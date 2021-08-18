@@ -1,17 +1,17 @@
 package LinkedList;
 
 import LinkedList.Util.LinkedList;
-import LinkedList.Util.Node;
+import LinkedList.Util.ListNode;
 
 public class ReverseList {
     public static void main(String[] args) {
-        Node head = new Node(1);
+        ListNode head = new ListNode(1);
         LinkedList list = new LinkedList(head);
-        list.add(new Node(2));
-        list.add(new Node(3));
-        list.add(new Node(4));
-        list.add(new Node(5));
-        list.add(new Node(6));
+        list.add(new ListNode(2));
+        list.add(new ListNode(3));
+        list.add(new ListNode(4));
+        list.add(new ListNode(5));
+        list.add(new ListNode(6));
         list.printList(head);
         head = reverseList(head);
         System.out.println("After complete reversal");
@@ -24,11 +24,11 @@ public class ReverseList {
     /**
      * Iterative solution to reverse linked list
      */
-    public static Node reverseList(Node head) {
+    public static ListNode reverseList(ListNode head) {
 
-        Node before = null;
-        Node curr = head;
-        Node next = head;
+        ListNode before = null;
+        ListNode curr = head;
+        ListNode next = head;
 
         while(curr != null) {
             next = curr.getNext();
@@ -50,10 +50,10 @@ public class ReverseList {
      * @param k
      * @return
      */
-    public static Node reverseLinkedList(Node head, int k) {
-        Node prev = null;
-        Node curr = head;
-        Node next = null;
+    public static ListNode reverseLinkedList(ListNode head, int k) {
+        ListNode prev = null;
+        ListNode curr = head;
+        ListNode next = null;
 
         int count = 0;
         while(curr != null && count < k) {

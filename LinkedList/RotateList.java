@@ -1,25 +1,25 @@
 package LinkedList;
 
 import LinkedList.Util.LinkedList;
-import LinkedList.Util.Node;
+import LinkedList.Util.ListNode;
 
 public class RotateList {
     public static void main(String[] args) {
-        Node head = new Node(1);
+        ListNode head = new ListNode(1);
         LinkedList list = new LinkedList(head);
-        list.add(new Node(2));
-        list.add(new Node(3));
-        list.add(new Node(4));
-        list.add(new Node(5));
-        list.add(new Node(6));
+        list.add(new ListNode(2));
+        list.add(new ListNode(3));
+        list.add(new ListNode(4));
+        list.add(new ListNode(5));
+        list.add(new ListNode(6));
         list.printList(head);
-        Node newHead = rotateList(head, 3);
+        ListNode newHead = rotateList(head, 3);
         System.out.println("After");
         list.printList(newHead);
     }
 
-    private static Node rotateList(Node head, int index) {
-        Node tail = head;
+    private static ListNode rotateList(ListNode head, int index) {
+        ListNode tail = head;
 
         if(tail == null || tail.getNext() == null) return tail;
         int len = 1;
@@ -29,8 +29,8 @@ public class RotateList {
         }
         index = index % len;
 
-        Node newHead = head;
-        Node pointer = head;
+        ListNode newHead = head;
+        ListNode pointer = head;
         for(int i=0; i<index && newHead != null; i++) {
             newHead = newHead.getNext();
         }

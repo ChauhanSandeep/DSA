@@ -2,17 +2,17 @@ package LinkedList;
 
 
 import LinkedList.Util.LinkedList;
-import LinkedList.Util.Node;
+import LinkedList.Util.ListNode;
 
 public class PalllindromeList {
 
     public static void main(String[] args) {
-        Node head = new Node(1);
+        ListNode head = new ListNode(1);
         LinkedList list = new LinkedList(head);
-        list.add(new Node(2));
-        list.add(new Node(3));
-        list.add(new Node(2));
-        list.add(new Node(1));
+        list.add(new ListNode(2));
+        list.add(new ListNode(3));
+        list.add(new ListNode(2));
+        list.add(new ListNode(1));
         System.out.println("Is linked list palindrome? " + isPalindrome(head));
 
     }
@@ -23,9 +23,9 @@ public class PalllindromeList {
      * @param head
      * @return
      */
-    public static boolean isPalindrome(Node head) {
-        Node slow = head;
-        Node fast = head;
+    public static boolean isPalindrome(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
 
         while(fast != null && fast.next != null) {
             slow = slow.next;
@@ -43,10 +43,10 @@ public class PalllindromeList {
 
     }
 
-    public static Node reverse(Node head) {
-        Node prev = null;
-        Node curr = head;
-        Node next = head;
+    public static ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        ListNode next = head;
 
         while(curr != null) {
             next = curr.next;
@@ -57,9 +57,9 @@ public class PalllindromeList {
         return prev;
     }
 
-    public static boolean compare(Node node1, Node node2) {
+    public static boolean compare(ListNode node1, ListNode node2) {
         while(node1 != null && node2 != null) {
-            if(node1.data != node2.data) return false;
+            if(node1.val != node2.val) return false;
             node1 = node1.next;
             node2 = node2.next;
         }

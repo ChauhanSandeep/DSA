@@ -2,39 +2,39 @@ package LinkedList.Util;
 
 public class LinkedList {
 
-    Node head;
-    Node tail;
-    public LinkedList(Node head) {
+    ListNode head;
+    ListNode tail;
+    public LinkedList(ListNode head) {
         this.head = head;
         this.tail = head;
     }
     public LinkedList(){}
 
-    public Node getHead() {
+    public ListNode getHead() {
         return head;
     }
 
-    public void setHead(Node head) {
+    public void setHead(ListNode head) {
         this.head = head;
     }
 
-    public Node getTail() {
+    public ListNode getTail() {
         return tail;
     }
 
-    public void setTail(Node tail) {
+    public void setTail(ListNode tail) {
         this.tail = tail;
     }
 
-    public void add(Node node) {
+    public void add(ListNode node) {
         tail.next = node;
         tail = tail.next;
     }
 
-    public void printList(Node head) {
-        Node temp = head;
+    public void printList(ListNode head) {
+        ListNode temp = head;
         while(temp != null) {
-            System.out.println(temp.getData());
+            System.out.println(temp.getVal());
             temp = temp.getNext();
         }
     }

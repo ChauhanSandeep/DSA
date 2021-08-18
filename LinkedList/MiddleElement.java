@@ -1,17 +1,17 @@
 package LinkedList;
 
 import LinkedList.Util.LinkedList;
-import LinkedList.Util.Node;
+import LinkedList.Util.ListNode;
 
 public class MiddleElement {
     public static void main(String[] args) {
-        Node head = new Node(1);
+        ListNode head = new ListNode(1);
         LinkedList list = new LinkedList(head);
-        list.add(new Node(2));
-        list.add(new Node(3));
-        list.add(new Node(4));
-        list.add(new Node(5));
-        list.add(new Node(6));
+        list.add(new ListNode(2));
+        list.add(new ListNode(3));
+        list.add(new ListNode(4));
+        list.add(new ListNode(5));
+        list.add(new ListNode(6));
 
         System.out.println(middleElement(head));
 
@@ -22,17 +22,17 @@ public class MiddleElement {
      * @param head
      * @return
      */
-    private static int middleElement(Node head) {
+    private static int middleElement(ListNode head) {
         if (head == null) return -1;
 
-        Node slow = head;
-        Node fast = head;
+        ListNode slow = head;
+        ListNode fast = head;
 
         while (fast.getNext() != null && fast.getNext().getNext() != null) {
             slow = slow.getNext();
             fast = fast.getNext().getNext();
         }
-        return slow.getData();
+        return slow.getVal();
 
     }
 }
