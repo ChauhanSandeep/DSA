@@ -1,5 +1,12 @@
 package DesignPatterns.creational.builder;
 
+/**
+ * Make constructor of Parent class private
+ * Add static Builder class with same instance variables as Parent class
+ * Make constructor with mandatory parameters
+ * add setters for remaining instance variables with return type as Builder
+ * add build method which creates Parent class object and return instance of it.
+ */
 public class BankAccount {
 
     private long accountNumber;
