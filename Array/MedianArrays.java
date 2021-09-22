@@ -3,44 +3,50 @@ package Array;
 public class MedianArrays {
 
     public static void main(String[] args) {
-//        int[] arr1 = {900};
-//        int[] arr2 = {5, 8, 10, 20};
-//        int median = getMedian(arr1, arr2, arr1.length, arr2.length);
-//        System.out.println(median);
-        String str = "abc";
-        System.out.println(str.substring(0, 1));
+        int[] arr1 = {1, 2};
+        int[] arr2 = {3, 4};
+        double median = getMedian(arr1, arr2);
+        System.out.println(median);
     }
 
-    static int getMedian(int arr1[], int arr2[], int len1, int len2) {
+    /**
+     * Get median using two pointer
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    static double getMedian(int[] nums1, int[] nums2) {
+        int len1 = nums1.length;
+        int len2 = nums2.length;
+        int count;
+        double curr = -1;
+        double prev = -1;
 
         int i = 0;
         int j = 0;
-        int count;
-        int m1 = -1, m2 = -1;
-
         if ((len2 + len1) % 2 == 1) {
-            for (count = 0;count <= (len1 + len2) / 2;count++) {
+            for (count = 0; count <= (len1 + len2) / 2; count++) {
                 if (i != len1 && j != len2) {
-                    m1 = (arr1[i] > arr2[j]) ?arr2[j++] : arr1[i++];
+                    curr = (nums1[i] > nums2[j]) ? nums2[j++] : nums1[i++];
                 } else if (i < len1) {
-                    m1 = arr1[i++];
+                    curr = nums1[i++];
                 } else {
-                    m1 = arr2[j++];
+                    curr = nums2[j++];
                 }
             }
-            return m1;
+            return curr;
         } else {
-            for (count = 0;count <= (len1 + len2) / 2;count++) {
-                m2 = m1;
+            for (count = 0; count <= (len1 + len2) / 2; count++) {
+                prev = curr;
                 if (i != len1 && j != len2) {
-                    m1 = (arr1[i] > arr2[j]) ?arr2[j++] : arr1[i++];
+                    curr = (nums1[i] > nums2[j]) ? nums2[j++] : nums1[i++];
                 } else if (i < len1) {
-                    m1 = arr1[i++];
+                    curr = nums1[i++];
                 } else {
-                    m1 = arr2[j++];
+                    curr = nums2[j++];
                 }
             }
-            return (m1 + m2) / 2;
+            return (curr + prev) / 2;
         }
     }
 }
