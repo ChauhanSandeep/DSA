@@ -35,7 +35,7 @@ public class SubsetSum {
         Boolean[][] dp = new Boolean[size+1] [sum+1];
         Arrays.fill(dp[0], false);
         for(int i=0; i<size+1; i++) {
-            dp[i][0] = true;
+            dp[i][0] = true; // This is not required as we are checking this inside findSubsetSumDp
         }
         findSubsetSumDp(arr, sum, size, dp);
         System.out.println(Arrays.deepToString(dp));
