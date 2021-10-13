@@ -8,6 +8,8 @@ import java.util.Queue;
  *
  * Return the minimum number of refueling stops the car must make in order to reach its destination.
  * If it cannot reach the destination, return -1.
+ *
+ * https://leetcode.com/problems/minimum-number-of-refueling-stops/discuss/294025/Java-Simple-Code-Greedy
  */
 public class MinRefuel {
     public static void main(String[] args) {
@@ -28,6 +30,8 @@ public class MinRefuel {
         int stops = 0;
         int maxReachable = startFuel;
 
+        // we should pick the station with maximum fuel (in reach).
+        // Distance does not matter because same amount of fuel will be exhausted in reaching that petrol station
         Queue<Integer> queue = new PriorityQueue<>((a, b) -> b - a);
         while (maxReachable < target) {
             while (i < len && stations[i][0] <= maxReachable) {
