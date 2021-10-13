@@ -2,7 +2,11 @@ package StackQueue;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
+/**
+ * https://leetcode.com/problems/lfu-cache/
+ */
 public class LfuCacheTest {
     public static void main(String[] args) {
         LFUCache cache = new LFUCache(2);
@@ -20,61 +24,62 @@ public class LfuCacheTest {
     }
 }
 
-// Need to understand this
-//https://leetcode.com/problems/lfu-cache/discuss/94521/JAVA-O(1)-very-easy-solution-using-3-HashMaps-and-LinkedHashSet
 class LFUCache {
-
-    private int min;
-
-    private final int capacity;
-    private final HashMap<Integer, Integer> keyToVal;
-    private final HashMap<Integer, Integer> keyToCount;
-    private final HashMap<Integer, LinkedHashSet<Integer>> countToLRUKeys;
+    public Map<Integer, Integer> keyValueMap;
+    public Map<Integer, Integer> keyFreqMap;
+    public Map<Integer, LinkedHashSet<Integer>> freqKeysMap;
+    int capacity;
+    int minFreq = -1;
 
     public LFUCache(int capacity) {
-        this.min = -1;
         this.capacity = capacity;
-        this.keyToVal = new HashMap<>();
-        this.keyToCount = new HashMap<>();
-        this.countToLRUKeys = new HashMap<>();
+        keyValueMap = new HashMap<>();
+        keyFreqMap = new HashMap<>();
+        freqKeysMap = new HashMap<>();
+        freqKeysMap.put(1, new LinkedHashSet<>());
     }
 
     public int get(int key) {
-        if (!keyToVal.containsKey(key)) return -1;
+        if(!keyValueMap.containsKey(key)) return -1;
 
-        int count = keyToCount.get(key);
-        countToLRUKeys.get(count).remove(key); // remove key from current count (since we will inc count)
-        if (count == min && countToLRUKeys.get(count).size() == 0) min++; // nothing in the current min bucket
+        int freq = keyFreqMap.get(key);
+        // update keyFreqMap
+        keyFreqMap.put(key, freq+1);
 
-        putCount(key, count + 1);
-        return keyToVal.get(key);
+        // update freqKeysMap
+        freqKeysMap.get(freq).remove(key);
+        if(!freqKeysMap.containsKey(freq+1)) {
+            freqKeysMap.put(freq+1, new LinkedHashSet<>());
+        }
+        freqKeysMap.get(freq+1).add(key);
+
+        // update min Freq
+        if(freq == minFreq && freqKeysMap.get(freq).size() == 0) {
+            minFreq++; // minFreq can never jump by more than 1, since updating an item only increments its count by 1
+        }
+        return keyValueMap.get(key);
     }
 
     public void put(int key, int value) {
-        if (capacity <= 0) return;
+        if(capacity <= 0)return;
 
-        if (keyToVal.containsKey(key)) {
-            keyToVal.put(key, value); // update key's value
-            get(key); // update key's count
-            return;
+        if(keyValueMap.containsKey(key)) {
+            // key already exists
+            keyValueMap.put(key, value);
+            get(key);
+        }else{
+            // adding key for first time
+            if(keyValueMap.size() >= capacity) {
+                int deleteKey = freqKeysMap.get(minFreq).iterator().next();
+                freqKeysMap.get(minFreq).remove(deleteKey);
+                keyValueMap.remove(deleteKey);
+                keyFreqMap.remove(deleteKey);
+            }
+
+            keyValueMap.put(key,value);
+            keyFreqMap.put(key,1);
+            freqKeysMap.get(1).add(key);
+            minFreq = 1;
         }
-
-        if (keyToVal.size() >= capacity)
-            evict(countToLRUKeys.get(min).iterator().next()); // evict LRU from this min count bucket
-
-        min = 1;
-        putCount(key, min); // adding new key and count
-        keyToVal.put(key, value); // adding new key and value
-    }
-
-    private void evict(int key) {
-        countToLRUKeys.get(min).remove(key);
-        keyToVal.remove(key);
-    }
-
-    private void putCount(int key, int count) {
-        keyToCount.put(key, count);
-        countToLRUKeys.computeIfAbsent(count, ignore -> new LinkedHashSet<>());
-        countToLRUKeys.get(count).add(key);
     }
 }
