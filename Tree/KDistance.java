@@ -10,60 +10,65 @@ public class KDistance {
 
     List<Integer> ans;
     TreeNode target;
-    int K;
+    int k;
 
     public static void main(String[] args) {
-        TreeNode root = new TreeNode(1);
-        root.left = new TreeNode(2);
-        root.right = new TreeNode(3);
-        root.left.left = new TreeNode(4);
-        root.left.right = new TreeNode(5);
-        root.right.left = new TreeNode(6);
-        new KDistance().distanceK(root, root.left, 1);
+        TreeNode root = new TreeNode(0);
+        root.right = new TreeNode(1);
+        root.right.right = new TreeNode(2);
+        root.right.right.right = new TreeNode(3);
+        new KDistance().distanceK(root, root.right, 2);
     }
 
 
 
     public List<Integer> distanceK(TreeNode root, TreeNode target, int K) {
-        ans = new LinkedList<>();
+        this.ans = new LinkedList<>();
         this.target = target;
-        this.K = K;
+        this.k = K;
         dfs(root);
         System.out.println(ans);
         return ans;
     }
 
-    // Return vertex distance from node to target if exists, else -1
-    // Vertex distance: the number of vertices on the path from node to target
     public int dfs(TreeNode node) {
-        if (node == null) return -1;
-        if (node == target) {
+        if(node == null) return -1;
+
+        if(node == target) {
             addSubtree(node, 0);
             return 1;
         }
         int left = dfs(node.left);
         int right = dfs(node.right);
-        if (left != -1) {
-            if (left == K) ans.add(node.val);
-            addSubtree(node.right, left + 1);
-            return left + 1;
+
+        if(left != -1) {
+            if(left == k) ans.add(node.val);
+
+            addSubtree(node.right, left+1);
+            return left+1;
         }
-        if (right != -1) {
-            if (right == K) ans.add(node.val);
-            addSubtree(node.left, right + 1);
-            return right + 1;
+        if(right != -1) {
+            if(right == k) ans.add(node.val);
+
+            addSubtree(node.left, right+1);
+            return right+1;
         }
+
         return -1;
     }
 
-    // Add all nodes 'K - dist' from the node to answer.
-    public void addSubtree(TreeNode node, int dist) {
-        if (node == null) return;
-        if (dist == K) {
-            ans.add(node.val);
-        } else {
-            addSubtree(node.left, dist + 1);
-            addSubtree(node.right, dist + 1);
+    public void addSubtree(TreeNode node, int distance) {
+        if(node == null || distance > k) {
+            return;
         }
+        if(distance == k) {
+            System.out.println("Adding " + node.val);
+            ans.add(node.val);
+            return;
+        }
+
+
+        addSubtree(node.left, distance + 1);
+        addSubtree(node.right, distance + 1);
     }
 }
