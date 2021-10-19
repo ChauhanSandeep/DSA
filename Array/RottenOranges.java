@@ -5,6 +5,10 @@ import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Given a grid containing oranges, each rotten orange rots its neighbor in one minute
+ * find in how many minutes all the oranges will be rotten.
+ */
 public class RottenOranges {
 
     public static void main(String[] args) {
