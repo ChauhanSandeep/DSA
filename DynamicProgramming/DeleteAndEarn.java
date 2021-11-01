@@ -8,24 +8,26 @@ package DynamicProgramming;
  */
 public class DeleteAndEarn {
     public static void main(String[] args) {
-        int[] arr = {3, 4, 2};
+        int[] arr = {10000};
         int result = new DeleteAndEarn().deleteAndEarn(arr);
         System.out.println(result);
     }
 
     public int deleteAndEarn(int[] nums) {
-        int[] numValue = new int[10001];
-        int[] dp = new int[10003];
 
+        int[] count = new int[10001];
         for(int num: nums) {
-            numValue[num] += num;
+            count[num]++;
         }
 
-        for(int i=10000; i>=0; i--) {
-            dp[i] = Math.max(dp[i+1],           // not take current element
-                    numValue[i] + dp[i+2]);     // take current element
+        int[] dp = new int[10001];
+        dp[0] = 0;
+        dp[1] = count[1];
+
+        for(int i=2; i<dp.length; i++) {
+            dp[i] = Math.max(i * count[i] + dp[i-2], dp[i-1]);
         }
-        return dp[0];
+        return dp[10000];
     }
 
 }
