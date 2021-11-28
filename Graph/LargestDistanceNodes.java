@@ -2,6 +2,7 @@ package Graph;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
  */
 public class LargestDistanceNodes {
     public static void main(String[] args) {
-        ArrayList<Integer> input = (ArrayList<Integer>) Stream.of(-1).collect(Collectors.toList());
+        ArrayList<Integer> input = (ArrayList<Integer>) Stream.of(-1, 0, 0, 0, 3).collect(Collectors.toList());
         System.out.println(new LargestDistanceNodes().solve(input));
     }
 
@@ -43,48 +44,48 @@ public class LargestDistanceNodes {
         }
         // Find the node which is farthest from root node using BFS
         int node = bfs(adj, root, size);
+        System.out.println("largest distance node is " + node);
         // Find the maximum distance from farthest node using modified DFS
         return dfs(adj, node, size);
     }
 
     public int bfs(ArrayList<ArrayList<Integer>> adj, int root, int size) {
         boolean[] visited = new boolean[size];
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(root);
-        while (!queue.isEmpty()) {
+        Queue<Integer> queue = new LinkedList<Integer>();
+        queue.offer(root);
+        visited[root] = true;
+        while(!queue.isEmpty()) {
             root = queue.poll();
-            if (!visited[root]) {
-                visited[root] = true;
-                for (Integer neighbor : adj.get(root)) {
-                    if (!visited[neighbor]) {
-                        queue.add(neighbor);
-                    }
+            for(Integer neighbor: adj.get(root)) {
+                if(!visited[neighbor]) {
+                    queue.offer(neighbor);
+                    visited[neighbor] = true;
                 }
+
             }
         }
         return root;
     }
 
-    public int dfs(ArrayList<ArrayList<Integer>> adj, int currNode, int size) {
+    public int dfs(ArrayList<ArrayList<Integer>> adj, int node, int size) {
         int max = 0;
-        Stack<Integer> nodeStack = new Stack<>();
         Stack<Integer> distStack = new Stack<>();
+        Stack<Integer> nodeStack = new Stack<>();
         boolean[] visited = new boolean[size];
 
-        nodeStack.push(currNode);
+        nodeStack.push(node);
         distStack.push(0);
+        visited[node] = true;
 
-        while (!nodeStack.isEmpty()) {
-            currNode = nodeStack.pop();
-            int d = distStack.pop();
-            if (!visited[currNode]) {
-                visited[currNode] = true;
-                for (Integer neighbor : adj.get(currNode)) {
-                    if (!visited[neighbor]) {
-                        max = Math.max(max, d + 1);
-                        nodeStack.push(neighbor);
-                        distStack.push(d + 1);
-                    }
+        while(!nodeStack.isEmpty()) {
+            int currNode = nodeStack.pop();
+            int currDist = distStack.pop();
+            max = Math.max(max, currDist);
+            for(Integer neighbor: adj.get(currNode)) {
+                if(!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    nodeStack.push(neighbor);
+                    distStack.push(currDist + 1);
                 }
             }
         }
