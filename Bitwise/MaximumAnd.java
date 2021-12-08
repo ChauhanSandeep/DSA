@@ -1,5 +1,8 @@
 package Bitwise;
 
+/**
+ * Find two numbers in array whose AND is maximum
+ */
 public class MaximumAnd {
     public static void main(String[] args) {
         int[] arr = {5, 8, 7, 2};
