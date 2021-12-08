@@ -1,7 +1,9 @@
 package Backtracking;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Subset {
     public static void main(String[] args) {
@@ -19,7 +21,8 @@ public class Subset {
         return resultList;
     }
 
-    private static void subsetsHelper(List<List<Integer>> resultList , List<Integer> list, int [] nums, int start){
+    private static void subsetsHelper(List<List<Integer>> resultList , ArrayList<Integer> list, int [] nums, int start){
+        list = (ArrayList<Integer>) new HashSet<>(list).stream().sorted((a, b) -> b - a).collect(Collectors.toList());
         resultList.add(new ArrayList<>(list));
 
         for(int i = start; i < nums.length; i++){
