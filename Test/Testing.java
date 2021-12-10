@@ -11,7 +11,9 @@ public class Testing {
     }
 
     public static void test() {
-        String data = Stream.of("null", "data").filter(e -> e != null).findFirst().orElse(null);
-        System.out.println(data);
+        int a = 2;
+        String str = "0.123456";
+        str = str.substring(0, a) + "(" + str.substring(a);
+        System.out.println(str);
     }
 }
