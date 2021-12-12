@@ -1,4 +1,4 @@
-package Graph;
+package Graph.SpanTree;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -28,6 +28,9 @@ public class CommutableIslands {
 
     /**
      * This works on Prim's algorithm
+     * Remove -> Mark* -> Work -> Add*
+     * remove from queue -> mark not visited -> print -> add not visited
+     *
      * @param vertices number of vertices in input 1 to `vertices`
      * @param input list of edges in graph format -> [vertex1, vertex2, weight]
      * @return min cost of spanning all vertices
