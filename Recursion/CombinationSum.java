@@ -12,7 +12,8 @@ public class CombinationSum {
     }
 
     /**
-     * Given an array find the subarray which gives the sum provided
+     * Given an array find the subarray which gives the sum provided.
+     * Same number can be used multiple times. Subarray need not continous
      * @param arr
      * @param sum
      * @return
