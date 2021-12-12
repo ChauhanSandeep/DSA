@@ -16,6 +16,32 @@ public class SmallestMultiple {
     }
 
     /**
+     * This is basic approach. Gives TLE for large inputs
+     **/
+    public String multipleBasic(int num) {
+        Queue<String> queue = new LinkedList<>();
+        queue.offer("1");
+
+        while(!queue.isEmpty()) {
+            String curr = queue.poll();
+            if(isValid(num, curr)) return curr;
+            queue.offer(curr+"0");
+            queue.offer(curr+"1");
+        }
+        return "";
+    }
+
+    public boolean isValid(int num, String str) {
+        int tentative = Integer.parseInt(str);
+        if(tentative < num || tentative%num != 0) return false;
+
+        for(int i=0; i<str.length(); i++) {
+            if(str.charAt(i) > '1')return false;
+        }
+        return true;
+    }
+
+    /**
      * This is most optimum approach
      * Add `0` and `1` to the current number and store remainder in queue
      * corresponding char to remainder is stored in `charArr`
