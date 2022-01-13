@@ -1,4 +1,4 @@
-package DynamicProgramming;
+package DynamicProgramming.MatrixChainMul;
 
 import java.util.Arrays;
 
