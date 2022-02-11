@@ -4,6 +4,7 @@ public class Chapter1 {
     public static void main(String[] args) {
         Runner1 runner = new Runner1();
         Thread thread1 = new Thread(runner);
+
         Thread thread2 = new Thread(new Runner2());
         Thread thread3 = new Thread(new Runnable() {
             @Override

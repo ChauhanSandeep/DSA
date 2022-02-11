@@ -30,7 +30,7 @@ public class LiveLockExample {
             System.out.println("worker1 acquired lock1");
             System.out.println("worker1 trying to get lock2");
             try {
-                if (lock2.tryLock(50, TimeUnit.MILLISECONDS)) {
+                if (lock2.tryLock(500, TimeUnit.MILLISECONDS)) {
                     System.out.println("worker1 acquired lock2");
                     System.out.println("worker1 work finished");
                     lock2.unlock();

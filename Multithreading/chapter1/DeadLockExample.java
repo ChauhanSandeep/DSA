@@ -13,8 +13,8 @@ public class DeadLockExample {
     Lock lock2 = new ReentrantLock();
 
     public void process() {
-        new Thread(this::worker1).start();
-        new Thread(this::worker2).start();
+        new Thread(() -> worker1()).start();
+        new Thread(() -> worker2()).start();
 
     }
 
