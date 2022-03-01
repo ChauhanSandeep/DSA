@@ -17,6 +17,10 @@ public class MergeElements {
 
     /**
      *  dp[i][j] = min(sum[i][j] + dp[i][k] + dp[k + 1][j]) (i <= k < j)
+     *  dp[i][k] gives min cost of merging elements from i to k
+     *  dp[k+1][j] gives min cost of merging elements from k+1 to j
+     *  sum[i][j] sum of elements from i to j. This is required as this
+     *  cost will be incurred again to merge two stones [i][k] and [k+1][j]
      */
     public int solve(int[] stones) {
         if (stones == null || stones.length == 0) {
