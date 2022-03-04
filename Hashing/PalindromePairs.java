@@ -11,6 +11,11 @@ import java.util.Map;
  */
 public class PalindromePairs {
 
+    public static void main(String[] args) {
+        String[] words = {"abcd","dcba","lls","s","sssll"};
+        System.out.println(new PalindromePairs().palindromePairs(words));
+    }
+
 
     /**
      * There are three scenarios in which palindrom pair can be found (word1 + word2)
