@@ -15,57 +15,47 @@ public class WordPattern2 {
         System.out.println("Word matches pattern ? " + new WordPattern2().wordPatternMatch(pattern, str));
     }
 
+    int pLen;
+    int sLen;
     public boolean wordPatternMatch(String pattern, String str) {
         Map<Character, String> map = new HashMap<>();
-        Set<String> set = new HashSet<>();
+        pLen = pattern.length();
+        sLen = str.length();
+        /**
+         * visited is used to avoid double mapping
+         * pattern = aba
+         * str = xyzxyzxyz
+         * this should return false because mapping
+         * [a -> xyz, b ->xyz] is not allowed
+         */
+        Set<String> visited = new HashSet<>();
+        return matches(pattern, 0, str, 0, map, visited);
 
-        return isMatch(str, 0, pattern, 0, map, set);
     }
 
-    boolean isMatch(String str, int i, String pattern, int j, Map<Character, String> map, Set<String> set) {
-        // base case
-        if (i == str.length() && j == pattern.length()) return true;
-        if (i == str.length() || j == pattern.length()) return false;
+    public boolean matches(String pattern, int pIndex, String str, int sIndex, Map<Character, String> map, Set<String> visited) {
+        if(pIndex == pLen && sIndex == sLen) return true;
+        if(pIndex >= pLen || sIndex >= sLen) return false;
 
-        // get current pattern character
-        char c = pattern.charAt(j);
+        char pchar = pattern.charAt(pIndex);
 
-        // if the pattern character exists
-        if (map.containsKey(c)) {
-            String s = map.get(c);
-
-            // then check if we can use it to match str[i...i+s.length()]
-            if (!str.startsWith(s, i)) {
-                return false;
+        if(map.containsKey(pchar)) {
+            if(str.substring(sIndex).startsWith(map.get(pchar))) {
+                return matches(pattern, pIndex + 1, str, sIndex + map.get(pchar).length(), map, visited);
             }
-
-            // if it can match, great, continue to match the rest
-            return isMatch(str, i + s.length(), pattern, j + 1, map, set);
+            return false;
         }
 
-        // pattern character does not exist in the map
-        for (int k = i; k < str.length(); k++) {
-            String p = str.substring(i, k + 1);
-
-            if (set.contains(p)) {
-                continue;
-            }
-
-            // create or update it
-            map.put(c, p);
-            set.add(p);
-
-            // continue to match the rest
-            if (isMatch(str, k + 1, pattern, j + 1, map, set)) {
-                return true;
-            }
-
-            // backtracking
-            map.remove(c);
-            set.remove(p);
+        for(int i=sIndex+1; i<=sLen; i++) {
+            String tentative = str.substring(sIndex, i);
+            if(visited.contains(tentative)) continue;
+            visited.add(tentative);
+            map.put(pchar, tentative);
+            if(matches(pattern, pIndex+1, str, i, map, visited)) return true;
+            // backtrack
+            map.remove(pchar);
+            visited.remove(tentative);
         }
-
-        // we've tried our best but still no luck
         return false;
     }
 }
