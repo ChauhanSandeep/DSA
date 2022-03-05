@@ -15,8 +15,12 @@ import java.util.Queue;
 public class CheapestFlighWithStops {
 
     public static void main(String[] args) {
-        int[][] flights = {{0, 3, 3}, {3, 4, 3}, {4, 1, 3}, {0, 5, 1}, {5, 1, 100}, {0, 6, 2}, {6, 1, 100}, {0, 7, 1}, {7, 8, 1}, {8, 9, 1}, {9, 1, 1}, {1, 10, 1}, {10, 2, 1}, {1, 2, 100}};
-        System.out.println(new CheapestFlighWithStops().findCheapestPriceDijkstra(11, flights, 0, 2, 4));
+        int[][] flights = {
+                {0,1,100},
+                {1,2,100},
+                {0,2,500}
+        };
+        System.out.println(new CheapestFlighWithStops().findCheapestPriceDijkstra(3, flights, 0, 2, 1));
     }
 
     public int findCheapestPriceBfs(int len, int[][] flights, int src, int dst, int k) {
@@ -101,7 +105,7 @@ public class CheapestFlighWithStops {
                 for (int[] neighbor : map.get(vertex)) {
                     int nVertex = neighbor[0];
                     int jumpCost = neighbor[1];
-                    queue.add(new Node(costSoFar + jumpCost, nVertex, allowedStops - 1));
+                    queue.add(new Node(nVertex,costSoFar + jumpCost, allowedStops - 1));
                 }
             }
         }
