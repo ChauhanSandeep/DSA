@@ -55,7 +55,7 @@ public class MinCostPath {
 
             if (!visited[curr.vertex]) {
                 visited[curr.vertex] = true;
-                System.out.println(String.format("[to: %s via: %s with weight: %s]", curr.vertex, curr.pathSoFar, curr.weightSoFar));
+                System.out.printf("[to: %s via: %s with weight: %s]%n", curr.vertex, curr.pathSoFar, curr.weightSoFar);
 
                 for (Edge edge : graph[curr.vertex]) {
                     if (!visited[edge.neighbor]) {
