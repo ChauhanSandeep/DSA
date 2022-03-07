@@ -16,29 +16,24 @@ public class PartitionLabels {
     }
 
     public List<Integer> partitionLabels(String str) {
-        int[] position = new int[26];
+        int[] lastPosArr = new int[26];
 
         for (int i = 0; i < str.length(); i++) {
-            position[str.charAt(i) - 'a'] = i;
+            lastPosArr[str.charAt(i) - 'a'] = i;
         }
 
         char[] charArr = str.toCharArray();
-        List<Integer> list = new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
         int start = 0;
-        int max = 0;
+        int lastPos = -1;
 
         for (int curr = 0; curr < charArr.length; curr++) {
-            if (curr == start) {
-                max = position[charArr[curr]];
-            }
-            if (max == curr) {
-                list.add(curr - start + 1);
+            lastPos = Math.max(lastPos, lastPosArr[charArr[curr] - 'a']);
+            if (lastPos == curr) {
+                result.add(curr - start + 1);
                 start = curr + 1;
-            } else {
-
-                max = Math.max(max, position[charArr[curr]]);
             }
         }
-        return list;
+        return result;
     }
 }
