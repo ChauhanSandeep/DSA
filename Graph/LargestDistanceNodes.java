@@ -69,23 +69,20 @@ public class LargestDistanceNodes {
 
     public int dfs(ArrayList<ArrayList<Integer>> adj, int node, int size) {
         int max = 0;
-        Stack<Integer> distStack = new Stack<>();
-        Stack<Integer> nodeStack = new Stack<>();
+        Stack<int[]> stack = new Stack<>();
         boolean[] visited = new boolean[size];
+        stack.push(new int[] {node, 0});
 
-        nodeStack.push(node);
-        distStack.push(0);
-        visited[node] = true;
-
-        while(!nodeStack.isEmpty()) {
-            int currNode = nodeStack.pop();
-            int currDist = distStack.pop();
+        while(!stack.isEmpty()) {
+            int[] curr = stack.pop();
+            int currNode = curr[0];
+            int currDist = curr[1];
+            if(visited[currNode]) continue;
+            visited[currNode] = true;
             max = Math.max(max, currDist);
             for(Integer neighbor: adj.get(currNode)) {
                 if(!visited[neighbor]) {
-                    visited[neighbor] = true;
-                    nodeStack.push(neighbor);
-                    distStack.push(currDist + 1);
+                    stack.push(new int[] {neighbor, currDist+1});
                 }
             }
         }
