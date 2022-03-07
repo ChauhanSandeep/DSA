@@ -33,14 +33,13 @@ public class MinBuses {
         Map<Integer, List<Integer>> map = new HashMap<>(); // <stop, List<route index>>
         for (int i = 0; i < routes.length; i++) {
             for (int j = 0; j < routes[i].length; j++) {
-                List<Integer> currRoute = map.getOrDefault(routes[i][j], new ArrayList<>());
-                currRoute.add(i);
-                map.put(routes[i][j], currRoute);
+                map.putIfAbsent(routes[i][j], new ArrayList<>());
+                map.get(routes[i][j]).add(i);
             }
         }
 
-        Set<Integer> visited = new HashSet<>();
-        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();     // visited routes
+        Queue<Integer> queue = new LinkedList<>();  // queue of stops
         int result = 0;
 
         queue.offer(source);
@@ -51,6 +50,7 @@ public class MinBuses {
             for (int i = 0; i < len; i++) {
                 int currStop = queue.poll();
                 List<Integer> currRoutes = map.get(currStop);
+
                 for (Integer currRoute : currRoutes) {
                     if (visited.contains(currRoute)) continue;
                     visited.add(currRoute);
@@ -59,6 +59,7 @@ public class MinBuses {
                         queue.offer(routes[currRoute][j]);
                     }
                 }
+
             }
         }
         return -1;
