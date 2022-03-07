@@ -32,29 +32,29 @@ public class MaxEvents {
         });
 
         // Queue returns event ending first
-        PriorityQueue<Integer> endQueue = new PriorityQueue<>();
+        PriorityQueue<Integer> attendableEvents = new PriorityQueue<>();
 
         int index = 0;
         int result = 0;
         int len = events.length;
         int today = events[0][0];
 
-        while(!endQueue.isEmpty() || index<len) {
-            while(!endQueue.isEmpty() && endQueue.peek() < today){
+        while(!attendableEvents.isEmpty() || index<len) {
+            while(!attendableEvents.isEmpty() && attendableEvents.peek() < today){
                 // events ended before today. cannot attend
-                endQueue.poll();
+                attendableEvents.poll();
             }
 
             while(index < len && events[index][0] == today) {
                 // events starting today
-                endQueue.offer(events[index][1]);
+                attendableEvents.offer(events[index][1]);
                 index++;
             }
 
-            if(!endQueue.isEmpty()) {
+            if(!attendableEvents.isEmpty()) {
                 // attend event
                 result++;
-                endQueue.poll();
+                attendableEvents.poll();
             }
             today++;
         }
