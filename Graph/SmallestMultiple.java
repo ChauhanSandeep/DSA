@@ -24,21 +24,20 @@ public class SmallestMultiple {
 
         while(!queue.isEmpty()) {
             String curr = queue.poll();
-            if(isValid(num, curr)) return curr;
+            if(isDivisible(curr, num)) return curr;
             queue.offer(curr+"0");
             queue.offer(curr+"1");
         }
         return "";
     }
 
-    public boolean isValid(int num, String str) {
-        int tentative = Integer.parseInt(str);
-        if(tentative < num || tentative%num != 0) return false;
-
-        for(int i=0; i<str.length(); i++) {
-            if(str.charAt(i) > '1')return false;
+    public boolean isDivisible(String numerator, int denominator) {
+        int remainder = 0;
+        for(int i=0; i<numerator.length(); i++) {
+            remainder = remainder * 10 + (numerator.charAt(i) - '0');
+            remainder = remainder % denominator;
         }
-        return true;
+        return remainder == 0;
     }
 
     /**
