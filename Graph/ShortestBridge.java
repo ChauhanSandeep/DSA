@@ -26,6 +26,12 @@ public class ShortestBridge {
         System.out.println(result);
     }
 
+    /**
+     * First do DFS on one of the island and put all nodes of that island in queue.
+     * Do BFS from first island(nodes in queue) to find the other island
+     * @param grid the island
+     * @return shortest distance between two islands
+     */
     public int shortestBridge(int[][] grid) {
         Queue<Pair> queue = new LinkedList<>();
         Set<Pair> visited = new HashSet<>();
