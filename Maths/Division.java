@@ -31,7 +31,7 @@ public class Division {
 
         // fractional part
         result.append(".");
-        HashMap<Long, Integer> map = new HashMap<>();// <quotient,index>
+        HashMap<Long, Integer> map = new HashMap<>();// <numerator,index>
         map.put(num, result.length());
         while (num != 0) {
             num *= 10;
