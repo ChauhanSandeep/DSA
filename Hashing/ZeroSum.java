@@ -34,7 +34,7 @@ public class ZeroSum {
                 if(maxLen < i - map.get(sum)) {
                     start = map.get(sum) + 1;
                     end = i;
-                    maxLen = i - map.get(sum);
+                    maxLen = end - start + 1;
                 }
             }else{
                 map.put(sum, i);
