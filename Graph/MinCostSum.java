@@ -59,7 +59,7 @@ public class MinCostSum {
                     cost++;
                 }
 
-                //check boundary condition and cost
+                //check boundary condition and cost. (Imp: cost check takes care of visited array)
                 if ((newX >= 0 && newY >= 0 && newX < rows && newY < cols) && cost < dist[newX][newY]) {
                     queue.offer(new Point(newX, newY, cost));
                     dist[newX][newY] = cost;
