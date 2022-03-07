@@ -10,8 +10,8 @@ public class KthLargest {
         int[] arr = {3,2,3,1,2,4,5,5,6};
 
 
-//        System.out.println(Arrays.toString(kthLargestInStream(k, arr)));
-        System.out.println(findKthLargest(arr, k));
+        System.out.println(Arrays.toString(kthLargestInStream(k, arr)));
+//        System.out.println(findKthLargest(arr, k));
     }
 
     public static int findKthLargest(int[] nums, int k) {
@@ -71,7 +71,7 @@ public class KthLargest {
     }
 
     /**
-     * In a stream find the kth largest element for when each element of stream arrives
+     * In a stream find the kth the largest element for when each element of stream arrives
      */
     public static int[] kthLargestInStream(int k, int[] arr) {
         PriorityQueue<Integer> minHeap = new PriorityQueue<>();
@@ -82,13 +82,11 @@ public class KthLargest {
 
         for (int i = 0; i < arr.length; i++) {
             minHeap.offer(arr[i]);
-            if (minHeap.size() >= k) {
-                while (minHeap.size() > k) {
-                    minHeap.poll();
-                }
-                if (minHeap.size() == k) {
-                    result[i] = minHeap.peek();
-                }
+            while (minHeap.size() > k) {
+                minHeap.poll();
+            }
+            if (minHeap.size() == k) {
+                result[i] = minHeap.peek();
             }
         }
         return result;
