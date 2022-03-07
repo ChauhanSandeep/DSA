@@ -35,21 +35,20 @@ public class KnightInChessBoard {
         Queue<Coordinate> queue = new LinkedList<>();
         queue.offer(new Coordinate(x1, y1));
         boolean[][] visited = new boolean[rows+1][cols+1];
-        visited[x1][y1] = true;
         int steps = 0;
 
         while(!queue.isEmpty()) {
             int size = queue.size();
-
             for(int i=0; i<size; i++) {
                 Coordinate curr = queue.poll();
+                if(visited[curr.x][curr.y]) continue;
+                visited[curr.x][curr.y] = true;
                 if(curr.x == x2 && curr.y == y2) return steps;
 
                 for(int dir=0; dir<dx.length; dir++) {
                     int nextX = curr.x + dx[dir];
                     int nextY = curr.y + dy[dir];
                     if(isValid(nextX, nextY, visited)) {
-                        visited[nextX][nextY] = true;
                         queue.offer(new Coordinate(nextX, nextY));
                     }
                 }
