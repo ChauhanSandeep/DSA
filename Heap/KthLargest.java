@@ -15,34 +15,29 @@ public class KthLargest {
     }
 
     public static int findKthLargest(int[] nums, int k) {
-
         k = nums.length - k;
-        int lo = 0;
-        int hi = nums.length - 1;
-        while (lo < hi) {
-            final int j = partition(nums, lo, hi);
-            if(j < k) {
-                lo = j + 1;
-            } else if (j > k) {
-                hi = j - 1;
-            } else {
-                break;
-            }
+        int left = 0;
+        int right = nums.length - 1;
+        while (left < right) {
+            final int pivotIndex = partition(nums, left, right);
+            if(pivotIndex == k) break;
+            else if(pivotIndex < k) left = pivotIndex + 1;
+            else right = pivotIndex - 1;
         }
         return nums[k];
     }
 
-    public static int partition(int[] nums, int lo, int hi) {
-        int pivot = nums[hi];
-        int i = lo;
-        for (int j = lo; j < hi; j++) {
-            if (nums[j] <= pivot) {
-                swap(nums, i, j);
-                i++;
+    public static int partition(int[] nums, int left, int right) {
+        int pivotElement = nums[right];
+        int pointer = left;
+        for (int i = left; i < right; i++) {
+            if (nums[i] <= pivotElement) {
+                swap(nums, pointer, i);
+                pointer++;
             }
         }
-        swap(nums, i, hi);
-        return i;
+        swap(nums, pointer, right);
+        return pointer;
     }
 
     public static void swap(int[] nums, int i, int j) {
