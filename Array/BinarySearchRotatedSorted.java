@@ -33,26 +33,4 @@ public class BinarySearchRotatedSorted {
         }
         return -1;
     }
-
-    public StringBuilder countSay(StringBuilder currBuilder, int curr, int target) {
-        // System.out.println(str + "    " + curr + "    " + target);
-        if(curr == target) return new StringBuilder(currBuilder);
-
-        StringBuilder nextBuilder = new StringBuilder();
-        int count = 1;
-        char c = currBuilder.charAt(0);
-        for(int i = 1; i<currBuilder.length(); i++) {
-            if(i == 0 || currBuilder.charAt(i-1) == currBuilder.charAt(i)) {
-                count++;
-            }else{
-                nextBuilder.append(String.valueOf(count));
-                nextBuilder.append(c);
-                count = 1;
-                c = currBuilder.charAt(i);
-            }
-        }
-        nextBuilder.append(String.valueOf(count));
-        nextBuilder.append(c);
-        return countSay(nextBuilder, curr+1, target);
-    }
 }
