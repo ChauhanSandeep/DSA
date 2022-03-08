@@ -6,7 +6,7 @@ public class Merge2Arrays {
     public static void main(String[] args) {
         long[] arr1 = {1, 3, 5, 7};
         long[] arr2 = {0, 2, 6, 8, 9};
-        mergeWithoutExtraSpace(arr1, arr2, 4, 5);
+        mergeWithoutExtraSpace(arr1, arr2);
 
         int[] arr3 = {1, 3, 5, 7};
         int[] arr4 = {0, 2, 6, 8, 9};
@@ -20,41 +20,32 @@ public class Merge2Arrays {
         int k = 0;
         while(i < arr1.length && j < arr2.length) {
             if(arr1[i] < arr2[j]) {
-                result[k] = arr1[i];
-                i++;
+                result[k++] = arr1[i++];
             }else{
-                result[k] = arr2[j];
-                j++;
+                result[k++] = arr2[j++];
             }
-            k++;
         }
-        System.arraycopy(arr1, i, result, k, arr1.length - i);
-        System.arraycopy(arr2, j, result, k, arr2.length - j);
-//
-//        while(i < arr1.length) {
-//            result[k] = arr1[i];
-//            i++;
-//            k++;
-//        }
-//
-//        while(j < arr2.length) {
-//            result[k] = arr2[j];
-//            j++;
-//            k++;
-//        }
+
+        while(i < arr1.length) {
+            result[k++] = arr1[i++];
+        }
+
+        while(j < arr2.length) {
+            result[k++] = arr2[j++];
+        }
         return result;
     }
 
     /**
      * Sort the two sorted arrays without using extra space
      */
-    public static void mergeWithoutExtraSpace(long[] arr1, long[] arr2, int n, int m) {
+    public static void mergeWithoutExtraSpace(long[] arr1, long[] arr2) {
         for(int i=0; i<arr1.length; i++) {
             if(arr1[i] > arr2[0]) {
                 long temp = arr1[i];
                 arr1[i] = arr2[0];
                 arr2[0] = temp;
-                placeFirstElement(arr2);
+                rearrangeFirstElement(arr2);
             }
         }
 
@@ -63,7 +54,7 @@ public class Merge2Arrays {
     }
 
     // place first element of arr in correct position
-    private static void placeFirstElement(long[] arr) {
+    private static void rearrangeFirstElement(long[] arr) {
         for(int i=0; i<arr.length-1; i++) {
             if(arr[i] > arr[i+1]) {
                 long temp = arr[i];
