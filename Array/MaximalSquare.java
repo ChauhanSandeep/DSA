@@ -2,6 +2,8 @@ package Array;
 
 /**
  * Find maximum dimension square of 1s
+ *
+ * https://leetcode.com/problems/maximal-square/
  */
 public class MaximalSquare {
     public static void main(String[] args) {

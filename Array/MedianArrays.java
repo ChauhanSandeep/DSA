@@ -1,5 +1,10 @@
 package Array;
 
+/**
+ * Find median of two sorted arrays
+ *
+ * https://leetcode.com/problems/median-of-two-sorted-arrays/
+ */
 public class MedianArrays {
 
     public static void main(String[] args) {

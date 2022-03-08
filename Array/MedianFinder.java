@@ -3,7 +3,9 @@ package Array;
 import java.util.PriorityQueue;
 
 /**
- * Find median in stream of integer incoming data
+ * Find median in stream of integer incoming data stream
+ *
+ * https://leetcode.com/problems/find-median-from-data-stream/
  */
 public class MedianFinder {
 
@@ -20,14 +22,21 @@ public class MedianFinder {
     PriorityQueue<Integer> maxHeap;
 
     public MedianFinder() {
+        // minHeap stores higher side of the element
         minHeap = new PriorityQueue<>();
+
+        // maxHeap contains lower side of the element.
+        // maxHeap is allowed to have one extra element in case size(minHeap) != size(maxHeap)
         maxHeap = new PriorityQueue<>((a, b) -> b - a);
     }
 
     public void addNum(int num) {
-        maxHeap.offer(num);
-        minHeap.offer(maxHeap.poll());
-        if (minHeap.size() > maxHeap.size()) maxHeap.offer(minHeap.poll());
+        maxHeap.offer(num);             // re-balance maxHeap
+        minHeap.offer(maxHeap.poll());  // re-balance minHeap
+        if (minHeap.size() > maxHeap.size()) {
+            // if size mismatch then add extra to maxHeap
+            maxHeap.offer(minHeap.poll());
+        }
     }
 
     public double findMedian() {
