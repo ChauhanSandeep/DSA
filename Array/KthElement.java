@@ -9,30 +9,25 @@ public class KthElement {
     }
 
     /*Find kth element in 2 sorted lists*/
-    public static long kthElement( int arr1[], int arr2[], int k) {
-        int i =0;
-        int j=0;
+    public static long kthElement(int arr1[], int arr2[], int k) {
+        int i = 0;
+        int j = 0;
         int count = 1;
-        while(count < k && i<arr1.length && j < arr2.length) {
-            if(arr1[i] < arr2[j]) {
+        while (count < k && (i < arr1.length || j < arr2.length)) {
+            if (i < arr1.length && j < arr2.length) {
+                if (arr1[i] < arr2[j]) i++;
+                else j++;
+            } else if (i < arr1.length) {
                 i++;
-            }else{
+            } else if (j < arr2.length) {
                 j++;
             }
             count++;
         }
-        while(count < k && i<arr1.length) {
-            i++;
-            count++;
-        }
-        while(count < k && j<arr2.length) {
-            j++;
-            count++;
-        }
-         System.out.println(i + "   " + j);
-        if(i<arr1.length && j<arr2.length) return Math.min(arr1[i], arr2[j]);
-        if(i<arr1.length) return arr1[i];
-        if(j<arr2.length) return arr2[j];
+        System.out.println(i + "   " + j);
+        if (i < arr1.length && j < arr2.length) return Math.min(arr1[i], arr2[j]);
+        if (i < arr1.length) return arr1[i];
+        if (j < arr2.length) return arr2[j];
 
         return -1;
 
