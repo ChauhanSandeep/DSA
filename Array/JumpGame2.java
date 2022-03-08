@@ -22,11 +22,12 @@ public class JumpGame2 {
         arr[nums.length-1] = 0;
         for(int index= nums.length - 2; index>=0; index--) {
             int maxJump = nums[index];
-            for(int jump=0; jump<=maxJump; jump++){
-                if(index + jump >= nums.length) {
-                    arr[index] = 1;
-                }else if (arr[index + jump] + 1 < arr[index]) {
-                    arr[index] = arr[index + jump] + 1;
+            if(index + maxJump >= nums.length) arr[index] = 1;
+            else{
+                for(int jump=0; jump<=maxJump; jump++){
+                    if (arr[index + jump] + 1 < arr[index]) {
+                        arr[index] = arr[index + jump] + 1;
+                    }
                 }
             }
         }
