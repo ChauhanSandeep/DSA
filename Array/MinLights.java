@@ -1,37 +1,50 @@
 package Array;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
- * Min lights required to activate to light complete corridor
+ * Given a list of integer signifying light bulbs and range.
+ * Bulbs marked 1 are functional and bulbs marked 0 are non-functional
+ * Find the min number of functional bulbs which can be used to light complete corridor.
+ *
  * https://www.interviewbit.com/problems/minimum-lights-to-activate/
  */
 public class MinLights {
     public static void main(String[] args) {
-        int[] lights = {0, 0, 1, 1, 1, 0, 0, 1};
+        ArrayList<Integer> lights = (ArrayList<Integer>) Stream.of(0, 0, 0, 1, 0).collect(Collectors.toList());
         int solve = new MinLights().solve(lights, 3);
         System.out.println(solve);
     }
 
-    public int solve(int[] lights, int range) {
-        int size = lights.length;
-        int count = 0;
+    /**
+     *
+     * @param list list of bulbs (0-> faulty, 1 -> working)
+     * @param range range of each bulb
+     * @return min bulbs required to light complete corridor
+     */
+    public int solve(ArrayList<Integer> list, int range) {
         int max = 0;
-        while (max < size) {
-            boolean found = false;
-            int left = Math.max(0, max - range + 1);
-            int right = Math.min(size - 1, max + range - 1);
+        int min = 0;
+        int target = list.size() - 1;
+        int count = 0;
 
-            for (int j = right; j >= left; j--) {
-                if (lights[j] == 1) {
-                    max = j + range;
-                    found = true;
-                    count++;
-                    break;
+        while (max < target) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) == 1) {
+                    int upperRange = i + range - 1;
+                    int lowerRange = i - range + 1;
+                    if (lowerRange <= min && upperRange > max) {
+                        max = upperRange;
+                    }
                 }
             }
-            if (!found) return -1;
+            if (min == max) return -1;
+            count++;
+            min = max;
         }
         return count;
-
     }
 
 
