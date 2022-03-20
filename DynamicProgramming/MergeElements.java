@@ -23,36 +23,36 @@ public class MergeElements {
      *  cost will be incurred again to merge two stones [i][k] and [k+1][j]
      */
     public int solve(int[] stones) {
-        if (stones == null || stones.length == 0) {
-            return 0;
-        }
+        if(stones == null || stones.length == 0) return 0;
         int len = stones.length;
-        int max = Integer.MAX_VALUE;
 
-        int[][] dp = new int[len + 1][len + 1];
-        int[] prefixSum = new int[len + 1];
-        int i, j, k, currLen;
+        int[] prefixSum = new int[len+1];
+        int[][] dp = new int[len+1][len+1];
 
-        for (i = 1; i <= len; i++) {
-            prefixSum[i] = prefixSum[i - 1] + stones[i - 1];
+        for(int i=1; i<len+1; i++) {
+            prefixSum[i] = stones[i-1] + prefixSum[i-1];
         }
-
-        for (i = 1; i <= len; i++) {
+        for(int i=0; i<len+1; i++) {
             dp[i][i] = 0;
         }
 
-        for (currLen = 2; currLen <= len; currLen++) {
-            for (i = 1; i <= len - currLen + 1; i++) {
-                j = i + currLen - 1;
-                System.out.println("i: " + i + " j:"+j);
-                dp[i][j] = max;
-                int sum = prefixSum[j] - prefixSum[i - 1];
-                for (k = i; k < j; k++) {
-                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k + 1][j] + sum);
+        for(int currLen = 2; currLen<=len; currLen++) {
+            for(int i=1; i<len+1; i++) {
+                int j = i+currLen-1;
+                if(j>=len+1) continue;
+                dp[i][j] = Integer.MAX_VALUE;
+                int sum = prefixSum[j] - prefixSum[i-1];
+                for(int k=i; k<j; k++) {
+                    /* Example
+                    dp[2][4] = min(
+                        dp[2][2] + dp[3][4] + sum,
+                        dp[2][3] + dp[4][4] + sum
+                    )
+                     */
+                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k+1][j] + sum);
                 }
             }
         }
-
         return dp[1][len];
     }
 }
