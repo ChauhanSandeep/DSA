@@ -7,49 +7,43 @@ import java.util.TreeMap;
 
 public class DiagonalTraversal {
     public static void main(String[] args) {
-        Node root = new Node(8);
-        root.left = new Node(3);
-        root.right = new Node(10);
-        root.left.left = new Node(1);
-        root.left.right = new Node(6);
-        root.right.right = new Node(14);
-        root.right.right.left = new Node(13);
-        root.left.right.left = new Node(4);
-        root.left.right.right = new Node(7);
+        TreeNode root = new TreeNode(8);
+        root.left = new TreeNode(3);
+        root.right = new TreeNode(10);
+        root.left.left = new TreeNode(1);
+        root.left.right = new TreeNode(6);
+        root.right.right = new TreeNode(14);
+        root.right.right.left = new TreeNode(13);
+        root.left.right.left = new TreeNode(4);
+        root.left.right.right = new TreeNode(7);
+        ArrayList<Integer> solve = new DiagonalTraversal().solve(root);
+        System.out.println(solve);
 
-        List<List<Integer>> result = diagonalTraversal(root);
-        System.out.println(result);
     }
 
     /**
      * Traverse binary tree in diagonal manner
-     * https://www.geeksforgeeks.org/diagonal-traversal-of-binary-tree/
+     * https://www.interviewbit.com/problems/diagonal-traversal/
      */
-    public static List<List<Integer>> diagonalTraversal(Node root) {
-        Map<Integer, List<Integer>> map = new TreeMap<>();
+    public ArrayList<Integer> solve(TreeNode root) {
+        if(root == null) return null;
+        List<List<Integer>> indexList = new ArrayList<>();
 
-        diagonalTraversalRec(root, map, 0);
-        List<List<Integer>> result = new ArrayList<>();
-        for(Map.Entry<Integer, List<Integer>> entry: map.entrySet()) {
-            result.add(entry.getValue());
+        traverse(root, 0, indexList);
+        ArrayList<Integer> result = new ArrayList<>();
+        for(List<Integer> list: indexList) {
+            result.addAll(list);
         }
         return result;
     }
 
-    public static void diagonalTraversalRec(Node node, Map<Integer, List<Integer>> map, int row) {
-        if(node == null) {
-            return;
+    private void traverse(TreeNode node, int index, List<List<Integer>> indexList) {
+        if(node == null) return;
+        traverse(node.left, index+1, indexList);
+        while(indexList.size() <= index) {
+            indexList.add(new ArrayList<>());
         }
-        diagonalTraversalRec(node.left, map, row+1);
-        if(map.get(row) == null) {
-            List<Integer> list = new ArrayList<>();
-            list.add(node.data);
-            map.put(row, list);
-        }else{
-            List<Integer> list = map.get(row);
-            list.add(node.data);
-            map.put(row, list);
-        }
-        diagonalTraversalRec(node.right, map, row);
+        indexList.get(index).add(node.val);
+        traverse(node.right, index, indexList);
     }
 }
