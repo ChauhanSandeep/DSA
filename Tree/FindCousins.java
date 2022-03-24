@@ -23,11 +23,12 @@ public class FindCousins {
     }
 
     Map<Integer, ArrayList<Integer>> map;
-    int resultLevel = -1;
+    int resultLevel;
     public ArrayList<Integer> solve(TreeNode root, int target) {
         if(root == null || root.val == target) return new ArrayList<>();
 
         map = new HashMap<>();
+        this.resultLevel = -1;
         traverse(root, target, 0);
         return map.get(resultLevel);
     }
