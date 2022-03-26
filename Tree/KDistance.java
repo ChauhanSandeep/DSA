@@ -1,74 +1,63 @@
 package Tree;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Find all the nodes at distance K from target Node in binary tree
  */
 public class KDistance {
 
-    List<Integer> ans;
-    TreeNode target;
-    int k;
-
     public static void main(String[] args) {
         TreeNode root = new TreeNode(0);
         root.right = new TreeNode(1);
         root.right.right = new TreeNode(2);
         root.right.right.right = new TreeNode(3);
-        new KDistance().distanceK(root, root.right, 2);
+        new KDistance().distanceK(root, 1, 2);
     }
 
+    ArrayList<Integer> result;
 
-
-    public List<Integer> distanceK(TreeNode root, TreeNode target, int K) {
-        this.ans = new LinkedList<>();
-        this.target = target;
-        this.k = K;
-        dfs(root);
-        System.out.println(ans);
-        return ans;
+    public ArrayList<Integer> distanceK(TreeNode root, int target, int distance) {
+        this.result = new ArrayList<>();
+        findNodes(root, target, distance);
+        return result;
     }
 
-    public int dfs(TreeNode node) {
-        if(node == null) return -1;
-
-        if(node == target) {
-            addSubtree(node, 0);
+    private int findNodes(TreeNode node, int target, int distance) {
+        if (node == null) return -1;
+        if (node.val == target) {
+            markChild(node.left, distance, 1);
+            markChild(node.right, distance, 1);
             return 1;
         }
-        int left = dfs(node.left);
-        int right = dfs(node.right);
-
-        if(left != -1) {
-            if(left == k) ans.add(node.val);
-
-            addSubtree(node.right, left+1);
-            return left+1;
-        }
-        if(right != -1) {
-            if(right == k) ans.add(node.val);
-
-            addSubtree(node.left, right+1);
-            return right+1;
+        int left = findNodes(node.left, target, distance);
+        if (left > 0 && left <= distance) {
+            if (left == distance) {
+                result.add(node.val);
+                return left + 1;
+            }
+            markChild(node.right, distance, left + 1);
+            return left + 1;
         }
 
+
+        int right = findNodes(node.right, target, distance);
+        if (right > 0 && right <= distance) {
+            if (right == distance) {
+                result.add(node.val);
+                return right + 1;
+            }
+            markChild(node.left, distance, right + 1);
+            return right + 1;
+        }
         return -1;
     }
 
-    public void addSubtree(TreeNode node, int distance) {
-        if(node == null || distance > k) {
-            return;
-        }
-        if(distance == k) {
-            System.out.println("Adding " + node.val);
-            ans.add(node.val);
-            return;
-        }
+    public void markChild(TreeNode node, int distance, int curr) {
+        if (node == null || curr > distance) return;
+        if (curr == distance) result.add(node.val);
 
-
-        addSubtree(node.left, distance + 1);
-        addSubtree(node.right, distance + 1);
+        markChild(node.left, distance, curr + 1);
+        markChild(node.right, distance, curr + 1);
     }
 }
