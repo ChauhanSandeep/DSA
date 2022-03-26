@@ -26,8 +26,7 @@ public class KDistance {
     private int findNodes(TreeNode node, int target, int distance) {
         if (node == null) return -1;
         if (node.val == target) {
-            markChild(node.left, distance, 1);
-            markChild(node.right, distance, 1);
+            markChild(node, distance, 0);
             return 1;
         }
         int left = findNodes(node.left, target, distance);
