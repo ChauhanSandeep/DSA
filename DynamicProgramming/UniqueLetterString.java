@@ -1,6 +1,10 @@
 package DynamicProgramming;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/
@@ -50,6 +54,38 @@ public class UniqueLetterString {
             lastPosition[c] = i;
         }
         return result;
+    }
+
+    /**
+     * This is much easier approach
+     * @param str
+     * @return
+     */
+    public int uniqueLetterString(String str) {
+        Map<Character, List<Integer>> map = new HashMap<>(); // <character, list of indexes>
+
+        // 1. create map
+        for(int i=0; i<str.length(); i++) {
+            char c = str.charAt(i);
+            map.computeIfAbsent(c, key -> new ArrayList<>()).add(i);
+        }
+
+        // 2. for each character, its unique count in string is
+        // leftRange * rightRange, where leftRange is range from prev occurence to current occurence
+        // and rightRange is range from current occurence to next occurence
+        int total = 0;
+        for(Map.Entry<Character, List<Integer>> entry: map.entrySet()) {
+            List<Integer> indexes = entry.getValue();
+            for(int i=0; i<indexes.size(); i++) {
+                int lastIndex = i == 0 ? -1 : indexes.get(i-1);
+                int nextIndex = i == indexes.size() - 1 ? str.length() : indexes.get(i+1);
+
+                int leftRange = indexes.get(i) - lastIndex;
+                int rightRange = nextIndex - indexes.get(i);
+                total += leftRange*rightRange;
+            }
+        }
+        return total;
     }
 
 }
