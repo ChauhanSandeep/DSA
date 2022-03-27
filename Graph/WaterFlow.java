@@ -35,75 +35,52 @@ public class WaterFlow {
      * [true, false, false, false, false]]
      */
 
-    public int solve(int[][] arr) {
-        int first = 0;
-        Boolean[][] visited1 = new Boolean[arr.length][arr[0].length];
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                touchBottomRight(arr, i, j, visited1);
-            }
-        }
-        System.out.println(Arrays.deepToString(visited1));
+    int rows;
+    int cols;
+    int[][] dirs = {
+            {-1, 0},
+            {0, -1},
+            {1, 0},
+            {0, 1}
+    };
 
-        Boolean[][] visited2 = new Boolean[arr.length][arr[0].length];
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                touchTopLeft(arr, i, j, visited2);
-            }
-        }
-        System.out.println(Arrays.deepToString(visited2));
+    public int solve(int[][] grid) {
+        if(grid == null || grid.length == 0 || grid[0].length == 0) return 0;
+        rows = grid.length;
+        cols = grid[0].length;
 
-        int diff = 0;
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                if (visited1[i][j] && visited2[i][j]) {
-                    System.out.println("i->" +i + "  j->" + j);
-                    diff++;
-                }
+        boolean[][] visited1 = new boolean[rows][cols]; // top-left
+        boolean[][] visited2 = new boolean[rows][cols]; // bottom-right
+
+        for(int i=0; i<rows; i++) {
+            dfs(grid, visited1, i, 0, Integer.MIN_VALUE);       // left
+            dfs(grid, visited2, i, cols-1, Integer.MIN_VALUE);  // right
+        }
+
+        for(int j=0; j<cols; j++) {
+            dfs(grid, visited1, 0, j, Integer.MIN_VALUE);       // top
+            dfs(grid, visited2, rows-1, j, Integer.MIN_VALUE);  // bottom
+        }
+
+        int count = 0;
+        for(int i=0; i<rows; i++) {
+            for(int j=0; j<cols; j++) {
+                if(visited1[i][j] && visited2[i][j]) count++;
             }
         }
-        return diff;
+
+        return count;
     }
 
-    private int touchBottomRight(int[][] arr, int i, int j, Boolean[][] visited) {
-        if (i < 0 || i >= arr.length || j < 0 || j >= arr[i].length || visited[i][j] != null) return 0;
-
-        if (i == arr.length - 1 || j == arr[i].length - 1) {
-            visited[i][j] = true;
-            return 1;
-        }
+    private void dfs(int[][] grid, boolean[][] visited, int i, int j, int prev) {
+        if(i<0 || j<0 || i>= grid.length || j>=grid[0].length || visited[i][j] || grid[i][j] < prev) return;
 
         visited[i][j] = true;
-        int down = isValid(arr, i, j, i + 1, j) ? touchBottomRight(arr, i + 1, j, visited) : 0;
-        int up = isValid(arr, i, j, i - 1, j) ? touchBottomRight(arr, i - 1, j, visited) : 0;
-        int left = isValid(arr, i, j, i, j - 1) ? touchBottomRight(arr, i, j - 1, visited) : 0;
-        int right = isValid(arr, i, j, i, j + 1) ? touchBottomRight(arr, i, j + 1, visited) : 0;
-
-        if (up > 0 || down > 0 || left > 0 || right > 0) return 1 + up + down + left + right;
-        visited[i][j] = false;
-        return 0;
-    }
-
-    private int touchTopLeft(int[][] arr, int i, int j, Boolean[][] visited) {
-        if (i < 0 || i >= arr.length || j < 0 || j >= arr[i].length || visited[i][j] != null) return 0;
-
-        if (i == 0 || j == 0) {
-            visited[i][j] = true;
-            return 1;
+        int curr = grid[i][j];
+        for(int[] dir: dirs) {
+            int ni = i + dir[0];
+            int nj = j + dir[1];
+            dfs(grid, visited, ni, nj, curr);
         }
-        visited[i][j] = true;
-        int down = isValid(arr, i, j, i + 1, j) ? touchTopLeft(arr, i + 1, j, visited) : 0;
-        int up = isValid(arr, i, j, i - 1, j) ? touchTopLeft(arr, i - 1, j, visited) : 0;
-        int left = isValid(arr, i, j, i, j - 1) ? touchTopLeft(arr, i, j - 1, visited) : 0;
-        int right = isValid(arr, i, j, i, j + 1) ? touchTopLeft(arr, i, j + 1, visited) : 0;
-
-        if (up > 0 || down > 0 || left > 0 || right > 0) return 1 + up + down + left + right;
-        visited[i][j] = false;
-        return 0;
-    }
-
-    private boolean isValid(int[][] arr, int i1, int j1, int i, int j) {
-        if (i < 0 || i >= arr.length || j < 0 || j >= arr[i].length) return false;
-        return arr[i1][j1] > arr[i][j];
     }
 }
