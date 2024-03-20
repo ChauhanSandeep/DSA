@@ -1,7 +1,5 @@
 package Tree;
 
-import com.sun.source.tree.BinaryTree;
-
 public class CheckBst {
 
     public static void main(String[] args) {
