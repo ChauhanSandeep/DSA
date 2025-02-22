@@ -73,13 +73,24 @@ public class Knapsack {
         }
         Arrays.fill(dp[0], 0);
 
-        for(int i=1; i<size+1; i++) {
-            for(int j=1; j<capacity+1; j++) {
-                if(weights[i-1] <= j) {
-                    dp[i][j] = Math.max(values[i-1] + dp[i-1][j-weights[i-1]], dp[i-1][j]);
-                }else{
-                    dp[i][j] = dp[i-1][j];
+        for (int i = 1; i <= size; i++) {
+            int currentWeight = weights[i - 1];  // Weight of the current item
+            int currentValue = values[i - 1];      // Value of the current item
+
+            for (int j = 1; j <= capacity; j++) {
+                // Option 1: Exclude the current item
+                int valueIfExcluded = dp[i - 1][j];
+
+                // Option 2: Include the current item (if it fits)
+                int valueIfIncluded = 0;
+                if (currentWeight <= j) {
+                    int remainingCapacity = j - currentWeight; // Remaining capacity after including the current item
+                    int bestValueForRemainingCapacity = dp[i - 1][remainingCapacity]; // Best value possible with remaining capacity
+                    valueIfIncluded = currentValue + bestValueForRemainingCapacity;
                 }
+
+                // Choose the best of including or excluding the current item
+                dp[i][j] = Math.max(valueIfExcluded, valueIfIncluded);
             }
         }
         return dp[size][capacity];
