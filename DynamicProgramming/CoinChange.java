@@ -3,7 +3,7 @@ package DynamicProgramming;
 import java.util.Arrays;
 
 /**
- * Minimum coins required to reach a target amount
+ * Minimum coins required to reach a target amount using given coins.
  */
 public class  CoinChange {
     public static void main(String[] args) {
@@ -12,6 +12,15 @@ public class  CoinChange {
         System.out.printf("Min coins required to reach sum %s is %s%n", target, minCoins(coins, target));
     }
 
+    /**
+     * The idea is to create an array of size target + 1 and set all the values to target + 1 except dp[0] = 0
+     * Then iterate through the array and for each value, iterate through the coins array and check if the value - coin is >= 0
+     * If it is, then check if dp[value-coin] + 1 < dp[value]. If yes, then update dp[value] to dp[value-coin] + 1
+     *
+     * @param coins
+     * @param target
+     * @return
+     */
     public static int minCoins(int[] coins, int target) {
         if(coins == null || coins.length == 0) return -1;
 

@@ -20,7 +20,6 @@ public class CourseSchedule {
     }
 
     public boolean canFinishUsingDFS(int numCourses, int[][] prerequisites) {
-
         HashMap<Integer, List<Integer>> courseMap = new HashMap<>();
         // create map
         for (int[] relation : prerequisites) {
@@ -47,7 +46,6 @@ public class CourseSchedule {
     }
 
     protected boolean isCyclic(Integer current, HashMap<Integer, List<Integer>> courseMap, Boolean[] cycle) {
-
         if(cycle[current] != null) return cycle[current];
         if (!courseMap.containsKey(current)) return false;
         cycle[current] = true;
@@ -63,7 +61,4 @@ public class CourseSchedule {
         cycle[current] = false;
         return false;
     }
-
-
-
 }
