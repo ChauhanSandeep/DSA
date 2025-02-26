@@ -1,81 +1,39 @@
 package DailyBytes.LinkedListPackage;
+import java.util.*;
 
-/**
- * This class detects if a linked list contains a cycle.
- * 
- * Algorithm:
- * - Use Floyd's Cycle-Finding Algorithm (Tortoise and Hare) to check for the presence of a cycle.
- * - Time Complexity: O(n)
- * - Space Complexity: O(1)
- * 
- * LeetCode Problem Link: https://leetcode.com/problems/linked-list-cycle/
- */
 public class CyclicLinkedList {
-
     public static void main(String[] args) {
         MyLinkedList list = new MyLinkedList();
-        list.push(new MyNode(1));
-        list.push(new MyNode(2));
-        list.push(new MyNode(3));
-        list.push(new MyNode(1)); // Creates a cycle for testing
+        MyNode node1 = new MyNode(1);
+        MyNode node2 = new MyNode(2);
+        MyNode node3 = new MyNode(3);
+        MyNode node4 = new MyNode(4);
 
-        boolean isCycle = hasCycle(list);
-        System.out.println("Does linked list contain a cycle? " + isCycle);
+        list.push(node4);
+        list.push(node3);
+        list.push(node2);
+        list.push(node1);
+
+        // Creating a cycle: 4 → 2 (node4 points back to node2)
+        node4.setNext(node2);
+
+        System.out.println("Does the linked list contain a cycle? " + findCycle(list));
     }
 
     /**
-     * Given a linked list containing unique numbers, return whether or not it has a cycle.
-     * A cycle is a circular arrangement where one node points back to a previous node.
-     * 
-     * @param list The input linked list.
-     * @return True if the linked list contains a cycle, false otherwise.
+     * Corrected cycle detection using Floyd's Cycle Detection Algorithm
      */
-    public static boolean hasCycle(MyLinkedList list) {
+    public static boolean findCycle(MyLinkedList list) {
         MyNode slow = list.getHead();
         MyNode fast = list.getHead();
 
         while (fast != null && fast.getNext() != null) {
-            slow = slow.getNext();
-            fast = fast.getNext().getNext();
-            if (slow == fast) {
-                return true;
-            }
+            slow = slow.getNext();        // Move slow pointer one step
+            fast = fast.getNext().getNext(); // Move fast pointer two steps
+
+            if (slow == fast) return true; // If they meet, there is a cycle
         }
 
-        return false;
-    }
-}
-
-class MyLinkedList {
-    private MyNode head;
-
-    public MyNode getHead() {
-        return head;
-    }
-
-    public void push(MyNode node) {
-        node.setNext(head);
-        head = node;
-    }
-}
-
-class MyNode {
-    private int data;
-    private MyNode next;
-
-    public MyNode(int data) {
-        this.data = data;
-    }
-
-    public int getData() {
-        return data;
-    }
-
-    public MyNode getNext() {
-        return next;
-    }
-
-    public void setNext(MyNode next) {
-        this.next = next;
+        return false; // No cycle
     }
 }

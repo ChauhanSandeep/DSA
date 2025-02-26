@@ -1,45 +1,74 @@
-package DynamicProgramming.KnapsackRelated;
+package DynamicProgramming.KnapsackUnbounded;
 
 import java.util.Arrays;
 
 /**
- * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
- * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
+ * Problem: Tushar's Birthday Party
+ *
+ * Given:
+ * - `eatingCapacities[]`: Eating capacity of each friend.
+ * - `dishCapacities[]`: Capacity (filling value) of each dish.
+ * - `dishCosts[]`: Cost of each dish.
+ *
+ * A friend is satisfied if the sum of dish capacities they consume equals their eating capacity.
+ * The goal is to find the minimum total cost required to satisfy all friends.
  *
  * Approach:
- * - Use the equations:
- *      - S1 - S2 = diff
- *      - S1 + S2 = totalSum
- *   By solving, we derive: S1 = (diff + totalSum) / 2.
- * - The problem now reduces to finding subsets whose sum equals S1.
- * - Use dynamic programming to count subsets that sum to S1.
+ * - This is a variation of the Unbounded Knapsack problem.
+ * - For each friend, compute the minimum cost required to exactly reach their eating capacity.
+ * - Use Dynamic Programming (Bottom-Up) to precompute the minimum cost for each capacity.
  *
- * Time Complexity: O(N * subsetSum), where N is the number of elements in the array.
- * Space Complexity: O(N * subsetSum), as we use a DP table.
+ * Time Complexity: O(N * M), where:
+ * - N = maximum eating capacity among friends.
+ * - M = number of dish options.
+ *
+ * Space Complexity: O(N) for the DP array.
+ *
+ * LeetCode Link: Not available, but similar to Unbounded Knapsack.
+ * InterviewBit Link: https://www.interviewbit.com/problems/tushars-birthday-party/
  */
-public class CountSubsetDiff {
-    public static void main(String[] args) {
-        int[] arr = {1, 1, 2, 3};
-        int diff = 1;
-        System.out.println("Count of subsets with given difference: " + countSubsetsWithDifference(arr, diff));
+public class BirthdayParty {
+
+    /**
+     * Computes the minimum cost to satisfy all friends.
+     *
+     * @param eatingCapacities Array representing each friend's eating capacity.
+     * @param dishCapacities   Array representing the filling capacity of each dish.
+     * @param dishCosts        Array representing the cost of each dish.
+     * @return Minimum total cost to satisfy all friends.
+     */
+    public int findMinimumCost(int[] eatingCapacities, int[] dishCapacities, int[] dishCosts) {
+        int totalMinCost = 0;
+
+        for (int capacity : eatingCapacities) {
+            totalMinCost += computeMinCostForCapacity(capacity, dishCapacities, dishCosts);
+        }
+
+        return totalMinCost;
     }
 
     /**
-     * Counts subsets where the difference between two subset sums equals the given difference.
+     * Computes the minimum cost required to exactly reach the given eating capacity.
+     * Uses a bottom-up DP approach (Unbounded Knapsack variation).
      *
-     * @param arr  Input array
-     * @param diff Target difference between two subset sums
-     * @return The number of valid subset pairs
+     * @param capacity        The target capacity to reach.
+     * @param dishCapacities  The capacity of each dish.
+     * @param dishCosts       The cost of each dish.
+     * @return Minimum cost to reach the given capacity, or Integer.MAX_VALUE if not possible.
      */
-    public static int countSubsetsWithDifference(int[] arr, int diff) {
-        int totalSum = Arrays.stream(arr).sum();
-        
-        // If diff is greater than totalSum or (diff + totalSum) is odd, partitioning is impossible
-        if (diff > totalSum || (diff + totalSum) % 2 != 0) {
-            return 0;
+    private int computeMinCostForCapacity(int capacity, int[] dishCapacities, int[] dishCosts) {
+        int[] minCost = new int[capacity + 1];
+        Arrays.fill(minCost, Integer.MAX_VALUE);
+        minCost[0] = 0;
+
+        for (int currentCapacity = 1; currentCapacity <= capacity; currentCapacity++) {
+            for (int i = 0; i < dishCapacities.length; i++) {
+                if (currentCapacity >= dishCapacities[i] && minCost[currentCapacity - dishCapacities[i]] != Integer.MAX_VALUE) {
+                    minCost[currentCapacity] = Math.min(minCost[currentCapacity], dishCosts[i] + minCost[currentCapacity - dishCapacities[i]]);
+                }
+            }
         }
-        
-        int targetSubsetSum = (diff + totalSum) / 2;
-        return CountSubsetSum.countSubsetSum(arr, targetSubsetSum); // Uses existing method
+
+        return minCost[capacity];
     }
 }
