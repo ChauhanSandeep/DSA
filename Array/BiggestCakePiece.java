@@ -2,7 +2,25 @@ package Array;
 
 import java.util.Arrays;
 
+/**
+ * Given a rectangular cake with height h and width w, and two arrays of integers horizontalCuts and verticalCuts
+ * that specify positions where cuts are made, this program finds the maximum area of a single piece of cake
+ * after all cuts.
+ *
+ * Algorithm:
+ * - Sort the horizontal and vertical cuts.
+ * - Compute the maximum gap between adjacent horizontal and vertical cuts.
+ * - Multiply these maximum gaps to get the largest possible piece of cake.
+ * - Return the result modulo 10^9 + 7 to prevent overflow.
+ *
+ * Time Complexity: O(N log N + M log M), where N and M are the lengths of horizontalCuts and verticalCuts, respectively.
+ * Space Complexity: O(1) since we use only a few extra variables.
+ *
+ * LeetCode Problem: https://leetcode.com/problems/maximum-area-of-a-piece-of-cake-after-horizontal-and-vertical-cuts/
+ */
 public class BiggestCakePiece {
+    private static final int MOD = 1_000_000_007;
+
     public static void main(String[] args) {
         int h = 5;
         int w = 4;
@@ -12,38 +30,48 @@ public class BiggestCakePiece {
     }
 
     /**
-     * Given a rectangular cake with height h and width w, and two arrays of integers horizontalCuts and verticalCuts where horizontalCuts[i]
-     * is the distance from the top of the rectangular cake to the ith horizontal cut and
-     * similarly, verticalCuts[j] is the distance from the left of the rectangular cake to the jth vertical cut.
+     * Computes the maximum area of a piece of cake after performing the given cuts.
      *
-     * Return the maximum area of a piece of cake after you cut at each horizontal and vertical position
-     * provided in the arrays horizontalCuts and verticalCuts. Since the answer can be a huge number, return this modulo 10^9 + 7.
+     * @param h The height of the cake.
+     * @param w The width of the cake.
+     * @param horizontalCuts Array containing horizontal cut positions.
+     * @param verticalCuts Array containing vertical cut positions.
+     * @return The maximum piece area modulo 10^9 + 7.
      */
     public static int maxArea(int h, int w, int[] horizontalCuts, int[] verticalCuts) {
-        Arrays.sort(horizontalCuts);
-        Arrays.sort(verticalCuts);
+        Arrays.sort(horizontalCuts); // Sort horizontal cuts
+        Arrays.sort(verticalCuts);   // Sort vertical cuts
 
-        int hDiff = getMaxCut(h, horizontalCuts);
-        if(hDiff == 0) return 0;
-
-        int vDiff = getMaxCut(w, verticalCuts);
-        long result = (long) hDiff * vDiff;
-        return (int)(result%(Math.pow(10, 9) + 7));
-
+        // Find the maximum height difference between consecutive horizontal cuts
+        int maxH = getMaxCut(h, horizontalCuts);
+        // Find the maximum width difference between consecutive vertical cuts
+        int maxW = getMaxCut(w, verticalCuts);
+        
+        // Compute the largest piece area and return modulo MOD
+        return (int) ((long) maxH * maxW % MOD);
     }
 
+    /**
+     * Finds the maximum difference between consecutive cuts in a sorted array.
+     *
+     * @param len The total length (height or width of the cake).
+     * @param cuts The sorted array of cut positions.
+     * @return The maximum segment size.
+     */
     private static int getMaxCut(int len, int[] cuts) {
-        int diff = 0;
+        int maxDiff = 0;
 
-        for(int i=0; i<cuts.length - 1; i++) {
-            if(cuts[i+1] - cuts[i] > diff) diff = cuts[i+1] - cuts[i];
+        // Consider the first segment (from the start of the cake to the first cut)
+        maxDiff = Math.max(maxDiff, cuts[0]);
+        
+        // Compute the largest gap between consecutive cuts
+        for (int i = 1; i < cuts.length; i++) {
+            maxDiff = Math.max(maxDiff, cuts[i] - cuts[i - 1]);
         }
-
-        // from beginning to the first cut and end to last cut
-        if(cuts.length > 0) {
-            if(cuts[0] > diff) diff = cuts[0];
-            if(len - cuts[cuts.length - 1] > diff) diff = len - cuts[cuts.length - 1];
-        }
-        return diff;
+        
+        // Consider the last segment (from the last cut to the end of the cake)
+        maxDiff = Math.max(maxDiff, len - cuts[cuts.length - 1]);
+        
+        return maxDiff;
     }
 }

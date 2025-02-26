@@ -1,60 +1,69 @@
 package Bitwise;
 
 /**
- * https://leetcode.com/problems/maximum-good-people-based-on-statements/
+ * This class finds the maximum number of good people based on the given statements.
+ * 
+ * Algorithm:
+ * - Use binary representation to create equations representing good and bad persons.
+ * - Validate each equation against the provided statements.
+ * - Keep track of the valid equation with the maximum number of good persons.
+ * - Time Complexity: O(2^n * n^2)
+ * - Space Complexity: O(n)
+ * 
+ * LeetCode Problem Link: https://leetcode.com/problems/maximum-good-people-based-on-statements/
  */
 public class MaxGoodPeople {
 
     public static void main(String[] args) {
         int[][] statements = {
-                {2, 1, 2},
-                {1, 2, 2},
-                {2, 0, 2}
+            {2, 1, 2},
+            {1, 2, 2},
+            {2, 0, 2}
         };
         System.out.println(new MaxGoodPeople().maximumGood(statements));
     }
 
     /**
-     *
-     * Create equation. ie binary string representing good and bad persons.
-     * for each equation check if equation is valid for the provided statements.
-     * Keep track of valid equation with max good persons.
+     * Create an equation representing good and bad persons in binary string format.
+     * For each equation, check if it is valid based on the provided statements.
+     * Keep track of the valid equation with the maximum number of good persons.
      */
     public int maximumGood(int[][] statements) {
-        int len = statements.length;
-        int result = 0;
+        int length = statements.length;
+        int maxGoodCount = 0;
 
-        int num = (int) (Math.pow(2, len) - 1);
-        while (num > 0) {
-            StringBuilder equation = new StringBuilder(Integer.toString(num, 2));
-            while (equation.length() != len) {
-                equation.insert(0, "0");
+        // Iterate through all possible binary equations representing good and bad persons
+        int totalCombinations = (1 << length) - 1;
+        while (totalCombinations > 0) {
+            StringBuilder binaryRepresentation = new StringBuilder(Integer.toString(totalCombinations, 2));
+            while (binaryRepresentation.length() < length) {
+                binaryRepresentation.insert(0, "0");
             }
-            if (valid(statements, equation.toString())) {
-                int tempRes = 0;
-                for (Character c : equation.toString().toCharArray()) {
-                    if (c == '1') tempRes++;
+            if (isValid(statements, binaryRepresentation.toString())) {
+                int goodCount = 0;
+                for (char ch : binaryRepresentation.toString().toCharArray()) {
+                    if (ch == '1') goodCount++;
                 }
-                result = Math.max(tempRes, result);
+                maxGoodCount = Math.max(goodCount, maxGoodCount);
             }
-            num--;
+            totalCombinations--;
         }
-        return result;
+        return maxGoodCount;
     }
 
-    public boolean valid(int[][] statements, String equation) {
-        for (int i = 0; i < equation.length(); i++) {
-            if (equation.charAt(i) == '1') {
-
+    /**
+     * Validate the binary equation against the provided statements.
+     */
+    private boolean isValid(int[][] statements, String binaryEquation) {
+        for (int i = 0; i < binaryEquation.length(); i++) {
+            if (binaryEquation.charAt(i) == '1') {
                 int[] statement = statements[i];
                 for (int j = 0; j < statement.length; j++) {
                     if (statement[j] == 2) continue;
-                    if (equation.charAt(j) - '0' != statement[j]) return false;
+                    if (binaryEquation.charAt(j) - '0' != statement[j]) return false;
                 }
-
             }
         }
         return true;
     }
-
 }

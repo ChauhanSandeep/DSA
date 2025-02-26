@@ -1,29 +1,57 @@
 package DailyBytes.ArrayPackage;
-import java.util.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * This class finds the index of the first unique character in a given string.
+ * 
+ * Algorithm:
+ * - Use a hashmap to store the indices of characters and remove entries if the character appears more than once.
+ * - Iterate through the hashmap to find the smallest index.
+ * - Time Complexity: O(n)
+ * - Space Complexity: O(n)
+ * 
+ * LeetCode Problem Link: https://leetcode.com/problems/first-unique-character-in-a-string/
+ */
 public class FirstUniqueChar {
 
     public static void main(String[] args) {
-        System.out.println("First unique character is " + getFirstUniqueChar("loveleetcode"));
-        System.out.println("First unique character is " + getFirstUniqueChar("thedailybyte"));
-
+        System.out.println("First unique character is at index: " + getFirstUniqueChar("loveleetcode"));
+        System.out.println("First unique character is at index: " + getFirstUniqueChar("thedailybyte"));
     }
 
+    /**
+     * Finds the index of the first unique character in the given string.
+     * @param str The input string.
+     * @return The index of the first unique character, or -1 if no unique character exists.
+     */
     public static int getFirstUniqueChar(String str) {
-        Map<Character, Integer> map = new HashMap<>();
+        Map<Character, Integer> characterIndexMap = new HashMap<>();
 
-        for(int i=0; i<str.length(); i++) {
-            char c = str.charAt(i);
-            if(map.containsKey(c)) map.remove(c);
-            else map.put(c, i);
+        // Iterate through the string to populate the character-index map
+        for (int i = 0; i < str.length(); i++) {
+            char currentChar = str.charAt(i);
+            if (characterIndexMap.containsKey(currentChar)) {
+                characterIndexMap.remove(currentChar);
+            } else {
+                characterIndexMap.put(currentChar, i);
+            }
         }
 
-        int index = Integer.MAX_VALUE;
-        for(Map.Entry<Character, Integer> entry: map.entrySet()) {
-            if(entry.getValue() < index) index = entry.getValue();
+        // Find the smallest index of unique characters
+        int smallestIndex = Integer.MAX_VALUE;
+        for (Map.Entry<Character, Integer> entry : characterIndexMap.entrySet()) {
+            if (entry.getValue() < smallestIndex) {
+                smallestIndex = entry.getValue();
+            }
         }
-        if(index == Integer.MAX_VALUE) return -1;
 
-        return index;
+        // If no unique character found, return -1
+        if (smallestIndex == Integer.MAX_VALUE) {
+            return -1;
+        }
+
+        return smallestIndex;
     }
 }

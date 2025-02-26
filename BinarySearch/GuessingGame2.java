@@ -12,25 +12,23 @@ public class GuessingGame2 {
     }
 
     public int getMoneyAmount(int n) {
-        int[][] dp = new int[n+1][n+1];
-        for(int[] row: dp) {
-            Arrays.fill(row, -1);
+        int[][] dp = new int[n + 1][n + 1];
+
+        for (int len = 2; len <= n; len++) { // Length of range
+            for (int left = 1; left <= n - len + 1; left++) {
+                int right = left + len - 1;
+                dp[left][right] = Integer.MAX_VALUE;
+
+                for (int pivot = left + (right - left) / 2; pivot <= right; pivot++) {
+                    int cost = pivot + Math.max(
+                        (pivot > left) ? dp[left][pivot - 1] : 0, 
+                        (pivot < right) ? dp[pivot + 1][right] : 0
+                    );
+                    dp[left][right] = Math.min(dp[left][right], cost);
+                }
+            }
         }
-        return getMoney(1, n, dp);
-    }
 
-    public int getMoney(int left, int right, int[][] dp) {
-        if(left >= right) return 0;
-        if(dp[left][right] != -1) return dp[left][right];
-
-        int min = Integer.MAX_VALUE;
-
-        for(int i=left; i<=right; i++) {
-            int ls = getMoney(left, i-1, dp);
-            int rs = getMoney(i+1, right, dp);
-            min = Math.min(i + Math.max(ls, rs) , min);
-        }
-        dp[left][right] = min;
-        return dp[left][right];
+        return dp[1][n];
     }
 }

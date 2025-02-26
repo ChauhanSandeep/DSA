@@ -1,8 +1,8 @@
 package Array;
 
 /**
- * Find duplicate number in array containing elements from 1 - n(duplicate occures 1 or more times)
- * You must solve the problem without modifying the array nums and uses only constant extra space.
+ * Find duplicate number in array containing elements from 1 - n(duplicate occurs 1 or more times)
+ * You must solve the problem without modifying the array nums and use only constant extra space.
  *
  * https://leetcode.com/problems/find-the-duplicate-number/
  */
@@ -15,23 +15,22 @@ public class DuplicateNumber {
     }
 
     public int findDuplicate(int[] nums) {
-        // This problem is like finding starting of loop in cyclic linked list
+        // This problem is like finding the start of a loop in a cyclic linked list
         int slow = nums[0];
         int fast = nums[0];
 
-        // find collision in loop of numbers
+        // Find collision point in the loop of numbers
         do {
             slow = nums[slow];
             fast = nums[nums[fast]];
-        }while(slow != fast);
+        } while (slow != fast);
 
-        // find the starting of loop
+        // Find the starting point of the loop
         fast = nums[0];
-        while(slow != fast) {
+        while (slow != fast) {
             slow = nums[slow];
             fast = nums[fast];
         }
         return slow;
     }
-
 }

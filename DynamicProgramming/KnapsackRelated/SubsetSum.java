@@ -3,85 +3,43 @@ package DynamicProgramming.KnapsackRelated;
 import java.util.Arrays;
 
 /**
- * Given an array and number, find if there is any subset which sums up to the number
- * Not needed to be subarray
+ * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
+ * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
+ *
+ * Approach:
+ * - Use the equations:
+ *      - S1 - S2 = diff
+ *      - S1 + S2 = totalSum
+ *   By solving, we derive: S1 = (diff + totalSum) / 2.
+ * - The problem now reduces to finding subsets whose sum equals S1.
+ * - Use dynamic programming to count subsets that sum to S1.
+ *
+ * Time Complexity: O(N * subsetSum), where N is the number of elements in the array.
+ * Space Complexity: O(N * subsetSum), as we use a DP table.
  */
-public class SubsetSum {
+public class CountSubsetDiff {
     public static void main(String[] args) {
-        int[] arr = {1, 4, 5};
-        int sum = 5;
-        System.out.println(findSubsetSumItr(arr, sum, arr.length));
+        int[] arr = {1, 1, 2, 3};
+        int diff = 1;
+        System.out.println("Count of subsets with given difference: " + countSubsetsWithDifference(arr, diff));
     }
 
     /**
-    Recursive
+     * Counts subsets where the difference between two subset sums equals the given difference.
+     *
+     * @param arr  Input array
+     * @param diff Target difference between two subset sums
+     * @return The number of valid subset pairs
      */
-    public static boolean findSubsetSum(int[] arr, int sum, int size) {
-        if(sum == 0) return true;
-        if(size ==0) return false;
-
-        if (arr[size - 1] <= sum) {
-            return findSubsetSum(arr, sum - arr[size - 1], size - 1) ||
-                    findSubsetSum(arr, sum, size - 1);
-        }else{
-            return findSubsetSum(arr, sum, size-1);
+    public static int countSubsetsWithDifference(int[] arr, int diff) {
+        int totalSum = Arrays.stream(arr).sum();
+        
+        // If diff is greater than totalSum or (diff + totalSum) is odd, partitioning is impossible
+        if (diff > totalSum || (diff + totalSum) % 2 != 0) {
+            return 0;
         }
+        
+        int targetSubsetSum = (diff + totalSum) / 2;
+        return CountSubsetSum.countSubsetSum(arr, targetSubsetSum); // Uses existing method
     }
-
-    /**
-    Recursive + Memoization
-     */
-    public static boolean findSubsetHelper(int[] arr, int sum, int size) {
-        Boolean[][] dp = new Boolean[size+1] [sum+1];
-        Arrays.fill(dp[0], false);
-        for(int i=0; i<size+1; i++) {
-            dp[i][0] = true; // This is not required as we are checking this inside findSubsetSumDp
-        }
-        findSubsetSumDp(arr, sum, size, dp);
-        System.out.println(Arrays.deepToString(dp));
-        return dp[size][sum];
-    }
-
-    private static boolean findSubsetSumDp(int[] arr, int sum, int size, Boolean[][] dp) {
-        if(sum == 0) return true;
-        if(size ==0) return false;
-        if(dp[size][sum] != null) {
-            return dp[size][sum];
-        }
-
-        boolean result = false;
-        if(arr[size-1] <= sum) {
-            result = findSubsetSumDp(arr, sum-arr[size-1], size-1, dp) ||
-                    findSubsetSumDp(arr, sum, size-1, dp);
-        }else{
-            result = findSubsetSumDp(arr, sum, size-1, dp);
-        }
-        dp[size][sum] = result;
-        return result;
-    }
-
-    /**
-     * Iterative
-     */
-    public static boolean findSubsetSumItr(int[] arr, int sum, int size) {
-        boolean[][] dp = new boolean[size+1][sum+1];
-
-        for(int i=0; i<size+1; i++) {
-            dp[i][0] = true;
-        }
-
-        for(int i=1; i<size+1; i++) {
-            for(int j=1; j<sum+1; j++) {            // j is current sum
-                if(arr[i-1] <= j) {                 // this is j, remember
-                    dp[i][j] = dp[i-1][j]           // same sum with previous index
-                            || dp[i-1][j-arr[i-1]]; // sum-current in previous index
-                }else{
-                    dp[i][j] = dp[i-1][j];
-                }
-            }
-        }
-        return dp[size][sum];
-    }
-
-
 }

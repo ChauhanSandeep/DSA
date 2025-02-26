@@ -1,70 +1,43 @@
-package DynamicProgramming.MatrixChainMul;
+package DynamicProgramming.KnapsackRelated;
 
 import java.util.Arrays;
 
 /**
- * Find the max number of ways to put parenthesis in boolean expression to evaluate to true
+ * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
+ * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
+ *
+ * Approach:
+ * - Given: S1 - S2 = diff and S1 + S2 = totalSum.
+ * - By solving, we derive: S1 = (diff + totalSum) / 2.
+ * - The problem reduces to finding subsets whose sum equals S1.
+ * - Use dynamic programming to count subsets that sum to S1.
+ *
+ * Time Complexity: O(N * targetSum), where N is the number of elements in the array.
+ * Space Complexity: O(N * targetSum), due to the DP table.
  */
-public class EvaluateTrue {
+public class CountSubsetDiff {
     public static void main(String[] args) {
-        System.out.println(new EvaluateTrue().cnttrue("F&F^T^F"));
+        int[] arr = {1, 1, 2, 3};
+        int diff = 1;
+        System.out.println("Count of subsets with given difference: " + countSubsetDiff(arr, diff));
     }
 
-    public int cnttrue(String str) {
-        int size = str.length();
-        int[][][] dp = new int[size + 1][size + 1][2];
+    /**
+     * Counts subsets where the difference between two subset sums equals the given difference.
+     *
+     * @param arr  Input array of positive integers
+     * @param diff Target difference between subset sums
+     * @return The number of valid subset pairs
+     */
+    public static int countSubsetDiff(int[] arr, int diff) {
+        int totalSum = Arrays.stream(arr).sum();
 
-        for (int[][] matrix : dp) {
-            for (int[] row : matrix) {
-                Arrays.fill(row, -1);
-            }
+        // Edge cases: If diff is negative or larger than totalSum, return 0
+        if (diff < 0 || diff > totalSum || (diff + totalSum) % 2 != 0) {
+            return 0;
         }
 
-        return countRec(str, 0, size - 1, 1, dp);
-    }
-
-    private int countRec(String str, int left, int right, int isTrue, int[][][] dp) {
-        if (left > right) return 0;
-        if (left == right) {
-            char curr = str.charAt(left);
-            if (isTrue == 1) return curr == 'T' ? 1 : 0;
-            return curr == 'F' ? 1 : 0;
-        }
-        if (dp[left][right][isTrue] != -1) return dp[left][right][isTrue];
-
-        int count = 0;
-        for (int k = left + 1; k <= right - 1; k = k + 2) {
-            int leftTrue = countRec(str, left, k - 1, 1, dp);
-            int leftFalse = countRec(str, left, k - 1, 0, dp);
-            int rightTrue = countRec(str, k + 1, right, 1, dp);
-            int rightFalse = countRec(str, k + 1, right, 0, dp);
-
-            char operator = str.charAt(k);
-            switch (operator) {
-                case '|':
-                    if (isTrue == 1)
-                        count += (leftTrue * rightTrue) + (leftTrue * rightFalse) + (leftFalse * rightTrue);
-                    else
-                        count += leftFalse * rightFalse;
-                    break;
-                case '&':
-                    if (isTrue == 1)
-                        count += (leftTrue * rightTrue);
-                    else
-                        count += (leftTrue * rightFalse) + (leftFalse * rightTrue) + (leftFalse * rightFalse);
-                    break;
-                case '^':
-                    if (isTrue == 1)
-                        count += (leftTrue * rightFalse) + (leftFalse * rightTrue);
-                    else
-                        count += (leftTrue * rightTrue) + (leftFalse * rightFalse);
-                    break;
-                default:
-                    throw new RuntimeException("Invalid operator");
-            }
-        }
-        dp[left][right][isTrue] = count;
-        System.out.println(str.substring(left, right + 1) + " " + (isTrue == 1 ? "true" : "false") + ": " + count);
-        return count;
+        int targetSum = (diff + totalSum) / 2;
+        return CountSubsetSum.countSubsetSum(arr, targetSum, arr.length); // Calls helper function
     }
 }

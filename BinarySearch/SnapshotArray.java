@@ -3,9 +3,20 @@ package BinarySearch;
 import java.util.TreeMap;
 
 /**
- * https://leetcode.com/problems/snapshot-array/
+ * This class represents a Snapshot Array which supports taking snapshots and retrieving
+ * values at a given index and snapshot ID.
+ * 
+ * Algorithm:
+ * - Use a TreeMap to store values at each index with their corresponding snapshot IDs.
+ * - Time Complexity: O(log n) for set and get operations.
+ * - Space Complexity: O(n) where n is the number of set operations.
+ * 
+ * LeetCode Problem Link: https://leetcode.com/problems/snapshot-array/
  */
 public class SnapshotArray {
+
+    private int currentSnapId;
+    private TreeMap<Integer, Integer>[] snapshotArray;
 
     public static void main(String[] args) {
         SnapshotArray snapshotArray = new SnapshotArray(1);
@@ -16,35 +27,29 @@ public class SnapshotArray {
         System.out.println(snapshotArray.get(0, 2));
     }
 
-    int snapId = 0;
-    TreeMap<Integer, Integer>[] arr; // <index, <snapId, value>>
-
     public SnapshotArray(int length) {
-        this.snapId = 0;
-        this.arr = new TreeMap[length];
-        for(int i=0; i<arr.length; i++) {
-            arr[i] = new TreeMap<>();
+        this.currentSnapId = 0;
+        this.snapshotArray = new TreeMap[length];
+        for (int i = 0; i < length; i++) {
+            snapshotArray[i] = new TreeMap<>();
         }
     }
 
-    public void set(int index, int val) {
-        TreeMap<Integer, Integer> map = arr[index];
-        map.put(this.snapId, val);
+    public void set(int index, int value) {
+        snapshotArray[index].put(currentSnapId, value);
     }
 
     public int snap() {
-        this.snapId++;
-        return this.snapId - 1;
+        currentSnapId++;
+        return currentSnapId - 1;
     }
 
-    public int get(int index, int snap_id) {
-        System.out.println(index + " " + snap_id);
-        TreeMap<Integer, Integer> map = arr[index];
-        if(map == null) return 0;
-        if(null != map.floorKey(snap_id)) {
-            System.out.println(map.floorKey(snap_id));
-            return map.get(map.floorKey(snap_id));
+    public int get(int index, int snapId) {
+        TreeMap<Integer, Integer> snapshots = snapshotArray[index];
+        if (snapshots == null) {
+            return 0;
         }
-        return 0;
+        Integer closestSnapId = snapshots.floorKey(snapId);
+        return closestSnapId == null ? 0 : snapshots.get(closestSnapId);
     }
 }

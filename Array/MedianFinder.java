@@ -3,47 +3,41 @@ package Array;
 import java.util.PriorityQueue;
 
 /**
- * Find median in stream of integer incoming data stream
+ * Find median in a stream of integer incoming data.
  *
  * https://leetcode.com/problems/find-median-from-data-stream/
  */
 public class MedianFinder {
 
-    public static void main(String[] args) {
-        MedianFinder medianFinder = new MedianFinder();
-        medianFinder.addNum(1);
-        medianFinder.addNum(2);
-        System.out.println(medianFinder.findMedian());
-        medianFinder.addNum(3);
-        System.out.println(medianFinder.findMedian());
-    }
-
-    PriorityQueue<Integer> minHeap;
-    PriorityQueue<Integer> maxHeap;
+    private PriorityQueue<Integer> minHeap; // Holds larger half (min-heap)
+    private PriorityQueue<Integer> maxHeap; // Holds smaller half (max-heap)
 
     public MedianFinder() {
-        // minHeap stores higher side of the element
-        minHeap = new PriorityQueue<>();
-
-        // maxHeap contains lower side of the element.
-        // maxHeap is allowed to have one extra element in case size(minHeap) != size(maxHeap)
-        maxHeap = new PriorityQueue<>((a, b) -> b - a);
+        minHeap = new PriorityQueue<>(); // Min-heap (natural order)
+        maxHeap = new PriorityQueue<>(Comparator.reverseOrder()); // Max-heap
     }
 
     public void addNum(int num) {
-        maxHeap.offer(num);             // re-balance maxHeap
-        minHeap.offer(maxHeap.poll());  // re-balance minHeap
+        maxHeap.offer(num); // Add to maxHeap (smaller half)
+        minHeap.offer(maxHeap.poll()); // Move maxHeap top to minHeap
+        
         if (minHeap.size() > maxHeap.size()) {
-            // if size mismatch then add extra to maxHeap
-            maxHeap.offer(minHeap.poll());
+            maxHeap.offer(minHeap.poll()); // Ensure maxHeap is never smaller than minHeap
         }
     }
 
     public double findMedian() {
-        if ((minHeap.size() + maxHeap.size()) % 2 == 0) {
-            return (double) (minHeap.peek() + maxHeap.peek()) / 2;
-        } else {
-            return (double) maxHeap.peek();
-        }
+        return (minHeap.size() == maxHeap.size()) 
+            ? (minHeap.peek() + maxHeap.peek()) / 2.0
+            : maxHeap.peek();
+    }
+
+    public static void main(String[] args) {
+        MedianFinder medianFinder = new MedianFinder();
+        medianFinder.addNum(1);
+        medianFinder.addNum(2);
+        System.out.println(medianFinder.findMedian()); // Output: 1.5
+        medianFinder.addNum(3);
+        System.out.println(medianFinder.findMedian()); // Output: 2.0
     }
 }

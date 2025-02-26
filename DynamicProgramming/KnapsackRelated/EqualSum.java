@@ -1,46 +1,54 @@
 package DynamicProgramming.KnapsackRelated;
 
+import java.util.Arrays;
+
 /**
- * Find if the array can be divided into two partitions such that sum of each partition is same
+ * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
+ * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
+ *
+ * Approach:
+ * - Given S1 - S2 = diff and S1 + S2 = totalSum.
+ * - We derive S1 = (diff + totalSum) / 2.
+ * - The problem reduces to counting subsets whose sum equals S1.
+ * - Solve using dynamic programming.
+ *
+ * Time Complexity: O(N * subsetSum), where N is the number of elements in the array.
+ * Space Complexity: O(N * subsetSum), as we use a DP table.
  */
-public class EqualSum {
+public class CountSubsetDiff {
     public static void main(String[] args) {
-        int[] arr = {479, 758, 315, 472, 730, 101, 460, 619};
-        System.out.println(equalPartition(arr, arr.length));
-
-        arr = new int[]{1, 3, 5};
-        System.out.println(equalPartition(arr, arr.length));
+        int[] arr = {1, 1, 2, 3};
+        int diff = 1;
+        System.out.println("Count of subsets with given difference: " + countSubsetsWithDifference(arr, diff));
     }
 
-    public static boolean equalPartition(int[] arr, int size) {
-        int sum = 0;
-        for(int i=0; i<arr.length; i++) {
-            sum += arr[i];
+    /**
+     * Counts subsets where the difference between two subset sums equals the given difference.
+     *
+     * @param arr  Input array
+     * @param diff Target difference between two subset sums
+     * @return The number of valid subset pairs
+     */
+    public static int countSubsetsWithDifference(int[] arr, int diff) {
+        if (arr.length == 0 || diff < 0) {
+            return 0; // Edge case: empty array or negative difference
         }
-        // sum must be event to be equally divisible
-        if(sum%2 == 1) return false;
-        // check if we can create subarray with sum = sum/2
-        return findSubsetSum(arr, sum/2, size);
+
+        int totalSum = Arrays.stream(arr).sum();
+
+        // If (diff + totalSum) is odd, we cannot partition into valid subsets
+        if ((diff + totalSum) % 2 != 0) {
+            return 0;
+        }
+
+        int subsetSum = (diff + totalSum) / 2;
+        return countSubsetsWithSum(arr, subsetSum);
     }
 
-    public static boolean findSubsetSum(int[] arr, int sum, int size) {
-        boolean[][] dp = new boolean[size+1][sum+1];
-
-        for(int i=0; i<size+1; i++) {
-            dp[i][0] = true;
-        }
-        for(int i=1; i<size+1; i++) {
-            for(int j=1; j<sum+1; j++) {
-                if(arr[i-1] <= j) {
-                    dp[i][j] = dp[i-1][j] || dp[i-1][j - arr[i-1]];
-                }else{
-                    dp[i][j] = dp[i-1][j];
-                }
-            }
-        }
-        return dp[size][sum];
+    /**
+     * Utilizes a pre-existing function to count subsets with a given sum.
+     */
+    private static int countSubsetsWithSum(int[] arr, int sum) {
+        return CountSubsetSum.countSubsetSum(arr, sum, arr.length);
     }
-
-
-
 }

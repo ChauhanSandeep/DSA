@@ -6,46 +6,47 @@ import java.util.stream.Stream;
 
 /**
  * Given a list of integer signifying light bulbs and range.
- * Bulbs marked 1 are functional and bulbs marked 0 are non-functional
- * Find the min number of functional bulbs which can be used to light complete corridor.
+ * Bulbs marked 1 are functional and bulbs marked 0 are non-functional.
+ * Find the min number of functional bulbs which can be used to light the complete corridor.
  *
  * https://www.interviewbit.com/problems/minimum-lights-to-activate/
  */
 public class MinLights {
+
     public static void main(String[] args) {
-        ArrayList<Integer> lights = (ArrayList<Integer>) Stream.of(0, 0, 0, 1, 0).collect(Collectors.toList());
-        int solve = new MinLights().solve(lights, 3);
-        System.out.println(solve);
+        ArrayList<Integer> lights = new ArrayList<>(Stream.of(0, 0, 0, 1, 0).collect(Collectors.toList()));
+        int result = new MinLights().solve(lights, 3);
+        System.out.println("Minimum lights needed: " + result);
     }
 
     /**
-     *
-     * @param list list of bulbs (0-> faulty, 1 -> working)
-     * @param range range of each bulb
-     * @return min bulbs required to light complete corridor
+     * @param bulbs  List of bulbs (0 -> faulty, 1 -> working)
+     * @param range  The range of each bulb
+     * @return       Minimum bulbs required to light the entire corridor, or -1 if impossible
      */
-    public int solve(ArrayList<Integer> list, int range) {
-        int max = 0;
-        int min = 0;
-        int target = list.size() - 1;
+    public int solve(ArrayList<Integer> bulbs, int range) {
         int count = 0;
+        int i = 0;
+        int n = bulbs.size();
 
-        while (max < target) {
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i) == 1) {
-                    int upperRange = i + range - 1;
-                    int lowerRange = i - range + 1;
-                    if (lowerRange <= min && upperRange > max) {
-                        max = upperRange;
-                    }
+        while (i < n) {
+            int rightMost = -1;
+            
+            // Look for the rightmost working bulb in range [i - (range - 1), i + (range - 1)]
+            for (int j = Math.min(n - 1, i + range - 1); j >= Math.max(0, i - (range - 1)); j--) {
+                if (bulbs.get(j) == 1) {
+                    rightMost = j;
+                    break;
                 }
             }
-            if (min == max) return -1;
-            count++;
-            min = max;
+
+            // If no working bulb found, return -1 (impossible to light the corridor)
+            if (rightMost == -1) return -1;
+
+            count++;  // Increase light count
+            i = rightMost + range;  // Jump to the next unlit position
         }
+
         return count;
     }
-
-
 }

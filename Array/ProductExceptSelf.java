@@ -3,60 +3,37 @@ package Array;
 import java.util.Arrays;
 
 /**
- * Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].
+ * Given an integer array nums, return an array such that answer[i] is the product of all elements except nums[i].
  */
 public class ProductExceptSelf {
     public static void main(String[] args) {
         int[] nums = {1,2,3,4};
-        System.out.println(Arrays.toString(productExceptSelf2(nums)));
+        System.out.println("Optimized Output: " + Arrays.toString(productExceptSelf(nums)));
     }
 
     /**
-     * Without using division
+     * 🔥 Optimized Approach (No Extra Space, O(n) Time Complexity)
+     * - Uses a single output array (`result[]`) for storing left products.
+     * - Then iterates backward, multiplying with right-side values.
+     * - **Space Complexity: O(1) (excluding output array)**
      */
-    public static int[] productExceptSelf1(int[] nums) {
+    public static int[] productExceptSelf(int[] nums) {
         int len = nums.length;
-
-        int[] left = new int[len];
-        int[] right = new int[len];
-
-        left[0] = 1;
-        for(int i=1; i<len; i++) {
-            left[i] = left[i-1] * nums[i-1];
-        }
-
-        right[len-1] = 1;
-        for(int i=len-2; i>=0; i--) {
-            right[i] = right[i+1] * nums[i+1];
-        }
-        // System.out.println(Arrays.toString(left));
-        // System.out.println(Arrays.toString(right));
-
         int[] result = new int[len];
-        for(int i=0; i<len; i++) {
-            result[i] = left[i] * right[i];
-        }
-        return result;
-    }
 
-    /**
-     * Without using division and no extra space
-     */
-    public static int[] productExceptSelf2(int[] nums) {
-        int len = nums.length;
-
-        int[] result = new int[len];
+        // Compute left products
         result[0] = 1;
-        for(int i=1; i<len; i++) {
-            result[i] = nums[i-1] * result[i-1];
+        for (int i = 1; i < len; i++) {
+            result[i] = result[i - 1] * nums[i - 1];
         }
 
-        int rightMul = 1;
-        for(int i=len-2; i>=0; i--) {
-            rightMul = rightMul * nums[i+1];
-            result[i] = rightMul * result[i];
+        // Multiply by right products in reverse
+        int rightProduct = 1;
+        for (int i = len - 1; i >= 0; i--) {
+            result[i] *= rightProduct;
+            rightProduct *= nums[i]; // Update right product
         }
+
         return result;
     }
-
 }

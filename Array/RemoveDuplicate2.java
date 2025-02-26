@@ -2,31 +2,28 @@ package Array;
 
 import java.util.Arrays;
 
-/**
- * Given an integer array nums sorted in non-decreasing order,
- * remove some duplicates in-place such that each unique element appears at most twice.
- * The relative order of the elements should be kept the same.
- */
 public class RemoveDuplicate2 {
     public static void main(String[] args) {
-        int[] nums = {0,0,1,1,1,1,2,3,3};
-        int k = new RemoveDuplicate2().removeDuplicates(nums);
-        System.out.println(k);
-        System.out.println(Arrays.toString(nums));
+        int[] nums = {0, 0, 1, 1, 1, 1, 2, 3, 3};
+        int newLength = removeDuplicates(nums);
+        
+        System.out.println("New Length: " + newLength);
+        System.out.println("Modified Array: " + Arrays.toString(Arrays.copyOf(nums, newLength)));
     }
 
-    public int removeDuplicates(int[] nums) {
-        int count = 1;
-        int k = 1;
+    public static int removeDuplicates(int[] nums) {
+        if (nums.length == 0) return 0;
 
-        for(int i=1; i<nums.length; i++) {
-            if(nums[i] == nums[i-1]) count++;
-            else count = 1;
+        int insertIndex = 1;
+        int occurrenceCount = 1;
 
-            if(count <= 2) nums[k++] = nums[i];
+        for (int i = 1; i < nums.length; i++) {
+            occurrenceCount = (nums[i] == nums[i - 1]) ? occurrenceCount + 1 : 1;
+
+            if (occurrenceCount <= 2) {
+                nums[insertIndex++] = nums[i];
+            }
         }
-        return k;
+        return insertIndex;
     }
-
-
 }

@@ -1,88 +1,57 @@
 package Array;
 
-/**
- * prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings.
- * There are various applications of this data structure, such as autocomplete and spellchecker.
- */
+import java.util.HashMap;
+import java.util.Map;
+
 public class TrieTest {
     public static void main(String[] args) {
         Trie trie = new Trie();
         trie.insert("apple");
-        System.out.println(trie.search("apple"));
-        System.out.println(trie.search("app"));
-        System.out.println(trie.startsWith("app"));
+        System.out.println(trie.search("apple"));  // true
+        System.out.println(trie.search("app"));    // false
+        System.out.println(trie.startsWith("app"));// true
         trie.insert("app");
-        System.out.println(trie.search("app"));
-        System.out.println(trie.startsWith("app"));
+        System.out.println(trie.search("app"));    // true
+        System.out.println(trie.startsWith("app"));// true
     }
 }
 
 class Trie {
-
     private TrieNode root;
 
-    /**
-     * Initialize your data structure here.
-     */
     public Trie() {
-        root = new TrieNode(' ');
+        root = new TrieNode();
     }
 
-    /**
-     * Inserts a word into the trie.
-     */
     public void insert(String word) {
-        TrieNode temp = root;
-
-        for (int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
-            if (temp.children[c - 'a'] == null) {
-                temp.children[c - 'a'] = new TrieNode(c);
-            }
-            temp = temp.children[c - 'a'];
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node.children.putIfAbsent(c, new TrieNode());
+            node = node.children.get(c);
         }
-        temp.isWord = true;
+        node.isWord = true;
     }
 
-    /**
-     * Returns if the word is in the trie.
-     */
     public boolean search(String word) {
-        TrieNode temp = root;
-
-        for (int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
-            if (temp.children[c - 'a'] == null) return false;
-            temp = temp.children[c - 'a'];
-        }
-        return temp.isWord;
+        TrieNode node = getNode(word);
+        return node != null && node.isWord;
     }
 
-    /**
-     * Returns if there is any word in the trie that starts with the given prefix.
-     */
     public boolean startsWith(String prefix) {
-        TrieNode temp = root;
+        return getNode(prefix) != null;
+    }
 
-        for (int i = 0; i < prefix.length(); i++) {
-            char c = prefix.charAt(i);
-            if (temp.children[c - 'a'] == null) return false;
-            temp = temp.children[c - 'a'];
+    private TrieNode getNode(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            if (!node.children.containsKey(c)) return null;
+            node = node.children.get(c);
         }
-        return true;
+        return node;
     }
 }
 
 class TrieNode {
-    TrieNode[] children = new TrieNode[26];
-    public char val;
-    public boolean isWord;
-
-    public TrieNode() {
-    }
-
-    public TrieNode(char c) {
-        this.val = c;
-    }
-
+    Map<Character, TrieNode> children = new HashMap<>();
+    boolean isWord;
 }

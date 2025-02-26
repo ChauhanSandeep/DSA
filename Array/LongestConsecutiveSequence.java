@@ -7,52 +7,39 @@ import java.util.stream.Collectors;
 /**
  * Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
  * You must write an algorithm that runs in O(n) time.
- *
- * https://leetcode.com/problems/longest-consecutive-sequence/
+ * 
+ * LeetCode: https://leetcode.com/problems/longest-consecutive-sequence/
  */
 public class LongestConsecutiveSequence {
     public static void main(String[] args) {
         int[] nums = {100, 4, 200, 1, 3, 2};
         int result = new LongestConsecutiveSequence().longestConsecutive(nums);
-        System.out.println(result);
+        System.out.println("Longest Consecutive Sequence Length: " + result);
     }
 
     public int longestConsecutive(int[] nums) {
-        Set<Integer> set = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+        if (nums.length == 0) return 0;
 
-        int max = 0;
-        for (int i = 0; i < nums.length; i++) {
-            if (set.contains(nums[i])) {
-                int currMax = 1;
-                set.remove(nums[i]);
-                currMax += lowerSide(nums[i] - 1, set);
-                currMax += higherSide(nums[i] + 1, set);
-                max = Math.max(max, currMax);
+        // Convert array to set for O(1) lookups
+        Set<Integer> numSet = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+
+        int longestSequence = 0;
+
+        for (int num : numSet) {
+            // Only process if it's the start of a sequence
+            if (!numSet.contains(num - 1)) {
+                int currentNum = num;
+                int currentStreak = 1;
+
+                while (numSet.contains(currentNum + 1)) {
+                    currentNum++;
+                    currentStreak++;
+                }
+
+                longestSequence = Math.max(longestSequence, currentStreak);
             }
         }
-        return max;
 
+        return longestSequence;
     }
-
-    public int lowerSide(int num, Set<Integer> set) {
-        int count = 0;
-
-        while (set.contains(num)) {
-            count++;
-            set.remove(num);
-            num--;
-        }
-        return count;
-    }
-
-    public int higherSide(int num, Set<Integer> set) {
-        int count = 0;
-        while (set.contains(num)) {
-            count++;
-            set.remove(num);
-            num++;
-        }
-        return count;
-    }
-
 }
