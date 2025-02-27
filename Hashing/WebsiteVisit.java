@@ -1,67 +1,54 @@
 package Hashing;
 
-import java.util.*;
-
 /**
- * https://leetcode.com/problems/analyze-user-website-visit-pattern/
+ * LeetCode: https://leetcode.com/problems/reconstruct-original-digits-from-english/
+ *
+ * Given a string containing an unordered English representation of digits 0-9,
+ * return the digits in ascending order.
+ *
+ * Approach:
+ * - Count the frequency of each character in the input string.
+ * - Use unique identifiers for specific digits (e.g., 'z' uniquely identifies "zero").
+ * - Deduct known digits to determine remaining ones.
+ * - Construct the output by appending digits in order based on frequency.
+ *
+ * Time Complexity: O(N) - We iterate over the input string and process a fixed set of characters.
+ * Space Complexity: O(1) - Uses a constant-size frequency array and output storage.
  */
-public class WebsiteVisit {
+public class OriginalDigits {
+
     public static void main(String[] args) {
-        String[] username = {"u1","u1","u1","u2","u2","u2"};
-        String[] website =  {"a", "b", "a", "a", "b", "c"};
-        int[] timestamp = {1,2,3,4,5,6};
-
-        List<String> result = new WebsiteVisit().mostVisitedPattern(username, timestamp, website);
-        System.out.println(result);
+        String result = new OriginalDigits().reconstructDigits("owoztneoer");
+        System.out.println(result); // Expected output: "012"
     }
 
-    public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
-        Map<String, List<Pair>> userPairMap = new HashMap<>();
-        int length = username.length;
-        // collect the website info for every user, key: username, value: (timestamp, website)
-        for (int i = 0; i < length; i++) {
-            userPairMap.putIfAbsent(username[i], new ArrayList<>());
-            userPairMap.get(username[i]).add(new Pair(timestamp[i], website[i]));
+    public String reconstructDigits(String s) {
+        int[] letterFrequency = new int[26]; // Frequency array for letters 'a' to 'z'
+        for (char ch : s.toCharArray()) {
+            letterFrequency[ch - 'a']++;
         }
-        // patternFreqMap userPairMap to record every 3 combination occuring time for the different user.
-        Map<String, Integer> patternFreqMap = new HashMap<>();
-        String res = "";
-        for (String user : userPairMap.keySet()) {
-            Set<String> set = new HashSet<>();
-            // this set is to avoid visit the same 3-seq in one user
-            List<Pair> pairList = userPairMap.get(user);
-            Collections.sort(pairList, (a, b) -> (a.time - b.time)); // sort by time
-            // brutal force O(N ^ 3)
-            for (int i = 0; i < pairList.size(); i++) {
-                for (int j = i + 1; j < pairList.size(); j++) {
-                    for (int k = j + 1; k < pairList.size(); k++) {
-                        String str = pairList.get(i).web + " " + pairList.get(j).web + " " + pairList.get(k).web;
-                        if (!set.contains(str)) {
-                            patternFreqMap.put(str, patternFreqMap.getOrDefault(str, 0) + 1);
-                            set.add(str);
-                        }
-                        if (res.equals("") || patternFreqMap.get(res) < patternFreqMap.get(str) || (patternFreqMap.get(res) == patternFreqMap.get(str) && res.compareTo(str) > 0)) {
-                            // make sure the right lexi order
-                            res = str;
-                        }
-                    }
-                }
-            }
+
+        int[] digitFrequency = new int[10]; // Stores frequency of digits 0-9
+        
+        // Identify unique digits using distinct characters
+        digitFrequency[0] = letterFrequency['z' - 'a']; // 'z' is unique to "zero"
+        digitFrequency[2] = letterFrequency['w' - 'a']; // 'w' is unique to "two"
+        digitFrequency[4] = letterFrequency['u' - 'a']; // 'u' is unique to "four"
+        digitFrequency[6] = letterFrequency['x' - 'a']; // 'x' is unique to "six"
+        digitFrequency[8] = letterFrequency['g' - 'a']; // 'g' is unique to "eight"
+
+        // Identify remaining digits by subtracting known occurrences
+        digitFrequency[3] = letterFrequency['h' - 'a'] - digitFrequency[8]; // "three" shares 'h' with "eight"
+        digitFrequency[5] = letterFrequency['f' - 'a'] - digitFrequency[4]; // "five" shares 'f' with "four"
+        digitFrequency[7] = letterFrequency['s' - 'a'] - digitFrequency[6]; // "seven" shares 's' with "six"
+        digitFrequency[9] = letterFrequency['i' - 'a'] - digitFrequency[5] - digitFrequency[6] - digitFrequency[8]; // "nine" shares 'i'
+        digitFrequency[1] = letterFrequency['n' - 'a'] - digitFrequency[7] - 2 * digitFrequency[9]; // "one" shares 'n' with "nine" and "seven"
+
+        // Construct the sorted digit string
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            result.append(String.valueOf(i).repeat(digitFrequency[i]));
         }
-        // grab the right answer
-        String[] splitArr = res.split(" ");
-        List<String> result = new ArrayList<>();
-        Collections.addAll(result, splitArr);
-        return result;
-    }
-}
-
-class Pair {
-    int time;
-    String web;
-
-    public Pair(int time, String web) {
-        this.time = time;
-        this.web = web;
+        return result.toString();
     }
 }

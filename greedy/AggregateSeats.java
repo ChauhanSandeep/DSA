@@ -7,55 +7,47 @@ public class AggregateSeats {
 
     public static void main(String[] args) {
         String str = "....x..xx...x..";
-        System.out.println(new AggregateSeats().seats(str));
+        System.out.println(new AggregateSeats().minMovesToAggregateSeats(str));
     }
 
-    public int median(String str) {
-        int count = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == 'x') count++;
+    // Find the median index of 'x' occurrences
+    private int findMedianIndex(String str) {
+        int count = 0, currCount = 0, index = 0;
+
+        for (char ch : str.toCharArray()) {
+            if (ch == 'x') count++;
         }
+        if (count == 0) return -1;
 
         int halfCount = (count + 1) / 2;
-        if (halfCount == 0) return -1;
-
-        int currCount = 0;
-        int index = 0;
-        while (currCount < halfCount) {
-            if (str.charAt(index) == 'x') currCount++;
-            index++;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == 'x') currCount++;
+            if (currCount == halfCount) return i;
         }
-        return index - 1;
+        return -1;
     }
 
-    public int seats(String str) {
-        // 1. Find median index. Around this index all 'x' would be consolidated
-        int mid = median(str);
+    public int minMovesToAggregateSeats(String str) {
+        int mid = findMedianIndex(str);
         if (mid == -1) return 0;
 
-        int MOD = 10000003;
+        final int MODULO = 10000003;
         long totalJumps = 0;
 
-        // 2. Fill left side of mid index
-        int availableIndex = mid - 1;
-        int currIndex = mid - 1;
-        while (currIndex >= 0) {
-            if (str.charAt(currIndex) == 'x') {
-                totalJumps = (totalJumps + availableIndex - currIndex) % MOD;
+        // Move left side towards the median
+        for (int i = mid - 1, availableIndex = mid - 1; i >= 0; i--) {
+            if (str.charAt(i) == 'x') {
+                totalJumps = (totalJumps + (availableIndex - i)) % MODULO;
                 availableIndex--;
             }
-            currIndex--;
         }
 
-        // 3. Fill right side of mid index
-        currIndex = mid + 1;
-        availableIndex = mid + 1;
-        while (currIndex < str.length()) {
-            if (str.charAt(currIndex) == 'x') {
-                totalJumps = (totalJumps + currIndex - availableIndex) % MOD;
+        // Move right side towards the median
+        for (int i = mid + 1, availableIndex = mid + 1; i < str.length(); i++) {
+            if (str.charAt(i) == 'x') {
+                totalJumps = (totalJumps + (i - availableIndex)) % MODULO;
                 availableIndex++;
             }
-            currIndex++;
         }
 
         return (int) totalJumps;

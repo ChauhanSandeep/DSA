@@ -1,6 +1,5 @@
 package LinkedList;
 
-
 import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
@@ -40,7 +39,6 @@ public class PalllindromeList {
         }
         fast = reverse(slow);
         return compare(head, fast);
-
     }
 
     public static ListNode reverse(ListNode head) {

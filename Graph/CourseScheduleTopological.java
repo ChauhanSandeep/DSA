@@ -1,42 +1,51 @@
 package Graph;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class CourseScheduleTopological {
     public boolean canFinish(int numCourses, int[][] prerequisites) {
+        // Step 1: Initialize adjacency list and in-degree array
+        List<List<Integer>> graph = new ArrayList<>(numCourses);
+        int[] inDegree = new int[numCourses];
 
-        // create inDegreeArr (incoming vertices to the node) for each node
-        // create queue with starting courses
-        // traverse queue and reduce inDegree of the nodes whose prerequisites are in queue
-        // if inDegree of any node becomes 0 then add it to queue
-        // in the end inDegree of all the nodes should be 0
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new ArrayList<>());
+        }
 
+        for (int[] relation : prerequisites) {
+            int course = relation[0], prereq = relation[1];
+            graph.get(prereq).add(course);
+            inDegree[course]++;
+        }
+
+        // Step 2: Find all courses with no prerequisites (in-degree 0)
         Queue<Integer> queue = new LinkedList<>();
-        int[] inDegreeArr = new int[numCourses];
-        for(int[] relation: prerequisites) {
-            inDegreeArr[relation[0]]++;
+        for (int i = 0; i < numCourses; i++) {
+            if (inDegree[i] == 0) queue.offer(i);
         }
 
-        for(int i=0; i<numCourses; i++) {
-            if(inDegreeArr[i] == 0) queue.offer(i); // find start courses
-        }
+        // Step 3: Process courses using BFS
+        int processedCourses = 0;
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            processedCourses++;
 
-        // begin traverse
-        while(!queue.isEmpty()) {
-            int startCourse = queue.poll();
-            for (int[] relation : prerequisites) {
-                if (relation[1] == startCourse) {
-                    if (--inDegreeArr[relation[0]] == 0) {
-                        queue.offer(relation[0]);
-                    }
+            for (int neighbor : graph.get(current)) {
+                if (--inDegree[neighbor] == 0) {
+                    queue.offer(neighbor);
                 }
             }
         }
 
-        for(Integer inDegree: inDegreeArr) {
-            if(inDegree != 0) return false;
-        }
-        return true;
+        // Step 4: If all courses were processed, return true; otherwise, a cycle exists
+        return processedCourses == numCourses;
+    }
+
+    public static void main(String[] args) {
+        CourseScheduleTopological scheduler = new CourseScheduleTopological();
+        int numCourses = 2;
+        int[][] prerequisites = { {1, 0}, {0, 1} };
+
+        System.out.println("Can finish courses: " + scheduler.canFinish(numCourses, prerequisites));
     }
 }

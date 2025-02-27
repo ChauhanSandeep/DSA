@@ -9,7 +9,6 @@ import java.util.Set;
 - Using the hashmap as the index to find out where the key is located in linked list.
 - Dealing with the key in a double linked list.
 
-
 A Node contains all keys with the same value. The head keeps track of the Node with highest value and tail keeps track of Node with lowest value. 
 The nodes from tail to head have values in increasing order. A hashmap has been used to reach the desired Node with the given key in O(1) time.
 
@@ -125,10 +124,4 @@ class AllOne {
 }
 
 /**
- * Your AllOne object will be instantiated and called as such:
- * AllOne obj = new AllOne();
- * obj.inc(key);
- * obj.dec(key);
- * String param_3 = obj.getMaxKey();
- * String param_4 = obj.getMinKey();
- */
+ * Your Al

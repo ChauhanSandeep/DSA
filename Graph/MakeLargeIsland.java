@@ -1,15 +1,7 @@
 package Graph;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-/**
- * You are given an n x n binary matrix grid. You are allowed to change at most one 0 to be 1.
- * Return the size of the largest island in grid after applying this operation.
- * An island is a 4-directionally connected group of 1s.
- */
 public class MakeLargeIsland {
     public static void main(String[] args) {
         int[][] grid = {
@@ -21,53 +13,75 @@ public class MakeLargeIsland {
     }
 
     public int largestIsland(int[][] grid) {
-        int id = 2;
-        int result = 0;
-        Map<Integer, Integer> map = new HashMap<>(); // <id, size>
-        // 1. mark island with id
-        for(int i=0; i<grid.length; i++) {
-            for(int j= 0; j<grid[i].length; j++){
-                if(grid[i][j] == 1) {
-                    int currSize = findSize(grid, i, j, id);
-                    result = Math.max(currSize, result);
-                    map.put(id, currSize);
-                    id++;
+        int n = grid.length;
+        int islandId = 2;  // Unique ID for each island
+        int maxIslandSize = 0;
+        Map<Integer, Integer> islandSizeMap = new HashMap<>();
+
+        // First Pass: Label islands & store sizes
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) {
+                    int size = dfs(grid, i, j, islandId);
+                    islandSizeMap.put(islandId, size);
+                    maxIslandSize = Math.max(maxIslandSize, size);
+                    islandId++;
                 }
             }
         }
-        // 2. connect island
-        for(int i=0; i<grid.length; i++) {
-            for(int j=0; j<grid[i].length; j++) {
-                if(grid[i][j] == 0) {
-                    int tentative = 1 + findConnected(grid, i, j, map);
-                    result = Math.max(result, tentative);
+
+        // Second Pass: Try flipping each `0`
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 0) {
+                    maxIslandSize = Math.max(maxIslandSize, 1 + computeNewIslandSize(grid, i, j, islandSizeMap));
                 }
             }
         }
-        return result;
+        return maxIslandSize;
     }
 
-    private int findSize(int[][] grid, int i, int j, int id) {
-        if(i<0 || i>=grid.length || j<0 || j>=grid[i].length || grid[i][j] != 1) {
-            return 0;
+    private int dfs(int[][] grid, int i, int j, int islandId) {
+        int n = grid.length;
+        Stack<int[]> stack = new Stack<>();
+        stack.push(new int[]{i, j});
+        grid[i][j] = islandId;
+        int size = 0;
+
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+        while (!stack.isEmpty()) {
+            int[] cell = stack.pop();
+            int x = cell[0], y = cell[1];
+            size++;
+
+            for (int[] dir : directions) {
+                int newX = x + dir[0], newY = y + dir[1];
+                if (newX >= 0 && newX < n && newY >= 0 && newY < n && grid[newX][newY] == 1) {
+                    grid[newX][newY] = islandId;
+                    stack.push(new int[]{newX, newY});
+                }
+            }
         }
-        grid[i][j] = id;
-        return 1 + findSize(grid, i + 1, j, id) + findSize(grid, i, j + 1, id)
-                + findSize(grid, i - 1, j, id) + findSize(grid, i, j - 1, id);
+        return size;
     }
 
-    private int findConnected(int[][] grid, int i, int j, Map<Integer, Integer> map) {
-        int connectedSize = 0;
-        Set<Integer> connectedIds = new HashSet<>();
+    private int computeNewIslandSize(int[][] grid, int i, int j, Map<Integer, Integer> islandSizeMap) {
+        int n = grid.length;
+        Set<Integer> uniqueIslands = new HashSet<>();
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-        if(i>0) connectedIds.add(grid[i - 1][j]);
-        if(i<grid.length - 1) connectedIds.add(grid[i + 1][j]);
-        if(j>0) connectedIds.add(grid[i][j - 1]);
-        if(j<grid[i].length - 1) connectedIds.add(grid[i][j + 1]);
-
-        for(Integer id: connectedIds) {
-            connectedSize += map.getOrDefault(id, 0);
+        for (int[] dir : directions) {
+            int newX = i + dir[0], newY = j + dir[1];
+            if (newX >= 0 && newX < n && newY >= 0 && newY < n && grid[newX][newY] > 1) {
+                uniqueIslands.add(grid[newX][newY]);
+            }
         }
-        return connectedSize;
+
+        int newSize = 0;
+        for (int islandId : uniqueIslands) {
+            newSize += islandSizeMap.get(islandId);
+        }
+        return newSize;
     }
 }

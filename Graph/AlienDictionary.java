@@ -1,32 +1,14 @@
 package Graph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import java.util.*;
 
-
-/**
- * This class determines the lexicographical order of characters in an alien language.
- * The input is a list of words sorted lexicographically according to the unknown language.
- * The goal is to derive the correct character precedence rules and return a valid order.
- *
- * Algorithm:
- * - Construct a directed graph where an edge A → B means 'A' appears before 'B' in the language.
- * - Use Kahn's Algorithm (Topological Sorting) via BFS to derive a valid order.
- *
- * Time Complexity: O(C) where C is the total number of characters across all words.
- * Space Complexity: O(1) since the maximum number of unique characters is 26 (A-Z).
- */
 public class AlienDictionary {
 
   public static void main(String[] args) {
     String[] words = {"wrt", "wrf", "er", "ett", "rftt"};
     AlienDictionary solver = new AlienDictionary();
     String order = solver.findAlienLanguageOrder(words);
-    System.out.println(order);
+    System.out.println(order); // Expected Output: "wertf"
   }
 
   /**
@@ -36,6 +18,8 @@ public class AlienDictionary {
    * @return A string representing the character order, or an empty string if no valid order exists.
    */
   public String findAlienLanguageOrder(String[] words) {
+    if (words == null || words.length == 0) return "";
+
     // Step 1: Initialize Graph Data Structures
     Map<Character, List<Character>> adjacencyList = new HashMap<>();
     Map<Character, Integer> inDegree = new HashMap<>();
@@ -60,11 +44,15 @@ public class AlienDictionary {
 
       // Find the first differing character and establish precedence
       for (int j = 0; j < Math.min(firstWord.length(), secondWord.length()); j++) {
-        char from = firstWord.charAt(j);
-        char to = secondWord.charAt(j);
-        if (from != to) {
-          adjacencyList.get(from).add(to);
-          inDegree.put(to, inDegree.get(to) + 1);
+        char parent = firstWord.charAt(j);
+        char child = secondWord.charAt(j);
+        
+        if (parent != child) {
+          // Only add edge if it doesn't already exist
+          if (!adjacencyList.get(parent).contains(child)) {
+            adjacencyList.get(parent).add(child);
+            inDegree.put(child, inDegree.get(child) + 1);
+          }
           break; // Stop at the first differing character
         }
       }
@@ -75,9 +63,9 @@ public class AlienDictionary {
     Deque<Character> queue = new ArrayDeque<>();
 
     // Start with characters that have no dependencies (in-degree = 0)
-    for (char character : inDegree.keySet()) {
-      if (inDegree.get(character) == 0) {
-        queue.offer(character);
+    for (Map.Entry<Character, Integer> entry : inDegree.entrySet()) {
+      if (entry.getValue() == 0) {
+        queue.offer(entry.getKey());
       }
     }
 

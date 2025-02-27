@@ -1,64 +1,55 @@
 package Graph;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-/**
- * Given an array of {course, prerequisite} find if we numOfCourses can be completed
- */
 public class CourseSchedule {
     public static void main(String[] args) {
-        int[][] arr = {
-                {1, 0},
-                {0, 1}
+        int[][] prerequisites = {
+            {1, 0},
+            {0, 1}
         };
-        boolean canFinish = new CourseSchedule().canFinishUsingDFS(2, arr);
-        System.out.println(canFinish);
 
+        CourseSchedule cs = new CourseSchedule();
+        boolean canFinish = cs.canFinishUsingDFS(2, prerequisites);
+        System.out.println("Can finish all courses: " + canFinish);
     }
 
     public boolean canFinishUsingDFS(int numCourses, int[][] prerequisites) {
+        // Step 1: Build adjacency list (courseMap)
         HashMap<Integer, List<Integer>> courseMap = new HashMap<>();
-        // create map
-        for (int[] relation : prerequisites) {
-            int pre = relation[1];
-            int course = relation[0];
-            if (courseMap.containsKey(pre)) {
-                courseMap.get(pre).add(course);
-            } else {
-                List<Integer> nextCourses = new LinkedList<>();
-                nextCourses.add(course);
-                courseMap.put(pre, nextCourses);
+        for (int[] pair : prerequisites) {
+            int course = pair[0], pre = pair[1];
+            courseMap.computeIfAbsent(pre, k -> new ArrayList<>()).add(course);
+        }
+
+        // Step 2: Track visited states (0 = unvisited, 1 = visiting, 2 = visited)
+        int[] visited = new int[numCourses];
+
+        // Step 3: Check for cycles using DFS
+        for (int course = 0; course < numCourses; course++) {
+            if (hasCycle(course, courseMap, visited)) {
+                return false; // Cycle detected -> can't finish courses
             }
         }
 
-        Boolean[] cycle = new Boolean[numCourses];
-        // check for cycle
-        for (int i = 0; i < numCourses; ++i) {
-            if (this.isCyclic(i, courseMap, cycle)) {
-                return false;
-            }
-        }
-
-        return true;
+        return true; // No cycle detected -> can finish courses
     }
 
-    protected boolean isCyclic(Integer current, HashMap<Integer, List<Integer>> courseMap, Boolean[] cycle) {
-        if(cycle[current] != null) return cycle[current];
-        if (!courseMap.containsKey(current)) return false;
-        cycle[current] = true;
+    private boolean hasCycle(int course, HashMap<Integer, List<Integer>> courseMap, int[] visited) {
+        if (visited[course] == 1) return true;  // Cycle detected
+        if (visited[course] == 2) return false; // Already processed, no cycle
 
-        boolean result;
-        for (Integer nextCourse : courseMap.get(current)) {
-            result = this.isCyclic(nextCourse, courseMap, cycle);
-            if (result) {
-                cycle[current] = true;
-                return true;
+        visited[course] = 1; // Mark as visiting
+
+        if (courseMap.containsKey(course)) {
+            for (int nextCourse : courseMap.get(course)) {
+                if (hasCycle(nextCourse, courseMap, visited)) {
+                    return true;
+                }
             }
         }
-        cycle[current] = false;
+
+        visited[course] = 2; // Mark as fully visited (no cycle)
         return false;
     }
 }

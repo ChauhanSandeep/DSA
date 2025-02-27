@@ -1,17 +1,11 @@
 package Graph;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 public class CurrencyConversion {
 
-    private class Rate {
-        String fromCurrency;
-        String toCurrency;
+    private static class Rate {
+        String fromCurrency, toCurrency;
         double amount;
 
         public Rate(String fromCurrency, String toCurrency, double amount) {
@@ -21,131 +15,83 @@ public class CurrencyConversion {
         }
     }
 
-    private class Pair implements Comparable<Pair> {
+    private static class Pair implements Comparable<Pair> {
         String currency;
-        String parent;
         double cost;
 
-        public Pair(String parent, String currency, double cost) {
+        public Pair(String currency, double cost) {
             this.currency = currency;
-            this.parent = parent;
             this.cost = cost;
         }
 
         @Override
         public int compareTo(Pair o) {
-            if (this.cost == o.cost) {
-                return 1;
-            } else {
-                return Double.compare(this.cost, o.cost);
-            }
+            return Double.compare(o.cost, this.cost); // Max heap for best conversion rate
         }
     }
 
-    HashMap<String, HashMap<String, Double>> graph = new HashMap<>();
+    private final Map<String, Map<String, Double>> graph = new HashMap<>();
 
     /**
-     * add all the currency conversion rate
-     * @param rates
+     * Add all currency conversion rates to the graph.
      */
-    private void addCurrencies(List<Rate> rates) {
-
+    public void addCurrencies(List<Rate> rates) {
         for (Rate rate : rates) {
-            if (!graph.containsKey(rate.fromCurrency)) {
-                graph.put(rate.fromCurrency, new HashMap<>());
-            }
+            graph.putIfAbsent(rate.fromCurrency, new HashMap<>());
+            graph.putIfAbsent(rate.toCurrency, new HashMap<>());
 
-            graph.get(rate.fromCurrency).put(rate.fromCurrency, 1.0);
-
+            // Store forward and reverse conversion
             graph.get(rate.fromCurrency).put(rate.toCurrency, rate.amount);
-        }
-
-        for (Rate rate : rates) {
-            for (Map.Entry<String, Double> val : graph.get(rate.fromCurrency).entrySet()) {
-                if (!graph.containsKey(val.getKey())) {
-                    graph.put(val.getKey(), new HashMap<>());
-                }
-
-                graph.get(val.getKey()).put(val.getKey(), 1.0);
-
-                if (!graph.get(val.getKey()).containsKey(rate.fromCurrency)) {
-                    graph.get(val.getKey()).put(rate.fromCurrency, 1.0 / val.getValue());
-                }
-            }
+            graph.get(rate.toCurrency).put(rate.fromCurrency, 1.0 / rate.amount);
         }
     }
 
     /**
-     * Find conversion rate source currency to target currency
-     * @param source
-     * @param target
-     * @return
+     * Find the best conversion rate from source to target using Dijkstra's Algorithm.
      */
     public double findConversionRate(String source, String target) {
-        if (!graph.containsKey(source)) {
-            return -1;
-        }
+        if (!graph.containsKey(source) || !graph.containsKey(target)) return -1;
+        if (source.equals(target)) return 1.0;
 
-        Queue<Pair> queue = new PriorityQueue<>();
-        queue.add(new Pair(null, source, 1.0));
+        PriorityQueue<Pair> queue = new PriorityQueue<>();
+        Map<String, Double> maxRates = new HashMap<>();
+        Set<String> visited = new HashSet<>();
 
-        Map<String, Double> dp = new HashMap<>();
-        Map<String, String> parentMap = new HashMap<>();
-        parentMap.put(source, source);
+        queue.add(new Pair(source, 1.0));
+        maxRates.put(source, 1.0);
 
         while (!queue.isEmpty()) {
-            Pair currPair = queue.poll();
-            String top = currPair.currency;
+            Pair curr = queue.poll();
+            if (visited.contains(curr.currency)) continue;
+            visited.add(curr.currency);
 
-            if (dp.containsKey(top) && dp.get(top) < currPair.cost) {
-                continue;
-            }
+            for (Map.Entry<String, Double> neighbor : graph.get(curr.currency).entrySet()) {
+                String nextCurrency = neighbor.getKey();
+                double newRate = curr.cost * neighbor.getValue();
 
-            dp.put(top, currPair.cost);
-            parentMap.put(top, currPair.parent);
-            graph.get(source).put(top, currPair.cost);
-
-            for (Map.Entry<String, Double> dest : graph.get(top).entrySet()) {
-                double rate = graph.get(source).get(top) * dest.getValue();
-
-                if (dp.containsKey(dest.getKey()) && dp.get(dest.getKey()) >= rate || dest.getKey().equals(source)) {
-                    continue;
+                if (!maxRates.containsKey(nextCurrency) || newRate > maxRates.get(nextCurrency)) {
+                    maxRates.put(nextCurrency, newRate);
+                    queue.add(new Pair(nextCurrency, newRate));
                 }
-                queue.add(new Pair(top, dest.getKey(), rate));
             }
         }
 
-
-        if (!graph.get(source).containsKey(target)) {
-            return -1;
-        }
-
-        System.out.println(getPath(parentMap, source, target));
-        return graph.get(source).get(target);
+        return maxRates.getOrDefault(target, -1.0);
     }
 
-    private String getPath(Map<String, String> parent, String from, String to) {
-        String current = to;
-        System.out.println(current);
-        Stack<String> res = new Stack<>();
-        res.add(to);
-        while (!parent.get(current).equals(from)) {
-            current = parent.get(current);
-            res.add(current);
-        }
+    public static void main(String[] args) {
+        CurrencyConversion converter = new CurrencyConversion();
+        List<Rate> rates = Arrays.asList(
+            new Rate("USD", "EUR", 0.85),
+            new Rate("EUR", "GBP", 0.75),
+            new Rate("USD", "INR", 74.0),
+            new Rate("GBP", "JPY", 150.0)
+        );
 
-        StringBuilder stringBuilder = new StringBuilder();
-        res.add(from);
+        converter.addCurrencies(rates);
 
-        while (res.size() != 0) {
-
-            stringBuilder.append(res.pop());
-            if (res.size() > 0) {
-                stringBuilder.append(" -> ");
-            }
-        }
-        return stringBuilder.toString();
+        System.out.println("USD to EUR: " + converter.findConversionRate("USD", "EUR"));
+        System.out.println("USD to GBP: " + converter.findConversionRate("USD", "GBP"));
+        System.out.println("INR to JPY: " + converter.findConversionRate("INR", "JPY"));
     }
-
-
 }
