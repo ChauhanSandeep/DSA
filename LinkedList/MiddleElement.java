@@ -1,38 +1,45 @@
 package LinkedList;
 
-import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
-public class MiddleElement {
+/**
+ * Given a Circular Linked List node, which is sorted in ascending order, write a function to insert a value insertVal into the list such that it remains a sorted circular list.
+ *
+ * https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/
+ */
+public class InsertSortedCircularLinkedList {
+
     public static void main(String[] args) {
-        ListNode head = new ListNode(1);
-        LinkedList list = new LinkedList(head);
-        list.add(new ListNode(2));
-        list.add(new ListNode(3));
-        list.add(new ListNode(4));
-        list.add(new ListNode(5));
-        list.add(new ListNode(6));
-
-        System.out.println(middleElement(head));
-
+        ListNode head = new ListNode(3);
+        head.next = new ListNode(4);
+        head.next.next = new ListNode(1);
+        head.next.next.next = head;
+        
+        InsertSortedCircularLinkedList list = new InsertSortedCircularLinkedList();
+        list.insert(head, 2);
     }
 
-    /**
-     * Find middle element of a linked list
-     * @param head
-     * @return
-     */
-    private static int middleElement(ListNode head) {
-        if (head == null) return -1;
-
-        ListNode slow = head;
-        ListNode fast = head;
-
-        while (fast.getNext() != null && fast.getNext().getNext() != null) {
-            slow = slow.getNext();
-            fast = fast.getNext().getNext();
+    public ListNode insert(ListNode head, int insertVal) {
+        if (head == null) {
+            ListNode node = new ListNode(insertVal);
+            node.next = node;
+            return node;
         }
-        return slow.getVal();
-
+        
+        ListNode temp = head;
+        while (true) {
+            if ((temp.val <= insertVal && insertVal <= temp.next.val) || // Insert within sorted range
+                (temp.val > temp.next.val && (insertVal >= temp.val || insertVal <= temp.next.val)) || // Insert at boundary
+                (temp.next == head)) { // Insert if full loop completed
+                
+                ListNode node = new ListNode(insertVal);
+                node.next = temp.next;
+                temp.next = node;
+                break;
+            }
+            
+            temp = temp.next;
+        }
+        return head;
     }
 }

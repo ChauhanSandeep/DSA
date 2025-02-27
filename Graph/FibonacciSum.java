@@ -1,28 +1,34 @@
 package Graph;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FibonacciSum {
     public static void main(String[] args) {
-        System.out.println(new FibonacciSum().fibsum(11));
+        System.out.println(new FibonacciSum().fibsum(11)); // Output: 2 (8 + 3)
+        System.out.println(new FibonacciSum().fibsum(17)); // Output: 3 (13 + 3 + 1)
+        System.out.println(new FibonacciSum().fibsum(19)); // Output: 3 (13 + 5 + 1)
     }
-    // 1, 1, 2, 3, 5
-    // S(n) = F(n+2) – 1
-    public int fibsum(int num) {
-        int fib[] = new int[60];
-        fib[0] = 0;
-        fib[1] = 1;
-        int i = 2;
 
-        while (fib[i - 1] + fib[i - 2] <= num) {
-            fib[i] = fib[i - 1] + fib[i - 2];
-            i++;
+    public int fibsum(int num) {
+        // Generate Fibonacci numbers up to num
+        List<Integer> fibList = new ArrayList<>();
+        fibList.add(1);
+        fibList.add(1);
+
+        while (fibList.get(fibList.size() - 1) + fibList.get(fibList.size() - 2) <= num) {
+            fibList.add(fibList.get(fibList.size() - 1) + fibList.get(fibList.size() - 2));
         }
-        i--;
+
         int count = 0;
+        int fibIndex = fibList.size() - 1;
+
+        // Find the minimum number of Fibonacci numbers that sum to num
         while (num > 0) {
-            while (fib[i] > num) {
-                i--;
+            while (fibList.get(fibIndex) > num) {
+                fibIndex--;
             }
-            num = num - fib[i];
+            num -= fibList.get(fibIndex);
             count++;
         }
         return count;

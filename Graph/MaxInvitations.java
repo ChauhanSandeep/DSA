@@ -3,35 +3,34 @@ package Graph;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/
- */
 public class MaxInvitations {
 
     public static void main(String[] args) {
-        int[] invitations =  {1, 2, 0};
-        System.out.println(new MaxInvitations().maximumInvitations(invitations));
-
+        int[] invitations = {1, 2, 0};
+        System.out.println("Maximum Invitations: " + new MaxInvitations().maximumInvitations(invitations));
     }
 
     public int maximumInvitations(int[] favorite) {
         int size = favorite.length;
         boolean[] visited = new boolean[size];
-        // topological sort which picks out acyclic part.
+
+        // Step 1: Compute In-Degree for Topological Sort
         int[] inDegree = new int[size];
-        for (int i = 0; i < size; ++i) {
-            int neighbor = favorite[i]; // i -> favorite[i].
-            ++inDegree[neighbor];
+        for (int i = 0; i < size; i++) {
+            inDegree[favorite[i]]++;
         }
+
+        // Step 2: Topological Sorting to Remove Acyclic Nodes
         Queue<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size; i++) {
             if (inDegree[i] == 0) {
                 visited[i] = true;
                 queue.offer(i);
             }
         }
 
-        int[] longestPath = new int[size]; // longestPath[i] is the longest path leading to i exclusively.
+        // Step 3: Compute Longest Path to Any Node
+        int[] longestPath = new int[size];
         while (!queue.isEmpty()) {
             int curr = queue.poll();
             int neighbor = favorite[curr];
@@ -41,29 +40,31 @@ public class MaxInvitations {
                 queue.offer(neighbor);
             }
         }
-        // now not visited nodes are all loops. check each loop's length.
-        int result1 = 0; // loops of length > 2.
-        int result2 = 0; // loops of length 2 and paths leading to both nodes.
-        for (int i = 0; i < size; ++i) {
-            if (!visited[i]) {
-                int curr = i;
-                int loopSize = 0;
 
-                while(!visited[curr]) {
+        // Step 4: Identify Cycles
+        int maxLoopSize = 0;
+        int chainContribution = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (!visited[i]) {  // Found a cycle
+                int curr = i, loopSize = 0;
+
+                // Count the cycle length
+                while (!visited[curr]) {
                     visited[curr] = true;
                     curr = favorite[curr];
                     loopSize++;
                 }
 
                 if (loopSize == 2) {
-                    // 2 nodes + 1 route for each node.
-                    // There can be multiple combinations of 2 nodes so use result2 +=
-                    result2 += 2 + longestPath[i] + longestPath[favorite[i]];
+                    // Special case: loops of length 2 with incoming chains
+                    chainContribution += 2 + longestPath[i] + longestPath[favorite[i]];
                 } else {
-                    result1 = Math.max(result1, loopSize);
+                    maxLoopSize = Math.max(maxLoopSize, loopSize);
                 }
             }
         }
-        return Math.max(result1, result2);
+
+        return Math.max(maxLoopSize, chainContribution);
     }
 }

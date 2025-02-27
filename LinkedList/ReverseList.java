@@ -67,6 +67,3 @@ public class ReverseList {
         if(next != null) {
             head.setNext(reverseLinkedList(next, k));
         }
-        return prev;
-    }
-}

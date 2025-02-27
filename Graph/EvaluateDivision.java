@@ -1,84 +1,72 @@
 package Graph;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
-/**
- * https://leetcode.com/problems/evaluate-division/
- */
 public class EvaluateDivision {
 
     public static void main(String[] args) {
-        List<List<String>> equations = Stream.of(
-                        Stream.of("a", "b").collect(Collectors.toList()),
-                        Stream.of("b", "c").collect(Collectors.toList())
-            ).collect(Collectors.toList());
+        List<List<String>> equations = Arrays.asList(
+                Arrays.asList("a", "b"),
+                Arrays.asList("b", "c")
+        );
 
         double[] values = {2.0, 3.0};
-        List<List<String>> queries =Stream.of(
-                        Stream.of("a","c").collect(Collectors.toList()),
-                        Stream.of("b","a").collect(Collectors.toList()),
-                        Stream.of("a","e").collect(Collectors.toList()),
-                        Stream.of("a","a").collect(Collectors.toList()),
-                        Stream.of("x","x").collect(Collectors.toList())
-            ).collect(Collectors.toList());
-        double[] doubles = new EvaluateDivision().calcEquation(equations, values, queries);
-        System.out.println(Arrays.toString(doubles));
+        List<List<String>> queries = Arrays.asList(
+                Arrays.asList("a", "c"),
+                Arrays.asList("b", "a"),
+                Arrays.asList("a", "e"),
+                Arrays.asList("a", "a"),
+                Arrays.asList("x", "x")
+        );
+
+        EvaluateDivision solver = new EvaluateDivision();
+        double[] results = solver.calcEquation(equations, values, queries);
+        System.out.println(Arrays.toString(results));
     }
 
     public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
-        Map<String, HashMap<String, Double>> map = new HashMap<>();
-        int len = equations.size();
-        for(int i=0; i<len; i++){
+        Map<String, Map<String, Double>> graph = new HashMap<>();
+
+        // Build the graph
+        for (int i = 0; i < equations.size(); i++) {
             String dividend = equations.get(i).get(0);
             String divisor = equations.get(i).get(1);
             double quotient = values[i];
 
-            map.putIfAbsent(dividend, new HashMap<>());
-            map.get(dividend).put(divisor, quotient);
+            graph.putIfAbsent(dividend, new HashMap<>());
+            graph.putIfAbsent(divisor, new HashMap<>());
 
-            map.putIfAbsent(divisor, new HashMap<>());
-            map.get(divisor).put(dividend, 1/quotient);
+            graph.get(dividend).put(divisor, quotient);
+            graph.get(divisor).put(dividend, 1.0 / quotient);
         }
 
-        double[] result = new double[queries.size()];
+        // Process queries
+        double[] results = new double[queries.size()];
         for (int i = 0; i < queries.size(); i++) {
-            List<String> query = queries.get(i);
-            String dividend = query.get(0);
-            String divisor = query.get(1);
+            String dividend = queries.get(i).get(0);
+            String divisor = queries.get(i).get(1);
 
-            if(!map.containsKey(dividend) || !map.containsKey(divisor)) {
-                result[i] = -1;
-                continue;
+            if (!graph.containsKey(dividend) || !graph.containsKey(divisor)) {
+                results[i] = -1.0;
+            } else if (dividend.equals(divisor)) {
+                results[i] = 1.0;
+            } else {
+                Set<String> visited = new HashSet<>();
+                results[i] = dfs(dividend, divisor, graph, visited, 1.0);
             }
-            if(dividend.equals(divisor)) {
-                result[i] = 1;
-                continue;
-            }
-            Set<String> visited = new HashSet<>();
-            result[i] = dfs(dividend, divisor, 1d, map, visited);
         }
-        return result;
+        return results;
     }
 
-    private double dfs(String currNode, String destNode, double resTillNow, Map<String, HashMap<String, Double>> map, Set<String> visited) {
+    private double dfs(String curr, String target, Map<String, Map<String, Double>> graph, Set<String> visited, double value) {
+        if (curr.equals(target)) return value;
+        if (visited.contains(curr)) return -1.0;
 
-        if(currNode.equals(destNode)) return resTillNow;
-        if(!map.containsKey(currNode) || visited.contains(currNode)) return -1d;
-        visited.add(currNode);
-
-        for(Map.Entry<String, Double> child: map.get(currNode).entrySet()) {
-            String nNode = child.getKey();
-            Double jumpVal = child.getValue();
-            double temp = dfs(nNode, destNode, resTillNow * jumpVal, map, visited);
-            if(temp != -1d) return temp;
+        visited.add(curr);
+        for (Map.Entry<String, Double> neighbor : graph.get(curr).entrySet()) {
+            double result = dfs(neighbor.getKey(), target, graph, visited, value * neighbor.getValue());
+            if (result != -1.0) return result;  // Stop DFS if a valid path is found
         }
-        return -1d;
+        return -1.0;
     }
 }

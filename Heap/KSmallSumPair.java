@@ -7,7 +7,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Given two sorted arrays, find k smallest pairs of sum
+ * LeetCode: https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
+ *
+ * Given two sorted arrays, find the k pairs with the smallest sums.
+ *
+ * Approach:
+ * - Use a Min Heap (PriorityQueue) to efficiently extract the smallest sum pairs.
+ * - Push initial pairs from nums1 with the first element of nums2.
+ * - Extract the smallest pair and push the next potential pair from nums2.
+ *
+ * Time Complexity: O(k log k) (Heap operations dominate)
+ * Space Complexity: O(k) (To store results and heap elements)
  */
 public class KSmallSumPair {
 
@@ -15,42 +25,45 @@ public class KSmallSumPair {
         int[] nums1 = {1, 7, 11};
         int[] nums2 = {2, 4, 6};
         int k = 5;
-        List<List<Integer>> lists = new KSmallSumPair().kSmallestPairs(nums1, nums2, k);
-        System.out.println(lists);
+        List<List<Integer>> result = new KSmallSumPair().kSmallestPairs(nums1, nums2, k);
+        System.out.println(result);
     }
 
     public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
-        PriorityQueue<HeapNode> heap = new PriorityQueue<>((a, b) -> a.sum - b.sum);
-        int len1 = nums1.length;
-        int len2 = nums2.length;
+        PriorityQueue<HeapNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.sum, b.sum));
+        List<List<Integer>> result = new ArrayList<>();
+        
+        if (nums1.length == 0 || nums2.length == 0 || k == 0) return result;
 
-        for(int i=0; i<len1; i++) {
-            HeapNode heapNode = new HeapNode(nums1[i], nums2[0], 0);
-            heap.offer(heapNode);
+        // Initialize heap with first k pairs from nums1 and the first element of nums2
+        for (int i = 0; i < Math.min(k, nums1.length); i++) {
+            minHeap.offer(new HeapNode(nums1[i], nums2[0], 0));
         }
 
-        List<List<Integer>> result = new ArrayList<>();
-        for(int i=0; i<k && !heap.isEmpty(); i++) {
-            HeapNode polled = heap.poll();
-            result.add(polled.pair);
+        while (k-- > 0 && !minHeap.isEmpty()) {
+            HeapNode node = minHeap.poll();
+            result.add(node.pair);
 
-            int nIndex = polled.index + 1;
-            if(nIndex < len2) {
-                heap.offer(new HeapNode(polled.pair.get(0), nums2[nIndex], nIndex));
+            int nextIndex = node.index + 1;
+            if (nextIndex < nums2.length) {
+                minHeap.offer(new HeapNode(node.pair.get(0), nums2[nextIndex], nextIndex));
             }
         }
         return result;
     }
 }
 
+/**
+ * Helper class to store pairs and their sum for priority queue processing.
+ */
 class HeapNode {
     List<Integer> pair;
     int index;
     int sum;
 
-    public HeapNode(int v1, int v2, int index) {
-        this.pair = Stream.of(v1, v2).collect(Collectors.toList());
+    public HeapNode(int num1, int num2, int index) {
+        this.pair = List.of(num1, num2);
         this.index = index;
-        this.sum = v1 + v2;
+        this.sum = num1 + num2;
     }
 }

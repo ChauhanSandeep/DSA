@@ -1,19 +1,8 @@
 package Graph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
-/**
- * https://leetcode.com/problems/bus-routes/
- */
 public class MinBuses {
-
     public static void main(String[] args) {
         int[][] routes = {
                 {7, 12},
@@ -24,42 +13,46 @@ public class MinBuses {
         int source = 4;
         int destination = 13;
         int numOfBuses = new MinBuses().numBusesToDestination(routes, source, destination);
-        System.out.println("Min buses required to go from source to destination are " + numOfBuses);
+        System.out.println("Min buses required to go from source to destination: " + numOfBuses);
     }
 
     public int numBusesToDestination(int[][] routes, int source, int destination) {
         if (source == destination) return 0;
 
-        Map<Integer, List<Integer>> map = new HashMap<>(); // <stop, List<route index>>
+        // Map: stop -> list of route indices
+        Map<Integer, List<Integer>> stopToRoutesMap = new HashMap<>();
         for (int i = 0; i < routes.length; i++) {
-            for (int j = 0; j < routes[i].length; j++) {
-                map.putIfAbsent(routes[i][j], new ArrayList<>());
-                map.get(routes[i][j]).add(i);
+            for (int stop : routes[i]) {
+                stopToRoutesMap.putIfAbsent(stop, new ArrayList<>());
+                stopToRoutesMap.get(stop).add(i);
             }
         }
 
-        Set<Integer> visited = new HashSet<>();     // visited routes
-        Queue<Integer> queue = new LinkedList<>();  // queue of stops
-        int result = 0;
-
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visitedRoutes = new HashSet<>();
         queue.offer(source);
+
+        int busesTaken = 0;
+
         while (!queue.isEmpty()) {
-            int len = queue.size();
-            result++;
+            int levelSize = queue.size();
+            busesTaken++;
 
-            for (int i = 0; i < len; i++) {
+            for (int i = 0; i < levelSize; i++) {
                 int currStop = queue.poll();
-                List<Integer> currRoutes = map.get(currStop);
+                List<Integer> routesAtStop = stopToRoutesMap.get(currStop);
 
-                for (Integer currRoute : currRoutes) {
-                    if (visited.contains(currRoute)) continue;
-                    visited.add(currRoute);
-                    for (int j = 0; j < routes[currRoute].length; j++) {
-                        if (routes[currRoute][j] == destination) return result;
-                        queue.offer(routes[currRoute][j]);
+                if (routesAtStop == null) continue; // Prevent NullPointerException
+
+                for (int routeIndex : routesAtStop) {
+                    if (visitedRoutes.contains(routeIndex)) continue;
+                    visitedRoutes.add(routeIndex);
+
+                    for (int nextStop : routes[routeIndex]) {
+                        if (nextStop == destination) return busesTaken;
+                        queue.offer(nextStop);
                     }
                 }
-
             }
         }
         return -1;

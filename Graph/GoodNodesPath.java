@@ -1,20 +1,10 @@
 package Graph;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-/**
- * Given a tree with N nodes labelled from 1 to N.
- * Each node is either good or bad denoted by binary array `goodNodes` of size N where
- * if goodNodes[i] is 1 then ith node is good else if A[i] is 0 then ith node is bad.
- * Also the given tree is rooted at node 1 and you need to tell the number of
- * root to leaf paths in the tree that contain not more than k good nodes.
- *
- * https://www.interviewbit.com/problems/path-with-good-nodes/
- */
 public class GoodNodesPath {
     public static void main(String[] args) {
-        int[] goodNodes = {0, 1, 0, 1, 1, 1};
+        int[] goodNodes = {0, 1, 0, 1, 1, 1}; // 0-based indexing
         int[][] relations = {
                 {1, 2},
                 {1, 5},
@@ -23,40 +13,54 @@ public class GoodNodesPath {
                 {2, 4}
         };
         int k = 1;
-        int result = new GoodNodesPath().solve(goodNodes, relations, k);
+        int result = new GoodNodesPath().countValidPaths(goodNodes, relations, k);
         System.out.println(result);
     }
 
     List<List<Integer>> adj;
-    int goodNodes[];
+    int[] goodNodes;
 
-    public int solve(int[] goodNodes, int[][] relations, int limit) {
+    public int countValidPaths(int[] goodNodes, int[][] relations, int maxGoodNodes) {
         int size = goodNodes.length;
-        if (size <= 1) return size;
+        if (size == 0) return 0;
 
-        adj = new ArrayList<>();
         this.goodNodes = goodNodes;
+        adj = new ArrayList<>();
+
+        // Initialize adjacency list
         for (int i = 0; i <= size; i++) {
-            adj.add(new ArrayList());
+            adj.add(new ArrayList<>());
         }
-        for (int relation[] : relations) {
+
+        // Build tree
+        for (int[] relation : relations) {
             adj.get(relation[0]).add(relation[1]);
             adj.get(relation[1]).add(relation[0]);
         }
-        return dfs(1, 0, limit + 1);
+
+        // Start DFS from root (node 1), with 0 good nodes counted
+        return dfs(1, -1, 0, maxGoodNodes);
     }
 
-    public int dfs(int curr, int parent, int limit) {
-        if (limit == 0) return 0;
-        if (adj.get(curr).size() == 1 && adj.get(curr).get(0) == parent) {
-            return (limit - goodNodes[curr - 1] > 0) ? 1 : 0;
+    private int dfs(int node, int parent, int goodCount, int maxGoodNodes) {
+        if (goodNodes[node - 1] == 1) { // Adjusting for 0-based index
+            goodCount++;
         }
-        int sum = 0;
-        for (int next : adj.get(curr)) {
-            if (next == parent) continue;
-            sum += dfs(next, curr, limit - goodNodes[curr - 1]);
+        if (goodCount > maxGoodNodes) {
+            return 0; // Path invalid
         }
-        return sum;
+
+        // If the node is a leaf (only one edge to parent), it's a valid path
+        if (adj.get(node).size() == 1 && adj.get(node).get(0) == parent) {
+            return 1;
+        }
+
+        int validPaths = 0;
+        for (int neighbor : adj.get(node)) {
+            if (neighbor != parent) { // Avoid revisiting parent
+                validPaths += dfs(neighbor, node, goodCount, maxGoodNodes);
+            }
+        }
+        return validPaths;
     }
 }
-

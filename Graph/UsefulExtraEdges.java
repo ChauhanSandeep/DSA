@@ -1,107 +1,81 @@
 package Graph;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
-/**
- * Given a graph of `vertices` nodes. Also given the weighted edges in the form of array `input`.
- * You are also given starting point `source` and `destination`
- * Also given are some extra edges in the form of vector `extraGraph`.
- *
- * You need to find the length of the shortest path from `source` to `destination` if you can use maximum
- * one road from the given roads in `extraGraph`.
- * `input` roads are one way ie they go from input[i][0] to input[i][1].
- * `extraGraph` roads are bidirectional
- * https://www.interviewbit.com/problems/useful-extra-edges/
- */
 public class UsefulExtraEdges {
 
-    public static void main(String[] args) {
-        ArrayList<ArrayList<Integer>> input = new ArrayList<>();
-        input.add((ArrayList<Integer>) Stream.of(1, 2, 1).collect(Collectors.toList()));
-        input.add((ArrayList<Integer>) Stream.of(2, 3, 2).collect(Collectors.toList()));
-
-        ArrayList<ArrayList<Integer>> extraGraph = new ArrayList<>();
-        extraGraph.add((ArrayList<Integer>) Stream.of(1, 3, 2).collect(Collectors.toList()));
-
-        System.out.println(new UsefulExtraEdges().solve(3, input, 1, 3, extraGraph));
-
+    static class Pair {
+        int vertex, weight;
+        Pair(int vertex, int weight) {
+            this.vertex = vertex;
+            this.weight = weight;
+        }
     }
 
-    private static final char UNIDIRECTIONAL = 'B';
-    private static final char BIDIRECTIONAL = 'E';
-    ArrayList<ArrayList<Pair>> graph;
-    int result;
-    boolean isTargetFound;
-
     public int solve(int vertices, ArrayList<ArrayList<Integer>> input, int source, int destination, ArrayList<ArrayList<Integer>> extraGraph) {
-
-        result = Integer.MAX_VALUE;
-        isTargetFound = false;
-        graph = new ArrayList<ArrayList<Pair>>();
-        boolean[] visited = new boolean[vertices + 1];
-
+        List<List<Pair>> graph = new ArrayList<>();
         for (int i = 0; i <= vertices; i++) {
             graph.add(new ArrayList<>());
         }
 
-        for (int i = 0; i < input.size(); i++) {
-            int v1 = input.get(i).get(0);
-            int v2 = input.get(i).get(1);
-            int weight = input.get(i).get(2);
-            graph.get(v1).add(new Pair(v2, weight, UNIDIRECTIONAL));
+        // Add one-way edges from `input`
+        for (ArrayList<Integer> edge : input) {
+            graph.get(edge.get(0)).add(new Pair(edge.get(1), edge.get(2)));
         }
 
-        for (int i = 0; i < extraGraph.size(); i++) {
-            int v1 = extraGraph.get(i).get(0);
-            int v2 = extraGraph.get(i).get(1);
-            int weight = extraGraph.get(i).get(2);
-            if (1 <= v1 && 1 <= v2 && v1 <= vertices && v2 <= vertices) {
-                graph.get(v1).add(new Pair(v2, weight, BIDIRECTIONAL));
-                graph.get(v2).add(new Pair(v1, weight, BIDIRECTIONAL));
-            }
+        // Compute shortest path without extra edges
+        int[] dist = dijkstra(graph, source, vertices);
+        int shortestPath = dist[destination];
 
+        // Try adding each extra edge and compute shortest path again
+        for (ArrayList<Integer> edge : extraGraph) {
+            int u = edge.get(0), v = edge.get(1), weight = edge.get(2);
+            graph.get(u).add(new Pair(v, weight));
+            graph.get(v).add(new Pair(u, weight)); // Bidirectional edge
+
+            int[] newDist = dijkstra(graph, source, vertices);
+            shortestPath = Math.min(shortestPath, newDist[destination]);
+
+            // Remove the extra edge to reset the graph
+            graph.get(u).remove(graph.get(u).size() - 1);
+            graph.get(v).remove(graph.get(v).size() - 1);
         }
 
-        dfs(source, destination, visited, 0, 0);
-        return isTargetFound ? result : -1;
+        return shortestPath == Integer.MAX_VALUE ? -1 : shortestPath;
     }
 
-    public void dfs(int source, int target, boolean[] visited, int tillCost, int extraEdges) {
-        //base case
-        if (extraEdges == 2) {
-            return;
-        } else if (target == source) {
-            isTargetFound = true;
-            result = Math.min(result, tillCost);
-            return;
-        }
-        visited[source] = true;
+    private int[] dijkstra(List<List<Pair>> graph, int source, int vertices) {
+        PriorityQueue<Pair> pq = new PriorityQueue<>(Comparator.comparingInt(p -> p.weight));
+        int[] dist = new int[vertices + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[source] = 0;
+        pq.add(new Pair(source, 0));
 
-        //go for children
-        for (Pair pair : graph.get(source)) {
-            if (!visited[pair.vertex]) {
-                if (pair.type == BIDIRECTIONAL) {
-                    dfs(pair.vertex, target, visited, tillCost + pair.weight, extraEdges + 1);
-                } else {
-                    dfs(pair.vertex, target, visited, tillCost + pair.weight, extraEdges);
+        while (!pq.isEmpty()) {
+            Pair current = pq.poll();
+            int u = current.vertex;
+
+            for (Pair neighbor : graph.get(u)) {
+                int v = neighbor.vertex, weight = neighbor.weight;
+                if (dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    pq.add(new Pair(v, dist[v]));
                 }
             }
         }
-
-        visited[source] = false;
+        return dist;
     }
 
-    static class Pair {
-        public int vertex;
-        public int weight;
-        public char type;
+    public static void main(String[] args) {
+        ArrayList<ArrayList<Integer>> input = new ArrayList<>();
+        input.add(new ArrayList<>(Arrays.asList(1, 2, 1)));
+        input.add(new ArrayList<>(Arrays.asList(2, 3, 2)));
 
-        Pair(int vertex, int weight, char type) {
-            this.vertex = vertex;
-            this.weight = weight;
-            this.type = type;
-        }
+        ArrayList<ArrayList<Integer>> extraGraph = new ArrayList<>();
+        extraGraph.add(new ArrayList<>(Arrays.asList(1, 3, 2)));
+
+        UsefulExtraEdges obj = new UsefulExtraEdges();
+        int result = obj.solve(3, input, 1, 3, extraGraph);
+        System.out.println("Shortest Path: " + result);
     }
 }

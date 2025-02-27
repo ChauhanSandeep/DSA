@@ -4,6 +4,19 @@ import LinkedList.Util.ListNode;
 
 import java.util.PriorityQueue;
 
+/**
+ * LeetCode: https://leetcode.com/problems/merge-k-sorted-lists/
+ *
+ * Given k sorted linked lists, merge them into one sorted linked list.
+ *
+ * Algorithm:
+ * - Use a min-heap (PriorityQueue) to store the head nodes of all lists.
+ * - Extract the minimum node from the heap and add it to the result list.
+ * - If the extracted node has a next node, push it into the heap.
+ *
+ * Time Complexity: O(N log K), where N is the total number of nodes and K is the number of lists.
+ * Space Complexity: O(K) for storing K elements in the heap.
+ */
 public class MergeKLists {
 
     public static void main(String args[]) {
@@ -26,50 +39,53 @@ public class MergeKLists {
         arr[2].next.next = new ListNode(10);
         arr[2].next.next.next = new ListNode(11);
 
-        ListNode head = mergeKSortedLists(arr, k);
-        printList(head); // 0 1 2 3 4 5 6 7 8 9 10 11
+        ListNode head = mergeKSortedLists(arr);
+        printList(head); // Expected output: 0 1 2 3 4 5 6 7 8 9 10 11
     }
 
-
     /**
-     * Given k sorted linked lists, merge the linked lists to create a common linked list
-     * @param arr
-     * @param k
-     * @return
+     * Merges k sorted linked lists into one sorted linked list.
+     *
+     * @param lists Array of sorted linked lists.
+     * @return The merged sorted linked list.
      */
-    public static ListNode mergeKSortedLists(ListNode arr[], int k) {
+    public static ListNode mergeKSortedLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) return null;
 
         PriorityQueue<ListNode> minHeap = new PriorityQueue<>((o1, o2) -> o1.val - o2.val);
 
-        // add first element from each list to minHeap
-        for (int i = 0; i < k; i++) {
-            if (arr[i] != null) {
-                minHeap.add(arr[i]);
+        // Add the head node of each list to the minHeap
+        for (ListNode list : lists) {
+            if (list != null) {
+                minHeap.add(list);
             }
         }
 
-        ListNode head = null, temp = null;
+        ListNode dummy = new ListNode(-1);
+        ListNode tail = dummy;
+
         while (!minHeap.isEmpty()) {
-            ListNode node = minHeap.peek();
-            minHeap.remove();
+            ListNode node = minHeap.poll();
+            tail.next = node;
+            tail = node;
 
-            if (node.next != null)  minHeap.add(node.next);
-
-            if (head == null) { // first element taken from minHeap
-                head = node;
-            } else {
-                temp.next = node;
+            if (node.next != null) {
+                minHeap.add(node.next);
             }
-            temp = node;
         }
-        return head;
+        return dummy.next;
     }
 
+    /**
+     * Prints a linked list.
+     *
+     * @param head The head of the linked list.
+     */
     public static void printList(ListNode head) {
         while (head != null) {
             System.out.print(head.val + " ");
             head = head.next;
         }
+        System.out.println();
     }
-
 }

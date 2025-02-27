@@ -1,91 +1,70 @@
 package Graph;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Stack;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * https://www.interviewbit.com/problems/largest-distance-between-nodes-of-a-tree/
- * [-1, 0, 0, 0, 3]
- *              0
- *            / | \
- *          1   2  3
- *                   \
- *                    4
- * Output: 3
- * Explanation: path 1->0->3->4
- *
  */
 public class LargestDistanceNodes {
     public static void main(String[] args) {
-        ArrayList<Integer> input = (ArrayList<Integer>) Stream.of(-1, 0, 0, 0, 3).collect(Collectors.toList());
+        List<Integer> input = Arrays.asList(-1, 0, 0, 0, 3);
         System.out.println(new LargestDistanceNodes().solve(input));
     }
 
-    public int solve(ArrayList<Integer> input) {
+    public int solve(List<Integer> input) {
         int size = input.size();
-        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        List<List<Integer>> adj = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             adj.add(new ArrayList<>());
         }
         int root = -1;
+
+        // Build the adjacency list
         for (int i = 0; i < size; i++) {
-            int num = input.get(i);
-            if (num == -1) {
+            int parent = input.get(i);
+            if (parent == -1) {
                 root = i;
                 continue;
             }
-            adj.get(i).add(num);
-            adj.get(num).add(i);
+            adj.get(i).add(parent);
+            adj.get(parent).add(i);
         }
-        // Find the node which is farthest from root node using BFS
-        int node = bfs(adj, root, size);
-        System.out.println("largest distance node is " + node);
-        // Find the maximum distance from farthest node using modified DFS
-        return dfs(adj, node, size);
+
+        // First BFS: Find the farthest node from root
+        int farthestNode = bfs(adj, root)[0];
+
+        // Second BFS: Find the max distance from the farthest node
+        return bfs(adj, farthestNode)[1];
     }
 
-    public int bfs(ArrayList<ArrayList<Integer>> adj, int root, int size) {
+    private int[] bfs(List<List<Integer>> adj, int start) {
+        int size = adj.size();
+        Queue<int[]> queue = new LinkedList<>();
         boolean[] visited = new boolean[size];
-        Queue<Integer> queue = new LinkedList<Integer>();
-        queue.offer(root);
-        visited[root] = true;
-        while(!queue.isEmpty()) {
-            root = queue.poll();
-            for(Integer neighbor: adj.get(root)) {
-                if(!visited[neighbor]) {
-                    queue.offer(neighbor);
+        queue.offer(new int[]{start, 0});
+        visited[start] = true;
+
+        int farthestNode = start;
+        int maxDistance = 0;
+
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int node = curr[0];
+            int dist = curr[1];
+
+            // Update max distance
+            if (dist > maxDistance) {
+                maxDistance = dist;
+                farthestNode = node;
+            }
+
+            for (int neighbor : adj.get(node)) {
+                if (!visited[neighbor]) {
                     visited[neighbor] = true;
-                }
-
-            }
-        }
-        return root;
-    }
-
-    public int dfs(ArrayList<ArrayList<Integer>> adj, int node, int size) {
-        int max = 0;
-        Stack<int[]> stack = new Stack<>();
-        boolean[] visited = new boolean[size];
-        stack.push(new int[] {node, 0});
-
-        while(!stack.isEmpty()) {
-            int[] curr = stack.pop();
-            int currNode = curr[0];
-            int currDist = curr[1];
-            if(visited[currNode]) continue;
-            visited[currNode] = true;
-            max = Math.max(max, currDist);
-            for(Integer neighbor: adj.get(currNode)) {
-                if(!visited[neighbor]) {
-                    stack.push(new int[] {neighbor, currDist+1});
+                    queue.offer(new int[]{neighbor, dist + 1});
                 }
             }
         }
-        return max;
+        return new int[]{farthestNode, maxDistance};
     }
 }

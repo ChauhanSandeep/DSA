@@ -1,120 +1,102 @@
 package Graph;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class WordLadder2 {
 
     Map<String, List<String>> graph = new HashMap<>();
-    List<String> currPath = new ArrayList<>();
     List<List<String>> result = new ArrayList<>();
+    List<String> currPath = new ArrayList<>();
 
     public static void main(String[] args) {
         String beginWord = "hit";
         String endWord = "cog";
-        List<String> wordList = Stream.of("hot", "dot", "dog", "lot", "log", "cog").collect(Collectors.toList());
+        List<String> wordList = Arrays.asList("hot", "dot", "dog", "lot", "log", "cog");
         List<List<String>> ladders = new WordLadder2().findLadders(beginWord, endWord, wordList);
         System.out.println(ladders);
     }
 
     public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
-        // copying the words into the set for efficient deletion in BFS
         Set<String> wordSet = new HashSet<>(wordList);
-        // build the DAG using BFS
-        createGraph(beginWord, endWord, wordSet);
+        if (!wordSet.contains(endWord)) return result; // Early exit
 
-        // every path will start from the beginWord
+        // Step 1: Build the graph using BFS
+        if (!createGraph(beginWord, endWord, wordSet)) return result;
+
+        // Step 2: Find all paths using backtracking
         currPath.add(beginWord);
-        // traverse the DAG to find all the paths between beginWord and endWord
         backtrack(beginWord, endWord);
-
         return result;
     }
 
-    private void createGraph(String beginWord, String endWord, Set<String> wordList) {
+    private boolean createGraph(String beginWord, String endWord, Set<String> wordSet) {
         Queue<String> queue = new LinkedList<>();
         queue.add(beginWord);
 
-        // remove the root word which is the first layer in the BFS
-        if (wordList.contains(beginWord)) {
-            wordList.remove(beginWord);
-        }
+        Map<String, Integer> level = new HashMap<>();
+        level.put(beginWord, 0);
 
-        Map<String, Integer> isEnqueued = new HashMap<String, Integer>();
-        isEnqueued.put(beginWord, 1);
+        boolean foundEndWord = false;
+        int depth = 0;
 
-        while (queue.size() > 0) {
-            // currentLayerWords will store the words of current layer
-            List<String> currentLayerWords = new ArrayList<>();
-
+        while (!queue.isEmpty() && !foundEndWord) {
+            depth++;
             int size = queue.size();
-            while(size > 0) {
-                String currWord = queue.poll();
-                List<String> neighbors = findNeighbors(currWord, wordList);
+            Set<String> nextLevelWords = new HashSet<>();
+
+            for (int i = 0; i < size; i++) {
+                String word = queue.poll();
+                List<String> neighbors = findNeighbors(word, wordSet);
+
                 for (String neighbor : neighbors) {
-                    currentLayerWords.add(neighbor);
-
-                    if (!graph.containsKey(currWord)) {
-                        graph.put(currWord, new ArrayList<>());
-                    }
-
-                    // add the edge from currWord to neighbor in the list
-                    graph.get(currWord).add(neighbor);
-                    if (!isEnqueued.containsKey(neighbor)) {
+                    if (!level.containsKey(neighbor)) {
+                        level.put(neighbor, depth);
                         queue.add(neighbor);
-                        isEnqueued.put(neighbor, 1);
                     }
+                    if (level.get(neighbor) == depth) { // Ensures shortest paths only
+                        graph.computeIfAbsent(word, k -> new ArrayList<>()).add(neighbor);
+                    }
+                    if (neighbor.equals(endWord)) foundEndWord = true;
                 }
-                size--;
+                nextLevelWords.addAll(neighbors);
             }
-            // removing the words of the previous layer
-            for (int i = 0; i < currentLayerWords.size(); i++) {
-                if (wordList.contains(currentLayerWords.get(i))) {
-                    wordList.remove(currentLayerWords.get(i));
-                }
-            }
+
+            wordSet.removeAll(nextLevelWords); // Remove processed words
         }
+        return foundEndWord;
     }
 
-    private List<String> findNeighbors(String word, Set<String> wordList) {
-        List<String> neighbors = new ArrayList<String>();
-        char charList[] = word.toCharArray();
+    private List<String> findNeighbors(String word, Set<String> wordSet) {
+        List<String> neighbors = new ArrayList<>();
+        char[] chars = word.toCharArray();
 
-        for (int i = 0; i < word.length(); i++) {
-            char oldChar = charList[i];
-
-            // replace the i-th character with all letters from a to z except the original character
+        for (int i = 0; i < chars.length; i++) {
+            char originalChar = chars[i];
             for (char c = 'a'; c <= 'z'; c++) {
-                charList[i] = c;
-
-                // skip if the character is same as original or if the word is not present in the wordList
-                if (c == oldChar || !wordList.contains(String.valueOf(charList))) {
-                    continue;
+                if (c == originalChar) continue;
+                chars[i] = c;
+                String newWord = new String(chars);
+                if (wordSet.contains(newWord)) {
+                    neighbors.add(newWord);
                 }
-                neighbors.add(String.valueOf(charList));
             }
-            charList[i] = oldChar;
+            chars[i] = originalChar;
         }
         return neighbors;
     }
 
     private void backtrack(String source, String destination) {
-        // store the path if we reached the endWord
         if (source.equals(destination)) {
-            List<String> tempPath = new ArrayList<>(currPath);
-            result.add(tempPath);
-        }
-
-        if (!graph.containsKey(source)) {
+            result.add(new ArrayList<>(currPath));
             return;
         }
 
-        for (int i = 0; i < graph.get(source).size(); i++) {
-            currPath.add(graph.get(source).get(i));
-            backtrack(graph.get(source).get(i), destination);
+        if (!graph.containsKey(source)) return;
+
+        for (String neighbor : graph.get(source)) {
+            currPath.add(neighbor);
+            backtrack(neighbor, destination);
             currPath.remove(currPath.size() - 1);
         }
     }
-
 }
