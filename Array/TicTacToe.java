@@ -1,42 +1,49 @@
 package Array;
 
-import java.util.Arrays;
+/**
+ * Create a grid of size n. Player 1 and 2 make move. Return the winner after each move.
+ * Return 0 if no player wins.
+ */
+public class TicTacToe {
 
-public class ThreeSumClosest {
     public static void main(String[] args) {
-        int[] arr = {-1, 2, 1, -4};
-        int target = 1;
-        System.out.println("Three sum closest to target is " + threeSumClosest(arr, target));
+        TicTacToe ticTacToe = new TicTacToe(2);
+        System.out.println(ticTacToe.move(0, 1, 1));
+        System.out.println(ticTacToe.move(1, 1, 2));
+        System.out.println(ticTacToe.move(1, 0, 1));
     }
 
-    public static int threeSumClosest(int[] nums, int target) {
-        Arrays.sort(nums);
+    int size;
+    int[] grid;
 
-        int len = nums.length;
-        int result = nums[0] + nums[1] + nums[2]; // Initialize with first possible sum
+    /** Initialize your data structure here. */
+    public TicTacToe(int n) {
+        this.size = n;
+        grid = new int[2*n + 2];
+    }
 
-        for (int i = 0; i < len - 2; i++) {
-            if (i > 0 && nums[i] == nums[i - 1]) continue; // Skip duplicate numbers
-
-            int j = i + 1, k = len - 1;
-
-            while (j < k) {
-                int sum = nums[i] + nums[j] + nums[k];
-
-                // If sum matches the target exactly, return immediately
-                if (sum == target) return sum;
-
-                // Update result if closer to target
-                if (Math.abs(target - sum) < Math.abs(target - result)) {
-                    result = sum;
-                }
-
-                // Move pointers accordingly
-                if (sum < target) j++;
-                else k--;
-            }
+    /** Player {player} makes a move at ({row}, {col}).
+     @param row The row of the board.
+     @param col The column of the board.
+     @param player The player, can be either 1 or 2.
+     @return The current winning condition, can be either:
+     0: No one wins.
+     1: Player 1 wins.
+     2: Player 2 wins. */
+    public int move(int row, int col, int player) {
+        int marker = player == 1 ? 1 : -1;
+        grid[row] = grid[row] + marker;
+        grid[size + col] =  grid[size + col] + marker;
+        if(row == col) {
+            grid[2*size] = grid[2*size] + marker;
         }
-
-        return result;
+        if(size - 1 - row == col) {
+            grid[2*size + 1] = grid[2*size + 1] + marker;
+        }
+        int target = marker * size;
+        if(grid[row] == target || grid[size + col] == target || grid[2*size] == target || grid[2*size+1] == target) {
+            return player;
+        }
+        return 0;
     }
 }

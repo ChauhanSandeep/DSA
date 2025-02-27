@@ -4,9 +4,9 @@ package design.connect4ai;
  * This class represents the game play actions for the Connect 4 AI, including moves and comparisons for the Minimax algorithm.
  */
 public class GamePlay {
-    private int row;
-    private int col;
-    private int value; // Value of the utility function
+    public int row;
+    public int col;
+    public int value; // Value of the utility function
 
     public GamePlay() {
         this.row = -1;

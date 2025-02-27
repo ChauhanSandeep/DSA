@@ -1,43 +1,114 @@
-package DynamicProgramming.KnapsackRelated;
+package DynamicProgramming.MatrixChainMul;
 
 import java.util.Arrays;
 
 /**
- * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
- * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
+ * LeetCode Problem: Boolean Parenthesization (Similar to https://leetcode.com/problems/parsing-a-boolean-expression/)
+ *
+ * Given a boolean expression containing 'T' (true), 'F' (false), and operators '&' (AND), '|' (OR), and '^' (XOR),
+ * this program calculates the number of ways to parenthesize the expression so that it evaluates to true.
  *
  * Approach:
- * - Given: S1 - S2 = diff and S1 + S2 = totalSum.
- * - By solving, we derive: S1 = (diff + totalSum) / 2.
- * - The problem reduces to finding subsets whose sum equals S1.
- * - Use dynamic programming to count subsets that sum to S1.
+ * - Uses memoized recursion (top-down dynamic programming) to optimize overlapping subproblems.
+ * - The `dp` array stores precomputed results to avoid redundant calculations.
  *
- * Time Complexity: O(N * targetSum), where N is the number of elements in the array.
- * Space Complexity: O(N * targetSum), due to the DP table.
+ * Time Complexity: O(N^3) (Since each subproblem takes O(N) and there are O(N^2) subproblems)
+ * Space Complexity: O(N^2) (For memoization storage)
  */
-public class CountSubsetDiff {
+public class EvaluateTrue {
     public static void main(String[] args) {
-        int[] arr = {1, 1, 2, 3};
-        int diff = 1;
-        System.out.println("Count of subsets with given difference: " + countSubsetDiff(arr, diff));
+        String expression = "F&F^T^F";
+        EvaluateTrue evaluator = new EvaluateTrue();
+        int waysToEvaluateTrue = evaluator.countWaysToEvaluateTrue(expression);
+        System.out.println("Number of ways to evaluate to true: " + waysToEvaluateTrue);
     }
 
     /**
-     * Counts subsets where the difference between two subset sums equals the given difference.
+     * Calculates the number of ways to parenthesize the boolean expression so that it evaluates to true.
      *
-     * @param arr  Input array of positive integers
-     * @param diff Target difference between subset sums
-     * @return The number of valid subset pairs
+     * @param expression Boolean expression containing 'T', 'F', '&', '|', and '^'.
+     * @return Number of ways to evaluate the expression to true.
      */
-    public static int countSubsetDiff(int[] arr, int diff) {
-        int totalSum = Arrays.stream(arr).sum();
+    public int countWaysToEvaluateTrue(String expression) {
+        int length = expression.length();
+        int[][][] dp = new int[length][length][2]; // Memoization table
 
-        // Edge cases: If diff is negative or larger than totalSum, return 0
-        if (diff < 0 || diff > totalSum || (diff + totalSum) % 2 != 0) {
-            return 0;
+        // Initialize memoization table with -1 (indicating uncomputed states)
+        for (int[][] subTable : dp) {
+            for (int[] row : subTable) {
+                Arrays.fill(row, -1);
+            }
         }
 
-        int targetSum = (diff + totalSum) / 2;
-        return CountSubsetSum.countSubsetSum(arr, targetSum, arr.length); // Calls helper function
+        return countWays(expression, 0, length - 1, true, dp);
+    }
+
+    /**
+     * Recursive function with memoization to count the number of ways to evaluate the expression.
+     *
+     * @param expression The boolean expression.
+     * @param left       Start index of the expression segment.
+     * @param right      End index of the expression segment.
+     * @param evaluateTo True if evaluating for true cases, false otherwise.
+     * @param dp         Memoization table to store results.
+     * @return Number of ways the expression evaluates to the desired value.
+     */
+    private int countWays(String expression, int left, int right, boolean evaluateTo, int[][][] dp) {
+        if (left > right) return 0;
+
+        // Base case: single character (either 'T' or 'F')
+        if (left == right) {
+            if (evaluateTo) return expression.charAt(left) == 'T' ? 1 : 0;
+            return expression.charAt(left) == 'F' ? 1 : 0;
+        }
+
+        int isTrue = evaluateTo ? 1 : 0;
+        if (dp[left][right][isTrue] != -1) return dp[left][right][isTrue];
+
+        int ways = 0;
+
+        // Iterate over operators (odd indices)
+        for (int operatorIndex = left + 1; operatorIndex < right; operatorIndex += 2) {
+            char operator = expression.charAt(operatorIndex);
+
+            // Compute left and right segment counts for both true and false cases
+            int leftTrue = countWays(expression, left, operatorIndex - 1, true, dp);
+            int leftFalse = countWays(expression, left, operatorIndex - 1, false, dp);
+            int rightTrue = countWays(expression, operatorIndex + 1, right, true, dp);
+            int rightFalse = countWays(expression, operatorIndex + 1, right, false, dp);
+
+            // Compute the number of ways based on the operator
+            switch (operator) {
+                case '|': // OR Operator
+                    if (evaluateTo) {
+                        ways += (leftTrue * rightTrue) + (leftTrue * rightFalse) + (leftFalse * rightTrue);
+                    } else {
+                        ways += leftFalse * rightFalse;
+                    }
+                    break;
+
+                case '&': // AND Operator
+                    if (evaluateTo) {
+                        ways += leftTrue * rightTrue;
+                    } else {
+                        ways += (leftTrue * rightFalse) + (leftFalse * rightTrue) + (leftFalse * rightFalse);
+                    }
+                    break;
+
+                case '^': // XOR Operator
+                    if (evaluateTo) {
+                        ways += (leftTrue * rightFalse) + (leftFalse * rightTrue);
+                    } else {
+                        ways += (leftTrue * rightTrue) + (leftFalse * rightFalse);
+                    }
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Invalid operator: " + operator);
+            }
+        }
+
+        dp[left][right][isTrue] = ways;
+        return ways;
     }
 }

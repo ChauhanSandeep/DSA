@@ -1,70 +1,64 @@
 package Array;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InsertDeleteGetRandom {
     public static void main(String[] args) {
         RandomizedSet randomizedSet = new RandomizedSet();
-        System.out.println(randomizedSet.insert(1)); // Inserts 1 to the set. Returns true as 1 was inserted successfully.
-        System.out.println(randomizedSet.remove(2)); // Returns false as 2 does not exist in the set.
-        System.out.println(randomizedSet.insert(2)); // Inserts 2 to the set, returns true. Set now contains [1,2].
-        System.out.println(randomizedSet.getRandom()); // getRandom() should return either 1 or 2 randomly.
-        System.out.println(randomizedSet.remove(1)); // Removes 1 from the set, returns true. Set now contains [2].
-        System.out.println(randomizedSet.insert(2)); // 2 was already in the set, so return false.
-        System.out.println(randomizedSet.getRandom()); // Since 2 is the only number in the set, getRandom()
+        System.out.println(randomizedSet.insert(1)); // true
+        System.out.println(randomizedSet.remove(2)); // false
+        System.out.println(randomizedSet.insert(2)); // true
+        System.out.println(randomizedSet.getRandom()); // 1 or 2
+        System.out.println(randomizedSet.remove(1)); // true
+        System.out.println(randomizedSet.insert(2)); // false
+        System.out.println(randomizedSet.getRandom()); // 2
     }
 }
 
 /**
- * Create a set which provide insert, delete and getRandom functionality in O(1) time complexity
+ * Create a set that provides insert, delete, and getRandom functionality in O(1) time complexity.
  */
 class RandomizedSet {
-    List<Integer> list;
-    Map<Integer, Integer> valIndexMap;
+    private final List<Integer> elements;
+    private final Map<Integer, Integer> indexMap;
+    private final Random random;
 
     public RandomizedSet() {
-        list = new ArrayList<>();
-        valIndexMap = new HashMap<>();
+        elements = new ArrayList<>();
+        indexMap = new HashMap<>();
+        random = new Random();
     }
 
-    /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+    /** Inserts a value to the set. Returns true if the value was not already present. */
     public boolean insert(int val) {
-        if (valIndexMap.containsKey(val)){
+        if (indexMap.containsKey(val)) {
             return false;
         }
-
-        list.add(val);
-        valIndexMap.put(val, list.size() - 1);
+        indexMap.put(val, elements.size());
+        elements.add(val);
         return true;
     }
 
-    /** Removes a value from the set. Returns true if the set contained the specified element. */
+    /** Removes a value from the set. Returns true if the value was present. */
     public boolean remove(int val) {
-        if (valIndexMap.containsKey(val)) {
-            int index = valIndexMap.get(val);
-            if (index < list.size() - 1) {
-                swap(list, index, list.size() - 1);
-                valIndexMap.put(list.get(index), index);
-            }
-            list.remove(list.size() - 1);
-            valIndexMap.remove(val);
-            return true;
+        if (!indexMap.containsKey(val)) {
+            return false;
         }
-        return false;
+        int indexToRemove = indexMap.get(val);
+        int lastElement = elements.get(elements.size() - 1);
+
+        // Move the last element to the removed spot
+        elements.set(indexToRemove, lastElement);
+        indexMap.put(lastElement, indexToRemove);
+
+        // Remove last element from list and map
+        elements.remove(elements.size() - 1);
+        indexMap.remove(val);
+        return true;
     }
 
     /** Get a random element from the set. */
     public int getRandom() {
-        int index = (int) Math.floor(Math.random() * list.size());
-        return list.get(index);
-    }
-
-    public void swap(List<Integer> list, int i, int j) {
-        int temp = list.get(i);
-        list.set(i, list.get(j));
-        list.set(j, temp);
+        return elements.get(random.nextInt(elements.size()));
     }
 }

@@ -3,43 +3,62 @@ package DynamicProgramming.KnapsackRelated;
 import java.util.Arrays;
 
 /**
- * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
- * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
- *
- * Approach:
- * - Use the equations:
- *      - S1 - S2 = diff
- *      - S1 + S2 = totalSum
- *   By solving, we derive: S1 = (diff + totalSum) / 2.
- * - The problem now reduces to finding subsets whose sum equals S1.
- * - Use dynamic programming to count subsets that sum to S1.
- *
- * Time Complexity: O(N * targetSubsetSum), where N is the number of elements in the array.
- * Space Complexity: O(N * targetSubsetSum), as we use a DP table.
+ * https://leetcode.com/problems/minimum-window-subsequence/
  */
-public class CountSubsetDiff {
+public class MinWindowSubsequence {
+
     public static void main(String[] args) {
-        int[] arr = {1, 1, 2, 3};
-        int diff = 1;
-        System.out.println("Count of subsets with given difference: " + countSubsetsWithDifference(arr, diff));
+        String s1 = "abcdebdde";
+        String s2 = "bde";
+        System.out.println(new MinWindowSubsequence().minWindow(s1, s2));
     }
 
-    /**
-     * Counts subsets where the difference between two subset sums equals the given difference.
-     *
-     * @param arr  Input array
-     * @param diff Target difference between two subset sums
-     * @return The number of valid subset pairs
-     */
-    public static int countSubsetsWithDifference(int[] arr, int diff) {
-        int totalSum = Arrays.stream(arr).sum();
-        
-        // If (diff + totalSum) is odd, partitioning into two valid subsets is impossible
-        if ((diff + totalSum) % 2 != 0 || diff > totalSum) {
-            return 0;
+    public String minWindow(String source, String target) {
+        if(source.length() < target.length()) return "";
+
+        int sourceLen = source.length();
+        int targetLen = target.length();
+
+        /**
+         * in dp[i][j]
+         * target substring 0-i
+         * source substring dp[i][j] - j
+         * dp[i][j] contains start of the source substring
+         */
+        int[][] dp = new int[targetLen + 1][sourceLen + 1];
+        for(int[] row: dp) {
+            Arrays.fill(row, -1);
         }
-        
-        int targetSubsetSum = (diff + totalSum) / 2;
-        return CountSubsetSum.countSubsetSum(arr, targetSubsetSum); // Uses existing method
+
+        for(int j=0; j<sourceLen+1; j++) {
+            // j+1 because it will be used by right-down diagonal
+            dp[0][j] = j+1;
+        }
+
+        for(int i=1; i<targetLen+1; i++) {
+            for(int j=1; j<sourceLen+1; j++) {
+                char tchar = target.charAt(i-1);
+                char schar = source.charAt(j-1);
+                if(schar == tchar) dp[i][j] = dp[i-1][j-1];
+                else dp[i][j] = dp[i][j-1];
+            }
+        }
+
+        int resStart = -1;
+        int resLen = sourceLen + 1;
+        for(int j=1; j<sourceLen+1; j++) {
+            if(dp[targetLen][j] != -1) {
+                int currStart = dp[targetLen][j] - 1;
+                int currEnd = j-1;
+                int currLen = currEnd - currStart + 1;
+                if(currLen < resLen) {
+                    resLen = currLen;
+                    resStart = currStart;
+                }
+            }
+        }
+        if(resLen == sourceLen + 1) return "";
+        return source.substring(resStart, resStart + resLen);
+
     }
 }

@@ -1,45 +1,66 @@
 package DynamicProgramming.KnapsackRelated;
 
-import java.util.Arrays;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
- * Problem: Count the number of subsets (S1, S2) such that S1 - S2 = diff.
- * LeetCode Link: https://leetcode.com/problems/target-sum/ (related problem)
- *
- * Approach:
- * - Use the equations:
- *      - S1 - S2 = diff
- *      - S1 + S2 = totalSum
- *   By solving, we derive: S1 = (diff + totalSum) / 2.
- * - The problem now reduces to finding subsets whose sum equals S1.
- * - Use dynamic programming to count subsets that sum to S1.
- *
- * Time Complexity: O(N * targetSubsetSum), where N is the number of elements in the array.
- * Space Complexity: O(N * targetSubsetSum), as we use a DP table.
+ * Find shortest subarray with sum atleast k
+ * https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/discuss/143726/C%2B%2BJavaPython-O(N)-Using-Deque
  */
-public class CountSubsetDiff {
+public class ShortestSubarraySum {
+
     public static void main(String[] args) {
-        int[] arr = {1, 1, 2, 3};
-        int diff = 1;
-        System.out.println("Count of subsets with given difference: " + countSubsetsWithDifference(arr, diff));
+        int[] arr = {2,-1,2,3};
+        int target = 4;
+        System.out.println("Min sub array length is " + new ShortestSubarraySum().shortestSubarray(arr, target));
     }
 
     /**
-     * Counts subsets where the difference between two subset sums equals the given difference.
-     *
-     * @param arr  Input array
-     * @param diff Target difference between two subset sums
-     * @return The number of valid subset pairs
+     * Minimum length subarray whose sum is greater than equal to `target`
+     * All integers in array are positive
      */
-    public static int countSubsetsWithDifference(int[] arr, int diff) {
-        int totalSum = Arrays.stream(arr).sum();
-        
-        // If diff is greater than totalSum or (diff + totalSum) is odd, partitioning is impossible
-        if (diff > totalSum || (diff + totalSum) % 2 != 0) {
-            return 0;
+    public int minSubArrayLen(int target, int[] nums) {
+        int j = 0;
+        int len = nums.length;
+        int result = len + 1;
+
+        for (int i = 0; i < len; i++) { // sliding window
+            target -= nums[i];
+            while (target <= 0) {
+                result = Math.min(result, i - j + 1);
+                target += nums[j++];
+            }
         }
-        
-        int targetSubsetSum = (diff + totalSum) / 2;
-        return CountSubsetSum.countSubsetSum(arr, targetSubsetSum); // Uses existing method
+        return result  == len + 1 ? 0 : result;
     }
+
+    /**
+     * Minimum length subarray whose sum is greater than equal to `target`
+     * Array integers can be positive or negative
+     */
+    public int shortestSubarray(int[] nums, int target) {
+        int len = nums.length;
+        long[] arrSum = new long[len + 1];
+
+        for(int i=0; i<arrSum.length-1; i++) {
+            arrSum[i + 1] = arrSum[i] + (long)nums[i];
+        }
+
+        int result = len + 1;
+        Deque<Integer> queue = new ArrayDeque<>();
+        for(int i=0; i<len+1; i++) {
+            while(!queue.isEmpty() && arrSum[queue.getLast()] >= arrSum[i]) {
+//                last index is negative
+                queue.pollLast();
+            }
+            while(!queue.isEmpty() && arrSum[i] - arrSum[queue.getFirst()] >= target) {
+//                a valid subarray
+                result = Math.min(result, i - queue.getFirst());
+                queue.pollFirst();
+            }
+            queue.addLast(i);
+        }
+        return result == len + 1 ? -1 : result;
+    }
+
 }
