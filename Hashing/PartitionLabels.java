@@ -1,54 +1,43 @@
 package Hashing;
 
-/**
- * LeetCode: https://leetcode.com/problems/reconstruct-original-digits-from-english/
- *
- * Given a string containing an unordered English representation of digits 0-9,
- * return the digits in ascending order.
- *
- * Approach:
- * - Count the frequency of each character in the input string.
- * - Identify digits using unique letters (e.g., 'z' uniquely identifies "zero").
- * - Deduct known digits to determine the remaining ones.
- * - Construct the output by appending digits in order based on frequency.
- *
- * Time Complexity: O(N) - We iterate over the input string and process a fixed set of characters.
- * Space Complexity: O(1) - Uses a constant-size frequency array and output storage.
- */
-public class OriginalDigits {
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * https://leetcode.com/problems/partition-labels/
+ *
+ * Given a string s, partition the string into as many parts as possible so that each letter appears in at most one part.
+ * Return a list of integers representing the size of these parts.
+ */
+public class PartitionLabels {
     public static void main(String[] args) {
-        String result = new OriginalDigits().originalDigits("owoztneoer");
-        System.out.println(result); // Expected output: "012"
+        List<Integer> result = new PartitionLabels().partitionLabels("ababcbacadefegdehijhklij");
+        System.out.println(result);
     }
 
-    public String originalDigits(String s) {
-        int[] letterFrequency = new int[26]; // Frequency array for letters 'a' to 'z'
-        for (char ch : s.toCharArray()) {
-            letterFrequency[ch - 'a']++;
+    public List<Integer> partitionLabels(String str) {
+        int[] lastOccurrence = new int[26]; // Stores last index of each character
+
+        // Step 1: Compute last occurrence of each character
+        for (int i = 0; i < str.length(); i++) {
+            lastOccurrence[str.charAt(i) - 'a'] = i;
         }
 
-        int[] digitFrequency = new int[10]; // Stores frequency of digits 0-9
+        List<Integer> result = new ArrayList<>();
+        int partitionStart = 0;
+        int maxPartitionEnd = 0;
 
-        // Identify unique digits using distinct characters
-        digitFrequency[0] = letterFrequency['z' - 'a']; // 'z' is unique to "zero"
-        digitFrequency[2] = letterFrequency['w' - 'a']; // 'w' is unique to "two"
-        digitFrequency[4] = letterFrequency['u' - 'a']; // 'u' is unique to "four"
-        digitFrequency[6] = letterFrequency['x' - 'a']; // 'x' is unique to "six"
-        digitFrequency[8] = letterFrequency['g' - 'a']; // 'g' is unique to "eight"
+        // Step 2: Iterate through the string and determine partitions
+        for (int i = 0; i < str.length(); i++) {
+            maxPartitionEnd = Math.max(maxPartitionEnd, lastOccurrence[str.charAt(i) - 'a']);
 
-        // Identify remaining digits by subtracting known occurrences
-        digitFrequency[3] = letterFrequency['h' - 'a'] - digitFrequency[8]; // "three" shares 'h' with "eight"
-        digitFrequency[5] = letterFrequency['f' - 'a'] - digitFrequency[4]; // "five" shares 'f' with "four"
-        digitFrequency[7] = letterFrequency['s' - 'a'] - digitFrequency[6]; // "seven" shares 's' with "six"
-        digitFrequency[9] = letterFrequency['i' - 'a'] - digitFrequency[5] - digitFrequency[6] - digitFrequency[8]; // "nine" shares 'i'
-        digitFrequency[1] = letterFrequency['n' - 'a'] - digitFrequency[7] - 2 * digitFrequency[9]; // "one" shares 'n' with "nine" and "seven"
-
-        // Construct the sorted digit string
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            result.append(String.valueOf(i).repeat(digitFrequency[i]));
+            // If current index matches the furthest occurrence of any character seen so far
+            if (i == maxPartitionEnd) {
+                result.add(i - partitionStart + 1);
+                partitionStart = i + 1;
+            }
         }
-        return result.toString();
+
+        return result;
     }
 }

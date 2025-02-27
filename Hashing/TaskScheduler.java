@@ -1,54 +1,98 @@
 package Hashing;
 
+import java.util.*;
+
 /**
- * LeetCode: https://leetcode.com/problems/reconstruct-original-digits-from-english/
+ * https://leetcode.com/problems/task-scheduler/
  *
- * Given a string containing an unordered English representation of digits 0-9,
- * return the digits in ascending order.
- *
- * Approach:
- * - Count the frequency of each character in the input string.
- * - Use unique identifiers for specific digits (e.g., 'z' uniquely identifies "zero").
- * - Deduct known digits to determine remaining ones.
- * - Construct the output by appending digits in order based on frequency.
- *
- * Time Complexity: O(N) - We iterate over the input string and process a fixed set of characters.
- * Space Complexity: O(1) - Uses a constant-size frequency array and output storage.
+ * Given a set of CPU tasks with cooldown times, determine the minimum time required to complete them.
  */
-public class OriginalDigits {
-
+public class TaskScheduler {
     public static void main(String[] args) {
-        String result = new OriginalDigits().originalDigits("owoztneoer");
-        System.out.println(result); // Expected output: "012"
+        char[] tasks = {'A', 'A', 'A', 'A', 'A', 'B', 'B', 'C'};
+        int totalTime = new TaskScheduler().leastInterval(tasks, 2);
+        System.out.println("\nTotal CPU time required: " + totalTime);
     }
 
-    public String originalDigits(String s) {
-        int[] letterFrequency = new int[26]; // Frequency array for letters 'a' to 'z'
-        for (char ch : s.toCharArray()) {
-            letterFrequency[ch - 'a']++;
+    /**
+     * Approach 1: Using a Priority Queue and Cooldown Queue
+     * Time Complexity: O(N log N) (due to priority queue operations)
+     * Space Complexity: O(N) (for storing tasks in queues)
+     */
+    public int leastInterval(char[] tasks, int cooldown) {
+        Map<Character, Integer> taskFrequencyMap = new HashMap<>();
+
+        // Step 1: Count occurrences of each task
+        for (char task : tasks) {
+            taskFrequencyMap.put(task, taskFrequencyMap.getOrDefault(task, 0) + 1);
         }
 
-        int[] digitFrequency = new int[10]; // Stores frequency of digits 0-9
-        
-        // Identify unique digits using distinct characters
-        digitFrequency[0] = letterFrequency['z' - 'a']; // 'z' is unique to "zero"
-        digitFrequency[2] = letterFrequency['w' - 'a']; // 'w' is unique to "two"
-        digitFrequency[4] = letterFrequency['u' - 'a']; // 'u' is unique to "four"
-        digitFrequency[6] = letterFrequency['x' - 'a']; // 'x' is unique to "six"
-        digitFrequency[8] = letterFrequency['g' - 'a']; // 'g' is unique to "eight"
+        // Step 2: Use a max heap (priority queue) to execute the most frequent task first
+        PriorityQueue<Task> taskQueue = new PriorityQueue<>((a, b) -> Integer.compare(b.remainingCount, a.remainingCount));
+        Queue<Task> cooldownQueue = new LinkedList<>();
 
-        // Identify remaining digits by subtracting known occurrences
-        digitFrequency[3] = letterFrequency['h' - 'a'] - digitFrequency[8]; // "three" shares 'h' with "eight"
-        digitFrequency[5] = letterFrequency['f' - 'a'] - digitFrequency[4]; // "five" shares 'f' with "four"
-        digitFrequency[7] = letterFrequency['s' - 'a'] - digitFrequency[6]; // "seven" shares 's' with "six"
-        digitFrequency[9] = letterFrequency['i' - 'a'] - digitFrequency[5] - digitFrequency[6] - digitFrequency[8]; // "nine" shares 'i'
-        digitFrequency[1] = letterFrequency['n' - 'a'] - digitFrequency[7] - 2 * digitFrequency[9]; // "one" shares 'n' with "nine" and "seven"
-
-        // Construct the sorted digit string
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            result.append(String.valueOf(i).repeat(digitFrequency[i]));
+        // Populate taskQueue with tasks and their frequencies
+        for (var entry : taskFrequencyMap.entrySet()) {
+            taskQueue.offer(new Task(entry.getKey(), 0, entry.getValue()));
         }
-        return result.toString();
+
+        int totalTimeUnits = 0;
+
+        // Step 3: Process tasks while there are still pending tasks
+        while (!taskQueue.isEmpty() || !cooldownQueue.isEmpty()) {
+            totalTimeUnits++;
+
+            // Move tasks from cooldown queue back to task queue when they can be executed
+            if (!cooldownQueue.isEmpty() && cooldownQueue.peek().nextAvailableTime <= totalTimeUnits) {
+                taskQueue.offer(cooldownQueue.poll());
+            }
+
+            // Execute the most frequent available task
+            if (!taskQueue.isEmpty()) {
+                Task task = taskQueue.poll();
+                System.out.print(task.name + "  ");
+
+                if (task.remainingCount > 1) {
+                    // Reduce task count and move it to cooldown queue
+                    cooldownQueue.offer(new Task(task.name, totalTimeUnits + cooldown + 1, task.remainingCount - 1));
+                }
+            } else {
+                System.out.print("wait  "); // No task available, CPU idle
+            }
+        }
+
+        return totalTimeUnits;
     }
+
+    /**
+     * Approach 2: Optimized Math-Based Solution
+     * Time Complexity: O(N) (single pass to count frequencies)
+     * Space Complexity: O(1) (since we store only 26 characters)
+     */
+    public int leastIntervalUsingMath(char[] tasks, int cooldown) {
+        int[] frequencies = new int[26];
+
+        // Step 1: Count occurrences of each task
+        for (char task : tasks) {
+            frequencies[task - 'A']++;
+        }
+
+        // Step 2: Find the task with the maximum frequency
+        int maxFrequency = Arrays.stream(frequencies).max().orElse(0);
+
+        // Step 3: Count how many tasks have this maximum frequency
+        int maxFrequencyCount = 0;
+        for (int frequency : frequencies) {
+            if (frequency == maxFrequency) {
+                maxFrequencyCount++;
+            }
+        }
+
+        // Step 4: Calculate the minimum intervals required
+        int minTime = (maxFrequency - 1) * (cooldown + 1) + maxFrequencyCount;
+        return Math.max(tasks.length, minTime);
+    }
+
+    // Task class to store task metadata (Java 14+ record for simplicity)
+    record Task(char name, int nextAvailableTime, int remainingCount) {}
 }

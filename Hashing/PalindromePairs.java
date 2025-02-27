@@ -1,56 +1,99 @@
 package Hashing;
 
-/**
- * LeetCode: https://leetcode.com/problems/reconstruct-original-digits-from-english/
- *
- * Given a string containing an unordered English representation of digits 0-9,
- * return the digits in ascending order.
- *
- * Approach:
- * - Count the frequency of each character in the input string.
- * - Use unique identifiers for specific digits (e.g., 'z' uniquely identifies "zero").
- * - Deduct known digits to determine remaining ones.
- * - Construct the output by appending digits in order based on frequency.
- *
- * Time Complexity: O(N) - We iterate over the input string and process a fixed set of characters.
- * Space Complexity: O(1) - Uses a constant-size frequency array and output storage.
- */
-public class OriginalDigits {
+import java.util.*;
 
+public class PalindromePairs {
     public static void main(String[] args) {
-        String result = new OriginalDigits().originalDigits("owoztneoer");
-        System.out.println(result); // Expected output: "012"
+        String[] words = {"abcd", "dcba", "lls", "s", "sssll"};
+        System.out.println(new PalindromePairs().palindromePairs(words));
     }
 
-    public String originalDigits(String s) {
-        int[] charCount = new int[26]; // Frequency array for letters 'a' to 'z'
-        for (char ch : s.toCharArray()) {
-            charCount[ch - 'a']++;
+    /**
+     * Finds all pairs of indices (i, j) where words[i] + words[j] form a palindrome.
+     * @param words - array of words
+     * @return list of palindrome index pairs
+     */
+    public List<List<Integer>> palindromePairs(String[] words) {
+        // Map words to their indices for quick lookup
+        Map<String, Integer> wordIndexMap = new HashMap<>();
+        for (int i = 0; i < words.length; i++) {
+            wordIndexMap.put(words[i], i);
         }
 
-        int[] digitCount = new int[10]; // Stores frequency of digits 0-9
-        
-        // Identify unique digits using distinct characters
-        digitCount[0] = charCount['z' - 'a']; // 'z' is unique to "zero"
-        digitCount[2] = charCount['w' - 'a']; // 'w' is unique to "two"
-        digitCount[4] = charCount['u' - 'a']; // 'u' is unique to "four"
-        digitCount[6] = charCount['x' - 'a']; // 'x' is unique to "six"
-        digitCount[8] = charCount['g' - 'a']; // 'g' is unique to "eight"
+        List<List<Integer>> result = new ArrayList<>();
 
-        // Identify remaining digits by subtracting known occurrences
-        digitCount[3] = charCount['h' - 'a'] - digitCount[8]; // "three" shares 'h' with "eight"
-        digitCount[5] = charCount['f' - 'a'] - digitCount[4]; // "five" shares 'f' with "four"
-        digitCount[7] = charCount['s' - 'a'] - digitCount[6]; // "seven" shares 's' with "six"
-        digitCount[9] = charCount['i' - 'a'] - digitCount[5] - digitCount[6] - digitCount[8]; // "nine" shares 'i'
-        digitCount[1] = charCount['n' - 'a'] - digitCount[7] - 2 * digitCount[9]; // "one" shares 'n' with "nine" and "seven"
+        for (String word : wordIndexMap.keySet()) {
+            int index = wordIndexMap.get(word);
+            String reversedWord = new StringBuilder(word).reverse().toString();
 
-        // Construct the sorted digit string
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < digitCount[i]; j++) {
-                result.append(i);
+            // Case 1: Exact reverse match (word1 == reverse(word2))
+            Integer reversedIndex = wordIndexMap.get(reversedWord);
+            if (reversedIndex != null && reversedIndex != index) {
+                result.add(Arrays.asList(index, reversedIndex));
+            }
+
+            // Case 2: Prefix is palindrome, suffix has reverse match
+            for (String suffix : allValidSuffixes(word)) {
+                Integer suffixIndex = wordIndexMap.get(new StringBuilder(suffix).reverse().toString());
+                if (suffixIndex != null) {
+                    result.add(Arrays.asList(suffixIndex, index));
+                }
+            }
+
+            // Case 3: Suffix is palindrome, prefix has reverse match
+            for (String prefix : allValidPrefixes(word)) {
+                Integer prefixIndex = wordIndexMap.get(new StringBuilder(prefix).reverse().toString());
+                if (prefixIndex != null) {
+                    result.add(Arrays.asList(index, prefixIndex));
+                }
             }
         }
-        return result.toString();
+        return result;
+    }
+
+    /**
+     * Returns a list of prefixes where the remaining suffix is a palindrome.
+     * @param word - input string
+     * @return list of valid prefixes
+     */
+    private List<String> allValidPrefixes(String word) {
+        List<String> validPrefixes = new ArrayList<>();
+        for (int i = 0; i < word.length(); i++) {
+            if (isPalindrome(word, i, word.length() - 1)) {
+                validPrefixes.add(word.substring(0, i));
+            }
+        }
+        return validPrefixes;
+    }
+
+    /**
+     * Returns a list of suffixes where the remaining prefix is a palindrome.
+     * @param word - input string
+     * @return list of valid suffixes
+     */
+    private List<String> allValidSuffixes(String word) {
+        List<String> validSuffixes = new ArrayList<>();
+        for (int i = 0; i < word.length(); i++) {
+            if (isPalindrome(word, 0, i)) {
+                validSuffixes.add(word.substring(i + 1)); // No need to specify the end index explicitly
+            }
+        }
+        return validSuffixes;
+    }
+
+    /**
+     * Checks if a substring of a given word is a palindrome.
+     * @param word - input string
+     * @param left - start index
+     * @param right - end index
+     * @return true if the substring is a palindrome, false otherwise
+     */
+    private boolean isPalindrome(String word, int left, int right) {
+        while (left < right) {
+            if (word.charAt(left) != word.charAt(right)) return false;
+            left++;
+            right--;
+        }
+        return true;
     }
 }

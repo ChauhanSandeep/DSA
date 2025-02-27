@@ -1,7 +1,9 @@
+package Graph;
+
 import java.util.*;
 
-public class CheapestFlightWithStopsOptimized {
-    
+public class CheapestFlightWithStops {
+
     public static void main(String[] args) {
         int[][] flights = {
             {0, 1, 100},
@@ -9,7 +11,7 @@ public class CheapestFlightWithStopsOptimized {
             {0, 2, 500}
         };
 
-        CheapestFlightWithStopsOptimized solver = new CheapestFlightWithStopsOptimized();
+        CheapestFlightWithStops solver = new CheapestFlightWithStops();
         int cheapestCost = solver.findCheapestPrice(3, flights, 0, 2, 1);
         System.out.println("Cheapest cost: " + cheapestCost);
     }
@@ -47,7 +49,7 @@ public class CheapestFlightWithStopsOptimized {
                 }
             }
         }
-        
+
         return -1; // No valid route found
     }
 }

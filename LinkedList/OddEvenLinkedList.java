@@ -1,56 +1,58 @@
 package LinkedList;
 
+import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
 /**
- * Given a Circular Linked List node, which is sorted in ascending order, write a function to insert a value insertVal into the list such that it remains a sorted circular list.
+ * Given the head of a singly linked list, group all the nodes with odd indices together followed by the nodes with even indices, and return the reordered list.
  *
- * https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/
+ * Algorithm:
+ * - Maintain separate pointers for odd and even indexed nodes.
+ * - Traverse the list and adjust pointers to group odd indices together followed by even indices.
+ * - Merge the two lists at the end.
+ *
+ * Time Complexity: O(n), where n is the number of nodes in the list.
+ * Space Complexity: O(1), since no extra space is used.
+ *
+ * https://leetcode.com/problems/odd-even-linked-list/
  */
-public class InsertSortedCircularLinkedList {
+public class OddEvenLinkedList {
 
     public static void main(String[] args) {
-        ListNode head = new ListNode(3);
-        head.next = new ListNode(4);
-        head.next.next = new ListNode(1);
-        head.next.next.next = head;
-        
-        InsertSortedCircularLinkedList list = new InsertSortedCircularLinkedList();
-        list.insert(head, 2);
+        ListNode head = new ListNode(1);
+        LinkedList list = new LinkedList(head);
+        list.add(new ListNode(2));
+        list.add(new ListNode(3));
+        list.add(new ListNode(4));
+        list.add(new ListNode(5));
+        ListNode reorderedList = new OddEvenLinkedList().oddEvenList(head);
+        list.printList(reorderedList);
     }
 
-    public ListNode insert(ListNode head, int insertVal) {
-        if (head == null) {
-            ListNode node = new ListNode(insertVal);
-            node.next = node;
-            return node;
-        }
-        
-        ListNode temp = head;
-        ListNode newNode = new ListNode(insertVal);
-
-        while (true) {
-            // Case 1: Insert in the middle of sorted values
-            if (temp.val <= insertVal && insertVal <= temp.next.val) {
-                break;
-            }
-
-            // Case 2: Insert at the boundary (smallest or largest)
-            if (temp.val > temp.next.val && (insertVal >= temp.val || insertVal <= temp.next.val)) {
-                break;
-            }
-
-            // Move to the next node
-            temp = temp.next;
-
-            // Case 3: If we complete a full loop, insert anywhere
-            if (temp == head) break;
+    /**
+     * Reorders the linked list by grouping odd-indexed nodes first, followed by even-indexed nodes.
+     * @param head The head of the linked list.
+     * @return The reordered linked list.
+     */
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
         }
 
-        // Insert the new node
-        newNode.next = temp.next;
-        temp.next = newNode;
-        
+        ListNode odd = head;
+        ListNode even = head.next;
+        ListNode evenHead = even;
+
+        // Rearrange nodes in odd-even order
+        while (even != null && even.next != null) {
+            odd.next = even.next;
+            odd = odd.next;
+            even.next = odd.next;
+            even = even.next;
+        }
+
+        // Attach even list after odd list
+        odd.next = evenHead;
         return head;
     }
 }

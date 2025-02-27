@@ -1,45 +1,68 @@
 package LinkedList;
 
+import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
-/**
- * Given a Circular Linked List node, which is sorted in ascending order, write a function to insert a value insertVal into the list such that it remains a sorted circular list.
- *
- * https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/
- */
-public class InsertSortedCircularLinkedList {
-
+public class IntersectionList {
     public static void main(String[] args) {
-        ListNode head = new ListNode(3);
-        head.next = new ListNode(4);
-        head.next.next = new ListNode(1);
-        head.next.next.next = head;
-        
-        InsertSortedCircularLinkedList list = new InsertSortedCircularLinkedList();
-        list.insert(head, 2);
+        ListNode head1 = new ListNode(1);
+        ListNode head2 = new ListNode(10);
+        ListNode four = new ListNode(4);
+
+        LinkedList list = new LinkedList(head1);
+        list.add(new ListNode(2));
+        list.add(new ListNode(3));
+        list.add(four);
+        list.add(new ListNode(5));
+        list.add(new ListNode(6));
+
+        LinkedList list2 = new LinkedList(head2);
+        head2.setNext(new ListNode(11));
+        head2.getNext().setNext(new ListNode(12));
+        head2.getNext().getNext().setNext(four);
+        System.out.println("first");
+        list.printList(head1);
+        System.out.println("Second");
+        list2.printList(head2);
+        ListNode intersectionNode = findIntersection(head1, head2);
+        System.out.println("Intersection of node is " + intersectionNode.getVal());
     }
 
-    public ListNode insert(ListNode head, int insertVal) {
-        if (head == null) {
-            ListNode node = new ListNode(insertVal);
-            node.next = node;
-            return node;
+    public static ListNode findIntersection(ListNode head1, ListNode head2) {
+        int len1 = findLen(head1);
+        int len2 = findLen(head2);
+
+        if(len2 > len1) {
+            return findIntersection(head2, head1, len2-len1);
+        }else{
+            return findIntersection(head1, head2, len1-len2);
         }
-        
-        ListNode temp = head;
-        while (true) {
-            if ((temp.val <= insertVal && insertVal <= temp.next.val) || // Insert within sorted range
-                (temp.val > temp.next.val && (insertVal >= temp.val || insertVal <= temp.next.val)) || // Insert at boundary
-                (temp.next == head)) { // Insert if full loop completed
-                
-                ListNode node = new ListNode(insertVal);
-                node.next = temp.next;
-                temp.next = node;
-                break;
-            }
-            
-            temp = temp.next;
+    }
+
+    public static ListNode findIntersection(ListNode head1, ListNode head2, int commonLen) {
+        int len = 0;
+        while(len < commonLen) {
+            head1 = head1.getNext();
+            len++;
         }
-        return head;
+
+        while(head1 != null || head2 != null) {
+            if(head1 == head2) return head1;
+
+            head1 = head1.getNext();
+            head2 = head2.getNext();
+        }
+        throw new RuntimeException("Not found");
+
+    }
+
+    public static int findLen(ListNode node) {
+        ListNode temp = node;
+        int len = 0;
+        while(temp != null) {
+            len++;
+            temp = temp.getNext();
+        }
+        return len;
     }
 }
