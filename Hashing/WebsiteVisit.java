@@ -56,7 +56,7 @@ public class WebsiteVisit {
       }
     }
 
-    return mostFrequentPattern != null ? List.of(mostFrequentPattern.split(" ")) : Collections.emptyList();
+    return mostFrequentPattern != null ? Arrays.asList(mostFrequentPattern.split(" ")) : Collections.emptyList();
   }
 }
 

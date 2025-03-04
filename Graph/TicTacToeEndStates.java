@@ -80,7 +80,17 @@ public class TicTacToeEndStates {
         return nextStates;
     }
 
+    /**
+     * Encode an empty board of size `size x size` as a string
+     * @param size Board size
+     * @return Encoded string representing an empty board
+     * Example: encode(3) -> "---" (3x3 empty board)
+     */
     private String encode(int size) {
-        return "-".repeat(size * size);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size * size; i++) {
+            sb.append("-");
+        }
+        return sb.toString();
     }
 }

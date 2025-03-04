@@ -32,7 +32,7 @@ public class TaskScheduler {
         Queue<Task> cooldownQueue = new LinkedList<>();
 
         // Populate taskQueue with tasks and their frequencies
-        for (var entry : taskFrequencyMap.entrySet()) {
+        for (Map.Entry<Character, Integer> entry : taskFrequencyMap.entrySet()) {
             taskQueue.offer(new Task(entry.getKey(), 0, entry.getValue()));
         }
 
@@ -94,5 +94,15 @@ public class TaskScheduler {
     }
 
     // Task class to store task metadata (Java 14+ record for simplicity)
-    record Task(char name, int nextAvailableTime, int remainingCount) {}
+static class Task {
+        char name;
+        int nextAvailableTime;
+        int remainingCount;
+
+        Task(char name, int nextAvailableTime, int remainingCount) {
+            this.name = name;
+            this.nextAvailableTime = nextAvailableTime;
+            this.remainingCount = remainingCount;
+        }
+    }
 }

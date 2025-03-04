@@ -1,6 +1,7 @@
 package Heap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class KSmallSumPair {
     public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
         PriorityQueue<HeapNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.sum, b.sum));
         List<List<Integer>> result = new ArrayList<>();
-        
+
         if (nums1.length == 0 || nums2.length == 0 || k == 0) return result;
 
         // Initialize heap with first k pairs from nums1 and the first element of nums2
@@ -62,7 +63,7 @@ class HeapNode {
     int sum;
 
     public HeapNode(int num1, int num2, int index) {
-        this.pair = List.of(num1, num2);
+        this.pair = Arrays.asList(num1, num2);
         this.index = index;
         this.sum = num1 + num2;
     }

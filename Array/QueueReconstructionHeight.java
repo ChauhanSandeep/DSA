@@ -5,6 +5,14 @@ import java.util.*;
 /**
  * 🔗 LeetCode: https://leetcode.com/problems/queue-reconstruction-by-height/
  * ✅ Greedy + Sorting + Insertion
+ * Description: Given an array of people, where each element is an array of two integers [h, k],
+ * this solution reconstructs the queue by height and the number of people in front of them.
+ * Approach:
+ * - Sort the array in descending order by height and ascending order by the number of people in front.
+ * - Insert each person at their correct position in the queue based on the number of people in front of them.
+ * - Return the reconstructed queue.
+ * Time Complexity: O(n^2)
+ * Space Complexity: O(n)
  */
 public class QueueReconstructionHeight {
     public static void main(String[] args) {

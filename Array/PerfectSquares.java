@@ -16,14 +16,14 @@ public class PerfectSquares {
     }
 
     /**
-     * 🔥 Dynamic Programming Approach
+     * Dynamic Programming Approach
      * Time Complexity: O(n * sqrt(n))
      * Space Complexity: O(n)
      */
     public int numSquaresDp(int n) {
         int[] dp = new int[n + 1];
         Arrays.fill(dp, Integer.MAX_VALUE);
-        
+
         // Perfect square numbers require only 1 step
         for (int i = 1; i * i <= n; i++) {
             dp[i * i] = 1;
@@ -41,7 +41,7 @@ public class PerfectSquares {
     }
 
     /**
-     * 🔥 Optimized BFS Approach (Shortest Path)
+     * Optimized BFS Approach (Shortest Path)
      * Treats the problem as an unweighted graph traversal
      * Time Complexity: O(n)
      * Space Complexity: O(n)
