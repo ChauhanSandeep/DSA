@@ -1,6 +1,7 @@
 package DynamicProgramming;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,18 +13,18 @@ import java.util.List;
  * - Use **direction-based traversal** (8 directions) to count attacking queens.
  * - **Avoid recursion** (uses iterative traversal).
  * - **Optimized data structures** (`int[][]` instead of nested lists).
- * 
- * Time Complexity: **O(N × M × 8) ≈ O(N × M)**  
+ *
+ * Time Complexity: **O(N × M × 8) ≈ O(N × M)**
  * Space Complexity: **O(N × M)**
  */
 public class QueenAttack {
-    
+
     // 8 possible movement directions for a Queen (Row, Column)
     private static final int[] DX = {0, -1, -1, -1, 0, 1, 1, 1};
     private static final int[] DY = {1, 1, 0, -1, -1, -1, 0, 1};
-    
+
     public static void main(String[] args) {
-        List<String> board = List.of(
+        List<String> board = Arrays.asList(
                 "010",
                 "100",
                 "001"
