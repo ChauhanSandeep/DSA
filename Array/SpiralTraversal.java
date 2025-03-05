@@ -1,7 +1,9 @@
 package Array;
 
-public class SpiralTraversal {
+import java.util.ArrayList;
+import java.util.List;
 
+public class SpiralTraversal {
     public static void main(String[] args) {
         int[][] matrix = {
                 {1, 2, 3, 4},
@@ -11,51 +13,45 @@ public class SpiralTraversal {
                 {1, 9, 0, 2}
         };
 
-        printSpiral(matrix);
+        System.out.println(spiralOrder(matrix));
     }
 
-    private static void printSpiral(int[][] matrix) {
-        int top = 0;
-        int bottom = matrix.length - 1;
-        int left = 0;
-        int right = matrix[0].length - 1;
-        int dir = 0;
+    public static List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> result = new ArrayList<>();
+        if (matrix == null || matrix.length == 0) return result;
 
-        while(left <= right && top <= bottom) {
-            switch(dir) {
-                case 0:
-                    //left to right
-                    for(int i=left; i <= right; i++) {
-                        System.out.println(matrix[top][i]);
-                    }
-                    top++;
-                    break;
-                case 1:
-                    // top to bottom
-                    for(int i=top; i<=bottom; i++) {
-                        System.out.println(matrix[i][right]);
-                    }
-                    right--;
-                    break;
-                case 2:
-                    // right to left
-                    for(int i=right; i>=left; i--) {
-                        System.out.println(matrix[bottom][i]);
-                    }
-                    bottom--;
-                    break;
-                case 3:
-                    // bottom to top
-                    for(int i=bottom; i>=top; i--) {
-                        System.out.println(matrix[i][left]);
-                    }
-                    left ++;
-                    break;
+        int top = 0, bottom = matrix.length - 1;
+        int left = 0, right = matrix[0].length - 1;
+
+        while (left <= right && top <= bottom) {
+            // Left to Right
+            for (int i = left; i <= right; i++) {
+                result.add(matrix[top][i]);
             }
-            dir = (dir + 1)%4;
+            top++; // Move down
+
+            // Top to Bottom
+            for (int i = top; i <= bottom; i++) {
+                result.add(matrix[i][right]);
+            }
+            right--; // Move left
+
+            if (top <= bottom) { // Check to prevent duplicate rows
+                // Right to Left
+                for (int i = right; i >= left; i--) {
+                    result.add(matrix[bottom][i]);
+                }
+                bottom--; // Move up
+            }
+
+            if (left <= right) { // Check to prevent duplicate columns
+                // Bottom to Top
+                for (int i = bottom; i >= top; i--) {
+                    result.add(matrix[i][left]);
+                }
+                left++; // Move right
+            }
         }
-
-
-
+        return result;
     }
 }

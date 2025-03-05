@@ -1,83 +1,84 @@
 package Array;
 
 /**
- * There are n dominoes in a line, and we place each domino vertically upright. In the beginning, we simultaneously push some of the dominoes either to the left or to the right.
- * After each second, each domino that is falling to the left pushes the adjacent domino on the left. Similarly, the dominoes falling to the right push their adjacent dominoes standing on the right.
- * When a vertical domino has dominoes falling on it from both sides, it stays still due to the balance of the forces.
- * Return a string representing the final state.
+ * There are n dominoes in a line, and we place each domino vertically upright. In the beginning, we push some dominoes either left ('L') or right ('R').
+ * This function returns the final state of dominoes after all forces are applied.
  */
 public class PushDominoes {
 
-  public static void main(String[] args) {
-    String dominoes = ".L.R...LR..L..";
-    String result = pushDominoes(dominoes);
-    System.out.println(result);
-  }
+    public static void main(String[] args) {
+        String dominoes = ".L.R...LR..L..";
+        System.out.println("Optimized Output: " + pushDominoes(dominoes));
+    }
 
-
-  public static String pushDominoes(String dominoes) {
-    char[] dominoesArr = dominoes.toCharArray();
-    for (int i = 0, lastLeft = -1, lastRight = -1; i <= dominoes.length(); i++)
-      if (i == dominoesArr.length || dominoesArr[i] == 'R') {
-        if (lastRight > lastLeft) { // R.....R
-          while (lastRight < i) {
-            dominoesArr[lastRight++] = 'R';
-          }
-        }else {// L....R
-          // do nothing
+    /**
+     * 🔥 Two-pointer approach (Efficient In-Place Modification)
+     */
+    public static String pushDominoes(String dominoes) {
+        char[] arr = dominoes.toCharArray();
+        
+        for (int i = 0, lastL = -1, lastR = -1; i <= arr.length; i++) {
+            if (i == arr.length || arr[i] == 'R') {
+                if (lastR > lastL) { // R.....R
+                    while (lastR < i) arr[lastR++] = 'R';
+                }
+                lastR = i;
+            } else if (arr[i] == 'L') {
+                if (lastL > lastR || lastR == -1) { // L.....L
+                    while (++lastL < i) arr[lastL] = 'L';
+                } else { // R...L
+                    lastL = i;
+                    for (int lo = lastR + 1, hi = lastL - 1; lo < hi; ) {
+                        arr[lo++] = 'R';
+                        arr[hi--] = 'L';
+                    }
+                }
+            }
         }
-        lastRight = i;
-      } else if (dominoesArr[i] == 'L') {
-        if (lastLeft > lastRight || lastRight == -1) { // L....L
-          while (++lastLeft < i)
-            dominoesArr[lastLeft] = 'L';
-        } else { //R...L
-          lastLeft = i;
-          for (int lo = lastRight + 1, hi = lastLeft - 1; lo < hi; ) {//one in the middle stays '.'
-            dominoesArr[lo++] = 'R';
-            dominoesArr[hi--] = 'L';
-          }
+        return new String(arr);
+    }
+
+    /**
+     * 🔥 Force-based approach (Uses an auxiliary forces array)
+     * - Uses an integer array to track net force applied at each index.
+     */
+    public static String pushDominoes2(String dominoes) {
+        char[] arr = dominoes.toCharArray();
+        int len = arr.length;
+        int[] forces = new int[len];
+
+        int force = 0;
+
+        // Pass 1: Compute forces from Right ('R' applies force)
+        for (int i = 0; i < len; i++) {
+            if (arr[i] == 'R') {
+                force = len;
+            } else if (arr[i] == 'L') {
+                force = 0;
+            } else {
+                force = Math.max(force - 1, 0);
+            }
+            forces[i] += force;
         }
-      }
-    return new String(dominoesArr);
-  }
 
-  public String pushDominoes2(String dominoes) {
-    char[] dominoesArr = dominoes.toCharArray();
-    int len = dominoesArr.length;
-    int[] forces = new int[len];
-
-    int force = 0;
-    for(int i=0; i<len; i++) {
-      if(dominoesArr[i] == 'R') {
-        force = len;
-      }else if (dominoesArr[i] == 'L') {
+        // Pass 2: Compute forces from Left ('L' applies force)
         force = 0;
-      }else{
-        force = Math.max(force-1, 0);
-      }
-      forces[i] += force;
+        for (int i = len - 1; i >= 0; i--) {
+            if (arr[i] == 'L') {
+                force = len;
+            } else if (arr[i] == 'R') {
+                force = 0;
+            } else {
+                force = Math.max(force - 1, 0);
+            }
+            forces[i] -= force;
+        }
+
+        // Construct result based on net forces
+        StringBuilder result = new StringBuilder(len);
+        for (int f : forces) {
+            result.append(f > 0 ? 'R' : f < 0 ? 'L' : '.');
+        }
+        return result.toString();
     }
-
-    force = 0;
-    for(int i=len-1; i>=0; i--) {
-      if(dominoesArr[i] == 'L') {
-        force = len;
-      }else if(dominoesArr[i] == 'R'){
-        force = 0;
-      }else{
-        force = Math.max(force-1, 0);
-      }
-      forces[i] -= force;
-    }
-
-    StringBuilder builder = new StringBuilder();
-    for(int i=0; i<forces.length; i++) {
-      builder.append(forces[i] > 0 ? 'R' : forces[i] < 0 ? 'L' : '.');
-    }
-    return builder.toString();
-
-
-  }
-
 }

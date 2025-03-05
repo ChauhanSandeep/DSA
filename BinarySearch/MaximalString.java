@@ -1,44 +1,55 @@
 package BinarySearch;
 
 /**
- * Find the lexicographically maximal string that can be created by doing max k swaps
+ * This code finds the lexicographically maximal string that can be created by doing up to k swaps.
+ * It uses a recursive approach to explore all possible swaps and keep track of the maximum string found.
+ * 
+ * Algorithm: 
+ * - Recursively swap characters in the string and keep track of the maximum string found.
+ * - Time Complexity: O(n^k)
+ * - Space Complexity: O(n)
+ * 
+ * LeetCode Problem Link: https://leetcode.com/problems/maximum-number-of-swaps/
  */
 public class MaximalString {
     public static void main(String[] args) {
         String input = "254";
-        String result = new MaximalString().solve(input, 1);
+        String result = new MaximalString().findMaximalString(input, 1);
         System.out.println(result);
     }
 
-    String max;
-    public String solve(String str, int k) {
-        this.max = str;
-        solveRec(str, k);
-        return max;
+    private String maximumString;
+
+    public String findMaximalString(String input, int maxSwaps) {
+        this.maximumString = input;
+        performSwaps(input, maxSwaps);
+        return maximumString;
     }
 
-    public void solveRec(String str, int k) {
-        if(str.compareTo(max) > 0) {
-            max = str;
+    private void performSwaps(String currentString, int remainingSwaps) {
+        if (currentString.compareTo(maximumString) > 0) {
+            maximumString = currentString;
         }
-        if(k == 0) return;
+        if (remainingSwaps == 0) {
+            return;
+        }
 
-        int size = str.length();
-        for(int i=0; i<size-1; i++) {
-            for(int j=i+1; j<size; j++) {
-                if(str.charAt(j) > str.charAt(i)) {
-                    String swapped = swap(str, i, j);
-                    solveRec(swapped, k-1);
+        int length = currentString.length();
+        for (int i = 0; i < length - 1; i++) {
+            for (int j = i + 1; j < length; j++) {
+                if (currentString.charAt(j) > currentString.charAt(i)) {
+                    String swappedString = swapCharacters(currentString, i, j);
+                    performSwaps(swappedString, remainingSwaps - 1);
                 }
             }
         }
     }
 
-    public String swap(String original, int first, int second) {
-        char[] charArr = original.toCharArray();
-        char temp = charArr[first];
-        charArr[first] = charArr[second];
-        charArr[second] = temp;
-        return new String(charArr);
+    private String swapCharacters(String originalString, int firstIndex, int secondIndex) {
+        char[] charArray = originalString.toCharArray();
+        char temp = charArray[firstIndex];
+        charArray[firstIndex] = charArray[secondIndex];
+        charArray[secondIndex] = temp;
+        return new String(charArray);
     }
 }

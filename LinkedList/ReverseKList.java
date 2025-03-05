@@ -55,6 +55,5 @@ public class ReverseKList {
         }
         prevTail.next = curr;
         return result.next;
-
     }
 }

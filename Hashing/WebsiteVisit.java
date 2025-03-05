@@ -6,62 +6,66 @@ import java.util.*;
  * https://leetcode.com/problems/analyze-user-website-visit-pattern/
  */
 public class WebsiteVisit {
-    public static void main(String[] args) {
-        String[] username = {"u1","u1","u1","u2","u2","u2"};
-        String[] website =  {"a", "b", "a", "a", "b", "c"};
-        int[] timestamp = {1,2,3,4,5,6};
+  public static void main(String[] args) {
+    String[] username = {"u1", "u1", "u1", "u2", "u2", "u2"};
+    String[] website = {"a", "b", "a", "a", "b", "c"};
+    int[] timestamp = {1, 2, 3, 4, 5, 6};
 
-        List<String> result = new WebsiteVisit().mostVisitedPattern(username, timestamp, website);
-        System.out.println(result);
+    List<String> result = new WebsiteVisit().mostVisitedPattern(username, timestamp, website);
+    System.out.println(result);
+  }
+
+  public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
+    Map<String, List<Pair>> userVisits = new HashMap<>();
+    int n = username.length;
+
+    // Collect the website visit info for each user
+    for (int i = 0; i < n; i++) {
+      userVisits.computeIfAbsent(username[i], k -> new ArrayList<>()).add(new Pair(timestamp[i], website[i]));
     }
 
-    public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
-        Map<String, List<Pair>> userPairMap = new HashMap<>();
-        int length = username.length;
-        // collect the website info for every user, key: username, value: (timestamp, website)
-        for (int i = 0; i < length; i++) {
-            userPairMap.putIfAbsent(username[i], new ArrayList<>());
-            userPairMap.get(username[i]).add(new Pair(timestamp[i], website[i]));
-        }
-        // patternFreqMap userPairMap to record every 3 combination occuring time for the different user.
-        Map<String, Integer> patternFreqMap = new HashMap<>();
-        String res = "";
-        for (String user : userPairMap.keySet()) {
-            Set<String> set = new HashSet<>();
-            // this set is to avoid visit the same 3-seq in one user
-            List<Pair> pairList = userPairMap.get(user);
-            Collections.sort(pairList, (a, b) -> (a.time - b.time)); // sort by time
-            // brutal force O(N ^ 3)
-            for (int i = 0; i < pairList.size(); i++) {
-                for (int j = i + 1; j < pairList.size(); j++) {
-                    for (int k = j + 1; k < pairList.size(); k++) {
-                        String str = pairList.get(i).web + " " + pairList.get(j).web + " " + pairList.get(k).web;
-                        if (!set.contains(str)) {
-                            patternFreqMap.put(str, patternFreqMap.getOrDefault(str, 0) + 1);
-                            set.add(str);
-                        }
-                        if (res.equals("") || patternFreqMap.get(res) < patternFreqMap.get(str) || (patternFreqMap.get(res) == patternFreqMap.get(str) && res.compareTo(str) > 0)) {
-                            // make sure the right lexi order
-                            res = str;
-                        }
-                    }
-                }
+    // Map to store the frequency of each 3-sequence pattern
+    Map<String, Integer> patternFrequency = new HashMap<>();
+    String mostFrequentPattern = null;
+
+    for (String user : userVisits.keySet()) {
+      List<Pair> visits = userVisits.get(user);
+      visits.sort(Comparator.comparingInt(p -> p.time)); // Sort by timestamp
+
+      Set<String> uniquePatterns = new HashSet<>();
+
+      // Generate all possible 3-sequence patterns for the user
+      for (int i = 0; i < visits.size(); i++) {
+        for (int j = i + 1; j < visits.size(); j++) {
+          for (int k = j + 1; k < visits.size(); k++) {
+            String pattern = visits.get(i).web + " " + visits.get(j).web + " " + visits.get(k).web;
+
+            // Ensure each user contributes only once per pattern
+            if (uniquePatterns.add(pattern)) {
+              patternFrequency.put(pattern, patternFrequency.getOrDefault(pattern, 0) + 1);
+
+              // Update most frequent pattern based on frequency and lexicographical order
+              if (mostFrequentPattern == null ||
+                  patternFrequency.get(pattern) > patternFrequency.get(mostFrequentPattern) ||
+                  (patternFrequency.get(pattern).equals(patternFrequency.get(mostFrequentPattern)) && pattern.compareTo(mostFrequentPattern) < 0)) {
+                mostFrequentPattern = pattern;
+              }
             }
+          }
         }
-        // grab the right answer
-        String[] splitArr = res.split(" ");
-        List<String> result = new ArrayList<>();
-        Collections.addAll(result, splitArr);
-        return result;
+      }
     }
+
+    return mostFrequentPattern != null ? Arrays.asList(mostFrequentPattern.split(" ")) : Collections.emptyList();
+  }
 }
 
 class Pair {
-    int time;
-    String web;
+  int time;
+  String web;
 
-    public Pair(int time, String web) {
-        this.time = time;
-        this.web = web;
-    }
+  public Pair(int time, String web) {
+    this.time = time;
+    this.web = web;
+  }
 }

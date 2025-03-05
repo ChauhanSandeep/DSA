@@ -1,71 +1,110 @@
 package DynamicProgramming;
 
+/**
+ * Problem: Shortest Common Superstring
+ * 
+ * Given an array of strings, find the shortest string that contains all given strings as subsequences 
+ * while preserving their order.
+ * 
+ * Approach:
+ * - Use **Greedy + Recursion** to iteratively merge the most overlapping pairs until only one string remains.
+ * - In each step, find the two strings with the **maximum overlap** and merge them.
+ * - The process continues recursively until we obtain a single string.
+ * 
+ * Time Complexity: **O(n^3)** (for each merge operation, we check all pairs, resulting in `O(n^2)`, 
+ *   and we merge `O(n)` times)
+ * Space Complexity: **O(n^2)** (due to recursive calls and array copies)
+ *
+ * This is not the optimal **NP-hard** solution, but it's a reasonable approach for small inputs.
+ * 
+ * LeetCode Link (Closest problem): https://leetcode.com/problems/find-the-shortest-superstring/
+ */
 public class ShortestCommonSuperstring {
 
     public static void main(String[] args) {
-        String[] arr = {"abcd", "cdef", "fgh", "de"};
-        System.out.println(new ShortestCommonSuperstring().solve(arr));
+        String[] words = {"abcd", "cdef", "fgh", "de"};
+        System.out.println("Shortest Common Superstring Length: " + new ShortestCommonSuperstring().findShortestSuperstring(words));
     }
 
-    public int solve(String[] arr) {
-        if (arr.length == 1) {
-            System.out.println(arr[0]);
-            return arr[0].length();
+    /**
+     * Finds the length of the shortest superstring that contains all strings as subsequences.
+     * @param words Array of strings
+     * @return Length of the shortest superstring
+     */
+    public int findShortestSuperstring(String[] words) {
+        if (words.length == 1) {
+            return words[0].length();
         }
 
-        int overlap = -1;
-        int x = -1;
-        int y = -1;
-        int maxLen = -1;
+        while (words.length > 1) {
+            int maxOverlap = -1;
+            int idx1 = -1, idx2 = -1;
+            String mergedString = "";
 
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr.length; j++) {
-                if (j == i) {
-                    continue;
-                }
-                int currOverlap = findOverlap(arr[i], arr[j]);
-                if (currOverlap > overlap || (currOverlap == overlap && maxLen < arr[i].length() + arr[j].length() - currOverlap)) {
-                    overlap = currOverlap;
-                    x = i;
-                    y = j;
-                    maxLen = arr[i].length() + arr[j].length() - currOverlap;
+            // Find the two strings with maximum overlap
+            for (int i = 0; i < words.length; i++) {
+                for (int j = 0; j < words.length; j++) {
+                    if (i == j) continue;
+                    int overlap = findOverlap(words[i], words[j]);
+
+                    int mergedLength = words[i].length() + words[j].length() - overlap;
+                    if (overlap > maxOverlap || (overlap == maxOverlap && mergedLength < mergedString.length())) {
+                        maxOverlap = overlap;
+                        idx1 = i;
+                        idx2 = j;
+                        mergedString = mergeStrings(words[i], words[j], overlap);
+                    }
                 }
             }
-        }
 
-        if (overlap == -1) {
-            int len = 0;
-            for (String str : arr)
-                len += str.length();
-            return len;
-        }
-
-        String merged = mergeStr(arr[x], arr[y], overlap);
-        String[] next = new String[arr.length - 1];
-        int index = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (i != x && i != y) {
-                next[index++] = arr[i];
+            // If no overlap is found, return total length of all remaining words
+            if (maxOverlap == -1) {
+                int totalLength = 0;
+                for (String word : words) {
+                    totalLength += word.length();
+                }
+                return totalLength;
             }
+
+            // Create a new array with merged strings
+            String[] newWords = new String[words.length - 1];
+            int index = 0;
+            for (int i = 0; i < words.length; i++) {
+                if (i != idx1 && i != idx2) {
+                    newWords[index++] = words[i];
+                }
+            }
+            newWords[index] = mergedString;
+
+            words = newWords; // Update the array for the next iteration
         }
-        next[index] = merged;
-        return solve(next);
+
+        return words[0].length();
     }
 
+    /**
+     * Finds the maximum overlap length between two strings.
+     * @param str1 First string
+     * @param str2 Second string
+     * @return Overlap length
+     */
     private int findOverlap(String str1, String str2) {
         for (int i = 0; i < str1.length(); i++) {
             if (str2.startsWith(str1.substring(i))) {
                 return str1.length() - i;
             }
         }
-        return -1;
+        return 0;
     }
 
-    private String mergeStr(String str1, String str2, int overlap) {
-        StringBuilder builder = new StringBuilder();
-        int index = str1.length() - overlap;
-        builder.append(str1, 0, index);
-        builder.append(str2);
-        return builder.toString();
+    /**
+     * Merges two strings based on the given overlap length.
+     * @param str1 First string
+     * @param str2 Second string
+     * @param overlap Overlap length
+     * @return Merged string
+     */
+    private String mergeStrings(String str1, String str2, int overlap) {
+        return str1.substring(0, str1.length() - overlap) + str2;
     }
 }

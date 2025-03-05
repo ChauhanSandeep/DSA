@@ -1,94 +1,108 @@
 package Hashing;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * https://leetcode.com/problems/task-scheduler/
+ *
+ * Given a set of CPU tasks with cooldown times, determine the minimum time required to complete them.
  */
 public class TaskScheduler {
     public static void main(String[] args) {
         char[] tasks = {'A', 'A', 'A', 'A', 'A', 'B', 'B', 'C'};
-        int cpuTime = new TaskScheduler().leastInterval(tasks, 2);
-        System.out.println(cpuTime);
+        int totalTime = new TaskScheduler().leastInterval(tasks, 2);
+        System.out.println("\nTotal CPU time required: " + totalTime);
     }
 
     /**
-     * Using queue. Good approach to begin
+     * Approach 1: Using a Priority Queue and Cooldown Queue
+     * Time Complexity: O(N log N) (due to priority queue operations)
+     * Space Complexity: O(N) (for storing tasks in queues)
      */
-    public int leastInterval(char[] tasks, int waitPeriod) {
-        Map<Character, Integer> map = new HashMap<>();
+    public int leastInterval(char[] tasks, int cooldown) {
+        Map<Character, Integer> taskFrequencyMap = new HashMap<>();
 
-        for (char c : tasks) {
-            map.put(c, map.getOrDefault(c, 0) + 1);
+        // Step 1: Count occurrences of each task
+        for (char task : tasks) {
+            taskFrequencyMap.put(task, taskFrequencyMap.getOrDefault(task, 0) + 1);
         }
-        PriorityQueue<Task> runnable = new PriorityQueue<>((a, b) -> b.count - a.count);
-        Queue<Task> waiting = new LinkedList<>();
 
-        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
-            runnable.offer(new Task(entry.getKey(), 0, entry.getValue()));
+        // Step 2: Use a max heap (priority queue) to execute the most frequent task first
+        PriorityQueue<Task> taskQueue = new PriorityQueue<>((a, b) -> Integer.compare(b.remainingCount, a.remainingCount));
+        Queue<Task> cooldownQueue = new LinkedList<>();
+
+        // Populate taskQueue with tasks and their frequencies
+        for (Map.Entry<Character, Integer> entry : taskFrequencyMap.entrySet()) {
+            taskQueue.offer(new Task(entry.getKey(), 0, entry.getValue()));
         }
-        int cpuTime = 0;
-        while (!waiting.isEmpty() || !runnable.isEmpty()) {
-            cpuTime++;
-            if (!waiting.isEmpty() && waiting.peek().nextRun <= cpuTime) {
-                runnable.offer(waiting.poll());
+
+        int totalTimeUnits = 0;
+
+        // Step 3: Process tasks while there are still pending tasks
+        while (!taskQueue.isEmpty() || !cooldownQueue.isEmpty()) {
+            totalTimeUnits++;
+
+            // Move tasks from cooldown queue back to task queue when they can be executed
+            if (!cooldownQueue.isEmpty() && cooldownQueue.peek().nextAvailableTime <= totalTimeUnits) {
+                taskQueue.offer(cooldownQueue.poll());
             }
 
-            if (!runnable.isEmpty()) {
-                Task task = runnable.poll();
-                System.out.print(task.c + "  ");
-                if (task.count > 1) {
-                    task.nextRun = cpuTime + waitPeriod + 1;
-                    task.count--;
-                    waiting.offer(task);
+            // Execute the most frequent available task
+            if (!taskQueue.isEmpty()) {
+                Task task = taskQueue.poll();
+                System.out.print(task.name + "  ");
+
+                if (task.remainingCount > 1) {
+                    // Reduce task count and move it to cooldown queue
+                    cooldownQueue.offer(new Task(task.name, totalTimeUnits + cooldown + 1, task.remainingCount - 1));
                 }
-                continue;
+            } else {
+                System.out.print("wait  "); // No task available, CPU idle
             }
-            System.out.print("wait  ");
         }
-        return cpuTime;
+
+        return totalTimeUnits;
     }
 
     /**
-     * This is more optimum approach using Math
+     * Approach 2: Optimized Math-Based Solution
+     * Time Complexity: O(N) (single pass to count frequencies)
+     * Space Complexity: O(1) (since we store only 26 characters)
      */
-    public int leastIntervalUsingMath(char[] tasks, int waitPeriod) {
-        // frequencies of the tasks
+    public int leastIntervalUsingMath(char[] tasks, int cooldown) {
         int[] frequencies = new int[26];
-        for (int t : tasks) {
-            frequencies[t - 'A']++;
+
+        // Step 1: Count occurrences of each task
+        for (char task : tasks) {
+            frequencies[task - 'A']++;
         }
 
-        // max frequency
-        int maxFreq = 0;
-        for (int f : frequencies) {
-            maxFreq = Math.max(maxFreq, f);
+        // Step 2: Find the task with the maximum frequency
+        int maxFrequency = Arrays.stream(frequencies).max().orElse(0);
+
+        // Step 3: Count how many tasks have this maximum frequency
+        int maxFrequencyCount = 0;
+        for (int frequency : frequencies) {
+            if (frequency == maxFrequency) {
+                maxFrequencyCount++;
+            }
         }
 
-        // count the most frequent tasks
-        int maxFreqChars = 0;
-        for (int f : frequencies) {
-            if (f == maxFreq) maxFreqChars++;
-        }
+        // Step 4: Calculate the minimum intervals required
+        int minTime = (maxFrequency - 1) * (cooldown + 1) + maxFrequencyCount;
+        return Math.max(tasks.length, minTime);
+    }
 
-        return Math.max(tasks.length, (maxFreq - 1) * (waitPeriod + 1) + maxFreqChars);
+    // Task class to store task metadata (Java 14+ record for simplicity)
+static class Task {
+        char name;
+        int nextAvailableTime;
+        int remainingCount;
+
+        Task(char name, int nextAvailableTime, int remainingCount) {
+            this.name = name;
+            this.nextAvailableTime = nextAvailableTime;
+            this.remainingCount = remainingCount;
+        }
     }
 }
-
-class Task {
-    public char c;
-    public int nextRun;
-    public int count;
-
-    public Task(char c, int nextRun, int count) {
-        this.c = c;
-        this.nextRun = nextRun;
-        this.count = count;
-    }
-}
-
-

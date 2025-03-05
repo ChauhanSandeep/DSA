@@ -1,5 +1,8 @@
 package DailyBytes.LinkedListPackage;
 
+/**
+ * This class represents a node in a singly linked list with methods to access and modify node data and the next node.
+ */
 public class MyNode {
 
     private int data;
@@ -35,9 +38,9 @@ public class MyNode {
 
     @Override
     public String toString() {
-        return "Node{" +
+        return "MyNode{" +
                 "data=" + data +
-                ", next=" + next +
+                ", next=" + (next != null ? next.getData() : "NULL") +
                 '}';
     }
 }

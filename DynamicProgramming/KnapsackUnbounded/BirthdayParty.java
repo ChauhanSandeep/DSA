@@ -3,41 +3,72 @@ package DynamicProgramming.KnapsackUnbounded;
 import java.util.Arrays;
 
 /**
- * Given are the eating capacity of each friend, filling capacity of each dish and cost of each dish.
- * A friend is satisfied if the sum of the filling capacity of dishes he ate is equal to his capacity.
- * Find the minimum cost such that all of friends are satisfied (reached their eating capacity).
- * https://www.interviewbit.com/problems/tushars-birthday-party/
+ * Problem: Tushar's Birthday Party
  *
+ * Given:
+ * - `eatingCapacities[]`: Eating capacity of each friend.
+ * - `dishCapacities[]`: Capacity (filling value) of each dish.
+ * - `dishCosts[]`: Cost of each dish.
+ *
+ * A friend is satisfied if the sum of dish capacities they consume equals their eating capacity.
+ * The goal is to find the minimum total cost required to satisfy all friends.
+ *
+ * Approach:
+ * - This is a variation of the Unbounded Knapsack problem.
+ * - For each friend, compute the minimum cost required to exactly reach their eating capacity.
+ * - Use Dynamic Programming (Bottom-Up) to precompute the minimum cost for each capacity.
+ *
+ * Time Complexity: O(N * M), where:
+ * - N = maximum eating capacity among friends.
+ * - M = number of dish options.
+ *
+ * Space Complexity: O(N) for the DP array.
+ *
+ * LeetCode Link: Not available, but similar to Unbounded Knapsack.
+ * InterviewBit Link: https://www.interviewbit.com/problems/tushars-birthday-party/
  */
 public class BirthdayParty {
 
     /**
-     * @param limits eating capacity of each friend
-     * @param values capacity of dish
-     * @param costs  cost of dish
-     * @return min cost in which all friends are full
+     * Computes the minimum cost to satisfy all friends.
+     *
+     * @param eatingCapacities Array representing each friend's eating capacity.
+     * @param dishCapacities   Array representing the filling capacity of each dish.
+     * @param dishCosts        Array representing the cost of each dish.
+     * @return Minimum total cost to satisfy all friends.
      */
-    public int solve(final int[] limits, final int[] values, final int[] costs) {
-        int res = 0;
-        for (Integer limit : limits) {
-            res += solveRec(limit, values, costs);
+    public int findMinimumCost(int[] eatingCapacities, int[] dishCapacities, int[] dishCosts) {
+        int totalMinCost = 0;
+
+        for (int capacity : eatingCapacities) {
+            totalMinCost += computeMinCostForCapacity(capacity, dishCapacities, dishCosts);
         }
-        return res;
+
+        return totalMinCost;
     }
 
-    // solve for a single friend
-    private int solveRec(int limit, int[] values, int[] costs) {
-        int[] dp = new int[limit + 1];
-        Arrays.fill(dp, Integer.MAX_VALUE);
-        dp[0] = 0;
+    /**
+     * Computes the minimum cost required to exactly reach the given eating capacity.
+     * Uses a bottom-up DP approach (Unbounded Knapsack variation).
+     *
+     * @param capacity        The target capacity to reach.
+     * @param dishCapacities  The capacity of each dish.
+     * @param dishCosts       The cost of each dish.
+     * @return Minimum cost to reach the given capacity, or Integer.MAX_VALUE if not possible.
+     */
+    private int computeMinCostForCapacity(int capacity, int[] dishCapacities, int[] dishCosts) {
+        int[] minCost = new int[capacity + 1];
+        Arrays.fill(minCost, Integer.MAX_VALUE);
+        minCost[0] = 0;
 
-        for (int i = 1; i <= limit; i++) {
-            for (int j = 0; j < values.length; j++) {
-                if (i - values[j] >= 0) {
-                    dp[i] = Math.min(dp[i], costs[j] + dp[i - values[j]]);
+        for (int currentCapacity = 1; currentCapacity <= capacity; currentCapacity++) {
+            for (int i = 0; i < dishCapacities.length; i++) {
+                if (currentCapacity >= dishCapacities[i] && minCost[currentCapacity - dishCapacities[i]] != Integer.MAX_VALUE) {
+                    minCost[currentCapacity] = Math.min(minCost[currentCapacity], dishCosts[i] + minCost[currentCapacity - dishCapacities[i]]);
                 }
             }
         }
-        return dp[limit];
+
+        return minCost[capacity];
     }
 }

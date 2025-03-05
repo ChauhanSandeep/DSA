@@ -1,15 +1,28 @@
-package Maths;
+package maths;
 
+/**
+ * Computes the square root of a given number using binary search.
+ *
+ * The algorithm finds the integer part first and then refines it to the desired precision.
+ *
+ * Time Complexity: O(log n)
+ * Space Complexity: O(1)
+ */
 public class FindSqrt {
     public static void main(String[] args) {
-        assert new FindSqrt().findSqrt(16) == 4 :"Incorrect ans";
-        assert new FindSqrt().findSqrt(25) == 5 :"Incorrect ans";
+        assert new FindSqrt().findSqrt(16) == 4 : "Incorrect answer";
+        assert new FindSqrt().findSqrt(25) == 5 : "Incorrect answer";
 
         double ans = new FindSqrt().findSqrt(3);
-        assert ans > 1.732 && ans < 1.733 :"Incorrect ans";
+        assert ans > 1.732 && ans < 1.733 : "Incorrect answer";
     }
 
-    //Find the integral part
+    /**
+     * Finds the square root of a given number with precision.
+     *
+     * @param num the number whose square root is to be found.
+     * @return the computed square root.
+     */
     private double findSqrt(double num) {
         int high = (int) num;
         int low = 1;
@@ -26,22 +39,32 @@ public class FindSqrt {
                 low = mid;
             }
         }
-        throw new RuntimeException("Could not find number");
+        throw new RuntimeException("Could not find square root");
     }
 
-    // Find the decimal part
+    /**
+     * Refines the square root calculation to a given precision using binary search.
+     *
+     * @param num the number whose square root is to be found.
+     * @param integral the integral part of the square root.
+     * @param precision the number of decimal places required.
+     * @return the computed square root.
+     */
     private double findSqrt(double num, int integral, int precision) {
         double low = integral;
         double high = integral + 1;
-        double maxError = 1/ Math.pow(10, precision+1);
+        double maxError = 1 / Math.pow(10, precision + 1);
 
-        while(high > low) {
+        while (high > low) {
             double mid = (high + low) / 2;
-            if(mid*mid == num || Math.abs((mid*mid)-num) < maxError) {
+            if (mid * mid == num || Math.abs((mid * mid) - num) < maxError) {
                 return mid;
-            } else if (mid*mid < num) low = mid;
-            else high = mid;
+            } else if (mid * mid < num) {
+                low = mid;
+            } else {
+                high = mid;
+            }
         }
-        throw new RuntimeException("Could no find the number");
+        throw new RuntimeException("Could not find square root");
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * https://leetcode.com/problems/partition-labels/
  *
- * You are given a string s. We want to partition the string into as many parts as possible so that each letter appears in at most one part.
+ * Given a string s, partition the string into as many parts as possible so that each letter appears in at most one part.
  * Return a list of integers representing the size of these parts.
  */
 public class PartitionLabels {
@@ -16,24 +16,28 @@ public class PartitionLabels {
     }
 
     public List<Integer> partitionLabels(String str) {
-        int[] lastPosArr = new int[26];
+        int[] lastOccurrence = new int[26]; // Stores last index of each character
 
+        // Step 1: Compute last occurrence of each character
         for (int i = 0; i < str.length(); i++) {
-            lastPosArr[str.charAt(i) - 'a'] = i;
+            lastOccurrence[str.charAt(i) - 'a'] = i;
         }
 
-        char[] charArr = str.toCharArray();
         List<Integer> result = new ArrayList<>();
-        int start = 0;
-        int lastPos = -1;
+        int partitionStart = 0;
+        int maxPartitionEnd = 0;
 
-        for (int curr = 0; curr < charArr.length; curr++) {
-            lastPos = Math.max(lastPos, lastPosArr[charArr[curr] - 'a']);
-            if (lastPos == curr) {
-                result.add(curr - start + 1);
-                start = curr + 1;
+        // Step 2: Iterate through the string and determine partitions
+        for (int i = 0; i < str.length(); i++) {
+            maxPartitionEnd = Math.max(maxPartitionEnd, lastOccurrence[str.charAt(i) - 'a']);
+
+            // If current index matches the furthest occurrence of any character seen so far
+            if (i == maxPartitionEnd) {
+                result.add(i - partitionStart + 1);
+                partitionStart = i + 1;
             }
         }
+
         return result;
     }
 }

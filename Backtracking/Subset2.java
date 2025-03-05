@@ -5,36 +5,61 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Find all the subsets of the array having duplicates in array.
+ * LeetCode: https://leetcode.com/problems/subsets-ii/
  *
- * https://leetcode.com/problems/subsets-ii/
+ * Problem:
+ * Given an integer array `nums` that may contain duplicates, return all possible subsets (the power set).
+ * Each subset must be **unique**.
+ *
+ * Approach:
+ * 1️⃣ **Backtracking with Sorting**
+ *    - Sort the array to easily identify duplicates.
+ *    - Skip duplicate elements within the same recursive call.
+ *    - Time Complexity: **O(2^N)** (Each element can be included/excluded).
+ *    - Space Complexity: **O(N)** (Recursive call stack).
  */
 public class Subset2 {
-
     public static void main(String[] args) {
-        int[] arr = {2, 1, 2};
-        List<List<Integer>> lists = new Subset2().subsetsWithDup(arr);
-        System.out.println(lists);
+        int[] nums = {2, 1, 2};
+
+        // Generating subsets with duplicates handled
+        List<List<Integer>> subsets = subsetsWithDup(nums);
+        System.out.println(subsets);
     }
 
-    public List<List<Integer>> subsetsWithDup(int[] nums) {
+    /**
+     * Generates all unique subsets, handling duplicate numbers.
+     *
+     * @param nums Input array with possible duplicates.
+     * @return List of unique subsets.
+     */
+    public static List<List<Integer>> subsetsWithDup(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
-        if(nums== null || nums.length == 0) return result;
-
-        Arrays.sort(nums);
-        subsetRec(nums, result, new ArrayList<>(), 0);
+        Arrays.sort(nums);  // Sorting helps in identifying duplicates easily.
+        generateUniqueSubsets(nums, 0, new ArrayList<>(), result);
         return result;
     }
 
-    public void subsetRec(int[] nums, List<List<Integer>> result, List<Integer> list, int start) {
-        result.add(new ArrayList<>(list));
+    /**
+     * Recursive function to generate subsets while skipping duplicates.
+     */
+    private static void generateUniqueSubsets(int[] nums, int index, List<Integer> currentSubset, List<List<Integer>> result) {
+        // Add current subset to the result list
+        result.add(new ArrayList<>(currentSubset));
 
-        for(int i=start; i<nums.length; i++) {
-            if(i > start && nums[i-1] == nums[i]) continue;
+        // Iterate through remaining elements
+        for (int i = index; i < nums.length; i++) {
+            // Skip duplicates within the same recursive call
+            if (i > index && nums[i] == nums[i - 1]) continue;
 
-            list.add(nums[i]);
-            subsetRec(nums, result, list, i+1);
-            list.remove(list.size() - 1);
+            // Include current element
+            currentSubset.add(nums[i]);
+
+            // Recursive call with next index
+            generateUniqueSubsets(nums, i + 1, currentSubset, result);
+
+            // Backtrack: remove last element before next iteration
+            currentSubset.remove(currentSubset.size() - 1);
         }
     }
 }

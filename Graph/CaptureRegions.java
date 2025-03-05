@@ -1,26 +1,25 @@
 package Graph;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Capture regions 'O' surrounded by all 'X'
+ * Capture all regions of 'O' that are completely surrounded by 'X'.
  * https://www.interviewbit.com/problems/capture-regions-on-board/
+ *
+ * **Approach:**
+ * - Use **DFS (Depth-First Search)** to mark all 'O' cells connected to the border as **safe**.
+ * - Convert the remaining 'O' cells (which are completely surrounded) to 'X'.
+ * - Restore safe regions back to 'O'.
+ *
+ * **Time Complexity:** O(R × C) (Each cell is processed at most twice)
+ * **Space Complexity:** O(R × C) (Recursive stack for DFS in worst case)
+ *
  */
 public class CaptureRegions {
 
     public static void main(String[] args) {
-        /**
-         'O', 'O', 'O', 'X', 'X', 'X', 'O',
-         'X', 'X', 'X', 'O', 'O', 'O', 'O',
-         'X', 'X', 'O', 'X', 'O', 'X', 'O',
-         'O', 'X', 'O', 'X', 'O', 'X', 'O',
-         'X', 'X', 'O', 'X', 'O', 'X', 'X',
-         'X', 'O', 'O', 'O', 'X', 'X', 'O',
-         'O', 'X', 'X', 'O', 'X', 'O', 'O',
-         'O', 'X', 'O', 'O', 'X', 'O', 'X'
-         */
         Character[][] matrix = {
                 {'O', 'O', 'O', 'X', 'X', 'X', 'O'},
                 {'X', 'X', 'X', 'O', 'O', 'O', 'O'},
@@ -31,53 +30,69 @@ public class CaptureRegions {
                 {'O', 'X', 'X', 'O', 'X', 'O', 'O'},
                 {'O', 'X', 'O', 'O', 'X', 'O', 'X'}
         };
-        ArrayList<ArrayList<Character>> input = new ArrayList<>();
-        for (Character[] list : matrix) {
-            input.add((ArrayList<Character>) Stream.of(list).collect(Collectors.toList()));
-        }
-        new CaptureRegions().solve(input);
-        System.out.println(input);
+
+        List<List<Character>> board = Arrays.stream(matrix)
+                .map(row -> new ArrayList<>(Arrays.asList(row)))
+                .collect(Collectors.toList());
+
+        new CaptureRegions().solve(board);
+        System.out.println(board);
     }
 
-    public void solve(ArrayList<ArrayList<Character>> input) {
-        if (input == null || input.size() == 0 || input.get(0).size() == 0) return;
+    /**
+     * Captures all surrounded 'O' regions by converting them to 'X'.
+     *
+     * @param board 2D grid of characters ('O' or 'X').
+     */
+    public void solve(List<List<Character>> board) {
+        if (board == null || board.isEmpty() || board.get(0).isEmpty()) return;
 
-        int rows = input.size();
-        int cols = input.get(0).size();
-        boolean[][] visited = new boolean[rows][cols];
+        int rows = board.size();
+        int cols = board.get(0).size();
+
+        // Step 1: Mark 'O' regions connected to the boundary as 'safe' (temporary marker '#')
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (input.get(i).get(j) == 'O' && !visited[i][j]) {
-                    if (doCapture(input, i, j, visited)) {
-                        capture(input, i, j);
-                    }
+            if (board.get(i).get(0) == 'O') markSafeRegions(board, i, 0);
+            if (board.get(i).get(cols - 1) == 'O') markSafeRegions(board, i, cols - 1);
+        }
+        for (int j = 0; j < cols; j++) {
+            if (board.get(0).get(j) == 'O') markSafeRegions(board, 0, j);
+            if (board.get(rows - 1).get(j) == 'O') markSafeRegions(board, rows - 1, j);
+        }
+
+        // Step 2: Convert surrounded 'O' regions to 'X' and revert '#' back to 'O'
+        flipCapturedRegions(board);
+    }
+
+    /**
+     * Marks all 'O' cells connected to the boundary as 'safe' using DFS.
+     */
+    private void markSafeRegions(List<List<Character>> board, int row, int col) {
+        if (row < 0 || col < 0 || row >= board.size() || col >= board.get(0).size() || board.get(row).get(col) != 'O') {
+            return;
+        }
+
+        board.get(row).set(col, '#'); // Temporarily mark as safe
+
+        // Explore all 4 directions
+        markSafeRegions(board, row + 1, col);
+        markSafeRegions(board, row - 1, col);
+        markSafeRegions(board, row, col + 1);
+        markSafeRegions(board, row, col - 1);
+    }
+
+    /**
+     * Flips all remaining 'O' to 'X' (captured regions) and restores '#' back to 'O'.
+     */
+    private void flipCapturedRegions(List<List<Character>> board) {
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board.get(0).size(); j++) {
+                if (board.get(i).get(j) == 'O') {
+                    board.get(i).set(j, 'X'); // Convert completely surrounded 'O' to 'X'
+                } else if (board.get(i).get(j) == '#') {
+                    board.get(i).set(j, 'O'); // Restore boundary-connected 'O'
                 }
             }
         }
-
-    }
-
-    public boolean doCapture(ArrayList<ArrayList<Character>> input, int i, int j, boolean[][] visited) {
-        if (i < 0 || j < 0 || i >= input.size() || j >= input.get(0).size()) return false;
-        if (visited[i][j] || input.get(i).get(j) == 'X') return true;
-        visited[i][j] = true;
-
-        boolean down = doCapture(input, i + 1, j, visited);
-        boolean up = doCapture(input, i - 1, j, visited);
-        boolean right = doCapture(input, i, j + 1, visited);
-        boolean left = doCapture(input, i, j - 1, visited);
-        boolean capture = down && up && left && right;
-        System.out.println("capture for " + i + " " + j + ": " + capture);
-        return capture;
-    }
-
-    public void capture(ArrayList<ArrayList<Character>> input, int i, int j) {
-        if (i < 0 || j < 0 || i >= input.size() || j >= input.get(0).size() || input.get(i).get(j) == 'X') return;
-        input.get(i).set(j, 'X');
-
-        capture(input, i + 1, j);
-        capture(input, i - 1, j);
-        capture(input, i, j + 1);
-        capture(input, i, j - 1);
     }
 }

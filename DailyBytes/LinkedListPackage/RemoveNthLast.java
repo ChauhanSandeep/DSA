@@ -1,48 +1,78 @@
 package DailyBytes.LinkedListPackage;
 
+/**
+ * This class contains a method to remove the nth node from the end of a linked list.
+ * 
+ * Algorithm:
+ * - Calculate the length of the linked list.
+ * - Traverse to the nth node from the end and remove it.
+ * - Time Complexity: O(n)
+ * - Space Complexity: O(1)
+ * 
+ * LeetCode Problem Link: https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+ */
 public class RemoveNthLast {
 
     public static void main(String[] args) {
-
         MyLinkedList list = new MyLinkedList();
-        MyNode head = new MyNode(1);
-        list.push(head);
+        list.push(new MyNode(1));
         list.push(new MyNode(2));
         list.push(new MyNode(3));
         list.push(new MyNode(4));
         list.push(new MyNode(5));
-        removeFromLast(list, 0);
+
+        System.out.print("Original list: ");
+        list.printList();
+
+        removeFromLast(list, 2);
+
+        System.out.print("Modified list: ");
         list.printList();
     }
 
-    public static void removeFromLast(MyLinkedList list, int index) {
-        if(index <= 0) {
+    /**
+     * Removes the nth node from the end of the linked list.
+     * @param list The linked list from which the node needs to be removed.
+     * @param n The index from the end of the list of the node to be removed.
+     */
+    public static void removeFromLast(MyLinkedList list, int n) {
+        if (n <= 0) {
             return;
         }
-        MyNode head = list.getHead();
-        if(head == null) return;
 
-        int len = 0;
-        MyNode temp = head;
-        while(temp != null) {
-            temp = temp.getNext();
-            len++;
+        MyNode head = list.getHead();
+        if (head == null) {
+            return;
         }
 
-        int curr = 0;
+        int length = 0;
+        MyNode temp = head;
+
+        // Calculate the length of the linked list
+        while (temp != null) {
+            temp = temp.getNext();
+            length++;
+        }
+
+        // If n is greater than the length of the list, do nothing
+        if (n > length) {
+            return;
+        }
+
         temp = head;
 
-        // remove first element
-        if(curr > len - index - 1) {
-            head = head.getNext();
-            list.setHead(head);
+        // Remove the head node if it is the nth node from the end
+        if (n == length) {
+            list.setHead(head.getNext());
             return;
         }
 
-        while (curr < len - index - 1) {
+        // Traverse to the nth node from the end
+        for (int i = 1; i < length - n; i++) {
             temp = temp.getNext();
-            curr++;
         }
+
+        // Remove the nth node from the end
         temp.setNext(temp.getNext().getNext());
     }
 }

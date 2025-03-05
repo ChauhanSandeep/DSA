@@ -1,64 +1,125 @@
 package Graph;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * Given an array of {course, prerequisite} find if we numOfCourses can be completed
+ * LeetCode Problem: Course Schedule
+ * https://leetcode.com/problems/course-schedule/
+ *
+ * Problem Statement:
+ * Given `numCourses` and a list of `prerequisites` [course, prerequisite],
+ * determine if it's possible to complete all courses without cyclic dependencies.
+ *
+ * Approaches:
+ * 1. **DFS Cycle Detection**:
+ *    - Model the course dependencies as a directed graph.
+ *    - Use DFS to check for cycles (if a node is revisited in the same path, a cycle exists).
+ *    - Time Complexity: **O(V + E)** (where V = courses, E = prerequisites)
+ *    - Space Complexity: **O(V + E)** (Adjacency list + recursion stack)
+ *
+ * 2. **BFS (Kahn’s Algorithm - Topological Sort)**:
+ *    - Compute in-degree for each course.
+ *    - Use a queue to process courses with zero in-degree.
+ *    - If we can process all courses, return true; otherwise, a cycle exists.
+ *    - Time Complexity: **O(V + E)**
+ *    - Space Complexity: **O(V + E)**
  */
 public class CourseSchedule {
+
     public static void main(String[] args) {
-        int[][] arr = {
-                {1, 0},
-                {0, 1}
+        int[][] prerequisites = {
+            {1, 0},
+            {0, 1}
         };
-        boolean canFinish = new CourseSchedule().canFinishUsingDFS(2, arr);
-        System.out.println(canFinish);
 
+        CourseSchedule cs = new CourseSchedule();
+        boolean canFinishDFS = cs.canFinishUsingDFS(2, prerequisites);
+        System.out.println("Can finish all courses (DFS): " + canFinishDFS);
+
+        boolean canFinishBFS = cs.canFinishUsingBFS(2, prerequisites);
+        System.out.println("Can finish all courses (BFS): " + canFinishBFS);
     }
 
+    /**
+     * Approach 1: DFS Cycle Detection
+     */
     public boolean canFinishUsingDFS(int numCourses, int[][] prerequisites) {
-        HashMap<Integer, List<Integer>> courseMap = new HashMap<>();
-        // create map
-        for (int[] relation : prerequisites) {
-            int pre = relation[1];
-            int course = relation[0];
-            if (courseMap.containsKey(pre)) {
-                courseMap.get(pre).add(course);
-            } else {
-                List<Integer> nextCourses = new LinkedList<>();
-                nextCourses.add(course);
-                courseMap.put(pre, nextCourses);
+        // Step 1: Build adjacency list (course dependency graph)
+        Map<Integer, List<Integer>> courseGraph = new HashMap<>();
+        for (int[] pair : prerequisites) {
+            int course = pair[0], prerequisite = pair[1];
+            courseGraph.computeIfAbsent(prerequisite, k -> new ArrayList<>()).add(course);
+        }
+
+        // Step 2: Track visited states (0 = unvisited, 1 = visiting, 2 = visited)
+        int[] visitState = new int[numCourses];
+
+        // Step 3: Check for cycles in each course
+        for (int course = 0; course < numCourses; course++) {
+            if (detectCycleDFS(course, courseGraph, visitState)) {
+                return false; // Cycle detected -> can't finish courses
             }
         }
 
-        Boolean[] cycle = new Boolean[numCourses];
-        // check for cycle
-        for (int i = 0; i < numCourses; ++i) {
-            if (this.isCyclic(i, courseMap, cycle)) {
-                return false;
-            }
-        }
-
-        return true;
+        return true; // No cycle detected -> all courses can be completed
     }
 
-    protected boolean isCyclic(Integer current, HashMap<Integer, List<Integer>> courseMap, Boolean[] cycle) {
-        if(cycle[current] != null) return cycle[current];
-        if (!courseMap.containsKey(current)) return false;
-        cycle[current] = true;
+    private boolean detectCycleDFS(int course, Map<Integer, List<Integer>> courseGraph, int[] visitState) {
+        if (visitState[course] == 1) return true;  // Cycle detected
+        if (visitState[course] == 2) return false; // Already processed, no cycle
 
-        boolean result;
-        for (Integer nextCourse : courseMap.get(current)) {
-            result = this.isCyclic(nextCourse, courseMap, cycle);
-            if (result) {
-                cycle[current] = true;
-                return true;
+        visitState[course] = 1; // Mark as visiting
+
+        if (courseGraph.containsKey(course)) {
+            for (int nextCourse : courseGraph.get(course)) {
+                if (detectCycleDFS(nextCourse, courseGraph, visitState)) {
+                    return true;
+                }
             }
         }
-        cycle[current] = false;
+
+        visitState[course] = 2; // Mark as fully visited (safe node)
         return false;
+    }
+
+    /**
+     * Approach 2: BFS (Kahn’s Algorithm - Topological Sort)
+     */
+    public boolean canFinishUsingBFS(int numCourses, int[][] prerequisites) {
+        // Step 1: Build adjacency list & compute in-degree for each course
+        Map<Integer, List<Integer>> courseGraph = new HashMap<>();
+        int[] inDegree = new int[numCourses];
+
+        for (int[] pair : prerequisites) {
+            int course = pair[0], prerequisite = pair[1];
+            courseGraph.computeIfAbsent(prerequisite, k -> new ArrayList<>()).add(course);
+            inDegree[course]++;
+        }
+
+        // Step 2: Initialize queue with courses having zero in-degree
+        Queue<Integer> queue = new LinkedList<>();
+        for (int course = 0; course < numCourses; course++) {
+            if (inDegree[course] == 0) {
+                queue.offer(course);
+            }
+        }
+
+        // Step 3: Process courses in topological order
+        int completedCourses = 0;
+        while (!queue.isEmpty()) {
+            int currentCourse = queue.poll();
+            completedCourses++;
+
+            if (courseGraph.containsKey(currentCourse)) {
+                for (int nextCourse : courseGraph.get(currentCourse)) {
+                    inDegree[nextCourse]--;
+                    if (inDegree[nextCourse] == 0) {
+                        queue.offer(nextCourse);
+                    }
+                }
+            }
+        }
+
+        return completedCourses == numCourses; // True if all courses can be completed
     }
 }

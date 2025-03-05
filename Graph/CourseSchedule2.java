@@ -1,27 +1,30 @@
 package Graph;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
-
 import java.util.*;
 
 /**
- * CourseSchedule2 computes a valid order in which courses can be completed given their prerequisites.
+ * LeetCode Problem: Course Schedule II
+ * https://leetcode.com/problems/course-schedule-ii/
  *
- * Problem Description:
- * Given the total number of courses and an array of prerequisite pairs {course, prerequisite},
- * this class determines a valid order to take courses such that all prerequisites are satisfied.
- * If no valid ordering exists (i.e., if there is a cycle in the prerequisites), an empty array is returned.
+ * Problem Statement:
+ * Given `numCourses` and a list of `prerequisites` [course, prerequisite],
+ * determine a valid order to take all courses. If there is no valid order, return an empty array.
  *
- * Algorithm:
- * - Construct an adjacency list representation of the course dependency graph.
- * - Use Depth-First Search (DFS) to perform topological sorting with cycle detection.
- *   - A node (course) is added to the result stack after all courses dependent on it have been processed.
- *   - A Boolean array is used to track the DFS recursion state for cycle detection.
+ * Approaches:
+ * 1. **DFS with Cycle Detection**:
+ *    - Build a directed graph using adjacency lists.
+ *    - Perform DFS to detect cycles and determine a valid course order.
+ *    - If a cycle is detected, return an empty array.
+ *    - Time Complexity: **O(V + E)** (where V = courses, E = prerequisites)
+ *    - Space Complexity: **O(V + E)** (Adjacency list + recursion stack)
  *
- * Time Complexity: O(V + E), where V is the number of courses and E is the number of prerequisite pairs.
- * Space Complexity: O(V) for the recursion stack and auxiliary data structures.
+ * 2. **BFS (Kahn’s Algorithm - Topological Sort)**:
+ *    - Compute in-degree for each course.
+ *    - Use a queue to process courses with zero in-degree.
+ *    - Process courses in topological order; if all courses are processed, return the order.
+ *    - If a cycle exists, return an empty array.
+ *    - Time Complexity: **O(V + E)**
+ *    - Space Complexity: **O(V + E)**
  */
 public class CourseSchedule2 {
 
@@ -35,82 +38,110 @@ public class CourseSchedule2 {
         };
 
         CourseSchedule2 scheduler = new CourseSchedule2();
-        int[] courseOrder = scheduler.findCourseOrder(numCourses, prerequisites);
-        System.out.println("Course order: " + Arrays.toString(courseOrder));
+        int[] courseOrderDFS = scheduler.findCourseOrderDFS(numCourses, prerequisites);
+        System.out.println("Course order (DFS): " + Arrays.toString(courseOrderDFS));
+
+        int[] courseOrderBFS = scheduler.findCourseOrderBFS(numCourses, prerequisites);
+        System.out.println("Course order (BFS): " + Arrays.toString(courseOrderBFS));
     }
 
     /**
-     * Determines a valid course order based on prerequisites.
-     *
+     * Approach 1: DFS with Cycle Detection
      * @param numCourses    Total number of courses.
      * @param prerequisites Array of prerequisite pairs {course, prerequisite}.
      * @return An array representing a valid course order; if no order exists, returns an empty array.
      */
-    public int[] findCourseOrder(int numCourses, int[][] prerequisites) {
-        // Build the graph: each course maps to a list of courses that depend on it.
-        List<List<Integer>> courseGraph = new ArrayList<>(numCourses);
+    public int[] findCourseOrderDFS(int numCourses, int[][] prerequisites) {
+        // Step 1: Build adjacency list (course dependency graph)
+        List<List<Integer>> courseGraph = new ArrayList<>();
         for (int i = 0; i < numCourses; i++) {
             courseGraph.add(new ArrayList<>());
         }
         for (int[] pair : prerequisites) {
-            int course = pair[0];
-            int prerequisite = pair[1];
+            int course = pair[0], prerequisite = pair[1];
             courseGraph.get(prerequisite).add(course);
         }
 
-        // Stack to hold the valid course order (topological sort order).
-        Stack<Integer> topoStack = new Stack<>();
-        // Array to track the DFS visitation state:
-        //   null: unvisited, true: currently in recursion stack, false: fully processed.
-        Boolean[] visitStatus = new Boolean[numCourses];
+        // Step 2: Track visit states (0 = unvisited, 1 = visiting, 2 = processed)
+        int[] visitState = new int[numCourses];
+        List<Integer> topoOrder = new ArrayList<>();
 
-        // Run DFS for each course to detect cycles and build the topological order.
+        // Step 3: Perform DFS to detect cycles and compute topological order
         for (int course = 0; course < numCourses; course++) {
-            if (dfsTopoSort(course, visitStatus, courseGraph, topoStack)) {
-                // Cycle detected; return empty array.
-                return new int[]{};
+            if (detectCycleDFS(course, courseGraph, visitState, topoOrder)) {
+                return new int[0]; // Cycle detected, no valid order
             }
         }
 
-        // Build the result array from the stack.
-        int[] courseOrder = new int[topoStack.size()];
-        int index = 0;
-        while (!topoStack.isEmpty()) {
-            courseOrder[index++] = topoStack.pop();
-        }
-        return courseOrder;
+        // Step 4: Convert List to array (reverse order since DFS adds last first)
+        Collections.reverse(topoOrder);
+        return topoOrder.stream().mapToInt(i -> i).toArray();
     }
 
     /**
-     * Helper method that performs DFS to build a topological order and detect cycles.
-     *
-     * @param course      The current course being processed.
-     * @param visitStatus Array tracking the DFS state for each course.
-     * @param courseGraph The graph representing course prerequisites.
-     * @param topoStack   Stack to accumulate the valid topological order.
-     * @return true if a cycle is detected starting from this course, false otherwise.
+     * Performs DFS to detect cycles and build topological order.
+     * @return true if a cycle is detected, false otherwise.
      */
-    private boolean dfsTopoSort(int course, Boolean[] visitStatus, List<List<Integer>> courseGraph, Stack<Integer> topoStack) {
-        // If this course has been visited before, return its DFS state.
-        if (visitStatus[course] != null) {
-            return visitStatus[course];
-        }
+    private boolean detectCycleDFS(int course, List<List<Integer>> courseGraph, int[] visitState, List<Integer> topoOrder) {
+        if (visitState[course] == 1) return true;  // Cycle detected
+        if (visitState[course] == 2) return false; // Already processed, no cycle
 
-        // Mark the course as currently in the recursion stack.
-        visitStatus[course] = true;
+        visitState[course] = 1; // Mark as visiting
 
-        // Explore all dependent courses.
-        for (int dependentCourse : courseGraph.get(course)) {
-            if (dfsTopoSort(dependentCourse, visitStatus, courseGraph, topoStack)) {
-                // Cycle detected in the dependency.
+        for (int nextCourse : courseGraph.get(course)) {
+            if (detectCycleDFS(nextCourse, courseGraph, visitState, topoOrder)) {
                 return true;
             }
         }
 
-        // Mark this course as fully processed.
-        visitStatus[course] = false;
-        // Push the course onto the topological order stack.
-        topoStack.push(course);
+        visitState[course] = 2; // Mark as fully processed
+        topoOrder.add(course);
         return false;
+    }
+
+    /**
+     * Approach 2: BFS (Kahn’s Algorithm - Topological Sort)
+     * @param numCourses    Total number of courses.
+     * @param prerequisites Array of prerequisite pairs {course, prerequisite}.
+     * @return An array representing a valid course order; if no order exists, returns an empty array.
+     */
+    public int[] findCourseOrderBFS(int numCourses, int[][] prerequisites) {
+        // Step 1: Build adjacency list & compute in-degree for each course
+        List<List<Integer>> courseGraph = new ArrayList<>();
+        int[] inDegree = new int[numCourses];
+
+        for (int i = 0; i < numCourses; i++) {
+            courseGraph.add(new ArrayList<>());
+        }
+        for (int[] pair : prerequisites) {
+            int course = pair[0], prerequisite = pair[1];
+            courseGraph.get(prerequisite).add(course);
+            inDegree[course]++;
+        }
+
+        // Step 2: Initialize queue with courses having zero in-degree
+        Queue<Integer> queue = new LinkedList<>();
+        for (int course = 0; course < numCourses; course++) {
+            if (inDegree[course] == 0) {
+                queue.offer(course);
+            }
+        }
+
+        // Step 3: Process courses in topological order
+        List<Integer> topoOrder = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            int currentCourse = queue.poll();
+            topoOrder.add(currentCourse);
+
+            for (int nextCourse : courseGraph.get(currentCourse)) {
+                inDegree[nextCourse]--;
+                if (inDegree[nextCourse] == 0) {
+                    queue.offer(nextCourse);
+                }
+            }
+        }
+
+        // Step 4: Check if all courses are processed
+        return topoOrder.size() == numCourses ? topoOrder.stream().mapToInt(i -> i).toArray() : new int[0];
     }
 }

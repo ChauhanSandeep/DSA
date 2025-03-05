@@ -3,61 +3,72 @@ package Array;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Determines the number of student pairs who can sit next to each other in a classroom arrangement.
+ *
+ * Approach:
+ * - The first element of the input array specifies the total number of students (always even, with two rows).
+ * - The remaining elements indicate occupied seats.
+ * - The method constructs a 2D seating matrix and checks for adjacent available seats.
+ * - Runs in **O(N) time complexity**, where N is the number of seats.
+ * - Space complexity is **O(N)** due to the 2D matrix representation.
+ */
 public class ClassRoom {
-
-    /**
-     * Provided an array describing classroom arrangement find how many students can sit in pairs(left, right, top, bottom)
-     * First element contains total student count(always even and there will always be 2 rows)
-     * Next elements are seats already taken.
-     * @param args
-     */
     public static void main(String[] args) {
-/*
-        [0, 1]
-        [1, 1]
-        [1, 1]
-        [1, 0]
-*/
-        int[] arr = {8,1, 8};
+        int[] arr = {8, 1, 8};
         int result = countPairs(arr);
-        System.out.println(result);
+        System.out.println("Number of student pairs: " + result);
     }
 
     /**
-     * For each unoccupied seat we have to check if there is a neighbor below or right of it.
-     * Left and above scenario will be covered when second part of the pair is under consideration
+     * Counts the number of adjacent student pairs who can sit next to each other.
+     *
+     * @param arr The input array describing student count and occupied seats.
+     * @return The number of adjacent student pairs.
      */
     public static int countPairs(int[] arr) {
-        int len = (arr[0] + 1)/2;
-        int[][] matrix = new int[len][2];
+        int totalSeats = arr[0];
+        int rows = totalSeats / 2;
+        int[][] seating = new int[rows][2];
         Set<Integer> occupiedSeats = new HashSet<>();
-        for(int i=1; i<arr.length; i++) {
+
+        for (int i = 1; i < arr.length; i++) {
             occupiedSeats.add(arr[i]);
         }
 
-        int seatNum = 1;
-        for(int i=0; i<matrix.length; i++) {
-            for(int j=0; j<matrix[i].length; j++) {
-                if(!occupiedSeats.contains(seatNum)) {
-                    matrix[i][j] = 1;
+        int seatNumber = 1;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (!occupiedSeats.contains(seatNumber)) {
+                    seating[i][j] = 1;
                 }
-                seatNum++;
+                seatNumber++;
             }
         }
 
-        int result = 0;
-        for(int i=0; i<matrix.length; i++) {
-            for(int j=0; j<matrix[i].length; j++) {
-                if(matrix[i][j] == 1) {
-                    result = result + isValidNeighbor(matrix, i+1, j) + isValidNeighbor(matrix, i, j+1);
+        int pairCount = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (seating[i][j] == 1) {
+                    pairCount += isValidNeighbor(seating, i + 1, j) + isValidNeighbor(seating, i, j + 1);
                 }
             }
         }
-        return result;
+        return pairCount;
     }
 
-    public static int isValidNeighbor(int[][] matrix, int i, int j) {
-        if(i < 0 || j<0 || i>=matrix.length || j>=matrix[i].length || matrix[i][j] == 0) return 0;
+    /**
+     * Checks if a seat is valid and unoccupied.
+     *
+     * @param seating The seating matrix.
+     * @param row The row index.
+     * @param col The column index.
+     * @return 1 if the seat is valid and unoccupied; otherwise, 0.
+     */
+    public static int isValidNeighbor(int[][] seating, int row, int col) {
+        if (row < 0 || col < 0 || row >= seating.length || col >= seating[row].length || seating[row][col] == 0) {
+            return 0;
+        }
         return 1;
     }
 }

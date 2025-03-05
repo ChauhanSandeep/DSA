@@ -35,7 +35,7 @@ public class OriginalDigits {
         numFreq[3] = charFreq['h'] - numFreq[8];
         // letter "f" is present only in "five" and "four"
         numFreq[5] = charFreq['f'] - numFreq[4];
-        // letter "str" is present only in "seven" and "six"
+        // letter "s" is present only in "seven" and "six"
         numFreq[7] = charFreq['s'] - numFreq[6];
         // letter "i" is present in "nine", "five", "six", and "eight"
         numFreq[9] = charFreq['i'] - numFreq[5] - numFreq[6] - numFreq[8];

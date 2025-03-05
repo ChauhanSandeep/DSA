@@ -1,5 +1,16 @@
 package Bitwise;
 
+/**
+ * This class contains a method to find the number of non-negative integers less than or equal to a given number
+ * that do not have consecutive 1s in their binary representation.
+ * 
+ * Algorithm:
+ * - Use dynamic programming to count the valid numbers by analyzing their binary representations.
+ * - Time Complexity: O(log n)
+ * - Space Complexity: O(log n)
+ * 
+ * LeetCode Problem Link: https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/
+ */
 public class ConsecutiveInteger {
 
     public static void main(String[] args) {
@@ -7,26 +18,33 @@ public class ConsecutiveInteger {
     }
 
     public static int findIntegers(int num) {
-        StringBuilder sb = new StringBuilder(Integer.toBinaryString(num)).reverse();
-        int n = sb.length();
-        int[] a = new int[n];
-        int[] b = new int[n];
-        a[0] = 1;
-        b[0] = 1;
-        for (int i = 1; i < n; i++) {
-            a[i] = a[i - 1] + b[i - 1];
-            b[i] = a[i - 1];
+        StringBuilder binaryRepresentation = new StringBuilder(Integer.toBinaryString(num)).reverse();
+        int length = binaryRepresentation.length();
+        int[] zeroEnd = new int[length];
+        int[] oneEnd = new int[length];
+        
+        // Base cases for DP
+        zeroEnd[0] = 1;
+        oneEnd[0] = 1;
+
+        // Fill the DP arrays
+        for (int i = 1; i < length; i++) {
+            zeroEnd[i] = zeroEnd[i - 1] + oneEnd[i - 1];
+            oneEnd[i] = zeroEnd[i - 1];
         }
-        int res = a[n - 1] + b[n - 1];
-        for (int i = n - 2; i >= 0; i--) {
-            if (sb.charAt(i) == '0' && sb.charAt(i + 1) == '0') {
-                res -= b[i];
+        
+        int result = zeroEnd[length - 1] + oneEnd[length - 1];
+        
+        // Subtract invalid counts
+        for (int i = length - 2; i >= 0; i--) {
+            if (binaryRepresentation.charAt(i) == '0' && binaryRepresentation.charAt(i + 1) == '0') {
+                result -= oneEnd[i];
             }
-            if (sb.charAt(i) == '1' && sb.charAt(i + 1) == '1') {
+            if (binaryRepresentation.charAt(i) == '1' && binaryRepresentation.charAt(i + 1) == '1') {
                 break;
             }
         }
-        return res;
-    }
 
+        return result;
+    }
 }

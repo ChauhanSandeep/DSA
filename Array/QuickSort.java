@@ -4,48 +4,41 @@ import java.util.Arrays;
 
 public class QuickSort {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         int[] data = {8, 7, 2, 1, 0, 9, 6};
-        System.out.println("Unsorted Array");
-        System.out.println(Arrays.toString(data));
+        System.out.println("Unsorted Array: " + Arrays.toString(data));
 
-        new QuickSort().quickSort(data, 0, data.length - 1);
+        quickSort(data, 0, data.length - 1);
 
-        System.out.println("Sorted Array in Ascending Order: ");
-        System.out.println(Arrays.toString(data));
+        System.out.println("Sorted Array in Ascending Order: " + Arrays.toString(data));
     }
 
-    void quickSort(int[] array, int low, int high) {
+    public static void quickSort(int[] array, int low, int high) {
         if (low < high) {
-            int pi = partition(array, low, high);
-            quickSort(array, low, pi - 1);
-            quickSort(array, pi + 1, high);
+            int partitionIndex = partition(array, low, high);
+            quickSort(array, low, partitionIndex - 1);
+            quickSort(array, partitionIndex + 1, high);
         }
     }
 
-    // method to find the partition position
-    private int partition(int[] array, int left, int right) {
-        // choose the rightmost element as pivotElement
-        int pivotElement = array[right];
-
-        // element before pointer will contain elements smaller than or equals pivotElement
-        int pointer = left;
+    private static int partition(int[] array, int left, int right) {
+        int pivot = array[right];
+        int partitionIndex = left;
 
         for (int i = left; i < right; i++) {
-            if (array[i] <= pivotElement) {
-                swap(array, i, pointer);
-                pointer++;
+            if (array[i] <= pivot) {
+                swap(array, i, partitionIndex);
+                partitionIndex++;
             }
         }
 
-        // swap the pivotElement element with the greater element specified by pointer
-        swap(array, pointer, right);
-        return pointer;
+        swap(array, partitionIndex, right);
+        return partitionIndex;
     }
 
-    private void swap(int[] array, int i, int pointer) {
-        int temp = array[pointer];
-        array[pointer] = array[i];
+    private static void swap(int[] array, int i, int j) {
+        int temp = array[j];
+        array[j] = array[i];
         array[i] = temp;
     }
 }

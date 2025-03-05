@@ -21,6 +21,6 @@ public class CountSubsetDiff {
          */
         int total = Arrays.stream(arr).sum();
         int subsetSum = (diff + total)/2;
-        return CountSubsetSum.countSubsetSum(arr, subsetSum, arr.length); // already solved
+        return CountSubsetSum.countSubsetSum(arr, subsetSum); // already solved
     }
 }

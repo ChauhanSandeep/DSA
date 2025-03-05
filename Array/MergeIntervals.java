@@ -8,39 +8,45 @@ public class MergeIntervals {
 
     public static void main(String[] args) {
         int[][] intervals = {
-                {1,3},
-                {2,6},
-                {8,10},
-                {15,18}
+                {1, 3},
+                {2, 6},
+                {8, 10},
+                {15, 18}
         };
         int[][] mergedIntervals = merge(intervals);
-        System.out.println(Arrays.deepToString(mergedIntervals));
+        System.out.println("Merged Intervals: " + Arrays.deepToString(mergedIntervals));
     }
+
+    /**
+     * Merges overlapping intervals.
+     * Time Complexity: O(N log N) - due to sorting
+     * Space Complexity: O(N) - for storing merged intervals
+     */
     public static int[][] merge(int[][] intervals) {
-        if(intervals == null || intervals.length <= 1) return intervals;
+        if (intervals == null || intervals.length <= 1) return intervals;
 
-        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+        // Sort intervals based on start time
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
 
-        List<int[]> resList = new ArrayList<>();
+        List<int[]> mergedIntervals = new ArrayList<>();
         int start = intervals[0][0];
         int end = intervals[0][1];
 
-        for(int[] interval : intervals) {
-            if(interval[0] <= end) {
-                end = Math.max(end, interval[1]);
-            }else{
-                resList.add(new int[] {start, end});
-                start = interval[0];
-                end = interval[1];
+        // Iterate and merge overlapping intervals
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] <= end) {  // Overlapping interval
+                end = Math.max(end, intervals[i][1]);
+            } else {  // Non-overlapping interval
+                mergedIntervals.add(new int[]{start, end});
+                start = intervals[i][0];
+                end = intervals[i][1];
             }
         }
 
-        resList.add(new int[] {start, end});
-        int[][] result = new int[resList.size()][2];
-        for(int i=0; i<resList.size(); i++) {
-            result[i][0] = resList.get(i)[0];
-            result[i][1] = resList.get(i)[1];
-        }
-        return result;
+        // Add the last interval
+        mergedIntervals.add(new int[]{start, end});
+
+        // Convert List<int[]> to int[][]
+        return mergedIntervals.toArray(new int[0][]);
     }
 }

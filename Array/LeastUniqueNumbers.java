@@ -1,47 +1,47 @@
 package Array;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Given an array of integers arr and an integer k. Find the least number of unique integers after removing exactly k elements.
- *
- * https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/
+ * 
+ * LeetCode: https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/
  */
 public class LeastUniqueNumbers {
 
     public static void main(String[] args) {
         int[] arr = {1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3};
-        int result = new LeastUniqueNumbers().findLeastNumOfUniqueInts(arr, 5);
-        System.out.println(result);
+        int k = 5;
+        int result = new LeastUniqueNumbers().findLeastNumOfUniqueInts(arr, k);
+        System.out.println("Least unique numbers after removing " + k + " elements: " + result);
     }
 
     public int findLeastNumOfUniqueInts(int[] arr, int k) {
-        Map<Integer, Integer> numFreqMap = new HashMap<>();
+        // Count frequency of each number
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
         for (int num : arr) {
-            numFreqMap.put(num, numFreqMap.getOrDefault(num, 0) + 1);
+            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
         }
-        // get all the unique numbers
-        List<Integer> nums = new ArrayList<>(numFreqMap.keySet());
-        // sort unique numbers by their frequency
-        Collections.sort(nums, (a, b) -> numFreqMap.get(a) - numFreqMap.get(b));
 
-        int size = numFreqMap.size();
-        int removedNums = 0;
-        int index = 0;
-        while (k > 0 && index < size) {
-            int freq = numFreqMap.get(nums.get(index++));
-            // remove all numbers
-            k = k - freq;
-            if (k >= 0) {
-                removedNums++;
+        // Sort unique numbers by their frequency in ascending order
+        List<Integer> uniqueNumbers = frequencyMap.keySet()
+                .stream()
+                .sorted(Comparator.comparingInt(frequencyMap::get))
+                .collect(Collectors.toList());
+
+        int uniqueCount = uniqueNumbers.size();
+
+        for (int num : uniqueNumbers) {
+            int freq = frequencyMap.get(num);
+            if (k >= freq) {
+                k -= freq;
+                uniqueCount--;  // Remove this number entirely
+            } else {
+                break;  // Can't remove this number completely, stop here
             }
         }
-        // return total uniqueNumber - Numbers removed
-        return size - removedNums;
+
+        return uniqueCount;
     }
 }

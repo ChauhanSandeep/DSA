@@ -5,74 +5,91 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Find the length of longest increasing subsequence in array
+ * Problem: Longest Increasing Subsequence (LIS)
+ * 
+ * Given an integer array, find the length of the longest strictly increasing subsequence.
+ * 
+ * Approaches:
+ * 1. **Dynamic Programming (O(N²))**:
+ *    - Maintain a DP array where `dp[i]` stores the LIS ending at index `i`.
+ *    - Iterate over previous elements to find valid increasing sequences.
+ *    - Update `dp[i] = max(dp[i], dp[j] + 1)` if `nums[j] < nums[i]`.
+ *    - **Time Complexity: O(N²), Space Complexity: O(N).**
+ * 
+ * 2. **Binary Search + Greedy (O(N log N))**:
+ *    - Maintain a list (`sub`) where we store the smallest possible end element for LIS of different lengths.
+ *    - If `num > last element of sub`, append it (extend LIS).
+ *    - Otherwise, replace the first element in `sub` that is `>= num` (using binary search).
+ *    - **Time Complexity: O(N log N), Space Complexity: O(N).**
  */
 public class LongestIncreasingSubsequence {
     public static void main(String[] args) {
         int[] arr = {10, 22, 9, 33, 21, 50, 41, 60, 60};
-        int lis = lengthOfLIS(arr);
-        System.out.println(lis);
+
+        System.out.println("LIS Length (O(N²) DP): " + findLIS_DP(arr));
+        System.out.println("LIS Length (O(N log N) Binary Search): " + findLIS_BinarySearch(arr));
     }
 
     /**
-     *
-     * O(n^2) time complexity
+     * Approach 1: Dynamic Programming (O(N²))
+     * Uses a DP array to store the length of LIS ending at each index.
      */
-    public static int findLIS(int[] arr) {
-        if (arr == null || arr.length == 1) return 1;
-        int[] dp = new int[arr.length];
-        Arrays.fill(dp, 1); // either initiate all element as 1 or return result+1 in the end
+    public static int findLIS_DP(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
 
-        int result = 1;
-        for(int i=1; i<arr.length; i++) {
-            for(int j=0; j<i; j++) {
-                if(arr[j] < arr[i] && dp[j] + 1 > dp[i]) {
-                    dp[i] = dp[j] + 1;
-                    result = Math.max(result, dp[i]);
+        int n = nums.length;
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1);  // Initialize LIS length as 1 for all elements
+        int maxLength = 1;
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[j] < nums[i]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                    maxLength = Math.max(maxLength, dp[i]);
                 }
             }
-
         }
-        return result;
+
+        return maxLength;
     }
 
     /**
-     * O(n^2) time complexity in worst case but much efficient generally
+     * Approach 2: Binary Search + Greedy (O(N log N))
+     * Uses a list (`sub`) to store potential LIS end elements.
      */
-    public static int lengthOfLIS(int[] nums) {
-        // list size will be ans but list will not contain valid subsequence
-        List<Integer> list = new ArrayList<>();
-        list.add(nums[0]);
+    public static int findLIS_BinarySearch(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
 
-        for(int i= 0; i<nums.length; i++){
-            int curr = nums[i];
-            if(curr > list.get(list.size() - 1)) {
-                list.add(curr);
-            }else{
-                // Find the first element in list that is greater than or equal to curr
-                /*int j = 0;
-                while(curr>list.get(j)){ // we can use binary seearch also for O(n log n) time complexity
-                    j++;
-                }*/
-                int j = binarySearch(list, curr);
-                list.set(j, curr);
+        List<Integer> sub = new ArrayList<>();
+        sub.add(nums[0]); // First element is always included
+
+        for (int num : nums) {
+            if (num > sub.get(sub.size() - 1)) {
+                // Extend the LIS by adding the new element
+                sub.add(num);
+            } else {
+                // Replace the first element in sub that is >= num (Binary Search)
+                int idx = lowerBound(sub, num);
+                sub.set(idx, num);
             }
         }
 
-        return list.size();
+        return sub.size(); // The length of sub is the LIS length
     }
 
-    private static int binarySearch(List<Integer> sub, int num) {
-        int left = 0;
-        int right = sub.size() - 1;
+    /**
+     * Binary search helper function to find the first index where `num` should be placed.
+     */
+    private static int lowerBound(List<Integer> sub, int num) {
+        int left = 0, right = sub.size() - 1;
 
         while (left < right) {
-            int mid = (left + right) / 2;
-            if (sub.get(mid) == num) return mid;
-
-            if (sub.get(mid) < num) left = mid + 1;
-            else right = mid;
+            int mid = left + (right - left) / 2;
+            if (sub.get(mid) >= num) right = mid;
+            else left = mid + 1;
         }
+
         return left;
     }
 }

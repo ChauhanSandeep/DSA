@@ -4,17 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-/**
- * You are given `rows`, `cols` and matrix. Every cell in `matrix` has a character U,R,L or D indicating up,right,left and down.
- *
- * Your target is to go from top left corner to the bottom right corner of the matrix.
- *
- * But there are some restrictions while moving along the matrix:
- * 1. If you follow what is written in the cell then you can move freely.
- * 2. But if you don't follow what is written in the cell then you have to pay 1 unit of cost.
- *
- * So your task is to find the minimum cost to go from top-left corner to the bottom-right corner.
- */
 public class MinCostSum {
     public static void main(String[] args) {
         int rows = 3;
@@ -27,65 +16,55 @@ public class MinCostSum {
         System.out.println(new MinCostSum().solve(rows, cols, matrix));
     }
 
-    //          R  D  L   U
-    int[] dx = {0, 1, 0, -1};
-    int[] dy = {1, 0, -1, 0};
+    // Directions: Right, Down, Left, Up
+    private static final int[] dx = {0, 1, 0, -1};
+    private static final int[] dy = {1, 0, -1, 0};
+    private static final String directions = "RDLU";
 
     public int solve(int rows, int cols, String[] matrix) {
-
-        String directions = "RDLU";
         int[][] dist = new int[rows][cols];
-        for (int[] list : dist) {
-            Arrays.fill(list, Integer.MAX_VALUE - 1);
+        for (int i = 0; i < rows; i++) {
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
         }
+
         PriorityQueue<Point> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.cost));
         queue.offer(new Point(0, 0, 0));
         dist[0][0] = 0;
 
         while (!queue.isEmpty()) {
-            Point currPoint = queue.poll();
-            if (currPoint.x == rows - 1 && currPoint.y == cols - 1) {
-                break;
-            }
+            Point curr = queue.poll();
+            int currX = curr.x, currY = curr.y, currCost = curr.cost;
+
+            // If we reached the bottom-right corner, return the cost
+            if (currX == rows - 1 && currY == cols - 1) return currCost;
 
             for (int i = 0; i < 4; i++) {
-                //new position
-                int newX = currPoint.x + dx[i];
-                int newY = currPoint.y + dy[i];
+                int newX = currX + dx[i];
+                int newY = currY + dy[i];
 
-                int cost = dist[currPoint.x][currPoint.y];
-                // increase cost by 1 (if path not matches)
-                if(directions.charAt(i) != matrix[currPoint.x].charAt(currPoint.y)) {
-                    cost++;
+                // Check boundaries
+                if (newX < 0 || newY < 0 || newX >= rows || newY >= cols) continue;
+
+                // Corrected Cost Calculation
+                int newCost = currCost + (matrix[currX].charAt(currY) != directions.charAt(i) ? 1 : 0);
+
+                // If we found a shorter path, update and push to queue
+                if (newCost < dist[newX][newY]) {
+                    dist[newX][newY] = newCost;
+                    queue.offer(new Point(newX, newY, newCost));
                 }
-
-                //check boundary condition and cost. (Imp: cost check takes care of visited array)
-                if ((newX >= 0 && newY >= 0 && newX < rows && newY < cols) && cost < dist[newX][newY]) {
-                    queue.offer(new Point(newX, newY, cost));
-                    dist[newX][newY] = cost;
-                }
-
             }
         }
-        System.out.println(Arrays.deepToString(dist));
-        return dist[rows-1][cols-1];
-    }
-}
 
-class Point {
-    int x;
-    int y;
-    int cost;
-
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.cost = 0;
+        return dist[rows - 1][cols - 1];
     }
 
-    public Point(int x, int y, int cost) {
-        this.x = x;
-        this.y = y;
-        this.cost = cost;
+    static class Point {
+        int x, y, cost;
+        public Point(int x, int y, int cost) {
+            this.x = x;
+            this.y = y;
+            this.cost = cost;
+        }
     }
 }

@@ -2,111 +2,159 @@ package DynamicProgramming;
 
 import java.util.Arrays;
 
+/**
+ * Problem: Egg Drop Problem
+ * LeetCode Link: https://leetcode.com/problems/super-egg-drop/
+ *
+ * Description:
+ * - Given `e` eggs and `f` floors, find the minimum number of attempts required 
+ *   to determine the highest floor from which the egg can be dropped without breaking.
+ * - The goal is to minimize the worst-case number of trials.
+ *
+ * Approaches:
+ * 1. **Recursive DP (Top-down with Memoization)**
+ *    - Uses recursion and memoization to compute results.
+ *    - **Time Complexity**: O(e * f²) (Leads to TLE for large inputs).
+ *    - **Space Complexity**: O(e * f) (Memoization table).
+ *
+ * 2. **Iterative DP (Bottom-up)**
+ *    - Uses a DP table to compute the minimum number of trials.
+ *    - **Time Complexity**: O(e * f²) (Leads to TLE for large inputs).
+ *    - **Space Complexity**: O(e * f).
+ *
+ * 3. **Optimized DP (Binary Search)**
+ *    - Uses binary search to optimize finding the critical floor.
+ *    - **Time Complexity**: O(e * f log f) (Most efficient).
+ *    - **Space Complexity**: O(e * f).
+ */
 public class EggDropProblem {
 
     public static void main(String[] args) {
-        System.out.println(new EggDropProblem().superEggDrop(2, 10));
+        EggDropProblem solver = new EggDropProblem();
+        
+        int eggs = 2, floors = 10;
+        
+        System.out.println("Minimum Trials (Recursive DP): " + solver.minTrialsRecursive(eggs, floors));
+        System.out.println("Minimum Trials (Iterative DP): " + solver.minTrialsIterative(eggs, floors));
+        System.out.println("Minimum Trials (Optimized DP - Binary Search): " + solver.superEggDrop(eggs, floors));
     }
 
     /**
-     * Recursive approach
-     * Throwing stackoverflow error in Interviewbit
-     * @param e eggs provided
-     * @param f number of floors
-     * @return min trials required to find threshold floor
+     * **Recursive Approach** (Top-down with Memoization)
+     * 
+     * @param eggs   Number of eggs.
+     * @param floors Number of floors.
+     * @return Minimum number of attempts required.
      */
-    public int minTrials(int e, int f) {
-        int[][] dp = new int[e+1][f+1];
-        for(int[] row: dp) {
+    public int minTrialsRecursive(int eggs, int floors) {
+        int[][] memo = new int[eggs + 1][floors + 1];
+        for (int[] row : memo) {
             Arrays.fill(row, -1);
         }
-        return minTrialsRec(e, f, dp);
-    }
-
-    public int minTrialsRec(int e, int f, int[][] dp) {
-        if(f == 1 || f == 0) {
-            return f;
-        }
-        if(e == 1) {
-            return f;
-        }
-        if(dp[e][f] != -1) return dp[e][f];
-        int min = Integer.MAX_VALUE;
-        for(int x=1; x<=f; x++) {
-            int temp = 1 + Math.max(minTrialsRec(e-1, x-1, dp), minTrialsRec(e, f-x, dp));
-            min = Math.min(min, temp);
-        }
-        dp[e][f] = min;
-        return dp[e][f];
+        return minTrialsRecHelper(eggs, floors, memo);
     }
 
     /**
-     * Iterative solution.
-     * Throws time complexity error in Interviewbit
-     * @param e eggs provided
-     * @param f number of floors
-     * @return min trials required to find threshold floor
+     * Recursive function with memoization.
      */
-    static int minTrialsIter(int e, int f) {
-        int dp[][] = new int[e + 1][f + 1];
+    private int minTrialsRecHelper(int eggs, int floors, int[][] memo) {
+        // Base cases
+        if (floors == 0 || floors == 1) return floors;
+        if (eggs == 1) return floors; // If only 1 egg, check all floors linearly.
 
-        for (int i = 1; i <= e; i++) {
-            dp[i][1] = 1; // 1 trial required for 1 floors
-            dp[i][0] = 0; // 0 trial required for 0 floors
-        }
-        for (int i = 1; i <= f; i++) {
-            dp[1][i] = i; // if only 1 egg is given then it would take `no. of floors` trials
+        if (memo[eggs][floors] != -1) return memo[eggs][floors];
+
+        int minAttempts = Integer.MAX_VALUE;
+
+        for (int floor = 1; floor <= floors; floor++) {
+            int breakCase = minTrialsRecHelper(eggs - 1, floor - 1, memo); // Egg breaks
+            int noBreakCase = minTrialsRecHelper(eggs, floors - floor, memo); // Egg doesn't break
+
+            int worstCase = 1 + Math.max(breakCase, noBreakCase);
+            minAttempts = Math.min(minAttempts, worstCase);
         }
 
-        for (int e1 = 2; e1 <= e; e1++) {
-            for (int f1 = 2; f1 <= f; f1++) {
-                dp[e1][f1] = Integer.MAX_VALUE;
-                for (int x = 1; x <= f1; x++) {
-                    int temp = 1 + Math.max(dp[e1 - 1][x - 1], dp[e1][f1 - x]);
-                    if (temp < dp[e1][f1]) {
-                        dp[e1][f1] = temp;
-                    }
+        return memo[eggs][floors] = minAttempts;
+    }
+
+    /**
+     * **Iterative Dynamic Programming Approach**
+     * 
+     * @param eggs   Number of eggs.
+     * @param floors Number of floors.
+     * @return Minimum number of attempts required.
+     */
+    public int minTrialsIterative(int eggs, int floors) {
+        int[][] dp = new int[eggs + 1][floors + 1];
+
+        // Base cases
+        for (int i = 1; i <= eggs; i++) {
+            dp[i][1] = 1; // 1 trial required for 1 floor
+            dp[i][0] = 0; // 0 trials required for 0 floors
+        }
+        for (int i = 1; i <= floors; i++) {
+            dp[1][i] = i; // If only 1 egg, worst case is checking each floor
+        }
+
+        // Compute DP table
+        for (int e = 2; e <= eggs; e++) {
+            for (int f = 2; f <= floors; f++) {
+                dp[e][f] = Integer.MAX_VALUE;
+                for (int x = 1; x <= f; x++) {
+                    int breakCase = dp[e - 1][x - 1];
+                    int noBreakCase = dp[e][f - x];
+
+                    int worstCase = 1 + Math.max(breakCase, noBreakCase);
+                    dp[e][f] = Math.min(dp[e][f], worstCase);
                 }
             }
         }
-        return dp[e][f];
+        return dp[eggs][floors];
     }
 
     /**
-     * Iterative solution.
-     * This is most optimized
-     * @param e eggs provided
-     * @param f number of floors
-     * @return min trials required to find threshold floor
+     * **Optimized DP using Binary Search**
+     * (Most Efficient Approach)
+     *
+     * @param eggs   Number of eggs.
+     * @param floors Number of floors.
+     * @return Minimum number of attempts required.
      */
-    public int superEggDrop(int e, int f) {
-        int[][] dp = new int[e + 1][f + 1];
+    public int superEggDrop(int eggs, int floors) {
+        int[][] dp = new int[eggs + 1][floors + 1];
 
-        for (int i = 1; i <= e; i++) {
-            dp[i][1] = 1; // 1 trial required for 1 floors
-            dp[i][0] = 0; // 0 trial required for 0 floors
+        // Base cases
+        for (int i = 1; i <= eggs; i++) {
+            dp[i][1] = 1; // 1 trial required for 1 floor
+            dp[i][0] = 0; // 0 trials required for 0 floors
+        }
+        for (int i = 1; i <= floors; i++) {
+            dp[1][i] = i; // If only 1 egg, worst case is checking each floor
         }
 
-        for (int i = 1; i <= f; i++) {
-            dp[1][i] = i;
-        }
-        for (int e1 = 2; e1 <= e; e1++) {
-            for (int f1 = 1; f1 <= f; f1++) {
-                int min = Integer.MAX_VALUE;
-                int left = 1;
-                int right = f1;
+        // Compute DP using binary search optimization
+        for (int e = 2; e <= eggs; e++) {
+            for (int f = 1; f <= floors; f++) {
+                int minAttempts = Integer.MAX_VALUE;
+                int left = 1, right = f;
+
                 while (left <= right) {
                     int mid = left + (right - left) / 2;
-                    int a = dp[e1 - 1][mid - 1]; // break
-                    int b = dp[e1][f1 - mid]; // did not break
-                    min = Math.min(min, Math.max(a, b) + 1);
-                    if (a == b) break;
-                    if (a < b) left = mid + 1;
+                    int breakCase = dp[e - 1][mid - 1]; // Egg breaks
+                    int noBreakCase = dp[e][f - mid]; // Egg doesn't break
+
+                    int worstCase = 1 + Math.max(breakCase, noBreakCase);
+                    minAttempts = Math.min(minAttempts, worstCase);
+
+                    // Adjust search range based on the worst-case comparison
+                    if (breakCase == noBreakCase) break;
+                    if (breakCase < noBreakCase) left = mid + 1;
                     else right = mid - 1;
                 }
-                dp[e1][f1] = min;
+
+                dp[e][f] = minAttempts;
             }
         }
-        return dp[e][f];
+        return dp[eggs][floors];
     }
 }

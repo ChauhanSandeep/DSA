@@ -1,51 +1,63 @@
 package Array;
 
+import java.util.Arrays;
+
 public class SetMatrixZero {
     public static void main(String[] args) {
+        int[][] matrix = {
+            {1, 1, 1},
+            {1, 0, 1},
+            {1, 1, 1}
+        };
 
+        new SetMatrixZero().setZeroes(matrix);
+        
+        // Print the modified matrix
+        for (int[] row : matrix) {
+            System.out.println(Arrays.toString(row));
+        }
     }
 
     public void setZeroes(int[][] matrix) {
-        boolean isCol = false;
-        int rowLen = matrix.length;
-        int colLen = matrix[0].length;
+        if (matrix == null || matrix.length == 0) return;
 
-        for (int i = 0; i < rowLen; i++) {
-            if (matrix[i][0] == 0) {
-                isCol = true;
-            }
+        boolean firstColHasZero = false;
+        int rows = matrix.length;
+        int cols = matrix[0].length;
 
-            for (int j = 1; j < colLen; j++) {
-                // If an element is zero, we set the first element of the corresponding row and column to 0
+        // Step 1: Use first row & column as markers
+        for (int i = 0; i < rows; i++) {
+            if (matrix[i][0] == 0) firstColHasZero = true;  // Track if first col should be zero
+            
+            for (int j = 1; j < cols; j++) {
                 if (matrix[i][j] == 0) {
-                    matrix[0][j] = 0;
-                    matrix[i][0] = 0;
+                    matrix[i][0] = 0;  // Mark the row
+                    matrix[0][j] = 0;  // Mark the column
                 }
             }
         }
 
-        // Iterate over the array once again and using the first row and first column, update the elements.
-        for (int i = 1; i < rowLen; i++) {
-            for (int j = 1; j < colLen; j++) {
+        // Step 2: Set cells to zero based on markers (skip first row & col)
+        for (int i = 1; i < rows; i++) {
+            for (int j = 1; j < cols; j++) {
                 if (matrix[i][0] == 0 || matrix[0][j] == 0) {
                     matrix[i][j] = 0;
                 }
             }
         }
 
-        // See if the first row needs to be set to zero as well
+        // Step 3: Handle first row separately if needed
         if (matrix[0][0] == 0) {
-            for (int j = 0; j < colLen; j++) {
+            for (int j = 0; j < cols; j++) {
                 matrix[0][j] = 0;
             }
         }
 
-        // See if the first column needs to be set to zero as well
-        if (isCol) {
-            for (int i = 0; i < rowLen; i++) {
+        // Step 4: Handle first column separately if needed
+        if (firstColHasZero) {
+            for (int i = 0; i < rows; i++) {
                 matrix[i][0] = 0;
             }
         }
     }
-
 }

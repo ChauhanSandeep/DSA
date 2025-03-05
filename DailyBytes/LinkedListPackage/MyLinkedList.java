@@ -1,7 +1,11 @@
 package DailyBytes.LinkedListPackage;
 
+/**
+ * This class represents a custom singly linked list implementation with methods to add nodes,
+ * print the list, and manage the head node.
+ */
 public class MyLinkedList {
-    MyNode head;
+    private MyNode head;
 
     public MyLinkedList() { }
 
@@ -9,21 +13,28 @@ public class MyLinkedList {
         this.head = head;
     }
 
+    /**
+     * Adds a node to the end of the linked list.
+     * @param node The node to be added.
+     */
     public void push(MyNode node) {
-        if(head == null) {
+        if (head == null) {
             head = node;
             return;
         }
         MyNode temp = head;
-        while(temp.getNext() != null) {
+        while (temp.getNext() != null) {
             temp = temp.getNext();
         }
         temp.setNext(node);
     }
 
+    /**
+     * Prints the linked list in a human-readable format.
+     */
     public void printList() {
         MyNode temp = head;
-        while(temp != null) {
+        while (temp != null) {
             System.out.print(temp.getData() + " -> ");
             temp = temp.getNext();
         }
@@ -40,8 +51,13 @@ public class MyLinkedList {
 
     @Override
     public String toString() {
-        return "MyLinkedList{" +
-                "head=" + head +
-                '}';
+        StringBuilder sb = new StringBuilder("MyLinkedList{");
+        MyNode temp = head;
+        while (temp != null) {
+            sb.append(temp.getData()).append(" -> ");
+            temp = temp.getNext();
+        }
+        sb.append("NULL}");
+        return sb.toString();
     }
 }

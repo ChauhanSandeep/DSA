@@ -5,35 +5,31 @@ import java.util.Arrays;
 public class SentenceReverse {
 
     public static void main(String[] args) {
-        //{'a', ' ', 'b'} => {'b', ' ', 'a'}
         char[] arr = { 'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'};
         reverseWords(arr);
-        System.out.println(Arrays.toString(arr));
+        System.out.println(Arrays.toString(arr)); // Expected: ['w', 'o', 'r', 'l', 'd', ' ', 'h', 'e', 'l', 'l', 'o']
     }
 
     static char[] reverseWords(char[] arr) {
-        // your code goes here
-        if(arr == null) return null;
-        if(arr.length == 0) return arr;
+        if (arr == null || arr.length == 0) return arr;
 
-        reverse(arr, 0, arr.length-1);
+        // Step 1: Reverse entire sentence
+        reverse(arr, 0, arr.length - 1);
 
-        int startIndex = 0;
-        int endIndex = 0;
-        while(endIndex < arr.length) {
-            if(arr[endIndex] == ' ') {
-                reverse(arr, startIndex, endIndex-1);
-                startIndex = endIndex+1;
-            }else if(endIndex == arr.length - 1) {
-                reverse(arr, startIndex, endIndex);
+        // Step 2: Reverse each word in-place
+        int wordStart = 0;
+        for (int i = 0; i <= arr.length; i++) {
+            if (i == arr.length || arr[i] == ' ') {  // End of word
+                reverse(arr, wordStart, i - 1);
+                wordStart = i + 1;
             }
-            endIndex++;
         }
+
         return arr;
     }
 
     private static void reverse(char[] arr, int start, int end) {
-        while(start < end) {
+        while (start < end) {
             char temp = arr[start];
             arr[start] = arr[end];
             arr[end] = temp;

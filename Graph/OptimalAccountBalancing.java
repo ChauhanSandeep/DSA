@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Find min transactions required to balance accounts in splitwise
+ * Find min transactions required to balance accounts in Splitwise.
  * https://leetcode.com/problems/optimal-account-balancing/
- * Splitwise
  */
 public class OptimalAccountBalancing {
 
@@ -19,84 +18,52 @@ public class OptimalAccountBalancing {
                 {1, 2, 5},
                 {2, 0, 5}};
         int minTransfers = new OptimalAccountBalancing().minTransfers(transactions);
-        System.out.println(minTransfers);
+        System.out.println("Minimum Transactions: " + minTransfers);
     }
-
-    int min;
 
     public int minTransfers(int[][] transactions) {
-        if (transactions == null || transactions.length == 0) return 0;
-        min = transactions.length;
-
-        Map<Integer, Integer> userBalance = new HashMap<>();
+        // Step 1: Compute net balance of each person
+        Map<Integer, Integer> balanceMap = new HashMap<>();
         for (int[] transaction : transactions) {
-            int amt = transaction[2];
-            int from = transaction[0];
-            int to = transaction[1];
-
-            userBalance.put(from, userBalance.getOrDefault(from, 0) + amt);
-            userBalance.put(to, userBalance.getOrDefault(to, 0) - amt);
+            int from = transaction[0], to = transaction[1], amount = transaction[2];
+            balanceMap.put(from, balanceMap.getOrDefault(from, 0) + amount);
+            balanceMap.put(to, balanceMap.getOrDefault(to, 0) - amount);
         }
 
-        List<Integer> positives = new ArrayList<>();
-        List<Integer> negatives = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> entry : userBalance.entrySet()) {
-            int val = entry.getValue();
-
-            if (val == 0) continue;
-            if (val > 0) positives.add(val);
-            if (val < 0) negatives.add(val);
+        // Step 2: Store only non-zero balances
+        List<Integer> balances = new ArrayList<>();
+        for (int balance : balanceMap.values()) {
+            if (balance != 0) balances.add(balance);
         }
 
-        dfs(positives, negatives, 0);
-        return min;
-
+        // Step 3: Use DFS with backtracking to minimize transactions
+        return dfs(balances, 0);
     }
 
-    public void dfs(List<Integer> positives, List<Integer> negatives, int curr) {
-        if (positives.size() == 0 && negatives.size() == 0) {
-            min = Math.min(min, curr);
-            return;
+    private int dfs(List<Integer> balances, int index) {
+        // Skip fully settled persons
+        while (index < balances.size() && balances.get(index) == 0) {
+            index++;
         }
-        if (curr > min) return;
 
-        int positive = positives.get(0);
+        // If all accounts are settled
+        if (index == balances.size()) return 0;
 
-        // match every positive and negative account
-        for (int i = 0; i < negatives.size(); i++) {
-            // new positive and new negative after doing transaction
-            int negative = negatives.get(i);
-            int nPositive = Math.max(positive + negative, 0);
-            int nNegative = Math.min(positive + negative, 0);
+        int minTransactions = Integer.MAX_VALUE;
 
-            // update positives and negatives list
-            if (nPositive == 0) {
-                positives.remove(0);
-            } else {
-                positives.set(0, nPositive);
-            }
+        for (int i = index + 1; i < balances.size(); i++) {
+            if (balances.get(i) * balances.get(index) < 0) { // They can settle
+                // Try settling balances[index] with balances[i]
+                balances.set(i, balances.get(i) + balances.get(index));
 
-            if (nNegative == 0) {
-                negatives.remove(i);
-            } else {
-                negatives.set(i, nNegative);
-            }
+                // Recursively settle remaining accounts
+                minTransactions = Math.min(minTransactions, 1 + dfs(balances, index + 1));
 
-            // dfs for remaining
-            dfs(positives, negatives, curr + 1);
-
-            // backtrack. keep values back
-            if (nPositive == 0) {
-                positives.add(0, positive);
-            } else {
-                positives.set(0, positive);
-            }
-
-            if (nNegative == 0) {
-                negatives.add(i, negative);
-            } else {
-                negatives.set(i, negative);
+                // Backtrack to previous state
+                balances.set(i, balances.get(i) - balances.get(index));
             }
         }
+
+        return minTransactions;
     }
 }
