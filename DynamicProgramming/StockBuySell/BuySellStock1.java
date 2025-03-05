@@ -42,7 +42,9 @@ public class BuySellStock1 {
         int sellStateProfit = 0;         // Initial state: no stock, zero profit
 
         for (int i = 1; i < prices.length; i++) {
+            // newSellStateProfit is the maximum profit when not holding a stock
             int newSellStateProfit = Math.max(sellStateProfit, buyStateProfit + prices[i] - fee);
+            // newBuyStateProfit is the maximum profit when holding a stock
             int newBuyStateProfit = Math.max(buyStateProfit, sellStateProfit - prices[i]);
 
             sellStateProfit = newSellStateProfit;
