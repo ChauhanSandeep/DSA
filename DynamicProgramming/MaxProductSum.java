@@ -1,34 +1,58 @@
 package DynamicProgramming;
 
 /**
- * Find subarray (continous) with max product
- * https://leetcode.com/problems/maximum-product-subarray/solution/
+ * Problem: Find the contiguous subarray with the maximum product.
+ * 
+ * Approach:
+ * - Maintain two variables `localMax` and `localMin` to track max/min product ending at the current index.
+ * - If `nums[i]` is negative, `localMax` and `localMin` swap values (since multiplying by a negative flips sign).
+ * - Update the global maximum product.
+ * 
+ * Time Complexity: O(N) (single pass through the array)
+ * Space Complexity: O(1) (constant space used)
+ * 
+ * Link: https://leetcode.com/problems/maximum-product-subarray/
  */
-public class MaxProductSum {
-
+public class MaxProductSubarray {
+    
     public static void main(String[] args) {
-        MaxProductSum maxProductSum = new MaxProductSum();
-        int[] nums = {2,3,-2,4};
-        System.out.println(maxProductSum.maxProduct(nums));
+        MaxProductSubarray maxProduct = new MaxProductSubarray();
+        
+        int[] nums1 = {2, 3, -2, 4};
+        System.out.println(maxProduct.maxProduct(nums1)); // Output: 6
 
-        nums = new int[]{2, -5, 3, 1, -4, 0, -10, 2, 8};
-        System.out.println(maxProductSum.maxProduct(nums));
+        int[] nums2 = {2, -5, 3, 1, -4, 0, -10, 2, 8};
+        System.out.println(maxProduct.maxProduct(nums2)); // Output: 80
+
+        int[] nums3 = {-1, -2, -3, 0};
+        System.out.println(maxProduct.maxProduct(nums3)); // Output: 6
     }
 
     public int maxProduct(int[] nums) {
-        int max = nums[0];
-        int currMax = nums[0];
-        int currMin = nums[0];
+        if (nums == null || nums.length == 0) return 0;
 
-        for(int i=1; i<nums.length; i++) {
-            int temp = Math.max(nums[i], Math.max(currMax * nums[i], currMin * nums[i]));
-            currMin = Math.min(nums[i], Math.min(currMax * nums[i], currMin * nums[i]));
-            currMax = temp;
+        int globalMax = nums[0];
+        int localMax = nums[0];
+        int localMin = nums[0];
 
-            // System.out.println(currMax + "   " + currMin);
+        for (int i = 1; i < nums.length; i++) {
+            int curr = nums[i];
 
-            max = Math.max(max, currMax);
+            // If current number is negative, swap localMax & localMin
+            if (curr < 0) {
+                int temp = localMax;
+                localMax = localMin;
+                localMin = temp;
+            }
+
+            // Compute local max/min products ending at index i
+            localMax = Math.max(curr, localMax * curr);
+            localMin = Math.min(curr, localMin * curr);
+
+            // Update global max product
+            globalMax = Math.max(globalMax, localMax);
         }
-        return max;
+
+        return globalMax;
     }
 }

@@ -1,15 +1,20 @@
 package DynamicProgramming;
 
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 /**
- * https://leetcode.com/problems/minimum-number-of-refueling-stops/
- *
- * Return the minimum number of refueling stops the car must make in order to reach its destination.
- * If it cannot reach the destination, return -1.
- *
- * https://leetcode.com/problems/minimum-number-of-refueling-stops/discuss/294025/Java-Simple-Code-Greedy
+ * Problem: Minimum Refueling Stops (Greedy Approach)
+ * 
+ * - Given a target distance, an initial fuel amount, and a list of fuel stations.
+ * - Return the **minimum number of refueling stops** needed to reach the target.
+ * - If it's not possible, return **-1**.
+ * 
+ * Approach:
+ * - Use a **max-heap (PriorityQueue)** to always pick the station with the most fuel within reach.
+ * - Keep refueling greedily until the target is reached.
+ * 
+ * Time Complexity: **O(n log n)** (heap operations for n stations)
+ * Space Complexity: **O(n)** (heap stores at most n stations)
  */
 public class MinRefuel {
     public static void main(String[] args) {
@@ -19,28 +24,33 @@ public class MinRefuel {
                 {75, 25}
         };
         int result = new MinRefuel().minRefuelStops(100, 25, stations);
-        System.out.println(result);
+        System.out.println("Minimum Refueling Stops: " + result); // Output: 3
     }
 
     public int minRefuelStops(int target, int startFuel, int[][] stations) {
-        if (startFuel >= target) return 0;
+        if (startFuel >= target) return 0; // No stops needed if initial fuel is enough
 
-        int i = 0;
-        int len = stations.length;
-        int stops = 0;
-        int maxReachable = startFuel;
+        int stops = 0, index = 0, n = stations.length;
+        int currentFuel = startFuel;
 
-        // we should pick the station with maximum fuel (in reach).
-        // Distance does not matter because same amount of fuel will be exhausted in reaching that petrol station
-        Queue<Integer> queue = new PriorityQueue<>((a, b) -> b - a);
-        while (maxReachable < target) {
-            while (i < len && stations[i][0] <= maxReachable) {
-                queue.offer(stations[i++][1]);
+        // Max heap to store fuel amounts of reachable stations
+        PriorityQueue<Integer> fuelPQ = new PriorityQueue<>((a, b) -> b - a);
+
+        while (currentFuel < target) {
+            // Add all reachable fuel stations to the max heap
+            while (index < n && stations[index][0] <= currentFuel) {
+                fuelPQ.offer(stations[index][1]);
+                index++;
             }
-            if (queue.isEmpty()) return -1;
-            maxReachable += queue.poll();
+
+            // If no station is reachable and we haven't reached the target, return -1
+            if (fuelPQ.isEmpty()) return -1;
+
+            // Refuel with the station offering the **maximum** fuel within reach
+            currentFuel += fuelPQ.poll();
             stops++;
         }
+
         return stops;
     }
 }

@@ -1,41 +1,68 @@
 package DynamicProgramming;
 
 /**
- * You are given n balloons, indexed from 0 to n - 1. Each balloon is painted with a number
- * on it represented by an array nums. You are asked to burst all the balloons.
+ * LeetCode Problem: Burst Balloons
+ * Link: https://leetcode.com/problems/burst-balloons/
+ * 
+ * Problem Statement:
+ * - You are given `n` balloons, indexed from `0` to `n-1`, each having a value in an array `nums`.
+ * - When you burst the `i-th` balloon, you gain `nums[i-1] * nums[i] * nums[i+1]` coins.
+ * - If `i-1` or `i+1` is out of bounds, assume a balloon with value `1` exists there.
+ * - Find the maximum coins that can be collected by bursting all balloons optimally.
  *
- * If you burst the ith balloon, you will get nums[i - 1] * nums[i] * nums[i + 1] coins.
- * If i - 1 or i + 1 goes out of bounds of the array, then treat it as if there is a
- * balloon with a 1 painted on it. Return max coins that can be collected
- *
- * https://www.youtube.com/watch?v=YzvF8CqPafI
+ * Approach:
+ * - Uses **Dynamic Programming** with the concept of partitions.
+ * - Defines `dp[left][right]` as the maximum coins that can be obtained by bursting balloons in the range `[left, right]`.
+ * - Iterates over all possible partition points and calculates the best gain for each subproblem.
+ * 
+ * Time Complexity: **O(n^3)** (Nested loops iterating over `n`, solving `n^2` subproblems)
+ * Space Complexity: **O(n^2)** (DP table storing results for all `[left, right]` ranges)
  */
 public class BurstBalloon {
 
     public static void main(String[] args) {
-        int[] arr = {3,1,5,8};
-        System.out.println(new BurstBalloon().maxGain(arr));
+        int[] nums = {3, 1, 5, 8};
+        BurstBalloon solver = new BurstBalloon();
+        System.out.println("Maximum coins: " + solver.maxCoins(nums));
     }
 
-    public int maxGain(int[] arr) {
-        int[][] dp = new int[arr.length][arr.length];
+    /**
+     * Computes the maximum coins collectible by bursting balloons optimally.
+     * 
+     * @param nums Original array representing balloon values.
+     * @return Maximum coins that can be collected.
+     */
+    public int maxCoins(int[] nums) {
+        int n = nums.length;
+        int[][] dp = new int[n][n];
 
-        for (int gap = 0; gap < dp.length; gap++) {
+        // Fill DP table for subarrays of different lengths
+        for (int length = 0; length < n; length++) {
+            for (int left = 0, right = length; right < n; left++, right++) {
+                int maxGain = Integer.MIN_VALUE;
 
-            for (int left = 0, right = gap; right < dp.length; left++, right++) {
-                int gain = Integer.MIN_VALUE;
+                // Try bursting each balloon in the range [left, right]
+                for (int lastBurst = left; lastBurst <= right; lastBurst++) {
+                    int leftGain = (lastBurst == left) ? 0 : dp[left][lastBurst - 1]; // Left subproblem
+                    int rightGain = (lastBurst == right) ? 0 : dp[lastBurst + 1][right]; // Right subproblem
+                    int balloonValue = getValue(nums, left - 1) * nums[lastBurst] * getValue(nums, right + 1);
 
-                for (int curr = left; curr <= right; curr++) {
-                    int leftGain = curr == left ? 0 : dp[left][curr - 1];
-                    int rightGain = curr == right ? 0 : dp[curr + 1][right];
-                    int val = (left == 0 ? 1 : arr[left - 1]) * arr[curr] * (right == arr.length - 1 ? 1 : arr[right + 1]);
-
-                    int tempGain = leftGain + rightGain + val;
-                    gain = Math.max(gain, tempGain);
+                    int totalGain = leftGain + rightGain + balloonValue;
+                    maxGain = Math.max(maxGain, totalGain);
                 }
-                dp[left][right] = gain;
+
+                dp[left][right] = maxGain;
             }
         }
-        return dp[0][dp.length - 1];
+
+        return dp[0][n - 1];
+    }
+
+    /**
+     * Helper function to handle out-of-bounds cases (treats missing elements as `1`).
+     */
+    private int getValue(int[] nums, int index) {
+        if (index < 0 || index >= nums.length) return 1;
+        return nums[index];
     }
 }

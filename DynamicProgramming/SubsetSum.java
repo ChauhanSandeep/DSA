@@ -4,28 +4,47 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Count number of subarrays with given sum in provided array.
- * subarrays are continous
+ * Problem: Count the number of subarrays with a given sum `k`.
+ * 
+ * Given an integer array `nums`, return the total number of continuous subarrays
+ * whose sum equals `k`.
+ *
+ * **Approach: Prefix Sum + HashMap**
+ * 1. Maintain a running prefix sum (`currentSum`).
+ * 2. Use a **HashMap (prefixSumMap)** to store the count of prefix sums encountered so far.
+ * 3. If `currentSum - k` exists in the map, it means there exists a subarray summing to `k`.
+ * 4. Update the map to keep track of occurrences of each prefix sum.
+ *
+ * **Time Complexity:** O(N) → Single pass through the array.  
+ * **Space Complexity:** O(N) → HashMap stores at most `N` prefix sums.  
+ *
+ * **LeetCode Problem:** https://leetcode.com/problems/subarray-sum-equals-k/
  */
 public class SubsetSum {
     public static void main(String[] args) {
         int[] nums = {1, 1, 1};
-        int sum = 2;
-        System.out.println(subarraySum(nums, sum));
+        int targetSum = 2;
+        System.out.println("Number of subarrays with sum " + targetSum + ": " + countSubarraysWithSum(nums, targetSum));
     }
 
-    public static int subarraySum(int[] nums, int k) {
-        int sum = 0;
-        int count = 0;
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(0, 1); // used when first match is found
-        for(int i=0; i<nums.length; i++) {
-            sum += nums[i];
-            if(map.containsKey(sum-k)) {
-                count = count + map.get(sum-k);
+    public static int countSubarraysWithSum(int[] nums, int k) {
+        int currentSum = 0;
+        int subarrayCount = 0;
+        Map<Integer, Integer> prefixSumMap = new HashMap<>();
+        prefixSumMap.put(0, 1); // Handle case where subarray starts from index 0
+
+        for (int num : nums) {
+            currentSum += num; // Update prefix sum
+
+            // If (currentSum - k) exists, add its count to the result
+            if (prefixSumMap.containsKey(currentSum - k)) {
+                subarrayCount += prefixSumMap.get(currentSum - k);
             }
-            map.put(sum, map.getOrDefault(sum, 0) + 1);
+
+            // Store the occurrence of the current prefix sum
+            prefixSumMap.put(currentSum, prefixSumMap.getOrDefault(currentSum, 0) + 1);
         }
-        return count;
+
+        return subarrayCount;
     }
 }

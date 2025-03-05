@@ -1,74 +1,98 @@
 package DynamicProgramming;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
- * We have n jobs, where every job is scheduled to be done from startTime[i] to endTime[i],
- * obtaining a profit of profit[i].
+ * LeetCode Problem: https://leetcode.com/problems/maximum-profit-in-job-scheduling/
  *
- * You're given the startTime, endTime and profit arrays, return the maximum profit you can
- * take such that there are no two jobs in the subset with overlapping time range.
+ * Problem Statement:
+ * Given `n` jobs, where each job has a start time, end time, and profit,
+ * return the maximum profit you can obtain by scheduling non-overlapping jobs.
+ * 
+ * Approach:
+ * - Sort jobs by **end time** to process jobs in order.
+ * - Use **Dynamic Programming with Binary Search** to optimize for max profit:
+ *   - For each job `i`, we have two choices:
+ *     1. Include job `i` → Add its profit to the best profit of the latest non-overlapping job.
+ *     2. Exclude job `i` → Take the max profit obtained so far.
+ *   - Use **binary search** to efficiently find the latest non-overlapping job.
+ * 
+ * Complexity:
+ * - Sorting: **O(n log n)**
+ * - DP with Binary Search: **O(n log n)**
+ * - **Overall Complexity: O(n log n)**
  */
 public class JobSchedule2 {
+    
     public static void main(String[] args) {
         int[] startTime = {1, 2, 3, 3};
         int[] endTime = {3, 4, 5, 6};
         int[] profit = {50, 10, 40, 70};
 
         int maxProfit = new JobSchedule2().jobScheduling(startTime, endTime, profit);
-        System.out.println(maxProfit);
+        System.out.println("Maximum Profit: " + maxProfit);  // Output: 120
     }
 
     public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
-        int len = startTime.length;
+        int n = startTime.length;
 
-        List<Interval> intervalList = new ArrayList<>();
-        for (int i = 0; i < len; i++) {
-            intervalList.add(new Interval(startTime[i], endTime[i], profit[i]));
+        // Step 1: Create Job list and sort by `endTime`
+        List<Job> jobs = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            jobs.add(new Job(startTime[i], endTime[i], profit[i]));
+        }
+        jobs.sort(Comparator.comparingInt(job -> job.end));
+
+        // Step 2: DP array to store max profit at each step
+        int[] dp = new int[n];
+        dp[0] = jobs.get(0).profit;
+
+        for (int i = 1; i < n; i++) {
+            int includeProfit = jobs.get(i).profit;
+
+            // Find the last non-overlapping job using binary search
+            int lastNonOverlappingJob = findLastNonOverlappingJob(jobs, i);
+            if (lastNonOverlappingJob != -1) {
+                includeProfit += dp[lastNonOverlappingJob];
+            }
+
+            // Step 3: Store the max profit by including or excluding the current job
+            dp[i] = Math.max(dp[i - 1], includeProfit);
         }
 
-        Collections.sort(intervalList, (a, b) -> {
-            if (a.start == b.start) return a.end - b.end;
-            return a.start - b.start;
-        });
-
-        int[] dp = new int[startTime.length];
-        Arrays.fill(dp, -1);
-        return findProfit(intervalList, 0, dp);
-
+        return dp[n - 1];  // The maximum profit at the last job index
     }
 
-    public int findProfit(List<Interval> intervalList, int startIndex, int[] dp) {
-        if (startIndex >= intervalList.size()) return 0;
-        if (startIndex == intervalList.size() - 1) return intervalList.get(startIndex).profit;
-        if (dp[startIndex] != -1) return dp[startIndex];
-
-        int nextStart = findNextInterval(intervalList, startIndex);
-        dp[startIndex] = Math.max(intervalList.get(startIndex).profit + findProfit(intervalList, nextStart, dp),
-                findProfit(intervalList, startIndex + 1, dp));
-
-        return dp[startIndex];
-    }
-
-    public int findNextInterval(List<Interval> intervalList, int currentIndex) {
-        int i = currentIndex ;
-        for (; i < intervalList.size(); i++) {
-            if (intervalList.get(i).start >= intervalList.get(currentIndex).end) return i;
+    /**
+     * Uses binary search to find the latest job that doesn't overlap with the current job.
+     * @param jobs - List of sorted jobs
+     * @param currentIndex - Current job index
+     * @return Index of last non-overlapping job, or -1 if none found
+     */
+    private int findLastNonOverlappingJob(List<Job> jobs, int currentIndex) {
+        int left = 0, right = currentIndex - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (jobs.get(mid).end <= jobs.get(currentIndex).start) {
+                if (jobs.get(mid + 1).end <= jobs.get(currentIndex).start) {
+                    left = mid + 1;
+                } else {
+                    return mid;
+                }
+            } else {
+                right = mid - 1;
+            }
         }
-        return i;
+        return -1;
     }
 }
 
-class Interval {
-    int start;
-    int end;
-    int profit;
-
-    public Interval(int start, int end, int profit) {
+/**
+ * Job class representing a single job with start time, end time, and profit.
+ */
+class Job {
+    int start, end, profit;
+    public Job(int start, int end, int profit) {
         this.start = start;
         this.end = end;
         this.profit = profit;

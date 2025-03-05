@@ -1,51 +1,85 @@
 package DynamicProgramming;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
+ * Problem: Concatenated Words
+ * 
+ * Given an array of strings `words`, return all the words that are formed 
+ * by concatenating two or more words from the given list.
+ * 
+ * Approach:
+ * - Sort words based on length (shortest first) so that we build from smaller words.
+ * - Use a `Set<String>` to store already processed words for quick lookup.
+ * - For each word, check if it can be formed using the previously added words.
+ * - Use **Dynamic Programming (DP)** to check if a word can be formed from words in the set.
+ * 
+ * Time Complexity:
+ * - Sorting: **O(n log n)**
+ * - Checking each word: **O(n * m²)** (where `m` is the average word length)
+ * - Overall: **O(n log n + n * m²)**
+ * 
+ * Space Complexity:
+ * - **O(n * m)** (for storing words in the set and DP array)
+ * 
+ * LeetCode Problem Link:
  * https://leetcode.com/problems/concatenated-words/
  */
 public class ConcatenatedWords {
     public static void main(String[] args) {
         String[] words = {"cat", "cats", "catsdogcats", "dog", "dogcatsdog", "hippopotamuses", "rat", "ratcatdogcat"};
-        List<String> result = new ConcatenatedWords().findAllConcatenatedWordsInADict(words);
-        System.out.println(result);
+        ConcatenatedWords solver = new ConcatenatedWords();
+        List<String> result = solver.findAllConcatenatedWords(words);
+        System.out.println("Concatenated Words: " + result);
     }
 
-    public List<String> findAllConcatenatedWordsInADict(String[] words) {
-        List<String> result = new ArrayList<>();
-        Set<String> set = new HashSet<>();
-        Arrays.sort(words, (s1, s2) -> s1.length() - s2.length());
+    /**
+     * Finds all concatenated words in the dictionary.
+     * 
+     * @param words Array of input words.
+     * @return List of concatenated words.
+     */
+    public List<String> findAllConcatenatedWords(String[] words) {
+        List<String> concatenatedWords = new ArrayList<>();
+        Set<String> dictionary = new HashSet<>();
+
+        // Sort words by length to ensure we build from smaller words
+        Arrays.sort(words, Comparator.comparingInt(String::length));
 
         for (String word : words) {
-            if (canForm(word, set)) {
-                result.add(word);
+            if (!word.isEmpty() && canBeFormed(word, dictionary)) {
+                concatenatedWords.add(word);
             }
-            set.add(word);
+            dictionary.add(word);
         }
 
-        return result;
+        return concatenatedWords;
     }
 
-    private boolean canForm(String word, Set<String> set) {
-        if (set.isEmpty()) return false; // handle input case [""]
-        boolean[] dp = new boolean[word.length() + 1];
-        dp[0] = true;
+    /**
+     * Checks if a given word can be formed by concatenating words in the set.
+     * 
+     * @param word The word to check.
+     * @param dictionary Set of words to check against.
+     * @return true if the word can be formed, false otherwise.
+     */
+    private boolean canBeFormed(String word, Set<String> dictionary) {
+        if (dictionary.isEmpty()) return false;
 
-        for (int right = 1; right <= word.length(); right++) {
+        int n = word.length();
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true; // Base case: empty string can be formed
+
+        // Check for all substrings if they exist in the dictionary
+        for (int right = 1; right <= n; right++) {
             for (int left = 0; left < right; left++) {
                 if (!dp[left]) continue;
-                if (set.contains(word.substring(left, right))) {
+                if (dictionary.contains(word.substring(left, right))) {
                     dp[right] = true;
-                    break;
+                    break; // No need to check further once found
                 }
             }
         }
-        return dp[word.length()];
+        return dp[n];
     }
-
 }
