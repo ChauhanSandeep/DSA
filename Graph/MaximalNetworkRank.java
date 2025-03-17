@@ -1,12 +1,22 @@
 package Graph;
 
-import java.util.HashSet;
+import java.util.*;
 
 /**
- * The network rank of two different cities is defined as the total number of directly connected roads to either city.
- * If a road is directly connected to both cities, it is only counted once.
+ * LeetCode 1615: Maximal Network Rank
+ * Problem Link: https://leetcode.com/problems/maximal-network-rank/
  *
- * https://leetcode.com/problems/maximal-network-rank/
+ * The network rank of two different cities is defined as the total number of directly connected roads to either city.
+ * If a road is directly connected to both cities, it is counted only once.
+ *
+ * Approach:
+ * 1. Use an adjacency list (HashSet) to store the connections between cities.
+ * 2. Maintain an array to track the degree (number of direct roads) for each city.
+ * 3. Iterate through all pairs of cities to compute their network rank.
+ * 4. If a road exists between two cities, subtract 1 from their combined degree.
+ *
+ * Time Complexity: O(N^2) → Since we check all pairs of cities.
+ * Space Complexity: O(N + E) → For adjacency list and degree array.
  */
 public class MaximalNetworkRank {
 
@@ -17,39 +27,49 @@ public class MaximalNetworkRank {
                 {1, 2},
                 {1, 3}
         };
-        int result = new MaximalNetworkRank().maximalNetworkRank(4, roads);
+        int result = maximalNetworkRank(4, roads);
         System.out.println("Maximal network rank: " + result);
     }
 
-    public int maximalNetworkRank(int n, int[][] roads) {
-        // Create adjacency list representation using HashSet
-        HashSet<Integer>[] graph = new HashSet[n];
-        int[] degree = new int[n]; // Stores count of direct roads for each city
+    /**
+     * Finds the maximal network rank of the given cities.
+     * @param n      - Number of cities
+     * @param roads  - List of roads connecting the cities
+     * @return       - Maximum network rank possible
+     */
+    public static int maximalNetworkRank(int n, int[][] roads) {
+        if (n == 0 || roads == null) return 0; // Edge case: No cities or no roads
 
+        // Graph representation: Adjacency list using HashSet
+        List<Set<Integer>> adjacencyList = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            graph[i] = new HashSet<>();
+            adjacencyList.add(new HashSet<>());
         }
 
-        // Build graph representation
+        int[] degree = new int[n]; // Stores count of direct roads for each city
+
+        // Build the graph representation
         for (int[] road : roads) {
-            int city1 = road[0], city2 = road[1];
-            graph[city1].add(city2);
-            graph[city2].add(city1);
-            degree[city1]++;
-            degree[city2]++;
+            int cityA = road[0], cityB = road[1];
+            adjacencyList.get(cityA).add(cityB);
+            adjacencyList.get(cityB).add(cityA);
+            degree[cityA]++;
+            degree[cityB]++;
         }
 
         int maxRank = 0;
 
-        // Compute maximal network rank
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                int rank = degree[i] + degree[j];
+        // Compute maximal network rank by iterating through all pairs
+        for (int city1 = 0; city1 < n; city1++) {
+            for (int city2 = city1 + 1; city2 < n; city2++) {
+                int networkRank = degree[city1] + degree[city2];
 
-                // If the two cities are directly connected, subtract 1 (avoid double-counting)
-                if (graph[i].contains(j)) rank--;
+                // If cities are directly connected, avoid double counting
+                if (adjacencyList.get(city1).contains(city2)) {
+                    networkRank--;
+                }
 
-                maxRank = Math.max(maxRank, rank);
+                maxRank = Math.max(maxRank, networkRank);
             }
         }
 

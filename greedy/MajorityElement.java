@@ -3,55 +3,86 @@ package greedy;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * LeetCode: https://leetcode.com/problems/majority-element/
+ * 
+ * Problem: Find the majority element (appears more than ⌊ n/2 ⌋ times) in an array.
+ * 
+ * Intuition:
+ * - The Boyer-Moore Voting Algorithm efficiently finds the majority element in O(n) time with O(1) space.
+ * - The HashMap approach provides an alternative, using extra space but maintaining simplicity.
+ * 
+ * Algorithm:
+ * 1. **Boyer-Moore Voting Algorithm** (O(n) time, O(1) space):
+ *    - Select a candidate that potentially occurs more than ⌊ n/2 ⌋ times.
+ *    - Validate if the candidate is truly the majority element.
+ * 2. **HashMap Approach** (O(n) time, O(n) space):
+ *    - Maintain a frequency map and return the first element exceeding ⌊ n/2 ⌋ occurrences.
+ */
 public class MajorityElement {
 
     public static void main(String[] args) {
-        int[] arr = {1, 2, 2, 1, 1};
-        System.out.println(new MajorityElement().majorityElement(arr)); // Output: 1
+        int[] nums = {1, 2, 2, 1, 1};
+        MajorityElement solution = new MajorityElement();
+        
+        System.out.println("Majority Element (Boyer-Moore): " + solution.findMajorityElement(nums));
+        System.out.println("Majority Element (HashMap): " + solution.findMajorityElementUsingMap(nums));
     }
 
     /**
      * Boyer-Moore Voting Algorithm
-     * Time Complexity: O(n), Space Complexity: O(1)
+     * Finds the majority element in O(n) time and O(1) space.
+     *
+     * @param nums Input array
+     * @return Majority element or -1 if no majority exists
      */
-    public int majorityElement(final int[] arr) {
-        int candidateIndex = 0;
+    public int findMajorityElement(int[] nums) {
+        int majorityCandidate = nums[0]; // Initial candidate
         int count = 1;
 
-        // Find candidate for majority element
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] == arr[candidateIndex]) count++;
-            else count--;
-
-            if (count == 0) {
-                candidateIndex = i;
-                count = 1;
+        // Phase 1: Identify potential majority candidate
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == majorityCandidate) {
+                count++;
+            } else {
+                count--;
+                if (count == 0) { // Reset candidate
+                    majorityCandidate = nums[i];
+                    count = 1;
+                }
             }
         }
 
-        // Verify candidate is actually a majority element (> N/2 occurrences)
-        int candidate = arr[candidateIndex];
-        count = 0;
-        for (int num : arr) {
-            if (num == candidate) count++;
+        // Phase 2: Verify if the candidate is actually the majority
+        int occurrenceCount = 0;
+        for (int num : nums) {
+            if (num == majorityCandidate) {
+                occurrenceCount++;
+            }
         }
 
-        return count > arr.length / 2 ? candidate : -1; // Return -1 if no majority element
+        return occurrenceCount > nums.length / 2 ? majorityCandidate : -1;
     }
 
     /**
-     * HashMap Approach (Alternative)
+     * HashMap Approach
+     * Uses a HashMap to count occurrences and identify the majority element.
      * Time Complexity: O(n), Space Complexity: O(n)
+     *
+     * @param nums Input array
+     * @return Majority element or -1 if no majority exists
      */
-    public int majorityElementWithMap(final int[] arr) {
-        int target = arr.length / 2;
-        Map<Integer, Integer> map = new HashMap<>();
+    public int findMajorityElementUsingMap(int[] nums) {
+        int majorityThreshold = nums.length / 2;
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
 
-        for (int num : arr) {
-            map.put(num, map.getOrDefault(num, 0) + 1);
-            if (map.get(num) > target) return num;
+        for (int num : nums) {
+            frequencyMap.merge(num, 1, Integer::sum); // Efficiently updates frequency count
+            if (frequencyMap.get(num) > majorityThreshold) {
+                return num; // Early exit if majority is found
+            }
         }
 
-        return -1; // This case shouldn't occur as problem assumes majority exists
+        return -1; // Shouldn't occur, assuming the problem guarantees a majority element
     }
 }
