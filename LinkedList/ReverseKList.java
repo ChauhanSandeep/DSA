@@ -4,7 +4,16 @@ import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
 /**
- * Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
+ * ✅ Problem: Reverse Nodes in k-Group
+ * 🔗 LeetCode: https://leetcode.com/problems/reverse-nodes-in-k-group/
+ *
+ * 🔍 **Approach:**
+ * 1️⃣ Count the total number of nodes.  
+ * 2️⃣ Reverse every group of `k` nodes while keeping track of links.  
+ * 3️⃣ Link the reversed segments correctly and preserve the remaining nodes.  
+ * 
+ * 📊 **Time Complexity:** O(N) - Each node is processed twice.  
+ * 🛠 **Space Complexity:** O(1) - Constant extra space is used.
  */
 public class ReverseKList {
 
@@ -15,45 +24,63 @@ public class ReverseKList {
         list.add(new ListNode(3));
         list.add(new ListNode(4));
         list.add(new ListNode(5));
-        ListNode resultNode = new ReverseKList().reverseKGroup(head, 2);
-        System.out.println(resultNode);
+
+        int k = 2;
+        ListNode result = new ReverseKList().reverseKGroup(head, k);
+        System.out.println("Reversed in groups of " + k + ": " + result);
     }
 
+    /**
+     * Reverses nodes of a linked list in groups of `k`.
+     * @param head Head of the linked list.
+     * @param k Group size for reversal.
+     * @return New head of the modified list.
+     */
     public ListNode reverseKGroup(ListNode head, int k) {
-        if(head == null){
-            return null;
-        }
-        int count = 0;
-        ListNode temp = head;
-        while(temp != null){
-            count++;
-            temp = temp.next;
-        }
+        if (head == null || k == 1) return head; // Edge case: No need to reverse
 
-        ListNode result = new ListNode(0);
+        int totalNodes = countNodes(head);
+        ListNode dummy = new ListNode(0); // Dummy node for easy list manipulation
+        dummy.next = head;
 
-        // For sublist reversal
+        ListNode prevTail = dummy; // Last node of the previous reversed group
         ListNode curr = head;
-        ListNode prev = null;
-        ListNode next = null;
 
-        // for linking reversed sublists
-        ListNode prevTail = result;
-        ListNode newTail = null;
+        while (totalNodes >= k) {
+            ListNode groupHead = curr; // Store head of the current group
+            ListNode prev = null;
+            ListNode next = null;
 
-        while(curr != null && count >= k){
-            newTail = curr;          // this will be tail of current sublist in the end
-            for(int i = 0; i < k; i++){
+            // Reverse k nodes
+            for (int i = 0; i < k; i++) {
                 next = curr.next;
                 curr.next = prev;
                 prev = curr;
                 curr = next;
-                count--;
             }
-            prevTail.next = prev;   // link next of last sublist to starting of current sublist
-            prevTail = newTail;     // update tail of previous Node for next iteration
+
+            // Link the reversed group
+            prevTail.next = prev;
+            groupHead.next = curr;
+            prevTail = groupHead; // Update prevTail for the next iteration
+
+            totalNodes -= k;
         }
-        prevTail.next = curr;
-        return result.next;
+
+        return dummy.next; // Return the new head (skip dummy node)
+    }
+
+    /**
+     * Counts the number of nodes in a linked list.
+     * @param head Head of the list.
+     * @return Total node count.
+     */
+    private int countNodes(ListNode head) {
+        int count = 0;
+        while (head != null) {
+            count++;
+            head = head.next;
+        }
+        return count;
     }
 }

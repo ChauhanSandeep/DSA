@@ -1,15 +1,13 @@
 package Heap;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * LeetCode: https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
  *
+ * Problem:
  * Given two sorted arrays, find the k pairs with the smallest sums.
  *
  * Approach:
@@ -20,34 +18,47 @@ import java.util.stream.Stream;
  * Time Complexity: O(k log k) (Heap operations dominate)
  * Space Complexity: O(k) (To store results and heap elements)
  */
-public class KSmallSumPair {
+public class KSmallestPairsFinder {
 
     public static void main(String[] args) {
         int[] nums1 = {1, 7, 11};
         int[] nums2 = {2, 4, 6};
         int k = 5;
-        List<List<Integer>> result = new KSmallSumPair().kSmallestPairs(nums1, nums2, k);
-        System.out.println(result);
+
+        KSmallestPairsFinder finder = new KSmallestPairsFinder();
+        List<List<Integer>> result = finder.findKSmallestPairs(nums1, nums2, k);
+        
+        System.out.println("K Smallest Pairs: " + result);
     }
 
-    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
-        PriorityQueue<HeapNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.sum, b.sum));
+    /**
+     * Finds k smallest sum pairs from two sorted arrays.
+     *
+     * @param nums1 First sorted array
+     * @param nums2 Second sorted array
+     * @param k     Number of pairs to find
+     * @return List of k smallest sum pairs
+     */
+    public List<List<Integer>> findKSmallestPairs(int[] nums1, int[] nums2, int k) {
         List<List<Integer>> result = new ArrayList<>();
-
         if (nums1.length == 0 || nums2.length == 0 || k == 0) return result;
 
-        // Initialize heap with first k pairs from nums1 and the first element of nums2
+        // Min Heap to store the pairs based on their sum
+        PriorityQueue<PairNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.sum, b.sum));
+
+        // Initialize heap with first k pairs (nums1[i], nums2[0])
         for (int i = 0; i < Math.min(k, nums1.length); i++) {
-            minHeap.offer(new HeapNode(nums1[i], nums2[0], 0));
+            minHeap.offer(new PairNode(nums1[i], nums2[0], 0));
         }
 
+        // Extract k smallest sum pairs
         while (k-- > 0 && !minHeap.isEmpty()) {
-            HeapNode node = minHeap.poll();
+            PairNode node = minHeap.poll();
             result.add(node.pair);
 
-            int nextIndex = node.index + 1;
+            int nextIndex = node.indexInNums2 + 1;
             if (nextIndex < nums2.length) {
-                minHeap.offer(new HeapNode(node.pair.get(0), nums2[nextIndex], nextIndex));
+                minHeap.offer(new PairNode(node.pair.get(0), nums2[nextIndex], nextIndex));
             }
         }
         return result;
@@ -57,14 +68,14 @@ public class KSmallSumPair {
 /**
  * Helper class to store pairs and their sum for priority queue processing.
  */
-class HeapNode {
+class PairNode {
     List<Integer> pair;
-    int index;
+    int indexInNums2;
     int sum;
 
-    public HeapNode(int num1, int num2, int index) {
-        this.pair = Arrays.asList(num1, num2);
-        this.index = index;
+    public PairNode(int num1, int num2, int indexInNums2) {
+        this.pair = List.of(num1, num2);
+        this.indexInNums2 = indexInNums2;
         this.sum = num1 + num2;
     }
 }

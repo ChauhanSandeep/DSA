@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
  * find the maximum number of events that can be attended by attending only one event per day.
  *
  * Algorithm:
- * - Sort events by start time.
+ * - Sort events by start time (then by end time for tie-breaking).
  * - Use a min-heap to track the earliest ending events available to attend.
  * - Iterate through days, attending the event that ends the earliest first.
  *
@@ -26,7 +26,7 @@ public class MaxEvents {
                 {3, 4},
                 {1, 1}
         };
-        System.out.println(new MaxEvents().maxEvents(events));
+        System.out.println("Max events attended: " + new MaxEvents().maxEvents(events));
     }
 
     /**
@@ -38,33 +38,33 @@ public class MaxEvents {
     public int maxEvents(int[][] events) {
         if (events == null || events.length == 0) return 0;
 
-        // Sort events by start day, then by end day if start days are equal.
-        Arrays.sort(events, (a, b) -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]);
+        // Sort events by start day; if start days are equal, sort by end day.
+        Arrays.sort(events, (a, b) -> a[0] == b[0] ? Integer.compare(a[1], b[1]) : Integer.compare(a[0], b[0]));
 
-        PriorityQueue<Integer> attendableEvents = new PriorityQueue<>(); // Min-heap for end days.
-        int index = 0, result = 0, len = events.length;
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>(); // Min-heap to track event end days.
+        int index = 0, eventsAttended = 0, totalEvents = events.length;
         int today = events[0][0]; // Start from the earliest event day.
 
-        while (!attendableEvents.isEmpty() || index < len) {
+        while (!minHeap.isEmpty() || index < totalEvents) {
             // Remove events that have already ended before today.
-            while (!attendableEvents.isEmpty() && attendableEvents.peek() < today) {
-                attendableEvents.poll();
+            while (!minHeap.isEmpty() && minHeap.peek() < today) {
+                minHeap.poll();
             }
 
             // Add all events that start today.
-            while (index < len && events[index][0] == today) {
-                attendableEvents.offer(events[index][1]);
+            while (index < totalEvents && events[index][0] == today) {
+                minHeap.offer(events[index][1]);
                 index++;
             }
 
             // Attend the event that ends the earliest.
-            if (!attendableEvents.isEmpty()) {
-                result++;
-                attendableEvents.poll();
+            if (!minHeap.isEmpty()) {
+                eventsAttended++;
+                minHeap.poll();
             }
 
             today++; // Move to the next day.
         }
-        return result;
+        return eventsAttended;
     }
 }

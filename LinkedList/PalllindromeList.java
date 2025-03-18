@@ -3,7 +3,19 @@ package LinkedList;
 import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
-public class PalllindromeList {
+/**
+ * ✅ Problem: Check if a linked list is a palindrome.
+ * 🔗 LeetCode: https://leetcode.com/problems/palindrome-linked-list/
+ * 
+ * 🔍 **Approach:**
+ * 1️⃣ Find the middle of the linked list using slow & fast pointers.  
+ * 2️⃣ Reverse the second half of the list.  
+ * 3️⃣ Compare the first half with the reversed second half.  
+ * 
+ * 📊 **Time Complexity:** O(N) - Traverses the list twice.  
+ * 🛠 **Space Complexity:** O(1) - Uses constant extra space.
+ */
+public class PalindromeList {
 
     public static void main(String[] args) {
         ListNode head = new ListNode(1);
@@ -12,54 +24,73 @@ public class PalllindromeList {
         list.add(new ListNode(3));
         list.add(new ListNode(2));
         list.add(new ListNode(1));
-        System.out.println("Is linked list palindrome? " + isPalindrome(head));
 
+        System.out.println("Is linked list a palindrome? " + isPalindrome(head));
     }
 
     /**
-     * Find if the linked list is pallindrome.
-     * Steps: 1. Find the middle element. 2. Reverse 2nd half of list. 3. Compare first hald and 2nd reversed half.
-     * @param head
-     * @return
+     * Determines if a linked list is a palindrome.
+     * @param head Head of the linked list.
+     * @return True if the list is a palindrome, else False.
      */
     public static boolean isPalindrome(ListNode head) {
-        ListNode slow = head;
-        ListNode fast = head;
+        if (head == null || head.next == null) return true; // Edge case: Empty or single-node list
 
-        while(fast != null && fast.next != null) {
+        // Step 1: Find the middle of the linked list
+        ListNode middleNode = findMiddle(head);
+
+        // Step 2: Reverse the second half of the list
+        ListNode reversedSecondHalf = reverseList(middleNode);
+
+        // Step 3: Compare both halves
+        return isEqual(head, reversedSecondHalf);
+    }
+
+    /**
+     * Uses the slow and fast pointer technique to find the middle of the list.
+     * @param head Head of the list.
+     * @return The starting node of the second half of the list.
+     */
+    private static ListNode findMiddle(ListNode head) {
+        ListNode slow = head, fast = head;
+        
+        while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
         }
-        boolean isEven = false;
-        if(fast == null) {
-            isEven = true;
-        }
-        if(!isEven) {
-            slow = slow.next;
-        }
-        fast = reverse(slow);
-        return compare(head, fast);
+
+        return slow; // Middle of the list (or second half start in even-length lists)
     }
 
-    public static ListNode reverse(ListNode head) {
-        ListNode prev = null;
-        ListNode curr = head;
-        ListNode next = head;
+    /**
+     * Reverses a linked list.
+     * @param head Head of the list to reverse.
+     * @return New head of the reversed list.
+     */
+    private static ListNode reverseList(ListNode head) {
+        ListNode prev = null, curr = head, next;
 
-        while(curr != null) {
+        while (curr != null) {
             next = curr.next;
             curr.next = prev;
             prev = curr;
             curr = next;
         }
+        
         return prev;
     }
 
-    public static boolean compare(ListNode node1, ListNode node2) {
-        while(node1 != null && node2 != null) {
-            if(node1.val != node2.val) return false;
-            node1 = node1.next;
-            node2 = node2.next;
+    /**
+     * Compares two linked lists for equality.
+     * @param first First list's head.
+     * @param second Second list's head.
+     * @return True if both lists are identical, otherwise False.
+     */
+    private static boolean isEqual(ListNode first, ListNode second) {
+        while (second != null) { // Only check second half (first half is always longer or equal)
+            if (first.val != second.val) return false;
+            first = first.next;
+            second = second.next;
         }
         return true;
     }

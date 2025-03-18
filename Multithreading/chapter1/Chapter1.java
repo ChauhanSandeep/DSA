@@ -1,66 +1,93 @@
-package Multithreading.chapter1;
+package multithreading.chapter1;
 
-public class Chapter1 {
+/**
+ * Demonstrates different ways to create and execute threads in Java.
+ * 
+ * - Using a class that implements Runnable (`WorkerRunnable`).
+ * - Using a class that extends Thread (`WorkerThread`).
+ * - Using an anonymous inner class (`AnonymousRunnable`).
+ * - Using a lambda expression (`LambdaRunnable`).
+ * 
+ * Each thread sleeps for 1 second between iterations and prints a message.
+ * 
+ * Time Complexity: O(1) per iteration (constant time operations inside loop).
+ * Space Complexity: O(1) (constant space usage per thread).
+ */
+public class ThreadDemo {
     public static void main(String[] args) {
-        Runner1 runner = new Runner1();
-        Thread thread1 = new Thread(runner);
+        Thread thread1 = new Thread(new WorkerRunnable());
+        Thread thread2 = new WorkerThread();
 
-        Thread thread2 = new Thread(new Runner2());
         Thread thread3 = new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
-                    for(int i=0; i<10; i++) {
-                        Thread.sleep(1000);
-                        System.out.println("Running intermittently");
-                    }
-                }catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                executeThreadTask("AnonymousRunnable");
             }
         });
 
-        Thread thread4 = new Thread(() -> {
-            for(int i=0; i<10; i++) {
-                try {
-                    Thread.sleep(1000);
-                    System.out.println("Running anonymously");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        Thread thread4 = new Thread(() -> executeThreadTask("LambdaRunnable"));
+
+        // Start all threads
         thread1.start();
         thread2.start();
         thread3.start();
         thread4.start();
     }
+
+    /**
+     * A utility method to execute a simple thread task.
+     * @param threadName The name of the thread (for logging purposes).
+     */
+    private static void executeThreadTask(String threadName) {
+        try {
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(1000);
+                System.out.println(threadName + " - Iteration: " + i);
+            }
+        } catch (InterruptedException e) {
+            System.err.println(threadName + " interrupted: " + e.getMessage());
+        }
+    }
 }
 
-
-class Runner1 implements Runnable {
+/**
+ * A thread worker implementing Runnable interface.
+ */
+class WorkerRunnable implements Runnable {
+    @Override
     public void run() {
-        try{
-            for(int i=0; i<10; i++) {
-                Thread.sleep(1000);
-                System.out.println("Runner1 " + i);
-            }
-        }catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        executeThreadTask("WorkerRunnable");
     }
- }
 
- class Runner2 extends Thread {
-    public void run() {
-        try{
-            for(int i=0; i<10; i++) {
+    private void executeThreadTask(String threadName) {
+        try {
+            for (int i = 0; i < 10; i++) {
                 Thread.sleep(1000);
-                System.out.println("Runner2 " + i);
+                System.out.println(threadName + " - Iteration: " + i);
             }
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.err.println(threadName + " interrupted: " + e.getMessage());
         }
     }
- }
+}
+
+/**
+ * A thread worker extending the Thread class.
+ */
+class WorkerThread extends Thread {
+    @Override
+    public void run() {
+        executeThreadTask("WorkerThread");
+    }
+
+    private void executeThreadTask(String threadName) {
+        try {
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(1000);
+                System.out.println(threadName + " - Iteration: " + i);
+            }
+        } catch (InterruptedException e) {
+            System.err.println(threadName + " interrupted: " + e.getMessage());
+        }
+    }
+}
