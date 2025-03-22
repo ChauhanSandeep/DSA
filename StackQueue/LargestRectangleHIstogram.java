@@ -4,47 +4,72 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * https://leetcode.com/problems/largest-rectangle-in-histogram/
+ * Problem: Find the largest rectangle area in a histogram.
+ * 
+ * <p>LeetCode Problem Link:
+ * <a href="https://leetcode.com/problems/largest-rectangle-in-histogram/">Largest Rectangle in Histogram</a>
+ * </p>
+ *
+ * <p><b>Approach:</b></p>
+ * - Use a **monotonic increasing stack** to efficiently determine the largest rectangle.
+ * - For each bar:
+ *   - Find the **previous smaller element** (left boundary).
+ *   - Find the **next smaller element** (right boundary).
+ * - Maintain a stack of indices, ensuring it remains in increasing order.
+ * - When encountering a smaller bar, calculate the area for previous bars.
+ *
+ * <p><b>Time Complexity:</b> O(N) (Each element is pushed and popped once).</p>
+ * <p><b>Space Complexity:</b> O(N) (Stack storage for indices).</p>
  */
-public class LargestRectangleHIstogram {
+public class LargestRectangleHistogram {
 
     public static void main(String[] args) {
-        int[] heights = {2, 1, 5, 6 ,2, 3};
-        int maxRectangle = new LargestRectangleHIstogram().largestRectangleArea(heights);
-        System.out.println("The max rectangle is " + maxRectangle);
+        int[] heights = {2, 1, 5, 6, 2, 3};
+        int maxRectangle = largestRectangleArea(heights);
+        System.out.println("Max rectangle area: " + maxRectangle); // Expected Output: 10
     }
 
     /**
-     * 1. Idea is, we will consider every element a[i] to be a candidate for the area calculation.
-     * That is, if a[i] is the minimum element then the maximum area possible for all such rectangles
-     * would be a[i] * (R-L-1), where a[R] is first subsequent element(R>i) in the array just smaller than a[i],
-     * similarly a[L] is first previous element just smaller than a[i].
-     * i.e. Take a[i] as a center and expand it to left and right and stop when first just smaller elements are found on both the sides
+     * Computes the largest rectangle area in a histogram.
      *
-     * 2. We add the element a[i] directly to the stack if it's greater than the peak element, because we are yet to find R for this.
-     * L is just the previous element in stack. (We will use this information later when we will pop it out).
-     *
-     * 3. If we get an element a[i] which is smaller than the peak value, it is the R value for all the elements present in stack which are
-     * greater than a[i]. Pop out the elements greater than a[i], we have their R value and L value(point 2). and now push a[i] and repeat..
+     * @param heights Array representing the heights of histogram bars.
+     * @return Maximum rectangular area.
      */
-    public int largestRectangleArea(int[] heights) {
-        Deque<Integer> stack = new ArrayDeque<>();
-        stack.push(-1);
-        int length = heights.length;
+    public static int largestRectangleArea(int[] heights) {
+        Deque<Integer> indexStack = new ArrayDeque<>();
+        indexStack.push(-1); // Sentinel value for ease of calculation
         int maxArea = 0;
-        for (int i = 0; i < length; i++) {
-            while ((stack.peek() != -1) && (heights[stack.peek()] >= heights[i])) {
-                int currentHeight = heights[stack.pop()];
-                int currentWidth = i - stack.peek() - 1;
-                maxArea = Math.max(maxArea, currentHeight * currentWidth);
+        
+        // Iterate through each histogram bar
+        for (int i = 0; i < heights.length; i++) {
+            // Maintain a monotonic increasing stack
+            while (indexStack.peek() != -1 && heights[indexStack.peek()] >= heights[i]) {
+                maxArea = calculateArea(heights, indexStack, i, maxArea);
             }
-            stack.push(i);
+            indexStack.push(i);
         }
-        while (stack.peek() != -1) {
-            int currentHeight = heights[stack.pop()];
-            int currentWidth = length - stack.peek() - 1;
-            maxArea = Math.max(maxArea, currentHeight * currentWidth);
+
+        // Process remaining bars in the stack
+        while (indexStack.peek() != -1) {
+            maxArea = calculateArea(heights, indexStack, heights.length, maxArea);
         }
+
         return maxArea;
+    }
+
+    /**
+     * Helper function to calculate the maximum rectangle area when popping from the stack.
+     *
+     * @param heights     The histogram heights array.
+     * @param indexStack  Stack storing indices of histogram bars.
+     * @param rightIndex  The right boundary index for width calculation.
+     * @param maxArea     Current maximum area.
+     * @return Updated maximum area.
+     */
+    private static int calculateArea(int[] heights, Deque<Integer> indexStack, int rightIndex, int maxArea) {
+        int height = heights[indexStack.pop()];
+        int leftIndex = indexStack.peek();
+        int width = rightIndex - leftIndex - 1;
+        return Math.max(maxArea, height * width);
     }
 }

@@ -5,76 +5,92 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 
 /**
- * https://leetcode.com/problems/single-threaded-cpu/
+ * Problem: Single-Threaded CPU - Process tasks based on availability and priority.
+ *
+ * Intuition:
+ * - Sort tasks by **enqueue time**.
+ * - Use a **min-heap (priority queue)** to process tasks based on:
+ *   1. **Shortest processing time** first.
+ *   2. If processing times are the same, process the **earlier indexed task**.
+ * - If no tasks are available, move the CPU clock forward to the next task.
+ *
+ * Approach:
+ * - Step 1: Sort tasks by `enqueueTime`.
+ * - Step 2: Use a **min-heap** to always pick the most eligible task:
+ *   - If multiple tasks are available at `currentTime`, pick the shortest job.
+ *   - If still tied, pick the task with the smallest index.
+ * - Step 3: Process tasks and store execution order.
+ *
+ * Time Complexity: **O(N log N)** (Sorting takes **O(N log N)**, each push/pop takes **O(log N)**)
+ * Space Complexity: **O(N)** (Priority queue and result storage)
+ *
+ * Problem Link: https://leetcode.com/problems/single-threaded-cpu/
  */
 public class SingleThreadCPU {
 
     public int[] getOrder(int[][] tasks) {
-        int len = tasks.length;
-        Task[] taskArr = new Task[len];
-        for (int i = 0; i < len; i++) {
-            taskArr[i] = new Task(i, tasks[i][0], tasks[i][1]);
+        int n = tasks.length;
+        Task[] tasksSortedByStartTime = new Task[n];
+
+        // Step 1: Create Task objects and sort them by enqueue time
+        for (int i = 0; i < n; i++) {
+            tasksSortedByStartTime[i] = new Task(i, tasks[i][0], tasks[i][1]);
         }
-        Arrays.sort(taskArr, (task1, task2) -> {
-            return task1.startTime - task2.startTime;
-        });
+        Arrays.sort(tasksSortedByStartTime, (a, b) -> Integer.compare(a.enqueueTime, b.enqueueTime));
 
+        // Step 2: Min-heap (priority queue) to process tasks based on shortest job first
+        PriorityQueue<Task> taskQueue = new PriorityQueue<>(
+                (a, b) -> a.processingTime == b.processingTime ? Integer.compare(a.index, b.index)
+                        : Integer.compare(a.processingTime, b.processingTime));
 
-        PriorityQueue<Task> minHeap = new PriorityQueue<Task>((task1, task2) -> {
-            if (task1.processingTime == task2.processingTime) {
-                return task1.index - task2.index;
-            }
-            return task1.processingTime - task2.processingTime;
-        });
+        int[] executionOrder = new int[n];
+        int taskIndex = 0, resultIndex = 0, currentTime = 0;
 
-        int nextTaskIndex = 0;
-        int[] resultArr = new int[len];
-        int resIndex = 0;
-        int currTime = 0;
-
-        while (resIndex < len) {
-            // Add all the tasks that came in while previous was getting processed
-            while (nextTaskIndex < taskArr.length && taskArr[nextTaskIndex].startTime <= currTime) {
-                minHeap.add(taskArr[nextTaskIndex]);
-                nextTaskIndex++;
+        while (resultIndex < n) {
+            // Add all tasks that have arrived by `currentTime`
+            while (taskIndex < n && tasksSortedByStartTime[taskIndex].enqueueTime <= currentTime) {
+                taskQueue.offer(tasksSortedByStartTime[taskIndex++]);
             }
 
-            // No tasks came in while previous was getting processed
-            if (minHeap.isEmpty()) {
-                currTime = taskArr[nextTaskIndex].startTime;
+            // If no tasks are available, jump to the next available task time
+            if (taskQueue.isEmpty()) {
+                currentTime = tasksSortedByStartTime[taskIndex].enqueueTime;
                 continue;
             }
 
-            Task currTask = minHeap.poll();
-            resultArr[resIndex++] = currTask.index;
-            currTime += currTask.processingTime;
+            // Step 3: Process the shortest available task
+            Task nextTask = taskQueue.poll();
+            executionOrder[resultIndex++] = nextTask.index;
+            currentTime += nextTask.processingTime;
         }
 
-        return resultArr;
-    }
-}
-
-class Task {
-    int index;
-    int startTime;
-    int processingTime;
-
-    Task(int i, int e, int p) {
-        this.index = i;
-        this.startTime = e;
-        this.processingTime = p;
+        return executionOrder;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof  Task)) return false;
+    /**
+     * Represents a task with an index, enqueue time, and processing time.
+     */
+    static class Task {
+        int index;
+        int enqueueTime;
+        int processingTime;
 
-        Task t2 = (Task) obj;
-        return t2.index == index && t2.startTime == startTime && t2.processingTime == processingTime;
-    }
+        Task(int index, int enqueueTime, int processingTime) {
+            this.index = index;
+            this.enqueueTime = enqueueTime;
+            this.processingTime = processingTime;
+        }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(index, startTime, processingTime);
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Task)) return false;
+            Task other = (Task) obj;
+            return this.index == other.index && this.enqueueTime == other.enqueueTime && this.processingTime == other.processingTime;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(index, enqueueTime, processingTime);
+        }
     }
 }

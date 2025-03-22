@@ -1,51 +1,70 @@
 package String;
 
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Converts a Roman numeral string to its corresponding integer value.
+ *
+ * Approach:
+ * - Use a HashMap to store the integer values of Roman numerals.
+ * - Traverse the string from right to left, keeping track of the last processed numeral.
+ * - If the current numeral is smaller than the last processed one, subtract it (e.g., IV = 4).
+ * - Otherwise, add it to the result.
+ *
+ * Time Complexity: O(N) - Single traversal of the string.
+ * Space Complexity: O(1) - Constant extra space for the HashMap.
+ *
+ * LeetCode Equivalent: https://leetcode.com/problems/roman-to-integer/
+ */
 public class RomanToInt {
     public static void main(String[] args) {
-        String roman = "MCMIV";
-        int integer = romanToInteger(roman);
-        System.out.println("Integer value for " + roman + " is "+ integer);
+        String romanNumeral = "MCMIV";
+        int integerValue = romanToInteger(romanNumeral);
+        System.out.println("Integer value for " + romanNumeral + " is " + integerValue);
     }
 
     /**
-     * Convert roman representation of a string to integer
-     * @param roman
-     * @return
+     * Converts a Roman numeral string to an integer.
+     *
+     * @param roman The Roman numeral string (e.g., "MCMIV").
+     * @return The corresponding integer value.
+     * @throws IllegalArgumentException if the input is null, empty, or contains invalid characters.
      */
     public static int romanToInteger(String roman) {
-        if(roman == null || roman.trim().equals("")) {
-            throw new RuntimeException("Invalid roman number");
+        if (roman == null || roman.trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid Roman numeral input.");
         }
 
-        Map<Character, Integer> map = new HashMap<>();
-        map.put('I', 1);
-        map.put('V', 5);
-        map.put('X', 10);
-        map.put('L', 50);
-        map.put('C', 100);
-        map.put('D', 500);
-        map.put('M', 1000);
+        // Immutable map storing Roman numeral values (Java 9+)
+        Map<Character, Integer> romanValues = Map.of(
+                'I', 1, 'V', 5, 'X', 10, 'L', 50,
+                'C', 100, 'D', 500, 'M', 1000
+        );
+
         int result = 0;
+        int lastSeenValue = 0;
 
-        for(int i=0; i<roman.length(); i++) {
+        // Traverse the string from right to left
+        for (int i = roman.length() - 1; i >= 0; i--) {
+            char currentChar = roman.charAt(i);
 
-            int curr = map.get(roman.charAt(i));
-            if(i+1 < roman.length()) {
-                int next = map.get(roman.charAt(i+1));
-                if(next > curr) {
-                    result += next - curr;
-                    i++;
-                }else{
-                    result += curr;
-                }
-            }else{
-                result += curr;
+            // Validate character
+            if (!romanValues.containsKey(currentChar)) {
+                throw new IllegalArgumentException("Invalid character in Roman numeral: " + currentChar);
             }
 
+            int currValue = romanValues.get(currentChar);
+
+            // If current value is smaller than the last seen value, subtract it
+            if (currValue < lastSeenValue) {
+                result -= currValue;
+            } else {
+                result += currValue;
+            }
+
+            lastSeenValue = currValue;
         }
+
         return result;
     }
 }

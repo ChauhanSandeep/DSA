@@ -1,42 +1,65 @@
 package String;
 
 /**
- * Find in how many minutes, hour and minutes of time will become palindrome.
+ * Time Palindrome Finder
+ * 
+ * Given a time in "HH:MM" format, determine how many minutes it will take 
+ * until the time becomes a palindrome (i.e., "HH:MM" reads the same forward and backward).
+ * 
+ * **Approach & Explanation:**
+ * - Convert input time into hours and minutes.
+ * - Increment time minute by minute until a palindrome is found.
+ * - Ensure time wraps correctly (i.e., 23:59 → 00:00).
+ * 
+ * **Time Complexity:** O(1) - At most 1440 iterations (24 hours).
+ * **Space Complexity:** O(1) - Constant space usage.
  */
 public class TimePalindrome {
 
     public static void main(String[] args) {
-        int res = new TimePalindrome().solve("21:00");
-        System.out.println(res);
+        String inputTime = "21:00";
+        int minutesUntilPalindrome = findMinutesToPalindrome(inputTime);
+        System.out.println(minutesUntilPalindrome);
     }
 
-    public int solve(String time) {
-        String[] arr = time.split(":");
-        int hour = Integer.parseInt(arr[0]);
-        int min = Integer.parseInt(arr[1]);
+    /**
+     * Finds the number of minutes required until the time becomes a palindrome.
+     *
+     * @param time The input time in "HH:MM" format.
+     * @return The number of minutes required to reach the next palindrome time.
+     */
+    public static int findMinutesToPalindrome(String time) {
+        String[] timeParts = time.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
 
-        int diff = 0;
-        while(!isPalindrome(hour, min)) {
-            if(min == 59) {
-                hour++;
-                min = 0;
-            }else{
-                min++;
+        int minutesElapsed = 0;
+
+        // Keep incrementing the time until we find a palindrome
+        while (!isPalindromeTime(hours, minutes)) {
+            minutes++;
+            if (minutes == 60) { // Wrap around for minutes
+                minutes = 0;
+                hours++;
+                if (hours == 24) { // Wrap around for hours
+                    hours = 0;
+                }
             }
-            if(hour == 24) hour = 0;
-            diff++;
+            minutesElapsed++;
         }
-        return diff;
-
+        return minutesElapsed;
     }
 
-    private boolean isPalindrome(int first, int second) {
-        String str1 = String.valueOf(first);
-        if(str1.length() == 1) str1 = "0" + str1;
-
-        String str2 = String.valueOf(second);
-        if(str2.length() == 1) str2 = "0" + str2;
-
-        return  new StringBuilder(str1).reverse().toString().equals(str2);
+    /**
+     * Checks if the given hour and minute form a palindrome when written in "HH:MM" format.
+     *
+     * @param hours   The hour value.
+     * @param minutes The minute value.
+     * @return True if the time is a palindrome, false otherwise.
+     */
+    private static boolean isPalindromeTime(int hours, int minutes) {
+        String hourStr = String.format("%02d", hours);
+        String minuteStr = String.format("%02d", minutes);
+        return new StringBuilder(hourStr).reverse().toString().equals(minuteStr);
     }
 }

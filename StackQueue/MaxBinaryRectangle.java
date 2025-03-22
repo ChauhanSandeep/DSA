@@ -5,10 +5,18 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Given a binary matrix, find the maximum area of rectangle that can be created from this matrix
- * Modification of LargestHistogram problem
- * https://www.youtube.com/watch?v=St0Jf_VmG_g&list=PL_z_8CaSLPWdeOezg68SKkeLN4-T_jNHd&index=8
+ * Given a binary matrix, find the maximum area of a rectangle formed by 1s.
+ * This is a variation of the "Largest Histogram Area" problem.
  *
+ * Approach:
+ * - Treat each row as the base of a histogram and compute the largest rectangle using a stack.
+ * - Maintain an array of column heights, updating it as we traverse each row.
+ * - Compute the largest rectangle in the histogram for each row.
+ *
+ * Problem Link: https://www.youtube.com/watch?v=St0Jf_VmG_g&list=PL_z_8CaSLPWdeOezg68SKkeLN4-T_jNHd&index=8
+ *
+ * Time Complexity: O(rows * cols), since each row computes a histogram in O(cols).
+ * Space Complexity: O(cols) for storing histogram heights.
  */
 public class MaxBinaryRectangle {
 
@@ -19,70 +27,84 @@ public class MaxBinaryRectangle {
                 {1, 1, 1, 1},
                 {1, 1, 0, 0}
         };
-        int area = new MaxBinaryRectangle().maximalRectangle(matrix);
-        System.out.println("max area is " + area);
 
+        MaxBinaryRectangle solver = new MaxBinaryRectangle();
+        int maxArea = solver.findMaxRectangleArea(matrix);
+        System.out.println("Maximum Rectangle Area: " + maxArea);
     }
 
-
-    public int maximalRectangle(int[][] matrix) {
+    /**
+     * Computes the maximum rectangular area in a binary matrix.
+     */
+    public int findMaxRectangleArea(int[][] matrix) {
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) return 0;
+
         int rows = matrix.length;
         int cols = matrix[0].length;
-
-        int result = 0;
         List<Integer> heights = new ArrayList<>();
+        int maxArea = 0;
 
-        for (int row = 0; row < rows; row++) {
-            if (row == 0) {
-                for (int j = 0; j < cols; j++) {
-                    heights.add(matrix[row][j]);
-                }
-            } else {
-                for (int j = 0; j < cols; j++) {
-                    if (matrix[row][j] == 0) {
-                        heights.set(j, 0);
-                    } else {
-                        heights.set(j, heights.get(j) + matrix[row][j]);
-                    }
-                }
-            }
-            int tempResult = largestHistogram(heights);
-//            System.out.println(tempResult);
-            result = Math.max(result, tempResult);
+        // Initialize the histogram heights with the first row
+        for (int col = 0; col < cols; col++) {
+            heights.add(matrix[0][col]);
         }
-        return result;
 
+        // Compute the maximum rectangle for the first row
+        maxArea = computeLargestHistogramArea(heights);
+
+        // Process remaining rows
+        for (int row = 1; row < rows; row++) {
+            updateHeights(heights, matrix[row]);
+            maxArea = Math.max(maxArea, computeLargestHistogramArea(heights));
+        }
+        
+        return maxArea;
     }
 
-    public int largestHistogram(List<Integer> heights) {
-//        System.out.println(heights);
-        int maxArea = 0;
+    /**
+     * Updates the histogram heights based on the current row.
+     */
+    private void updateHeights(List<Integer> heights, int[] row) {
+        for (int col = 0; col < row.length; col++) {
+            if (row[col] == 0) {
+                heights.set(col, 0);
+            } else {
+                heights.set(col, heights.get(col) + 1);
+            }
+        }
+    }
+
+    /**
+     * Computes the largest rectangle area in a histogram using a stack.
+     */
+    private int computeLargestHistogramArea(List<Integer> heights) {
         Stack<Integer> stack = new Stack<>();
-        stack.push(-1);
+        stack.push(-1); // Sentinel value to avoid empty stack issues
+
+        int maxArea = 0;
 
         for (int i = 0; i < heights.size(); i++) {
-            int rightIndex = i;
-
-            while (stack.peek() != -1 && heights.get(stack.peek()) >= heights.get(rightIndex)) {
-                int currIndex = stack.pop();
-                int currHeight = heights.get(currIndex);
-
-                int leftIndex = stack.peek();
-                int width = rightIndex - leftIndex - 1;
-                maxArea = Math.max(maxArea, width * currHeight);
+            while (stack.peek() != -1 && heights.get(stack.peek()) >= heights.get(i)) {
+                maxArea = Math.max(maxArea, computeArea(heights, stack, i));
             }
-            stack.push(rightIndex);
+            stack.push(i);
         }
 
+        // Process remaining elements in stack
         while (stack.peek() != -1) {
-            int currIndex = stack.pop();
-            int currHeight = heights.get(currIndex);
-
-            int leftIndex = stack.peek();
-            int width = heights.size() - leftIndex - 1;
-            maxArea = Math.max(maxArea, width * currHeight);
+            maxArea = Math.max(maxArea, computeArea(heights, stack, heights.size()));
         }
+
         return maxArea;
+    }
+
+    /**
+     * Computes the area of a rectangle given a popped index from the stack.
+     */
+    private int computeArea(List<Integer> heights, Stack<Integer> stack, int rightBoundary) {
+        int heightIndex = stack.pop();
+        int height = heights.get(heightIndex);
+        int width = rightBoundary - stack.peek() - 1; // Compute width based on next left boundary
+        return width * height;
     }
 }

@@ -1,31 +1,53 @@
-package String;
+package string;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class RemoveDuplicate {
+/**
+ * Problem: Remove duplicate characters from a given string while maintaining order.
+ * 
+ * Intuition:
+ * - Use a HashSet to track encountered characters.
+ * - Append characters to a StringBuilder only if they have not been added before.
+ * - Maintain the original order of first occurrences.
+ * 
+ * Time Complexity: O(N) - Single pass through the string.
+ * Space Complexity: O(N) - HashSet for storing unique characters.
+ */
+public class RemoveDuplicateCharacters {
+
     public static void main(String[] args) {
         String input = "geeksforGeeks";
-        String output = removeDuplicates(input);
-        System.out.println("String after removing duplicates from " + input + "is " + output);
+        String output = removeDuplicates(input, false); // Case-sensitive
+        System.out.println("String after removing duplicates: " + output);
+
+        String outputIgnoreCase = removeDuplicates(input, true); // Case-insensitive
+        System.out.println("String after removing duplicates (ignoring case): " + outputIgnoreCase);
     }
 
     /**
-     * Remove all the duplicates from string
-     * @param input
-     * @return
+     * Removes duplicate characters from the input string while maintaining order.
+     *
+     * @param input        The input string.
+     * @param ignoreCase   Whether to ignore case sensitivity (true for case-insensitive).
+     * @return The string with duplicate characters removed.
      */
-    public static String removeDuplicates(String input) {
-        input = input.toLowerCase();
-        Set<Character> set = new HashSet<>();
-        StringBuilder buffer = new StringBuilder();
+    public static String removeDuplicates(String input, boolean ignoreCase) {
+        if (input == null || input.isEmpty()) {
+            return input; // Return original string for null/empty cases.
+        }
 
-        for(Character c: input.toCharArray()) {
-            if(!set.contains(c)) {
-                buffer.append(c);
-                set.add(c);
+        Set<Character> seenCharacters = new HashSet<>();
+        StringBuilder result = new StringBuilder();
+
+        for (char c : input.toCharArray()) {
+            char characterToCheck = ignoreCase ? Character.toLowerCase(c) : c;
+
+            if (!seenCharacters.contains(characterToCheck)) {
+                result.append(c); // Append original character
+                seenCharacters.add(characterToCheck);
             }
         }
-        return buffer.toString();
+        return result.toString();
     }
 }

@@ -1,70 +1,104 @@
-package String;
+package string;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
- * You are given a string s and an integer repeatLimit. Construct a new string repeatLimitedString
- * using the characters of s such that no letter appears more than repeatLimit times in a row.
- * You do not have to use all characters from s.
- * https://leetcode.com/problems/construct-string-with-repeat-limit/
+ * Problem: Construct a repeat-limited string using characters from s such that:
+ * - No character appears more than `repeatLimit` times consecutively.
+ * - The lexicographically largest valid string is constructed.
+ *
+ * Approach:
+ * - Count character frequencies.
+ * - Use a max heap (PriorityQueue) to always pick the highest lexicographical character.
+ * - Append characters up to `repeatLimit`, then insert the next largest character to break consecutive repetitions.
+ * - If no other character is available, return the result.
+ *
+ * Time Complexity: O(N log A), where N is the string length and A is the number of distinct characters (≤ 26).
+ * Space Complexity: O(A) for storing character frequencies.
+ *
+ * LeetCode Link: https://leetcode.com/problems/construct-string-with-repeat-limit/
  */
 public class RepeatLimitedString {
     public static void main(String[] args) {
-        System.out.println(new RepeatLimitedString().repeatLimitedString("aababab", 2));
+        System.out.println(repeatLimitedString("aababab", 2));  // Output: "bababa"
+        System.out.println(repeatLimitedString("cczazcc", 3));  // Output: "zzcccac"
+        System.out.println(repeatLimitedString("a", 1));        // Output: "a"
     }
 
-    public String repeatLimitedString(String str, int limit) {
-        Map<Character, Integer> map = new HashMap<>();
-        for (Character c : str.toCharArray()) {
-            map.put(c, map.getOrDefault(c, 0) + 1);
+    /**
+     * Constructs a repeat-limited string with the largest lexicographical order.
+     *
+     * @param str   The input string.
+     * @param limit The maximum consecutive occurrences of any character.
+     * @return A valid string satisfying the constraints.
+     */
+    public static String repeatLimitedString(String str, int limit) {
+        // Step 1: Count character frequencies
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : str.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
         }
-        PriorityQueue<Node> queue = new PriorityQueue<Node>((a, b) -> b.c - a.c);
-        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
-            queue.offer(new Node(entry.getKey(), entry.getValue()));
+
+        // Step 2: Use a max heap to get characters in descending order
+        PriorityQueue<CharNode> maxHeap = new PriorityQueue<>(
+            (a, b) -> Character.compare(b.character, a.character)
+        );
+
+        for (Map.Entry<Character, Integer> entry : frequencyMap.entrySet()) {
+            maxHeap.offer(new CharNode(entry.getKey(), entry.getValue()));
         }
 
-        int currLimit = 0;
-        StringBuilder builder = new StringBuilder();
-        Character lastChar = null;
-        while (!queue.isEmpty()) {
-            Node curr = queue.poll();
-            Node backup = queue.poll();
+        StringBuilder result = new StringBuilder();
+        CharNode prevNode = null;
 
-            if(lastChar != null && curr.c == lastChar && currLimit == limit) {
-                if(backup == null) return builder.toString();
-                builder.append(backup.c);
-                backup.freq = backup.freq - 1;
+        // Step 3: Build the largest lexicographical string
+        while (!maxHeap.isEmpty()) {
+            CharNode currNode = maxHeap.poll();
 
-                currLimit = 1;
-                lastChar = backup.c;
-            }else{
-                builder.append(curr.c);
-                curr.freq = curr.freq -1;
+            int useCount = Math.min(currNode.frequency, limit);
+            result.append(String.valueOf(currNode.character).repeat(useCount));
+            currNode.frequency -= useCount;
 
-                if(lastChar != null && lastChar != curr.c) currLimit = 1;
-                else currLimit++;
-                lastChar = curr.c;
+            // If there's a previous node waiting to be reinserted, add it back
+            if (prevNode != null) {
+                maxHeap.offer(prevNode);
+                prevNode = null;
             }
-            if(curr.freq != 0) {
-                queue.offer(curr);
+
+            // If current character still has remaining occurrences, store it for next use
+            if (currNode.frequency > 0) {
+                prevNode = currNode;
+            } else {
+                prevNode = null;
             }
-            if(backup != null && backup.freq != 0) {
-                queue.offer(backup);
+
+            // If the top character is the same and we need a breaker character
+            if (prevNode != null && !maxHeap.isEmpty() && maxHeap.peek().character != prevNode.character) {
+                CharNode nextNode = maxHeap.poll();
+                result.append(nextNode.character);
+                nextNode.frequency--;
+
+                if (nextNode.frequency > 0) {
+                    maxHeap.offer(nextNode);
+                }
             }
         }
-        return builder.toString();
+
+        return result.toString();
     }
-
 }
 
-class Node {
-    char c;
-    int freq;
+/**
+ * Helper class to store character-frequency pairs.
+ */
+class CharNode {
+    char character;
+    int frequency;
 
-    public Node(char c, int freq) {
-        this.c = c;
-        this.freq = freq;
+    public CharNode(char character, int frequency) {
+        this.character = character;
+        this.frequency = frequency;
     }
 }

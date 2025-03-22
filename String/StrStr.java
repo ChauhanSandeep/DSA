@@ -1,67 +1,87 @@
 package String;
 
+/**
+ * Implement the "strStr()" function that finds the index of the first occurrence of a substring.
+ *
+ * Approaches:
+ * 1. **Brute Force (O(N * M))**: Checks all possible starting positions in the main string.
+ * 2. **KMP Algorithm (O(N + M))**: Uses a prefix table (LPS) to avoid redundant comparisons.
+ *
+ * Time Complexity:
+ * - Brute Force: **O(N * M)**
+ * - KMP Algorithm: **O(N + M)**
+ *
+ * Space Complexity:
+ * - Brute Force: **O(1)**
+ * - KMP Algorithm: **O(M)** (for LPS array)
+ *
+ * LeetCode Equivalent: https://leetcode.com/problems/implement-strstr/
+ */
 public class StrStr {
     public static void main(String[] args) {
-        String str = "GeeksForGeeks";
-        String subStr = "For";
-        int index = findSubStr(str, subStr);
-        System.out.println(index);
+        String text = "GeeksForGeeks";
+        String pattern = "For";
+
+        System.out.println(findSubstringBruteForce(text, pattern)); // 5
+        System.out.println(findSubstringKMP(text, pattern)); // 5
     }
 
     /**
-     * Find the index of substring in string
-     * @param str
-     * @param subStr
-     * @return
+     * Brute Force Approach: Finds the first occurrence of a substring in a string.
+     *
+     * @param text The main string.
+     * @param pattern The substring to search for.
+     * @return The index of the first occurrence, or -1 if not found.
      */
-    // TODO : implement using KMP/Z Algo
-    public static int findSubStr(String str, String subStr) {
-        char c = subStr.charAt(0);
-        for(int i=0; i<str.length(); i++) {
-            if(str.charAt(i) == c && stringMatches(str, subStr, i)) return i;
+    public static int findSubstringBruteForce(String text, String pattern) {
+        if (text == null || pattern == null || pattern.isEmpty()) return -1;
+
+        int textLength = text.length();
+        int patternLength = pattern.length();
+
+        for (int i = 0; i <= textLength - patternLength; i++) {
+            if (text.charAt(i) == pattern.charAt(0) && isMatch(text, pattern, i)) {
+                return i;
+            }
         }
         return -1;
     }
 
-    public static boolean stringMatches(String str, String subStr, int index) {
-        if (index + subStr.length() > str.length()) return false;
+    /**
+     * Helper function to check if a substring starting at a given index matches the pattern.
+     */
+    private static boolean isMatch(String text, String pattern, int index) {
+        int patternLength = pattern.length();
+        if (index + patternLength > text.length()) return false;
 
-        for(int i=0; i<subStr.length(); i++) {
-            if(subStr.charAt(i) != str.charAt(i + index)) return false;
+        for (int i = 0; i < patternLength; i++) {
+            if (text.charAt(index + i) != pattern.charAt(i)) return false;
         }
         return true;
     }
 
-    // using KMP alogrithm
-    public int strStr(String haystack, String needle) {
-        if (needle.isEmpty()) return 0;
-        int[] lps = computeKMPTable(needle);
-        int i = 0, j = 0, haystackLen = haystack.length(), needleLen = needle.length();
-        while (i < haystackLen) {
-            if (haystack.charAt(i) == needle.charAt(j)) {
-                ++i;
-                ++j;
-                if (j == needleLen) {
-                    return i - needleLen; // found solution
-                }
-            } else {
-                if (j != 0) j = lps[j - 1]; // try match with longest prefix suffix
-                else i++; // don't match -> go to next character of `haystack` string
-            }
-        }
-        return -1;
-    }
-    private int[] computeKMPTable(String pattern) {
-        int i = 1, j = 0, n = pattern.length();
-        int[] lps = new int[n];
-        while (i < n) {
-            if (pattern.charAt(i) == pattern.charAt(j)) {
-                lps[i++] = ++j;
-            } else {
-                if (j != 0) j = lps[j - 1]; // try match with longest prefix suffix
-                else i++; // don't match -> go to next character
-            }
-        }
-        return lps;
-    }
-}
+    /**
+     * Optimized Approach: Finds the first occurrence using the KMP (Knuth-Morris-Pratt) Algorithm.
+     *
+     * @param text The main string.
+     * @param pattern The substring to search for.
+     * @return The index of the first occurrence, or -1 if not found.
+     */
+    public static int findSubstringKMP(String text, String pattern) {
+        if (pattern.isEmpty()) return 0;
+
+        int textLength = text.length();
+        int patternLength = pattern.length();
+
+        // Compute LPS (Longest Prefix Suffix) array
+        int[] lps = computeLPSArray(pattern);
+
+        int i = 0, j = 0; // Pointers for text and pattern
+
+        while (i < textLength) {
+            if (text.charAt(i) == pattern.charAt(j)) {
+                i++;
+                j++;
+
+                // If we found a match
+                if (
