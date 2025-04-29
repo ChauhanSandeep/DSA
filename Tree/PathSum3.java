@@ -11,7 +11,7 @@ import java.util.Map;
  * - We use a depth-first search (DFS) approach to traverse the tree.
  * - As we traverse, we maintain the cumulative sum (`currSum`) and use a hashmap to track the number of times a particular sum has occurred.
  * - If at any point the difference between the current sum and the target sum (`currSum - targetSum`) exists in the hashmap, it means we've found a path that sums up to the target.
- * 
+ *
  * Time Complexity: O(N), where N is the number of nodes in the tree.
  * Space Complexity: O(H), where H is the height of the tree (due to recursion stack and hashmap storage).
  *
@@ -36,14 +36,14 @@ public class PathSum3 {
 
         // Create an instance of the PathSum3 class and call the pathSum method
         int result = new PathSum3().pathSum(root, 8);
-        
+
         // Print the result
         System.out.println("Number of paths with sum equal to target: " + result);
     }
 
     /**
      * This method starts the path sum calculation and initiates the DFS traversal.
-     * 
+     *
      * @param root The root node of the binary tree.
      * @param sum The target sum to find paths for.
      * @return The number of paths where the sum of values equals targetSum.
@@ -51,23 +51,23 @@ public class PathSum3 {
     public int pathSum(TreeNode root, int sum) {
         // Initialize the result and hashmap to store cumulative sums
         Map<Integer, Integer> map = new HashMap<>();
-        
+
         // Start DFS traversal from the root node
         pathSum(root, 0, sum, map);
-        
+
         // Return the total result
         return result;
     }
 
     /**
      * This helper method performs a DFS traversal and checks for paths with sum equal to the target.
-     * 
+     *
      * @param root The current node being processed.
      * @param currSum The cumulative sum from the root to the current node.
      * @param targetSum The target sum we are trying to find.
-     * @param map A hashmap storing the frequency of cumulative sums encountered during traversal.
+     * @param sumFrequencyMap A hashmap storing the frequency of cumulative sums encountered during traversal like <sum, frequency>.
      */
-    private void pathSum(TreeNode root, int currSum, int targetSum, Map<Integer, Integer> map) {
+    private void pathSum(TreeNode root, int currSum, int targetSum, Map<Integer, Integer> sumFrequencyMap) {
         if (root == null) {
             return;
         }
@@ -81,21 +81,22 @@ public class PathSum3 {
         }
 
         // If there exists a previous sum that, when subtracted from the current sum, equals the target sum, it means a valid path is found
-        if (map.containsKey(currSum - targetSum)) {
-            result += map.get(currSum - targetSum);
+        int complementarySum = currSum - targetSum;
+        if (sumFrequencyMap.containsKey(complementarySum)) {
+            result += sumFrequencyMap.get(complementarySum);
         }
 
-        // Add the current sum to the map (for future paths to use)
-        map.put(currSum, map.getOrDefault(currSum, 0) + 1);
+        // Add the current sum to the sumFrequencyMap (for future paths to use)
+        sumFrequencyMap.put(currSum, sumFrequencyMap.getOrDefault(currSum, 0) + 1);
 
         // Traverse the left and right subtrees
-        pathSum(root.left, currSum, targetSum, map);
-        pathSum(root.right, currSum, targetSum, map);
+        pathSum(root.left, currSum, targetSum, sumFrequencyMap);
+        pathSum(root.right, currSum, targetSum, sumFrequencyMap);
 
-        // After traversing both children, backtrack by removing the current sum from the map
-        map.put(currSum, map.get(currSum) - 1);
-        if (map.get(currSum) == 0) {
-            map.remove(currSum);
+        // After traversing both children, backtrack by removing the current sum from the sumFrequencyMap
+        sumFrequencyMap.put(currSum, sumFrequencyMap.get(currSum) - 1);
+        if (sumFrequencyMap.get(currSum) == 0) {
+            sumFrequencyMap.remove(currSum);
         }
     }
 

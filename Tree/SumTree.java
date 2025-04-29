@@ -18,7 +18,7 @@ package Tree;
  *
  * Time Complexity: O(N), where N is the number of nodes in the tree, as each node is visited once.
  * Space Complexity: O(H), where H is the height of the tree, due to the recursive call stack.
- * 
+ *
  * LeetCode Link: https://leetcode.com/problems/check-if-a-binary-tree-is-a-sum-tree/
  */
 
@@ -48,7 +48,7 @@ public class SumTree {
      * Checks if the given binary tree is a SumTree.
      * A SumTree is a binary tree where the value of a node is equal to the sum of the values
      * of its left and right subtrees.
-     * 
+     *
      * @param root The root of the binary tree.
      * @return True if the tree is a SumTree, otherwise false.
      */
@@ -61,7 +61,7 @@ public class SumTree {
             // Call the helper function to check the SumTree condition and return the result
             int subtreeSum = isSumTreeRec(root);
             // The node's value should be equal to the sum of the left and right subtrees
-            return 2 * root.data == subtreeSum;
+            return root.data == subtreeSum;
         } catch (RuntimeException e) {
             // Return false if a RuntimeException is thrown (meaning the tree is not a SumTree)
             return false;
@@ -70,7 +70,7 @@ public class SumTree {
 
     /**
      * Recursively checks whether a binary tree is a SumTree.
-     * 
+     *
      * @param node The current node being checked.
      * @return The sum of the node's value and its left and right subtrees.
      * @throws RuntimeException If the tree is not a SumTree.
@@ -100,19 +100,5 @@ public class SumTree {
 
         // Return the sum of the node's value and its left and right subtrees
         return node.data + leftSum + rightSum;
-    }
-}
-
-/**
- * Definition for a binary tree node.
- */
-class Node {
-    int data;
-    Node left, right;
-
-    // Constructor to initialize a node with a given value
-    Node(int data) {
-        this.data = data;
-        left = right = null;
     }
 }

@@ -6,24 +6,31 @@ import java.util.Stack;
 
 /**
  * Problem: Perform a spiral (zigzag) level-order traversal of a binary tree.
- * 
+ * Input:
+ *          1
+ *         / \
+ *        2   3
+ *       / \ / \
+ *      7  6 5  4
+ * Output: [1, 3, 2, 7, 6, 5, 4]
+ *
  * Intuition:
  * The traversal alternates between left-to-right and right-to-left levels.
  * To achieve this, two stacks are used:
  * - One stack for left-to-right level traversal.
  * - Another stack for right-to-left level traversal.
- * The algorithm processes the tree level by level, alternately pushing the nodes 
+ * The algorithm processes the tree level by level, alternately pushing the nodes
  * into one of the two stacks and popping nodes to create the spiral order output.
- * 
+ *
  * Algorithm:
  * 1. Start with the root node and push it into `stack1`.
  * 2. For each level, pop nodes from `stack1` (left-to-right) and push their children into `stack2`.
  * 3. Then, pop nodes from `stack2` (right-to-left) and push their children into `stack1`.
  * 4. Repeat this process until both stacks are empty.
- * 
+ *
  * Time Complexity: O(N), where N is the number of nodes in the tree.
  * Space Complexity: O(N), due to the space used by the stacks and the result list.
- * 
+ *
  * LeetCode Link: https://leetcode.com/problems/spiral-order-traversal-of-binary-tree/
  */
 
@@ -46,7 +53,7 @@ public class SpiralTraversal {
 
     /**
      * Perform a spiral order traversal (zigzag level-order traversal) of a binary tree.
-     * 
+     *
      * @param root The root of the binary tree.
      * @return A list containing the nodes in spiral order.
      */
@@ -95,19 +102,5 @@ public class SpiralTraversal {
             }
         }
         return result;
-    }
-}
-
-/**
- * Definition for a binary tree node.
- */
-class Node {
-    int data;
-    Node left, right;
-
-    // Constructor to initialize a node with a given value
-    Node(int data) {
-        this.data = data;
-        left = right = null;
     }
 }

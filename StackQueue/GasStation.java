@@ -1,7 +1,9 @@
 package StackQueue;
 
 /**
- * Gas Station Problem - Find the starting gas station index from where a circular trip can be completed.
+ * Given two integer arrays gas and cost, return the starting gas station's index
+ * if you can travel around the circuit once in the clockwise direction,
+ * otherwise return -1. If there exists a solution, it is guaranteed to be unique.
  *
  * <p>LeetCode Problem Link:
  * <a href="https://leetcode.com/problems/gas-station/">https://leetcode.com/problems/gas-station/</a>
@@ -18,7 +20,9 @@ package StackQueue;
 public class GasStation {
 
     /**
-     * Determines if a circular journey can be completed starting from a specific gas station.
+     * We can complete the circuit only if the total gas is greater than or equal to total cost.
+     * So we track that first. Then, we check where the gas tank becomes negative — which means we can’t start from that segment.
+     * We reset the starting station and try again. This greedy approach works in a single pass.
      *
      * @param gas  Array where gas[i] represents the fuel available at station i.
      * @param cost Array where cost[i] represents the fuel required to travel from station i to i+1.
@@ -39,6 +43,9 @@ public class GasStation {
                 startIndex = i + 1; // Move start to the next station
                 currentFuelBalance = 0; // Reset the fuel balance
             }
+            // we don't need to loop over to the starting position because
+            // - We’re guaranteed that if the total surplus is non-negative, there is a point where the journey can complete.
+            // •	By linear traversal and greedy resets, we eventually land at that point.
         }
 
         // If total fuel balance is negative, no solution exists

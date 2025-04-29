@@ -2,15 +2,15 @@ package Tree;
 
 /**
  * **Balanced Binary Tree Check**
- * 
- * A binary tree is considered balanced if for every node in the tree, the absolute difference in height 
+ *
+ * A binary tree is considered balanced if for every node in the tree, the absolute difference in height
  * between its left and right subtrees is at most 1, and both subtrees are also balanced binary trees.
- * 
+ *
  * **Approach:**
  * - Perform a **post-order traversal** to calculate the height of each subtree.
  * - During traversal, check if the subtree is balanced at each node by comparing the heights of its left and right subtrees.
  * - If at any point, the difference in height between left and right subtrees exceeds 1, return that the tree is unbalanced.
- * 
+ *
  * **Time Complexity:** **O(N)** (Each node is visited once)
  * **Space Complexity:** **O(H)** (recursion stack, where H is the height of the tree)
  */
@@ -23,8 +23,8 @@ class CheckBalanced {
              2     3
             / \   /
            4   5 6
-                   /
-                  7
+                /
+               7
         */
 
         Node root = new Node(1);
@@ -43,9 +43,9 @@ class CheckBalanced {
     }
 
     /**
-     * Checks if the binary tree is balanced. A balanced binary tree is one where for every node, 
+     * Checks if the binary tree is balanced. A balanced binary tree is one where for every node,
      * the difference in height between its left and right subtrees is at most 1.
-     * 
+     *
      * @param node The root node of the tree.
      * @return True if the tree is balanced, false otherwise.
      */
@@ -54,9 +54,9 @@ class CheckBalanced {
     }
 
     /**
-     * Recursively computes the height of the subtree rooted at the given node. 
+     * Recursively computes the height of the subtree rooted at the given node.
      * If at any point the subtree is unbalanced, return -1 to indicate imbalance.
-     * 
+     *
      * @param node The node to check.
      * @return The height of the subtree, or -1 if the subtree is unbalanced.
      */
@@ -79,16 +79,3 @@ class CheckBalanced {
     }
 }
 
-/**
- * Basic structure for a Node in a binary tree.
- */
-class Node {
-    int value;
-    Node left, right;
-
-    public Node(int value) {
-        this.value = value;
-        this.left = null;
-        this.right = null;
-    }
-}

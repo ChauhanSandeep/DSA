@@ -7,10 +7,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a philosopher in the Dining Philosophers problem.
  * Each philosopher alternates between thinking and eating, while ensuring no deadlocks occur.
- * 
+ *
  * Problem: Dining Philosophers Problem (Concurrency Control)
  * Solution: Uses a tryLock() mechanism with a timeout to prevent deadlock.
- * 
+ *
  * @author [Your Name]
  */
 public class Philosopher implements Runnable {
@@ -80,3 +80,5 @@ public class Philosopher implements Runnable {
         System.out.println("Philosopher " + philosopherId + " is eating...");
         eatingCounter++;
         TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
+    }
+}

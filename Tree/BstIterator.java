@@ -5,22 +5,22 @@ import java.util.LinkedList;
 
 /**
  * **BST Iterator (Inorder Traversal)**
- * 
+ *
  * This class implements an iterator over a Binary Search Tree (BST).
  * It returns the elements in **ascending order** (inorder traversal).
- * 
+ *
  * **Approach:**
  * - Uses a **stack-based iterative inorder traversal**.
  * - At initialization, pushes all left subtree nodes onto the stack.
  * - `next()` retrieves the smallest element, processes the right subtree if present.
  * - `hasNext()` checks if there are remaining elements.
- * 
- * **Time Complexity:** 
+ *
+ * **Time Complexity:**
  * - `hasNext()`: **O(1)** (constant-time check).
  * - `next()`: **O(1)** amortized (each node is pushed & popped once).
- * 
+ *
  * **Space Complexity:** **O(H)** (height of tree, worst case O(N) for a skewed tree).
- * 
+ *
  * **LeetCode/InterviewBit Link:** https://www.interviewbit.com/problems/bst-iterator/
  */
 public class BstIterator {
@@ -84,19 +84,5 @@ public class BstIterator {
         while (iterator.hasNext()) {
             System.out.println(iterator.next());
         }
-    }
-}
-
-/**
- * Basic TreeNode structure for the BST.
- */
-class TreeNode {
-    int val;
-    TreeNode left, right;
-
-    public TreeNode(int value) {
-        this.val = value;
-        this.left = null;
-        this.right = null;
     }
 }

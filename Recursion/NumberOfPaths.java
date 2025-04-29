@@ -61,4 +61,29 @@ public class NumberOfPaths {
         memo.put(key, paths); // Store result in cache
         return paths;
     }
+
+    /**
+     * Computes number of unique paths using bottom-up DP (0-based indexing).
+     *
+     * @param m Number of rows.
+     * @param n Number of columns.
+     * @return Total number of unique paths from (0,0) to (m-1,n-1)
+     */
+    public static long numberOfPathsIterative(int m, int n) {
+        long[][] dp = new long[m][n];
+
+        // Base cases: First row and first column = 1 path
+        for (int i = 0; i < m; i++) dp[i][0] = 1; // can travel only in one direction
+        for (int j = 0; j < n; j++) dp[0][j] = 1; // can travel only in one direction
+
+        // Fill rest of the table
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                // Total paths is sum of paths from top and left cells
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+
+        return dp[m - 1][n - 1];
+    }
 }

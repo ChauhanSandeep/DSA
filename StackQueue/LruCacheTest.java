@@ -1,11 +1,19 @@
 package StackQueue;
 
-import java.util.LinkedHashMap;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Implementation of an LRU (Least Recently Used) Cache using LinkedHashMap.
- * 
+ * Implementation of an LRU (Least Recently Used) Cache
+ * - LRUCache(int capacity) Initialize the LRU cache with positive size capacity.
+ * - int get(int key) Return the value of the key if the key exists, otherwise return -1.
+ * - void put(int key, int value) Update the value of the key if the key exists. Otherwise, add the key-value pair to
+ * the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+ *
+ * The functions get and put must each run in O(1) average time complexity.
+ *
  * <p>LeetCode Problem Link:
  * <a href="https://leetcode.com/problems/lru-cache/">LRU Cache</a>
  * </p>
@@ -21,60 +29,73 @@ import java.util.Map;
  *
  * <p><b>Space Complexity:</b> O(capacity) (Stores up to `capacity` items).</p>
  */
-class LRUCache extends LinkedHashMap<Integer, Integer> {
-    private final int capacity;
+public class LruCacheTest {
+    public static void main(String[] args) {
+        LruCache cache = new LruCache(2);
+        cache.set(1, 10);
+        cache.set(2, 20);
+        System.out.println("Value for the key: 1 is " + cache.get(1));
 
-    public LRUCache(int capacity) {
-        super(capacity, 0.75f, true); // Enable access-order for LRU behavior
+        cache.set(3, 30);
+        System.out.println("Value for the key: 2 is " + cache.get(2));
+
+        cache.set(4, 40);
+        System.out.println("Value for the key: 1 is " + cache.get(1));
+        System.out.println("Value for the key: 3 is " + cache.get(3));
+        System.out.println("Value for the key: 4 is " + cache.get(4));
+    }
+}
+
+// Queue used in this will cause O(n) time complexity to fetch a item (To remove a item etc)
+// Check LruCacheTestImproved
+class LruCache {
+    LinkedList<Node> lruQueue = new LinkedList<>();
+    Map<Integer, Node> cacheMap = new HashMap<>();
+    int capacity;
+
+    public LruCache(int capacity) {
         this.capacity = capacity;
     }
 
     /**
-     * Retrieves the value associated with the key, or -1 if not found.
-     * @param key The key to retrieve.
-     * @return The associated value, or -1 if the key is not found.
+     * To get value from cache
+     * @param key
+     * @return
      */
     public int get(int key) {
-        return super.getOrDefault(key, -1);
+        if(!cacheMap.containsKey(key)) return -1;
+
+        Node node = cacheMap.get(key);
+        lruQueue.remove(node);
+        lruQueue.addFirst(node);
+        return node.value;
     }
 
     /**
-     * Inserts a new key-value pair or updates an existing one.
-     * If the cache exceeds capacity, the least recently used entry is removed.
-     * @param key The key to insert/update.
-     * @param value The value associated with the key.
+     * To add the key, value to cache
+     * @param key
+     * @param value
      */
-    public void put(int key, int value) {
-        super.put(key, value);
+    public void set(int key, int value) {
+        if(!cacheMap.containsKey(key)) {
+            Node node = new Node(key, value);
+            lruQueue.addFirst(node);
+            cacheMap.put(key, node);
+        }else {
+            Node node = cacheMap.get(key);
+            lruQueue.remove(node);
+            node.value = value;
+            lruQueue.addFirst(node);
+            cacheMap.put(key, node);
+        }
+
+        int currCapacity = cacheMap.size();
+        while(currCapacity > capacity) {
+            Node node = lruQueue.pollLast();
+            cacheMap.remove(node.key);
+            currCapacity--;
+        }
     }
 
-    /**
-     * Removes the eldest entry if the cache exceeds its capacity.
-     * This method is automatically called by LinkedHashMap when inserting a new entry.
-     */
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
-        return size() > capacity;
-    }
-}
 
-/**
- * Driver class to test LRU Cache functionality.
- */
-public class LruCacheTest {
-    public static void main(String[] args) {
-        LRUCache cache = new LRUCache(2);
-
-        cache.put(1, 10);
-        cache.put(2, 20);
-        System.out.println("Value for key 1: " + cache.get(1)); // Output: 10
-
-        cache.put(3, 30); // Evicts key 2
-        System.out.println("Value for key 2: " + cache.get(2)); // Output: -1 (not found)
-
-        cache.put(4, 40); // Evicts key 1
-        System.out.println("Value for key 1: " + cache.get(1)); // Output: -1 (not found)
-        System.out.println("Value for key 3: " + cache.get(3)); // Output: 30
-        System.out.println("Value for key 4: " + cache.get(4)); // Output: 40
-    }
 }

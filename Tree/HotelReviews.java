@@ -3,28 +3,29 @@ package Tree;
 import java.util.Arrays;
 
 /**
- * Given a string representation of a dictionary and an array of hotel reviews, 
+ * Given a string representation of a dictionary and an array of hotel reviews,
  * this class ranks the reviews based on how many words from the dictionary they contain.
  * Reviews with more matching dictionary words appear first in the result.
- * 
+ * Link: https://www.interviewbit.com/problems/hotel-reviews/
+ *
  * Intuition:
  * - We use a Trie data structure to efficiently store the dictionary words.
  * - For each review, we traverse its words and count how many words exist in the dictionary.
  * - The reviews are then ranked based on the count of matched words in descending order.
- * 
+ *
  * Algorithm:
  * 1. Build a Trie from the dictionary string.
  * 2. For each review, count how many dictionary words are present by splitting the review based on underscores ('_').
  * 3. Sort the reviews based on the count of matches in descending order.
  * 4. If two reviews have the same count, their original index determines the order.
- * 
+ *
  * Time Complexity:
  * - Building the Trie: O(n), where n is the length of the dictionary string.
  * - Counting dictionary words in each review: O(m), where m is the average length of the reviews.
  * - Sorting reviews: O(k log k), where k is the number of reviews.
- * 
+ *
  * Space Complexity:
- * - The space complexity is O(n + k), where n is the number of characters in the dictionary string and 
+ * - The space complexity is O(n + k), where n is the number of characters in the dictionary string and
  *   k is the number of reviews stored.
  */
 public class HotelReviews {

@@ -1,4 +1,4 @@
-package StackQueue;
+package StackQueue.AdityaVermaPlaylist;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -10,20 +10,20 @@ import java.util.Stack;
  * - push(x): Pushes an element onto the stack.
  * - pop(): Removes the top element from the stack.
  * - getMin(): Retrieves the minimum element in the stack.
- * 
- * The core idea is to use an **additional stack (`minStack`)** to keep track of 
+ *
+ * The core idea is to use an **additional stack (`minStack`)** to keep track of
  * the minimum element at each stage.
- * 
+ *
  * **Algorithm & Complexity:**
  * - **push(x):** Push to the main stack and update minStack if necessary. **O(1)**
  * - **pop():** Remove from both stacks if the popped element was the min. **O(1)**
  * - **getMin():** Returns the top of `minStack`, which always has the minimum value. **O(1)**
- * 
+ *
  * **Edge Cases Considered:**
  * - Calling `pop()` or `getMin()` on an empty stack throws `EmptyStackException`.
  * - Handling duplicate minimum values correctly.
- * 
- * **LeetCode Link:**  
+ *
+ * **LeetCode Link:**
  * https://leetcode.com/problems/min-stack/
  */
 class MinStack {
@@ -79,10 +79,9 @@ class MinStack {
         }
         return minStack.peek();
     }
-}
 
-// Driver code to test MinStack
-public class MinStackClass {
+
+    // Driver method to test the MinStack class
     public static void main(String[] args) {
         MinStack minStack = new MinStack();
 
@@ -101,3 +100,4 @@ public class MinStackClass {
         System.out.println("Min: " + minStack.getMin()); // 3
     }
 }
+

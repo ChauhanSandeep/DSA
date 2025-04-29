@@ -3,22 +3,22 @@ package Tree;
 import java.util.Stack;
 
 /**
- * TreeTraversal performs various tree traversal methods (Preorder, Inorder, and Postorder) 
+ * TreeTraversal performs various tree traversal methods (Preorder, Inorder, and Postorder)
  * both recursively and iteratively.
- * 
+ *
  * The class provides standard tree traversal techniques, as well as their iterative counterparts.
  * The tree is traversed based on the order in which the nodes are visited.
  * - Preorder: Visit the root first, then the left subtree, and then the right subtree.
  * - Inorder: Visit the left subtree first, then the root, and then the right subtree.
  * - Postorder: Visit the left subtree first, then the right subtree, and then the root.
- * 
+ *
  * Intuition:
  * - Recursive traversals are straightforward but can cause stack overflow for large trees.
  * - Iterative approaches use an explicit stack to simulate the recursive calls, preventing stack overflow and providing more control.
  *
- * Time Complexity: 
+ * Time Complexity:
  * - All traversals: O(N), where N is the number of nodes in the tree, since each node is visited once.
- * 
+ *
  * Space Complexity:
  * - Recursive traversals: O(H), where H is the height of the tree due to the recursive call stack.
  * - Iterative traversals: O(N), where N is the number of nodes in the tree, as we store the nodes in a stack.
@@ -55,7 +55,7 @@ public class TreeTraversal {
 
         System.out.println("\nPreorder traversal (recursive):");
         preorder(root);
-        
+
         System.out.println("\nPostorder traversal (iterative):");
         postorderIterative(root);
 
@@ -66,7 +66,7 @@ public class TreeTraversal {
     /**
      * Recursive Postorder Traversal.
      * In Postorder, the left subtree is visited first, followed by the right subtree, and then the root.
-     * 
+     *
      * @param node The current node.
      */
     static void postorder(Node node) {
@@ -80,7 +80,7 @@ public class TreeTraversal {
     /**
      * Recursive Inorder Traversal.
      * In Inorder, the left subtree is visited first, followed by the root, and then the right subtree.
-     * 
+     *
      * @param node The current node.
      */
     static void inorder(Node node) {
@@ -94,7 +94,7 @@ public class TreeTraversal {
     /**
      * Recursive Preorder Traversal.
      * In Preorder, the root is visited first, followed by the left subtree, and then the right subtree.
-     * 
+     *
      * @param node The current node.
      */
     static void preorder(Node node) {
@@ -109,13 +109,19 @@ public class TreeTraversal {
      * Iterative Inorder Traversal using a stack.
      * In Inorder, the left subtree is visited first, followed by the root, and then the right subtree.
      * This iterative version avoids recursion by using an explicit stack.
-     * 
+     *
      * @param root The root of the tree.
      */
     public static void inorderIterative(Node root) {
         Stack<Node> stack = new Stack<>();
         Node curr = root;
 
+        /**
+         * Logic:
+         * 1. Traverse the left subtree and push all nodes to the stack.
+         * 2. If the current node is null, pop from the stack and visit the node.
+         * 3. Move to the right subtree.
+         */
         while (!stack.isEmpty() || curr != null) {
             if (curr != null) {
                 stack.push(curr); // Push left nodes to stack
@@ -132,7 +138,7 @@ public class TreeTraversal {
      * Iterative Preorder Traversal using a stack.
      * In Preorder, the root is visited first, followed by the left subtree, and then the right subtree.
      * This iterative version avoids recursion by using an explicit stack.
-     * 
+     *
      * @param root The root of the tree.
      */
     public static void preorderIterative(Node root) {
@@ -155,7 +161,7 @@ public class TreeTraversal {
      * Iterative Postorder Traversal using two stacks.
      * In Postorder, the left subtree is visited first, followed by the right subtree, and then the root.
      * This iterative version avoids recursion by using two stacks.
-     * 
+     *
      * @param root The root of the tree.
      */
     public static void postorderIterative(Node root) {

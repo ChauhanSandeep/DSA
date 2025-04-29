@@ -65,16 +65,19 @@ public class ShortestDistance {
 
         // Step 2: Multi-Source BFS to calculate the shortest distance
         while (!queue.isEmpty()) {
+            // SELECT
             int[] cell = queue.poll();
             int row = cell[0], col = cell[1];
 
             for (int[] dir : DIRECTIONS) {
+                // READ
                 int newRow = row + dir[0], newCol = col + dir[1];
 
                 // If within bounds and found a shorter path to a '1' cell
+                // condition `matrix[newRow][newCol] > matrix[row][col] + 1` avoids reprocessing so visited matrix is not required
                 if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols &&
                         matrix[newRow][newCol] > matrix[row][col] + 1) {
-                    
+
                     matrix[newRow][newCol] = matrix[row][col] + 1;
                     queue.offer(new int[]{newRow, newCol});
                 }

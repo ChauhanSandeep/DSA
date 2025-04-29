@@ -45,7 +45,7 @@ public class SudokuSolve {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] != '.') {
                     int num = board[i][j] - '1';
-                    int block = (i / 3) * 3 + (j / 3);
+                    int block = (i / 3) * 3 + (j / 3); // (i / 3) * 3 gives the row of the block and (j / 3) gives the column of the block
                     rowDigit[i][num] = colDigit[j][num] = blockDigit[block][num] = true;
                 }
             }
@@ -67,9 +67,11 @@ public class SudokuSolve {
             int num = c - '1';
 
             if (!rowDigit[row][num] && !colDigit[col][num] && !blockDigit[block][num]) {
+                // choose
                 board[row][col] = c;
                 rowDigit[row][num] = colDigit[col][num] = blockDigit[block][num] = true;
 
+                // recursive traversal
                 if (solve(index + 1, board)) return true;
 
                 // Backtrack

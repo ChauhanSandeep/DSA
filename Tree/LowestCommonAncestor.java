@@ -6,8 +6,8 @@ package tree;
  * Intuition:
  * - In a BST, the left child is smaller than the parent node and the right child is greater.
  * - The LCA of two nodes is the deepest node that is an ancestor of both nodes.
- * - If both node values are smaller than the current node, the LCA lies in the left subtree. 
- * - If both node values are larger than the current node, the LCA lies in the right subtree. 
+ * - If both node values are smaller than the current node, the LCA lies in the left subtree.
+ * - If both node values are larger than the current node, the LCA lies in the right subtree.
  * - If one node is on one side and the other is on the opposite side, the current node is their LCA.
  *
  * Time Complexity: O(H) where H is the height of the tree. In the worst case, this could be O(N), where N is the number of nodes.
@@ -17,12 +17,12 @@ package tree;
  */
 
 public class LowestCommonAncestor {
-    
+
     // Node class to represent each node in the binary search tree
     static class Node {
         int data;
         Node left, right;
-        
+
         Node(int data) {
             this.data = data;
             left = right = null;
@@ -32,15 +32,15 @@ public class LowestCommonAncestor {
     public static void main(String[] args) {
         /*
             Example Tree:
-                    5
+                     5
                    /   \
                  4      6
                 /        \
                3          7
-                         \
-                          8
+                           \
+                            8
         */
-        
+
         // Construct the example tree
         Node root = new Node(5);
         root.left = new Node(4);
@@ -51,7 +51,7 @@ public class LowestCommonAncestor {
 
         // Test case 1: Find LCA of nodes 7 and 8
         System.out.printf("Lowest common ancestor of 7 and 8 is: %d\n", findLCA(root, 7, 8).data);
-        
+
         // Test case 2: Find LCA of nodes 3 and 8
         System.out.printf("Lowest common ancestor of 3 and 8 is: %d\n", findLCA(root, 3, 8).data);
     }
@@ -73,7 +73,7 @@ public class LowestCommonAncestor {
         }
 
         Node currentNode = root;
-        
+
         // Traverse the tree to find the LCA.
         while (currentNode != null) {
             // If both nodes n1 and n2 lie on the left side of the current node, move left.

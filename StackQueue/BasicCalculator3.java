@@ -34,36 +34,36 @@ public class BasicCalculator3 {
         Stack<Integer> numberStack = new Stack<>();
 
         char lastOperator = '+'; // Default to addition for first number
-        int i = 0;
+        int currIndex = 0;
 
-        while (i < expression.length()) {
-            char currentChar = expression.charAt(i);
+        while (currIndex < expression.length()) {
+            char currentChar = expression.charAt(currIndex);
 
             if (Character.isDigit(currentChar)) {
                 // Parse full integer value
                 int number = 0;
-                while (i < expression.length() && Character.isDigit(expression.charAt(i))) {
-                    number = number * 10 + (expression.charAt(i) - '0');
-                    i++;
+                while (currIndex < expression.length() && Character.isDigit(expression.charAt(currIndex))) {
+                    number = number * 10 + (expression.charAt(currIndex) - '0');
+                    currIndex++;
                 }
-                applyOperator(numberStack, lastOperator, number);
-                continue; // Skip incrementing `i` since it's already moved
+                applyToStack(numberStack, lastOperator, number);
+                continue; // Skip incrementing `currIndex` since it's already moved
             }
 
             if (currentChar == '(') {
                 // Handle subexpression recursively
                 int parenthesisDepth = 1;
-                int j = i + 1;
-                while (j < expression.length() && parenthesisDepth > 0) {
-                    if (expression.charAt(j) == '(') parenthesisDepth++;
-                    else if (expression.charAt(j) == ')') parenthesisDepth--;
-                    j++;
+                int innerIndex = currIndex + 1;
+                while (innerIndex < expression.length() && parenthesisDepth > 0) {
+                    if (expression.charAt(innerIndex) == '(') parenthesisDepth++;
+                    else if (expression.charAt(innerIndex) == ')') parenthesisDepth--;
+                    innerIndex++;
                 }
 
                 // Recursively evaluate subexpression
-                int evaluatedSubExpression = calculate(expression.substring(i + 1, j - 1));
-                i = j; // Move `i` past the closing parenthesis
-                applyOperator(numberStack, lastOperator, evaluatedSubExpression);
+                int evaluatedSubExpression = calculate(expression.substring(currIndex + 1, innerIndex - 1));
+                currIndex = innerIndex; // Move `currIndex` past the closing parenthesis
+                applyToStack(numberStack, lastOperator, evaluatedSubExpression);
                 continue;
             }
 
@@ -72,7 +72,7 @@ public class BasicCalculator3 {
                 lastOperator = currentChar;
             }
 
-            i++; // Move to the next character
+            currIndex++; // Move to the next character
         }
 
         // Sum up all values in the stack
@@ -86,7 +86,7 @@ public class BasicCalculator3 {
     /**
      * Applies the given operator to the stack, modifying it in place.
      */
-    private void applyOperator(Stack<Integer> stack, char operator, int value) {
+    private void applyToStack(Stack<Integer> stack, char operator, int value) {
         switch (operator) {
             case '+':
                 stack.push(value);

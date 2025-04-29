@@ -9,28 +9,28 @@ import java.util.TreeMap;
 
 /**
  * This class provides methods for performing a vertical order traversal of a binary tree.
- * 
+ *
  * Intuition:
- * - A vertical order traversal groups nodes that are aligned vertically along the same 
+ * - A vertical order traversal groups nodes that are aligned vertically along the same
  *   vertical line in the tree. Each node's horizontal distance (hd) from the root is tracked
  *   during the traversal. Nodes with the same horizontal distance are considered in the same vertical column.
  * - There are two ways to implement this traversal:
  *   1. Level order traversal using a queue (Breadth-First Search).
  *   2. Recursion, using the horizontal distance to group nodes.
- * 
+ *
  * Algorithm:
  * - **Method 1 (Using Queue and Level Order Traversal)**:
  *   - Perform a BFS starting from the root.
  *   - Track the horizontal distance (hd) of each node and store them in a map.
  *   - Finally, traverse the map in order of hd to get the vertical order.
- *   
+ *
  * - **Method 2 (Using Recursion)**:
  *   - Perform DFS traversal and track the horizontal distance of each node.
  *   - Use a map to store nodes based on their horizontal distance, and print them accordingly.
- * 
+ *
  * Time Complexity: O(n) - Both methods visit every node once.
  * Space Complexity: O(n) - Storing nodes in the map.
- * 
+ *
  * LeetCode Problem Link: https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/
  */
 public class VerticalTraversal {
@@ -46,14 +46,14 @@ public class VerticalTraversal {
         root.right.right = new Node(7);
         root.right.left.right = new Node(8);
         root.right.right.right = new Node(9);
-        
+
         System.out.println("Vertical Order traversal is:");
         System.out.println(verticalOrder(root)); // Expected output based on tree structure
     }
 
     /**
      * Performs vertical order traversal of a binary tree using level order traversal (BFS).
-     * 
+     *
      * @param root The root node of the binary tree.
      * @return A list of integers representing the vertical order traversal of the tree.
      */
@@ -94,7 +94,7 @@ public class VerticalTraversal {
 
     /**
      * Prints the vertical order traversal of a binary tree using DFS and recursion.
-     * 
+     *
      * @param root The root node of the binary tree.
      */
     public static void printVerticalOrder(Node root) {
@@ -112,7 +112,7 @@ public class VerticalTraversal {
 
     /**
      * A recursive helper method to perform DFS traversal and populate the map with vertical order.
-     * 
+     *
      * @param node The current node.
      * @param hd The horizontal distance of the current node.
      * @param map The map to store nodes by their horizontal distance.
@@ -126,19 +126,6 @@ public class VerticalTraversal {
         // Recursively process the left and right subtrees with updated horizontal distance
         printVerticalOrder(node.left, hd - 1, map);
         printVerticalOrder(node.right, hd + 1, map);
-    }
-}
-
-/**
- * Node class representing each node in the binary tree.
- */
-class Node {
-    int data;
-    Node left, right;
-
-    public Node(int data) {
-        this.data = data;
-        this.left = this.right = null;
     }
 }
 

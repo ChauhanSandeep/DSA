@@ -1,79 +1,76 @@
 package recursion;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
- * Problem: Find all unique combinations where the numbers sum up to a target.
- * Each number can be used **only once** in a combination.
+ * Problem: Find all unique combinations where each number in the array may be used only once, and
+ * the sum of the selected numbers equals the target.
+ *
+ * LeetCode: https://leetcode.com/problems/combination-sum-ii/
+ *
+ * Intuition:
+ * - This is a variation of the subset-sum problem with two constraints:
+ *     1. Each number may be used at most once.
+ *     2. No duplicate combinations allowed (input can have duplicates).
  *
  * Approach:
- * - Use **backtracking** with sorting to handle duplicates.
- * - At each step, either **include or exclude** the current element.
- * - **Sort input array** to easily skip duplicates while iterating.
- * - Use **DFS (Depth-First Search)** to explore different combinations.
+ * - Sort the input array to bring duplicates together.
+ * - Recursively explore the decision tree using **explicit branching**:
+ *     - PICK the current number → move to next index (index + 1), subtract from target.
+ *     - SKIP the current number → move to next index that has a different number to avoid duplicates.
+ * - Base cases:
+ *     - If target becomes 0 → add current path to result.
+ *     - If index goes out of bounds or target becomes negative → terminate branch.
+ * - This solution avoids using a `for` loop and clearly separates the decision branches for better traceability.
  *
- * Time Complexity: O(2^N) (Exponential in the worst case)
- * Space Complexity: O(N) (Recursion stack depth)
+ * Time Complexity: O(2^N) in the worst case (exponential combinations)
+ * Space Complexity: O(N) for the recursion stack + current list
  *
- * LeetCode Link: https://leetcode.com/problems/combination-sum-ii/
+ * Trade-offs:
+ * - + More control and clarity in the recursion flow by modeling it as binary decisions.
+ * - - Slightly more verbose than a loop-based backtracking solution.
  */
 public class CombinationSum2 {
 
     public static void main(String[] args) {
-        List<Integer> candidates = Stream.of(10, 1, 2, 7, 6, 1, 5).collect(Collectors.toList());
-        List<List<Integer>> result = findCombinationSum2(new ArrayList<>(candidates), 8);
+        int[] candidates = {10, 1, 2, 7, 6, 1, 5};
+        int target = 8;
+
+        List<List<Integer>> result = new ArrayList<>();
+        Arrays.sort(candidates); // Sorting is essential for duplicate-skipping
+        backtrack(candidates, 0, target, new ArrayList<>(), result);
+
         System.out.println(result);
     }
 
     /**
-     * Finds all unique combinations that sum up to the target.
+     * Recursively explores the combinations by choosing to include or exclude the current number.
      *
-     * @param candidates List of positive integers (may contain duplicates).
-     * @param target     Target sum to achieve.
-     * @return List of all possible unique combinations.
+     * @param candidates Sorted array of input numbers.
+     * @param index      Current position in the array.
+     * @param target     Remaining sum to reach.
+     * @param current    Current combination being built.
+     * @param result     Final list of all valid unique combinations.
      */
-    public static List<List<Integer>> findCombinationSum2(List<Integer> candidates, int target) {
-        List<List<Integer>> result = new ArrayList<>();
-        if (candidates == null || candidates.isEmpty()) return result;
-
-        // Sort input to handle duplicates easily
-        Collections.sort(candidates);
-        backtrack(candidates, target, 0, new ArrayList<>(), result);
-        return result;
-    }
-
-    /**
-     * Recursive backtracking function to generate valid combinations.
-     *
-     * @param candidates Input list of numbers.
-     * @param target     Remaining sum to be achieved.
-     * @param index      Current index in the list.
-     * @param current    Temporary list storing the current combination.
-     * @param result     Final list containing all valid combinations.
-     */
-    private static void backtrack(List<Integer> candidates, int target, int index, List<Integer> current, List<List<Integer>> result) {
+    private static void backtrack(int[] candidates, int index, int target, List<Integer> current, List<List<Integer>> result) {
         if (target == 0) {
-            result.add(new ArrayList<>(current)); // Add valid combination
+            result.add(new ArrayList<>(current));
             return;
         }
 
-        for (int i = index; i < candidates.size(); i++) {
-            // Skip duplicate elements (Only pick the first occurrence)
-            if (i > index && candidates.get(i).equals(candidates.get(i - 1))) continue;
+        if (index >= candidates.length || target < 0) return;
 
-            // Stop if the number is greater than the remaining target
-            if (candidates.get(i) > target) break;
+        // ---- PICK current number ----
+        current.add(candidates[index]);
+        backtrack(candidates, index + 1, target - candidates[index], current, result);
+        current.remove(current.size() - 1); // backtrack
 
-            // Include the number
-            current.add(candidates.get(i));
-            // Recur with the next index (since we can't reuse elements)
-            backtrack(candidates, target - candidates.get(i), i + 1, current, result);
-            // Backtrack (undo the choice)
-            current.remove(current.size() - 1);
+        // ---- SKIP current number and all its duplicates ----
+        int next = index + 1;
+        while (next < candidates.length && candidates[next] == candidates[index]) {
+            next++;
         }
+
+        backtrack(candidates, next, target, current, result);
     }
 }

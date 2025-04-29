@@ -1,5 +1,6 @@
 package String;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,11 +36,15 @@ public class RomanToInt {
             throw new IllegalArgumentException("Invalid Roman numeral input.");
         }
 
-        // Immutable map storing Roman numeral values (Java 9+)
-        Map<Character, Integer> romanValues = Map.of(
-                'I', 1, 'V', 5, 'X', 10, 'L', 50,
-                'C', 100, 'D', 500, 'M', 1000
-        );
+        // Map storing Roman numeral values
+        Map<Character, Integer> romanValues = new HashMap<>();
+        romanValues.put('I', 1);
+        romanValues.put('V', 5);
+        romanValues.put('X', 10);
+        romanValues.put('L', 50);
+        romanValues.put('C', 100);
+        romanValues.put('D', 500);
+        romanValues.put('M', 1000);
 
         int result = 0;
         int lastSeenValue = 0;

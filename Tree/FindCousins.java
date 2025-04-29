@@ -11,19 +11,19 @@ import java.util.Map;
  * Intuition:
  * - To find the cousins, we need to first locate the target node and its level.
  * - Once the level is determined, we can identify all nodes at that level except for the siblings of the target node.
- * 
+ *
  * Algorithm:
  * 1. Perform a level order traversal of the binary tree.
  * 2. Track nodes at each level in a map.
  * 3. Once the target node is found, retrieve all nodes at the same level, except the target's sibling.
- * 
+ *
  * Time Complexity:
- * - The time complexity is O(n), where n is the number of nodes in the binary tree. 
+ * - The time complexity is O(n), where n is the number of nodes in the binary tree.
  *   We visit each node exactly once.
- * 
+ *
  * Space Complexity:
  * - The space complexity is O(n), which is required to store the nodes at each level in a map.
- * 
+ *
  * InterviewBit Link:
  * https://www.interviewbit.com/problems/cousins-in-binary-tree/
  */
@@ -31,7 +31,7 @@ public class FindCousins {
 
     // Map to store nodes at each level of the tree
     private Map<Integer, ArrayList<Integer>> levelNodesMap;
-    
+
     // Variable to store the level of the target node
     private int targetNodeLevel;
 
@@ -39,6 +39,14 @@ public class FindCousins {
      * Main method to test the FindCousins functionality.
      */
     public static void main(String[] args) {
+        /**
+         * Construct the following binary tree:
+         *                   1
+         *                  / \
+         *                 2   3
+         *               / \  / \
+         *              4  5 6   7
+         */
         TreeNode root = new TreeNode(1);
         root.left = new TreeNode(2);
         root.left.left = new TreeNode(4);
@@ -50,14 +58,14 @@ public class FindCousins {
         // Find cousins of node with value 5
         FindCousins finder = new FindCousins();
         ArrayList<Integer> cousins = finder.solve(root, 5);
-        
+
         // Print the cousins
         System.out.println(cousins);
     }
 
     /**
      * This method returns a list of cousin nodes of the target node.
-     * 
+     *
      * @param root   The root of the binary tree.
      * @param target The value of the target node.
      * @return A list of integers representing the cousins of the target node.
@@ -82,7 +90,7 @@ public class FindCousins {
     /**
      * A helper method to perform a DFS traversal of the tree and populate the levelNodesMap.
      * It also identifies the level of the target node.
-     * 
+     *
      * @param node     The current node being visited.
      * @param target   The value of the target node.
      * @param currentLevel The current level in the tree.
@@ -107,7 +115,7 @@ public class FindCousins {
 
         // Recursively search for the target in the left subtree
         boolean foundInLeft = traverse(node.left, target, currentLevel + 1);
-        
+
         // If target is found in the left subtree, no need to search the right subtree
         if (foundInLeft) {
             return false;

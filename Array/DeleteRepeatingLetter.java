@@ -6,14 +6,18 @@ package Array;
  *
  * Approach:
  * - Iterate through the string while tracking consecutive duplicate characters.
- * - Sum up the deletion costs and retain the highest cost character in each duplicate sequence.
- * - Runs in **O(N) time complexity** since we iterate through the string once.
- * - Space complexity is **O(1)** as we use only a few variables.
+ * - Keep the highest-cost character in each duplicate sequence.
+ * - Sum up the deletion costs of the rest.
+ *
+ * Time Complexity: O(N) - Single pass through the string.
+ * Space Complexity: O(1) - Uses only a few variables.
+ *
+ * LeetCode: https://leetcode.com/problems/minimum-deletion-cost-to-avoid-repeating-letters/
  */
 public class DeleteRepeatingLetter {
     public static void main(String[] args) {
         int[] cost = {1, 2, 3, 4, 5};
-        System.out.println("Minimum deletion cost: " + minCost("abaac", cost));
+        System.out.println("Minimum deletion cost: " + new DeleteRepeatingLetter().minDeletionCost("abaac", cost));
     }
 
     /**
@@ -23,26 +27,24 @@ public class DeleteRepeatingLetter {
      * @param cost Deletion cost for each character.
      * @return Minimum total deletion cost.
      */
-    public static int minCost(String str, int[] cost) {
-        int totalCost = 0;
+    public int minDeletionCost(String str, int[] cost) {
         int len = str.length();
-        if (len == 1) return totalCost;
+        int currentGroupCost = 0;
+        int maxCostInGroup = 0;
+        int totalDeletionCost = 0;
 
-        for (int i = 1; i < len; i++) {
-            if (str.charAt(i) == str.charAt(i - 1)) {
-                int maxCost = cost[i - 1];
-                int sumCost = 0;
-                char currChar = str.charAt(i - 1);
-
-                while (i < len && str.charAt(i) == currChar) {
-                    sumCost += cost[i];
-                    maxCost = Math.max(maxCost, cost[i]);
-                    i++;
-                }
-                totalCost += sumCost - maxCost;
-                i--; // Adjust index to continue checking properly
+        for(int i=0; i<len; i++) {
+            if(i == 0 || str.charAt(i-1) == str.charAt(i)) {
+                // still in same character group
+                currentGroupCost += cost[i];
+                maxCostInGroup = Math.max(maxCostInGroup, cost[i]);
+            } else {
+                totalDeletionCost = totalDeletionCost + (currentGroupCost - maxCostInGroup);
+                currentGroupCost = cost[i];
+                maxCostInGroup = cost[i];
             }
         }
-        return totalCost;
+        totalDeletionCost = totalDeletionCost + (currentGroupCost - maxCostInGroup);
+        return totalDeletionCost;
     }
 }

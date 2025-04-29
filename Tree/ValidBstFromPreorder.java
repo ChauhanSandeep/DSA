@@ -1,78 +1,123 @@
 package Tree;
-import java.util.*;
+
+import java.util.Deque;
+import java.util.ArrayDeque;
 
 /**
- * This class calculates the number of unique Binary Search Trees (BSTs) 
- * that can be formed with 'n' nodes. 
- * 
- * Intuition:
- * - A binary search tree is constructed by selecting each node as the root
- *   and recursively constructing left and right subtrees with the remaining nodes.
- * - The problem is solved using Dynamic Programming (DP) by using a memoization approach to store
- *   already computed results and avoid redundant computations.
- * 
- * Algorithm:
- * - For each number of nodes from 1 to 'n', compute the number of BSTs by 
- *   iterating over each node as the root and calculating the product of the number of 
- *   possible left and right subtrees.
- * - Use a map (memoization) to store the number of unique BSTs for each number of nodes.
- * 
- * Time Complexity: O(n^2) - For each node count (1 to n), we iterate through all previous nodes.
- * Space Complexity: O(n) - We store the results in a map of size 'n'.
- * 
- * LeetCode Problem Link: https://leetcode.com/problems/unique-binary-search-trees/
+ * Given a preorder traversal sequence, determine if a valid Binary Search Tree (BST)
+ * can be constructed from it.
+ *
+ * <p>LeetCode Link: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/
  */
-public class UniqueBinaryTree {
-
+public class ValidBstFromPreorder {
     public static void main(String[] args) {
-        // Example usage: Find the number of unique BSTs that can be formed with 3 nodes
-        int result = new UniqueBinaryTree().numTrees(3);
-        System.out.println(result); // Expected output: 5
+        /*
+                   40
+                 /   \
+               30    80
+              /  \     \
+             25  35    100
+         */
+        int[] preorderSequence = {40, 30, 25, 35, 80, 100};
+        boolean isValid = new ValidBstFromPreorder().isValidPreorderBST(preorderSequence);
+        System.out.println("Is valid BST? " + isValid);
+    }
+
+    public boolean isValidPreorderBstSuboptimal(int[] preorderSequence) {
+        return verify(preorderSequence, 0, preorderSequence.length - 1);
     }
 
     /**
-     * This method calculates the number of unique binary search trees that can be created with 'n' nodes.
-     * 
-     * @param n The number of nodes.
-     * @return The number of unique BSTs.
+     * Recursive function to verify if the subarray from start to end can form a valid BST preorder.
+     *
+     * @param preorder The full preorder sequence
+     * @param start Starting index of current subtree
+     * @param end Ending index of current subtree
+     * @return true if valid BST preorder for this subtree
      */
-    public int numTrees(int n) {
-        // Memoization map to store already computed results
-        Map<Integer, Integer> memo = new HashMap<>();
-        
-        // Base cases
-        memo.put(0, 1); // 0 nodes -> 1 BST (empty tree)
-        memo.put(1, 1); // 1 node -> 1 BST (single node tree)
-        
-        return countUniqueBSTs(n, memo);
+    private boolean verify(int[] preorder, int start, int end) {
+        if (start >= end) return true; // Empty or one-element subtree is valid
+
+        int root = preorder[start];
+
+        // Step 1: Find the first element greater than root — this is the start of right subtree
+        int rightStart = start + 1;
+        while (rightStart <= end && preorder[rightStart] < root) {
+            rightStart++;
+        }
+
+        // Step 2: Ensure all elements in the right subtree are > root
+        for (int i = rightStart; i <= end; i++) {
+            if (preorder[i] < root) {
+                return false; // Invalid BST
+            }
+        }
+
+        // Step 3: Recursively verify left and right subtrees
+        boolean leftValid = verify(preorder, start + 1, rightStart - 1);
+        boolean rightValid = verify(preorder, rightStart, end);
+
+        return leftValid && rightValid;
     }
 
     /**
-     * Helper method that computes the number of unique BSTs using memoization.
-     * 
-     * @param n The number of nodes.
-     * @param memo The memoization map to store results of subproblems.
-     * @return The number of unique BSTs that can be formed with 'n' nodes.
+     * Thinking intution process (How we came up with this aproach?)
+     * -
+     *
+     *  <p>Logic:
+     * - Use a monotonic stack to track ancestors.
+     * - Maintain a `lowerBound` to track the valid range for the next node.
+     * - If we encounter a node smaller than `lowerBound`, it's invalid.
+     * - This is because all the nodes in right subtree should be greater than the current node.(lowerBound)
+     * - When encountering a larger node, pop from the stack to update the last known root.
+     *
+     * Dry run:
+     *
+     * - For each node in preorder:
+     *   - Check if it's valid against `lowerBound`.
+     *   - Pop nodes from stack while current node is greater than the top of the stack.
+     *   - Push the current node onto the stack.
+     *
+     * <p>Example:
+     * Given preorder sequence: [40, 30, 25, 35, 80, 100]
+     * - Start with empty stack and `lowerBound = Integer.MIN_VALUE`.
+     * - Process each value:
+     *   - 40: push to stack
+     *   - 30: push to stack
+     *   - 25: push to stack
+     *   - 35: pop 25 (valid), pop 30 (valid), update `lowerBound` to 30, push 35
+     *   - 80: pop all smaller values, update `lowerBound` to 40, push 80
+     *
+     * <p>Time Complexity: O(N), where N is the number of nodes in the sequence.
+     * <p>Space Complexity: O(N) for the stack in the worst case.
+     *
+     * @param preorderSequence The preorder traversal array.
+     * @return true if a valid BST can be formed, otherwise false.
      */
-    private int countUniqueBSTs(int n, Map<Integer, Integer> memo) {
-        // Return the result from the memoization map if it is already computed
-        if (memo.containsKey(n)) {
-            return memo.get(n);
+    public boolean isValidPreorderBST(int[] preorderSequence) {
+        if (preorderSequence == null || preorderSequence.length == 0) {
+            return true; // An empty sequence is trivially a valid BST.
         }
 
-        // Calculate the number of unique BSTs for 'n' nodes
-        int numBSTs = 0;
-        for (int root = 1; root <= n; root++) {
-            // Calculate the number of left and right subtrees recursively
-            int leftSubtreeCount = countUniqueBSTs(root - 1, memo);
-            int rightSubtreeCount = countUniqueBSTs(n - root, memo);
-            
-            // The total number of unique BSTs is the product of left and right subtrees
-            numBSTs += leftSubtreeCount * rightSubtreeCount;
+        Deque<Integer> stack = new ArrayDeque<>();
+        int lowerBound = Integer.MIN_VALUE;
+
+        for (int value : preorderSequence) {
+            // If current value is smaller than the last valid root, it violates BST properties.
+            if (value < lowerBound) {
+                // why because all the nodes in right subtree should be greater than the current node.(lowerBound)
+                return false;
+            }
+
+            // Remove smaller elements (they are left children), update `lowerBound` to last popped.
+            while (!stack.isEmpty() && stack.peek() < value) {
+                lowerBound = stack.pop();
+            }
+
+            // Push current value as a potential new root.
+            stack.push(value);
         }
 
-        // Store the computed result in the memoization map
-        memo.put(n, numBSTs);
-        return numBSTs;
+        return true;
     }
 }

@@ -2,98 +2,103 @@ package DynamicProgramming.KnapsackRelated;
 
 import java.util.Arrays;
 
+/**
+ * Problem: 0/1 Knapsack
+ *
+ * Problem Statement:
+ * You are given `n` items, each with a weight `wt[i]` and a value `val[i]`.
+ * Your task is to find the maximum total value you can achieve without exceeding a given capacity `W`.
+ * Each item can either be included (1) or excluded (0) — fractional inclusion is not allowed.
+ *
+ * Leetcode Equivalent: No exact match, but conceptually linked to:
+ * https://leetcode.com/problems/partition-equal-subset-sum/
+ */
 public class Knapsack {
 
     /**
-     * Find the maximum values that can be collected given that weight cannot exceed capacity.
-     * @return
+     * Recursive Approach (with memoization):
+     *
+     * Intuition:
+     * At every index, you have two choices — include the item or exclude it.
+     * You explore both and take the one that gives you the maximum value.
+     *
+     * Approach:
+     * - Base Case: if you reach index 0, take the item if it fits.
+     * - Recursively calculate max value for taking or skipping the item.
+     * - Use memoization to avoid recomputation.
+     *
+     * Time Complexity: O(length * capacity)
+     * Space Complexity: O(length * capacity) for memo + O(length) stack space
      */
-    public static void main(String[] args) {
-        int[] values = {1, 6, 10, 16};
-        int[] weights = {1, 2, 3, 5};
-        int capacity = 6;
-        System.out.println(knapsackIter(weights, values, capacity, 4));
+    public static int knapsackRecursive(int[] weights, int[] values, int length, int capacity) {
+        int[][] dp = new int[length][capacity + 1];
+        for (int[] row : dp) {
+            java.util.Arrays.fill(row, -1);
+        }
+        return helper(weights, values, length - 1, capacity, dp);
     }
 
-    /**
-     * Recursive
-     */
-    public static int knapsackRec(int[] weights, int[] values, int capacity, int size) {
-        if(size==0 || capacity==0) {
+    private static int helper(int[] weights, int[] values, int currentIndex, int capacity, int[][] dp) {
+        if (currentIndex == 0) {
+            if (weights[0] <= capacity) return values[0];
             return 0;
         }
-        if(weights[size-1 ] <= capacity) {
-            return Math.max(values[size-1] + knapsackRec(weights, values, capacity-weights[size-1], size-1),
-                    knapsackRec(weights, values, capacity, size-1));
-        }else{
-            return knapsackRec(weights, values, capacity, size-1);
+
+        if (dp[currentIndex][capacity] != -1) return dp[currentIndex][capacity];
+
+        int excludeItem = helper(weights, values, currentIndex - 1, capacity, dp);
+        int includeItem = 0;
+        if (weights[currentIndex] <= capacity) {
+            includeItem = values[currentIndex] + helper(weights, values, currentIndex - 1, capacity - weights[currentIndex], dp);
         }
+
+        return dp[currentIndex][capacity] = Math.max(includeItem, excludeItem);
     }
 
     /**
-     * Recursive + memoization
+     * Iterative Tabulation Approach:
+     *
+     * Intuition:
+     * Use a DP table where dp[i][w] stores the max value for items [0..i] and capacity w.
+     * Build the table bottom-up.
+     *
+     * Approach:
+     * - Initialize first row based on whether item 0 can be taken.
+     * - Loop through items and capacities, applying the recurrence relation.
+     *
+     * Time Complexity: O(length * capacity)
+     * Space Complexity: O(length * capacity)
      */
-    public static int knapsackHelper(int[] weights, int[] values, int capacity, int size) {
-        int[][] dp = new int[size+1][capacity+1];
-        for(int[] row: dp) {
-            Arrays.fill(row, -1);
-        }
-        return knapsackDp(weights, values, capacity, size, dp);
-    }
+    public static int knapsackIterative(int[] weights, int[] values, int length, int capacity) {
+        int[][] dp = new int[length][capacity + 1]; // dp[i][j] denotes max value for first i items and capacity j
 
-    public static int knapsackDp(int[] weights, int[] values, int capacity, int size, int[][] dp) {
-        if(size ==0 || capacity ==0) {
-            return 0;
-        }
-        if(dp[size][capacity] != -1) {
-            return dp[size][capacity];
+        // Initialize for the first item.
+        for (int w = weights[0]; w <= capacity; w++) {
+            dp[0][w] = values[0];
         }
 
-        int result = -1;
-        if(weights[size-1 ] <= capacity) {
-            result = Math.max(values[size-1] + knapsackDp(weights, values, capacity-weights[size-1], size-1, dp),
-                    knapsackDp(weights, values, capacity, size-1, dp));
-        }else{
-            result = knapsackDp(weights, values, capacity, size-1, dp);
-        }
-        dp[size][capacity] = result;
-        return result;
-    }
-
-    /**
-     * Iteration
-     */
-    public static int knapsackIter(int[] weights, int[] values, int capacity, int size) {
-        int[][] dp = new int[size+1][capacity+1];
-        for(int[] row: dp) {
-            Arrays.fill(row, -1);
-        }
-        for(int i=0; i<dp.length; i++) {
-            dp[i][0] = 0;
-        }
-        Arrays.fill(dp[0], 0);
-
-        for (int i = 1; i <= size; i++) {
-            int currentWeight = weights[i - 1];  // Weight of the current item
-            int currentValue = values[i - 1];      // Value of the current item
-
-            for (int j = 1; j <= capacity; j++) {
-                // Option 1: Exclude the current item
-                int valueIfExcluded = dp[i - 1][j];
-
-                // Option 2: Include the current item (if it fits)
-                int valueIfIncluded = 0;
-                if (currentWeight <= j) {
-                    int remainingCapacity = j - currentWeight; // Remaining capacity after including the current item
-                    int bestValueForRemainingCapacity = dp[i - 1][remainingCapacity]; // Best value possible with remaining capacity
-                    valueIfIncluded = currentValue + bestValueForRemainingCapacity;
+        for (int itemIndex = 1; itemIndex < length; itemIndex++) {
+            for (int remainingCapacity = 0; remainingCapacity <= capacity; remainingCapacity++) {
+                int excludeItem = dp[itemIndex - 1][remainingCapacity];
+                int includeItem = 0;
+                if (weights[itemIndex] <= remainingCapacity) {
+                    // If we can include the item, calculate the value.
+                    // Include the item and add its value to the remaining capacity.
+                    includeItem = values[itemIndex] + dp[itemIndex - 1][remainingCapacity - weights[itemIndex]];
                 }
-
-                // Choose the best of including or excluding the current item
-                dp[i][j] = Math.max(valueIfExcluded, valueIfIncluded);
+                dp[itemIndex][remainingCapacity] = Math.max(includeItem, excludeItem);
             }
         }
-        return dp[size][capacity];
+
+        return dp[length - 1][capacity];
     }
 
+    public static void main(String[] args) {
+        int[] wt = {1, 3, 4, 5};
+        int[] val = {1, 4, 5, 7};
+        int capacity = 7;
+
+        System.out.println("Recursive (Memoized): " + knapsackRecursive(wt, val, wt.length, capacity));
+        System.out.println("Iterative (Tabulated): " + knapsackIterative(wt, val, wt.length, capacity));
+    }
 }

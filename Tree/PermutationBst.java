@@ -5,10 +5,10 @@ package Tree;
  * with N nodes, with a maximum height of h.
  *
  * Intuition: The problem is a combination of dynamic programming (DP) and
- * combinatorics. The idea is to recursively calculate the number of BSTs 
- * for subproblems based on the number of nodes and height constraints.
+ * combinatorics. The idea is to recursively calculate the number of BSTs
+ * for sub-problems based on the number of nodes and height constraints.
  *
- * The total number of BSTs for a given number of nodes and a specific height 
+ * The total number of BSTs for a given number of nodes and a specific height
  * is determined by the recursive partitioning of nodes into left and right subtrees,
  * ensuring that the maximum height constraint is adhered to.
  *
@@ -25,7 +25,7 @@ package Tree;
  */
 
 public class PermutationBst {
-    
+
     private int[] memoizationArray;
 
     public static void main(String[] args) {
@@ -33,50 +33,45 @@ public class PermutationBst {
     }
 
     /**
-     * Public method to calculate the number of BSTs that can be formed
-     * with 'N' nodes and a maximum height of 'h'.
-     * 
-     * @param numOfNodes The number of nodes in the BST
-     * @param maxHeight  The maximum allowed height for the BST
+     * Public method to calculate the number of BSTs that can be formed with
+     * 'numOfNodes' nodes and a maximum tree height of 'maxHeight'.
+     *
+     * @param numOfNodes  The number of nodes in the BST
+     * @param maxHeight   The maximum allowed height for the BST
      * @return The number of valid BSTs that can be formed
      */
     public int countTrees(int numOfNodes, int maxHeight) {
-        this.memoizationArray = new int[numOfNodes];
-        return calculateTrees(numOfNodes, maxHeight, 0);
+        return calculateTrees(numOfNodes, maxHeight);
     }
 
     /**
-     * Helper method to recursively calculate the number of BSTs
-     * that can be formed with the given number of nodes and height.
-     * 
-     * @param numNodes   The number of nodes in the subtree
-     * @param maxHeight  The maximum allowed height for the subtree
-     * @param currentHeight The current height of the subtree
-     * @return The number of valid BSTs that can be formed
+     * Recursively calculates the number of BSTs that can be formed with 'numNodes'
+     * nodes given the remaining allowed height 'remainingHeightAllowed'.
+     *
+     * This approach simplifies the API by converting the absolute height into
+     * a decrementing counter, thus eliminating the need for an explicit 'currentHeight' parameter.
+     *
+     * @param numNodes               The number of nodes in the subtree.
+     * @param remainingHeightAllowed The remaining height available for placing nodes.
+     * @return The number of valid BSTs that can be formed.
      */
-    private int calculateTrees(int numNodes, int maxHeight, int currentHeight) {
-        // Base case: If there are no nodes or only one node, there is one BST
+    private int calculateTrees(int numNodes, int remainingHeightAllowed) {
+        // Base Case: With 0 or 1 node, only one BST is possible.
         if (numNodes <= 1) {
             return 1;
         }
+        // If no remaining height is available but more than one node exists, no valid tree can be formed.
+        if (remainingHeightAllowed == 0) {
+            return 0;
+        }
 
         int totalCount = 0;
-        int leftSubtreeCount, rightSubtreeCount;
 
-        // Try placing each node as the root and recursively calculate left and right subtrees
+        // For each possible choice of root, partition the nodes into left and right subtrees.
         for (int root = 1; root <= numNodes; root++) {
-            if (currentHeight + 1 <= maxHeight) {
-                leftSubtreeCount = calculateTrees(root - 1, maxHeight, currentHeight + 1);
-                rightSubtreeCount = calculateTrees(numNodes - root, maxHeight, currentHeight + 1);
-
-                // Memoize the result for root node placement at the first level
-                if (currentHeight == 0) {
-                    memoizationArray[root - 1] += leftSubtreeCount * rightSubtreeCount;
-                }
-
-                // Add the valid BSTs formed by this root placement
-                totalCount += leftSubtreeCount * rightSubtreeCount;
-            }
+            int leftSubtrees = calculateTrees(root - 1, remainingHeightAllowed - 1);
+            int rightSubtrees = calculateTrees(numNodes - root, remainingHeightAllowed - 1);
+            totalCount += leftSubtrees * rightSubtrees;
         }
 
         return totalCount;
@@ -85,14 +80,14 @@ public class PermutationBst {
     /**
      * Optimized approach (commented out in the original code) for counting the number of BSTs
      * using dynamic programming and combinatorics.
-     * 
+     *
      * @param nodes     The number of nodes
      * @param height    The maximum allowed height
      * @return The number of valid BSTs modulo 1e9+7
      */
     public int optimizedCountTrees(int nodes, int height) {
         int MOD = (int) (1e9 + 7);
-        
+
         // Combinatorics table for binomial coefficients
         int[][] binomialCoeff = new int[nodes + 1][nodes + 1];
         // DP table to store the number of BSTs for a given node count and height

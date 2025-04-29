@@ -4,18 +4,28 @@ import java.util.*;
 
 /**
  * Computes the Bottom View of a Binary Tree.
- * 
+ *
  * The Bottom View consists of the last visible nodes when the tree is viewed from the bottom.
- * 
+ *
+ *          20
+ *         /  \
+ *       8     22
+ *      / \    / \
+ *     5   3  4  25
+ *        / \
+ *      10  14
+ *
+ *  output : [5, 10, 3, 4, 25]
+ *
  * **Approach:**
  * - Perform a level-order traversal using a queue (BFS).
  * - Maintain a TreeMap to store the last encountered node for each horizontal distance (hd).
  * - Store nodes in a map where the key is `hd` and the value is the last node encountered at that `hd`.
  * - Extract values from the TreeMap to get the final bottom view.
- * 
+ *
  * **Time Complexity:** O(N) - We visit each node once in BFS.
  * **Space Complexity:** O(N) - For storing nodes in a queue and map.
- * 
+ *
  * **LeetCode Link:** https://leetcode.com/problems/binary-tree-bottom-view/ (similar problem)
  */
 public class BottomView {
@@ -47,26 +57,26 @@ public class BottomView {
 
         // TreeMap to maintain the last node at each horizontal distance (hd)
         Map<Integer, Integer> bottomViewMap = new TreeMap<>();
-        Queue<NodeWithHD> queue = new LinkedList<>();
+        Queue<NodeWithHorizontalDistance> queue = new LinkedList<>();
 
         // Initialize root node with horizontal distance 0
-        queue.offer(new NodeWithHD(root, 0));
+        queue.offer(new NodeWithHorizontalDistance(root, 0));
 
         while (!queue.isEmpty()) {
-            NodeWithHD current = queue.poll();
+            NodeWithHorizontalDistance current = queue.poll();
             TreeNode node = current.node;
-            int hd = current.hd;
+            int horizontalDistance = current.horizontalDistance;
 
             // Update the map with the last seen node at this horizontal distance
-            bottomViewMap.put(hd, node.data);
+            bottomViewMap.put(horizontalDistance, node.data);
 
-            // Enqueue left child with hd - 1
+            // Enqueue left child with horizontalDistance - 1
             if (node.left != null) {
-                queue.offer(new NodeWithHD(node.left, hd - 1));
+                queue.offer(new NodeWithHorizontalDistance(node.left, horizontalDistance - 1));
             }
-            // Enqueue right child with hd + 1
+            // Enqueue right child with horizontalDistance + 1
             if (node.right != null) {
-                queue.offer(new NodeWithHD(node.right, hd + 1));
+                queue.offer(new NodeWithHorizontalDistance(node.right, horizontalDistance + 1));
             }
         }
 
@@ -92,12 +102,12 @@ class TreeNode {
 /**
  * Helper class to associate a node with its horizontal distance (hd).
  */
-class NodeWithHD {
+class NodeWithHorizontalDistance {
     TreeNode node;
-    int hd;
+    int horizontalDistance;
 
-    public NodeWithHD(TreeNode node, int hd) {
+    public NodeWithHorizontalDistance(TreeNode node, int horizontalDistance) {
         this.node = node;
-        this.hd = hd;
+        this.horizontalDistance = horizontalDistance;
     }
 }

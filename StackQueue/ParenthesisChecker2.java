@@ -12,18 +12,30 @@ public class ParenthesisChecker2 {
 
     /**
      * Removes the minimum number of parentheses to make the string valid.
-     * 
+     *
+     * Example:
+     * Input: s = "lee(t(c)o)de)"
+     * Output: "lee(t(c)o)de"
+     * Explanation: "lee(t(co)de)" , "lee(t(c)ode)" would also be accepted.
+     *
+     * Intuition:
+     * - If an opening parenthesis ( does not have a matching closing parenthesis ), it is invalid.
+     * - If a closing parenthesis ) does not have a preceding unmatched opening parenthesis (, it is invalid.
+     * - Identify these indices by traversing the string and keeping track of the parentheses which are not matched.
+     *
      * Approach:
      * - Traverse the string and track indices of misplaced '(' and ')'.
      * - Remove these indices to generate a valid string.
-     * 
+     *
      * Time Complexity: O(N), where N is the length of the string.
      * Space Complexity: O(N), as we store indices of invalid parentheses.
-     * 
+     *
      * LeetCode Problem: https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/
      */
     public static String minRemoveToMakeValid(String str) {
+        // opening parenthesis which are not able to closed are stored in invalidOpenIndices
         List<Integer> invalidOpenIndices = new ArrayList<>();
+        // closing parenthesis which do not have corresponding opening parenthesis are stored in invalidCloseIndices
         List<Integer> invalidCloseIndices = new ArrayList<>();
 
         // Identify misplaced parentheses

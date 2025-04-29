@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Problem: Find all unique combinations of factors (excluding 1 and n itself) 
+ * Problem: Find all unique combinations of factors (excluding 1 and n itself)
  * that multiply to give `n`.
  *
  * Approach:
@@ -39,22 +39,22 @@ public class FactorsCombination {
     /**
      * Recursive backtracking function to generate factor combinations.
      *
-     * @param n       The remaining number to factorize.
+     * @param target       The remaining number to factorize.
      * @param start   The smallest factor to consider (prevents duplicate permutations).
-     * @param current The temporary list storing the current factor combination.
+     * @param currentChain The temporary list storing the currentChain factor combination.
      * @param result  The final list containing all valid factor combinations.
      */
-    private static void backtrack(int n, int start, List<Integer> current, List<List<Integer>> result) {
-        if (n == 1 && current.size() > 1) { // Valid combination found (excluding trivial cases)
-            result.add(new ArrayList<>(current));
+    private static void backtrack(int target, int start, List<Integer> currentChain, List<List<Integer>> result) {
+        if (target == 1 && currentChain.size() > 1) { // Valid combination found (excluding trivial cases)
+            result.add(new ArrayList<>(currentChain));
             return;
         }
 
-        for (int i = start; i <= n; i++) {
-            if (n % i == 0) { // Check if `i` is a factor of `n`
-                current.add(i);
-                backtrack(n / i, i, current, result); // Continue with the reduced value
-                current.remove(current.size() - 1); // Backtrack to try other factors
+        for (int i = start; i <= target; i++) {
+            if (target % i == 0) { // Check if `i` is a factor of `target`
+                currentChain.add(i);
+                backtrack(target / i, i, currentChain, result); // Continue with the reduced value
+                currentChain.remove(currentChain.size() - 1); // Backtrack to try other factors
             }
         }
     }
