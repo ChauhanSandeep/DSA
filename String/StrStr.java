@@ -1,67 +1,137 @@
 package String;
 
+/**
+ * Implement the "strStr()" function that finds the index of the first occurrence of a substring.
+ * For example : strStr("GeeksForGeeks", "For") will return 5.
+ *
+ * Approaches:
+ * 1. **Brute Force (O(N * M))**: Checks all possible starting positions in the main string.
+ * 2. **KMP Algorithm (O(N + M))**: Uses a prefix table (LPS) to avoid redundant comparisons.
+ *
+ * Time Complexity:
+ * - Brute Force: **O(N * M)**
+ * - KMP Algorithm: **O(N + M)**
+ *
+ * Space Complexity:
+ * - Brute Force: **O(1)**
+ * - KMP Algorithm: **O(M)** (for LPS array)
+ *
+ * LeetCode Equivalent: https://leetcode.com/problems/implement-strstr/
+ */
 public class StrStr {
-    public static void main(String[] args) {
-        String str = "GeeksForGeeks";
-        String subStr = "For";
-        int index = findSubStr(str, subStr);
-        System.out.println(index);
-    }
+  public static void main(String[] args) {
+    String text = "GeeksForGeeks";
+    String pattern = "For";
 
-    /**
-     * Find the index of substring in string
-     * @param str
-     * @param subStr
-     * @return
-     */
-    // TODO : implement using KMP/Z Algo
-    public static int findSubStr(String str, String subStr) {
-        char c = subStr.charAt(0);
-        for(int i=0; i<str.length(); i++) {
-            if(str.charAt(i) == c && stringMatches(str, subStr, i)) return i;
-        }
-        return -1;
-    }
+    System.out.println(findSubstringBruteForce(text, pattern)); // 5
+    System.out.println(findSubstringKMP(text, pattern)); // 5
+  }
 
-    public static boolean stringMatches(String str, String subStr, int index) {
-        if (index + subStr.length() > str.length()) return false;
+  /**
+   * Brute Force Approach: Finds the first occurrence of a substring in a string.
+   *
+   * @param text The main string.
+   * @param pattern The substring to search for.
+   * @return The index of the first occurrence, or -1 if not found.
+   */
+  public static int findSubstringBruteForce(String text, String pattern) {
+      if (text == null || pattern == null || pattern.isEmpty()) {
+          return -1;
+      }
 
-        for(int i=0; i<subStr.length(); i++) {
-            if(subStr.charAt(i) != str.charAt(i + index)) return false;
-        }
-        return true;
-    }
+    int textLength = text.length();
+    int patternLength = pattern.length();
 
-    // using KMP alogrithm
-    public int strStr(String haystack, String needle) {
-        if (needle.isEmpty()) return 0;
-        int[] lps = computeKMPTable(needle);
-        int i = 0, j = 0, haystackLen = haystack.length(), needleLen = needle.length();
-        while (i < haystackLen) {
-            if (haystack.charAt(i) == needle.charAt(j)) {
-                ++i;
-                ++j;
-                if (j == needleLen) {
-                    return i - needleLen; // found solution
-                }
-            } else {
-                if (j != 0) j = lps[j - 1]; // try match with longest prefix suffix
-                else i++; // don't match -> go to next character of `haystack` string
-            }
-        }
-        return -1;
+    for (int i = 0; i <= textLength - patternLength; i++) {
+      if (text.charAt(i) == pattern.charAt(0) && isMatch(text, pattern, i)) {
+        return i;
+      }
     }
-    private int[] computeKMPTable(String pattern) {
-        int i = 1, j = 0, n = pattern.length();
-        int[] lps = new int[n];
-        while (i < n) {
-            if (pattern.charAt(i) == pattern.charAt(j)) {
-                lps[i++] = ++j;
-            } else {
-                if (j != 0) j = lps[j - 1]; // try match with longest prefix suffix
-                else i++; // don't match -> go to next character
-            }
+    return -1;
+  }
+
+  /**
+   * Helper function to check if a substring starting at a given index matches the pattern.
+   */
+  private static boolean isMatch(String text, String pattern, int index) {
+    int patternLength = pattern.length();
+      if (index + patternLength > text.length()) {
+          return false;
+      }
+
+    for (int i = 0; i < patternLength; i++) {
+        if (text.charAt(index + i) != pattern.charAt(i)) {
+            return false;
         }
-        return lps;
     }
+    return true;
+  }
+
+  /**
+   * Optimized Approach: Finds the first occurrence using the KMP (Knuth-Morris-Pratt) Algorithm.
+   *
+   * @param text The main string.
+   * @param pattern The substring to search for.
+   * @return The index of the first occurrence, or -1 if not found.
+   */
+  public static int findSubstringKMP(String text, String pattern) {
+      if (pattern.isEmpty()) {
+          return 0;
+      }
+
+    int textLength = text.length();
+    int patternLength = pattern.length();
+
+    // Compute LPS (Longest Prefix Suffix) array
+    int[] lps = computeLPSArray(pattern);
+
+    int i = 0, j = 0; // Pointers for text and pattern
+
+    while (i < textLength) {
+      if (text.charAt(i) == pattern.charAt(j)) {
+        i++;
+        j++;
+
+        // If we found a match
+        if (j == patternLength) {
+          return i - patternLength; // Found the pattern, return start index
+        }
+      } else {
+        if (j != 0) {
+          j = lps[j - 1]; // Move to the last known prefix match
+        } else {
+          i++; // Move forward in the text
+        }
+      }
+    }
+    return -1; // No match found
+  }
+
+  /**
+   * Computes the LPS (Longest Prefix Suffix) array for the KMP algorithm.
+   *
+   * @param pattern The pattern for which LPS is computed.
+   * @return The LPS array.
+   */
+  private static int[] computeLPSArray(String pattern) {
+    int length = pattern.length();
+    int[] lps = new int[length];
+    int j = 0; // Length of the previous longest prefix suffix
+    int i = 1; // Start from the second character
+
+    while (i < length) {
+      if (pattern.charAt(i) == pattern.charAt(j)) {
+        lps[i] = ++j;
+        i++;
+      } else {
+        if (j != 0) {
+          j = lps[j - 1]; // Try the last known prefix match
+        } else {
+          lps[i] = 0;
+          i++;
+        }
+      }
+    }
+    return lps;
+  }
 }

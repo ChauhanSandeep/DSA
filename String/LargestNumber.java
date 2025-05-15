@@ -3,26 +3,50 @@ package String;
 import java.util.Arrays;
 
 /**
- * Create largest number from the list of integers. Return number as string.
+ * LeetCode Problem: https://leetcode.com/problems/largest-number/
+ *
+ * Problem:
+ * Given a list of non-negative integers, arrange them to form the largest possible number.
+ * Return the number as a string.
+ *
+ * Approach:
+ * - Convert all integers to strings.
+ * - Define a custom comparator for sorting:
+ *   - Compare `a + b` vs. `b + a` to determine order (concatenation logic).
+ *   - Sort in **descending order** to maximize the number.
+ * - Concatenate sorted numbers to form the result.
+ * - Handle the **edge case** where all numbers are zero.
+ *
+ * Time Complexity: O(N log N) (due to sorting)
+ * Space Complexity: O(N) (for storing string representations)
  */
 public class LargestNumber {
     public static void main(String[] args) {
-        int[] nums = {3,30,34,5,9};
+        int[] nums = {3, 30, 34, 5, 9};
         String result = new LargestNumber().largestNumber(nums);
-        System.out.println("Largest number is " + result);
+        System.out.println("Largest number is: " + result);
     }
+
     public String largestNumber(int[] nums) {
-        String[] strs = new String[nums.length];
-        for(int i=0; i<nums.length; i++) {
-            strs[i] = String.valueOf(nums[i]);
+        // Convert integers to strings
+        String[] stringNumbers = Arrays.stream(nums)
+                                       .mapToObj(String::valueOf)
+                                       .toArray(String[]::new);
+
+        // Custom sorting: Compare concatenated strings to determine order
+        Arrays.sort(stringNumbers, (a, b) -> (b + a).compareTo(a + b));
+
+        // If the largest number is "0", return "0" (to handle leading zero case)
+        if (stringNumbers[0].equals("0")) {
+            return "0";
         }
 
-        Arrays.sort(strs, (a, b) -> (b+a).compareTo(a+b));
-        StringBuilder builder = new StringBuilder();
-        for(String str: strs) {
-            builder.append(str);
+        // Build the final largest number string
+        StringBuilder resultBuilder = new StringBuilder();
+        for (String num : stringNumbers) {
+            resultBuilder.append(num);
         }
-        if(builder.charAt(0) == '0') return "0";
-        return builder.toString();
+
+        return resultBuilder.toString();
     }
 }

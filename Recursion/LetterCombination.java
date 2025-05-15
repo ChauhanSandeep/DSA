@@ -1,51 +1,68 @@
-package Recursion;
+package recursion;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Problem: Given a string containing digits (2-9), return all possible letter 
+ * combinations that the number could represent (like a telephone keypad).
+ *
+ * Approach:
+ * - Use **backtracking** to generate all possible combinations.
+ * - Use a **mapping array** to store corresponding characters for each digit.
+ * - Iterate through the characters mapped to the current digit and recursively explore possibilities.
+ *
+ * Time Complexity: O(4^N) (Exponential, where N = number of digits)
+ * Space Complexity: O(N) (Recursion stack depth)
+ *
+ * LeetCode Link: https://leetcode.com/problems/letter-combinations-of-a-phone-number/
+ */
 public class LetterCombination {
+
     public static void main(String[] args) {
-        System.out.println("All string combinations for provided numbers are "+ letterCombinations("23"));
-        System.out.println("All string combinations for provided numbers are "+ letterCombinations("222"));
+        System.out.println("All letter combinations for '23': " + letterCombinations("23"));
+        System.out.println("All letter combinations for '222': " + letterCombinations("222"));
     }
 
     /**
-     * Given a string containing digits from 2-9 inclusive, return all
-     * possible letter combinations that the number could represent in telephone
-     * @param digits
-     * @return
+     * Returns all possible letter combinations for a given digit string.
+     *
+     * @param digits A string consisting of digits from 2-9.
+     * @return A list of possible letter combinations.
      */
     public static List<String> letterCombinations(String digits) {
         List<String> result = new ArrayList<>();
-        if(digits == null || digits.length() == 0) return result;
+        if (digits == null || digits.isEmpty()) return result;
 
-        String[] mapping = {
-                "0",
-                "1",
-                "abc",
-                "def",
-                "ghi",
-                "jkl",
-                "mno",
-                "pqrs",
-                "tuv",
-                "wxyz"
+        // Mapping of digits to corresponding letters on a telephone keypad
+        String[] digitToLetters = {
+                "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"
         };
 
-        letterCombinationRec(digits, mapping, 0, "", result);
+        backtrack(digits, digitToLetters, 0, new StringBuilder(), result);
         return result;
-
     }
 
-    public static void letterCombinationRec(String digits, String[] mapping, int index, String current, List<String> result) {
-        if(index == digits.length()) {
-            result.add(current);
+    /**
+     * Recursive backtracking function to generate letter combinations.
+     *
+     * @param digits        Input digit string.
+     * @param digitToLetters Array mapping each digit (2-9) to corresponding letters.
+     * @param index         Current position in the digit string.
+     * @param current       Current combination being formed.
+     * @param result        List storing all valid combinations.
+     */
+    private static void backtrack(String digits, String[] digitToLetters, int index, StringBuilder current, List<String> result) {
+        if (index == digits.length()) {
+            result.add(current.toString()); // Add formed combination to result
             return;
         }
 
-        String letters = mapping[digits.charAt(index) - '0'];
-        for(Character c: letters.toCharArray()) {
-            letterCombinationRec(digits, mapping, index+1, current + c, result);
+        String letters = digitToLetters[digits.charAt(index) - '0'];
+        for (char letter : letters.toCharArray()) {
+            current.append(letter); // Choose a letter
+            backtrack(digits, digitToLetters, index + 1, current, result);
+            current.deleteCharAt(current.length() - 1); // Undo choice (Backtrack)
         }
     }
 }

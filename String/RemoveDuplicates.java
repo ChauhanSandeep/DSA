@@ -1,33 +1,53 @@
-package String;
+package string;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-public class RemoveDuplicates {
+/**
+ * Problem: Remove duplicate characters from a given string while maintaining order.
+ * 
+ * Intuition:
+ * - Use a HashSet to track encountered characters.
+ * - Append characters to a StringBuilder only if they have not been added before.
+ * - Maintain the original order of first occurrences.
+ * 
+ * Time Complexity: O(N) - Single pass through the string.
+ * Space Complexity: O(N) - HashSet for storing unique characters.
+ */
+public class RemoveDuplicateCharacters {
+
     public static void main(String[] args) {
-        String str = "acaaabbbacdddd";
-        System.out.println(removeDuplicates(str));
+        String input = "geeksforGeeks";
+        String output = removeDuplicates(input, false); // Case-sensitive
+        System.out.println("String after removing duplicates: " + output);
+
+        String outputIgnoreCase = removeDuplicates(input, true); // Case-insensitive
+        System.out.println("String after removing duplicates (ignoring case): " + outputIgnoreCase);
     }
 
-    private static String removeDuplicates(String str) {
-        Deque<Character> queue = new ArrayDeque<>();
+    /**
+     * Removes duplicate characters from the input string while maintaining order.
+     *
+     * @param input        The input string.
+     * @param ignoreCase   Whether to ignore case sensitivity (true for case-insensitive).
+     * @return The string with duplicate characters removed.
+     */
+    public static String removeDuplicates(String input, boolean ignoreCase) {
+        if (input == null || input.isEmpty()) {
+            return input; // Return original string for null/empty cases.
+        }
 
-        for(int i=0; i<str.length(); i++) {
-            if(queue.isEmpty()) {
-                queue.offerLast(str.charAt(i));
-            }else if (queue.peekLast() != str.charAt(i)) {
-                queue.offerLast(str.charAt(i));
-            }else {
-                while(i < str.length() && queue.peekLast() == str.charAt(i)) {
-                    i++;
-                }
-                queue.pollLast();
-                i--;
+        Set<Character> seenCharacters = new HashSet<>();
+        StringBuilder result = new StringBuilder();
+
+        for (char c : input.toCharArray()) {
+            char characterToCheck = ignoreCase ? Character.toLowerCase(c) : c;
+
+            if (!seenCharacters.contains(characterToCheck)) {
+                result.append(c); // Append original character
+                seenCharacters.add(characterToCheck);
             }
         }
-        StringBuffer buffer = new StringBuffer();
-        while(!queue.isEmpty()) {
-            buffer.append(queue.pollFirst());
-        }
-        return buffer.toString();
+        return result.toString();
     }
 }

@@ -5,6 +5,30 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * Implementation of an LRU (Least Recently Used) Cache
+ * - LRUCache(int capacity) Initialize the LRU cache with positive size capacity.
+ * - int get(int key) Return the value of the key if the key exists, otherwise return -1.
+ * - void put(int key, int value) Update the value of the key if the key exists. Otherwise, add the key-value pair to
+ * the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+ *
+ * The functions get and put must each run in O(1) average time complexity.
+ *
+ * <p>LeetCode Problem Link:
+ * <a href="https://leetcode.com/problems/lru-cache/">LRU Cache</a>
+ * </p>
+ *
+ * <p><b>Approach:</b></p>
+ * - Uses **LinkedHashMap** with `accessOrder = true` to maintain LRU order.
+ * - **Overrides `removeEldestEntry`** to automatically remove the least recently used entry.
+ * - Provides **O(1) time complexity** for `get()` and `put()` operations.
+ *
+ * <p><b>Time Complexity:</b></p>
+ * - **O(1) for `get(key)`** (Direct lookup via HashMap).
+ * - **O(1) for `put(key, value)`** (Insertion & reordering in LinkedHashMap).
+ *
+ * <p><b>Space Complexity:</b> O(capacity) (Stores up to `capacity` items).</p>
+ */
 public class LruCacheTest {
     public static void main(String[] args) {
         LruCache cache = new LruCache(2);
@@ -25,8 +49,8 @@ public class LruCacheTest {
 // Queue used in this will cause O(n) time complexity to fetch a item (To remove a item etc)
 // Check LruCacheTestImproved
 class LruCache {
-    LinkedList<Node> queue = new LinkedList<>();
-    Map<Integer, Node> map = new HashMap<>();
+    LinkedList<Node> lruQueue = new LinkedList<>();
+    Map<Integer, Node> cacheMap = new HashMap<>();
     int capacity;
 
     public LruCache(int capacity) {
@@ -39,11 +63,11 @@ class LruCache {
      * @return
      */
     public int get(int key) {
-        if(!map.containsKey(key)) return -1;
+        if(!cacheMap.containsKey(key)) return -1;
 
-        Node node = map.get(key);
-        queue.remove(node);
-        queue.addFirst(node);
+        Node node = cacheMap.get(key);
+        lruQueue.remove(node);
+        lruQueue.addFirst(node);
         return node.value;
     }
 
@@ -53,38 +77,25 @@ class LruCache {
      * @param value
      */
     public void set(int key, int value) {
-        if(!map.containsKey(key)) {
+        if(!cacheMap.containsKey(key)) {
             Node node = new Node(key, value);
-            queue.addFirst(node);
-            map.put(key, node);
+            lruQueue.addFirst(node);
+            cacheMap.put(key, node);
         }else {
-            Node node = map.get(key);
-            queue.remove(node);
+            Node node = cacheMap.get(key);
+            lruQueue.remove(node);
             node.value = value;
-            queue.addFirst(node);
-            map.put(key, node);
+            lruQueue.addFirst(node);
+            cacheMap.put(key, node);
         }
 
-        int currCapacity = map.size();
+        int currCapacity = cacheMap.size();
         while(currCapacity > capacity) {
-            Node node = queue.pollLast();
-            map.remove(node.key);
+            Node node = lruQueue.pollLast();
+            cacheMap.remove(node.key);
             currCapacity--;
         }
     }
 
 
-}
-
-
-class Node {
-    int key;
-    int value;
-
-    Node(){}
-
-    Node(int key, int value) {
-        this.key = key;
-        this.value = value;
-    }
 }

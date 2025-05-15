@@ -1,62 +1,79 @@
 package String;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Given 2 strings text and word, find the start index of substring from text which is anagram of word
+ * Problem: Find All Anagrams in a String
  *
- * https://leetcode.com/problems/find-all-anagrams-in-a-string/
+ * Given two strings `text` and `word`, find all **start indices** of `word`'s anagrams in `text`.
+ *
+ * Intuition:
+ * - Use the **Sliding Window** technique to check anagram matches efficiently.
+ * - Instead of `HashMap<Character, Integer>`, use a **fixed-size array** (`int[26]`) since `word` contains only lowercase letters.
+ * - Maintain a `matchCount` to track matched characters instead of comparing maps.
+ *
+ * Approach:
+ * 1. **Precompute the frequency count of `word`**.
+ * 2. **Initialize a sliding window** of size `word.length()`.
+ * 3. **Slide the window across `text`**, updating character frequencies dynamically.
+ * 4. **Check if window matches `word`'s frequency** and store valid indices.
+ *
+ * Time Complexity: **O(N)**, where N = length of `text` (Sliding Window runs in linear time)
+ * Space Complexity: **O(1)** (Fixed-size frequency arrays)
+ *
+ * Problem Link: https://leetcode.com/problems/find-all-anagrams-in-a-string/
  */
 public class AllAnagrams {
 
     public static void main(String[] args) {
         List<Integer> result = new AllAnagrams().findAnagrams("abab", "ab");
-        System.out.println(result);
+        System.out.println(result); // Expected: [0, 1, 2]
     }
 
     public List<Integer> findAnagrams(String text, String word) {
         List<Integer> result = new ArrayList<>();
-        if(text == null || word == null || text.length() < word.length()) return result;
+        if (text == null || word == null || text.length() < word.length()) return result;
 
-        Map<Character, Integer> wordMap = new HashMap<>();
-        Map<Character, Integer> textMap = new HashMap<>();
-        for(int i=0; i<word.length(); i++) {
-            wordMap.put(word.charAt(i), wordMap.getOrDefault(word.charAt(i), 0) + 1);
+        int[] wordFreq = new int[26];
+        int[] windowFreq = new int[26];
+
+        // Step 1: Count frequency of characters in `word`
+        for (char ch : word.toCharArray()) {
+            wordFreq[ch - 'a']++;
         }
 
-        int first = 0;
-        int last = 0;
-        for(; last<word.length(); last++) {
-            char curr = text.charAt(last);
-            textMap.put(curr, textMap.getOrDefault(curr, 0) + 1);
-        }
+        int left = 0, right = 0, matchCount = 0;
+        int wordLength = word.length();
+        int textLength = text.length();
 
-        if(isSame(wordMap, textMap)) {
-            result.add(0);
-        }
-        while(last < text.length()) {
-            textMap.put(text.charAt(last), textMap.getOrDefault(text.charAt(last), 0) + 1);
-            textMap.put(text.charAt(first), textMap.get(text.charAt(first)) - 1);
-            if(textMap.get(text.charAt(first)) == 0) {
-                textMap.remove(text.charAt(first));
+        // Step 2: Expand the window while tracking frequency
+        for (; right < textLength; right++) {
+            char addedChar = text.charAt(right);
+            windowFreq[addedChar - 'a']++;
+
+            // If window size exceeds `wordLength`, shrink from the left
+            if (right - left + 1 > wordLength) {
+                char removedChar = text.charAt(left);
+                windowFreq[removedChar - 'a']--;
+                left++;
             }
-            first++;
-            last++;
-            if(isSame(wordMap, textMap)) {
-                result.add(first);
+
+            // Step 3: If the window matches `wordFreq`, store the starting index
+            if (isAnagram(wordFreq, windowFreq)) {
+                result.add(left);
             }
         }
+
         return result;
     }
 
-    public boolean isSame(Map<Character, Integer> first, Map<Character, Integer> second) {
-        for(Map.Entry<Character, Integer> entry: first.entrySet()) {
-            if(!second.containsKey(entry.getKey()) || second.get(entry.getKey()).intValue() != entry.getValue().intValue()) {
-                return false;
-            }
+    /**
+     * Checks if two frequency arrays are identical.
+     */
+    private boolean isAnagram(int[] freq1, int[] freq2) {
+        for (int i = 0; i < 26; i++) {
+            if (freq1[i] != freq2[i]) return false;
         }
         return true;
     }

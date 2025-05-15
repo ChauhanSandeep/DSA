@@ -1,60 +1,76 @@
-package Multithreading.utilities;
+package multithreading.utilities;
 
-import static java.lang.Thread.sleep;
-
-public class OddEvenDemo {
+/**
+ * Problem: Print Odd and Even numbers using two threads in sequence.
+ * 
+ * Intuition:
+ * - One thread prints odd numbers, and the other prints even numbers.
+ * - A shared lock is used for synchronization.
+ * - Threads use `wait()` and `notifyAll()` to alternate execution.
+ *
+ * Approach:
+ * - Use a shared lock object.
+ * - Each thread waits until it's its turn to print.
+ * - The sequence is maintained by a shared flag.
+ *
+ * Time Complexity: O(N) — Each number is printed once.
+ * Space Complexity: O(1) — Constant extra space used.
+ */
+public class OddEvenPrinter {
 
     public static void main(String[] args) {
         Object lock = new Object();
-        Thread t1 = new Thread(new TaskEvenOdd(lock, false, 1, 2), "Odd");
-        Thread t2 = new Thread(new TaskEvenOdd(lock, true, 2, 2), "Even");
 
-        t1.start();
-        t2.start();
+        Thread oddThread = new Thread(new NumberPrinter(lock, false, 1, 2), "Odd");
+        Thread evenThread = new Thread(new NumberPrinter(lock, true, 2, 2), "Even");
 
+        oddThread.start();
+        evenThread.start();
     }
 }
 
-class TaskEvenOdd implements Runnable {
-    static boolean runEven = false;
+/**
+ * Runnable class for printing numbers sequentially.
+ */
+class NumberPrinter implements Runnable {
+    private static boolean isEvenTurn = false; // Shared flag to indicate turn
+    private final Object lock;
+    private final boolean isEvenThread;
+    private int number;
+    private final int step;
 
-    final Object lock;
-    boolean isEven;
-    int count;
-    int step;
-
-    public TaskEvenOdd(Object lock, boolean isEven, int count, int step) {
+    public NumberPrinter(Object lock, boolean isEvenThread, int startNumber, int step) {
         this.lock = lock;
-        this.count = count;
+        this.isEvenThread = isEvenThread;
+        this.number = startNumber;
         this.step = step;
-        this.isEven = isEven;
     }
 
     @Override
     public void run() {
-        while(true) {
+        while (number <= 20) { // Limiting for demonstration, can be adjusted
             synchronized (lock) {
-                while(this.isEven != runEven) {
+                while (isEvenThread != isEvenTurn) {
                     try {
-                        lock.wait();
+                        lock.wait(); // Wait until it's this thread's turn
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                        System.err.println("Thread interrupted: " + e.getMessage());
                     }
                 }
-                System.out.println(Thread.currentThread().getName() + ": " + count);
-                count += step;
-                runEven = !runEven;
-                sleep(500);
-                lock.notifyAll();
-            }
-        }
-    }
 
-    public void sleep(long time) {
-        try {
-            Thread.sleep(500);
-        } catch (Exception e) {
-            e.printStackTrace();
+                System.out.println(Thread.currentThread().getName() + ": " + number);
+                number += step;
+                isEvenTurn = !isEvenTurn; // Toggle flag for the next thread
+
+                lock.notifyAll(); // Notify waiting threads
+            }
+
+            try {
+                Thread.sleep(500); // Simulate delay
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }

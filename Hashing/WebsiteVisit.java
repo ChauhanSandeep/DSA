@@ -3,69 +3,116 @@ package Hashing;
 import java.util.*;
 
 /**
+ * Problem: Analyze User Website Visit Pattern
  * https://leetcode.com/problems/analyze-user-website-visit-pattern/
+ *
+ * Given the visit history of multiple users, find the most frequently visited 3-sequence pattern.
+ * If multiple sequences have the same frequency, return the lexicographically smallest one.
+ *
+ * Approach:
+ * - Step 1: Store visits in a Map where key = username, value = list of (timestamp, website).
+ * - Step 2: Sort each user's visit list by timestamp.
+ * - Step 3: Generate all unique 3-sequence patterns per user.
+ * - Step 4: Count the occurrences of each pattern across all users.
+ * - Step 5: Find the most frequent pattern (break ties lexicographically).
+ *
+ * Time Complexity: O(N log N) (sorting) + O(U * V^3) (pattern generation) ≈ O(N log N) for typical cases.
+ * Space Complexity: O(N) for storing user visits.
  */
 public class WebsiteVisit {
-  public static void main(String[] args) {
-    String[] username = {"u1", "u1", "u1", "u2", "u2", "u2"};
-    String[] website = {"a", "b", "a", "a", "b", "c"};
-    int[] timestamp = {1, 2, 3, 4, 5, 6};
 
-    List<String> result = new WebsiteVisit().mostVisitedPattern(username, timestamp, website);
-    System.out.println(result);
-  }
+    public static void main(String[] args) {
+        String[] username = {"u1", "u1", "u1", "u2", "u2", "u2"};
+        String[] website = {"a", "b", "a", "a", "b", "c"};
+        int[] timestamp = {1, 2, 3, 4, 5, 6};
 
-  public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
-    Map<String, List<Pair>> userVisits = new HashMap<>();
-    int n = username.length;
-
-    // Collect the website visit info for each user
-    for (int i = 0; i < n; i++) {
-      userVisits.computeIfAbsent(username[i], k -> new ArrayList<>()).add(new Pair(timestamp[i], website[i]));
+        List<String> result = new WebsiteVisit().mostVisitedPattern(username, timestamp, website);
+        System.out.println(result); // Expected Output: [a, b, a]
     }
 
-    // Map to store the frequency of each 3-sequence pattern
-    Map<String, Integer> patternFrequency = new HashMap<>();
-    String mostFrequentPattern = null;
+    public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
+        Map<String, List<Pair>> userVisits = new HashMap<>();
+        int n = username.length;
 
-    for (String user : userVisits.keySet()) {
-      List<Pair> visits = userVisits.get(user);
-      visits.sort(Comparator.comparingInt(p -> p.time)); // Sort by timestamp
-
-      Set<String> uniquePatterns = new HashSet<>();
-
-      // Generate all possible 3-sequence patterns for the user
-      for (int i = 0; i < visits.size(); i++) {
-        for (int j = i + 1; j < visits.size(); j++) {
-          for (int k = j + 1; k < visits.size(); k++) {
-            String pattern = visits.get(i).web + " " + visits.get(j).web + " " + visits.get(k).web;
-
-            // Ensure each user contributes only once per pattern
-            if (uniquePatterns.add(pattern)) {
-              patternFrequency.put(pattern, patternFrequency.getOrDefault(pattern, 0) + 1);
-
-              // Update most frequent pattern based on frequency and lexicographical order
-              if (mostFrequentPattern == null ||
-                  patternFrequency.get(pattern) > patternFrequency.get(mostFrequentPattern) ||
-                  (patternFrequency.get(pattern).equals(patternFrequency.get(mostFrequentPattern)) && pattern.compareTo(mostFrequentPattern) < 0)) {
-                mostFrequentPattern = pattern;
-              }
-            }
-          }
+        // Step 1: Collect user visits (store timestamps and website names)
+        for (int i = 0; i < n; i++) {
+            userVisits.computeIfAbsent(username[i], k -> new ArrayList<>()).add(new Pair(timestamp[i], website[i]));
         }
-      }
+
+        // Step 2: Sort visits per user by timestamp
+        for (List<Pair> visits : userVisits.values()) {
+            visits.sort(Comparator.comparingInt(p -> p.time));
+        }
+
+        // Step 3: Generate unique 3-sequence patterns per user
+        Map<String, Integer> patternFrequency = new HashMap<>();
+        for (String user : userVisits.keySet()) {
+            List<Pair> visits = userVisits.get(user);
+            Set<String> uniquePatterns = generateUniquePatterns(visits);
+
+            // Step 4: Update pattern frequency map
+            for (String pattern : uniquePatterns) {
+                patternFrequency.put(pattern, patternFrequency.getOrDefault(pattern, 0) + 1);
+            }
+        }
+
+        // Step 5: Find the most frequent pattern (break ties lexicographically)
+        return findMostFrequentPattern(patternFrequency);
     }
 
-    return mostFrequentPattern != null ? Arrays.asList(mostFrequentPattern.split(" ")) : Collections.emptyList();
-  }
-}
+    /**
+     * Generates all unique 3-sequence patterns for a user's visit history.
+     * @param visits Sorted list of website visits by timestamp.
+     * @return A set of unique 3-sequence patterns.
+     */
+    private Set<String> generateUniquePatterns(List<Pair> visits) {
+        Set<String> uniquePatterns = new HashSet<>();
+        int size = visits.size();
 
-class Pair {
-  int time;
-  String web;
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                for (int k = j + 1; k < size; k++) {
+                    String pattern = visits.get(i).web + " " + visits.get(j).web + " " + visits.get(k).web;
+                    uniquePatterns.add(pattern);
+                }
+            }
+        }
+        return uniquePatterns;
+    }
 
-  public Pair(int time, String web) {
-    this.time = time;
-    this.web = web;
-  }
+    /**
+     * Finds the most frequent pattern from the pattern frequency map.
+     * If multiple patterns have the same frequency, the lexicographically smallest one is returned.
+     * @param patternFrequency Map of 3-sequence patterns and their frequencies.
+     * @return List representing the most frequent 3-sequence pattern.
+     */
+    private List<String> findMostFrequentPattern(Map<String, Integer> patternFrequency) {
+        String mostFrequentPattern = null;
+        int maxFrequency = 0;
+
+        for (Map.Entry<String, Integer> entry : patternFrequency.entrySet()) {
+            String pattern = entry.getKey();
+            int frequency = entry.getValue();
+
+            if (frequency > maxFrequency || (frequency == maxFrequency && pattern.compareTo(mostFrequentPattern) < 0)) {
+                mostFrequentPattern = pattern;
+                maxFrequency = frequency;
+            }
+        }
+
+        return mostFrequentPattern != null ? Arrays.asList(mostFrequentPattern.split(" ")) : Collections.emptyList();
+    }
+
+    /**
+     * Helper class to store visit information (timestamp, website).
+     */
+    static class Pair {
+        int time;
+        String web;
+
+        public Pair(int time, String web) {
+            this.time = time;
+            this.web = web;
+        }
+    }
 }

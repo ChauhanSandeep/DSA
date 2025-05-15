@@ -2,58 +2,83 @@ package Graph;
 
 import java.util.*;
 
+/**
+ * LeetCode 827: Making A Large Island
+ * Problem Link: https://leetcode.com/problems/making-a-large-island/
+ *
+ * Given an n x n binary grid, where 1 represents land and 0 represents water,
+ * we can flip exactly one 0 to a 1. The goal is to return the size of the largest
+ * possible island after making this flip.
+ *
+ * Approach:
+ * 1. First, perform a DFS to label each island with a unique ID and compute their sizes.
+ * 2. Then, iterate over all water cells (0s) and check the potential island size if flipped.
+ * 3. Keep track of the maximum island size found.
+ *
+ * Time Complexity: O(N^2) (DFS for labeling + Checking potential flips)
+ * Space Complexity: O(N^2) (For storing island sizes and visited nodes)
+ */
 public class MakeLargeIsland {
     public static void main(String[] args) {
         int[][] grid = {
                 {1, 1, 1},
                 {0, 1, 0},
-                {0, 0, 1}};
+                {0, 0, 1}
+        };
         int largestIsland = new MakeLargeIsland().largestIsland(grid);
         System.out.println("Largest island after flipping one 0 is " + largestIsland);
     }
 
     public int largestIsland(int[][] grid) {
         int n = grid.length;
-        int islandId = 2;  // Unique ID for each island
+        int islandId = 2;  // Start from 2 to differentiate from 1
         int maxIslandSize = 0;
         Map<Integer, Integer> islandSizeMap = new HashMap<>();
-
-        // First Pass: Label islands & store sizes
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (grid[i][j] == 1) {
-                    int size = dfs(grid, i, j, islandId);
-                    islandSizeMap.put(islandId, size);
-                    maxIslandSize = Math.max(maxIslandSize, size);
+        
+        // Step 1: Identify and label islands while storing their sizes
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] == 1) { 
+                    int islandSize = performDFS(grid, row, col, islandId);
+                    islandSizeMap.put(islandId, islandSize);
+                    maxIslandSize = Math.max(maxIslandSize, islandSize);
                     islandId++;
                 }
             }
         }
 
-        // Second Pass: Try flipping each `0`
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (grid[i][j] == 0) {
-                    maxIslandSize = Math.max(maxIslandSize, 1 + computeNewIslandSize(grid, i, j, islandSizeMap));
+        // Step 2: Try flipping each '0' and compute the largest island possible
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] == 0) {
+                    maxIslandSize = Math.max(maxIslandSize, computePotentialIslandSize(grid, row, col, islandSizeMap));
                 }
             }
         }
+
         return maxIslandSize;
     }
 
-    private int dfs(int[][] grid, int i, int j, int islandId) {
+    /**
+     * Performs DFS to label an island with a unique ID and compute its size.
+     * @param grid - The input grid.
+     * @param row - Current row position.
+     * @param col - Current column position.
+     * @param islandId - Unique ID assigned to the island.
+     * @return The size of the island.
+     */
+    private int performDFS(int[][] grid, int row, int col, int islandId) {
         int n = grid.length;
-        Stack<int[]> stack = new Stack<>();
-        stack.push(new int[]{i, j});
-        grid[i][j] = islandId;
-        int size = 0;
-
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        Stack<int[]> stack = new Stack<>();
+        stack.push(new int[]{row, col});
+        grid[row][col] = islandId; // Label island
+        int islandSize = 0;
 
         while (!stack.isEmpty()) {
             int[] cell = stack.pop();
             int x = cell[0], y = cell[1];
-            size++;
+            islandSize++;
 
             for (int[] dir : directions) {
                 int newX = x + dir[0], newY = y + dir[1];
@@ -63,25 +88,36 @@ public class MakeLargeIsland {
                 }
             }
         }
-        return size;
+        return islandSize;
     }
 
-    private int computeNewIslandSize(int[][] grid, int i, int j, Map<Integer, Integer> islandSizeMap) {
+    /**
+     * Computes the potential island size if a 0 is flipped to a 1.
+     * @param grid - The input grid.
+     * @param row - Row index of the water cell.
+     * @param col - Column index of the water cell.
+     * @param islandSizeMap - Map containing sizes of identified islands.
+     * @return The size of the newly formed island.
+     */
+    private int computePotentialIslandSize(int[][] grid, int row, int col, Map<Integer, Integer> islandSizeMap) {
         int n = grid.length;
-        Set<Integer> uniqueIslands = new HashSet<>();
+        Set<Integer> neighboringIslands = new HashSet<>();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
+        // Identify unique neighboring island IDs
         for (int[] dir : directions) {
-            int newX = i + dir[0], newY = j + dir[1];
+            int newX = row + dir[0], newY = col + dir[1];
             if (newX >= 0 && newX < n && newY >= 0 && newY < n && grid[newX][newY] > 1) {
-                uniqueIslands.add(grid[newX][newY]);
+                neighboringIslands.add(grid[newX][newY]);
             }
         }
 
-        int newSize = 0;
-        for (int islandId : uniqueIslands) {
-            newSize += islandSizeMap.get(islandId);
+        // Compute new island size by merging connected islands
+        int newIslandSize = 1; // 1 for the flipped cell itself
+        for (int islandId : neighboringIslands) {
+            newIslandSize += islandSizeMap.getOrDefault(islandId, 0);
         }
-        return newSize;
+
+        return newIslandSize;
     }
 }

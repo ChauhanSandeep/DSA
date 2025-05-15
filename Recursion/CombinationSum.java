@@ -1,42 +1,54 @@
-package Recursion;
+package recursion;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Problem: Find all unique combinations in the given array where the numbers sum up to a target.
+ * Each number can be used multiple times.
+ *
+ * Approach:
+ * - Use **backtracking** to explore all possible combinations.
+ * - Start from a given index and recursively pick elements while the sum is within the target.
+ * - Use **DFS (Depth-First Search)** with a decision tree.
+ * - **Prune unnecessary calls** when the current sum exceeds the target.
+ *
+ * Time Complexity: O(2^N) (Exponential in the worst case due to multiple choices at each step)
+ * Space Complexity: O(N) (Recursion stack depth)
+ *
+ * LeetCode Link: https://leetcode.com/problems/combination-sum/
+ */
 public class CombinationSum {
-    public static void main(String[] args) {
-        int[] arr = {2, 3, 6, 7};
-        int sum = 7;
-        List<List<Integer>> ans = combinationSumHelper(arr, sum);
-        System.out.println(ans);
+  public static void main(String[] args) {
+    int[] candidates = {2, 3, 6, 7};
+    int target = 7;
+
+    List<List<Integer>> result = new ArrayList<>();
+    backtrack(candidates, 0, target, new ArrayList<>(), result);
+
+    System.out.println(result);
+  }
+
+  private static void backtrack(int[] candidates, int index, int target, List<Integer> current,
+      List<List<Integer>> result) {
+    // Base case: valid combination
+    if (target == 0) {
+      result.add(new ArrayList<>(current));
+      return;
     }
 
-    /**
-     * Given an array find the subarray which gives the sum provided.
-     * Same number can be used multiple times. Subarray need not continous
-     * @param arr
-     * @param sum
-     * @return
-     */
-    public static List<List<Integer>> combinationSumHelper(int[] arr, int sum) {
-        List<List<Integer>> ans = new ArrayList<>();
-        List<Integer> temp = new ArrayList<>();
-        combinationSumRec(arr, 0, sum, 0, temp, ans);
-        return ans;
+    // Base case: index out of bounds or target exceeded
+    if (index >= candidates.length || target < 0) {
+      return;
     }
 
-    private static void combinationSumRec(int[] arr, int startIndex, int target, int currSum, List<Integer> list, List<List<Integer>> result){
-        if(currSum>target) return;
+    // 1. Pick the current number and stay at same index (allow reuse)
+    current.add(candidates[index]);
+    backtrack(candidates, index, target - candidates[index], current, result);
+    current.remove(current.size() - 1); // backtrack
 
-        if(currSum==target){
-            result.add(new ArrayList<>(list));
-            return;
-        }
-
-        for(int i=startIndex; i<arr.length; i++){
-            list.add(arr[i]);
-            combinationSumRec(arr, i, target, currSum+arr[i], list, result);
-            list.remove(list.size()-1);
-        }
-    }
+    // 2. Skip the current number and move to next index
+    backtrack(candidates, index + 1, target, current, result);
+  }
 }

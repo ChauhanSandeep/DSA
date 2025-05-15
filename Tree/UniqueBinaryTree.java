@@ -2,30 +2,78 @@ package Tree;
 import java.util.*;
 
 /**
- * Find the number of binary subtree that can be created with n nodes.
+ * This class calculates the number of unique Binary Search Trees (BSTs)
+ * that can be formed with 'n' nodes.
+ *
+ * Intuition:
+ * - A binary search tree is constructed by selecting each node as the root
+ *   and recursively constructing left and right subtrees with the remaining nodes.
+ * - The problem is solved using Dynamic Programming (DP) by using a memoization approach to store
+ *   already computed results and avoid redundant computations.
+ *
+ * Algorithm:
+ * - For each number of nodes from 1 to 'n', compute the number of BSTs by
+ *   iterating over each node as the root and calculating the product of the number of
+ *   possible left and right subtrees.
+ * - Use a map (memoization) to store the number of unique BSTs for each number of nodes.
+ *
+ * Time Complexity: O(n^2) - For each node count (1 to n), we iterate through all previous nodes.
+ * Space Complexity: O(n) - We store the results in a map of size 'n'.
+ *
+ * LeetCode Problem Link: https://leetcode.com/problems/unique-binary-search-trees/
  */
 public class UniqueBinaryTree {
+
     public static void main(String[] args) {
+        // Example usage: Find the number of unique BSTs that can be formed with 3 nodes
         int result = new UniqueBinaryTree().numTrees(3);
-        System.out.println(result);
+        System.out.println(result); // Expected output: 5
     }
 
-    public int numTrees(int n) {
-        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-        map.put(0,1);
-        map.put(1,1);
-        return numTrees(n, map);
+    /**
+     * This method calculates the number of unique binary search trees that can be created with 'numNodes' nodes.
+     *
+     * @param numNodes The number of nodes.
+     * @return The number of unique BSTs.
+     */
+    public int numTrees(int numNodes) {
+        // Memoization map to store already computed results
+        Map<Integer, Integer> memo = new HashMap<>();
+
+        // Base cases
+        memo.put(0, 1); // 0 nodes -> 1 BST (empty tree)
+        memo.put(1, 1); // 1 node -> 1 BST (single node tree)
+
+        return countUniqueBSTs(numNodes, memo);
     }
 
-    private int numTrees(int n, Map<Integer, Integer> map){
-        if(n == 0 || n == 1) return 1;
-        if(map.containsKey(n)) return map.get(n);
-        // recursion
-        int sum = 0;
-        for(int i = 1;i <= n;i++)
-//                 left subtree            right subtree
-            sum += numTrees(i-1, map) * numTrees(n-i, map);
-        map.put(n, sum);
-        return sum;
+    /**
+     * Helper method that computes the number of unique BSTs using memoization.
+     *
+     * @param numNodes The number of nodes.
+     * @param memo The memoization map to store results of subproblems.
+     * @return The number of unique BSTs that can be formed with 'numNodes' nodes.
+     */
+    private int countUniqueBSTs(int numNodes, Map<Integer, Integer> memo) {
+        // Return the result from the memoization map if it is already computed
+        if (memo.containsKey(numNodes)) {
+            return memo.get(numNodes);
+        }
+
+        // Calculate the number of unique BSTs for 'numNodes' nodes
+        int numBSTs = 0;
+        for (int root = 1; root <= numNodes; root++) {
+            // Calculate the number of left and right subtrees recursively
+            int leftSubtreeCount = countUniqueBSTs(root - 1, memo);
+            int rightSubtreeCount = countUniqueBSTs(numNodes - root, memo);
+
+            // The total number of unique BSTs is the product of left and right subtrees
+            // This is because each combination of left and right subtrees can form a unique BST
+            numBSTs += leftSubtreeCount * rightSubtreeCount;
+        }
+
+        // Store the computed result in the memoization map
+        memo.put(numNodes, numBSTs);
+        return numBSTs;
     }
 }

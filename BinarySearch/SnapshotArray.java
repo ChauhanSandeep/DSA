@@ -1,55 +1,123 @@
 package BinarySearch;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
+
 /**
- * This class represents a Snapshot Array which supports taking snapshots and retrieving
- * values at a given index and snapshot ID.
- * 
- * Algorithm:
- * - Use a TreeMap to store values at each index with their corresponding snapshot IDs.
- * - Time Complexity: O(log n) for set and get operations.
- * - Space Complexity: O(n) where n is the number of set operations.
- * 
- * LeetCode Problem Link: https://leetcode.com/problems/snapshot-array/
+ * SnapshotArray is a data structure that mimics versioned arrays.
+ * It allows setting values, taking snapshots of the array, and retrieving values
+ * from a specific snapshot efficiently.
+ *
+ * <p>
+ * -------------------------------------
+ * 🔍 Intuition:
+ * -------------------------------------
+ * Instead of storing the full array for every snapshot (which is memory inefficient),
+ * we only store the changes made to each index along with the snapshot ID at which
+ * that change occurred.
+ *
+ * For example:
+ * - If you set index 5 to 10 in snapshot 3, we store (3, 10) in the list for index 5.
+ * - When retrieving a value from a specific snapshot, we find the most recent change
+ *   before or equal to that snapshot using binary search.
+ *
+ * -------------------------------------
+ * 🧠 Approach:
+ * -------------------------------------
+ * - Maintain an array of lists (changeHistory), one for each index in the array.
+ * - Each list contains pairs: [snapshotId, value]
+ * - When setting a value:
+ *      → If the latest entry is for the current snapshot, update it.
+ *      → Else, append a new pair.
+ * - When taking a snapshot:
+ *      → Increment the global snapshot counter and return the previous ID.
+ * - When getting a value for a specific snapshot:
+ *      → Perform a binary search to find the latest value ≤ given snapshotId.
+ *
+ * ⏱️ Time Complexity:
+ * - set(index, val): O(1) amortized
+ * - snap(): O(1)
+ * - get(index, snapId): O(log m), where m = number of updates at that index
+ *
+ * 📦 Space Complexity:
+ * - O(total set operations), as we only store actual changes
+ *
+ * This approach is clean, efficient, and interview-friendly.
+ *
+ * LeetCode Problem: https://leetcode.com/problems/snapshot-array/
  */
 public class SnapshotArray {
 
-    private int currentSnapId;
-    private TreeMap<Integer, Integer>[] snapshotArray;
+  // Represents the snapshot ID counter (starts from 0)
+  private int currentSnapshotId;
 
-    public static void main(String[] args) {
-        SnapshotArray snapshotArray = new SnapshotArray(1);
-        snapshotArray.set(0, 15);
-        snapshotArray.snap();
-        snapshotArray.snap();
-        snapshotArray.snap();
-        System.out.println(snapshotArray.get(0, 2));
+  // Stores change history for each index:
+  // Each list contains pairs of [snapshotId, value]
+  private List<int[]>[] changeHistory; // changeHistory[index] = List of [snapshotId, value]
+
+  // Constructor: Initialize the change history for each index
+  public SnapshotArray(int length) {
+    this.currentSnapshotId = 0;
+    changeHistory = new ArrayList[length];
+
+    for (int i = 0; i < length; i++) {
+      changeHistory[i] = new ArrayList<>();
+      // Initially, every index has value 0 at snapshot 0
+      changeHistory[i].add(new int[]{0, 0});
+    }
+  }
+
+  // Set the value at a specific index for the current snapshot version
+  public void set(int index, int value) {
+    List<int[]> historyAtIndex = changeHistory[index];
+    int[] lastChange = historyAtIndex.get(historyAtIndex.size() - 1);
+
+    // If the latest change is for the current snapshot, update it
+    if (lastChange[0] == currentSnapshotId) {
+      lastChange[1] = value;
+    } else {
+      // Otherwise, add a new record for current snapshotId
+      historyAtIndex.add(new int[]{currentSnapshotId, value});
+    }
+  }
+
+  // Take a snapshot and return its ID
+  public int snap() {
+    return currentSnapshotId++;
+  }
+
+  // Get the value at index from the snapshot with given snapshotId
+  public int get(int index, int targetSnapshotId) {
+    List<int[]> historyAtIndex = changeHistory[index];
+
+    int low = 0, high = historyAtIndex.size() - 1;
+    int result = 0;
+
+    // Binary search for the closest snapshotId ≤ targetSnapshotId
+    while (low <= high) {
+      int mid = (low + high) / 2;
+      int[] entry = historyAtIndex.get(mid);
+
+      if (entry[0] <= targetSnapshotId) {
+        result = entry[1];  // potential answer
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
     }
 
-    public SnapshotArray(int length) {
-        this.currentSnapId = 0;
-        this.snapshotArray = new TreeMap[length];
-        for (int i = 0; i < length; i++) {
-            snapshotArray[i] = new TreeMap<>();
-        }
-    }
+    return result;
+  }
 
-    public void set(int index, int value) {
-        snapshotArray[index].put(currentSnapId, value);
-    }
-
-    public int snap() {
-        currentSnapId++;
-        return currentSnapId - 1;
-    }
-
-    public int get(int index, int snapId) {
-        TreeMap<Integer, Integer> snapshots = snapshotArray[index];
-        if (snapshots == null) {
-            return 0;
-        }
-        Integer closestSnapId = snapshots.floorKey(snapId);
-        return closestSnapId == null ? 0 : snapshots.get(closestSnapId);
-    }
+  // For quick testing
+  public static void main(String[] args) {
+    SnapshotArray array = new SnapshotArray(1);
+    array.set(0, 15);
+    array.snap();
+    array.snap();
+    array.snap();
+    System.out.println(array.get(0, 2)); // Output should be 15
+  }
 }

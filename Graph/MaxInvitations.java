@@ -1,8 +1,24 @@
 package Graph;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
+/**
+ * LeetCode 2127: Maximum Employees to Be Invited to a Meeting
+ * Problem Link: https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/
+ *
+ * Problem:
+ * - Given an array 'favorite' where favorite[i] is the employee that employee 'i' prefers to sit next to.
+ * - The goal is to find the maximum number of employees that can be invited to the meeting.
+ *
+ * Approach:
+ * 1. **Compute In-Degree** → Find the number of incoming edges for each node.
+ * 2. **Topological Sort (BFS)** → Remove nodes with no incoming edges (acyclic parts).
+ * 3. **Process Remaining Cycles** → Identify cycles and compute their sizes.
+ * 4. **Handle Special Case of 2-Node Cycles** → Consider longest incoming chains.
+ *
+ * Time Complexity: O(N) → Each node is processed once.
+ * Space Complexity: O(N) → For visited array, in-degree array, and queue.
+ */
 public class MaxInvitations {
 
     public static void main(String[] args) {
@@ -10,61 +26,66 @@ public class MaxInvitations {
         System.out.println("Maximum Invitations: " + new MaxInvitations().maximumInvitations(invitations));
     }
 
+    /**
+     * Finds the maximum number of employees that can be invited to the meeting.
+     * @param favorite - Array representing favorite coworkers for each employee
+     * @return Maximum number of invitations possible
+     */
     public int maximumInvitations(int[] favorite) {
-        int size = favorite.length;
-        boolean[] visited = new boolean[size];
+        int n = favorite.length;
+        boolean[] visited = new boolean[n];
 
         // Step 1: Compute In-Degree for Topological Sort
-        int[] inDegree = new int[size];
-        for (int i = 0; i < size; i++) {
+        int[] inDegree = new int[n];
+        for (int i = 0; i < n; i++) {
             inDegree[favorite[i]]++;
         }
 
         // Step 2: Topological Sorting to Remove Acyclic Nodes
         Queue<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < n; i++) {
             if (inDegree[i] == 0) {
                 visited[i] = true;
                 queue.offer(i);
             }
         }
 
-        // Step 3: Compute Longest Path to Any Node
-        int[] longestPath = new int[size];
+        // Step 3: Compute Longest Path to Any Node (Handles Chains Leading to Cycles)
+        int[] longestPath = new int[n];
         while (!queue.isEmpty()) {
-            int curr = queue.poll();
-            int neighbor = favorite[curr];
-            longestPath[neighbor] = Math.max(longestPath[neighbor], longestPath[curr] + 1);
-            if (--inDegree[neighbor] == 0) {
-                visited[neighbor] = true;
-                queue.offer(neighbor);
+            int employee = queue.poll();
+            int next = favorite[employee];
+
+            longestPath[next] = Math.max(longestPath[next], longestPath[employee] + 1);
+            if (--inDegree[next] == 0) {
+                visited[next] = true;
+                queue.offer(next);
             }
         }
 
-        // Step 4: Identify Cycles
-        int maxLoopSize = 0;
-        int chainContribution = 0;
+        // Step 4: Identify Cycles and Compute Max Invitation Count
+        int maxCycleSize = 0, chainContribution = 0;
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < n; i++) {
             if (!visited[i]) {  // Found a cycle
-                int curr = i, loopSize = 0;
+                int cycleSize = 0, current = i;
 
                 // Count the cycle length
-                while (!visited[curr]) {
-                    visited[curr] = true;
-                    curr = favorite[curr];
-                    loopSize++;
+                while (!visited[current]) {
+                    visited[current] = true;
+                    current = favorite[current];
+                    cycleSize++;
                 }
 
-                if (loopSize == 2) {
-                    // Special case: loops of length 2 with incoming chains
+                if (cycleSize == 2) {
+                    // Special case: 2-node cycles with incoming chains
                     chainContribution += 2 + longestPath[i] + longestPath[favorite[i]];
                 } else {
-                    maxLoopSize = Math.max(maxLoopSize, loopSize);
+                    maxCycleSize = Math.max(maxCycleSize, cycleSize);
                 }
             }
         }
 
-        return Math.max(maxLoopSize, chainContribution);
+        return Math.max(maxCycleSize, chainContribution);
     }
 }

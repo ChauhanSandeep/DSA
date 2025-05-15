@@ -3,64 +3,86 @@ package Hashing;
 import java.util.*;
 
 public class PalindromePairs {
+
     public static void main(String[] args) {
         String[] words = {"abcd", "dcba", "lls", "s", "sssll"};
-        System.out.println(new PalindromePairs().palindromePairs(words));
+        System.out.println(new PalindromePairs().findPalindromePairs(words));
     }
 
     /**
-     * Finds all pairs of indices (i, j) where words[i] + words[j] form a palindrome.
-     * @param words - array of words
-     * @return list of palindrome index pairs
+     * Problem: Given a list of unique words, find all pairs of distinct indices (i, j)
+     * such that the concatenation of words[i] + words[j] forms a palindrome.
+     *
+     * Approach:
+     * 1. Store words in a HashMap with their corresponding indices for O(1) lookups.
+     * 2. Check for three cases:
+     *    - Direct reverse match (word1 == reverse(word2)).
+     *    - Palindromic prefix with a corresponding reversed suffix.
+     *    - Palindromic suffix with a corresponding reversed prefix.
+     *
+     * Complexity:
+     * - Constructing the HashMap: O(N)
+     * - Checking each word for palindrome properties: O(N * M^2) (M = max length of words)
+     * - Overall: **O(N * M^2)**
+     *
+     * LeetCode Link: https://leetcode.com/problems/palindrome-pairs/
+     *
+     * @param words - Array of unique words
+     * @return List of palindrome pairs represented as index pairs
      */
-    public List<List<Integer>> palindromePairs(String[] words) {
-        // Map words to their indices for quick lookup
+    public List<List<Integer>> findPalindromePairs(String[] words) {
         Map<String, Integer> wordIndexMap = new HashMap<>();
+        List<List<Integer>> palindromePairs = new ArrayList<>();
+
+        // Store each word with its index for fast lookup
         for (int i = 0; i < words.length; i++) {
             wordIndexMap.put(words[i], i);
         }
 
-        List<List<Integer>> result = new ArrayList<>();
-
-        for (String word : wordIndexMap.keySet()) {
-            int index = wordIndexMap.get(word);
+        // Iterate through each word in the list
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
             String reversedWord = new StringBuilder(word).reverse().toString();
 
-            // Case 1: Exact reverse match (word1 == reverse(word2))
-            Integer reversedIndex = wordIndexMap.get(reversedWord);
-            if (reversedIndex != null && reversedIndex != index) {
-                result.add(Arrays.asList(index, reversedIndex));
+            // Case 1: Check if reversed word exists in the map (direct palindrome pair)
+            if (wordIndexMap.containsKey(reversedWord) && wordIndexMap.get(reversedWord) != i) {
+                palindromePairs.add(Arrays.asList(i, wordIndexMap.get(reversedWord)));
             }
 
-            // Case 2: Prefix is palindrome, suffix has reverse match
-            for (String suffix : allValidSuffixes(word)) {
-                Integer suffixIndex = wordIndexMap.get(new StringBuilder(suffix).reverse().toString());
-                if (suffixIndex != null) {
-                    result.add(Arrays.asList(suffixIndex, index));
+            // Case 2: Check valid palindromic prefixes
+            for (String suffix : getValidSuffixes(word)) {
+                String reversedSuffix = new StringBuilder(suffix).reverse().toString();
+                if (wordIndexMap.containsKey(reversedSuffix)) {
+                    palindromePairs.add(Arrays.asList(wordIndexMap.get(reversedSuffix), i));
                 }
             }
 
-            // Case 3: Suffix is palindrome, prefix has reverse match
-            for (String prefix : allValidPrefixes(word)) {
-                Integer prefixIndex = wordIndexMap.get(new StringBuilder(prefix).reverse().toString());
-                if (prefixIndex != null) {
-                    result.add(Arrays.asList(index, prefixIndex));
+            // Case 3: Check valid palindromic suffixes
+            for (String prefix : getValidPrefixes(word)) {
+                String reversedPrefix = new StringBuilder(prefix).reverse().toString();
+                if (wordIndexMap.containsKey(reversedPrefix)) {
+                    palindromePairs.add(Arrays.asList(i, wordIndexMap.get(reversedPrefix)));
                 }
             }
         }
-        return result;
+
+        return palindromePairs;
     }
 
     /**
      * Returns a list of prefixes where the remaining suffix is a palindrome.
-     * @param word - input string
-     * @return list of valid prefixes
+     * If a suffix is a palindrome, the corresponding prefix can form a valid pair.
+     *
+     * Example: "lls" -> "l" is a valid prefix because "ls" is a palindrome.
+     *
+     * @param word - Input string
+     * @return List of valid prefixes
      */
-    private List<String> allValidPrefixes(String word) {
+    private List<String> getValidPrefixes(String word) {
         List<String> validPrefixes = new ArrayList<>();
         for (int i = 0; i < word.length(); i++) {
             if (isPalindrome(word, i, word.length() - 1)) {
-                validPrefixes.add(word.substring(0, i));
+                validPrefixes.add(word.substring(0, i)); // Prefix before palindrome suffix
             }
         }
         return validPrefixes;
@@ -68,29 +90,36 @@ public class PalindromePairs {
 
     /**
      * Returns a list of suffixes where the remaining prefix is a palindrome.
-     * @param word - input string
-     * @return list of valid suffixes
+     * If a prefix is a palindrome, the corresponding suffix can form a valid pair.
+     *
+     * Example: "sll" -> "ll" is a valid suffix because "s" is a palindrome.
+     *
+     * @param word - Input string
+     * @return List of valid suffixes
      */
-    private List<String> allValidSuffixes(String word) {
+    private List<String> getValidSuffixes(String word) {
         List<String> validSuffixes = new ArrayList<>();
         for (int i = 0; i < word.length(); i++) {
             if (isPalindrome(word, 0, i)) {
-                validSuffixes.add(word.substring(i + 1)); // No need to specify the end index explicitly
+                validSuffixes.add(word.substring(i + 1)); // Suffix after palindrome prefix
             }
         }
         return validSuffixes;
     }
 
     /**
-     * Checks if a substring of a given word is a palindrome.
-     * @param word - input string
-     * @param left - start index
-     * @param right - end index
-     * @return true if the substring is a palindrome, false otherwise
+     * Checks if a substring within a word is a palindrome.
+     *
+     * @param word - Input string
+     * @param left - Start index
+     * @param right - End index
+     * @return True if the substring is a palindrome, otherwise false
      */
     private boolean isPalindrome(String word, int left, int right) {
         while (left < right) {
-            if (word.charAt(left) != word.charAt(right)) return false;
+            if (word.charAt(left) != word.charAt(right)) {
+                return false;
+            }
             left++;
             right--;
         }

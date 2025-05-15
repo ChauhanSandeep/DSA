@@ -1,107 +1,122 @@
-package Multithreading.chapter1;
+package multithreading.chapter1;
 
+import java.util.concurrent.*;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
+/**
+ * Demonstrates different types of thread pools available in Java's Executor Framework.
+ *
+ * <p> Thread Pool Types Covered:
+ * 1. Single Thread Executor - Executes tasks sequentially using a single worker thread.
+ * 2. Fixed Thread Pool - Uses a fixed number of threads to execute tasks concurrently.
+ * 3. Cached Thread Pool - Creates new threads as needed and reuses idle threads.
+ * 4. Scheduled Thread Pool - Schedules tasks for execution at fixed intervals or with a delay.
+ *
+ * <p> Ensures proper shutdown of executors to prevent resource leaks.
+ */
 public class ThreadPoolExample {
 
     public static void main(String[] args) {
-        runUsingSingleThreadPool();
-//        runUsingFixedThreadPool();
-//        runUsingCachedThreadPool();
-//        runUsingScheduledThreadPool();
+        executeSingleThreadPool();
+//        executeFixedThreadPool();
+//        executeCachedThreadPool();
+//        executeScheduledThreadPool();
     }
 
-    public static void runUsingSingleThreadPool() {
+    /**
+     * Executes tasks using a Single Thread Executor.
+     * Ensures that tasks execute sequentially in a single-threaded environment.
+     */
+    public static void executeSingleThreadPool() {
         ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-        for(int i=0; i<5; i++) {
-            singleThreadExecutor.submit(new Task(i));
-        }
-        // SHUTDOWN EXECUTOR (otherwise process will never finish)
 
-        // prevent executor to execute further tasks
-        singleThreadExecutor.shutdown();
-        // wait for 1 second and terminate actual running tasks
-        try{
-            if(singleThreadExecutor.awaitTermination(1, TimeUnit.SECONDS)) {
-                singleThreadExecutor.shutdownNow();
-            }
-        }catch (InterruptedException e) {
-            singleThreadExecutor.shutdownNow();
+        for (int i = 0; i < 5; i++) {
+            singleThreadExecutor.submit(new WorkerTask(i));
         }
 
+        // Shutdown the executor service
+        shutdownExecutor(singleThreadExecutor);
     }
 
-    public static void runUsingFixedThreadPool() {
-        ExecutorService poolThreadExecutor = Executors.newFixedThreadPool(5);
-        for(int i=0; i<5; i++) {
-            poolThreadExecutor.submit(new Task(i));
-        }
-        // we have to shut down the executor
-        poolThreadExecutor.shutdown();
+    /**
+     * Executes tasks using a Fixed Thread Pool with 5 worker threads.
+     * Ideal for executing a predictable number of tasks in parallel.
+     */
+    public static void executeFixedThreadPool() {
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
 
-        try{
-            if(poolThreadExecutor.awaitTermination(1, TimeUnit.SECONDS)) {
-                poolThreadExecutor.shutdownNow();
-            }
-        }catch (InterruptedException e) {
-            poolThreadExecutor.shutdownNow();
-            e.printStackTrace();
+        for (int i = 0; i < 5; i++) {
+            fixedThreadPool.submit(new WorkerTask(i));
         }
+
+        shutdownExecutor(fixedThreadPool);
     }
 
-    public static void runUsingCachedThreadPool() {
-        ExecutorService cachedThreadPoolExecutor = Executors.newCachedThreadPool();
-        for(int i=0; i<5; i++) {
-            cachedThreadPoolExecutor.submit(new Task(i));
+    /**
+     * Executes tasks using a Cached Thread Pool.
+     * Suitable for handling many short-lived asynchronous tasks.
+     */
+    public static void executeCachedThreadPool() {
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+
+        for (int i = 0; i < 5; i++) {
+            cachedThreadPool.submit(new WorkerTask(i));
         }
 
-        cachedThreadPoolExecutor.shutdown();
-        try{
-            if(cachedThreadPoolExecutor.awaitTermination(1, TimeUnit.SECONDS)) {
-                cachedThreadPoolExecutor.shutdownNow();
-            }
-        }catch (InterruptedException e) {
-            cachedThreadPoolExecutor.shutdownNow();
-            e.printStackTrace();
-        }
+        shutdownExecutor(cachedThreadPool);
     }
 
-    public static void runUsingScheduledThreadPool() {
+    /**
+     * Executes tasks using a Scheduled Thread Pool.
+     * Schedules periodic execution of a task with a fixed delay.
+     */
+    public static void executeScheduledThreadPool() {
         ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-        scheduledExecutor.scheduleAtFixedRate(new Task(1), 1000, 5000, TimeUnit.MILLISECONDS);
 
-        scheduledExecutor.shutdown();
+        scheduledExecutor.scheduleAtFixedRate(
+                () -> System.out.println("Scheduled task executed by " + Thread.currentThread().getName()),
+                1000, 5000, TimeUnit.MILLISECONDS
+        );
 
-        try{
-            if(scheduledExecutor.awaitTermination(1, TimeUnit.SECONDS)) {
-                scheduledExecutor.shutdownNow();
+        shutdownExecutor(scheduledExecutor);
+    }
+
+    /**
+     * Properly shuts down an executor service to prevent resource leaks.
+     *
+     * @param executorService the executor to shut down
+     */
+    private static void shutdownExecutor(ExecutorService executorService) {
+        executorService.shutdown();
+        try {
+            // Wait for ongoing tasks to complete
+            if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                executorService.shutdownNow(); // Force shutdown if tasks don't terminate in time
             }
-        }catch (InterruptedException e) {
-            scheduledExecutor.shutdownNow();
-            e.printStackTrace();
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt(); // Restore interrupted status
         }
     }
 }
 
-class Task implements Runnable {
-    private int id;
+/**
+ * Represents a worker task that prints task execution details.
+ */
+class WorkerTask implements Runnable {
+    private final int taskId;
 
-    public Task(int id) {
-        this.id = id;
+    public WorkerTask(int taskId) {
+        this.taskId = taskId;
     }
 
+    @Override
     public void run() {
-        System.out.println("Task with id " + id + " is in progress. Thread id " + Thread.currentThread().getName());
-        long duration = (long) (Math.random() * 2);
-        try {
-            TimeUnit.SECONDS.sleep(duration);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Executing Task " + taskId + " on Thread " + Thread.currentThread().getName());
 
+        try {
+            TimeUnit.SECONDS.sleep((long) (Math.random() * 2)); // Simulate task duration
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupted status
+        }
     }
 }

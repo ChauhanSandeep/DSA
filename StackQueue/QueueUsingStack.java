@@ -4,36 +4,56 @@ import java.util.Stack;
 
 public class QueueUsingStack {
     public static void main(String[] args) {
-        StackQueue queue = new StackQueue();
+        QueueUsingStacks queue = new QueueUsingStacks();
         queue.push(2);
         queue.push(3);
-        System.out.println(queue.pop());
+        System.out.println(queue.pop()); // Expected: 2
         queue.push(10);
-        System.out.println(queue.pop());
+        System.out.println(queue.pop()); // Expected: 3
     }
 }
 
 /**
- * Create queue using stack
+ * Implements a Queue using two stacks (FIFO order).
+ * 
+ * Approach:
+ * - Push elements onto `inputStack`.
+ * - For `pop()`, transfer elements to `outputStack` only when it's empty, ensuring correct order.
+ * 
+ * Time Complexity:
+ * - Push: O(1) (amortized)
+ * - Pop: O(1) (amortized) due to lazy transfer
+ * - Worst-case Pop: O(N) when transferring elements
+ * 
+ * Space Complexity: O(N), where N is the number of elements stored.
+ * 
+ * LeetCode Problem: https://leetcode.com/problems/implement-queue-using-stacks/
  */
-class StackQueue
-{
-    Stack<Integer> s1 = new Stack<Integer>();
-    Stack<Integer> s2 = new Stack<Integer>();
+class QueueUsingStacks {
+    private Stack<Integer> inputStack = new Stack<>();  // For enqueue operation
+    private Stack<Integer> outputStack = new Stack<>(); // For dequeue operation
 
-    void push(int x)
-    {
-	   s1.push(x);
+    /**
+     * Pushes an element into the queue.
+     */
+    public void push(int x) {
+        inputStack.push(x);
     }
 
-    int pop()
-    {
-	   if(s1.isEmpty() && s2.isEmpty()) return -1;
-	   if(!s2.isEmpty()) return s2.pop();
-	   
-	  while(!s1.isEmpty()) {
-	      s2.push(s1.pop());
-	  }
-	  return s2.pop();
+    /**
+     * Removes and returns the front element of the queue.
+     * Returns -1 if the queue is empty.
+     */
+    public int pop() {
+        if (outputStack.isEmpty()) {
+            if (inputStack.isEmpty()) {
+                return -1; // Queue is empty
+            }
+            // Transfer elements from inputStack to outputStack for correct order
+            while (!inputStack.isEmpty()) {
+                outputStack.push(inputStack.pop());
+            }
+        }
+        return outputStack.pop();
     }
 }

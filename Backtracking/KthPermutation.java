@@ -7,12 +7,29 @@ import java.util.List;
  * LeetCode: https://leetcode.com/problems/permutation-sequence/
  *
  * Problem: Given `n`, which represents a sequence [1, 2, ..., n], find the `k`-th lexicographically smallest permutation.
+ * Example : n = 4, k = 17
+ * Output: "3214"
+ * Explanation: The 17-th permutation of [1, 2, 3, 4] is "3214".
+ *
+ *
  *
  * Approach:
  * - Compute (n-1)! to determine the size of each "block" of permutations.
  * - Use the k-th index to determine which number should be fixed in each step.
  * - Reduce k and adjust the factorial dynamically to determine subsequent numbers.
  * - Remove used numbers to avoid repetition.
+ *
+ * Step-by-step trace for n = 4, k = 17 (zero-based k = 16):
+ *
+ * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+ * | Step | Available Numbers | Factorial | k   | Index = k / factorial | Picked Digit | New k = k % factorial |
+ * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+ * | 1    | [1, 2, 3, 4]      |(4-1)! = 6 | 16  | 2                      | 3             | 4                      |
+ * | 2    | [1, 2, 4]         |(3-1)! = 2 | 4   | 2                      | 4             | 0                      |
+ * | 3    | [1, 2]            |(2-1)! = 1 | 0   | 0                      | 1             | 0                      |
+ * | 4    | [2]               |(1-1)! = 1 | 0   | 0                      | 2             | -                      |
+ *|------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+ * Final Permutation: "3412"
  *
  * Time Complexity:  O(n) → We iterate through `n` elements and perform constant-time operations.
  * Space Complexity: O(n) → We store `n` elements in a list.
@@ -47,7 +64,7 @@ public class KthPermutation {
         k--;
 
         // Generate the k-th permutation
-        while (!availableNumbers.isEmpty()) {
+        while (true) {
             int index = k / factorial;
             permutation.append(availableNumbers.get(index));
             availableNumbers.remove(index);

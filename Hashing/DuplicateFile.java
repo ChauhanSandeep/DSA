@@ -1,46 +1,73 @@
 package Hashing;
+
 import java.util.*;
 
 /**
- * Given list of directory path, file name and content. Group the files with duplicate content together.
+ * LeetCode Problem: https://leetcode.com/problems/find-duplicate-file-in-system/
+ * 
+ * Given a list of directory paths, file names, and content, this program groups files 
+ * with duplicate content together.
+ * 
+ * Example Input:
+ *   paths = ["root/a 1.txt(abcd) 2.txt(efgh)", 
+ *            "root/c 3.txt(abcd)", 
+ *            "root/c/d 4.txt(efgh)", 
+ *            "root 4.txt(efgh)"]
+ * 
+ * Output:
+ *   [["root/a/1.txt", "root/c/3.txt"], ["root/a/2.txt", "root/c/d/4.txt", "root/4.txt"]]
+ * 
+ * Time Complexity: O(N * M), where N is the number of directories and M is the average number of files per directory.
+ * Space Complexity: O(N * M) for storing file paths.
  */
 public class DuplicateFile {
+
     public static void main(String[] args) {
         String[] paths = {
-                "root/a 1.txt(abcd) 2.txt(efgh)",   // 1.txt and 2.txt in location root/a
-                "root/c 3.txt(abcd)",               // 3.txt in location root/c
-                "root/c/d 4.txt(efgh)",             // 4.txt in location root/c/d
-                "root 4.txt(efgh)"};                // 4.txt in location root
+            "root/a 1.txt(abcd) 2.txt(efgh)",   // 1.txt and 2.txt in location root/a
+            "root/c 3.txt(abcd)",               // 3.txt in location root/c
+            "root/c/d 4.txt(efgh)",             // 4.txt in location root/c/d
+            "root 4.txt(efgh)"};                // 4.txt in location root
+        
         List<List<String>> duplicates = new DuplicateFile().findDuplicate(paths);
         System.out.println(duplicates);
     }
+
+    /**
+     * Finds duplicate files by grouping them based on identical content.
+     *
+     * @param paths An array of directory paths with file names and contents.
+     * @return A list of file groups where each group contains files with the same content.
+     */
     public List<List<String>> findDuplicate(String[] paths) {
-//         {"root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)","root 4.txt(efgh)"}
         List<List<String>> result = new ArrayList<>();
-        if(paths == null || paths.length == 0) return result;
+        if (paths == null || paths.length == 0) return result;
 
-        Map<String, List<String>> contentPathMap = new HashMap<>();
+        Map<String, List<String>> contentToFileMap = new HashMap<>();
 
-        for(String path: paths) {
-            String[] pathSplitArr = path.split("\\s+");
+        for (String path : paths) {
+            String[] directoryInfo = path.split("\\s+");
+            String directoryPath = directoryInfo[0];
 
-            for(int i=1; i<pathSplitArr.length; i++) {
-                int index = pathSplitArr[i].indexOf("(");
-                String fileContent = pathSplitArr[i].substring(index);
-                String filePath = pathSplitArr[0] + "/" + pathSplitArr[i].substring(0, index);
-                List<String> set = contentPathMap.getOrDefault(fileContent, new ArrayList<>());
-                set.add(filePath);
-                contentPathMap.put(fileContent, set);
-            }
+            for (int i = 1; i < directoryInfo.length; i++) {
+                int contentStartIdx = directoryInfo[i].indexOf("(");
+                String fileName = directoryInfo[i].substring(0, contentStartIdx);
+                String content = directoryInfo[i].substring(contentStartIdx);
 
-        }
+                String filePath = directoryPath + "/" + fileName;
 
-        for(Map.Entry<String, List<String>> entry: contentPathMap.entrySet()) {
-            if(entry.getValue().size() > 1){
-                result.add(new ArrayList<>(entry.getValue()));
+                // Store file paths based on content
+                contentToFileMap.computeIfAbsent(content, k -> new ArrayList<>()).add(filePath);
             }
         }
+
+        // Collect only those groups where there are duplicate files
+        for (List<String> fileList : contentToFileMap.values()) {
+            if (fileList.size() > 1) {
+                result.add(fileList);
+            }
+        }
+
         return result;
-
     }
 }

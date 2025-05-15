@@ -7,10 +7,16 @@ import java.util.Arrays;
  *
  * Given a boolean expression containing 'T' (true), 'F' (false), and operators '&' (AND), '|' (OR), and '^' (XOR),
  * this program calculates the number of ways to parenthesize the expression so that it evaluates to true.
+ * For example:
+ * - Input: "T|F&T^F"
+ * - Output: 4
+ * - Explanation: The expression can be parenthesized in 4 different ways to evaluate to true.
+ * - Parenthesizations: 1) ((T|F)&T^F), 2) (T|(F&T^F)), 3) (T|((F&T)^F)), 4) ((T|F)&(T^F))
  *
  * Approach:
- * - Uses memoized recursion (top-down dynamic programming) to optimize overlapping subproblems.
- * - The `dp` array stores precomputed results to avoid redundant calculations.
+ * - The expression is evaluated using a recursive function with memoization.
+ * - Each operator is processed separately, and the number of ways to evaluate the left and right segments
+ *   are combined based on the operator's behavior.
  *
  * Time Complexity: O(N^3) (Since each subproblem takes O(N) and there are O(N^2) subproblems)
  * Space Complexity: O(N^2) (For memoization storage)
@@ -31,9 +37,9 @@ public class EvaluateTrue {
      */
     public int countWaysToEvaluateTrue(String expression) {
         int length = expression.length();
-        int[][][] dp = new int[length][length][2]; // Memoization table
+        int[][][] dp = new int[length][length][2]; // Here dp[i][j][0] = false, dp[i][j][1] = true; in the range i to j
 
-        // Initialize memoization table with -1 (indicating uncomputed states)
+        // Initialize memoization table with -1 (indicating un computed states)
         for (int[][] subTable : dp) {
             for (int[] row : subTable) {
                 Arrays.fill(row, -1);
@@ -58,7 +64,11 @@ public class EvaluateTrue {
 
         // Base case: single character (either 'T' or 'F')
         if (left == right) {
-            if (evaluateTo) return expression.charAt(left) == 'T' ? 1 : 0;
+            if (evaluateTo) {
+                // If we want to evaluate to true, return 1 if it's 'T', else 0
+              return expression.charAt(left) == 'T' ? 1 : 0;
+            }
+            // If we want to evaluate to false, return 1 if it's 'F', else 0
             return expression.charAt(left) == 'F' ? 1 : 0;
         }
 
@@ -81,24 +91,30 @@ public class EvaluateTrue {
             switch (operator) {
                 case '|': // OR Operator
                     if (evaluateTo) {
+                        // True if either side is true
                         ways += (leftTrue * rightTrue) + (leftTrue * rightFalse) + (leftFalse * rightTrue);
                     } else {
+                        // False only if both sides are false
                         ways += leftFalse * rightFalse;
                     }
                     break;
 
                 case '&': // AND Operator
                     if (evaluateTo) {
+                        // True only if both sides are true
                         ways += leftTrue * rightTrue;
                     } else {
+                        // False if either side is false
                         ways += (leftTrue * rightFalse) + (leftFalse * rightTrue) + (leftFalse * rightFalse);
                     }
                     break;
 
                 case '^': // XOR Operator
                     if (evaluateTo) {
+                        // True if one side is true and the other is false
                         ways += (leftTrue * rightFalse) + (leftFalse * rightTrue);
                     } else {
+                        // False if both sides are true or both sides are false
                         ways += (leftTrue * rightTrue) + (leftFalse * rightFalse);
                     }
                     break;

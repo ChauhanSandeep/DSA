@@ -2,68 +2,90 @@ package StackQueue;
 
 import java.util.Arrays;
 import java.util.Stack;
-import java.util.Vector;
 
 /**
- * https://www.geeksforgeeks.org/maximize-sum-of-given-array-after-removing-valleys/
+ * Problem: Maximize the sum of the given array after removing valleys.
+ * 
+ * Intuition:
+ * - A valley is an element in the array that is surrounded by greater or equal elements.
+ * - We iterate over the array twice (left-to-right and right-to-left) to compute possible maximum sums
+ *   assuming the current element is the lowest in its segment.
+ * 
+ * Approach:
+ * - Use a **monotonic increasing stack** to efficiently compute `leftSum` and `rightSum`.
+ * - `leftSum[i]`: Maximum sum assuming elements on the left can be reduced to `arr[i]`.
+ * - `rightSum[i]`: Maximum sum assuming elements on the right can be reduced to `arr[i]`.
+ * - The final result is obtained by maximizing `(leftSum[i] + rightSum[i] - arr[i])`.
+ * 
+ * Time Complexity: **O(N)** (Each element is pushed and popped at most once)
+ * Space Complexity: **O(N)** (For leftSum, rightSum, and stack)
+ * 
+ * Problem Link: https://www.geeksforgeeks.org/maximize-sum-of-given-array-after-removing-valleys/
  */
 public class RemoveValleys {
 
     public static void main(String[] args) {
-        int[] arr = {8, 1, 10, 1, 8 };
-        System.out.println(solve(arr));
+        int[] arr = {8, 1, 10, 1, 8};
+        System.out.println(getMaxSumAfterRemovingValleys(arr));
     }
 
-    static int solve(int[] arr) {
-        int size = arr.length;
-        int[] leftSum = new int[size]; // sum at index i, considering all elements to left are smaller than arr[i]
-        int[] rightSum = new int[size];// sum at index i, considering all elements to right are smaller than arr[i]
+    /**
+     * Computes the maximum sum after removing valleys from the array.
+     * @param arr Input array
+     * @return Maximum possible sum
+     */
+    public static int getMaxSumAfterRemovingValleys(int[] arr) {
+        int n = arr.length;
+        int[] leftSum = new int[n];  // Stores max sum considering left reductions
+        int[] rightSum = new int[n]; // Stores max sum considering right reductions
         Stack<Integer> stack = new Stack<>();
 
-        // Calculate leftSum array
-        for (int i = 0; i < size; i++) {
-            int curr = arr[i];
-            while (stack.size() != 0 && arr[stack.peek()] >= curr) {
+        // Compute leftSum: Traverse left to right
+        for (int i = 0; i < n; i++) {
+            int currElement = arr[i];
+
+            while (!stack.isEmpty() && arr[stack.peek()] >= currElement) {
                 stack.pop();
             }
 
-            if (stack.size() == 0) {
-//              CASE 1. No left elements are smaller. Reduce all to arr[i]
-                leftSum[i] = (i + 1) * curr;
+            if (stack.isEmpty()) {
+                // No smaller element on the left; reduce everything to arr[i]
+                leftSum[i] = (i + 1) * currElement;
             } else {
-//              CASE 2. Smaller element found on left. Reduce all elements from smallIndex to i to value arr[i]
-                int smallIndex = stack.pop();
-                leftSum[i] = leftSum[smallIndex] + ((i - smallIndex) * curr);
+                int smallerIndex = stack.peek();
+                leftSum[i] = leftSum[smallerIndex] + ((i - smallerIndex) * currElement);
             }
-            stack.add(i);
-        }
-        stack.clear();
 
-        // Calculate rightSum array
-        for (int i = size - 1; i > -1; i--) {
-            int curr = arr[i];
-            while (stack.size() != 0 && arr[stack.peek()] >= curr) {
+            stack.push(i);
+        }
+
+        stack.clear(); // Reset stack for rightSum calculation
+
+        // Compute rightSum: Traverse right to left
+        for (int i = n - 1; i >= 0; i--) {
+            int currElement = arr[i];
+
+            while (!stack.isEmpty() && arr[stack.peek()] >= currElement) {
                 stack.pop();
             }
 
-            if (stack.size() == 0) {
-//              CASE 1. No right elements are smaller. Reduce all to arr[i]
-                rightSum[i] = (size - i) * curr;
+            if (stack.isEmpty()) {
+                // No smaller element on the right; reduce everything to arr[i]
+                rightSum[i] = (n - i) * currElement;
             } else {
-//              CASE 2. Smaller element found on right. Reduce all elements from smallIndex to i to value arr[i]
-                int smallIndex = stack.peek();
-                rightSum[i] = rightSum[smallIndex] + ((smallIndex - i) * curr);
+                int smallerIndex = stack.peek();
+                rightSum[i] = rightSum[smallerIndex] + ((smallerIndex - i) * currElement);
             }
-            stack.add(i);
-        }
-        System.out.println(Arrays.toString(leftSum));
-        System.out.println(Arrays.toString(rightSum));
 
-        int result = 0;
-        for (int i = 0; i < size; i++) {
-            int curr = leftSum[i] + rightSum[i] - arr[i];
-            result = Math.max(result, curr);
+            stack.push(i);
         }
-        return result;
+
+        // Compute the maximum possible sum
+        int maxSum = 0;
+        for (int i = 0; i < n; i++) {
+            maxSum = Math.max(maxSum, leftSum[i] + rightSum[i] - arr[i]);
+        }
+
+        return maxSum;
     }
 }

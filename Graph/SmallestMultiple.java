@@ -1,65 +1,81 @@
 package Graph;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.ArrayDeque;
 
 /**
- * Find the smallest multiple of a number using only 0s and 1s.
- * Uses BFS and remainder tracking to construct the smallest valid number.
- * https://www.youtube.com/watch?v=Om47LiGTy8o
+ * Find the smallest multiple of a given number using only the digits 0 and 1.
+ * 
+ * ### **Approach:**
+ * - We use **Breadth-First Search (BFS)** to explore all possible numbers formed by 0s and 1s.
+ * - Each number formed is represented by its remainder when divided by `num`.
+ * - We track remainders using a queue and an array (`digitMap`) to store the last digit used.
+ * - When remainder `0` is found, we backtrack to construct the valid multiple.
+ * 
+ * ### **Complexity Analysis:**
+ * - **Time Complexity:** `O(N)`, where `N` is the given number. Each remainder (0 to N-1) is processed once.
+ * - **Space Complexity:** `O(N)`, as we store `N` remainders and parent tracking.
+ * 
+ * **LeetCode Problem Reference:** (Not available, but inspired by similar BFS number construction problems)
+ * YouTube Explanation: https://www.youtube.com/watch?v=Om47LiGTy8o
  */
 public class SmallestMultiple {
 
     public static void main(String[] args) {
         int num = 7;
-        String multiple = new SmallestMultiple().multiple(num);
-        System.out.println("Smallest multiple of " + num + " with only 0s and 1s: " + multiple);
+        String smallestMultiple = findSmallestMultiple(num);
+        System.out.println("Smallest multiple of " + num + " using only 0s and 1s: " + smallestMultiple);
     }
 
     /**
-     * Optimized BFS approach to find the smallest multiple containing only 0s and 1s.
-     * @param num The number whose multiple we need to find.
-     * @return Smallest multiple in string format.
+     * Uses BFS to find the smallest multiple of `num` that consists only of digits 0 and 1.
+     *
+     * @param num The given number for which we need to find the smallest multiple.
+     * @return The smallest multiple as a string.
      */
-    public String multiple(int num) {
-        if (num == 1) return "1";
+    public static String findSmallestMultiple(int num) {
+        if (num == 1) return "1"; // Base case, smallest multiple of 1 is 1 itself.
 
-        Queue<Integer> queue = new LinkedList<>();
-        char[] charArr = new char[num]; // Stores '0' or '1' for each remainder
-        int[] parentArr = new int[num]; // Stores the parent remainder for backtracking
+        Queue<Integer> queue = new ArrayDeque<>();
+        char[] digitMap = new char[num]; // Stores '0' or '1' for each remainder.
+        int[] parentMap = new int[num]; // Tracks parent remainder for backtracking.
 
-        Arrays.fill(charArr, '2'); // Uninitialized state
-        Arrays.fill(parentArr, -1);
+        // Initialize tracking arrays
+        Arrays.fill(digitMap, '2'); // Mark uninitialized states
+        Arrays.fill(parentMap, -1);
 
-        charArr[1] = '1'; // Starting remainder
+        // Start BFS from remainder 1 (which represents the number "1")
         queue.offer(1);
+        digitMap[1] = '1';
 
         while (!queue.isEmpty()) {
-            int r = queue.poll();
-            if (r == 0) break; // Found a valid multiple
+            int remainder = queue.poll();
+            if (remainder == 0) break; // If remainder is 0, we found a valid multiple.
 
-            int r0 = (r * 10) % num;
-            int r1 = (r * 10 + 1) % num;
+            // Generate new remainders by appending '0' or '1' and taking modulo `num`
+            int remainderWith0 = (remainder * 10) % num;
+            int remainderWith1 = (remainder * 10 + 1) % num;
 
-            if (charArr[r0] == '2') {
-                charArr[r0] = '0';
-                parentArr[r0] = r;
-                queue.offer(r0);
+            // If new remainder hasn't been visited, enqueue and track it.
+            if (digitMap[remainderWith0] == '2') {
+                digitMap[remainderWith0] = '0';
+                parentMap[remainderWith0] = remainder;
+                queue.offer(remainderWith0);
             }
-            if (charArr[r1] == '2') {
-                charArr[r1] = '1';
-                parentArr[r1] = r;
-                queue.offer(r1);
+            if (digitMap[remainderWith1] == '2') {
+                digitMap[remainderWith1] = '1';
+                parentMap[remainderWith1] = remainder;
+                queue.offer(remainderWith1);
             }
         }
 
-        // Backtrack to reconstruct the number
-        StringBuilder builder = new StringBuilder();
-        for (int rem = 0; rem != -1; rem = parentArr[rem]) {
-            builder.insert(0, charArr[rem]);
+        // Backtrack to reconstruct the smallest multiple
+        StringBuilder result = new StringBuilder();
+        for (int rem = 0; rem != -1; rem = parentMap[rem]) {
+            result.insert(0, digitMap[rem]);
         }
 
-        return builder.toString();
+        return result.toString();
     }
 }

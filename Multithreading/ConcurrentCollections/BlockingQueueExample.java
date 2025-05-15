@@ -4,60 +4,81 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Demonstrates the usage of BlockingQueue with a Producer-Consumer model.
+ * 
+ * Producer (`ProducerWorker`) adds numbers to the queue.
+ * Consumer (`ConsumerWorker`) takes numbers from the queue.
+ * 
+ * Uses an `ArrayBlockingQueue` with a fixed size of 10.
+ * Ensures proper exception handling and modern Java best practices.
+ */
 public class BlockingQueueExample {
 
     public static void main(String[] args) {
-        new BlockingQueueExample().drive();
+        new BlockingQueueExample().startProcessing();
     }
 
-    private void drive() {
-        BlockingQueue<Integer> blockingQueue = new ArrayBlockingQueue<Integer>(10);
-        FirstWorker producer = new FirstWorker(blockingQueue);
-        SecondWorker consumer = new SecondWorker(blockingQueue);
+    /**
+     * Initializes and starts Producer and Consumer threads.
+     */
+    private void startProcessing() {
+        BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(10);
 
-        Thread t1 = new Thread(producer);
-        Thread t2 = new Thread(consumer);
-        t1.start();
-        t2.start();
+        Thread producerThread = new Thread(new ProducerWorker(queue));
+        Thread consumerThread = new Thread(new ConsumerWorker(queue));
+
+        producerThread.start();
+        consumerThread.start();
     }
 
-    class FirstWorker implements Runnable {
-        int counter = 0;
-        BlockingQueue<Integer> blockingQueue;
-        public FirstWorker(BlockingQueue<Integer> blockingQueue) {
-            this.blockingQueue = blockingQueue;
+    /**
+     * Producer thread that adds numbers to the BlockingQueue.
+     */
+    class ProducerWorker implements Runnable {
+        private final BlockingQueue<Integer> queue;
+        private int currentValue = 0;
+
+        public ProducerWorker(BlockingQueue<Integer> queue) {
+            this.queue = queue;
         }
 
+        @Override
         public void run() {
-
-            while(true) {
-                try{
-                    blockingQueue.put(counter);
-                    System.out.println("Adding " + counter + " to the queue");
-                    counter++;
-                    Thread.sleep(100);
-                }catch (Exception e) {
-                    e.printStackTrace();
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    queue.put(currentValue);
+                    System.out.println("Produced: " + currentValue);
+                    currentValue++;
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restore the interrupt flag
+                    System.out.println("Producer thread interrupted.");
                 }
             }
         }
     }
 
-    class SecondWorker implements Runnable {
-        BlockingQueue<Integer> blockingQueue;
+    /**
+     * Consumer thread that retrieves numbers from the BlockingQueue.
+     */
+    class ConsumerWorker implements Runnable {
+        private final BlockingQueue<Integer> queue;
 
-        public SecondWorker(BlockingQueue<Integer> blockingQueue) {
-            this.blockingQueue = blockingQueue;
+        public ConsumerWorker(BlockingQueue<Integer> queue) {
+            this.queue = queue;
         }
 
+        @Override
         public void run() {
-            while(true) {
-                try{
-                    Integer counter = blockingQueue.take();
-                    System.out.println("Taking " + counter + " from the queue");
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Integer value = queue.take();
+                    System.out.println("Consumed: " + value);
                     TimeUnit.SECONDS.sleep(1);
-                }catch (Exception e) {
-                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restore the interrupt flag
+                    System.out.println("Consumer thread interrupted.");
                 }
             }
         }

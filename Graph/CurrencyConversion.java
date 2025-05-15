@@ -51,6 +51,7 @@ public class CurrencyConversion {
         }
     }
 
+    // <From Currency, <To Currency, Rate>>
     private final Map<String, Map<String, Double>> exchangeGraph = new HashMap<>();
 
     /**
@@ -86,17 +87,22 @@ public class CurrencyConversion {
         Set<String> visited = new HashSet<>();
 
         queue.add(new ExchangeRate(source, 1.0)); // Start with base currency at 1.0 conversion rate
+        // bestRate contains the best conversion rate for each currency from the source currency
         bestRates.put(source, 1.0);
 
         while (!queue.isEmpty()) {
+            // SELECT
             ExchangeRate current = queue.poll();
+            // MARK(*)
             if (visited.contains(current.currency)) continue;
             visited.add(current.currency);
 
             for (Map.Entry<String, Double> neighbor : exchangeGraph.get(current.currency).entrySet()) {
+                // WORK
                 String nextCurrency = neighbor.getKey();
                 double newRate = current.rate * neighbor.getValue();
 
+                // ADD(*)
                 if (!bestRates.containsKey(nextCurrency) || newRate > bestRates.get(nextCurrency)) {
                     bestRates.put(nextCurrency, newRate);
                     queue.add(new ExchangeRate(nextCurrency, newRate));

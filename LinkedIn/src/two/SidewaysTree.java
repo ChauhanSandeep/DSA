@@ -1,79 +1,101 @@
 package two;
 
 /**
- * Given a binary tree where all the right nodes are either empty or leaf nodes, flip it upside down
- * and turn it into a tree with left leaf nodes.
- * In the original tree, if a node has a right child, it also must have a left child.
+ * Given a binary tree where all the right nodes are either empty or leaf nodes, flip it upside down.
+ * The transformed tree should have all left leaf nodes.
  *
- * for example, turn these:
+ * Constraints:
+ * - If a node has a right child, it must also have a left child.
  *
- *        1                1
- *       / \              / \
- *      2   3            2   3
- *     /
- *    4
- *   / \
- *  5   6
+ * Example:
+ * Original Tree:         Transformed Tree:
+ *       1                    5
+ *      / \                  / \
+ *     2   3                6   4
+ *    /                     \
+ *   4                       2
+ *  / \                     / \
+ * 5   6                   3   1
  *
- * into these:
+ * Approach:
+ * - We traverse the tree from top to bottom and reassign pointers iteratively or recursively.
+ * - The leftmost node becomes the new root.
+ * - Each left child becomes a new parent, its right child becomes its new left child, 
+ *   and the original parent becomes its new right child.
  *
- *        1               1
- *       /               /
- *      2---3           2---3
- *     /
- *    4
- *   /
- *  5---6
+ * Time Complexity: O(N) (Each node is visited once)
+ * Space Complexity: O(1) for iterative, O(H) for recursive (stack depth)
  *
- * where 5 is the new root node for the left tree, and 2 for the right tree.
- * oriented correctly:
- *
- *     5                  2
- *    / \                / \
- *   6   4              3   1
- *        \
- *         2
- *        / \
- *       3   1
- *
+ * LeetCode Problem Link (if applicable): https://leetcode.com/problems/binary-tree-upside-down/
  */
 public class SidewaysTree {
 
-  public TreeNode reverseIteratively(TreeNode root) {
-    // Store the current root node and it's left and right child
-    TreeNode currentRoot = root;
-    TreeNode leftChild = root.left;
-    TreeNode rightChild = root.right;
+    /**
+     * Iterative Approach: Flips the tree upside down.
+     * @param root Root of the original binary tree.
+     * @return New root after flipping.
+     */
+    public TreeNode flipTreeIterative(TreeNode root) {
+        if (root == null || root.left == null) {
+            return root; // Edge case: Empty tree or single-node tree
+        }
 
-    // Initialize variables to store the new left and right children
-    TreeNode nextLeftChild;
-    TreeNode nextRightChild;
+        TreeNode current = root;
+        TreeNode newRoot = null;
+        TreeNode rightSibling = null;
+        TreeNode parent = null;
 
-    // Fix the root cycle problem by setting the current node's left and right pointers to null
-    currentRoot.left = null;
-    currentRoot.right = null;
+        while (current != null) {
+            TreeNode next = current.left; // Store left child before modifying it
+            
+            // Reassign pointers
+            current.left = rightSibling;
+            rightSibling = current.right;
+            current.right = parent;
 
-    // Iterate through the tree, flipping it upside down
-    while (leftChild != null) {
-      // Store the left and right children of the current node. This create path for next level iteration
-      nextLeftChild = leftChild.left;
-      nextRightChild = leftChild.right;
+            // Move to the next level
+            parent = current;
+            current = next;
+        }
 
-      // Update the current node's pointers to flip the tree
-      leftChild.right = currentRoot;
-      leftChild.left = rightChild;
-
-      // Move to next level
-      currentRoot = leftChild;
-      leftChild = nextLeftChild;
-      rightChild = nextRightChild;
+        return parent; // The new root
     }
-    return currentRoot;
-  }
 
-  class TreeNode {
-    TreeNode left;
-    TreeNode right;
-    int data;
-  }
+    /**
+     * Recursive Approach: Flips the tree upside down.
+     * @param root Root of the original binary tree.
+     * @return New root after flipping.
+     */
+    public TreeNode flipTreeRecursive(TreeNode root) {
+        if (root == null || root.left == null) {
+            return root; // Base case: Empty tree or leftmost node
+        }
+
+        // Recursively get the new root
+        TreeNode newRoot = flipTreeRecursive(root.left);
+
+        // Adjust pointers
+        root.left.left = root.right;  // Make right child the new left child
+        root.left.right = root;       // Make current root the new right child
+
+        root.left = null;
+        root.right = null; // Prevent cycles
+
+        return newRoot; // Return the new root
+    }
+
+    /**
+     * Definition for a binary tree node.
+     */
+    static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int val) {
+            this.val = val;
+            this.left = null;
+            this.right = null;
+        }
+    }
 }

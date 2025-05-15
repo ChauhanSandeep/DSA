@@ -3,17 +3,27 @@ package LinkedList;
 import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
-
 /**
- * This class provides methods to reverse a linked list.
- * Includes:
- * - Iterative reversal of the entire list.
- * - Recursive reversal (TODO).
- * - Reversing in groups of 'k' nodes.
+ * ✅ Problem: Reverse Linked List
+ * 🔗 LeetCode: https://leetcode.com/problems/reverse-linked-list/
  *
- * LeetCode Problem: https://leetcode.com/problems/reverse-linked-list/
+ * 🔍 **Approach:**
+ * - Iterative reversal of the entire list.
+ * - Recursive reversal of the entire list.
+ * - Reversing in groups of 'k' nodes.
+ * 
+ * 📊 **Time Complexity:**
+ * - `reverseList()`: O(N) - Iterates through the list once.
+ * - `reverseListRec()`: O(N) - Visits each node once.
+ * - `reverseInGroups()`: O(N) - Each node is visited once.
+ *
+ * 🛠 **Space Complexity:**
+ * - `reverseList()`: O(1) - Uses constant extra space.
+ * - `reverseListRec()`: O(N) - Due to recursive function calls.
+ * - `reverseInGroups()`: O(N) - Due to recursive calls.
  */
 public class ReverseList {
+
     public static void main(String[] args) {
         ListNode head = new ListNode(1);
         LinkedList list = new LinkedList(head);
@@ -30,6 +40,10 @@ public class ReverseList {
         System.out.println("After complete reversal:");
         list.printList(head);
 
+        head = reverseListRec(head);
+        System.out.println("After recursive reversal:");
+        list.printList(head);
+
         head = reverseInGroups(head, 4);
         System.out.println("After batch-wise reversal:");
         list.printList(head);
@@ -40,16 +54,12 @@ public class ReverseList {
      *
      * @param head Head of the linked list.
      * @return New head of the reversed linked list.
-     *
-     * Time Complexity: O(n) - Iterates through the list once.
-     * Space Complexity: O(1) - Uses constant extra space.
      */
     public static ListNode reverseList(ListNode head) {
-        ListNode prev = null;
-        ListNode current = head;
+        ListNode prev = null, current = head, nextNode;
 
         while (current != null) {
-            ListNode nextNode = current.getNext(); // Store next node
+            nextNode = current.getNext(); // Store next node
             current.setNext(prev); // Reverse link
             prev = current; // Move prev forward
             current = nextNode; // Move current forward
@@ -58,12 +68,21 @@ public class ReverseList {
     }
 
     /**
-     * TODO: Implement recursive reversal of the linked list.
+     * Reverses the entire linked list recursively.
      *
-     * @param list Linked list object to be reversed.
+     * @param head Head of the linked list.
+     * @return New head of the reversed linked list.
      */
-    public static void reverseLinkedListRec(LinkedList list) {
-        // Complete this method
+    public static ListNode reverseListRec(ListNode head) {
+        if (head == null || head.getNext() == null) {
+            return head; // Base case: If list is empty or has only one node, return head.
+        }
+
+        ListNode reversedHead = reverseListRec(head.getNext()); // Reverse remaining list
+        head.getNext().setNext(head); // Reverse the current node's next link
+        head.setNext(null); // Set current node's next to null (to avoid cycles)
+
+        return reversedHead;
     }
 
     /**
@@ -72,22 +91,18 @@ public class ReverseList {
      * @param head Head of the linked list.
      * @param k Group size for reversal.
      * @return New head after group-wise reversal.
-     *
-     * Time Complexity: O(n) - Each node is visited once.
-     * Space Complexity: O(n/k) - Due to recursive calls.
      */
     public static ListNode reverseInGroups(ListNode head, int k) {
         if (head == null || k <= 1) {
             return head; // No change needed
         }
 
-        ListNode prev = null;
-        ListNode current = head;
+        ListNode prev = null, current = head, nextNode;
         int count = 0;
 
         // Reverse first 'k' nodes
         while (current != null && count < k) {
-            ListNode nextNode = current.getNext();
+            nextNode = current.getNext();
             current.setNext(prev);
             prev = current;
             current = nextNode;

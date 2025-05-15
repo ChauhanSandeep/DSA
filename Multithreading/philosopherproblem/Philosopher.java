@@ -2,96 +2,83 @@ package Multithreading.philosopherproblem;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Philosopher implements Runnable{
-    private int id;
-    private Chopstick leftChopstick;
-    private Chopstick rightChopstick;
-    private volatile boolean isFull = false;
-    private Random random;
-    private int eatingCounter;
+/**
+ * Represents a philosopher in the Dining Philosophers problem.
+ * Each philosopher alternates between thinking and eating, while ensuring no deadlocks occur.
+ *
+ * Problem: Dining Philosophers Problem (Concurrency Control)
+ * Solution: Uses a tryLock() mechanism with a timeout to prevent deadlock.
+ *
+ * @author [Your Name]
+ */
+public class Philosopher implements Runnable {
 
+    private final int philosopherId;
+    private final Chopstick lowerChopstick;
+    private final Chopstick higherChopstick;
+    private final Random random;
+    private final AtomicBoolean hasFinishedEating;  // Ensures thread-safe state management
+    private int eatingCounter = 0;  // Tracks the number of times the philosopher has eaten
+
+    /**
+     * Initializes a philosopher with assigned chopsticks.
+     * The chopsticks are assigned in increasing order to reduce deadlock probability.
+     *
+     * @param id The philosopher's unique ID.
+     * @param leftChopstick The left chopstick.
+     * @param rightChopstick The right chopstick.
+     */
     public Philosopher(int id, Chopstick leftChopstick, Chopstick rightChopstick) {
-        this.id = id;
-        this.leftChopstick = leftChopstick;
-        this.rightChopstick = rightChopstick;
-        random = new Random();
+        this.philosopherId = id;
+        this.random = new Random();
+        this.hasFinishedEating = new AtomicBoolean(false);
+
+        // To avoid deadlocks, always pick up the lower ID chopstick first
+        if (leftChopstick.hashCode() < rightChopstick.hashCode()) {
+            this.lowerChopstick = leftChopstick;
+            this.higherChopstick = rightChopstick;
+        } else {
+            this.lowerChopstick = rightChopstick;
+            this.higherChopstick = leftChopstick;
+        }
     }
 
     @Override
     public void run() {
-        try{
-            while(!isFull) {
+        try {
+            while (!hasFinishedEating.get()) {
                 think();
-                if(leftChopstick.pickUp(this, State.LEFT)) {
-                    if(rightChopstick.pickUp(this, State.RIGHT)){
+                if (lowerChopstick.pickUp(this, State.LEFT)) {
+                    if (higherChopstick.pickUp(this, State.RIGHT)) {
                         eat();
-                        rightChopstick.putDown(this, State.RIGHT);
+                        higherChopstick.putDown(this, State.RIGHT);
                     }
-                    leftChopstick.putDown(this, State.LEFT);
+                    lowerChopstick.putDown(this, State.LEFT);
                 }
             }
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Properly handle thread interruption
         }
     }
 
+    /**
+     * Simulates the philosopher thinking.
+     * The philosopher waits for a random amount of time before attempting to eat.
+     */
     private void think() throws InterruptedException {
-        System.out.println(this.id + " is thinking");
+        System.out.println("Philosopher " + philosopherId + " is thinking...");
         TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
     }
 
+    /**
+     * Simulates the philosopher eating.
+     * The philosopher waits for a random amount of time while eating.
+     */
     private void eat() throws InterruptedException {
-        System.out.println(this.id + " is eating");
-        this.eatingCounter++;
+        System.out.println("Philosopher " + philosopherId + " is eating...");
+        eatingCounter++;
         TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Chopstick getLeftChopstick() {
-        return leftChopstick;
-    }
-
-    public void setLeftChopstick(Chopstick leftChopstick) {
-        this.leftChopstick = leftChopstick;
-    }
-
-    public Chopstick getRightChopstick() {
-        return rightChopstick;
-    }
-
-    public void setRightChopstick(Chopstick rightChopstick) {
-        this.rightChopstick = rightChopstick;
-    }
-
-    public boolean isFull() {
-        return isFull;
-    }
-
-    public void setFull(boolean full) {
-        isFull = full;
-    }
-
-    public Random getRandom() {
-        return random;
-    }
-
-    public void setRandom(Random random) {
-        this.random = random;
-    }
-
-    public int getEatingCounter() {
-        return eatingCounter;
-    }
-
-    public void setEatingCounter(int eatingCounter) {
-        this.eatingCounter = eatingCounter;
     }
 }

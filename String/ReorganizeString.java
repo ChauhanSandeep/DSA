@@ -1,54 +1,78 @@
-package String;
+package string;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
- * Given a string s, rearrange the characters of s so that any two adjacent characters are not the same.
- *
- * https://leetcode.com/problems/reorganize-string/
+ * Problem: Rearrange characters in a string so that no two adjacent characters are the same.
+ * 
+ * Approach:
+ * - Count the frequency of each character.
+ * - Use a max heap (PriorityQueue) to always place the most frequent character first.
+ * - Greedily place the two most frequent characters at a time.
+ * - If a character’s frequency is greater than (n + 1) / 2, return an empty string as it's impossible to rearrange.
+ * 
+ * Time Complexity: O(N log A), where N is the string length and A is the alphabet size (26 for lowercase letters).
+ * Space Complexity: O(A) for storing character frequencies.
+ * 
+ * LeetCode Link: https://leetcode.com/problems/reorganize-string/
  */
 public class ReorganizeString {
 
     public static void main(String[] args) {
-        System.out.println(new ReorganizeString().reorganizeString("aab"));
+        System.out.println(reorganizeString("aab"));  // Output: "aba"
+        System.out.println(reorganizeString("aaab")); // Output: ""
     }
 
-    public String reorganizeString(String str) {
-        Map<Character, Integer> map = new HashMap<>();
-        for(Character c: str.toCharArray()) {
-            map.put(c, map.getOrDefault(c, 0) + 1);
+    /**
+     * Rearranges the string so that no two adjacent characters are the same.
+     * 
+     * @param str The input string.
+     * @return A valid rearranged string or an empty string if not possible.
+     */
+    public static String reorganizeString(String str) {
+        // Step 1: Count character frequencies
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : str.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
         }
 
-        PriorityQueue<Character> maxHeap = new PriorityQueue<>((a, b) -> map.get(b) - map.get(a));
-        maxHeap.addAll(map.keySet());
+        // Step 2: Max heap to store characters based on frequency (highest frequency first)
+        PriorityQueue<Character> maxHeap = new PriorityQueue<>(
+            (a, b) -> frequencyMap.get(b) - frequencyMap.get(a)
+        );
+        maxHeap.addAll(frequencyMap.keySet());
 
-        StringBuilder builder = new StringBuilder();
-        while(maxHeap.size() >= 2) {
+        // Step 3: Check if valid rearrangement is possible
+        int maxFrequency = maxHeap.peek() != null ? frequencyMap.get(maxHeap.peek()) : 0;
+        if (maxFrequency > (str.length() + 1) / 2) {
+            return ""; // Not possible to reorganize
+        }
+
+        // Step 4: Construct the result using a greedy approach
+        StringBuilder result = new StringBuilder();
+        while (maxHeap.size() >= 2) {
             char first = maxHeap.poll();
             char second = maxHeap.poll();
-            builder.append(first);
-            builder.append(second);
 
-            map.put(first, map.get(first) - 1);
-            map.put(second, map.get(second) - 1);
+            result.append(first).append(second);
 
-            if(map.get(first) >= 1){
-                maxHeap.offer(first);
-            }
-            if(map.get(second) >= 1) {
-                maxHeap.offer(second);
-            }
+            // Decrease frequency and re-add to heap if still needed
+            frequencyMap.put(first, frequencyMap.get(first) - 1);
+            frequencyMap.put(second, frequencyMap.get(second) - 1);
+
+            if (frequencyMap.get(first) > 0) maxHeap.offer(first);
+            if (frequencyMap.get(second) > 0) maxHeap.offer(second);
         }
 
-        if(maxHeap.size() == 1) {
-            char c = maxHeap.poll();
-            if(map.get(c) > 1) {
-                return "";
-            }
-            builder.append(c);
+        // Step 5: Handle the last remaining character (if any)
+        if (!maxHeap.isEmpty()) {
+            char last = maxHeap.poll();
+            if (frequencyMap.get(last) > 1) return ""; // Not possible to reorganize
+            result.append(last);
         }
-        return builder.toString();
+
+        return result.toString();
     }
 }

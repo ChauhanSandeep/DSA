@@ -35,26 +35,27 @@ public class ChainOfPairs {
 
     /**
      * Computes the maximum length of a chain that can be formed with given pairs.
-     * 
+     *
      * @param pairs 2D array where pairs[i] = {a, b}
      * @return Maximum length of the chain
      */
     public int maxLengthOfPairChain(int[][] pairs) {
-        int n = pairs.length;
-        if (n == 0) return 0;
+        int len = pairs.length;
+        if (len == 0) return 0;
 
         // Sort pairs based on the first element to ensure correct DP order
         Arrays.sort(pairs, (a, b) -> Integer.compare(a[0], b[0]));
 
-        int[] dp = new int[n];
+        int[] dp = new int[len];
         Arrays.fill(dp, 1); // Each pair is a valid chain of at least length 1
 
         int maxChainLength = 1;
 
         // Compute the longest chain ending at each pair
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < len; i++) {
             for (int j = 0; j < i; j++) {
                 if (pairs[j][1] < pairs[i][0]) { // Valid chain condition
+                    // This stores the maximum length of the chain ending at i
                     dp[i] = Math.max(dp[i], dp[j] + 1);
                 }
             }
@@ -69,10 +70,14 @@ public class ChainOfPairs {
      * - Sort the pairs based on the **second** element.
      * - Iterate through the pairs and select the next pair if it is valid.
      * - This approach is more efficient than the DP solution.
-     * 
+     *
+     * Proof that is returns correct result:
+     * - By sorting the pairs based on the second element, we ensure that we always extend the chain with the smallest possible end.
+     * - This way, we maximize the number of pairs we can include in the chain.
+     *
      * Time Complexity: **O(n log n)** (Sorting the pairs)
      * Space Complexity: **O(1)** (No extra space used)
-     * 
+     *
      */
     public int maxLengthOfPairChainGreedy(int[][] pairs) {
         Arrays.sort(pairs, (a, b) -> Integer.compare(a[1], b[1])); // Sort by second element

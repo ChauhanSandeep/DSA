@@ -5,14 +5,28 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Leetcode 542: 01 Matrix
- * Given a binary matrix, find the shortest distance of each cell from the nearest 0.
- * Uses Multi-Source BFS for optimal performance.
+ * **Leetcode 542: 01 Matrix**
+ * LeetCode: https://leetcode.com/problems/01-matrix/
+ *
+ * --- Problem Description ---
+ * Given a binary matrix where:
+ * - `0` represents an empty cell.
+ * - `1` represents a filled cell.
+ * Return a matrix where each `1` is replaced by the shortest distance to the nearest `0`.
+ *
+ * --- Approach ---
+ * 1. **Use Multi-Source BFS**, starting from all `0`s and expanding outward.
+ * 2. **Mark all `1`s as `Integer.MAX_VALUE` initially** to indicate unprocessed distances.
+ * 3. **BFS propagates distances optimally** in O(N²) time.
+ *
+ * --- Complexity Analysis ---
+ * - **Time Complexity:** O(N * M) → Each cell is processed at most once.
+ * - **Space Complexity:** O(N * M) → Queue stores at most N * M elements.
  */
 public class ShortestDistance {
 
     private static final int[][] DIRECTIONS = {
-            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1} // Up, Down, Left, Right
     };
 
     public static void main(String[] args) {
@@ -21,44 +35,55 @@ public class ShortestDistance {
                 {0, 1, 0},
                 {1, 1, 1}
         };
+
         int[][] result = new ShortestDistance().updateMatrix(mat);
-        System.out.println(Arrays.deepToString(result));
+        for (int[] row : result) {
+            System.out.println(Arrays.toString(row));
+        }
     }
 
+    /**
+     * Computes the shortest distance from each cell to the nearest '0' using Multi-Source BFS.
+     *
+     * @param matrix The input binary matrix.
+     * @return The transformed matrix with distances.
+     */
     public int[][] updateMatrix(int[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
+        int rows = matrix.length, cols = matrix[0].length;
         Queue<int[]> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[rows][cols];
 
-        // Step 1: Add all '0' cells to the queue and mark them visited
+        // Step 1: Initialize queue with all '0's and mark '1's as unprocessed (max value)
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (matrix[i][j] == 0) {
-                    queue.offer(new int[]{i, j});
-                    visited[i][j] = true;
+                    queue.offer(new int[]{i, j}); // Enqueue all '0' cells
                 } else {
-                    matrix[i][j] = Integer.MAX_VALUE - 1;  // Prevent integer overflow
+                    matrix[i][j] = Integer.MAX_VALUE; // Unprocessed '1's
                 }
             }
         }
 
-        // Step 2: Perform Multi-Source BFS
+        // Step 2: Multi-Source BFS to calculate the shortest distance
         while (!queue.isEmpty()) {
+            // SELECT
             int[] cell = queue.poll();
             int row = cell[0], col = cell[1];
 
             for (int[] dir : DIRECTIONS) {
-                int newRow = row + dir[0];
-                int newCol = col + dir[1];
+                // READ
+                int newRow = row + dir[0], newCol = col + dir[1];
 
-                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols && !visited[newRow][newCol]) {
+                // If within bounds and found a shorter path to a '1' cell
+                // condition `matrix[newRow][newCol] > matrix[row][col] + 1` avoids reprocessing so visited matrix is not required
+                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols &&
+                        matrix[newRow][newCol] > matrix[row][col] + 1) {
+
                     matrix[newRow][newCol] = matrix[row][col] + 1;
                     queue.offer(new int[]{newRow, newCol});
-                    visited[newRow][newCol] = true;
                 }
             }
         }
+
         return matrix;
     }
 }

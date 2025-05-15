@@ -3,71 +3,103 @@ package StackQueue;
 import java.util.Stack;
 
 /**
- * The string contains only non-negative integers, '+', '-', '*', '/',
- * and open '(' and closing parentheses ')'.
- * The integer division should truncate toward zero.
+ * Problem: Basic Calculator III
+ * LeetCode Link: https://leetcode.com/problems/basic-calculator-iii/
+ *
+ * Given a mathematical expression containing non-negative integers, '+', '-', '*', '/',
+ * and parentheses '(' and ')', evaluate the expression following standard mathematical precedence.
+ *
+ * Approach:
+ * - Use a stack to store values and compute based on the last encountered operator.
+ * - Use recursion to evaluate subexpressions enclosed in parentheses.
+ * - Handle integer division by truncating toward zero.
+ *
+ * Time Complexity: O(N), where N is the length of the expression.
+ * Space Complexity: O(N), due to recursion depth and stack storage.
  */
 public class BasicCalculator3 {
 
     public static void main(String[] args) {
-        String str = "(1-(3*2+2)-3)+(9+8)";
-        System.out.println(new BasicCalculator3().calculate(str));
+        String expression = "(1-(3*2+2)-3)+(9+8)";
+        System.out.println("Result: " + new BasicCalculator3().calculate(expression));
     }
 
-    public int calculate(String str) {
-        str = str.replaceAll("\\s+", "");
-        Stack<Integer> stack = new Stack<>();
-
-        char op = '+';
-        for(int i = 0 ; i < str.length();) {
-            char c = str.charAt(i);
-            if (c == '(') {
-                // find the block and use the recursive to solve
-                int level = 1;
-                int j = i+1;
-                while (j < str.length() && level > 0) {
-                    if(str.charAt(j) == '(') level ++;
-                    else if(str.charAt(j) == ')') level --;
-                    j++;
-                }
-                int blockValue = calculate(str.substring(i + 1, j-1));
-                i = j;
-                if (op == '+') {
-                    stack.push(blockValue);
-                } else if (op == '-') {
-                    stack.push(-blockValue);
-                } else if (op == '*') {
-                    stack.push(stack.pop() * blockValue);
-                } else if (op == '/') {
-                    stack.push(stack.pop() / blockValue);
-                }
-            } else if (Character.isDigit(c)) {
-                int j = i;
-                int value = 0;
-                while (j < str.length() && Character.isDigit(str.charAt(j))) {
-                    value = 10 * value + (str.charAt(j) - '0');
-                    j++;
-                }
-                i = j;
-                if (op == '+') {
-                    stack.push(value);
-                } else if (op == '-') {
-                    stack.push(-value);
-                } else if (op == '*') {
-                    stack.push(stack.pop() * value);
-                } else if (op == '/') {
-                    stack.push(stack.pop() / value);
-                }
-            } else {
-                op = c;
-                i++;
-            }
+    public int calculate(String expression) {
+        if (expression == null || expression.isEmpty()) {
+            return 0; // Handle edge case of empty input
         }
+
+        // Remove all whitespace to simplify processing
+        expression = expression.replaceAll("\\s+", "");
+        Stack<Integer> numberStack = new Stack<>();
+
+        char lastOperator = '+'; // Default to addition for first number
+        int currIndex = 0;
+
+        while (currIndex < expression.length()) {
+            char currentChar = expression.charAt(currIndex);
+
+            if (Character.isDigit(currentChar)) {
+                // Parse full integer value
+                int number = 0;
+                while (currIndex < expression.length() && Character.isDigit(expression.charAt(currIndex))) {
+                    number = number * 10 + (expression.charAt(currIndex) - '0');
+                    currIndex++;
+                }
+                applyToStack(numberStack, lastOperator, number);
+                continue; // Skip incrementing `currIndex` since it's already moved
+            }
+
+            if (currentChar == '(') {
+                // Handle subexpression recursively
+                int parenthesisDepth = 1;
+                int innerIndex = currIndex + 1;
+                while (innerIndex < expression.length() && parenthesisDepth > 0) {
+                    if (expression.charAt(innerIndex) == '(') parenthesisDepth++;
+                    else if (expression.charAt(innerIndex) == ')') parenthesisDepth--;
+                    innerIndex++;
+                }
+
+                // Recursively evaluate subexpression
+                int evaluatedSubExpression = calculate(expression.substring(currIndex + 1, innerIndex - 1));
+                currIndex = innerIndex; // Move `currIndex` past the closing parenthesis
+                applyToStack(numberStack, lastOperator, evaluatedSubExpression);
+                continue;
+            }
+
+            // If the character is an operator, update lastOperator
+            if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/') {
+                lastOperator = currentChar;
+            }
+
+            currIndex++; // Move to the next character
+        }
+
+        // Sum up all values in the stack
         int result = 0;
-        while (!stack.isEmpty()) {
-            result += stack.pop();
+        while (!numberStack.isEmpty()) {
+            result += numberStack.pop();
         }
         return result;
     }
 
+    /**
+     * Applies the given operator to the stack, modifying it in place.
+     */
+    private void applyToStack(Stack<Integer> stack, char operator, int value) {
+        switch (operator) {
+            case '+':
+                stack.push(value);
+                break;
+            case '-':
+                stack.push(-value);
+                break;
+            case '*':
+                stack.push(stack.pop() * value);
+                break;
+            case '/':
+                stack.push(stack.pop() / value);
+                break;
+        }
+    }
 }
