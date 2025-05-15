@@ -1,4 +1,4 @@
-package Graph.SpanTree;
+package Graph.Prims;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;

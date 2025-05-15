@@ -1,4 +1,4 @@
-package Graph.SpanTree;
+package Graph.Dijkstra;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;

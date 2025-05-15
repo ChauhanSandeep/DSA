@@ -1,4 +1,4 @@
-package Graph;
+package Graph.Bellman;
 
 import java.util.*;
 
@@ -36,7 +36,7 @@ public class CheapestFlightWithStops {
         int cheapestCost = solver.findCheapestPriceDijkstra(3, flights, 0, 2, 1);
         System.out.println("Cheapest cost using Dijkstra's: " + cheapestCost);
 
-        int cheapestCostBFS = solver.findCheapestPriceBFS(3, flights, 0, 2, 1);
+        int cheapestCostBFS = solver.findCheapestPriceBellmanFord(3, flights, 0, 2, 1);
         System.out.println("Cheapest cost using BFS: " + cheapestCostBFS);
     }
 
@@ -82,26 +82,59 @@ public class CheapestFlightWithStops {
     }
 
     /**
-     * Approach 2: Bellman-Ford Style BFS (Relax edges up to k+1 times)
+     * Finds the cheapest price to travel from a source city to a destination city
+     * with at most K stops using a Bellman-Ford style approach.
+     *
+     * 💡 Intuition:
+     * - Each flight is an edge. We perform at most (K+1) "levels" of edge relaxation,
+     *   where each level represents one extra stop.
+     * - In each level, we try to improve the cost of reaching each city using the
+     *   flights available, *without prematurely using updated values in the same level.*
+     *   (hence we use a temp array for the update).
+     *
+     * 🔍 Why it works:
+     * - We’re relaxing all edges up to K+1 times, just like Bellman-Ford.
+     * - But we do it in a controlled way using copies of the distance array,
+     *   which simulates layer-wise propagation (like BFS).
+     *
+     * ✅ Time Complexity: O(K * E), where:
+     *      - K is the max number of stops
+     *      - E is the number of flights (edges)
+     * ✅ Space Complexity: O(V), where V is the number of cities (vertices)
+     *
+     * @param totalCities   Total number of cities (vertices)
+     * @param flights       List of flights; each flight is [from, to, cost]
+     * @param source        Starting city
+     * @param destination   Target city
+     * @param maxStops      Maximum number of stops allowed (K)
+     * @return Minimum cost to reach destination within K stops, or -1 if unreachable
      */
-    public int findCheapestPriceBFS(int totalCities, int[][] flights, int source, int destination, int maxStops) {
-        // Distance array initialized to max value
+    public int findCheapestPriceBellmanFord(int totalCities, int[][] flights, int source, int destination, int maxStops) {
+        // minCost[i] will hold the minimum cost to reach city i from source
+        // Initialize all costs to infinity, except the source city
         int[] minCost = new int[totalCities];
         Arrays.fill(minCost, Integer.MAX_VALUE);
         minCost[source] = 0;
 
-        // Iterate maxStops + 1 times to relax the edges
-        for (int i = 0; i <= maxStops; i++) {
-            int[] tempCost = Arrays.copyOf(minCost, totalCities);
+        // Perform up to (maxStops + 1) rounds of edge relaxation. Edge relaxation is the
+        // process of updating the cost to reach a city if a cheaper route is found.
+        for (int stops = 0; stops <= maxStops; stops++) {
+            // Create a copy of the current cost array to prevent premature updates
+            int[] updatedCost = Arrays.copyOf(minCost, totalCities);
 
             for (int[] flight : flights) {
-                int from = flight[0], to = flight[1], price = flight[2];
-                if (minCost[from] != Integer.MAX_VALUE) { // Only relax if reachable
-                    tempCost[to] = Math.min(tempCost[to], minCost[from] + price);
+                int from = flight[0];
+                int to = flight[1];
+                int price = flight[2];
+
+                // Only relax if source city is reachable
+                if (minCost[from] != Integer.MAX_VALUE) {
+                    updatedCost[to] = Math.min(updatedCost[to], minCost[from] + price);
                 }
             }
 
-            minCost = tempCost;
+            // Move to the next level of relaxation
+            minCost = updatedCost;
         }
 
         return minCost[destination] == Integer.MAX_VALUE ? -1 : minCost[destination];

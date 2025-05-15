@@ -1,4 +1,4 @@
-package Graph;
+package Graph.Kahn;
 
 import java.util.*;
 
@@ -10,19 +10,6 @@ import java.util.*;
  * Given `numCourses` and a list of `prerequisites` [course, prerequisite],
  * determine if it's possible to complete all courses without cyclic dependencies.
  *
- * Approaches:
- * 1. **DFS Cycle Detection**:
- *    - Model the course dependencies as a directed graph.
- *    - Use DFS to check for cycles (if a node is revisited in the same path, a cycle exists).
- *    - Time Complexity: **O(V + E)** (where V = courses, E = prerequisites)
- *    - Space Complexity: **O(V + E)** (Adjacency list + recursion stack)
- *
- * 2. **BFS (Kahn’s Algorithm - Topological Sort)**:
- *    - Compute in-degree for each course.
- *    - Use a queue to process courses with zero in-degree.
- *    - If we can process all courses, return true; otherwise, a cycle exists.
- *    - Time Complexity: **O(V + E)**
- *    - Space Complexity: **O(V + E)**
  */
 public class CourseSchedule {
 
@@ -42,6 +29,14 @@ public class CourseSchedule {
 
     /**
      * Approach 1: DFS Cycle Detection
+     *  - Model the course dependencies as a directed graph.
+     *  - Use DFS to check for cycles (if a node is revisited in the same path, a cycle exists).
+     *
+     *  - Time Complexity: **O(V + E)** (where V = courses, E = prerequisites)
+     *  - Space Complexity: **O(V + E)** (Adjacency list + recursion stack)
+     * @param numCourses
+     * @param prerequisites
+     * @return
      */
     public boolean canFinishUsingDFS(int numCourses, int[][] prerequisites) {
         // Step 1: Build adjacency list (course dependency graph)
@@ -84,6 +79,12 @@ public class CourseSchedule {
 
     /**
      * Approach 2: BFS (Kahn’s Algorithm - Topological Sort)
+     * - Compute in-degree for each course.
+     * - Use a queue to process courses with zero in-degree.
+     * - If we can process all courses, return true; otherwise, a cycle exists.
+     *
+     * - Time Complexity: **O(V + E)**
+     * - Space Complexity: **O(V + E)**
      */
     public boolean canFinishUsingBFS(int numCourses, int[][] prerequisites) {
         // Step 1: Build adjacency list & compute in-degree for each course

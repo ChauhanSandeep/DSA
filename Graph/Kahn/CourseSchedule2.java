@@ -1,4 +1,4 @@
-package Graph;
+package Graph.Kahn;
 
 import java.util.*;
 
@@ -10,21 +10,6 @@ import java.util.*;
  * Given `numCourses` and a list of `prerequisites` [course, prerequisite],
  * determine a valid order to take all courses. If there is no valid order, return an empty array.
  *
- * Approaches:
- * 1. **DFS with Cycle Detection**:
- *    - Build a directed graph using adjacency lists.
- *    - Perform DFS to detect cycles and determine a valid course order.
- *    - If a cycle is detected, return an empty array.
- *    - Time Complexity: **O(V + E)** (where V = courses, E = prerequisites)
- *    - Space Complexity: **O(V + E)** (Adjacency list + recursion stack)
- *
- * 2. **BFS (Kahn’s Algorithm - Topological Sort)**:
- *    - Compute in-degree for each course.
- *    - Use a queue to process courses with zero in-degree.
- *    - Process courses in topological order; if all courses are processed, return the order.
- *    - If a cycle exists, return an empty array.
- *    - Time Complexity: **O(V + E)**
- *    - Space Complexity: **O(V + E)**
  */
 public class CourseSchedule2 {
 
@@ -47,6 +32,12 @@ public class CourseSchedule2 {
 
     /**
      * Approach 1: DFS with Cycle Detection
+     * - Build a directed graph using adjacency lists.
+     * - Perform DFS to detect cycles and determine a valid course order.
+     * - If a cycle is detected, return an empty array.
+     *
+     * - Time Complexity: **O(V + E)** (where V = courses, E = prerequisites)
+     * - Space Complexity: **O(V + E)** (Adjacency list + recursion stack)
      * @param numCourses    Total number of courses.
      * @param prerequisites Array of prerequisite pairs {course, prerequisite}.
      * @return An array representing a valid course order; if no order exists, returns an empty array.
@@ -64,18 +55,18 @@ public class CourseSchedule2 {
 
         // Step 2: Track visit states (0 = unvisited, 1 = visiting, 2 = processed)
         int[] visitState = new int[numCourses];
-        List<Integer> topoOrder = new ArrayList<>();
+        List<Integer> courseOrder = new ArrayList<>();
 
         // Step 3: Perform DFS to detect cycles and compute topological order
         for (int course = 0; course < numCourses; course++) {
-            if (detectCycleDFS(course, courseGraph, visitState, topoOrder)) {
+            if (detectCycleDFS(course, courseGraph, visitState, courseOrder)) {
                 return new int[0]; // Cycle detected, no valid order
             }
         }
 
         // Step 4: Convert List to array (reverse order since DFS adds last first)
-        Collections.reverse(topoOrder);
-        return topoOrder.stream().mapToInt(i -> i).toArray();
+        Collections.reverse(courseOrder);
+        return courseOrder.stream().mapToInt(i -> i).toArray();
     }
 
     /**
@@ -101,6 +92,14 @@ public class CourseSchedule2 {
 
     /**
      * Approach 2: BFS (Kahn’s Algorithm - Topological Sort)
+     *  - Compute in-degree for each course.
+     *  - Use a queue to process courses with zero in-degree.
+     *  - Process courses in topological order; if all courses are processed, return the order.
+     *  - If a cycle exists, return an empty array.
+     *
+     *  - Time Complexity: **O(V + E)**
+     *  - Space Complexity: **O(V + E)**
+     *
      * @param numCourses    Total number of courses.
      * @param prerequisites Array of prerequisite pairs {course, prerequisite}.
      * @return An array representing a valid course order; if no order exists, returns an empty array.
@@ -128,10 +127,10 @@ public class CourseSchedule2 {
         }
 
         // Step 3: Process courses in topological order
-        List<Integer> topoOrder = new ArrayList<>();
+        List<Integer> courseOrder = new ArrayList<>();
         while (!queue.isEmpty()) {
             int currentCourse = queue.poll();
-            topoOrder.add(currentCourse);
+            courseOrder.add(currentCourse);
 
             for (int nextCourse : courseGraph.get(currentCourse)) {
                 inDegree[nextCourse]--;
@@ -142,6 +141,6 @@ public class CourseSchedule2 {
         }
 
         // Step 4: Check if all courses are processed
-        return topoOrder.size() == numCourses ? topoOrder.stream().mapToInt(i -> i).toArray() : new int[0];
+        return courseOrder.size() == numCourses ? courseOrder.stream().mapToInt(i -> i).toArray() : new int[0];
     }
 }

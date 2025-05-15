@@ -114,19 +114,19 @@ public class FindCousins {
         levelNodesMap.get(currentLevel).add(node.val);
 
         // Recursively search for the target in the left subtree
-        boolean foundInLeft = traverse(node.left, target, currentLevel + 1);
+        boolean isLeftChildTarget = traverse(node.left, target, currentLevel + 1);
 
         // If target is found in the left subtree, no need to search the right subtree
-        if (foundInLeft) {
+        if (isLeftChildTarget) {
             return false;
         }
 
         // Recursively search for the target in the right subtree
-        boolean foundInRight = traverse(node.right, target, currentLevel + 1);
+        boolean isRightChildTarget = traverse(node.right, target, currentLevel + 1);
 
         // If the target is found in the right subtree and the left child exists,
         // remove the left child from the cousins list
-        if (foundInRight && node.left != null) {
+        if (isRightChildTarget && node.left != null) {
             levelNodesMap.get(currentLevel + 1).remove(Integer.valueOf(node.left.val));
         }
 

@@ -10,9 +10,12 @@ import java.util.List;
  * Problem:
  * Given a collection of numbers, where some numbers may be duplicates,
  * return all unique permutations in any order.
+ * For example: Input: [1,1,2]
+ * Output: [[1,1,2],[1,2,1],[2,1,1]]
+ * The number of unique combinations for array of length N and M1, M2 ... Mk duplicate combination is : N!/(M1!*M2!*...*Mk!)
  *
  * Approach:
- * - **Backtracking with Pruning**: 
+ * - **Backtracking with Pruning**:
  *   - Sort the array to group duplicates together.
  *   - Use a `used[]` boolean array to track which elements are in the current permutation.
  *   - **Skip duplicates** by ensuring that each duplicate number is used **only once per recursion level**.
@@ -58,7 +61,9 @@ public class Permutation2 {
 
         for (int i = 0; i < nums.length; i++) {
             // Skip used elements or duplicate elements (if previous duplicate is not used)
-            if (used[i] || (i > 0 && nums[i] == nums[i - 1] && !used[i - 1])) {
+            boolean isCurrentElementAlreadyUsed = used[i];
+            boolean isDuplicateElementAlreadyUsed = i > 0 && nums[i] == nums[i - 1] && !used[i - 1];
+            if (isCurrentElementAlreadyUsed || isDuplicateElementAlreadyUsed) {
                 continue;
             }
 

@@ -1,15 +1,15 @@
-package Graph;
+package Graph.Dijkstra;
 
 import java.util.*;
 
 /**
  * Min Cost to Reach Bottom-Right in a Grid
- * 
+ *
  * Approach:
  * - Use **Dijkstra's Algorithm** to find the minimum cost path from (0,0) to (rows-1,cols-1).
  * - **Priority Queue (Min-Heap)** ensures optimal selection of minimum cost paths.
  * - Each movement in the given direction costs **0**, while changing direction costs **1**.
- * 
+ *
  * Time Complexity: **O(R * C * log(R * C))** (Dijkstra’s Algorithm with Min-Heap)
  * Space Complexity: **O(R * C)** (For distance matrix & priority queue)
  */

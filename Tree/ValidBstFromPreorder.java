@@ -6,6 +6,13 @@ import java.util.ArrayDeque;
 /**
  * Given a preorder traversal sequence, determine if a valid Binary Search Tree (BST)
  * can be constructed from it.
+ * Example: [40, 30, 25, 35, 80, 100]
+ * - This sequence can form a valid BST.
+ *                    40
+ *                  /   \
+ *                30    80
+ *               /  \     \
+ *              25  35    100
  *
  * <p>LeetCode Link: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/
  */
@@ -22,7 +29,14 @@ public class ValidBstFromPreorder {
         boolean isValid = new ValidBstFromPreorder().isValidPreorderBST(preorderSequence);
         System.out.println("Is valid BST? " + isValid);
     }
-
+    /**
+     * This method checks if the given preorder sequence can form a valid BST.
+     * It uses a recursive approach to verify the properties of BST.
+     * This is suboptimal than using stack approach because it uses O(N) space for recursion.
+     *
+     * @param preorderSequence The preorder traversal array.
+     * @return true if a valid BST can be formed, otherwise false.
+     */
     public boolean isValidPreorderBstSuboptimal(int[] preorderSequence) {
         return verify(preorderSequence, 0, preorderSequence.length - 1);
     }

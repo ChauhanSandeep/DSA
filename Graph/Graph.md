@@ -2,22 +2,23 @@
 
 ## Table of Contents
 - [Introduction to Graphs](#introduction-to-graphs)
-- [Breadth-First Search (BFS)](#breadth-first-search-bfs)
-- [Depth-First Search (DFS)](#depth-first-search-dfs)
+- [Breadth-First Search (BFS)](#breadth-first-search-bfs) `(SELECT → MARK(*) → WORK → ADD(*))` [In Queue]
+- [Depth-First Search (DFS)](#depth-first-search-dfs) `(SELECT → MARK(*) → WORK → ADD(*))` [In Stack]
 - [Topological Sort](#topological-sort)
+    - [Topological Sort using DFS](#dfs-based-topological-sort-implementation)
+    - [Kahn's Algorithm (PREFERRED)](#kahns-algorithm-based-appraoch) `(SELECT → MARK(*) → WORK → ADD(*))` [In Queue with 0 In-Degree]
 - [Shortest Path Algorithms](#shortest-path-algorithms)
-    - [Dijkstra's Algorithm](#dijkstras-algorithm)
+    - [Dijkstra's Algorithm](#dijkstras-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap]
     - [Bellman-Ford Algorithm](#bellman-ford-algorithm)
     - [Floyd-Warshall Algorithm](#floyd-warshall-algorithm)
 - [Minimum Spanning Tree](#minimum-spanning-tree)
-    - [Prim's Algorithm](#prims-algorithm)
+    - [Prim's Algorithm](#prims-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))`
     - [Kruskal's Algorithm](#kruskals-algorithm)
 - [Articulation Points and Bridges](#articulation-points-and-bridges)
 - [Kosaraju's Algorithm](#kosarajus-algorithm)
 - [Disjoint Sets (Union-Find)](#disjoint-sets-union-find)
 
 ## Introduction to Graphs
-
 A graph is a non-linear data structure consisting of vertices (or nodes) and edges that connect these vertices. Graphs are used to represent networks of many kinds, including social networks, computer networks, roads, and much more.
 
 ### Graph Representation
@@ -90,12 +91,7 @@ public class AdjacencyListGraph {
 
 ## Breadth-First Search (BFS)
 
-BFS is a traversal algorithm that explores all the vertices of a graph at the present depth before moving on to vertices at the next depth level.
-
-### Intuition
-- Start at a source node and explore all its neighbors before moving to the next level
-- Uses a queue data structure (First-In-First-Out)
-- Visits nodes in increasing order of their distance from the source
+BFS is an algorithm for traversing or searching a graph. It starts at a source node and explores all its neighbors level by level before moving to the next level. It’s ideal for finding the shortest path in an unweighted graph and is implemented using a queue.
 
 ### Use Cases
 - Finding shortest paths in unweighted graphs
@@ -104,13 +100,16 @@ BFS is a traversal algorithm that explores all the vertices of a graph at the pr
 sets such that no two graph vertices within the same set are adjacent)
 - Finding all nodes within one connected component
 
-### Steps
-1. Create a queue and a visited array
-2. Enqueue the source vertex and mark it as visited
-3. While the queue is not empty:
-    - Dequeue a vertex
-    - Process the vertex
-    - Enqueue all unvisited adjacent vertices and mark them as visited
+### Steps 
+Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
+- Create a `queue` and a `visited[]` array.  
+- Add the starting node to the queue and mark it as visited.
+- **SELECT**: Remove the front node from the queue.
+- **MARK(*)**: Ensure the node is marked as visited to avoid reprocessing.
+- **WORK**: Process the node (e.g., print, track level, update parent map).
+- **ADD(*)**:For all unvisited neighbors of the current node,  
+  mark them as visited and add them to the queue.
+- **Repeat**: Continue until the queue is empty.
 
 ### Java Implementation
 
@@ -178,6 +177,12 @@ public class BFS {
 - **Time Complexity**: O(V + E) where V is the number of vertices and E is the number of edges
 - **Space Complexity**: O(V) for the queue and visited array
 
+### When to Use:
+- **Finding the shortest path in unweighted graphs**: BFS guarantees the shortest path from the source node to any other node when edge weights are equal.
+- **Exploring a graph level by level**: When you need to visit all nodes at a particular distance from the source before moving on to the next level.
+- **Flood-fill problems**: E.g., in image processing, to spread or fill regions from a starting point.
+- **Connectivity checks**: To determine if a graph is connected or if a node is reachable from another node.
+
 ### Example LeetCode Problems
 1. [LeetCode #200: Number of Islands](https://leetcode.com/problems/number-of-islands/)
 2. [LeetCode #994: Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)
@@ -186,12 +191,7 @@ public class BFS {
 
 ## Depth-First Search (DFS)
 
-DFS is a traversal algorithm that explores as far as possible along each branch before backtracking.
-
-### Intuition
-- Start at a source node and explore each branch completely before moving to the next branch
-- Uses a stack (explicitly or implicitly through recursion)
-- Goes as deep as possible before backtracking
+DFS is another graph traversal algorithm where you explore as deep as possible along a branch before backtracking. It is implemented using either recursion or a stack. DFS is useful for topological sorting, pathfinding, and checking graph connectivity.
 
 ### Use Cases
 - Finding paths between two vertices
@@ -201,10 +201,15 @@ DFS is a traversal algorithm that explores as far as possible along each branch 
 - Solving puzzles like mazes
 
 ### Steps
-1. Create a visited array
-2. Start at the source vertex, mark it as visited
-3. Recursively visit all unvisited adjacent vertices
-4. Backtrack when there are no more unvisited neighbors
+Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
+- Create a `stack` and a `visited[]` array.  
+- Add the starting node to the stack and mark it as visited.
+- **SELECT**: Pop the top node from the stack.
+- **MARK(*)**: Ensure the node is marked as visited to avoid reprocessing.
+- **WORK**: Process the node (e.g., print, store in result list, update metadata).
+- **ADD(*)**:  For all unvisited neighbors of the current node,  
+  mark them as visited and push them onto the stack.
+- **Repeat**: Continue until the stack is empty (or all nodes are visited in recursion).
 
 ### Java Implementation
 
@@ -317,35 +322,33 @@ public class DFS {
 
 ## Topological Sort
 
-Topological sorting is a linear ordering of vertices in a directed acyclic graph (DAG) such that for every directed edge (u, v), vertex u comes before v in the ordering.
-
-### Intuition
-- Only applicable to Directed Acyclic Graphs (DAGs)
-- Represents dependencies between tasks
-- Multiple valid topological orderings may exist
+Topological sort is the process of ordering the vertices of a directed graph such that for every directed edge u → v, vertex u comes before v in the ordering. This is primarily used in directed acyclic graphs (DAGs) and is helpful in scheduling tasks.
 
 ### Use Cases
-- Task scheduling with dependencies
-- Course prerequisite planning
-- Build systems
-- Data serialization
+- **Ordering tasks or events** with dependencies: Topological sort is used in project scheduling, task dependency resolution, and course prerequisite ordering where tasks must occur in a specific order.
+- **DAGs (Directed Acyclic Graphs)**: This algorithm is specifically designed for directed acyclic graphs where cycles do not exist.
+- **Dependency resolution**: In package managers, topological sort can be used to determine the order in which packages should be installed based on their dependencies.
 
 ### Approaches
 1. **DFS-based (Recursive)**: Uses a temporary stack to store vertices in topological order
 2. **Kahn's Algorithm (Iterative)**: Uses in-degree of vertices and a queue
 
 ### DFS-based Topological Sort Implementation
+In this approach, topological sorting is performed using DFS. As DFS visits each node, it places the node on a stack once all its descendants are processed. The stack’s order gives a valid topological sort of the DAG.
 
+#### Steps:
+1. Initialize a visited array to track visited nodes
+2. Perform DFS on unvisited nodes
+3. Push nodes to a stack after visiting all their neighbors
+4. Pop elements from the stack to get the topological order
+
+#### Java Implementation
 ```java
 import java.util.*;
 
 /**
  * TopologicalSortDFS performs a topological sort of a directed acyclic graph (DAG)
  * using Depth-First Search (DFS).
- *
- * <p><strong>Intuition:</strong>
- * Topological sort is used to order the vertices of a directed acyclic graph (DAG)
- * such that for every directed edge u → v, vertex u comes before v in the ordering.
  *
  * <p><strong>Approach:</strong>
  * We perform a DFS traversal of the graph. When visiting a node, we recursively visit
@@ -414,18 +417,25 @@ public class TopologicalSortDFS {
 }
 ```
 
+### Kahn's Algorithm based appraoch
+Kahn’s algorithm is a method of topological sorting for DAGs using in-degree tracking. Nodes with zero in-degree (no dependencies) are processed first, and their removal decreases the in-degree of their neighbors. This process continues until all nodes are sorted or a cycle is detected.
+
+#### Steps:
+Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
+- **Initialize**: Compute `in-degree` of all nodes. Create a `queue` and enqueue all nodes with in-degree = 0.
+- **SELECT**: Dequeue a node from the front of the queue.
+- **MARK(*)**: Conceptually mark this node as processed by adding it to the result list.
+- **WORK**: Process the node (e.g., store it in the topological order list).
+- **ADD(*)**: For each neighbor of the current node, reduce its in-degree by 1. If in-degree becomes 0, enqueue the neighbor.
+- **Repeat**: Continue until the queue is empty. If the result list size is less than the total nodes, then there is a cycle in the graph.
+
+### Java Implementation
 ```java
 import java.util.*;
 
 /**
  * TopologicalSortKahn performs topological sorting of a Directed Acyclic Graph (DAG)
  * using Kahn’s Algorithm (BFS-based approach).
- *
- * <p><strong>Intuition:</strong>
- * In a DAG, if we repeatedly remove nodes with zero in-degree (no dependencies),
- * the order in which we remove them is a valid topological sort. If at any point
- * we are left with nodes having non-zero in-degrees and no zero in-degree node is available,
- * it indicates a cycle.
  *
  * <p><strong>Steps (Kahn’s Algorithm):</strong>
  * 1. Calculate the in-degree of all vertices.
@@ -555,28 +565,29 @@ public class TopologicalSortKahn {
 4. [LeetCode #802: Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
 
 ## Shortest Path Algorithms
+These algorithms are used to find the shortest path between nodes in a graph. Depending on the graph structure (weighted/unweighted, directed/undirected), various algorithms can be used, such as Dijkstra’s, Bellman-Ford, or Floyd-Warshall.
 
 ### Dijkstra's Algorithm
+Dijkstra’s algorithm is a greedy method for finding the shortest path in a graph with non-negative weights. It works by iteratively selecting the node with the smallest tentative distance, updating its neighbors, and continuing until the destination is reached or all nodes are processed.
 
-Dijkstra's algorithm finds the shortest paths from a source vertex to all other vertices in a weighted graph with non-negative weights.
-
-### Intuition
-- Greedy algorithm that selects the vertex with the minimum distance value
-- Uses a priority queue to efficiently select the next vertex to process
-- Cannot handle negative edge weights
+### Example Leetcode Problems
+- [LeetCode #743: Network Delay Time](https://leetcode.com/problems/network-delay-time/)
+- [LeetCode #1631: Path With Minimum Effort](https://leetcode.com/problems/path-with-minimum-effort/)
+- [LeetCode #787: Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
 
 ### Use Cases
-- Finding shortest routes in road networks
-- Network routing protocols
-- Flight scheduling
+- **Shortest path in weighted graphs** (with non-negative weights): Ideal for finding the shortest path from a source node to all other nodes.
+- **Routing algorithms**: Used in network protocols to find the best path between nodes, such as in GPS systems or internet routing.
+- **Network delay problems**: Where the goal is to minimize the time for a signal to travel across a network.
 
 ### Steps
-1. Create a distance array and initialize all distances to infinity except the source vertex (0)
-2. Create a priority queue and add the source vertex with distance 0
-3. While the priority queue is not empty:
-    - Extract the vertex with the minimum distance
-    - For each adjacent vertex, if the distance through current vertex is smaller than its current distance, update it
-    - Add the vertex to the priority queue with its updated distance
+Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
+- **Initialize**: Create a `min-heap` (priority queue) to store `(node, distance)` and a `distance[]` array initialized to ∞ for all nodes except the source (0). Add the source node to the heap.
+- **SELECT**: Extract the node with the smallest distance from the min-heap.
+- **MARK(*)**: If the node is already finalized (visited), skip it; otherwise, mark it as processed.
+- **WORK**: Update the shortest path info for the current node (e.g., record distance to the node).
+- **ADD(*)**: For all unvisited neighbors of the current node, if a shorter path is found via the current node, update their distance and add them to the min-heap.
+- **Repeat**: Continue until the min-heap is empty.
 
 ### Java Implementation
 
@@ -585,11 +596,6 @@ import java.util.*;
 
 /**
  * Dijkstra's Algorithm - Single Source Shortest Path for Weighted Directed Graph
- *
- * ✅ Intuition:
- * - Dijkstra’s algorithm finds the shortest distance from a source node to all other nodes in a weighted graph (with non-negative weights).
- * - It uses a greedy strategy by always picking the vertex with the minimum distance that has not been processed yet.
- * - A priority queue (min-heap) ensures we always pick the closest unvisited node efficiently.
  *
  * ✅ Steps:
  * 1. Initialize all distances as infinity (except source = 0).
@@ -600,92 +606,70 @@ import java.util.*;
  * ✅ Time Complexity: O((V + E) * log V) using PriorityQueue
  * ✅ Space Complexity: O(V) for distance array and priority queue
  */
-public class Dijkstra {
+import java.util.*;
 
-  /**
-   * Helper class to represent a node and its current known distance from the source.
-   * Used in the priority queue for efficient minimum distance retrieval.
-   */
-  static class Node implements Comparable<Node> {
-    int vertex;
-    int distance;
+// Class representing an edge in the graph
+static class Edge {
+  int source;
+  int destination;
+  int weight;
 
-    public Node(int vertex, int distance) {
-      this.vertex = vertex;
-      this.distance = distance;
-    }
-
-    @Override
-    public int compareTo(Node other) {
-      return Integer.compare(this.distance, other.distance);
-    }
+  public Edge(int source, int destination, int weight) {
+    this.source = source;
+    this.destination = destination;
+    this.weight = weight;
   }
+}
 
-  /**
-   * Graph representation using adjacency list for weighted directed edges.
-   */
-  static class Graph {
-    int numVertices;
-    List<List<Node>> adjacencyList;
+// Helper class for priority queue
+static class NodeInfo {
+  int currentNode;
+  String pathSoFar;
+  int totalWeightSoFar;
 
-    public Graph(int numVertices) {
-      this.numVertices = numVertices;
-      adjacencyList = new ArrayList<>(numVertices);
-      for (int i = 0; i < numVertices; i++) {
-        adjacencyList.add(new ArrayList<>());
-      }
-    }
-
-    /**
-     * Adds a directed edge from source to destination with the given weight.
-     */
-    public void addEdge(int source, int destination, int weight) {
-      adjacencyList.get(source).add(new Node(destination, weight));
-    }
+  public NodeInfo(int currentNode, String pathSoFar, int totalWeightSoFar) {
+    this.currentNode = currentNode;
+    this.pathSoFar = pathSoFar;
+    this.totalWeightSoFar = totalWeightSoFar;
   }
+}
 
-  /**
-   * Runs Dijkstra's algorithm from a given source and returns shortest distances
-   * to all vertices.
-   *
-   * @param graph The input weighted graph.
-   * @param source The source vertex.
-   * @return An array where dist[i] is the shortest distance from source to vertex i.
-   */
-  public static int[] dijkstra(Graph graph, int source) {
-    int V = graph.numVertices;
-    int[] shortestDistances = new int[V];
-    Arrays.fill(shortestDistances, Integer.MAX_VALUE);
-    shortestDistances[source] = 0;
+// Dijkstra's algorithm implementation
+private void dijkstraShortestPaths(int numberOfVertices, ArrayList<Edge>[] graph, int source) {
+  // Distance array: stores shortest distance from source to each node
+  int[] shortestDistance = new int[numberOfVertices + 1];
+  Arrays.fill(shortestDistance, Integer.MAX_VALUE);
+  shortestDistance[source] = 0;
 
-    // Min-heap to pick the node with the smallest distance
-    PriorityQueue<Node> minHeap = new PriorityQueue<>();
-    minHeap.offer(new Node(source, 0));
+  // Min-heap to always pick the node with the smallest distance
+  PriorityQueue<NodeInfo> minHeap = new PriorityQueue<>(Comparator.comparingInt(n -> n.totalWeightSoFar));
+  minHeap.offer(new NodeInfo(source, source + "", 0));
 
-    while (!minHeap.isEmpty()) {
-      Node current = minHeap.poll();
-      int currentVertex = current.vertex;
-      int currentDistance = current.distance;
+  // Visited array to avoid reprocessing nodes
+  boolean[] visited = new boolean[numberOfVertices + 1];
 
-      // Skip if a better path to currentVertex has already been processed
-      if (currentDistance > shortestDistances[currentVertex]) {
-        continue;
-      }
+  while (!minHeap.isEmpty()) {
+    NodeInfo current = minHeap.poll();
 
-      // Process all adjacent vertices
-      for (Node neighbor : graph.adjacencyList.get(currentVertex)) {
-        int adjacent = neighbor.vertex;
-        int weight = neighbor.distance;
+    // Skip if already visited
+    if (visited[current.currentNode]) continue;
+    visited[current.currentNode] = true;
 
-        // Check for a shorter path to adjacent through currentVertex
-        if (shortestDistances[currentVertex] + weight < shortestDistances[adjacent]) {
-          shortestDistances[adjacent] = shortestDistances[currentVertex] + weight;
-          minHeap.offer(new Node(adjacent, shortestDistances[adjacent]));
-        }
+    // Output the path and cost from source to current node
+    System.out.printf("To node: %d | Path: %s | Total weight: %d%n",
+        current.currentNode, current.pathSoFar, current.totalWeightSoFar);
+
+    // Explore neighbors
+    for (Edge edge : graph[current.currentNode]) {
+      int neighbor = edge.destination;
+      int newDistance = current.totalWeightSoFar + edge.weight;
+
+      // Only consider if not visited and new path is shorter
+      if (!visited[neighbor] && newDistance < shortestDistance[neighbor]) {
+        shortestDistance[neighbor] = newDistance;
+        minHeap.offer(new NodeInfo(neighbor, current.pathSoFar + "->" + neighbor, newDistance));
       }
     }
-
-    return shortestDistances;
   }
 }
 ```
@@ -694,19 +678,14 @@ public class Dijkstra {
 - **Time Complexity**: O((V + E) log V) using a binary heap priority queue
 - **Space Complexity**: O(V) for the distance array and the priority queue
 
-### Bellman-Ford Algorithm
-
-Bellman-Ford algorithm finds the shortest paths from a source vertex to all other vertices in a weighted graph. Unlike Dijkstra's, it can handle negative weight edges.
-
-### Intuition
-- Dynamic programming approach
-- Can detect negative weight cycles
-- Less efficient than Dijkstra's but more general
+## Bellman-Ford Algorithm
+Bellman-Ford is a single-source shortest path algorithm that works even with negative edge weights. It relaxes all edges up to n-1 times (where n is the number of nodes) and can detect negative weight cycles, unlike Dijkstra’s algorithm.
 
 ### Use Cases
-- Networks with negative edge weights
-- Detecting negative cycles
-- Currency exchange arbitrage detection
+- **Graphs with negative edge weights**: Bellman-Ford can handle graphs with negative weight edges, unlike Dijkstra’s.
+- **Detecting negative cycles**: If there’s a cycle in the graph where the total weight is negative, Bellman-Ford can detect this.
+- **Shortest path in graphs where edge weights may change dynamically**: Unlike Dijkstra, Bellman-Ford is simpler for dealing with edge weights that change over time.
+
 
 ### Steps
 1. Initialize distances from source to all vertices as infinite and distance to source as 0
@@ -818,32 +797,27 @@ public class BellmanFord {
 }
 ```
 
-### Time and Space Complexity
+#### Time and Space Complexity
 - **Time Complexity**: O(V × E)
 - **Space Complexity**: O(V) for the distance array
 
 ### Floyd-Warshall Algorithm
-
-Floyd-Warshall algorithm finds shortest paths between all pairs of vertices in a weighted graph.
+Floyd-Warshall is an all-pairs shortest path algorithm for graphs with both positive and negative edge weights (without negative weight cycles). It uses dynamic programming to compute the shortest paths between all pairs of vertices, iterating over all pairs and possible intermediates.
 <b><u>This is not important for interviews</u></b>
 
-### Intuition
-- Dynamic programming approach
-- Works with positive and negative edge weights
-- Cannot handle negative cycles
+#### Use Cases
+- **All-pairs shortest path**: If you need the shortest path between every pair of nodes in a graph, especially when the graph is relatively small.
+- **Graph with dense edges**: Floyd-Warshall is particularly effective when the graph is dense, as it computes all distances in one go.
+- **Handling negative weights**: Like Bellman-Ford, it can handle graphs with negative weights, but it handles all pairs simultaneously.
 
-### Use Cases
-- All-pairs shortest paths computation
-- Transitive closure of a graph
-- Finding the shortest path in a weighted graph with positive or negative edge weights
 
-### Steps
+#### Steps
 1. Initialize the distance matrix with direct edge weights (use infinity for non-adjacent vertices)
 2. For each vertex k as an intermediate:
     - For each pair of vertices (i, j):
         - If dist[i][j] > dist[i][k] + dist[k][j], update dist[i][j] = dist[i][k] + dist[k][j]
 
-### Java Implementation
+#### Java Implementation
 
 ```java
 import java.util.*;
@@ -851,10 +825,6 @@ import java.util.*;
 /**
  * FloydWarshallAlgorithm computes the shortest distances between all pairs of vertices
  * in a weighted directed graph using dynamic programming.
- *
- * ✅ Intuition:
- * For any pair (u, v), check if there's an intermediate node k that gives a shorter path.
- * If yes, update the distance: dist[u][v] = min(dist[u][v], dist[u][k] + dist[k][v])
  *
  * ✅ Steps:
  * 1. Initialize the distance matrix using the input graph matrix.
@@ -912,140 +882,115 @@ public class FloydWarshallAlgorithm {
 }
 ```
 
-### Time and Space Complexity
+#### Time and Space Complexity
 - **Time Complexity**: O(V³)
 - **Space Complexity**: O(V²) for the distance matrix
 
-### Example LeetCode Problems for Shortest Path Algorithms
+#### Example LeetCode Problems for Shortest Path Algorithms
 1. [LeetCode #743: Network Delay Time](https://leetcode.com/problems/network-delay-time/)
 2. [LeetCode #787: Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
 3. [LeetCode #1334: Find the City With the Smallest Number of Neighbors at a Threshold Distance](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)
 4. [LeetCode #399: Evaluate Division](https://leetcode.com/problems/evaluate-division/)
 
-## Minimum Spanning Tree
-
-A minimum spanning tree (MST) is a subset of the edges of a connected, edge-weighted undirected graph that connects all the vertices together without any cycles and with the minimum possible total edge weight.
+### Minimum Spanning Tree
+An MST of a weighted undirected graph is a tree that spans all the vertices and has the minimum possible total edge weight. It ensures all nodes are connected with the least amount of weight, useful in network design, clustering, etc.
 
 ### Prim's Algorithm
-
-Prim's algorithm finds the MST by starting from one vertex and greedily growing the tree by adding the lowest-weight edge that connects a vertex in the tree to a vertex outside the tree.
-
-### Intuition
-- Greedy algorithm that builds the MST one vertex at a time
-- Starts from an arbitrary vertex and grows the tree
-- Similar to Dijkstra's algorithm but focuses on minimum spanning tree rather than shortest paths
+Prim’s algorithm is a greedy algorithm to find the MST of a graph. Starting from any node, it repeatedly adds the nearest vertex not in the MST, until all vertices are included. It uses a priority queue to track the edge with the smallest weight at each step.
 
 ### Use Cases
-- Network design
-- Cluster analysis
-- Circuit design
+- **Dense graphs**: If the graph has a large number of edges, Prim’s is preferred over Kruskal’s since it avoids sorting edges.
+- **Incrementally constructing a minimum spanning tree (MST)**: You start from a node and grow the MST one edge at a time.
+- **When edge weights are available** and you need to connect all nodes with the minimum possible total weight.
+
 
 ### Steps
-1. Start with any vertex as the MST
-2. While MST doesn't include all vertices:
-    - Find the minimum weight edge that connects a vertex in MST to a vertex outside MST
-    - Add this edge and the new vertex to MST
+Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
+- **Initialize**: Create a `min-heap` (priority queue) to store `(toNode, weight)`, and a `visited[]` array. Start with an arbitrary node (usually 0), and add `(0, 0)` to the heap. Initialize `minCost = 0`.
+- **SELECT**: Extract the edge with the minimum weight from the heap.
+- **MARK(*)**: If the destination node is already visited, skip it; otherwise, mark it as visited.
+- **WORK**: Add the edge’s weight to the total MST cost.
+- **ADD(*)**: For all unvisited neighbors of the current node, add them to the heap along with their edge weight.
+- **Repeat**: Continue until all nodes are added to the MST (heap is empty or all nodes are visited).
 
 ### Java Implementation
 
 ```java
 import java.util.*;
 
-/**
- * Prim's Algorithm for Minimum Spanning Tree (MST) in a Weighted Undirected Graph.
- *
- * ✅ Intuition:
- *   - Start from any vertex (usually vertex 0).
- *   - Always pick the minimum weight edge that connects a vertex in the MST set to a vertex outside it.
- *   - Greedily grow the MST until all vertices are included.
- *
- * ✅ Efficient Implementation:
- *   - Uses a PriorityQueue (Min-Heap) to select the minimum weight edge.
- *   - Maintains key[] array to track the minimum cost to connect each vertex to the MST.
- *   - parent[] array tracks the structure of the MST.
- *
- * ✅ Time Complexity: O(E log V)
- * ✅ Space Complexity: O(V + E)
- */
+// Represents an edge between two nodes with a weight
+class Edge {
+  int from;     // Source vertex of the edge
+  int to;       // Destination vertex of the edge
+  int weight;   // Weight of the edge
+
+  public Edge(int from, int to, int weight) {
+    this.from = from;
+    this.to = to;
+    this.weight = weight;
+  }
+}
+
 public class PrimMST {
 
   /**
-   * Represents an edge from the current node to a destination with an associated weight.
-   */
-  static class Edge implements Comparable<Edge> {
-    int to;      // Destination vertex
-    int weight;  // Weight of the edge
-
-    public Edge(int to, int weight) {
-      this.to = to;
-      this.weight = weight;
-    }
-
-    // PriorityQueue uses this to sort edges by weight (min first)
-    @Override
-    public int compareTo(Edge other) {
-      return Integer.compare(this.weight, other.weight);
-    }
-  }
-
-  /**
-   * Returns a list of edges that form the MST using Prim’s Algorithm.
+   * Prim's Algorithm to find the Minimum Spanning Tree (MST) of a connected, undirected graph.
    *
-   * @param graph The input graph represented as an adjacency list.
-   *              graph[u] = List of edges from vertex 'u' to its neighbors.
-   * @return List of edges in the MST (each edge is represented as: to, weight)
+   * Intuition:
+   * - Start from any vertex (here, vertex 0).
+   * - Maintain a min-heap to always pick the edge with the smallest weight that connects
+   *   a visited vertex to an unvisited one.
+   * - Use a visited array to track vertices already included in the MST.
+   * - Add edges only if they connect to unvisited vertices.
+   *
+   * Time Complexity: O(E * log V) where E = number of edges, V = number of vertices
+   * Space Complexity: O(V + E)
+   *
+   * @param numOfVertices - Total number of vertices in the graph
+   * @param adjList - Adjacency list representing the graph
+   * @return Total weight of the MST
    */
-  public static List<Edge> primMST(List<List<Edge>> graph) {
-    int numVertices = graph.size();           // Total number of vertices
+  public int primMST(int numOfVertices, List<List<Edge>> adjList) {
+    // Min-heap to pick the edge with the minimum weight at every step
+    PriorityQueue<Edge> minHeap = new PriorityQueue<>((a, b) -> a.weight - b.weight);
 
-    boolean[] inMST = new boolean[numVertices]; // Tracks if a vertex is already in MST
-    int[] key = new int[numVertices];           // Minimum edge weight to connect each vertex to MST
-    int[] parent = new int[numVertices];        // Tracks the parent of each vertex in the MST
+    // Track vertices already included in the MST
+    boolean[] visited = new boolean[numOfVertices];
 
-    Arrays.fill(key, Integer.MAX_VALUE);        // Initially, all keys are infinity
-    Arrays.fill(parent, -1);                    // No parent assigned yet
+    // Start from vertex 0: we use -1 as 'from' since this is the starting node
+    minHeap.offer(new Edge(-1, 0, 0));
 
-    // Min-heap based on edge weight
-    PriorityQueue<Edge> minHeap = new PriorityQueue<>();
+    int mstWeight = 0;
 
-    // Start from vertex 0
-    key[0] = 0;
-    minHeap.offer(new Edge(0, 0));  // (vertex, weight)
-
-    List<Edge> mstEdges = new ArrayList<>();
-
-    // Until all vertices are included in MST
     while (!minHeap.isEmpty()) {
-      // Extract vertex with the smallest key (edge weight)
-      Edge current = minHeap.poll();
-      int u = current.to;
+      Edge currentEdge = minHeap.poll();
 
-      // If vertex is already in MST, skip it
-      if (inMST[u]) continue;
+      int currentVertex = currentEdge.to;
 
-      // Mark the current vertex as included in MST
-      inMST[u] = true;
+      // If already included in MST, skip
+      if (visited[currentVertex]) continue;
 
-      // If u is not the starting vertex, add its connecting edge to the MST
-      if (parent[u] != -1) {
-        mstEdges.add(new Edge(u, key[u]));  // (child, weight of edge from parent)
+      // Mark the vertex as included in MST
+      visited[currentVertex] = true;
+
+      // Add the edge's weight to the total MST weight
+      mstWeight += currentEdge.weight;
+
+      // Debug print (optional): Show selected edge
+      if (currentEdge.from != -1) {
+        System.out.printf("Edge selected: from %d to %d with weight %d%n",
+            currentEdge.from, currentEdge.to, currentEdge.weight);
       }
 
-      // Traverse all neighbors of vertex 'u'
-      for (Edge neighbor : graph.get(u)) {
-        int v = neighbor.to;
-        int weight = neighbor.weight;
-
-        // If 'v' is not in MST and edge (u-v) offers a cheaper connection
-        if (!inMST[v] && weight < key[v]) {
-          key[v] = weight;          // Update key to new minimum weight
-          parent[v] = u;            // Set parent of 'v' as 'u'
-          minHeap.offer(new Edge(v, key[v]));  // Push updated edge to heap
+      // Add all adjacent unvisited edges to the heap
+      for (Edge neighborEdge : adjList.get(currentVertex)) {
+        if (!visited[neighborEdge.to]) {
+          minHeap.offer(neighborEdge);
         }
       }
     }
 
-    return mstEdges;  // Contains MST edges (to, weight from its parent)
+    return mstWeight;
   }
 }
 ```
@@ -1055,120 +1000,112 @@ public class PrimMST {
 - **Space Complexity**: O(V) for the key and parent arrays and the priority queue
 
 ### Kruskal's Algorithm
-
-Kruskal's algorithm finds the MST by considering all edges in increasing order of weight and adding them to the MST if they don't form a cycle.
-
-### Intuition
-- Greedy algorithm that builds the MST by adding edges in order of increasing weight
-- Uses a disjoint-set data structure to efficiently check for cycles
-- Focuses on edges rather than vertices
+Kruskal’s algorithm is another greedy algorithm for finding the MST. It works by sorting all edges in increasing order of weight and then adding the smallest edge to the MST, ensuring no cycles are formed. It uses the union-find data structure to detect cycles efficiently.
 
 ### Use Cases
-- Network design
-- Clustering algorithms
-- Approximation algorithms for other problems
+- **Sparse graphs**: When the graph has fewer edges, Kruskal’s algorithm is more efficient since it works by sorting edges and is faster when edges are sparse.
+- **Building a minimum spanning tree (MST)**: If the task is to find the MST of a graph, Kruskal's is one of the most straightforward algorithms, particularly if the edges are already sorted.
+- **Union-Find operations are efficient**: Kruskal’s works well when you can efficiently manage disjoint sets using Union-Find (or DSU) to check for cycles.
+
 
 ### Steps
-1. Sort all edges in non-decreasing order of their weight
-2. Create a disjoint-set for all vertices
-3. For each edge in the sorted order:
-    - If including this edge doesn't form a cycle, include it in the MST
-    - Otherwise, discard it
+1. Sort all edges in increasing order of their weight
+2. Initialize a disjoint-set for tracking connected components. Disjoint set is a data structure that keeps track of a set of elements partitioned into disjoint subsets.
+3. For each edge:
+    - If the edge connects two different components, include it in the MST and union the components
+    - If the edge connects two vertices in the same component, skip it (to avoid cycles)
+4. Stop when we have V-1 edges in the MST
 
 ### Java Implementation
 
 ```java
 import java.util.*;
 
+class Edge {
+  int from;
+  int to;
+  int weight;
+
+  public Edge(int from, int to, int weight) {
+    this.from = from;
+    this.to = to;
+    this.weight = weight;
+  }
+}
+
 public class KruskalMST {
-    static class Edge implements Comparable<Edge> {
-        int src, dest, weight;
-        
-         public Edge(int src, int dest, int weight) {
-        this.src = src;
-        this.dest = dest;
-        this.weight = weight;
-    }
-    
-    @Override
-    public int compareTo(Edge other) {
-        return Integer.compare(this.weight, other.weight);
-    }
-}
 
-static class DisjointSet {
-    int[] parent, rank;
-    
-    public DisjointSet(int n) {
-        parent = new int[n];
-        rank = new int[n];
-        
-        // Initialize each element as a separate set
-        for (int i = 0; i < n; i++) {
-            parent[i] = i;
-        }
-    }
-    
-    // Find the set of an element (with path compression)
-    public int find(int x) {
-        if (parent[x] != x) {
-            parent[x] = find(parent[x]); // Path compression
-        }
-        return parent[x];
-    }
-    
-    // Union of two sets (using rank)
-    public void union(int x, int y) {
-        int rootX = find(x);
-        int rootY = find(y);
-        
-        if (rootX == rootY) return;
-        
-        // Attach smaller rank tree under root of higher rank tree
-        if (rank[rootX] < rank[rootY]) {
-            parent[rootX] = rootY;
-        } else if (rank[rootX] > rank[rootY]) {
-            parent[rootY] = rootX;
-        } else {
-            // If ranks are same, make one as root and increment its rank
-            parent[rootY] = rootX;
-            rank[rootX]++;
-        }
-    }
-}
+  /**
+   * Kruskal’s Algorithm to find Minimum Spanning Tree (MST) of a connected, undirected graph.
+   *
+   * Intuition:
+   * - Sort all edges by increasing weight.
+   * - Use Union-Find (Disjoint Set Union) to avoid forming cycles.
+   * - Keep adding the lightest edge that connects two different components.
+   *
+   * Time Complexity: O(E log E) — sorting edges dominates
+   * Space Complexity: O(V) — for union-find structures
+   *
+   * @param numOfVertices Number of vertices in the graph
+   * @param edges List of all edges in the graph
+   * @return Total weight of the MST
+   */
+  public int kruskalMST(int numOfVertices, List<Edge> edges) {
+    // Sort all edges by weight
+    edges.sort(Comparator.comparingInt(edge -> edge.weight));
 
-public static List<Edge> kruskalMST(List<Edge> edges, int V) {
-    // Create a list to store the MST
-    List<Edge> mst = new ArrayList<>();
-    
-    // Sort all edges in non-decreasing order of their weight
-    Collections.sort(edges);
-    
-    // Create disjoint sets
-    DisjointSet ds = new DisjointSet(V);
-    
-    // Number of edges to be taken is V-1
-    int e = 0;
-    int i = 0;
-    
-    // Keep adding edges until we reach V-1 edges
-    while (e < V - 1 && i < edges.size()) {
-        // Get the next edge
-        Edge nextEdge = edges.get(i++);
-        
-        int x = ds.find(nextEdge.src);
-        int y = ds.find(nextEdge.dest);
-        
-        // If including this edge doesn't form a cycle, include it
-        if (x != y) {
-            mst.add(nextEdge);
-            ds.union(x, y);
-            e++;
-        }
+    // Initialize Union-Find (Disjoint Set Union) structures
+    int[] parent = new int[numOfVertices];
+    int[] rank = new int[numOfVertices];
+
+    for (int i = 0; i < numOfVertices; i++) {
+      parent[i] = i;
+      rank[i] = 0;
     }
-    
-    return mst;
-}
+
+    int mstWeight = 0;
+    int edgesUsed = 0;
+
+    for (Edge edge : edges) {
+      int rootFrom = find(edge.from, parent);
+      int rootTo = find(edge.to, parent);
+
+      // If from and to are in different components, add the edge to MST
+      if (rootFrom != rootTo) {
+        union(rootFrom, rootTo, parent, rank);
+        mstWeight += edge.weight;
+        edgesUsed++;
+
+        System.out.printf("Edge added: from %d to %d with weight %d%n",
+            edge.from, edge.to, edge.weight);
+      }
+
+      // Early stopping: MST will have (V - 1) edges
+      if (edgesUsed == numOfVertices - 1) break;
+    }
+
+    return mstWeight;
+  }
+
+  // Union-Find helper to find root of a node with path compression
+  private int find(int node, int[] parent) {
+    if (parent[node] != node) {
+      parent[node] = find(parent[node], parent); // Path compression
+    }
+    return parent[node];
+  }
+
+  // Union by rank
+  private void union(int u, int v, int[] parent, int[] rank) {
+    if (rank[u] < rank[v]) {
+      parent[u] = v;
+    } else if (rank[u] > rank[v]) {
+      parent[v] = u;
+    } else {
+      parent[v] = u;
+      rank[u]++;
+    }
+  }
 }
 ```
 
@@ -1185,11 +1122,6 @@ public static List<Edge> kruskalMST(List<Edge> edges, int V) {
 ## Articulation Points and Bridges
 
 Articulation points (or cut vertices) are nodes that, when removed, increase the number of connected components in a graph. Bridges are edges that, when removed, increase the number of connected components.
-
-### Intuition
-- Identify critical components in a network
-- Uses a modified DFS to track when a vertex is a potential articulation point
-- Uses discovery time and lowest reachable ancestor time
 
 ### Use Cases
 - Network reliability analysis
@@ -1373,11 +1305,6 @@ public class ArticulationPointsAndBridges {
 
 Kosaraju's algorithm finds all strongly connected components (SCCs) in a directed graph.
 
-### Intuition
-- A strongly connected component is a maximal subgraph where every vertex is reachable from every other vertex
-- Uses two DFS traversals and a stack to find all SCCs
-- First DFS to get the finishing times, second DFS to find SCCs
-
 ### Use Cases
 - Finding closely related items in social networks
 - Decomposing complex systems
@@ -1490,11 +1417,6 @@ public class KosarajuSCC {
 ## Disjoint Sets (Union-Find)
 
 Disjoint-set or Union-Find is a data structure that keeps track of elements which are split into disjoint (non-overlapping) sets.
-
-### Intuition
-- Efficiently determines if two elements are in the same set
-- Uses path compression and union by rank to achieve near-constant time operations
-- Essential for Kruskal's algorithm and cycle detection
 
 ### Use Cases
 - Kruskal's MST algorithm

@@ -6,14 +6,23 @@ import java.util.Queue;
 /**
  * Problem: Serialize and Deserialize a binary tree.
  *
- * Intuition: 
+ * Intuition:
  * The goal is to convert a binary tree into a string representation that can be stored
  * and later restored back into the original tree structure.
- * We use a level-order traversal (breadth-first traversal) for both serialization 
- * and deserialization. For serialization, we capture the values of nodes at each 
+ * We use a level-order traversal (breadth-first traversal) for both serialization
+ * and deserialization. For serialization, we capture the values of nodes at each
  * level, using "null" to represent missing children. For deserialization, we rebuild
- * the tree from the string by using the same level-order approach, constructing each 
+ * the tree from the string by using the same level-order approach, constructing each
  * node and assigning its left and right children.
+ *            1
+ *          /   \
+ *         2     3
+ *        / \   / \
+ *      null 4  5  6
+ *             / \
+ *            7   8
+ *
+ *      Serialized : [1, 2, 3, null, 4, 5, 6, null, null, 7, 8, null, null]
  *
  * Algorithm:
  * 1. **Serialize**:
@@ -38,7 +47,7 @@ public class SerializeDeserialize {
         root.right = new TreeNode(3);
         root.right.left = new TreeNode(4);
         root.right.right = new TreeNode(5);
-        
+
         // Serialize the tree
         String serializedString = new SerializeDeserialize().serialize(root);
         System.out.println("Serialized tree: " + serializedString);
@@ -50,7 +59,7 @@ public class SerializeDeserialize {
 
     /**
      * Serializes a binary tree into a string representation.
-     * 
+     *
      * @param root The root of the binary tree.
      * @return A string representing the serialized binary tree.
      */
@@ -80,7 +89,7 @@ public class SerializeDeserialize {
 
     /**
      * Deserializes a string into a binary tree.
-     * 
+     *
      * @param data A string representing the serialized binary tree.
      * @return The root node of the deserialized binary tree.
      */
@@ -90,11 +99,11 @@ public class SerializeDeserialize {
         // Split the data into an array of values
         String[] nodes = data.split(", ");
         Queue<TreeNode> queue = new LinkedList<>();
-        
+
         // Create the root of the tree
         TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));
         queue.offer(root);
-        
+
         int index = 1;
 
         // Perform level-order traversal to reconstruct the tree
