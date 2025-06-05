@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 /**
  * Given an integer array nums, return an array such that answer[i] is the product of all elements except nums[i].
+ * You must write an algorithm that runs in O(n) time and without using the division operation.
+ *
+ * Leetcode link: https://leetcode.com/problems/product-of-array-except-self/description/
  */
 public class ProductExceptSelf {
     public static void main(String[] args) {
@@ -12,7 +15,7 @@ public class ProductExceptSelf {
     }
 
     /**
-     * 🔥 Optimized Approach (No Extra Space, O(n) Time Complexity)
+     * Optimized Approach (No Extra Space, O(n) Time Complexity)
      * - Uses a single output array (`result[]`) for storing left products.
      * - Then iterates backward, multiplying with right-side values.
      * - **Space Complexity: O(1) (excluding output array)**

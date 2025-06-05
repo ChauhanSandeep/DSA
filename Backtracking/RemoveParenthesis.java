@@ -9,6 +9,11 @@ import java.util.*;
  * Given a string containing parentheses and characters, remove the **minimum number**
  * of invalid parentheses to make the expression valid. Return all possible results.
  *
+ * Example
+ *
+ * Input: s = "()())()"
+ * Output: ["(())()","()()()"]
+ *
  * Approach:
  * - We use **BFS (Breadth-First Search)** to explore all possible valid expressions.
  * - At each step, we remove **one** parenthesis and check if the result is valid.
@@ -84,5 +89,86 @@ public class RemoveParenthesis {
             }
         }
         return openCount == 0;
+    }
+
+    private Set<String> validExpressions = new HashSet<>();
+
+    /**
+     * Main method to be called to remove invalid parentheses.
+     */
+    public List<String> removeInvalidParenthesesImproved(String input) {
+        int misplacedOpen = 0, misplacedClose = 0;
+
+        // Calculate how many '(' and ')' are misplaced
+        for (char ch : input.toCharArray()) {
+            if (ch == '(') {
+                misplacedOpen++;
+            } else if (ch == ')') {
+                if (misplacedOpen > 0) {
+                    misplacedOpen--; // Match a previous '('
+                } else {
+                    misplacedClose++; // No matching '(' found
+                }
+            }
+        }
+
+        // Start DFS traversal to generate valid expressions
+        dfs(input, 0, 0, 0, misplacedOpen, misplacedClose, new StringBuilder());
+
+        return new ArrayList<>(validExpressions);
+    }
+
+    /**
+     * Recursive DFS to try out all combinations by removing misplaced parentheses.
+     *
+     * @param input            Original string
+     * @param index            Current index in the string
+     * @param openCount        Count of open '(' in the current path
+     * @param closeCount       Count of close ')' in the current path
+     * @param openToRemove     Number of '(' left to remove
+     * @param closeToRemove    Number of ')' left to remove
+     * @param currentExpression Current state of the expression being built
+     */
+    private void dfs(String input, int index, int openCount, int closeCount,
+        int openToRemove, int closeToRemove, StringBuilder currentExpression) {
+
+        // If we've processed all characters
+        if (index == input.length()) {
+            if (openToRemove == 0 && closeToRemove == 0) {
+                validExpressions.add(currentExpression.toString());
+            }
+            return;
+        }
+
+        char currentChar = input.charAt(index);
+        int currentLength = currentExpression.length();
+
+        // Option 1: Discard current character if it's a parenthesis and can be removed
+        if (currentChar == '(' && openToRemove > 0) {
+            dfs(input, index + 1, openCount, closeCount,
+                openToRemove - 1, closeToRemove, currentExpression);
+        } else if (currentChar == ')' && closeToRemove > 0) {
+            dfs(input, index + 1, openCount, closeCount,
+                openToRemove, closeToRemove - 1, currentExpression);
+        }
+
+        // Option 2: Include current character
+        currentExpression.append(currentChar);
+
+        if (currentChar != '(' && currentChar != ')') {
+            // Just add the character and move on
+            dfs(input, index + 1, openCount, closeCount, openToRemove, closeToRemove, currentExpression);
+
+        } else if (currentChar == '(') {
+            // Include it and increase open count
+            dfs(input, index + 1, openCount + 1, closeCount, openToRemove, closeToRemove, currentExpression);
+
+        } else if (currentChar == ')' && closeCount < openCount) {
+            // Include it only if we have more '(' to balance
+            dfs(input, index + 1, openCount, closeCount + 1, openToRemove, closeToRemove, currentExpression);
+        }
+
+        // Backtrack to previous state
+        currentExpression.deleteCharAt(currentLength);
     }
 }

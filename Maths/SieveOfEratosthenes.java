@@ -8,20 +8,6 @@ import java.util.stream.IntStream;
 /**
  * Implementation of the Sieve of Eratosthenes algorithm to find all prime numbers less than a given number n.
  *
- * ### Intuition:
- * - A boolean array is used to track composite (non-prime) numbers.
- * - Starting from 2, all multiples of a prime are marked as composite.
- * - The remaining unmarked numbers are prime.
- *
- * ### Algorithm:
- * 1. Create a boolean array where `true` represents a prime number.
- * 2. Iterate through numbers, marking multiples as `false` (not prime).
- * 3. Collect and return the list of prime numbers.
- *
- * ### Complexity Analysis:
- * - **Time Complexity:** O(n log log n) — Efficient for large n.
- * - **Space Complexity:** O(n) — Requires an array of size n.
- *
  * LeetCode Problem: https://leetcode.com/problems/count-primes/
  */
 public class SieveOfEratosthenes {
@@ -34,7 +20,15 @@ public class SieveOfEratosthenes {
     }
 
     /**
-     * Returns a list of all prime numbers less than the given integer n.
+     * ### Algorithm:
+     * 1. Create a boolean array where `true` represents a prime number.
+     * 2. Iterate through numbers, starting from 2, and mark all multiples of each prime as `false`.
+     *    This is done because the multiple of a prime numbers will not be prime.
+     * 3. Continue this process until you reach the square root of n.
+     *
+     * ### Complexity Analysis:
+     * - **Time Complexity:** O(n log log n) — Efficient for large n.
+     * - **Space Complexity:** O(n) — Requires an array of size n.
      *
      * @param n The upper limit (exclusive) to find prime numbers.
      * @return A list of prime numbers less than n.
@@ -48,9 +42,10 @@ public class SieveOfEratosthenes {
         }
 
         for (int i = 2; i * i <= n; i++) { // Iterate up to sqrt(n)
-            if (isPrime[i]) { // If i is still prime
+            if (isPrime[i]) { // If i is still prime, mark its multiples as composite
+                // start from i*i instead of i+1 to avoid redundant checks
                 for (int j = i * i; j < n; j += i) {
-                    isPrime[j] = false; // Mark multiples of i as composite
+                    isPrime[j] = false;
                 }
             }
         }

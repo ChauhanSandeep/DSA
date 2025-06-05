@@ -5,13 +5,13 @@ import java.util.Map;
 
 /**
  * LeetCode: https://leetcode.com/problems/majority-element/
- * 
+ *
  * Problem: Find the majority element (appears more than ⌊ n/2 ⌋ times) in an array.
- * 
+ *
  * Intuition:
  * - The Boyer-Moore Voting Algorithm efficiently finds the majority element in O(n) time with O(1) space.
  * - The HashMap approach provides an alternative, using extra space but maintaining simplicity.
- * 
+ *
  * Algorithm:
  * 1. **Boyer-Moore Voting Algorithm** (O(n) time, O(1) space):
  *    - Select a candidate that potentially occurs more than ⌊ n/2 ⌋ times.
@@ -24,7 +24,7 @@ public class MajorityElement {
     public static void main(String[] args) {
         int[] nums = {1, 2, 2, 1, 1};
         MajorityElement solution = new MajorityElement();
-        
+
         System.out.println("Majority Element (Boyer-Moore): " + solution.findMajorityElement(nums));
         System.out.println("Majority Element (HashMap): " + solution.findMajorityElementUsingMap(nums));
     }
@@ -32,6 +32,14 @@ public class MajorityElement {
     /**
      * Boyer-Moore Voting Algorithm
      * Finds the majority element in O(n) time and O(1) space.
+     *
+     * Approach
+     * 1. Initialize a candidate and a count.
+     * 2. Traverse the array:
+     *   - If the current element matches the candidate, increment the count.
+     *   - If it doesn't match, decrement the count.
+     *   - If the count reaches zero, update the candidate to the current element.
+     * 3. Verify if the candidate is indeed the majority element by counting its occurrences.
      *
      * @param nums Input array
      * @return Majority element or -1 if no majority exists
@@ -54,6 +62,7 @@ public class MajorityElement {
         }
 
         // Phase 2: Verify if the candidate is actually the majority
+        // we need to verify because the candidate might not be the majority in cases like [1,2,3,4,5]
         int occurrenceCount = 0;
         for (int num : nums) {
             if (num == majorityCandidate) {
@@ -67,7 +76,8 @@ public class MajorityElement {
     /**
      * HashMap Approach
      * Uses a HashMap to count occurrences and identify the majority element.
-     * Time Complexity: O(n), Space Complexity: O(n)
+     * Time Complexity: O(n),
+     * Space Complexity: O(n)
      *
      * @param nums Input array
      * @return Majority element or -1 if no majority exists

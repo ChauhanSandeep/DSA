@@ -4,6 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
+/**
+ * Problem: 3Sum
+ *
+ * Given an integer array `nums`, return all the unique triplets `[nums[i], nums[j], nums[k]]`
+ * such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == target`.
+ *
+ * Example:
+ * Input: nums = [-1, 0, 1, 2, -1, -4], target = 0
+ * Output: [[-1, -1, 2], [-1, 0, 1]]
+ *
+ * Leetcode link : https://leetcode.com/problems/3sum/
+ *
+ * Approach:
+ * 1. Sort the array to allow for two-pointer technique.
+ * 2. Iterate through the array and use two pointers to find pairs that sum to the target minus the current element.
+ * 3. Skip duplicates to avoid repeated triplets in the result.
+ */
 public class ThreeSum {
     public static void main(String[] args) {
         int[] arr = {1, 4, 45, 6, 10, 8, 8};

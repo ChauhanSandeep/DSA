@@ -11,14 +11,11 @@ import java.util.Arrays;
  * 1. Each child gets at least one candy.
  * 2. Higher-rated children get more candies than their adjacent lower-rated ones.
  *
- * Approach:
- * - **Left-to-Right Pass**: Ensure children with higher ratings than the previous child get more candies.
- * - **Right-to-Left Pass**: Ensure children with higher ratings than the next child get more candies.
- * - Use a **candies array** initialized to 1 for all children.
- * - **Sum up the candy counts** after adjusting in both passes.
+ * For example
+ * Input: [1, 0, 2]
+ * Output: 5
+ * Explanation: 2 candies for the first child, 1 candy for the second child, and 2 candies for the third child.
  *
- * Time Complexity: O(N) - We traverse the ratings array twice.
- * Space Complexity: O(N) - We use an extra array for candy distribution.
  */
 public class CandyDistribution {
 
@@ -29,6 +26,21 @@ public class CandyDistribution {
 
     /**
      * Calculates the minimum candies needed to satisfy the problem constraints.
+     *
+     * Approach:
+     * - **Left-to-Right Pass**: Ensure children with higher ratings than the previous child get more candies.
+     * - **Right-to-Left Pass**: Ensure children with higher ratings than the next child get more candies.
+     * - Use a **candies array** initialized to 1 for all children.
+     * - **Sum up the candy counts** after adjusting in both passes.
+     *
+     * This guarantees solution because:
+     * - Every child has at least 1 candy from the start.
+     * - Every local peak in ratings gets more candies than both neighbors.
+     * - Every increasing or decreasing sequence is respected by at least one pass.
+     * - By using Math.max(...) in the second pass, we never violate the result of the first pass.
+     *
+     * Time Complexity: O(N) - We traverse the ratings array twice.
+     * Space Complexity: O(N) - We use an extra array for candy distribution.
      *
      * @param ratings An array representing student ratings.
      * @return The minimum number of candies required.

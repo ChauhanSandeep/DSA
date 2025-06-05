@@ -1,7 +1,5 @@
 package DynamicProgramming.KnapsackRelated;
 
-import java.util.Arrays;
-
 /**
  * Problem: 0/1 Knapsack
  *
@@ -30,29 +28,48 @@ public class Knapsack {
      * Time Complexity: O(length * capacity)
      * Space Complexity: O(length * capacity) for memo + O(length) stack space
      */
-    public static int knapsackRecursive(int[] weights, int[] values, int length, int capacity) {
-        int[][] dp = new int[length][capacity + 1];
-        for (int[] row : dp) {
+    public static int knapsackRecursive(int[] weights, int[] values, int length, int maxCapacity) {
+        // Create memoization table with default value -1
+        int[][] memo = new int[length][maxCapacity + 1]; // memo[i][j] denotes max value for first i items and capacity j
+        for (int[] row : memo) {
             java.util.Arrays.fill(row, -1);
         }
-        return helper(weights, values, length - 1, capacity, dp);
+        return knapsackRecursiveHelper(weights, values, 0, maxCapacity, memo);
     }
 
-    private static int helper(int[] weights, int[] values, int currentIndex, int capacity, int[][] dp) {
-        if (currentIndex == 0) {
-            if (weights[0] <= capacity) return values[0];
+    /**
+     * Recursive helper to compute maximum value using memoization.
+     * @param weights Array of item weights.
+     * @param values Array of item values.
+     * @param currentIndex Current item index being considered.
+     * @param remainingCapacity Remaining capacity in the knapsack.
+     * @param memo DP table storing intermediate results.
+     * @return Maximum value possible from current index onward.
+     */
+    private static int knapsackRecursiveHelper(int[] weights, int[] values, int currentIndex, int remainingCapacity, int[][] memo) {
+        // Base condition: no more items to check
+        if (currentIndex == weights.length) {
             return 0;
         }
 
-        if (dp[currentIndex][capacity] != -1) return dp[currentIndex][capacity];
-
-        int excludeItem = helper(weights, values, currentIndex - 1, capacity, dp);
-        int includeItem = 0;
-        if (weights[currentIndex] <= capacity) {
-            includeItem = values[currentIndex] + helper(weights, values, currentIndex - 1, capacity - weights[currentIndex], dp);
+        // Return cached value if already computed
+        if (memo[currentIndex][remainingCapacity] != -1) {
+            return memo[currentIndex][remainingCapacity];
         }
 
-        return dp[currentIndex][capacity] = Math.max(includeItem, excludeItem);
+        // Option 1: Do not include the current item
+        int exclude = knapsackRecursiveHelper(weights, values, currentIndex + 1, remainingCapacity, memo);
+
+        // Option 2: Include the current item (if it fits)
+        int include = 0;
+        if (weights[currentIndex] <= remainingCapacity) {
+            include = values[currentIndex] +
+                knapsackRecursiveHelper(weights, values, currentIndex + 1, remainingCapacity - weights[currentIndex], memo);
+        }
+
+        // Store and return the maximum of both options
+        memo[currentIndex][remainingCapacity] = Math.max(include, exclude);
+        return memo[currentIndex][remainingCapacity];
     }
 
     /**

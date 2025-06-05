@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class MinLights {
 
     public static void main(String[] args) {
-        ArrayList<Integer> lights = new ArrayList<>(Stream.of(0, 0, 0, 1, 0).collect(Collectors.toList()));
+        List<Integer> lights = Stream.of(0, 0, 0, 1, 0).collect(Collectors.toList());
         int result = new MinLights().findMinLights(lights, 3);
         System.out.println("Minimum lights needed: " + result);
     }

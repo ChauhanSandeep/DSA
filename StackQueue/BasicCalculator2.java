@@ -43,7 +43,7 @@ public class BasicCalculator2 {
             }
 
             // Process the current operator or if it's the last character
-            if (!Character.isDigit(currentChar) && currentChar != ' ' || i == expression.length() - 1) {
+            if ((!Character.isDigit(currentChar) && (currentChar != ' ')) || (i == (expression.length() - 1))) {
                 switch (lastOperator) {
                     case '+':
                         numberStack.push(currentNumber);

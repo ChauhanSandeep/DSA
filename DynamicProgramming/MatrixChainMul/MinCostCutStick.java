@@ -3,11 +3,20 @@ package DynamicProgramming.MatrixChainMul;
 import java.util.Arrays;
 
 
+/**
+ * Given an integer array cuts where cuts[i] denotes a position you should perform a cut at.
+ * You should perform the cuts in order, you can change the order of the cuts as you wish.
+ *
+ * The cost of one cut is the length of the stick to be cut, the total cost is the sum of costs of all cuts.
+ * When you cut a stick, it will be split into two smaller sticks (i.e. the sum of their lengths is the
+ * length of the stick before the cut).
+ *
+ * Leetcode Problem: <a href="https://leetcode.com/problems/minimum-cost-to-cut-a-stick/">...</a>
+ */
 public class MinCostCutStick {
 
     /**
      * Solves the Minimum Cost to Cut a Stick problem using recursion with memoization.
-     * Leetcode Problem: https://leetcode.com/problems/minimum-cost-to-cut-a-stick/
      *
      * Intuition:
      * - Every time we cut the stick, we pay a cost equal to its current length.
@@ -53,36 +62,36 @@ public class MinCostCutStick {
      * Recursive helper to find the minimum cost to cut the stick between allCuts[left] and allCuts[right].
      *
      * @param allCuts the sorted cuts array with boundaries included
-     * @param left the index of the left cut
-     * @param right the index of the right cut
+     * @param leftIndexAllCuts the index of the left cut
+     * @param rightIndexAllCuts the index of the right cut
      * @param memo memoization table
      * @return minimum cost to cut this segment
      */
-    private int findMinCost(int[] allCuts, int left, int right, int[][] memo) {
+    private int findMinCost(int[] allCuts, int leftIndexAllCuts, int rightIndexAllCuts, int[][] memo) {
       // Base case: No more cuts possible between left and right
-      if (left + 1 == right) {
+      if (leftIndexAllCuts + 1 == rightIndexAllCuts) {
         return 0;
       }
 
       // Return cached result
-      if (memo[left][right] != -1) {
-        return memo[left][right];
+      if (memo[leftIndexAllCuts][rightIndexAllCuts] != -1) {
+        return memo[leftIndexAllCuts][rightIndexAllCuts];
       }
 
       int minCost = Integer.MAX_VALUE;
 
       // Try all possible first cuts between left and right
-      for (int mid = left + 1; mid < right; mid++) {
-        int leftCost = findMinCost(allCuts, left, mid, memo);
-        int rightCost = findMinCost(allCuts, mid, right, memo);
-        int cutCost = allCuts[right] - allCuts[left]; // because left and right contains index number but actual length is allCuts[right] - allCuts[left]
+      for (int cutIndex = leftIndexAllCuts + 1; cutIndex < rightIndexAllCuts; cutIndex++) {
+        int leftCost = findMinCost(allCuts, leftIndexAllCuts, cutIndex, memo);
+        int rightCost = findMinCost(allCuts, cutIndex, rightIndexAllCuts, memo);
+        int cutCost = allCuts[rightIndexAllCuts] - allCuts[leftIndexAllCuts]; // because left and right contains index number but actual length is allCuts[right] - allCuts[left]
 
         int totalCost = leftCost + rightCost + cutCost;
         minCost = Math.min(minCost, totalCost);
       }
 
       // Cache and return result
-      memo[left][right] = minCost;
+      memo[leftIndexAllCuts][rightIndexAllCuts] = minCost;
       return minCost;
     }
 

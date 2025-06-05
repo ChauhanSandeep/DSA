@@ -41,7 +41,7 @@ public class PermutationBst {
      * @return The number of valid BSTs that can be formed
      */
     public int countTrees(int numOfNodes, int maxHeight) {
-        return calculateTrees(numOfNodes, maxHeight);
+        return countTreesRecursive(numOfNodes, maxHeight);
     }
 
     /**
@@ -55,7 +55,7 @@ public class PermutationBst {
      * @param remainingHeightAllowed The remaining height available for placing nodes.
      * @return The number of valid BSTs that can be formed.
      */
-    private int calculateTrees(int numNodes, int remainingHeightAllowed) {
+    private int countTreesRecursive(int numNodes, int remainingHeightAllowed) {
         // Base Case: With 0 or 1 node, only one BST is possible.
         if (numNodes <= 1) {
             return 1;
@@ -69,8 +69,8 @@ public class PermutationBst {
 
         // For each possible choice of root, partition the nodes into left and right subtrees.
         for (int root = 1; root <= numNodes; root++) {
-            int leftSubtrees = calculateTrees(root - 1, remainingHeightAllowed - 1);
-            int rightSubtrees = calculateTrees(numNodes - root, remainingHeightAllowed - 1);
+            int leftSubtrees = countTreesRecursive(root - 1, remainingHeightAllowed - 1);
+            int rightSubtrees = countTreesRecursive(numNodes - root, remainingHeightAllowed - 1);
             totalCount += leftSubtrees * rightSubtrees;
         }
 

@@ -3,7 +3,7 @@ package maths;
 /**
  * Computes the square root of a given number using binary search.
  *
- * This approach finds the integer part of the square root first and then refines 
+ * This approach finds the integer part of the square root first and then refines
  * it to the desired precision using a binary search method.
  *
  * Algorithm:
@@ -23,7 +23,7 @@ package maths;
 public class FindSqrt {
     public static void main(String[] args) {
         FindSqrt sqrtCalculator = new FindSqrt();
-        
+
         // Test cases for perfect squares
         assert sqrtCalculator.computeSqrt(16) == 4 : "Incorrect answer";
         assert sqrtCalculator.computeSqrt(25) == 5 : "Incorrect answer";
@@ -85,7 +85,9 @@ public class FindSqrt {
      * @return The computed square root with decimal precision.
      */
     private double refineSqrt(double number, int integerPart, int decimalPlaces) {
-        double low = integerPart, high = integerPart + 1, tolerance = 1 / Math.pow(10, decimalPlaces + 1);
+        double low = integerPart;
+        double high = integerPart + 1;
+        double tolerance = 1 / Math.pow(10, decimalPlaces + 1);
 
         while ((high - low) > tolerance) {
             double mid = (low + high) / 2;

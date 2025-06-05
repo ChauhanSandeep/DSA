@@ -62,8 +62,11 @@ public class Permutation2 {
         for (int i = 0; i < nums.length; i++) {
             // Skip used elements or duplicate elements (if previous duplicate is not used)
             boolean isCurrentElementAlreadyUsed = used[i];
-            boolean isDuplicateElementAlreadyUsed = i > 0 && nums[i] == nums[i - 1] && !used[i - 1];
-            if (isCurrentElementAlreadyUsed || isDuplicateElementAlreadyUsed) {
+            boolean isDuplicateWithoutPreviousUsed = i > 0 && nums[i] == nums[i - 1] && !used[i - 1];
+            if (isCurrentElementAlreadyUsed || isDuplicateWithoutPreviousUsed) {
+                // 1. If the current element is already used then we cannot use it again
+                // 2. If the current number is the same as the previous one and the previous one has not been used
+                // in this recursive call, skip this to avoid generating a duplicate permutation
                 continue;
             }
 
