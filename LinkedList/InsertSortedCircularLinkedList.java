@@ -5,14 +5,16 @@ import LinkedList.Util.ListNode;
 /**
  * Given a circular linked list that is sorted in ascending order, insert a value `insertVal`
  * into the list while maintaining its sorted order.
- * 
+ *
  * The circular linked list does not have a defined head, but at least one reference node is given.
  * If the list is empty, create a new single-node circular list and return it.
+ * Insertion should be done in such a way that the list remains sorted, even if the list contains duplicate values.
+ *
+ * For example, if the list is 3 -> 4 -> 1 (circular),
+ * inserting 2 should result in 3 -> 4 -> 1 -> 2 (circular).
  *
  * Problem Link: https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/
- * 
- * Time Complexity: O(N), where N is the number of nodes in the list.
- * Space Complexity: O(1), as we use only a few extra pointers.
+ *
  */
 public class InsertSortedCircularLinkedList {
 
@@ -29,6 +31,16 @@ public class InsertSortedCircularLinkedList {
 
     /**
      * Inserts a new node into a sorted circular linked list while maintaining order.
+     *
+     * Steps:
+     * 1. If the list is empty, create a new node that points to itself.
+     * 2. Traverse the list to find the correct position for insertion:
+     *   - If the new value is between two existing values, insert it there.
+     *   - If the new value is greater than the maximum or less than the minimum, insert it at the boundary.
+     *   - If we complete a full loop without finding a suitable position, insert the new value anywhere.
+     *
+     * Time Complexity: O(N), where N is the number of nodes in the list.
+     * Space Complexity: O(1), as we use only a few extra pointers.
      *
      * @param head The head of the circular linked list
      * @param insertVal The value to insert
@@ -47,7 +59,7 @@ public class InsertSortedCircularLinkedList {
 
         while (true) {
             // Case 2: Insert in the middle of sorted values (between two valid nodes)
-            if (current.val <= insertVal && insertVal <= current.next.val) {
+            if (insertVal >= current.val && insertVal <= current.next.val) {
                 break;
             }
 
@@ -61,6 +73,9 @@ public class InsertSortedCircularLinkedList {
             current = current.next;
 
             // Case 4: If we complete a full loop, insert the new value anywhere
+            // Situations where this could happen:
+            // - The list has only one node (current == current.next)
+            // - The new value is not between any two existing values and we have traversed the entire list without finding a suitable position.
             if (current == head) {
                 break;
             }

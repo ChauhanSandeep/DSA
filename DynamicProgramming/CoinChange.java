@@ -7,9 +7,15 @@ import java.util.Arrays;
  * Link: https://leetcode.com/problems/coin-change/
  *
  * Problem Statement:
- * - Given an array of coin denominations and a target amount, 
+ * - Given an array of coin denominations and a target amount,
  *   find the minimum number of coins needed to make up that amount.
  * - If it's not possible to form the target sum, return -1.
+ * For example:
+ *  Input: coins = [2, 3], target = 7
+ *  Output: 3 (2 + 2 + 3)
+ *
+ *  Explanation:
+ *  - You can use two coins of denomination 2 and one coin of denomination 3 to reach the target sum of 7.
  *
  * Approach:
  * - **Dynamic Programming (Bottom-Up)**
@@ -34,7 +40,7 @@ public class CoinChange {
 
     /**
      * Finds the minimum number of coins required to reach a target sum.
-     * 
+     *
      * @param coins  Array of available coin denominations
      * @param target Target sum
      * @return Minimum number of coins needed, or -1 if not possible

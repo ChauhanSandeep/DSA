@@ -22,7 +22,7 @@ import LinkedList.Util.ListNode;
  *
  * Link: https://leetcode.com/problems/palindrome-linked-list/
  */
-public class PalindromeList {
+public class OddEvenLinkedList {
 
     public static void main(String[] args) {
         ListNode head = new ListNode(1);

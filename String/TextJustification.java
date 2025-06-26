@@ -4,111 +4,142 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 /**
- * Text Justification
  * https://leetcode.com/problems/text-justification/
  *
- * Given an array of words and a maximum width, format the text so that each line is fully justified.
+ * ### Problem Statement:
+ * Given an array of words and a max width, format the text such that:
+ * - Each line is fully justified (both left and right).
+ * - Words are packed greedily into lines.
+ * - Spaces are distributed as evenly as possible.
+ * - Last line should be left-justified and no extra space inserted between words.
  *
- * **Approach & Explanation:**
- * - Use a greedy approach to group words into lines without exceeding `maxWidth`.
- * - Distribute spaces evenly between words for full justification.
- * - Ensure the last line is left-justified.
+ * ### Example:
+ * Input:
+ * words = ["What", "must", "be", "acknowledgment", "shall", "be"], maxWidth = 16
  *
- * **Time Complexity:** O(N) - Each word is processed once.
- * **Space Complexity:** O(N) - Output list stores justified lines.
+ * Output:
+ * [
+ * "What   must   be",
+ * "acknowledgment  ",
+ * "shall be        "
+ * ]
+ *
+ * ### Follow-up:
+ * - Can you modify it to support center alignment or right justification?
+ * - How would you format the text in streaming fashion (line-by-line)?
+ *
+ * ### Time Complexity: O(N) – N = total number of words processed
+ * ### Space Complexity: O(N) – for storing the output lines
  */
 public class TextJustification {
-    public static void main(String[] args) {
-        String[] words = {"What", "must", "be", "acknowledgment", "shall", "be"};
-        int maxWidth = 16;
 
-        TextJustification tj = new TextJustification();
-        List<String> result = tj.fullJustify(words, maxWidth);
+  public static void main(String[] args) {
+    String[] words = {"What", "must", "be", "acknowledgment", "shall", "be"};
+    int maxWidth = 16;
 
-        // Print justified text
-        for (String line : result) {
-            System.out.println("\"" + line + "\"");
-        }
+    TextJustification tj = new TextJustification();
+    List<String> justified = tj.fullJustify(words, maxWidth);
+
+    for (String line : justified) {
+      System.out.println("\"" + line + "\"");
+    }
+  }
+
+  /**
+   * Justifies a list of words into lines of maxWidth characters.
+   *
+   * Steps:
+   * - Use greedy packing to fill lines with as many words as possible.
+   * - Once a line is full, call helper to add spacing appropriately.
+   * - For the last line, use left-justified formatting.
+   *
+   * @param words    Input words
+   * @param maxWidth Maximum width of each line
+   * @return List of fully justified lines
+   */
+  public List<String> fullJustify(String[] words, int maxWidth) {
+    List<String> result = new ArrayList<>();
+
+    int startLineWordIndex = 0; // Index of the first word in the current line
+    int currentLength = 0; // Current length of the line without spaces
+
+    for (int lastLineWordIndex = 0; lastLineWordIndex < words.length; lastLineWordIndex++) {
+      int wordLengthWithSpace = currentLength + words[lastLineWordIndex].length() + (lastLineWordIndex - startLineWordIndex);
+
+      if (wordLengthWithSpace > maxWidth) {
+        result.add(formatLine(words, startLineWordIndex, lastLineWordIndex - 1, maxWidth, false));
+        startLineWordIndex = lastLineWordIndex;
+        currentLength = 0;
+      }
+      currentLength += words[lastLineWordIndex].length();
     }
 
-    public List<String> fullJustify(String[] words, int maxWidth) {
-        List<String> justifiedText = new ArrayList<>();
-        int start = 0, currentLength = 0;
+    result.add(formatLine(words, startLineWordIndex, words.length - 1, maxWidth, true));
+    return result;
+  }
 
-        for (int i = 0; i < words.length; i++) {
-            // Calculate total length including space between words
-            int potentialLength = currentLength + words[i].length() + (i - start);
-
-            // If adding words[i] exceeds maxWidth, justify the current line
-            if (potentialLength > maxWidth) {
-                justifiedText.add(formatLine(words, start, i - 1, maxWidth, false));
-                start = i;
-                currentLength = 0;
-            }
-            currentLength += words[i].length();
-        }
-
-        // Justify the last line (left-justified)
-        justifiedText.add(formatLine(words, start, words.length - 1, maxWidth, true));
-
-        return justifiedText;
+  /**
+   * Formats a single line of words with proper spacing.
+   *
+   * @param words      Full input word list
+   * @param startIndex      Start index for the line
+   * @param endIndex        End index for the line
+   * @param maxWidth   Max allowed width
+   * @param isLastLine Whether this is the last line
+   * @return Justified line string
+   */
+  private String formatLine(String[] words, int startIndex, int endIndex, int maxWidth, boolean isLastLine) {
+    if (isLastLine || startIndex == endIndex) {
+      String line = String.join(" ", Arrays.copyOfRange(words, startIndex, endIndex + 1));
+      return padRight(line, maxWidth);
     }
 
-    /**
-     * Formats a line by adding appropriate spaces.
-     *
-     * @param words     Array of words.
-     * @param start     Start index of words for this line.
-     * @param end       End index of words for this line.
-     * @param maxWidth  The max width of each line.
-     * @param isLastLine Whether this is the last line (left-justified).
-     * @return A justified line as a string.
-     */
-    private String formatLine(String[] words, int start, int end, int maxWidth, boolean isLastLine) {
-        // Join words with single spaces for the last line or if there's only one word
-        if (isLastLine || start == end) {
-            String line = String.join(" ", Arrays.copyOfRange(words, start, end + 1));
-            return padRight(line, maxWidth);
+    int totalWords = endIndex - startIndex;
+    int totalWordLength = getWordLength(words, startIndex, endIndex);
+    int totalSpaces = maxWidth - totalWordLength;
+
+    int minSpacesBetween = totalSpaces / totalWords; // Minimum spaces between words
+    int remainingSpaces = totalSpaces % totalWords; // Extra spaces to distribute
+
+    StringBuilder lineBuilder = new StringBuilder();
+    for (int i = startIndex; i <= endIndex; i++) {
+      lineBuilder.append(words[i]);
+
+      if (i < endIndex) {
+        for (int s = 0; s < minSpacesBetween; s++) {
+          lineBuilder.append(" ");
         }
-
-        // Calculate total spaces needed
-        int totalWords = end - start;
-        int totalSpaces = maxWidth - getWordLength(words, start, end);
-        int minSpace = totalSpaces / totalWords;
-        int extraSpace = totalSpaces % totalWords;
-
-        // Build justified line
-        StringBuilder justifiedLine = new StringBuilder();
-        for (int i = start; i <= end; i++) {
-            if (i > start) {
-                justifiedLine.append(" ".repeat(minSpace));
-                if (extraSpace > 0) {
-                    justifiedLine.append(" ");
-                    extraSpace--;
-                }
-            }
-            justifiedLine.append(words[i]);
+        if (remainingSpaces > 0) {
+          lineBuilder.append(" ");
+          remainingSpaces--;
         }
-
-        return justifiedLine.toString();
+      }
     }
 
-    /**
-     * Calculates the total length of words in a given range (excluding spaces).
-     */
-    private int getWordLength(String[] words, int start, int end) {
-        int length = 0;
-        for (int i = start; i <= end; i++) {
-            length += words[i].length();
-        }
-        return length;
-    }
+    return lineBuilder.toString();
+  }
 
-    /**
-     * Pads the given string with spaces on the right to match the desired width.
-     */
-    private String padRight(String text, int width) {
-        return text + " ".repeat(width - text.length());
+  /**
+   * Returns the combined length of all words in a range.
+   */
+  private int getWordLength(String[] words, int start, int end) {
+    int len = 0;
+    for (int i = start; i <= end; i++) {
+      len += words[i].length();
     }
+    return len;
+  }
+
+  /**
+   * Pads a line on the right with spaces until it matches the maxWidth.
+   */
+  private String padRight(String line, int width) {
+    StringBuilder sb = new StringBuilder(line);
+    while (sb.length() < width) {
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
 }

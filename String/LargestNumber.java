@@ -1,52 +1,71 @@
-package String;
+package string;
 
 import java.util.Arrays;
 
+
 /**
- * LeetCode Problem: https://leetcode.com/problems/largest-number/
+ * https://leetcode.com/problems/largest-number/
  *
- * Problem:
- * Given a list of non-negative integers, arrange them to form the largest possible number.
- * Return the number as a string.
+ * ### Problem Statement:
+ * Given an array of non-negative integers, arrange them such that they form the largest number.
  *
- * Approach:
- * - Convert all integers to strings.
- * - Define a custom comparator for sorting:
- *   - Compare `a + b` vs. `b + a` to determine order (concatenation logic).
- *   - Sort in **descending order** to maximize the number.
- * - Concatenate sorted numbers to form the result.
- * - Handle the **edge case** where all numbers are zero.
+ * ### Example:
+ * Input: [3, 30, 34, 5, 9]
+ * Output: "9534330"
  *
- * Time Complexity: O(N log N) (due to sorting)
- * Space Complexity: O(N) (for storing string representations)
+ * ### Approach:
+ * 1. Convert integers to strings.
+ * 2. Sort using a custom comparator: for strings a and b, compare (b + a) vs (a + b).
+ *    - This ensures that when combined, the number is maximized.
+ * 3. Concatenate the sorted strings.
+ * 4. Handle edge case: when all numbers are zero, return "0".
+ *
+ * ### Time Complexity: O(n log n) — due to sorting.
+ * ### Space Complexity: O(n) — to store string representations.
+ *
+ * ### Follow-up:
+ * - Can you modify this to return the k-th largest number instead of the largest overall?
+ * - What if the input is a stream of numbers?
  */
 public class LargestNumber {
-    public static void main(String[] args) {
-        int[] nums = {3, 30, 34, 5, 9};
-        String result = new LargestNumber().largestNumber(nums);
-        System.out.println("Largest number is: " + result);
+
+  public static void main(String[] args) {
+    int[] nums = {3, 30, 34, 5, 9};
+    String largest = largestNumber(nums);
+    System.out.println("Largest number is: " + largest);
+  }
+
+  /**
+   * Forms the largest number possible by rearranging integers.
+   *
+   * @param nums Array of non-negative integers.
+   * @return The largest number in string format.
+   */
+  public static String largestNumber(int[] nums) {
+    if (nums == null || nums.length == 0) {
+      return "0";
     }
 
-    public String largestNumber(int[] nums) {
-        // Convert integers to strings
-        String[] stringNumbers = Arrays.stream(nums)
-                                       .mapToObj(String::valueOf)
-                                       .toArray(String[]::new);
+    // Step 1: Convert integers to strings
+    String[] strNums = Arrays.stream(nums)
+        .mapToObj(String::valueOf)
+        .toArray(String[]::new);
 
-        // Custom sorting: Compare concatenated strings to determine order
-        Arrays.sort(stringNumbers, (a, b) -> (b + a).compareTo(a + b));
+    // Step 2: Sort using custom comparator
+    // [3, 30] => "330" vs "303" => "330" is larger, so "3" should come before "30"
+    Arrays.sort(strNums, (a, b) -> (b + a).compareTo(a + b));
 
-        // If the largest number is "0", return "0" (to handle leading zero case)
-        if (stringNumbers[0].equals("0")) {
-            return "0";
-        }
-
-        // Build the final largest number string
-        StringBuilder resultBuilder = new StringBuilder();
-        for (String num : stringNumbers) {
-            resultBuilder.append(num);
-        }
-
-        return resultBuilder.toString();
+    // Step 3: Edge case — all zeroes (e.g., [0,0])
+    if (strNums[0].equals("0")) {
+      return "0";
     }
+
+    // Step 4: Build final result
+    StringBuilder resultBuilder = new StringBuilder();
+    for (String num : strNums) {
+      resultBuilder.append(num);
+    }
+
+    return resultBuilder.toString();
+  }
 }

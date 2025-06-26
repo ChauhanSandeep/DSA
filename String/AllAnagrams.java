@@ -4,77 +4,87 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Problem: Find All Anagrams in a String
+ * ✅ Problem: Find All Anagrams in a String
  *
- * Given two strings `text` and `word`, find all **start indices** of `word`'s anagrams in `text`.
+ * Given two strings `text` and `pattern`, return **all start indices** of `pattern`'s anagrams in `text`.
  *
- * Intuition:
- * - Use the **Sliding Window** technique to check anagram matches efficiently.
- * - Instead of `HashMap<Character, Integer>`, use a **fixed-size array** (`int[26]`) since `word` contains only lowercase letters.
- * - Maintain a `matchCount` to track matched characters instead of comparing maps.
+ * Better Example:
+ * Input: text = "xyzabcabaxy", pattern = "ab"
+ * Output: [3, 6, 7]
+ * Explanation:
+ * - "ab" → anagram at index 3
+ * - "ba" → anagram at index 6
+
+ * Explanation:
+ * - "ab" → anagram at index 0
+ * - "ba" → anagram at index 1
+ * - "ab" → anagram at index 2
  *
- * Approach:
- * 1. **Precompute the frequency count of `word`**.
- * 2. **Initialize a sliding window** of size `word.length()`.
- * 3. **Slide the window across `text`**, updating character frequencies dynamically.
- * 4. **Check if window matches `word`'s frequency** and store valid indices.
+ * 🔗 Leetcode: https://leetcode.com/problems/find-all-anagrams-in-a-string/
  *
- * Time Complexity: **O(N)**, where N = length of `text` (Sliding Window runs in linear time)
- * Space Complexity: **O(1)** (Fixed-size frequency arrays)
- *
- * Problem Link: https://leetcode.com/problems/find-all-anagrams-in-a-string/
+ * 🔁 Follow-Up Questions:
+ * 1. What if the string contains unicode characters?
+ *    ➤ Use `Map<Character, Integer>` instead of fixed arrays.
+ * 2. Can we find count of distinct anagrams instead of indices?
+ *    ➤ Maintain a `Set<String>` of anagram substrings and return its size.
+ * 3. What if matching is case-insensitive?
+ *    ➤ Normalize the input using `.toLowerCase()` before processing.
  */
 public class AllAnagrams {
 
     public static void main(String[] args) {
         List<Integer> result = new AllAnagrams().findAnagrams("abab", "ab");
-        System.out.println(result); // Expected: [0, 1, 2]
+        System.out.println(result); // Output: [0, 1, 2]
     }
 
-    public List<Integer> findAnagrams(String text, String word) {
+
+    /**
+     * Steps:
+     * 1. Use a sliding window of size equal to `pattern`.
+     * 2. Maintain a frequency count of characters in `pattern`.
+     * 3. For each window in `text`, compare character counts.
+     * 4. If counts match, add the start index to result.
+     *
+     * Time Complexity: O(N * 26) = O(N) where N = text length
+     * Space Complexity: O(26) = O(1) for character counts
+     */
+    public List<Integer> findAnagrams(String text, String pattern) {
         List<Integer> result = new ArrayList<>();
-        if (text == null || word == null || text.length() < word.length()) return result;
-
-        int[] wordFreq = new int[26];
-        int[] windowFreq = new int[26];
-
-        // Step 1: Count frequency of characters in `word`
-        for (char ch : word.toCharArray()) {
-            wordFreq[ch - 'a']++;
+        if (text == null || pattern == null || text.length() < pattern.length()) {
+            return result;
         }
 
-        int left = 0, right = 0, matchCount = 0;
-        int wordLength = word.length();
-        int textLength = text.length();
+        int[] charCount = new int[26];
+        for (char c : pattern.toCharArray()) {
+            charCount[c - 'a']++;
+        }
 
-        // Step 2: Expand the window while tracking frequency
-        for (; right < textLength; right++) {
-            char addedChar = text.charAt(right);
-            windowFreq[addedChar - 'a']++;
+        int left = 0, right = 0, matchCount = pattern.length();
 
-            // If window size exceeds `wordLength`, shrink from the left
-            if (right - left + 1 > wordLength) {
-                char removedChar = text.charAt(left);
-                windowFreq[removedChar - 'a']--;
+        while (right < text.length()) {
+            char rightChar = text.charAt(right);
+            // If the character is part of the pattern, decrease match count
+            if (charCount[rightChar - 'a']-- > 0) {
+                matchCount--;
+            }
+
+            // If the window size exceeds pattern length, move left pointer
+            if (right - left + 1 > pattern.length()) {
+                char leftChar = text.charAt(left);
+                // If the left character was part of the pattern, increase match count
+                if (charCount[leftChar - 'a']++ >= 0) {
+                    matchCount++;
+                }
                 left++;
             }
 
-            // Step 3: If the window matches `wordFreq`, store the starting index
-            if (isAnagram(wordFreq, windowFreq)) {
+            if (matchCount == 0) {
                 result.add(left);
             }
+
+            right++;
         }
 
         return result;
-    }
-
-    /**
-     * Checks if two frequency arrays are identical.
-     */
-    private boolean isAnagram(int[] freq1, int[] freq2) {
-        for (int i = 0; i < 26; i++) {
-            if (freq1[i] != freq2[i]) return false;
-        }
-        return true;
     }
 }

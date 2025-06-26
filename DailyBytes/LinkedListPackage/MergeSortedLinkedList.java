@@ -5,13 +5,13 @@ import java.util.LinkedList;
 
 /**
  * This class merges two sorted linked lists into a single sorted linked list.
- * 
+ *
  * Algorithm:
  * - Use two pointers to traverse both lists and add the smaller element to the result list.
  * - Once one list is exhausted, add the remaining elements of the other list to the result list.
  * - Time Complexity: O(n + m) where n and m are the lengths of the two input lists.
  * - Space Complexity: O(n + m)
- * 
+ *
  * LeetCode Problem Link: https://leetcode.com/problems/merge-two-sorted-lists/
  */
 public class MergeSortedLinkedList {
@@ -46,27 +46,27 @@ public class MergeSortedLinkedList {
     public static LinkedList<Integer> mergeSortedLinkedLists(LinkedList<Integer> list1, LinkedList<Integer> list2) {
         LinkedList<Integer> resultList = new LinkedList<>();
 
-        int i = 0, j = 0;
-        while (i < list1.size() && j < list2.size()) {
-            if (list1.get(i) < list2.get(j)) {
-                resultList.add(list1.get(i));
-                i++;
+        int pointer1 = 0, pointer2 = 0;
+        while (pointer1 < list1.size() && pointer2 < list2.size()) {
+            if (list1.get(pointer1) < list2.get(pointer2)) {
+                resultList.add(list1.get(pointer1));
+                pointer1++;
             } else {
-                resultList.add(list2.get(j));
-                j++;
+                resultList.add(list2.get(pointer2));
+                pointer2++;
             }
         }
 
         // Add remaining elements from list1
-        while (i < list1.size()) {
-            resultList.add(list1.get(i));
-            i++;
+        while (pointer1 < list1.size()) {
+            resultList.add(list1.get(pointer1));
+            pointer1++;
         }
 
         // Add remaining elements from list2
-        while (j < list2.size()) {
-            resultList.add(list2.get(j));
-            j++;
+        while (pointer2 < list2.size()) {
+            resultList.add(list2.get(pointer2));
+            pointer2++;
         }
 
         return resultList;

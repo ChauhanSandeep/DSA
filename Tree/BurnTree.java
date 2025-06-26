@@ -2,21 +2,36 @@ package Tree;
 
 /**
  * **Burning a Binary Tree from a Leaf Node**
- * 
+ *
  * Given a binary tree and a leaf node, the fire spreads to all connected nodes (parent, left, right)
  * every second. The goal is to determine the minimum time required to completely burn the tree.
- * 
+ *
+ * For example:
+ * * ```
+ *                5
+ *               /  \
+ *             4     6
+ *            / \     \
+ *           3  14     7
+ *                    / \
+ *                   9   8
+ * ```
+ * If the fire starts at node `14`, it will take `5` seconds to burn the entire tree.
+ *
+ * **Key Points:**
+ * - Fire spreads to parent, left, and right nodes.
+ *
  * **Approach:**
  * - Perform a postorder traversal to find the leaf node.
  * - As we return back, calculate the depth at which the leaf node is found.
  * - Keep track of the farthest node burning using a **global max time counter**.
  * - Burn child nodes on the opposite subtree after encountering the burning leaf.
- * 
+ *
  * **Time Complexity:** **O(N)** (visiting each node once)
  * **Space Complexity:** **O(H)** (recursion stack, worst case O(N) for skewed tree)
  */
 public class BurnTree {
-    
+
     private int maxBurnTime = 0; // Tracks the maximum time taken to burn the tree
 
     public static void main(String[] args) {
@@ -44,7 +59,7 @@ public class BurnTree {
 
     /**
      * Computes the minimum time required to burn the entire tree starting from a given leaf node.
-     * 
+     *
      * @param root The root of the binary tree.
      * @param leafValue The value of the leaf node where the fire starts.
      * @return The minimum time required to burn the entire tree.
@@ -56,7 +71,7 @@ public class BurnTree {
 
     /**
      * Recursively finds the burning node and calculates burning times.
-     * 
+     *
      * @param node Current node in traversal.
      * @param leafValue The target leaf node from which the fire starts.
      * @return The depth of the burning node if found, otherwise -1.
@@ -86,13 +101,13 @@ public class BurnTree {
 
     /**
      * Burns all child nodes in a subtree at increasing time intervals.
-     * 
+     *
      * @param node Current node in the opposite subtree.
      * @param time Time taken for fire to reach this node.
      */
     private void propagateFire(TreeNode node, int time) {
         if (node == null) return;
-        
+
         maxBurnTime = Math.max(maxBurnTime, time + 1);
         propagateFire(node.left, time + 1);
         propagateFire(node.right, time + 1);

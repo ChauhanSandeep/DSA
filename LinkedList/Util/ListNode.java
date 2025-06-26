@@ -20,6 +20,23 @@ public class ListNode {
         this.next = next;
     }
 
+    // Getters and Setters for the value and next node
+    public int getVal() {
+        return val;
+    }
+
+    public void setVal(int val) {
+        this.val = val;
+    }
+
+    public ListNode getNext() {
+        return next;
+    }
+
+    public void setNext(ListNode next) {
+        this.next = next;
+    }
+
     /**
      * Returns the string representation of the ListNode.
      * Useful for debugging.

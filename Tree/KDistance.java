@@ -6,20 +6,17 @@ import java.util.ArrayList;
  * Given a binary tree, this class finds all the nodes that are at a distance `K` from a target node.
  * The tree is traversed to locate the target node, and from there, nodes at the specified distance `K` are found.
  *
- * Intuition:
- * - The approach first finds the target node. Once the target is found, it starts marking nodes at distance `K` from it.
- * - The traversal works both downwards (to child nodes) and upwards (to parent nodes) to ensure all nodes at distance `K` are covered.
- * 
- * Algorithm:
- * 1. Perform a depth-first search (DFS) to find the target node.
- * 2. Once the target is found, call a helper function (`markChild`) to explore nodes at distance `K`.
- * 3. Explore both the left and right subtrees while also considering the parent node by traversing upwards.
- * 
- * Time Complexity:
- * - Finding the target and marking nodes at distance `K` takes O(N), where N is the number of nodes in the binary tree.
- * 
- * Space Complexity:
- * - The space complexity is O(H), where H is the height of the binary tree due to recursive calls on the stack.
+ * Leetcode link: https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/
+ *
+ * For example:
+ *         3
+ *        /  \
+ *       5    1
+ *      / \   / \
+ *     6   2  0   8
+ *        / \
+ *       7   4
+ *       If the target node is 5 and K is 2, the output will be [7, 4, 1].
  */
 public class KDistance {
 
@@ -35,20 +32,29 @@ public class KDistance {
         //             \
         //              3
         TreeNode root = new TreeNode(0);
-        root.right = new TreeNode(1);
+        root.right = new Tree.TreeNode(1);
         root.right.right = new TreeNode(2);
         root.right.right.right = new TreeNode(3);
-        
+
         // Calling the method with target node value 1 and distance 2
         KDistance kDistance = new KDistance();
         ArrayList<Integer> nodesAtDistanceK = kDistance.distanceK(root, 1, 2);
-        
+
         // Output the nodes at distance 2 from node with value 1
         System.out.println(nodesAtDistanceK);
     }
 
     /**
-     * Finds all nodes that are at a distance `K` from the target node.
+     * Algorithm:
+     * 1. Perform a depth-first search (DFS) to find the target node.
+     * 2. Once the target is found, call a helper function (`markChild`) to explore nodes at distance `K`.
+     * 3. Explore both the left and right subtrees while also considering the parent node by traversing upwards.
+     *
+     * Time Complexity:
+     * - Finding the target and marking nodes at distance `K` takes O(N), where N is the number of nodes in the binary tree.
+     *
+     * Space Complexity:
+     * - The space complexity is O(H), where H is the height of the binary tree due to recursive calls on the stack.
      *
      * @param root The root node of the binary tree.
      * @param target The value of the target node.
@@ -62,7 +68,7 @@ public class KDistance {
     }
 
     /**
-     * A helper function that recursively searches for the target node in the binary tree and 
+     * A helper function that recursively searches for the target node in the binary tree and
      * calls `markChild` to find nodes at the required distance.
      *
      * @param node The current node being explored in the binary tree.
@@ -81,7 +87,7 @@ public class KDistance {
 
         // Search in the left subtree
         int left = findNodes(node.left, target, distance);
-        
+
         // If the target is found in the left subtree and is within the distance
         if (left > 0 && left <= distance) {
             if (left == distance) {
@@ -95,7 +101,7 @@ public class KDistance {
 
         // Search in the right subtree
         int right = findNodes(node.right, target, distance);
-        
+
         // If the target is found in the right subtree and is within the distance
         if (right > 0 && right <= distance) {
             if (right == distance) {
@@ -130,15 +136,4 @@ public class KDistance {
 
 }
 
-/**
- * Definition for a binary tree node.
- */
-class TreeNode {
-    int val;
-    TreeNode left;
-    TreeNode right;
 
-    TreeNode(int x) {
-        val = x;
-    }
-}

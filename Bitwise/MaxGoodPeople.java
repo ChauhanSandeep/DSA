@@ -1,69 +1,102 @@
 package Bitwise;
 
 /**
- * This class finds the maximum number of good people based on the given statements.
- * 
- * Algorithm:
- * - Use binary representation to create equations representing good and bad persons.
- * - Validate each equation against the provided statements.
- * - Keep track of the valid equation with the maximum number of good persons.
- * - Time Complexity: O(2^n * n^2)
- * - Space Complexity: O(n)
- * 
- * LeetCode Problem Link: https://leetcode.com/problems/maximum-good-people-based-on-statements/
+ * LeetCode Problem: https://leetcode.com/problems/maximum-good-people-based-on-statements/
+ *
+ * Problem Statement:
+ * You are given a 2D array `statements` of size n x n representing statements made by people about others.
+ * Each `statements[i][j]` can be:
+ * - 0: i says j is bad
+ * - 1: i says j is good
+ * - 2: i made no statement about j
+ *
+ * A person can either be good or bad. Good people always tell the truth, but bad people can lie or tell the truth.
+ * Return the maximum number of people who can be good based on the given statements.
+ *
+ * Example:
+ * Input: statements = [
+ * [2,1,2],
+ * [1,2,2],
+ * [2,0,2]]
+ *
+ * Output: 2
+ * Explanation:
+ * - Person 0 states that person 1 is good.
+ * - Person 1 states that person 0 is good.
+ * - Person 2 states that person 1 is bad.
+ *
+ * Follow-up Questions (for interviews):
+ * - What if the size of `statements` is very large (say > 25)?
+ *   👉 Brute-force is not feasible, need constraint propagation or SAT solvers.
+ * - Can we avoid using strings and work directly with bits?
+ *   👉 Yes, you can optimize memory and speed using bitwise operations on integers.
  */
 public class MaxGoodPeople {
 
-    public static void main(String[] args) {
-        int[][] statements = {
-            {2, 1, 2},
-            {1, 2, 2},
-            {2, 0, 2}
-        };
-        System.out.println(new MaxGoodPeople().maximumGood(statements));
+  public static void main(String[] args) {
+    int[][] statements = {
+        {2, 1, 2},
+        {1, 2, 2},
+        {2, 0, 2}
+    };
+    System.out.println(new MaxGoodPeople().maximumGood(statements));  // Output: 2
+  }
+
+  /**
+   * Finds the maximum number of people that can be good based on statements made.
+   *
+   * Algorithm:
+   * - Iterate over all possible combinations of people (2^n subsets).
+   * - Represent each combination as a bitmask, where 1 indicates "good".
+   * - For each combination, validate it by ensuring all "good" people only tell the truth.
+   * - Keep track of the combination with the highest count of good people.
+   *
+   * Time Complexity: O(2^n * n^2) — for every subset, we check each person’s statement about others.
+   * Space Complexity: O(1) — constant extra space apart from input.
+   *
+   * @param statements 2D array where statements[i][j] indicates what person i says about person j.
+   * @return Maximum number of good people possible.
+   */
+  public int maximumGood(int[][] statements) {
+    if (statements == null || statements.length == 0) return 0;
+
+    int n = statements.length;
+    int maxGoodPeople = 0;
+
+    int totalCombinations = 1 << n; // 2^n possible combinations
+    for (int mask = 0; mask < totalCombinations; mask++) {
+      if (isValidConfiguration(mask, statements, n)) {
+        int goodCount = Integer.bitCount(mask); // Count of 1's in the bitmask
+        maxGoodPeople = Math.max(maxGoodPeople, goodCount);
+      }
     }
+    return maxGoodPeople;
+  }
 
-    /**
-     * Create an equation representing good and bad persons in binary string format.
-     * For each equation, check if it is valid based on the provided statements.
-     * Keep track of the valid equation with the maximum number of good persons.
-     */
-    public int maximumGood(int[][] statements) {
-        int length = statements.length;
-        int maxGoodCount = 0;
+  /**
+   * Validates whether the current combination (bitmask) is logically consistent.
+   *
+   * @param mask       Bitmask representing the current assumption of good people (1 = good, 0 = bad)
+   * @param statements The original matrix of statements.
+   * @param n          Number of people.
+   * @return true if the configuration is valid, false otherwise.
+   */
+  private boolean isValidConfiguration(int mask, int[][] statements, int n) {
+    for (int i = 0; i < n; i++) {
+      // If person i is assumed to be good
+      if (((mask >> i) & 1) == 1) {
+        for (int j = 0; j < n; j++) {
+          int statement = statements[i][j];
+          if (statement == 2) continue; // No statement made
 
-        // Iterate through all possible binary equations representing good and bad persons
-        int totalCombinations = (1 << length) - 1;
-        while (totalCombinations > 0) {
-            StringBuilder binaryRepresentation = new StringBuilder(Integer.toString(totalCombinations, 2));
-            while (binaryRepresentation.length() < length) {
-                binaryRepresentation.insert(0, "0");
-            }
-            if (isValid(statements, binaryRepresentation.toString())) {
-                int goodCount = 0;
-                for (char ch : binaryRepresentation.toString().toCharArray()) {
-                    if (ch == '1') goodCount++;
-                }
-                maxGoodCount = Math.max(goodCount, maxGoodCount);
-            }
-            totalCombinations--;
+          int assumedGood = (mask >> j) & 1;
+          if (statement != assumedGood) {
+            // Contradiction found: a good person lied
+            return false;
+          }
         }
-        return maxGoodCount;
+      }
     }
-
-    /**
-     * Validate the binary equation against the provided statements.
-     */
-    private boolean isValid(int[][] statements, String binaryEquation) {
-        for (int i = 0; i < binaryEquation.length(); i++) {
-            if (binaryEquation.charAt(i) == '1') {
-                int[] statement = statements[i];
-                for (int j = 0; j < statement.length; j++) {
-                    if (statement[j] == 2) continue;
-                    if (binaryEquation.charAt(j) - '0' != statement[j]) return false;
-                }
-            }
-        }
-        return true;
-    }
+    return true;
+  }
 }

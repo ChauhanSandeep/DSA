@@ -3,13 +3,30 @@ package design.connect4ai;
 import java.util.LinkedList;
 import java.util.Random;
 
+/**
+ * Implements Minimax algorithm with depth-limiting for Connect Four AI.
+ *
+ * ### Problem Context:
+ * Design an AI that plays Connect Four optimally using the Minimax algorithm up to a fixed depth.
+ * This AI assumes a deterministic and perfect opponent.
+ * Uses a utility heuristic function provided by the `State` class to evaluate board states.
+ *
+ * ### Features:
+ * - Depth-limited Minimax.
+ * - Random selection among equally optimal moves to introduce variability.
+ *
+ * ### Follow-up Questions:
+ * - How can you optimize this using Alpha-Beta pruning? (Hint: Prune branches that cannot affect final decision)
+ * - How to add transposition tables for memoization?
+ * - Can you adapt it for Monte Carlo Tree Search for larger search spaces?
+ */
 public class MinMax {
     //Variable that holds the maximum depth the MinMax algorithm will reach (level of the three)
     int maxDepth;
     //Variable that holds which letter the computer controls
     int computerLetter;
     ////////////////////
-    
+
     //Constructor
     public MinMax(int thePlayerLetter) {
         maxDepth = 5; //This is important to get a better decision (more depth, more accurate decision, more time)

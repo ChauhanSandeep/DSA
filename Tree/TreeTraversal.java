@@ -6,8 +6,6 @@ import java.util.Stack;
  * TreeTraversal performs various tree traversal methods (Preorder, Inorder, and Postorder)
  * both recursively and iteratively.
  *
- * The class provides standard tree traversal techniques, as well as their iterative counterparts.
- * The tree is traversed based on the order in which the nodes are visited.
  * - Preorder: Visit the root first, then the left subtree, and then the right subtree.
  * - Inorder: Visit the left subtree first, then the root, and then the right subtree.
  * - Postorder: Visit the left subtree first, then the right subtree, and then the root.
@@ -116,21 +114,17 @@ public class TreeTraversal {
         Stack<Node> stack = new Stack<>();
         Node curr = root;
 
-        /**
-         * Logic:
-         * 1. Traverse the left subtree and push all nodes to the stack.
-         * 2. If the current node is null, pop from the stack and visit the node.
-         * 3. Move to the right subtree.
-         */
-        while (!stack.isEmpty() || curr != null) {
-            if (curr != null) {
-                stack.push(curr); // Push left nodes to stack
+        while (curr != null || !stack.isEmpty()) {
+            // Reach the leftmost Node of the current Node
+            while (curr != null) {
+                stack.push(curr);
                 curr = curr.left;
-            } else {
-                curr = stack.pop(); // Pop from stack and visit node
-                System.out.print(curr.data + "->");
-                curr = curr.right; // Traverse right subtree
             }
+            // Current must be null at this point
+            curr = stack.pop();
+            System.out.print(curr.data + "->");
+            // Visit the right subtree
+            curr = curr.right;
         }
     }
 

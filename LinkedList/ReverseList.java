@@ -6,12 +6,14 @@ import LinkedList.Util.ListNode;
 /**
  * ✅ Problem: Reverse Linked List
  * 🔗 LeetCode: https://leetcode.com/problems/reverse-linked-list/
+ * 📚 Problem Statement:
+ * Given the head of a singly linked list, reverse the list, and return the reversed list.
  *
  * 🔍 **Approach:**
  * - Iterative reversal of the entire list.
  * - Recursive reversal of the entire list.
  * - Reversing in groups of 'k' nodes.
- * 
+ *
  * 📊 **Time Complexity:**
  * - `reverseList()`: O(N) - Iterates through the list once.
  * - `reverseListRec()`: O(N) - Visits each node once.
@@ -34,19 +36,19 @@ public class ReverseList {
         list.add(new ListNode(6));
 
         System.out.println("Original List:");
-        list.printList(head);
+        list.printList();
 
         head = reverseList(head);
         System.out.println("After complete reversal:");
-        list.printList(head);
+        list.printList();
 
         head = reverseListRec(head);
         System.out.println("After recursive reversal:");
-        list.printList(head);
+        list.printList();
 
         head = reverseInGroups(head, 4);
         System.out.println("After batch-wise reversal:");
-        list.printList(head);
+        list.printList();
     }
 
     /**
@@ -83,37 +85,5 @@ public class ReverseList {
         head.setNext(null); // Set current node's next to null (to avoid cycles)
 
         return reversedHead;
-    }
-
-    /**
-     * Reverses the linked list in groups of 'k' nodes.
-     *
-     * @param head Head of the linked list.
-     * @param k Group size for reversal.
-     * @return New head after group-wise reversal.
-     */
-    public static ListNode reverseInGroups(ListNode head, int k) {
-        if (head == null || k <= 1) {
-            return head; // No change needed
-        }
-
-        ListNode prev = null, current = head, nextNode;
-        int count = 0;
-
-        // Reverse first 'k' nodes
-        while (current != null && count < k) {
-            nextNode = current.getNext();
-            current.setNext(prev);
-            prev = current;
-            current = nextNode;
-            count++;
-        }
-
-        // Recursively reverse the next part and attach it
-        if (current != null) {
-            head.setNext(reverseInGroups(current, k));
-        }
-
-        return prev; // New head of the reversed section
     }
 }

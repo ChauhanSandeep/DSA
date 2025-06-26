@@ -1,123 +1,162 @@
 package design;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
- * https://leetcode.com/problems/design-in-memory-file-system/
+ * Problem: https://leetcode.com/problems/design-in-memory-file-system/
+ *
+ * ### Problem Statement:
+ * Design a basic in-memory file system to support operations like creating directories,
+ * adding content to files, reading content, and listing directory contents.
+ *
+ * ### Example:
+ * Input:
+ * FileSystem fileSystem = new FileSystem();
+ * fileSystem.mkdir("/a/b/c");
+ * fileSystem.addContentToFile("/a/b/c/d", "hello");
+ * List<String> list = fileSystem.ls("/"); // Returns ["a"]
+ * String content = fileSystem.readContentFromFile("/a/b/c/d"); // Returns "hello"
+ *
+ * ### Follow-up Questions:
+ * 1. Can you implement `rm` (remove) command?
+ *    - Yes, you'd need to handle both file and directory deletion carefully, ensuring safe traversal and clean-up.
+ * 2. How to implement `move` command?
+ *    - It involves detaching a node from one path and attaching it under another, similar to renaming directories.
+ * 3. Can we handle concurrency?
+ *    - Use locks on nodes or global read-write locks for thread safety.
  */
-class FileSystem {
+public class FileSystem {
 
-    Node root;
+    private final FileNode root;
 
     public FileSystem() {
-        root = new Node("/");
+        this.root = new FileNode("/");
     }
 
+    /**
+     * Lists the contents of a given path.
+     * If it's a file, returns a singleton list of the file name.
+     * If it's a directory, returns the list of child names in lexicographic order.
+     *
+     * @param path Absolute path
+     * @return List of file or directory names
+     *
+     * Time Complexity: O(k log k) where k is the number of children in the last directory
+     * Space Complexity: O(k) for storing the result list
+     */
     public List<String> ls(String path) {
-        List<String> list;
+        FileNode node = traversePath(path);
 
-        if ("/".equals(path)) {
-            list = new ArrayList<>(root.children.keySet());
-            Collections.sort(list);
-            return list;
+        if (node.isFile) {
+            return Collections.singletonList(node.name);
         }
 
-        Node temp = root;
-        String[] nodes = path.split("/");
-
-        for (int i = 0; i < nodes.length; i++) {
-            if (temp.children.containsKey(nodes[i])) {
-                temp = temp.children.get(nodes[i]);
-            }
-        }
-        if (temp.isFile) {
-            return Arrays.asList(temp.name);
-        }
-        list = new ArrayList<>(temp.children.keySet());
-        Collections.sort(list);
-        return list;
+        List<String> contents = new ArrayList<>(node.children.keySet());
+        Collections.sort(contents);
+        return contents;
     }
 
+    /**
+     * Creates a directory path recursively.
+     *
+     * @param path Absolute path
+     *
+     * Time Complexity: O(n), n = number of directories in path
+     * Space Complexity: O(1)
+     */
     public void mkdir(String path) {
-        Node temp = root;
-        String[] nodes = path.split("/");
-        for (int i = 1; i < nodes.length; i++) {
-            if (!temp.children.containsKey(nodes[i])) {
-                temp.children.put(nodes[i], new Node(nodes[i]));
-            }
-            temp = temp.children.get(nodes[i]);
+        String[] dirs = path.split("/");
+        FileNode current = root;
+
+        for (int i = 1; i < dirs.length; i++) {
+            current.children.putIfAbsent(dirs[i], new FileNode(dirs[i]));
+            current = current.children.get(dirs[i]);
         }
     }
 
+    /**
+     * Appends content to a file at the given path. Creates the file if it doesn't exist.
+     *
+     * @param filePath Absolute file path
+     * @param content  Content to append
+     *
+     * Time Complexity: O(n), n = depth of file path
+     * Space Complexity: O(1)
+     */
     public void addContentToFile(String filePath, String content) {
-        Node temp = root;
-        String[] nodes = filePath.split("/");
-        for (int i = 1; i < nodes.length - 1; i++) {
-            if (!temp.children.containsKey(nodes[i])) {
-                temp.children.put(nodes[i], new Node(nodes[i]));
-            }
-            temp = temp.children.get(nodes[i]);
-        }
-        Node file = temp.children.get(nodes[nodes.length - 1]);
-        if (file != null && file.isFile) {
-            file.content = file.content + content;
-        } else {
-            Node curr = new Node(nodes[nodes.length - 1], true);
-            curr.content = content;
-            temp.children.put(nodes[nodes.length - 1], curr);
+        String[] parts = filePath.split("/");
+        FileNode current = root;
+
+        // Traverse to the directory containing the file
+        for (int i = 1; i < parts.length - 1; i++) {
+            current.children.putIfAbsent(parts[i], new FileNode(parts[i]));
+            current = current.children.get(parts[i]);
         }
 
+        String fileName = parts[parts.length - 1];
+        current.children.putIfAbsent(fileName, new FileNode(fileName, true));
+        FileNode fileNode = current.children.get(fileName);
+        fileNode.content += content;
     }
 
+    /**
+     * Reads content from a file at the given path.
+     *
+     * @param filePath Absolute file path
+     * @return File content
+     *
+     * Time Complexity: O(n), n = depth of file path
+     * Space Complexity: O(1)
+     */
     public String readContentFromFile(String filePath) {
-        Node temp = root;
-        String[] nodes = filePath.split("/");
+        FileNode fileNode = traversePath(filePath);
+        return fileNode.isFile ? fileNode.content : null;
+    }
 
-        for (int i = 1; i < nodes.length - 1; i++) {
-            temp = temp.children.get(nodes[i]);
+    /**
+     * Traverses the given path and returns the last FileNode.
+     *
+     * @param path Absolute file/directory path
+     * @return Final FileNode at the given path
+     */
+    private FileNode traversePath(String path) {
+        String[] parts = path.split("/");
+        FileNode current = root;
+
+        for (int i = 1; i < parts.length; i++) {
+            current = current.children.get(parts[i]);
         }
-        Node file = temp.children.get(nodes[nodes.length - 1]);
-        if (file.isFile) return file.content;
-        return null;
-
+        return current;
     }
 
     public static void main(String[] args) {
-        FileSystem fileSystem = new FileSystem();
-        fileSystem.ls("/");
-        fileSystem.mkdir("/a/b/c");
-        fileSystem.addContentToFile("/a/b/c/d", "hello");
-        fileSystem.ls("/");
-        fileSystem.readContentFromFile("/a/b/c/d");
+        FileSystem fs = new FileSystem();
+        fs.mkdir("/a/b/c");
+        fs.addContentToFile("/a/b/c/d", "hello");
+        System.out.println(fs.ls("/")); // [a]
+        System.out.println(fs.readContentFromFile("/a/b/c/d")); // "hello"
     }
 }
 
-class Node {
+/**
+ * Represents a file or directory in the file system.
+ */
+class FileNode {
     String name;
     boolean isFile;
     String content;
-    HashMap<String, Node> children;
+    Map<String, FileNode> children;
 
-    public Node(String name) { // create directory
-        this.name = name;
-        isFile = false;
-        children = new HashMap<>();
-        this.content = null;
+    // Constructor for directory
+    public FileNode(String name) {
+        this(name, false);
     }
 
-    public Node(String name, boolean isFile) {
+    // Constructor for file/directory
+    public FileNode(String name, boolean isFile) {
         this.name = name;
         this.isFile = isFile;
-        if (isFile) {
-            this.children = new HashMap<>();
-            content = "";
-        } else {
-            this.children = new HashMap<>();
-            this.content = null;
-        }
+        this.content = isFile ? "" : null;
+        this.children = new HashMap<>();
     }
 }
