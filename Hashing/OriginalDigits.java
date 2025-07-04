@@ -2,23 +2,13 @@ package Hashing;
 
 /**
  * LeetCode Problem: https://leetcode.com/problems/reconstruct-original-digits-from-english/
- * 
- * Given a string `s` containing an out-of-order English representation of digits 0-9, 
+ *
+ * Given a string `s` containing an out-of-order English representation of digits 0-9,
  * this function reconstructs the original digits in ascending order.
- * 
- * Example Input:
- *   "owoztneoer"
- * 
- * Output:
- *   "012"
- * 
- * Approach:
- * - Identify unique characters that appear in only one digit.
- * - Use a frequency map to determine counts of each digit.
- * - Construct the final sorted number sequence.
- * 
- * Time Complexity: O(N), where N is the length of the input string.
- * Space Complexity: O(1), since we use a fixed array of size 26.
+ *
+ * Example Input: "owoztneoer"
+ * Output: "012"
+ * Explanation: The string contains the words for "zero", "one", and "two" in a jumbled form.
  */
 public class OriginalDigits {
 
@@ -30,12 +20,19 @@ public class OriginalDigits {
     /**
      * Reconstructs the original digits from a shuffled English representation.
      *
+     * Approach:
+     * - Identify unique characters that appear in only one digit.
+     * - Use a frequency map to determine counts of each digit.
+     * - Construct the final sorted number sequence.
+     *
+     * Time Complexity: O(N), where N is the length of the input string.
+     * Space Complexity: O(1), since we use a fixed array of size 26.
      * @param str Input string containing scrambled digit words.
      * @return A string containing digits in ascending order.
      */
     public String originalDigits(String str) {
         int[] charCount = new int[26]; // Frequency array for letters 'a' to 'z'
-        
+
         // Count the occurrences of each letter in the input string
         for (char letter : str.toCharArray()) {
             charCount[letter - 'a']++;

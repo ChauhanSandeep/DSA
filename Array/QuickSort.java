@@ -22,17 +22,27 @@ public class QuickSort {
     }
 
     private static int partition(int[] array, int left, int right) {
+        // Choose the rightmost element as the pivot
         int pivot = array[right];
+
+        // `partitionIndex` tracks the position where the next smaller element should go
         int partitionIndex = left;
 
         for (int i = left; i < right; i++) {
+            // If current element is <= pivot, it belongs on the left side
             if (array[i] <= pivot) {
+                // Swap current element with the element at `partitionIndex`
                 swap(array, i, partitionIndex);
+
+                // Move the partitionIndex forward to prepare for next smaller element
                 partitionIndex++;
             }
         }
 
+        // Finally, place the pivot element in its correct sorted position
         swap(array, partitionIndex, right);
+
+        // Return the index where pivot is now placed
         return partitionIndex;
     }
 

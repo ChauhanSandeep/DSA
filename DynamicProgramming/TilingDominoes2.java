@@ -1,54 +1,82 @@
 package DynamicProgramming;
 
 /**
- * Problem: Find the number of ways to tile a 3 x N board using 2 x 1 dominoes.
- * 
- * **Approach: Dynamic Programming with Bitmasking (State Compression)**
- * - The possible states are represented using a **3-bit mask** (0-7) where:
- *   - `1` means a cell is occupied.
- *   - `0` means a cell is empty.
- * - Recurrence relation tracks how valid states transition between columns.
- * 
- * **Time Complexity:** O(N) → Iterates once through `N`.  
- * **Space Complexity:** O(1) → Uses only two 1D arrays instead of a full DP table.  
- * 
- * **Reference:** https://www.youtube.com/watch?v=yn2jnmlepY8
+ * Problem: Tiling a 3 x N Board with 2 x 1 Dominoes
+ *
+ * You are given a 3 x N board. Count the number of ways to tile it completely using 2 x 1 dominoes.
+ * - Dominoes can be placed either vertically or horizontally.
+ * - All cells must be filled. Overlapping and out-of-bound placements are not allowed.
+ *
+ * Approach: Dynamic Programming with Bitmasking (State Compression)
+ * - Represent the state of each column using a 3-bit mask (8 possible states: 0 to 7).
+ *   - Bit 0: top row
+ *   - Bit 1: middle row
+ *   - Bit 2: bottom row
+ *   - 1 means filled, 0 means empty
+ * - Base state: `prev[7] = 1` (a fully filled column before the first)
+ * - Use precomputed transitions from one state to another for each column.
+ *
+ * Leetcode version (different constraints): N/A
+ * Reference: https://www.youtube.com/watch?v=yn2jnmlepY8
+ *
+ * Example:
+ * Input: n = 2 → Output: 3
+ * Ways:
+ * - Two vertical dominoes in each column
+ * - Four horizontal dominoes stacked
+ * - Two L-shaped placements (top+middle, middle+bottom)
+ *
+ * Follow-up Questions:
+ * - How would this change if trominoes or L-shaped tiles were allowed?
+ * - How do you extend this to an M x N board? (Matrix DP with memoization or matrix exponentiation)
  */
 public class TilingDominoes2 {
 
-    private static final int MOD = 1_000_000_007; // 10^9 + 7
+  private static final int MOD = 1_000_000_007;
+  private static final int STATE_COUNT = 8; // 3-bit masks from 000 to 111
+  private static final int FULL_MASK = 7;   // 111 in binary — all rows filled
 
-    public static void main(String[] args) {
-        int n = 50;
-        System.out.println("Ways to tile a 3 x " + n + " board: " + countWays(n));
+  public static void main(String[] args) {
+    int n = 50;
+    System.out.println("Ways to tile a 3 x " + n + " board: " + countWaysToTile3xN(n));
+  }
+
+  /**
+   * DP with state compression using bitmasks.
+   *
+   * Each column can be represented using a 3-bit mask (0–7),
+   * where each bit represents the fill status of a cell (top to bottom).
+   *
+   * Time Complexity: O(N)
+   * Space Complexity: O(1) – constant space for 8 states
+   */
+  public static int countWaysToTile3xN(int length) {
+    if (length <= 0) return 0;
+
+    if (length == 1) return 0; // 3x1 can't be fully tiled with 2x1 dominoes
+
+    int[] prev = new int[STATE_COUNT];
+    int[] curr;
+
+    // Base case: an imaginary column before the first is fully filled
+    prev[FULL_MASK] = 1;
+
+    for (int col = 1; col <= length; col++) {
+      curr = new int[STATE_COUNT];
+
+      // Transition logic:
+      curr[0b000] = prev[0b111];                                       // All empty → all filled by 3 horizontal dominos
+      curr[0b001] = prev[0b110];                                       // Last column ended with top 2 filled
+      curr[0b010] = prev[0b101];                                       // Last column ended with top+bottom filled
+      curr[0b011] = (prev[0b100] + prev[0b111]) % MOD;                 // 011 from 100 and 111
+      curr[0b100] = prev[0b011];                                       // 100 from 011
+      curr[0b101] = prev[0b010];                                       // 101 from 010
+      curr[0b110] = (prev[0b001] + prev[0b111]) % MOD;                 // 110 from 001 and 111
+      curr[0b111] = ((prev[0b000] + prev[0b011]) % MOD + prev[0b110]) % MOD; // 000/011/110 to 111
+
+      prev = curr; // Move to next column
     }
 
-    public static int countWays(int n) {
-        if (n <= 0) return 0;
-        if (n == 1) return 0;  // 3x1 board cannot be fully covered
-
-        int[] prev = new int[8]; // State for (i-1)
-        int[] curr = new int[8]; // State for i
-        prev[7] = 1; // Base case: fully filled (000 -> 111)
-
-        for (int i = 1; i <= n; i++) {
-            // Reset current state
-            curr = new int[8];
-
-            // State transitions based on bitmask representation
-            curr[0] = prev[7];                          // 000 -> 111 (placing 3 horizontal dominos)
-            curr[1] = prev[6];                          // 110 -> 001
-            curr[2] = prev[5];                          // 101 -> 010
-            curr[3] = (prev[4] + prev[7]) % MOD;        // 100 -> 011, 111 -> 011 (stacking vertically)
-            curr[4] = prev[3];                          // 011 -> 100
-            curr[5] = prev[2];                          // 010 -> 101
-            curr[6] = (prev[1] + prev[7]) % MOD;        // 001 -> 110, 111 -> 110 (stacking vertically)
-            curr[7] = ((prev[3] + prev[6]) % MOD + prev[0]) % MOD; // 011 -> 111, 110 -> 111, 000 -> 111
-
-            // Move current state to previous for the next iteration
-            prev = curr;
-        }
-
-        return prev[7]; // Fully filled state at the last column
-    }
+    return prev[FULL_MASK]; // Final column must be completely filled
+  }
 }

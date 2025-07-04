@@ -2,6 +2,23 @@ package Hashing;
 
 import java.util.*;
 
+/**
+ * Problem: Given a list of unique words, find all pairs of distinct indices (i, j)
+ * such that the concatenation of words[i] + words[j] forms a palindrome.
+ *
+ * Example:
+ * Input: ["abcd", "dcba", "lls", "s", "sssll"]
+ * Output: [[0, 1], [1, 0], [3, 2], [2, 4]]
+ * Explanation:
+ * - "abcd" + "dcba" = "abcddcba" (palindrome)
+ *
+ * Leetcode Link: https://leetcode.com/problems/palindrome-pairs/
+ *
+ * Follow-up Questions:
+ * 1. Can we do this in O(n * k) where k = average word length? (Trie-based optimization possible)
+ *    Leetcode follow-up ref: https://leetcode.com/problems/palindrome-pairs/solutions/79215/o-n-k-2-java-solution-with-trie-structure/
+ * 2. How to handle duplicates in the list? (Not required here as words are unique)
+ */
 public class PalindromePairs {
 
     public static void main(String[] args) {
@@ -24,15 +41,10 @@ public class PalindromePairs {
      * - Constructing the HashMap: O(N)
      * - Checking each word for palindrome properties: O(N * M^2) (M = max length of words)
      * - Overall: **O(N * M^2)**
-     *
-     * LeetCode Link: https://leetcode.com/problems/palindrome-pairs/
-     *
-     * @param words - Array of unique words
-     * @return List of palindrome pairs represented as index pairs
      */
     public List<List<Integer>> findPalindromePairs(String[] words) {
-        Map<String, Integer> wordIndexMap = new HashMap<>();
-        List<List<Integer>> palindromePairs = new ArrayList<>();
+        Map<String, Integer> wordIndexMap = new HashMap<>(); // mapping between word and its index
+        List<List<Integer>> palindromePairs = new ArrayList<>(); // to store the result pairs
 
         // Store each word with its index for fast lookup
         for (int i = 0; i < words.length; i++) {

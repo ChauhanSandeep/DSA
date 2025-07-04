@@ -1,9 +1,26 @@
 package Array;
 
 /**
- * There are n dominoes in a line, and we place each domino vertically upright. In the beginning, we push some
- * dominoes either left ('L') or right ('R').
- * This function returns the final state of dominoes after all forces are applied.
+ * ✅ Problem: Push Dominoes
+ *
+ * You are given a string dominoes representing the initial state of some dominoes.
+ * Each character can be:
+ *   - 'L': domino pushed to the left
+ *   - 'R': domino pushed to the right
+ *   - '.': upright domino
+ *
+ * After applying all forces, return a string representing the final state.
+ *
+ * 🔗 Leetcode: https://leetcode.com/problems/push-dominoes/
+ *
+ * 🔁 Example:
+ * Input: ".L.R...LR..L.."
+ * Output: "LL.RR.LLRRLL.."
+ *
+ * 🔍 Follow-up questions:
+ * 1. Can you do this in-place? ✅ Done using two-pointer approach.
+ * 2. What if dominoes can also be diagonal (e.g., 45°)? Requires physics simulation – not in scope.
+ * 3. How would you handle real-time updates? (e.g., stream of changes). ➤ Segment tree or union-find.
  */
 public class PushDominoes {
 
@@ -70,10 +87,6 @@ public class PushDominoes {
     }
 
     /**
-     * 🔥 Force-based approach (Uses an auxiliary forces array)
-     * - Uses an integer array to track net force applied at each index.
-     */
-    /**
      * Simulates the final state of dominoes using a force-based approach.
      *
      * 💡 Approach:
@@ -91,7 +104,7 @@ public class PushDominoes {
      * @param dominoes A string of initial domino states ('.', 'L', 'R')
      * @return Final domino state after all forces have settled
      */
-    public static String pushDominoes2(String dominoes) {
+    public static String pushDominoesForceBased(String dominoes) {
         char[] arr = dominoes.toCharArray();
         int len = arr.length;
         int[] forces = new int[len];

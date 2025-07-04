@@ -1,83 +1,131 @@
 package Array;
 
 /**
- * Find the median of two sorted arrays.
+ * Problem: Median of Two Sorted Arrays
  *
+ * You are given two sorted arrays `nums1` and `nums2` of sizes m and n.
+ * Find the median of the combined sorted array in O(log(min(m, n))) time.
+ *
+ * Leetcode Link:
  * https://leetcode.com/problems/median-of-two-sorted-arrays/
+ *
+ * Example:
+ * Input: nums1 = [1, 2], nums2 = [3, 4]
+ * Output: 2.5
+ * Explanation: Combined array = [1, 2, 3, 4], median = (2 + 3) / 2
+ *
+ * Follow-up Questions:
+ * - What if the arrays are unsorted? (Sort before applying logic)
+ * - Can this be done without merging? (Yes, use binary search on partition)
+ * - Can you extend this to k sorted arrays? (Use min-heap)
  */
 public class MedianArrays {
 
-    public static void main(String[] args) {
-        int[] arr1 = {1, 2};
-        int[] arr2 = {3, 4};
+  public static void main(String[] args) {
+    int[] nums1 = {1, 2};
+    int[] nums2 = {3, 4};
 
-        System.out.println("Two Pointer Median: " + findMedianTwoPointer(arr1, arr2));
-        System.out.println("Binary Search Median: " + findMedianBinarySearch(arr1, arr2));
+    System.out.println("Two-Pointer Median: " + findMedianByMerging(nums1, nums2));
+    System.out.println("Binary Search Median: " + findMedianBinarySearch(nums1, nums2));
+  }
+
+  /**
+   * Approach 1: Two-pointer Merge Technique
+   * Simulates merging of two sorted arrays until the median is found.
+   *
+   * Steps:
+   * 1. Use two pointers to merge up to (n1 + n2)/2 elements.
+   * 2. Track current and previous elements to compute median.
+   *
+   * Time Complexity: O(m + n)
+   * Space Complexity: O(1)
+   *
+   * @param nums1 First sorted array
+   * @param nums2 Second sorted array
+   * @return Median of the merged array
+   */
+  public static double findMedianByMerging(int[] nums1, int[] nums2) {
+      if ((nums1 == null || nums1.length == 0) && (nums2 == null || nums2.length == 0)) {
+          return 0.0;
+      }
+
+    int len1 = nums1.length, len2 = nums2.length;
+    int total = len1 + len2;
+    int mid = total / 2;
+
+    int i = 0, j = 0, count = 0;
+    double prev = 0, curr = 0;
+
+    while (count <= mid) {
+      prev = curr;
+
+      if (i < len1 && (j >= len2 || nums1[i] < nums2[j])) {
+        curr = nums1[i++];
+      } else {
+        curr = nums2[j++];
+      }
+
+      count++;
     }
 
-    /**
-     * Approach 1: Two-pointer Merge Approach (O(n + m))
-     * This method merges two sorted arrays while tracking the median position.
-     */
-    static double findMedianTwoPointer(int[] nums1, int[] nums2) {
-        int n1 = nums1.length, n2 = nums2.length;
-        int totalLen = n1 + n2;
-        int mid = totalLen / 2;
-        int i = 0, j = 0, count = 0;
-        double curr = -1, prev = -1;
+    return (total % 2 == 0) ? (prev + curr) / 2.0 : curr;
+  }
 
-        while (count <= mid) {
-            prev = curr;
-            if (i < n1 && (j >= n2 || nums1[i] < nums2[j])) {
-                curr = nums1[i++];
-            } else {
-                curr = nums2[j++];
-            }
-            count++;
+  /**
+   * Approach 2: Binary Search Partitioning
+   * Perform binary search on the smaller array to find a partition where:
+   *   maxLeft1 <= minRight2 && maxLeft2 <= minRight1
+   *   This ensures the left partition contains all elements less than or equal to the right partition.
+   *   Once the correct partition is found, compute the median based on the total length (even/odd).
+   *
+   * Steps:
+   * 1. Perform binary search on nums1 to find the correct split.
+   * 2. Use INT_MIN/INT_MAX for out-of-bound values.
+   * 3. Check partition condition; compute median accordingly.
+   *
+   * Time Complexity: O(log(min(m, n)))
+   * Space Complexity: O(1)
+   *
+   * @param nums1 First sorted array
+   * @param nums2 Second sorted array
+   * @return Median of the merged array
+   */
+  public static double findMedianBinarySearch(int[] nums1, int[] nums2) {
+    // Always binary search on the smaller array
+      if (nums1.length > nums2.length) {
+          return findMedianBinarySearch(nums2, nums1);
+      }
+
+    int len1 = nums1.length, len2 = nums2.length;
+    int low = 0, high = len1;
+
+    while (low <= high) {
+      // cut in nums1 is at the middle of the current search range
+      int cut1 = (low + high) / 2;
+      // cut in nums2 is derived from the total length minus cut1
+      int cut2 = (len1 + len2 + 1) / 2 - cut1;
+
+      int leftMax1 = (cut1 == 0) ? Integer.MIN_VALUE : nums1[cut1 - 1];
+      int leftMax2 = (cut2 == 0) ? Integer.MIN_VALUE : nums2[cut2 - 1];
+
+      int rightMin1 = (cut1 == len1) ? Integer.MAX_VALUE : nums1[cut1];
+      int rightMin2 = (cut2 == len2) ? Integer.MAX_VALUE : nums2[cut2];
+
+      // Correct partition found
+      if (leftMax1 <= rightMin2 && leftMax2 <= rightMin1) {
+        if ((len1 + len2) % 2 == 0) {
+          return (Math.max(leftMax1, leftMax2) + Math.min(rightMin1, rightMin2)) / 2.0;
+        } else {
+          return Math.max(leftMax1, leftMax2);
         }
-
-        return (totalLen % 2 == 0) ? (curr + prev) / 2.0 : curr;
+      } else if (leftMax1 > rightMin2) {
+        high = cut1 - 1;
+      } else {
+        low = cut1 + 1;
+      }
     }
 
-    /**
-     * Approach 2: Binary Search on the Smaller Array (O(log(min(n, m))))
-     * Uses partitioning to find the correct split between the two arrays.
-     */
-    public static double findMedianBinarySearch(int[] nums1, int[] nums2) {
-        // Ensure nums1 is the smaller array for optimal binary search
-        if (nums1.length > nums2.length) {
-            int[] temp = nums1;
-            nums1 = nums2;
-            nums2 = temp;
-        }
-
-        int n1 = nums1.length, n2 = nums2.length;
-        int low = 0, high = n1;
-
-        while (low <= high) {
-            int cut1 = (low + high) / 2;
-            int cut2 = (n1 + n2 + 1) / 2 - cut1;
-
-            int left1 = (cut1 == 0) ? Integer.MIN_VALUE : nums1[cut1 - 1];
-            int left2 = (cut2 == 0) ? Integer.MIN_VALUE : nums2[cut2 - 1];
-
-            int right1 = (cut1 == n1) ? Integer.MAX_VALUE : nums1[cut1];
-            int right2 = (cut2 == n2) ? Integer.MAX_VALUE : nums2[cut2];
-
-            if (left1 <= right2 && left2 <= right1) { // Valid partition found
-                if ((n1 + n2) % 2 == 0)
-                    return (Math.max(left1, left2) + Math.min(right1, right2)) / 2.0;
-                else
-                    return Math.max(left1, left2);
-            } 
-            else if (left1 > right2) { // Need to shift partition left
-                high = cut1 - 1;
-            } 
-            else { // Need to shift partition right
-                low = cut1 + 1;
-            }
-        }
-
-        return 0.0; // Edge case (should not reach here)
-    }
+    // Unreachable under valid input assumptions
+    throw new IllegalArgumentException("Invalid input: unable to find median.");
+  }
 }

@@ -75,21 +75,24 @@ public class MaxGoodPeople {
 
   /**
    * Validates whether the current combination (bitmask) is logically consistent.
+   * Steps:
+   * - For each person i assumed to be good (bit i is set in mask):
+   * - Check their statements about others.
+   * - If they claim someone is good (1), ensure that person is also marked as good in the mask.
+   * - If they claim someone is bad (0), ensure that person is marked as bad (not good) in the mask.
+   *    - If any contradiction is found, return false.
    *
-   * @param mask       Bitmask representing the current assumption of good people (1 = good, 0 = bad)
-   * @param statements The original matrix of statements.
-   * @param n          Number of people.
-   * @return true if the configuration is valid, false otherwise.
    */
   private boolean isValidConfiguration(int mask, int[][] statements, int n) {
     for (int i = 0; i < n; i++) {
-      // If person i is assumed to be good
+      // ((mask >> i) & 1) checks if the i-th bit (from the right, 0-based) in the integer mask is set to 1.
+      // This means person i is assumed to be good in this configuration.
       if (((mask >> i) & 1) == 1) {
         for (int j = 0; j < n; j++) {
-          int statement = statements[i][j];
+          int statement = statements[i][j]; // statement of i about j
           if (statement == 2) continue; // No statement made
 
-          int assumedGood = (mask >> j) & 1;
+          int assumedGood = (mask >> j) & 1; // Check if j is assumed good in this configuration
           if (statement != assumedGood) {
             // Contradiction found: a good person lied
             return false;

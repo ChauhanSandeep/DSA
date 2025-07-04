@@ -2,91 +2,115 @@ package DynamicProgramming;
 
 import java.util.Arrays;
 
+
 /**
- * Problem: Maximum Length of Chain of Pairs
- * 
- * Given an array of pairs (x, y), where `x < y`, find the longest chain such that
- * for every pair (a, b) -> (c, d), `b < c` (i.e., they don’t overlap).
- * 
- * Approaches:
- * 1. **O(N²) DP Approach** (Classic LIS Variation)
- *    - Sort pairs by first element.
- *    - Use DP to find the longest valid chain where `prev.y < curr.x`.
- * 
- * 2. **O(N log N) Greedy Approach** (Optimized)
- *    - Sort pairs by their second element.
- *    - Select the first non-overlapping pair iteratively.
- * 
- * Time Complexity:
- * - **DP Approach**: O(N²)
- * - **Greedy Approach**: O(N log N) (Sorting + Single Pass)
+ * Problem: Maximum Length of Pair Chain
+ *
+ * You are given an array of `n` pairs where each pair contains two integers (a, b)
+ * such that a < b. A pair (c, d) can follow another pair (a, b) if b < c.
+ * Find the length of the longest chain which can be formed from given pairs.
+ *
+ * Leetcode Link:
+ * https://leetcode.com/problems/maximum-length-of-pair-chain/
+ *
+ * Example:
+ * Input: pairs = [[5,24],[15,25],[27,40],[50,60]]
+ * Output: 3
+ * Explanation: The longest chain is [5,24] -> [27,40] -> [50,60]
+ *
+ * Follow-up Questions:
+ * - Can you construct the chain as well? (Yes, using path reconstruction from DP)
+ * - What if you can reverse a pair (a,b) to (b,a)? (Careful! Not allowed by default)
  */
 public class LongestSubsequencePair {
-    public static void main(String[] args) {
-        Pair[] pairs = {
-            new Pair(5, 24), new Pair(15, 25), new Pair(27, 40), new Pair(50, 60)
-        };
 
-        System.out.println("LIS using DP (O(N²)): " + findLongestChainDP(pairs));
-        System.out.println("LIS using Greedy (O(N log N)): " + findLongestChainGreedy(pairs));
-    }
+  public static void main(String[] args) {
+    IntervalPair[] pairs =
+        {new IntervalPair(5, 24), new IntervalPair(15, 25), new IntervalPair(27, 40), new IntervalPair(50, 60)};
 
-    /**
-     * Approach 1: O(N²) Dynamic Programming
-     * Similar to Longest Increasing Subsequence (LIS)
-     */
-    public static int findLongestChainDP(Pair[] pairList) {
-        if (pairList == null || pairList.length == 0) return 0;
+    System.out.println("Using DP (O(N²)) approach: " + findLongestChainDP(pairs));
+    System.out.println("Using Greedy (O(N log N)) approach: " + findLongestChainGreedy(pairs));
+  }
 
-        int n = pairList.length;
-        Arrays.sort(pairList, (a, b) -> Integer.compare(a.x, b.x)); // Sort by first element
+  /**
+   * Dynamic Programming Approach (O(N²))
+   * Similar to Longest Increasing Subsequence (LIS).
+   *
+   * Steps:
+   * 1. Sort pairs by start value (x).
+   * 2. For each pair, find the longest chain ending at that index by checking previous pairs.
+   * 3. Use a DP array where dp[i] = length of chain ending at i.
+   *
+   * Time Complexity: O(N²)
+   * Space Complexity: O(N)
+   */
+  public static int findLongestChainDP(IntervalPair[] inputPairs) {
+      if (inputPairs == null || inputPairs.length == 0) {
+          return 0;
+      }
 
-        int[] dp = new int[n];
-        Arrays.fill(dp, 1); // Initialize LIS length as 1 for each element
+    int length = inputPairs.length;
+    IntervalPair[] pairs = Arrays.copyOf(inputPairs, length); // avoid modifying input
+    Arrays.sort(pairs, (a, b) -> Integer.compare(a.start, b.start));
 
-        int maxLength = 1;
-        for (int i = 1; i < n; i++) {
-            for (int j = 0; j < i; j++) {
-                if (pairList[j].y < pairList[i].x) {
-                    dp[i] = Math.max(dp[i], dp[j] + 1);
-                }
-            }
-            maxLength = Math.max(maxLength, dp[i]);
+    int[] dp = new int[length]; // dp[i] = max chain length ending at i
+    Arrays.fill(dp, 1); // Base case: each pair is a chain of length 1
+
+    int maxChainLength = 1;
+
+    for (int end = 1; end < length; end++) {
+      for (int start = 0; start < end; start++) {
+        if (pairs[start].end < pairs[end].start) {
+          dp[end] = Math.max(dp[end], dp[start] + 1);
         }
-
-        return maxLength;
+      }
+      maxChainLength = Math.max(maxChainLength, dp[end]);
     }
 
-    /**
-     * Approach 2: O(N log N) Greedy Algorithm
-     * - Sort pairs by their second element.
-     * - Select pairs greedily by choosing the first non-overlapping one.
-     */
-    public static int findLongestChainGreedy(Pair[] pairList) {
-        if (pairList == null || pairList.length == 0) return 0;
+    return maxChainLength;
+  }
 
-        Arrays.sort(pairList, (a, b) -> Integer.compare(a.y, b.y)); // Sort by second element
+  /**
+   * Greedy Approach (O(N log N))
+   *
+   * Steps:
+   * 1. Sort all pairs by end value.
+   * 2. Always choose the earliest finishing pair that does not overlap with the previous.
+   *
+   * Time Complexity: O(N log N) due to sorting.
+   * Space Complexity: O(1)
+   */
+  public static int findLongestChainGreedy(IntervalPair[] inputPairs) {
+      if (inputPairs == null || inputPairs.length == 0) {
+          return 0;
+      }
 
-        int maxLength = 1, prevEnd = pairList[0].y;
-        for (int i = 1; i < pairList.length; i++) {
-            if (pairList[i].x > prevEnd) { // Non-overlapping condition
-                maxLength++;
-                prevEnd = pairList[i].y;
-            }
-        }
+    IntervalPair[] pairs = Arrays.copyOf(inputPairs, inputPairs.length); // preserve input
+    Arrays.sort(pairs, (a, b) -> Integer.compare(a.end, b.end));
 
-        return maxLength;
+    int maxChainLength = 1;
+    int lastSelectedEnd = pairs[0].end;
+
+    for (int i = 1; i < pairs.length; i++) {
+      if (pairs[i].start > lastSelectedEnd) {
+        maxChainLength++;
+        lastSelectedEnd = pairs[i].end;
+      }
     }
+
+    return maxChainLength;
+  }
 }
 
 /**
- * Pair class representing (x, y) intervals
+ * Class representing a pair (x, y) where x < y.
  */
-class Pair {
-    int x, y;
+class IntervalPair {
+  int start;
+  int end;
 
-    public Pair(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+  public IntervalPair(int start, int end) {
+    this.start = start;
+    this.end = end;
+  }
 }

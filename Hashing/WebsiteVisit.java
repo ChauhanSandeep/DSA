@@ -8,16 +8,30 @@ import java.util.*;
  *
  * Given the visit history of multiple users, find the most frequently visited 3-sequence pattern.
  * If multiple sequences have the same frequency, return the lexicographically smallest one.
+ * Input:
+ * username = ["joe", "joe", "joe", "james", "james", "james", "james", "mary", "mary", "mary"],
+ * timestamp = [1,2,3,4,5,6,7,8,9,10],
+ * website = ["home", "about", "career", "home", "cart", "maps", "home", "home" ,"about" , "career"]
+ * Output: ["home", "about", "career"]
  *
- * Approach:
- * - Step 1: Store visits in a Map where key = username, value = list of (timestamp, website).
- * - Step 2: Sort each user's visit list by timestamp.
- * - Step 3: Generate all unique 3-sequence patterns per user.
- * - Step 4: Count the occurrences of each pattern across all users.
- * - Step 5: Find the most frequent pattern (break ties lexicographically).
+ * Explanation: The tuples in this example are:
+ * ["joe", "home", 1], ["joe", "about" ,2], ["joe", "career", 31, ["james", "home", 4], ["james", "cart", 5],
+ * ["james", "maps", 6], ["james", "home", 7], ["mary", "home" ,8], ["mary", "about", 9], and ["mary", "career", 10].
  *
- * Time Complexity: O(N log N) (sorting) + O(U * V^3) (pattern generation) ≈ O(N log N) for typical cases.
- * Space Complexity: O(N) for storing user visits.
+ * The pattern ("home", "about", "career") has score 2 (joe and mary) .
+ * The pattern ("home", "cart", "maps") has score 1 (james).
+ * The pattern ("home", "cart", "home") has score 1 (james).
+ * The pattern ("home", "maps", "home") has score 1 (james).
+ * The pattern ("cart", "maps", "home") has score 1 (james).
+ * The pattern ("home", "home", "home") has score 0 (no user visited home 3 times)
+ *
+ * Follow-ups:
+ * Question: How would you handle large datasets where the number of users and visits is very high?
+ * Answer: We could use a more memory-efficient data structure, such as a Trie, to store patterns and their frequencies.
+ *
+ * Question: How would you optimize the solution for real-time updates?
+ * Answer: We could maintain a sliding window of recent visits and update the pattern counts incrementally.
+ *
  */
 public class WebsiteVisit {
 
@@ -30,8 +44,20 @@ public class WebsiteVisit {
         System.out.println(result); // Expected Output: [a, b, a]
     }
 
+    /**
+     * Steps:
+     * 1: Store visits in a Map where key = username, value = list of (timestamp, website).
+     * 2: Sort each user's visit list by timestamp.
+     * 3: Generate all unique 3-sequence patterns per user.
+     * 4: Count the occurrences of each pattern across all users.
+     * 5: Find the most frequent pattern (break ties lexicographically).
+     *
+     *  Time Complexity: O(N log N) (sorting) + O(U * V^3) (pattern generation), where N is size of input, U is number of users and V is average number of visits per user
+     *  Approx ≈ O(N log N) for typical cases
+     *  Space Complexity: O(N) for storing user visits.
+     */
     public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
-        Map<String, List<Pair>> userVisits = new HashMap<>();
+        Map<String, List<Pair>> userVisits = new HashMap<>(); // Map of username to list of (timestamp, website) pairs
         int n = username.length;
 
         // Step 1: Collect user visits (store timestamps and website names)
@@ -41,7 +67,7 @@ public class WebsiteVisit {
 
         // Step 2: Sort visits per user by timestamp
         for (List<Pair> visits : userVisits.values()) {
-            visits.sort(Comparator.comparingInt(p -> p.time));
+            visits.sort(Comparator.comparingInt(pair -> pair.time));
         }
 
         // Step 3: Generate unique 3-sequence patterns per user

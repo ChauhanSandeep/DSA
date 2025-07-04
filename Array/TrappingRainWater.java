@@ -57,10 +57,11 @@ public class TrappingRainWater {
 
     // Continue until the two pointers meet
     while (left < right) {
-      // Always process the smaller side
+      // Always process the smaller side because it determines the water level
       if (height[left] < height[right]) {
-        // If current height is greater than leftMax, update it
         if (height[left] >= leftMax) {
+          // current left height is greater than or equal to leftMax, so update leftMax
+          // No water can be trapped at this index
           leftMax = height[left];
         } else {
           // Water can be trapped: leftMax - current height

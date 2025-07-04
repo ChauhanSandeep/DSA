@@ -4,63 +4,152 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 /**
- * Given a list of products, return the top 3 lexicographically smallest suggestions for each prefix
- * of the searchWord.
- * <p>
- * LeetCode: https://leetcode.com/problems/search-suggestions-system/
+ * 🔹 Problem: Search Suggestions System
+ * 🔗 Leetcode: https://leetcode.com/problems/search-suggestions-system/
+ *
+ * Given a list of product strings and a search word, suggest at most 3 product names
+ * after each character of the search word is typed. The suggested products must start
+ * with the typed prefix and be in lexicographically increasing order.
+ *
+ * 📌 Example:
+ * Input:
+ *    products = ["mobile","mouse","moneypot","monitor","mousepad"]
+ *    searchWord = "mouse"
+ * Output:
+ *    [
+ *      ["mobile","moneypot","monitor"],
+ *      ["mobile","moneypot","monitor"],
+ *      ["mouse","mousepad"],
+ *      ["mouse","mousepad"],
+ *      ["mouse","mousepad"]
+ *    ]
+ *
+ * ✅ Follow-up:
+ * - How would you scale to millions of products? → Use Trie with indexing.
+ * - What if prefix search must be case-insensitive? → Normalize input to lowercase.
  */
 public class SuggestedProducts {
 
-    public static void main(String[] args) {
-        String[] products = {"mobile", "mouse", "moneypot", "monitor", "mousepad"};
-        String searchWord = "mouse";
-        List<List<String>> suggestions = new SuggestedProducts().suggestedProducts(products, searchWord);
-        System.out.println(suggestions);
+  public static void main(String[] args) {
+    String[] products = {"mobile", "mouse", "moneypot", "monitor", "mousepad"};
+    String searchWord = "mouse";
+
+    List<List<String>> suggestions = new SuggestedProducts().getSuggestedProducts(products, searchWord);
+    System.out.println(suggestions);
+  }
+
+  /**
+   * Builds a Trie and returns up to 3 suggestions for each prefix of searchWord.
+   *
+   * @param products Array of product names
+   * @param searchWord The search string typed by the user
+   * @return Suggestions for each prefix of searchWord
+   *
+   * 🔹 Time Complexity:
+   *     - Insert: O(N * L) for N words of length L
+   *     - DFS per prefix: O(3 * 26 * L) worst case (bounded by 3 results)
+   * 🔹 Space Complexity: O(N * L) for Trie
+   */
+  public List<List<String>> getSuggestedProducts(String[] products, String searchWord) {
+    Trie trie = new Trie();
+    List<List<String>> suggestionsByPrefix = new ArrayList<>();
+
+    Arrays.sort(products); // Ensure lexicographical order
+    for (String product : products) {
+      trie.insert(product);
     }
 
-    public List<List<String>> suggestedProducts(String[] products, String searchWord) {
-        List<List<String>> result = new ArrayList<>();
-        Arrays.sort(products);  // Sort the products lexicographically
+    StringBuilder prefixBuilder = new StringBuilder();
+    for (char c : searchWord.toCharArray()) {
+      prefixBuilder.append(c);
+      suggestionsByPrefix.add(trie.getWordsStartingWith(prefixBuilder.toString()));
+    }
 
-        StringBuilder prefix = new StringBuilder();
-        int start = 0;
-        int len = products.length;
+    return suggestionsByPrefix;
+  }
 
-        for (char c : searchWord.toCharArray()) {
-            prefix.append(c);
-            start = lowerBinarySearch(products, start, prefix.toString());
+  /**
+   * Trie data structure for prefix search.
+   */
+  static class Trie {
 
-            List<String> currentSuggestions = new ArrayList<>();
-            for (int i = start; i < Math.min(start + 3, len); i++) {
-                if (!products[i].startsWith(prefix.toString())) break;
-                currentSuggestions.add(products[i]);
-            }
-            result.add(currentSuggestions);
-        }
-        return result;
+    /** Node representing a single character in the Trie */
+    private static class Node {
+      boolean isEndOfWord = false;
+      Node[] children = new Node[26];
+    }
+
+    private final Node root;
+
+    public Trie() {
+      this.root = new Node();
     }
 
     /**
-     * Finds the first occurrence of a word that is lexicographically >= prefix
-     * using binary search.
-     *
-     * @param products Sorted list of product names
-     * @param start    Start index for searching
-     * @param prefix   The current prefix of the search word
-     * @return The index of the first word >= prefix
+     * Inserts a word into the Trie.
+     * @param word The word to be inserted
      */
-    private int lowerBinarySearch(String[] products, int start, String prefix) {
-        int left = start, right = products.length;
-
-        while (left < right) {
-            int mid = (left + right) / 2;
-            if (products[mid].compareTo(prefix) < 0) {  // Move right if mid word < prefix
-                left = mid + 1;
-            } else {
-                right = mid;  // Keep searching in the left half
-            }
+    public void insert(String word) {
+      Node current = root;
+      for (char c : word.toCharArray()) {
+        int index = c - 'a';
+        if (current.children[index] == null) {
+          current.children[index] = new Node();
         }
-        return left;
+        current = current.children[index];
+      }
+      current.isEndOfWord = true;
     }
+
+    /**
+     * Returns up to 3 lexicographically smallest words starting with the given prefix.
+     *
+     * @param prefix Prefix to search
+     * @return List of up to 3 matching words
+     */
+    public List<String> getWordsStartingWith(String prefix) {
+      Node current = root;
+      List<String> results = new ArrayList<>();
+
+      // Traverse down the trie to the end of the prefix
+      for (char c : prefix.toCharArray()) {
+        int index = c - 'a';
+        if (current.children[index] == null) {
+          return results; // Prefix not found
+        }
+        current = current.children[index];
+      }
+
+      dfs(current, new StringBuilder(prefix), results);
+      return results;
+    }
+
+    /**
+     * Performs DFS to find up to 3 words from the given node.
+     *
+     * @param node Current node in trie
+     * @param wordSoFar Prefix built so far
+     * @param result Accumulator for result list (max size = 3)
+     */
+    private void dfs(Node node, StringBuilder wordSoFar, List<String> result) {
+        if (result.size() == 3) {
+            return;
+        }
+
+      if (node.isEndOfWord) {
+        result.add(wordSoFar.toString());
+      }
+
+      for (char c = 'a'; c <= 'z'; c++) {
+        int index = c - 'a';
+        if (node.children[index] != null) {
+          wordSoFar.append(c);
+          dfs(node.children[index], wordSoFar, result);
+          wordSoFar.deleteCharAt(wordSoFar.length() - 1); // backtrack
+        }
+      }
+    }
+  }
 }

@@ -8,14 +8,17 @@ import java.util.PriorityQueue;
  *
  * Given an array of events where each event has a start and end day,
  * find the maximum number of events that can be attended by attending only one event per day.
+ * For example:
+ * Input: events = [[1,4],[4,4],[2,2],[3,4],[1,1]]
+ * meaning that:
+ * - Event 1 starts on day 1 and ends on day 4
+ * * - Event 2 starts on day 4 and ends on day 4
+ * * - Event 3 starts on day 2 and ends on day 2
+ * * - Event 4 starts on day 3 and ends on day 4
+ * * - Event 5 starts on day 1 and ends on day 1
+ * Output: 4
+ * Explanation: You can attend events 1, 2, 3, and 5 on days 1, 2, 3, and 4 respectively.
  *
- * Algorithm:
- * - Sort events by start time (then by end time for tie-breaking).
- * - Use a min-heap to track the earliest ending events available to attend.
- * - Iterate through days, attending the event that ends the earliest first.
- *
- * Time Complexity: O(N log N) due to sorting and heap operations.
- * Space Complexity: O(N) for the heap.
  */
 public class MaxEvents {
     public static void main(String[] args) {
@@ -30,7 +33,13 @@ public class MaxEvents {
     }
 
     /**
-     * Finds the maximum number of events that can be attended.
+     * Algorithm:
+     * - Sort events by start time (then by end time for tie-breaking).
+     * - Use a min-heap to track the earliest ending events available to attend.
+     * - Iterate through days, attending the event that ends the earliest first.
+     *
+     * Time Complexity: O(N log N) due to sorting and heap operations.
+     * Space Complexity: O(N) for the heap.
      *
      * @param events A 2D array where events[i] = [startDay, endDay].
      * @return The maximum number of events that can be attended.

@@ -1,28 +1,31 @@
 package DailyBytes.LinkedListPackage;
 import java.util.*;
 
+
+/**
+ * Find if a singly linked list has a cycle.
+ * For example, in the list 1 -> 2 -> 3 -> 4 -> 5, if the next of node 5 points back to node 3,
+ * it creates a cycle: 1 -> 2 -> 3 -> 4 -> 5 -> 3 ...
+ *
+ */
 public class CyclicLinkedList {
-    public static void main(String[] args) {
-        MyLinkedList list = new MyLinkedList();
-        MyNode node1 = new MyNode(1);
-        MyNode node2 = new MyNode(2);
-        MyNode node3 = new MyNode(3);
-        MyNode node4 = new MyNode(4);
-
-        list.push(node4);
-        list.push(node3);
-        list.push(node2);
-        list.push(node1);
-
-        // Creating a cycle: 4 → 2 (node4 points back to node2)
-        node4.setNext(node2);
-
-        System.out.println("Does the linked list contain a cycle? " + findCycle(list));
-    }
-
-    /**
-     * Corrected cycle detection using Floyd's Cycle Detection Algorithm
-     */
+  /**
+   * ✅ Detects cycle in a singly linked list using Floyd's Tortoise and Hare algorithm.
+   *
+   * Steps:
+   * 1. Use two pointers (slow and fast).
+   * 2. Move slow one step, fast two steps.
+   * 3. If they meet, there’s a cycle.
+   * 4. If fast reaches null, no cycle.
+   *
+   * Time Complexity: O(n)
+   * Space Complexity: O(1)
+   *
+   * 🔗 Leetcode: https://leetcode.com/problems/linked-list-cycle/
+   *
+   * @param list Singly linked list
+   * @return true if there is a cycle; false otherwise
+   */
     public static boolean findCycle(MyLinkedList list) {
         MyNode slow = list.getHead();
         MyNode fast = list.getHead();

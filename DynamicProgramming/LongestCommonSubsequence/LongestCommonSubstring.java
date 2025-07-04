@@ -37,13 +37,13 @@ public class LongestCommonSubstring {
      * Space Complexity: O(m * n) (for dp table) + recursion stack
      */
     public static int longestCommonSubstringRecursive(String text1, String text2) {
-        int m = text1.length();
-        int n = text2.length();
+        int len1 = text1.length();
+        int len2 = text2.length();
         // dp[i][j] will store the length of longest common substring ending at text1[i] and text2[j]
-        int[][] dp = new int[m][n];
+        int[][] dp = new int[len1][len2];
 
         // Initialize dp with -1
-        for (int i = 0; i < m; i++) {
+        for (int i = 0; i < len1; i++) {
             Arrays.fill(dp[i], -1);
         }
 

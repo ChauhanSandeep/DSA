@@ -5,15 +5,12 @@ import java.util.Map;
 
 /**
  * Converts a Roman numeral string to its corresponding integer value.
- *
- * Approach:
- * - Use a HashMap to store the integer values of Roman numerals.
- * - Traverse the string from right to left, keeping track of the last processed numeral.
- * - If the current numeral is smaller than the last processed one, subtract it (e.g., IV = 4).
- * - Otherwise, add it to the result.
- *
- * Time Complexity: O(N) - Single traversal of the string.
- * Space Complexity: O(1) - Constant extra space for the HashMap.
+ * Problem: Roman to Integer
+ * Example: "MCMIV" -> 1904
+ * Explaination:
+ * - Roman numerals are represented by combinations of letters from the Latin alphabet.
+ * - Each letter has a fixed integer value.
+ * - The numeral is read from left to right, and the values are added together.
  *
  * LeetCode Equivalent: https://leetcode.com/problems/roman-to-integer/
  */
@@ -27,9 +24,14 @@ public class RomanToInt {
     /**
      * Converts a Roman numeral string to an integer.
      *
-     * @param roman The Roman numeral string (e.g., "MCMIV").
-     * @return The corresponding integer value.
-     * @throws IllegalArgumentException if the input is null, empty, or contains invalid characters.
+     * Approach:
+     * - Use a HashMap to store the integer values of Roman numerals.
+     * - Traverse the string from right to left, keeping track of the last processed numeral.
+     * - If the current numeral is smaller than the last processed one, subtract it (e.g., IV = 4).
+     * - Otherwise, add it to the result.
+     *
+     * Time Complexity: O(N) - Single traversal of the string.
+     * Space Complexity: O(1) - Constant extra space for the HashMap.
      */
     public static int romanToInteger(String roman) {
         if (roman == null || roman.trim().isEmpty()) {

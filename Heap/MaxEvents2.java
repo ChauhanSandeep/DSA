@@ -1,5 +1,6 @@
 package Heap;
 
+import java.sql.Time;
 import java.util.Arrays;
 
 /**
@@ -7,13 +8,10 @@ import java.util.Arrays;
  *
  * Given an array of events where each event has [startDay, endDay, value], find the max value
  * that can be obtained by attending up to k events, attending all days for any chosen event.
- *
- * Algorithm:
- * - Sort events by start day (then by end day for stability).
- * - Use DP with memoization and binary search to maximize event value selection.
- *
- * Time Complexity: O(N * K) (for DP) + O(N log N) (for sorting and binary search), overall **O(NK + N log N)**.
- * Space Complexity: O(NK) for memoization.
+ * Example:
+ * Input: events = [[1,2,4],[3,4,3],[2,3,1]], k = 2
+ * Output: 7
+ * Explanation: Attend event 1 (value 4) and event 2 (value 3) for a total value of 7.
  */
 public class MaxEvents2 {
     public static void main(String[] args) {
@@ -29,6 +27,14 @@ public class MaxEvents2 {
     private int[][] dp;
     private int eventCount;
 
+    /*
+     * Algorithm:
+     * - Sort events by start day (then by end day for stability).
+     * - Use DP with memoization and binary search to maximize event value selection.
+     *
+     * Time Complexity: O(N * K) (for DP) + O(N log N) (for sorting and binary search), overall **O(NK + N log N)**.
+     * Space Complexity: O(NK) for memoization.
+     */
     public int maxValue(int[][] events, int k) {
         if (events == null || events.length == 0 || k == 0) return 0;
 

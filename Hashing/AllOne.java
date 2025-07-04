@@ -1,172 +1,214 @@
 package Hashing;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/all-oone-data-structure/
- * 
- * Implements a data structure that supports the following operations in O(1) time:
- * - {@code inc(String key)}: Increments the count of a key by 1. If the key is not present, inserts it with count 1.
- * - {@code dec(String key)}: Decrements the count of a key by 1. If the count becomes 0, removes the key.
- * - {@code getMaxKey()}: Returns a key with the highest count.
- * - {@code getMinKey()}: Returns a key with the lowest count.
- * 
- * Uses a **doubly linked list** to maintain frequency groups and a **HashMap** to store key-node mappings.
- * 
- * Time Complexity:
- * - `inc()`, `dec()`, `getMaxKey()`, `getMinKey()` → **O(1)**
- * - Space Complexity: **O(N)** (where N is the number of unique keys)
+ * ✅ Problem: All O`one Data Structure
+ * 🔗 LeetCode: https://leetcode.com/problems/all-oone-data-structure/
+ *
+ * Design a data structure to:
+ *  - Increment a string key's frequency in O(1)
+ *  - Decrement frequency in O(1)
+ *  - Retrieve any key with max/min frequency in O(1)
+ *
+ * 🎯 Use Case Example:
+ *    AllOne ao = new AllOne();
+ *    ao.inc("hello");
+ *    ao.inc("hello");
+ *    ao.inc("world");
+ *    ao.getMaxKey(); // "hello"
+ *    ao.getMinKey(); // "world"
+ *
+ * 🧠 Core Idea:
+ *    - Doubly Linked List of frequency buckets (each holds keys with same frequency)
+ *    - HashMap maps keys to their bucket node
+ *    - Maintain head (max freq) and tail (min freq) sentinels
+ *    - While incrementing/decrementing:
+ *      1. Find current node
+ *      2. Create or find next/prev frequency node
+ *      3. Move key to new node
+ *      4. Remove key from old node
+ *      5. Clean up empty nodes
+ *    - While retrieving max/min key:
+ *      1. Return any key from head.prev (max) or tail.next (min) node
+ *
+ * Time: O(1) for all operations
+ * Space: O(N), where N is number of keys
+ *
+ * 🔄 Follow-ups:
+ *    - How would you return all keys with max frequency?
+ *    Answer: Iterate through the max frequency node's keys.
+ *    - What if frequency updates needed to support batching?
+ *    Answer: Use a queue to batch updates and process them in O(1) amortized time.
  */
-class AllOne {
+public class AllOne {
 
-    /**
-     * Represents a node in the doubly linked list that groups keys with the same frequency.
-     */
-    class Node {
-        Set<String> keys; // Stores keys with the same frequency
-        int frequency;    // Frequency of the keys
-        Node prev, next;  // Pointers to previous and next nodes
+  /**
+   * Each node represents a frequency bucket and holds a set of keys with the same frequency.
+   */
+  private static class Node {
+    int frequency; // Frequency of the keys
+    Set<String> keys; // Stores keys with the same frequency
+    Node prev, next;  // Pointers to previous and next nodes
 
-        /**
-         * Constructs a node with the given frequency.
-         */
-        Node(int frequency) {
-            this.frequency = frequency;
-            this.keys = new HashSet<>();
-        }
+    Node(int frequency) {
+      this.frequency = frequency;
+      this.keys = new LinkedHashSet<>(); // Maintain insertion order
+    }
+  }
 
-        /**
-         * Constructs a node with a single key and given frequency.
-         */
-        Node(String key, int frequency) {
-            this(frequency);
-            this.keys.add(key);
-        }
+  private final Map<String, Node> keyToNodeMap;
+  private final Node head; // Highest frequency sentinel (head.prev is max)
+  private final Node tail; // Lowest frequency sentinel (tail.next is min)
+
+  public AllOne() {
+    keyToNodeMap = new HashMap<>();
+    head = new Node(-1); // Dummy head sentinel
+    tail = new Node(-1); // Dummy tail sentinel
+    head.prev = tail;
+    tail.next = head;
+  }
+
+  /**
+   * Increments the frequency of a key by 1.
+   *
+   * Steps:
+   * 1. If key doesn't exist, create a new node for frequency 1.
+   * 2. If key exists, find its current node.
+   * 3. If next frequency node exists, use it; otherwise create a new node for the incremented frequency.
+   * 4. Move the key to the new node and remove it from the old node.
+   *
+   * * Time Complexity: O(1) for all operations
+   * * Space Complexity: O(N) for storing keys and nodes
+   */
+  public void inc(String key) {
+    if (!keyToNodeMap.containsKey(key)) {
+      // First time insertion
+      Node node;
+      if (tail.next.frequency == 1) {
+        node = tail.next;
+      } else {
+        node = new Node(1);
+      }
+      if (tail.next.frequency != 1) {
+        insertAfter(tail, node);
+      }
+      node.keys.add(key);
+      keyToNodeMap.put(key, node);
+    } else {
+      Node curr = keyToNodeMap.get(key);
+      Node next = (curr.next.frequency == curr.frequency + 1) ? curr.next : new Node(curr.frequency + 1);
+      if (curr.next.frequency != curr.frequency + 1) {
+        insertAfter(curr, next);
+      }
+      next.keys.add(key);
+      keyToNodeMap.put(key, next);
+      removeKeyFromNode(curr, key);
+    }
+  }
+
+  /**
+   * Decrements the frequency of a key by 1. Removes key if frequency hits 0.
+   *
+   * Steps:
+   * 1. If key doesn't exist, do nothing.
+   * 2. Find the current node for the key.
+   * 3. If frequency is 1, remove the key from the map.
+   * 4. If frequency > 1, find or create the previous frequency node.
+   * 5. Move the key to the previous frequency node and remove it from the current node.
+   *
+   * Time Complexity: O(1) for all operations
+   * Space Complexity: O(N) for storing keys and nodes
+   */
+  public void dec(String key) {
+    if (!keyToNodeMap.containsKey(key)) {
+      return;
     }
 
-    private final Map<String, Node> keyNodeMap; // Maps a key to its corresponding frequency node
-    private final Node head, tail; // Sentinel nodes for easy insertion/deletion
-
-    /**
-     * Initializes the data structure.
-     */
-    public AllOne() {
-        this.keyNodeMap = new HashMap<>();
-        this.head = new Node(-1); // Dummy head (max frequency node will be just before this)
-        this.tail = new Node(-1); // Dummy tail (min frequency node will be just after this)
-
-        head.prev = tail;
-        tail.next = head;
+    Node curr = keyToNodeMap.get(key);
+    if (curr.frequency == 1) {
+      // Frequency becomes 0 → remove
+      keyToNodeMap.remove(key);
+    } else {
+      Node prev = (curr.prev.frequency == curr.frequency - 1) ? curr.prev : new Node(curr.frequency - 1);
+      if (curr.prev.frequency != curr.frequency - 1) {
+        insertAfter(curr.prev, prev);
+      }
+      prev.keys.add(key);
+      keyToNodeMap.put(key, prev);
     }
+    removeKeyFromNode(curr, key);
+  }
 
-    /**
-     * Removes a node from the doubly linked list.
-     */
-    private void deleteNode(Node node) {
-        node.next.prev = node.prev;
-        node.prev.next = node.next;
+  /**
+   * Returns any key with the highest frequency.
+   *
+   * Steps:
+   * 1. If the list is empty (head.prev == tail), return an empty string.
+   * 2. Otherwise, return any key from the max frequency node (head.prev).
+   *
+   * Time Complexity: O(1)
+   * Space Complexity: O(1)
+   */
+  public String getMaxKey() {
+    return (head.prev == tail) ? "" : head.prev.keys.iterator().next();
+  }
+
+  /**
+   * Returns any key with the lowest frequency.
+   *
+   * Steps:
+   * 1. If the list is empty (tail.next == head), return an empty string.
+   * 2. Otherwise, return any key from the min frequency node (tail.next).
+   *
+   * Time Complexity: O(1)
+   * Space Complexity: O(1)
+   */
+  public String getMinKey() {
+    return (tail.next == head) ? "" : tail.next.keys.iterator().next();
+  }
+
+  /**
+   * Inserts `newNode` right after `existing`.
+   */
+  private void insertAfter(Node existing, Node newNode) {
+    newNode.next = existing.next;
+    newNode.prev = existing;
+    existing.next.prev = newNode;
+    existing.next = newNode;
+  }
+
+  /**
+   * Removes a node from the doubly linked list.
+   */
+  private void deleteNode(Node node) {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+  }
+
+  /**
+   * Removes the given key from the node. If node becomes empty, delete it.
+   */
+  private void removeKeyFromNode(Node node, String key) {
+    node.keys.remove(key);
+    if (node.keys.isEmpty()) {
+      deleteNode(node);
     }
+  }
 
-    /**
-     * Removes a key from a node and deletes the node if it becomes empty.
-     */
-    private void removeKeyAndCleanUp(String key, Node node) {
-        node.keys.remove(key);
-        if (node.keys.isEmpty()) {
-            deleteNode(node);
-        }
-    }
+  /**
+   * Example Usage.
+   */
+  public static void main(String[] args) {
+    AllOne allOne = new AllOne();
+    allOne.inc("a");
+    allOne.inc("b");
+    allOne.inc("a");
+    allOne.inc("c");
+    allOne.dec("b");
 
-    /**
-     * Inserts a new node after a given node in the doubly linked list.
-     */
-    private void insertAfter(Node existingNode, Node newNode) {
-        newNode.next = existingNode.next;
-        newNode.prev = existingNode;
-        existingNode.next.prev = newNode;
-        existingNode.next = newNode;
-    }
-
-    /**
-     * Retrieves or creates the next frequency node.
-     */
-    private Node createOrGetNextNode(Node currentNode, String key, int newFrequency) {
-        if (currentNode.next.frequency == newFrequency) {
-            currentNode.next.keys.add(key);
-            return currentNode.next;
-        }
-        Node newNode = new Node(key, newFrequency);
-        insertAfter(currentNode, newNode);
-        return newNode;
-    }
-
-    /**
-     * Retrieves or creates the previous frequency node.
-     */
-    private Node createOrGetPrevNode(Node currentNode, String key, int newFrequency) {
-        if (currentNode.prev.frequency == newFrequency) {
-            currentNode.prev.keys.add(key);
-            return currentNode.prev;
-        }
-        Node newNode = new Node(key, newFrequency);
-        insertAfter(currentNode.prev, newNode);
-        return newNode;
-    }
-
-    /**
-     * Increments the frequency of a key by 1.
-     * If the key does not exist, inserts it with a frequency of 1.
-     */
-    public void inc(String key) {
-        if (keyNodeMap.containsKey(key)) {
-            Node currentNode = keyNodeMap.get(key);
-            Node nextNode = createOrGetNextNode(currentNode, key, currentNode.frequency + 1);
-            keyNodeMap.put(key, nextNode);
-            removeKeyAndCleanUp(key, currentNode);
-        } else {
-            Node firstNode = (tail.next.frequency == 1) ? tail.next : new Node(key, 1);
-            if (firstNode == tail.next) {
-                firstNode.keys.add(key);
-            } else {
-                insertAfter(tail, firstNode);
-            }
-            keyNodeMap.put(key, firstNode);
-        }
-    }
-
-    /**
-     * Decrements the frequency of a key by 1.
-     * If the key's frequency becomes 0, it is removed from the data structure.
-     */
-    public void dec(String key) {
-        if (!keyNodeMap.containsKey(key)) return;
-
-        Node currentNode = keyNodeMap.get(key);
-        if (currentNode.frequency == 1) {
-            keyNodeMap.remove(key); // Remove key entirely
-        } else {
-            Node prevNode = createOrGetPrevNode(currentNode, key, currentNode.frequency - 1);
-            keyNodeMap.put(key, prevNode);
-        }
-        removeKeyAndCleanUp(key, currentNode);
-    }
-
-    /**
-     * Returns a key with the highest frequency.
-     * If no keys exist, returns an empty string.
-     */
-    public String getMaxKey() {
-        return head.prev == tail ? "" : head.prev.keys.iterator().next();
-    }
-
-    /**
-     * Returns a key with the lowest frequency.
-     * If no keys exist, returns an empty string.
-     */
-    public String getMinKey() {
-        return tail.next == head ? "" : tail.next.keys.iterator().next();
-    }
+    System.out.println("Max Key: " + allOne.getMaxKey()); // a
+    System.out.println("Min Key: " + allOne.getMinKey()); // c or b (after b is decremented)
+  }
 }

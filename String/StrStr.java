@@ -3,18 +3,7 @@ package String;
 /**
  * Implement the "strStr()" function that finds the index of the first occurrence of a substring.
  * For example : strStr("GeeksForGeeks", "For") will return 5.
- *
- * Approaches:
- * 1. **Brute Force (O(N * M))**: Checks all possible starting positions in the main string.
- * 2. **KMP Algorithm (O(N + M))**: Uses a prefix table (LPS) to avoid redundant comparisons.
- *
- * Time Complexity:
- * - Brute Force: **O(N * M)**
- * - KMP Algorithm: **O(N + M)**
- *
- * Space Complexity:
- * - Brute Force: **O(1)**
- * - KMP Algorithm: **O(M)** (for LPS array)
+ * Explanation: The substring "For" starts at index 5 in the string "GeeksForGeeks".
  *
  * LeetCode Equivalent: https://leetcode.com/problems/implement-strstr/
  */
@@ -29,10 +18,14 @@ public class StrStr {
 
   /**
    * Brute Force Approach: Finds the first occurrence of a substring in a string.
+   * Approach:
+   * 1. Iterate through the main string.
+   * 2. For each character, check if the substring matches starting from that index.
+   * 3. If a match is found, return the starting index.
+   * * If no match is found after checking all possible starting indices, return -1.
    *
-   * @param text The main string.
-   * @param pattern The substring to search for.
-   * @return The index of the first occurrence, or -1 if not found.
+   * Time complexity: O(N * M) where N is the length of the text and M is the length of the pattern.
+   * Space complexity: O(1) since no extra space is used except for variables.
    */
   public static int findSubstringBruteForce(String text, String pattern) {
       if (text == null || pattern == null || pattern.isEmpty()) {
@@ -70,6 +63,8 @@ public class StrStr {
   /**
    * Optimized Approach: Finds the first occurrence using the KMP (Knuth-Morris-Pratt) Algorithm.
    *
+   * Time complexity: O(N + M) where N is the length of the text and M is the length of the pattern.
+   * Space complexity: O(M) for the LPS (Longest Prefix Suffix) array.
    * @param text The main string.
    * @param pattern The substring to search for.
    * @return The index of the first occurrence, or -1 if not found.

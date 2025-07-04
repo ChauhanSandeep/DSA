@@ -2,85 +2,119 @@ package Array;
 
 import java.util.*;
 
+/**
+ * ✅ Problem:
+ * You are given a list of existing meeting schedules and a new meeting request.
+ * Write a function to determine if the new meeting can be accommodated without overlapping.
+ *
+ * ✅ Example:
+ * Existing: [10:00–11:00], [14:00–16:00], [23:00–23:30]
+ * Incoming: [11:00–14:00] → Can be added ✔
+ * Incoming: [10:30–11:30] → Overlaps ❌
+ *
+ * Time: O(N log N) due to sorting (can be reduced to O(N) if list is pre-sorted).
+ * Space: O(1) additional.
+ *
+ * 🔗 Follow-up:
+ * - Add a buffer time between meetings
+ * - Handle multi-day meetings
+ * - Support for recurring meetings
+ */
 public class MeetingSchedule {
 
-    public static void main(String[] args) {
-        String[][] scheduleStr = {
-                {"10:00", "11:00"},
-                {"14:00", "16:00"},
-                {"23:00", "23:30"}
-        };
+  public static void main(String[] args) {
+    String[][] scheduleStr = {{"10:00", "11:00"}, {"14:00", "16:00"}, {"23:00", "23:30"}};
 
-        List<Schedule> schedules = new ArrayList<>();
-        for (String[] times : scheduleStr) {
-            schedules.add(new Schedule(times[0], times[1]));
-        }
-
-        Schedule incomingSchedule = new Schedule("11:00", "14:00");
-        boolean canAccommodate = accommodate(schedules, incomingSchedule);
-
-        System.out.println("Can accommodate: " + canAccommodate);
-        System.out.println("Updated Schedule: " + schedules);
+    List<Meeting> meetings = new ArrayList<>();
+    for (String[] times : scheduleStr) {
+      meetings.add(new Meeting(times[0], times[1]));
     }
 
-    /**
-     * Tries to insert a new schedule into an existing sorted schedule list.
-     *
-     * @param schedules        The list of existing schedules.
-     * @param incomingSchedule The new schedule to insert.
-     * @return true if the schedule was successfully inserted; false if there is a conflict.
-     */
-    public static boolean accommodate(List<Schedule> schedules, Schedule incomingSchedule) {
-        if (schedules.isEmpty()) {
-            schedules.add(incomingSchedule);
-            return true;
-        }
+    Meeting incoming = new Meeting("11:00", "14:00");
+    boolean canFit = MeetingScheduler.canAccommodate(meetings, incoming);
 
-        Collections.sort(schedules); // Ensure the schedules are sorted by start time
-
-        // Check if the new schedule fits before the first meeting
-        if (incomingSchedule.endTime <= schedules.get(0).startTime) {
-            schedules.add(0, incomingSchedule);
-            return true;
-        }
-
-        // Check available slots between meetings
-        for (int i = 0; i < schedules.size(); i++) {
-            if (schedules.get(i).endTime <= incomingSchedule.startTime &&
-                    (i == schedules.size() - 1 || incomingSchedule.endTime <= schedules.get(i + 1).startTime)) {
-                schedules.add(i + 1, incomingSchedule);
-                return true;
-            }
-        }
-
-        return false; // No available slot
-    }
+    System.out.println("Can accommodate: " + canFit);
+    System.out.println("Updated Schedule: " + meetings);
+  }
 }
 
-class Schedule implements Comparable<Schedule> {
-    float startTime;
-    float endTime;
+class MeetingScheduler {
 
-    public Schedule(String startTime, String endTime) {
-        this.startTime = convertToFloatTime(startTime);
-        this.endTime = convertToFloatTime(endTime);
+  /**
+   * Tries to accommodate a new meeting in an existing list of meetings.
+   *
+   * ✅ Steps:
+   * 1. Sort the existing meetings by start time
+   * 2. Try inserting in the gap between any two meetings or before/after all
+   *
+   * @param meetings List of existing meetings (can be unsorted)
+   * @param incoming The new meeting request
+   * @return true if it can be added without overlap
+   */
+  public static boolean canAccommodate(List<Meeting> meetings, Meeting incoming) {
+    if (meetings.isEmpty()) {
+      meetings.add(incoming);
+      return true;
     }
 
-    /**
-     * Converts a "HH:MM" time format into a float representation (e.g., "10:30" → 10.5).
-     */
-    private float convertToFloatTime(String time) {
-        String[] parts = time.split(":");
-        return Integer.parseInt(parts[0]) + Integer.parseInt(parts[1]) / 60f;
+    // Sort by start time
+    Collections.sort(meetings);
+
+    // Check before the first meeting
+    if (incoming.endMinutes <= meetings.get(0).startMinutes) {
+      meetings.add(0, incoming);
+      return true;
     }
 
-    @Override
-    public int compareTo(Schedule other) {
-        return Float.compare(this.startTime, other.startTime);
+    // Check between meetings
+    for (int i = 0; i < meetings.size() - 1; i++) {
+      Meeting current = meetings.get(i);
+      Meeting next = meetings.get(i + 1);
+
+      if (incoming.startMinutes >= current.endMinutes && incoming.endMinutes <= next.startMinutes) {
+        meetings.add(i + 1, incoming);
+        return true;
+      }
     }
 
-    @Override
-    public String toString() {
-        return String.format("{startTime=%.2f, endTime=%.2f}", startTime, endTime);
+    // Check after the last meeting
+    if (incoming.startMinutes >= meetings.get(meetings.size() - 1).endMinutes) {
+      meetings.add(incoming);
+      return true;
     }
+
+    return false; // No gap found
+  }
+}
+
+class Meeting implements Comparable<Meeting> {
+  int startMinutes;
+  int endMinutes;
+
+  public Meeting(String startTime, String endTime) {
+    this.startMinutes = parseTimeToMinutes(startTime);
+    this.endMinutes = parseTimeToMinutes(endTime);
+  }
+
+  /**
+   * Converts time string "HH:MM" to total minutes since midnight.
+   */
+  private int parseTimeToMinutes(String time) {
+    String[] parts = time.split(":");
+    return Integer.parseInt(parts[0]) * 60 + Integer.parseInt(parts[1]);
+  }
+
+  @Override
+  public int compareTo(Meeting other) {
+    return Integer.compare(this.startMinutes, other.startMinutes);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("[%s - %s]", formatTime(startMinutes), formatTime(endMinutes));
+  }
+
+  private String formatTime(int minutes) {
+    return String.format("%02d:%02d", minutes / 60, minutes % 60);
+  }
 }

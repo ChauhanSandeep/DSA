@@ -7,21 +7,19 @@ import java.util.*;
  * https://leetcode.com/problems/cheapest-flights-within-k-stops/
  *
  * Problem Statement:
- * Given `n` cities, an array `flights` where flights[i] = [from, to, price],
- * find the cheapest price from `src` to `dst` with at most `k` stops.
- * If no route exists, return -1.
+ * Given `n` cities and a list of flights in the form [from, to, price],
+ * determine the cheapest price from `src` to `dst` with at most `k` stops.
+ * Return -1 if such a route does not exist.
  *
- * Approaches:
- * 1. **Dijkstra’s with modifications (Priority Queue - Optimized BFS)**:
- *    - Uses a Min-Heap to always expand the cheapest route first.
- *    - Tracks stops to prevent unnecessary exploration.
- *    - Time Complexity: **O(E log V)**
- *    - Space Complexity: **O(V + E)**
+ * Example:
+ * Input: n = 3, flights = [[0,1,100],[1,2,100],[0,2,500]], src = 0, dst = 2, k = 1
+ * Output: 200
+ * Explanation: The cheapest route is 0 -> 1 -> 2 with a total cost of 200.
  *
- * 2. **Bellman-Ford Variation (Simple BFS-based DP)**:
- *    - Uses a distance array and iterates up to `k+1` times.
- *    - Time Complexity: **O(K * E)**
- *    - Space Complexity: **O(V)**
+ * Follow-up Questions:
+ * - What if we need to return the actual path instead of just the cost?
+ * - Can we adapt the solution to handle dynamic changes in the flight network?
+ * - What changes are needed if the constraints change to *at most K edges* (vs stops)?
  */
 public class CheapestFlightWithStops {
 
@@ -41,7 +39,16 @@ public class CheapestFlightWithStops {
     }
 
     /**
-     * Approach 1: Modified Dijkstra’s Algorithm using Priority Queue (Min-Heap)
+     * Approach 1 : Modified Dijkstra's algorithm that tracks the remaining stops.
+     *
+     * Steps:
+     * 1. Build adjacency list of the graph.
+     * 2. Use a MinHeap (PriorityQueue) to always expand the lowest-cost route.
+     * 3. Keep track of how many stops remain for each path.
+     * 4. Skip visiting a city if we’ve already reached it with more stops left.
+     *
+     * Time Complexity: O(E log V)
+     * Space Complexity: O(V + E)
      */
     public int findCheapestPriceDijkstra(int totalCities, int[][] flights, int source, int destination, int maxStops) {
         // Step 1: Build the adjacency list {source -> [destination, price]}
@@ -101,13 +108,6 @@ public class CheapestFlightWithStops {
      *      - K is the max number of stops
      *      - E is the number of flights (edges)
      * ✅ Space Complexity: O(V), where V is the number of cities (vertices)
-     *
-     * @param totalCities   Total number of cities (vertices)
-     * @param flights       List of flights; each flight is [from, to, cost]
-     * @param source        Starting city
-     * @param destination   Target city
-     * @param maxStops      Maximum number of stops allowed (K)
-     * @return Minimum cost to reach destination within K stops, or -1 if unreachable
      */
     public int findCheapestPriceBellmanFord(int totalCities, int[][] flights, int source, int destination, int maxStops) {
         // minCost[i] will hold the minimum cost to reach city i from source

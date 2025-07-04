@@ -1,57 +1,86 @@
 package DailyBytes.ArrayPackage;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+
 /**
- * This class finds the index of the first unique character in a given string.
- * 
- * Algorithm:
- * - Use a hashmap to store the indices of characters and remove entries if the character appears more than once.
- * - Iterate through the hashmap to find the smallest index.
- * - Time Complexity: O(n)
- * - Space Complexity: O(n)
- * 
- * LeetCode Problem Link: https://leetcode.com/problems/first-unique-character-in-a-string/
+ * ✅ Problem: First Unique Character in a String
+ *
+ * Given a string `s`, return the index of the **first non-repeating character** in it.
+ * If it doesn't exist, return -1.
+ *
+ * 🔗 Leetcode: https://leetcode.com/problems/first-unique-character-in-a-string/
+ *
+ * 🧠 Example:
+ * Input:  "loveleetcode"
+ * Output: 2 ('v' is the first non-repeating character)
+ *
+ * 🔍 Follow-Up Questions:
+ * 1. What if you need to return the first unique *character* instead of index? ➤ Small change in logic
+ * 2. Can this be done in one pass? ➤ Not reliably without using LinkedHashMap
+ * 3. What if the input stream is continuous? ➤ Use a frequency map + queue to track candidates
  */
 public class FirstUniqueChar {
 
     public static void main(String[] args) {
-        System.out.println("First unique character is at index: " + getFirstUniqueChar("loveleetcode"));
-        System.out.println("First unique character is at index: " + getFirstUniqueChar("thedailybyte"));
+        System.out.println("First unique character is at index: " + findFirstUniqueCharIndex("loveleetcode"));
+        System.out.println("First unique character is at index: " + findFirstUniqueCharIndex("thedailybyte"));
     }
 
     /**
-     * Finds the index of the first unique character in the given string.
-     * @param str The input string.
-     * @return The index of the first unique character, or -1 if no unique character exists.
+     * ✅ Optimized approach using frequency array.
+     *
+     * Steps:
+     * 1. Count frequency of each character.
+     * 2. In a second pass, return index of the first char with frequency 1.
+     *
+     * Time Complexity: O(n) — two passes over the input string
+     * Space Complexity: O(1) — constant space as char set is fixed (only lowercase a-z)
+     *
+     * @param str The input string
+     * @return Index of first unique character or -1 if none exists
      */
-    public static int getFirstUniqueChar(String str) {
-        Map<Character, Integer> characterIndexMap = new HashMap<>();
+    public static int findFirstUniqueCharIndex(String str) {
+        if (str == null || str.isEmpty()) return -1;
 
-        // Iterate through the string to populate the character-index map
+        int[] freq = new int[26];
+        int length = str.length();
+
+        for (int i = 0; i < length; i++) {
+            freq[str.charAt(i) - 'a']++;
+        }
+
+        for (int i = 0; i < length; i++) {
+            if (freq[str.charAt(i) - 'a'] == 1) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * 🔁 Alternative method using Map to track index of first occurrence,
+     * and remove if character repeats (less efficient due to removals).
+     *
+     * Time: O(n) on average, worst-case O(n²) due to `remove()` in `HashMap`
+     * Space: O(n)
+     */
+    public static int findFirstUniqueCharIndexWithMap(String str) {
+        if (str == null || str.isEmpty()) return -1;
+
+        Map<Character, Integer> charIndexMap = new LinkedHashMap<>();
+
         for (int i = 0; i < str.length(); i++) {
-            char currentChar = str.charAt(i);
-            if (characterIndexMap.containsKey(currentChar)) {
-                characterIndexMap.remove(currentChar);
+            char ch = str.charAt(i);
+            if (charIndexMap.containsKey(ch)) {
+                charIndexMap.remove(ch); // Not unique anymore
             } else {
-                characterIndexMap.put(currentChar, i);
+                charIndexMap.put(ch, i);
             }
         }
 
-        // Find the smallest index of unique characters
-        int smallestIndex = Integer.MAX_VALUE;
-        for (Map.Entry<Character, Integer> entry : characterIndexMap.entrySet()) {
-            if (entry.getValue() < smallestIndex) {
-                smallestIndex = entry.getValue();
-            }
-        }
-
-        // If no unique character found, return -1
-        if (smallestIndex == Integer.MAX_VALUE) {
-            return -1;
-        }
-
-        return smallestIndex;
+        return charIndexMap.values().stream().findFirst().orElse(-1);
     }
 }
