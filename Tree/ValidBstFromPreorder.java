@@ -34,8 +34,8 @@ public class ValidBstFromPreorder {
      * It uses a recursive approach to verify the properties of BST.
      * This is suboptimal than using stack approach because it uses O(N) space for recursion.
      *
-     * @param preorderSequence The preorder traversal array.
-     * @return true if a valid BST can be formed, otherwise false.
+     * Time Complexity: O(N) where N is the number of nodes in the sequence.
+     * Space Complexity: O(N) for the recursion stack.
      */
     public boolean isValidPreorderBstSuboptimal(int[] preorderSequence) {
         return verify(preorderSequence, 0, preorderSequence.length - 1);
@@ -43,11 +43,6 @@ public class ValidBstFromPreorder {
 
     /**
      * Recursive function to verify if the subarray from start to end can form a valid BST preorder.
-     *
-     * @param preorder The full preorder sequence
-     * @param start Starting index of current subtree
-     * @param end Ending index of current subtree
-     * @return true if valid BST preorder for this subtree
      */
     private boolean verify(int[] preorder, int start, int end) {
         if (start >= end) return true; // Empty or one-element subtree is valid
@@ -75,7 +70,7 @@ public class ValidBstFromPreorder {
     }
 
     /**
-     * Thinking intution process (How we came up with this aproach?)
+     * Thinking intuition process (How we came up with this approach?)
      * -
      *
      *  <p>Logic:
@@ -114,12 +109,12 @@ public class ValidBstFromPreorder {
         }
 
         Deque<Integer> stack = new ArrayDeque<>();
-        int lowerBound = Integer.MIN_VALUE;
+        int lowerBound = Integer.MIN_VALUE; // max of left subtree
 
         for (int value : preorderSequence) {
             // If current value is smaller than the last valid root, it violates BST properties.
             if (value < lowerBound) {
-                // why because all the nodes in right subtree should be greater than the current node.(lowerBound)
+                // why? because all the nodes in right subtree should be greater than the max of left subtree.
                 return false;
             }
 

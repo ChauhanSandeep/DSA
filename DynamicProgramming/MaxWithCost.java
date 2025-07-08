@@ -3,7 +3,7 @@ package DynamicProgramming;
 /**
  * 🔗 LeetCode: https://leetcode.com/problems/maximum-number-of-points-with-cost/
  *
- * ✅ Problem Statement:
+ * Problem Statement:
  * You are given a 2D integer matrix `points` of size `m x n`.
  * Each cell contains some points. You start from any cell in the first row
  * and move down row by row. From a cell `(i, j)`, you can move to any cell `(i+1, k)`
@@ -11,7 +11,7 @@ package DynamicProgramming;
  *
  * Your goal is to return the **maximum total points** you can collect.
  *
- * 🔸 Example:
+ * Example:
  * Input: points = [
 *       [1,2,3],
 *       [1,5,1],
@@ -34,7 +34,7 @@ public class MaxWithCost {
    * Calculates the maximum total points one can collect row by row,
    * factoring in the cost of jumping between columns.
    *
-   * ✅ Approach:
+   * Approach:
    * - Use **Dynamic Programming** with a 2D DP table where `dp[i][j]` holds the max points at row `i`, col `j`.
    * - For each cell, calculate the maximum points from the previous row considering the jump cost.
    *
@@ -82,7 +82,7 @@ public class MaxWithCost {
    * - `rightMax[col]`: The best possible value when coming from the right side of col,
    *   accounting for the cost of moving left (−1 per step).
    *
-   * 🔄 Transformation Logic:
+   * Transformation Logic:
    * - Moving right from col `k` to col `col` reduces the value by (col - k),
    *   which can be simulated in left-to-right sweep:
    *     leftMax[col] = max(prevRowMaxPoints[col], leftMax[col - 1] - 1)
@@ -98,8 +98,8 @@ public class MaxWithCost {
    *     max(leftMax[col], rightMax[col])
    * Then add the current cell’s point value: `points[row][col]`
    *
-   * 🔁 Time Complexity: O(rows × cols)
-   * 🧠 Space Complexity: O(cols)
+   * Time Complexity: O(rows × cols)
+   * Space Complexity: O(cols)
    */
   public long maxPointsOptimized(int[][] points) {
     int rows = points.length;

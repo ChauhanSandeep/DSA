@@ -2,22 +2,22 @@ package Array;
 
 /**
  * 🔗 Leetcode: https://leetcode.com/problems/kth-smallest-element-in-sorted-matrix/
- * ❗Alternate (more accurate): https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0
+ * Alternate (more accurate): https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0
  *
- * ✅ Problem:
+ * Problem:
  * Given two sorted arrays `arr1` and `arr2`, return the Kth element in the merged sorted array without merging them.
  *
- * ✅ Constraints:
+ * Constraints:
  * - Time: O(log(min(n, m)))
  * - Space: O(1)
  *
- * ✅ Example:
+ * Example:
  * arr1 = [2, 3, 6, 7, 9]
  * arr2 = [1, 4, 8, 10]
  * k = 5
  * Output: 6 (5th smallest in merged array)
  *
- * ✅ Follow-up:
+ * Follow-up:
  * - What if arrays are very large and live on disk? Use external merge pattern.
  * - What if `k` is very small? Consider min-heap solution (not optimal for large k).
  */
@@ -79,7 +79,7 @@ public class KthElement {
       int right1 = (partition1 == len1) ? Integer.MAX_VALUE : arr1[partition1];
       int right2 = (partition2 == len2) ? Integer.MAX_VALUE : arr2[partition2];
 
-      // ✅ Found correct partition
+      // Found correct partition
       if (left1 <= right2 && left2 <= right1) {
         return Math.max(left1, left2);
       }

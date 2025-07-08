@@ -102,7 +102,11 @@ public class MedianArrays {
     while (low <= high) {
       // cut in nums1 is at the middle of the current search range
       int cut1 = (low + high) / 2;
-      // cut in nums2 is derived from the total length minus cut1
+      /**
+       * cut1 + cut2 = (len1 + len2 + 1) / 2 because cut1 + cut2 is the total number of elements in the left partition
+       * +1 is added to handle odd-length cases correctly.
+       * cut2 = (len1 + len2 + 1) / 2 - cut1
+       */
       int cut2 = (len1 + len2 + 1) / 2 - cut1;
 
       int leftMax1 = (cut1 == 0) ? Integer.MIN_VALUE : nums1[cut1 - 1];

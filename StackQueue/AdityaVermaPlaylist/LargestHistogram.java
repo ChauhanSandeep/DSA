@@ -7,9 +7,7 @@ import java.util.Stack;
  * Given an array of integers heights representing the histogram's bar height where the width of each bar is 1,
  * return the area of the largest rectangle in the histogram.
  *
- * <p>LeetCode Problem Link:
- * <a href="https://leetcode.com/problems/largest-rectangle-in-histogram/">Largest Rectangle in Histogram</a>
- * </p>
+ * LeetCode Problem Link: https://leetcode.com/problems/largest-rectangle-in-histogram/
  *
  * Intuition:
  * - For each bar, the largest rectangle it can form is bounded by the nearest smaller bars on the left and right.
@@ -58,34 +56,25 @@ public class LargestHistogram {
 
         Stack<Integer> stack = new Stack<>();
 
-        // Find Nearest Smaller to Left (NSL)
+        // Find Nearest Smaller to Right (NSR)
         for (int i = 0; i < length; i++) {
-            while (!stack.isEmpty() && heights[stack.peek()] >= heights[i]) {
-                stack.pop();
-            }
-
-            if (stack.isEmpty()) {
-                leftSmaller[i] = -1; // No smaller to the left
-            } else {
-                leftSmaller[i] = stack.peek();
+            // If current element is smaller than stack top, it's NSR for those
+            while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
+                int idx = stack.pop();
+                rightSmaller[idx] = i;
             }
 
             stack.push(i);
         }
-
         // Clear stack to reuse
         stack.clear();
 
-        // Find Nearest Smaller to Right (NSR)
+        // Find Nearest Smaller to Left (NSL)
         for (int i = length - 1; i >= 0; i--) {
-            while (!stack.isEmpty() && heights[stack.peek()] >= heights[i]) {
-                stack.pop();
-            }
-
-            if (stack.isEmpty()) {
-                rightSmaller[i] = length; // No smaller to the right
-            } else {
-                rightSmaller[i] = stack.peek();
+            // While stack has elements that are >= current → they're not useful
+            while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
+                int idx = stack.pop();
+                leftSmaller[idx] = i; // Current index is nearest smaller to left for popped index
             }
 
             stack.push(i);

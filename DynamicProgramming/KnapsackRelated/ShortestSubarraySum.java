@@ -12,6 +12,11 @@ import java.util.Deque;
  *
  * - Subarray = contiguous elements.
  * - Array can contain positive and negative integers.
+ *
+ * Example:
+ * Input: nums = [2,-1,2], k = 3
+ * Output: 3
+ * Explanation: The subarray [2, -1, 2] has a sum of 3, which is >= k.
  */
 public class ShortestSubarraySum {
 
@@ -33,7 +38,7 @@ public class ShortestSubarraySum {
      *
      * Time: O(N), Space: O(1)
      */
-  public int minSubArrayLen(int targetSum, int[] numbers) {
+  public int minSubArrayWithOnlyPositives(int targetSum, int[] numbers) {
       int windowStart = 0;
       int arrayLength = numbers.length;
       int minLength = arrayLength + 1; // Set to an impossible high value initially
@@ -56,69 +61,74 @@ public class ShortestSubarraySum {
   }
 
     /**
-     * Advanced version when array can contain negative numbers also.
+     * Optimized version using only a Deque of Pair<Index, PrefixSum> when array may contain negative numbers.
      *
      * Steps:
-     * 1. **Use Prefix Sum**:
-     *    - Create a `prefixSum` array where each element at index `i` stores the sum of all elements from the start of the array up to index `i-1`.
-     *    - This helps in quickly calculating the sum of any subarray using the formula:
-     *      `sum of subarray [i, j] = prefixSum[j+1] - prefixSum[i]`.
+     * 1. **Rolling Prefix Sum**:
+     *    - Maintain a running `prefixSum` variable as we iterate through the array.
+     *    - No need to build a full prefix array.
      *
-     * 2. **Use a Deque for Optimization**:
-     *    - A double-ended queue is used to store indices of the `prefixSum` array.
-     *    - The deque helps maintain a **monotonic increasing order** of prefix sums, which ensures efficient calculation of subarray sums.
+     * 2. **Use a Deque of Pair<Index, PrefixSum>**:
+     *    - Stores potential candidates for start indices of subarrays.
+     *    - Maintains a **monotonic increasing order** of prefix sums.
      *
-     * 3. **Iterate Through the Array**:
-     *    - For each index `i` in the `prefixSum` array:
-     *      - **Remove Larger Prefix Sums**: If the last element in the deque has a larger prefix sum than the current one, remove it. It’s not useful for finding the shortest subarray.
-     *      - **Check for Valid Subarray**: If the difference between the current prefix sum and the smallest prefix sum in the deque is at least `k`, calculate the subarray length and update the result.
-     *      - **Add Current Index**: Add the current index to the deque.
+     * 3. **Deque Operations**:
+     *    - **Pop from front** if the current prefixSum - deque.front.prefixSum ≥ k.
+     *      → We found a valid subarray → update minimum length.
+     *    - **Pop from back** if current prefixSum ≤ deque.back.prefixSum.
+     *      → These entries are no longer useful as they represent worse starting points.
+     *    - **Push current index and prefixSum to the back**.
      *
-     * 4. **Return the Result**:
-     *    - If no valid subarray is found, return `-1`.
-     *    - Otherwise, return the shortest subarray length.
+     * 4. **Return Result**:
+     *    - If no valid subarray found, return -1.
+     *    - Otherwise, return the shortest valid length.
      *
-     * Why this works?
-     * - When iterating through the array, the deque stores indices of prefix sums in increasing order.
-     *   This allows us to quickly check if the current prefix sum (prefixSum[j+1]) minus the smallest prefix sum in the deque (prefixSum[i]) is at least k.
-     * - If the condition is satisfied, the difference between the indices (j - i) gives the length of the subarray.
-     *   Since the deque maintains increasing order, the first valid subarray found will be the shortest.
-     * - If the current prefix sum (prefixSum[j+1]) is smaller than or equal to the last prefix sum in the deque, the last prefix sum is removed.
-     *   This is because a larger prefix sum at the same or earlier index will never help in finding a shorter subarray in the future.
+     * Why this works:
+     * - Monotonic queue helps to quickly eliminate suboptimal start points.
+     * - Rolling prefix sum avoids building an extra array.
+     * - Efficient in both time and space: O(N)
      *
-     *
-     * Time: O(N), Space: O(N)
+     * Time complexity: O(N)
+     * Space complexity: O(N)
      */
-    public int shortestSubarray(int[] nums, int target) {
-        int len = nums.length;
-        long[] prefixSum = new long[len + 1];
+    public int shortestSubarray(int[] nums, int k) {
+        int length = nums.length;
+        long prefixSum = 0;
+        int result = length + 1;
 
-        // Build prefix sum array: prefixSum[i] = sum of first (i-1) elements
-        for (int i = 0; i < len; i++) {
-            prefixSum[i + 1] = prefixSum[i] + (long) nums[i];
-        }
+        Deque<Pair> monotonicIncreasingQueue = new ArrayDeque<>();
 
-        int shortestSubarray = len + 1; // Set to an impossible high value initially
-        Deque<Integer> deque = new ArrayDeque<>();
+        // Initial dummy prefix sum at index -1 (i.e., before array starts)
+        monotonicIncreasingQueue.offerLast(new Pair(-1, 0L));
 
-        for (int i = 0; i < len + 1; i++) {
+        for (int i = 0; i < length; i++) {
+            prefixSum += nums[i];
 
-            // Maintain monotonic increasing order in deque
-            // If the last element has bigger prefix sum, remove it (useless)
-            while (!deque.isEmpty() && prefixSum[deque.getLast()] >= prefixSum[i]) {
-                deque.pollLast();
+            // Step 1: Check if any prefix in monotonicIncreasingQueue can form a valid subarray
+            while (!monotonicIncreasingQueue.isEmpty() && prefixSum - monotonicIncreasingQueue.peekFirst().index >= k) {
+                int startIndex = monotonicIncreasingQueue.pollFirst().index;
+                result = Math.min(result, i - startIndex);
             }
 
-            // Check if current prefix sum - oldest prefix sum >= target
-            // If yes, update shortestSubarray and remove the oldest
-            while (!deque.isEmpty() && prefixSum[i] - prefixSum[deque.getFirst()] >= target) {
-                shortestSubarray = Math.min(shortestSubarray, i - deque.pollFirst());
+            // Step 2: Maintain monotonic increasing monotonicIncreasingQueue (by prefix sum)
+            while (!monotonicIncreasingQueue.isEmpty() && monotonicIncreasingQueue.peekLast().prefixSum >= prefixSum) {
+                monotonicIncreasingQueue.pollLast(); // Remove worse candidate
             }
 
-            // Add current index to deque
-            deque.addLast(i);
+            // Step 3: Add current index and prefix sum as a candidate
+            monotonicIncreasingQueue.offerLast(new Pair(i, prefixSum));
         }
 
-        return shortestSubarray == len + 1 ? -1 : shortestSubarray;
+        return result == length + 1 ? -1 : result;
+    }
+
+    static class Pair {
+        int index;
+        long prefixSum;
+
+        Pair(int index, long prefixSum) {
+            this.index = index;
+            this.prefixSum = prefixSum;
+        }
     }
 }

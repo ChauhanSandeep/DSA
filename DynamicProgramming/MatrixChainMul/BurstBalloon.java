@@ -13,6 +13,14 @@ import java.util.Arrays;
  * - If `i-1` or `i+1` is out of bounds, assume a balloon with value `1` exists there.
  * - Find the maximum coins that can be collected by bursting all balloons optimally.
  *
+ * Example:
+ * Input: nums = [3, 1, 5, 8]
+ * Output: 167
+ * Explanation:
+ * - Burst balloons in the order: 1, 2, 0, 3
+ * - nums = [3,1,5,8] --> [3,5,8] --> [3,8] --> [8] --> []
+ * - coins =  3*1*5    +   3*5*8   +  1*3*8  + 1*8*1 = 167
+ *
  * Approach:
  * - Uses **Dynamic Programming** with the concept of partitions.
  * - Defines `dp[left][right]` as the maximum coins that can be obtained by bursting balloons in the range `[left, right]`.
@@ -52,7 +60,7 @@ public class BurstBalloon {
      * @param nums the array of balloon values
      * @return maximum coins collected
      */
-    public int maxCoins(int[] nums) {
+    public int maxCoinsRecursiveApproach(int[] nums) {
         int length = nums.length;
         int[][] memo = new int[length][length];
 
@@ -88,13 +96,13 @@ public class BurstBalloon {
 
         // Try bursting each balloon between left and right as the last one
         for (int i = left; i <= right; i++) {
-            // Coins from left and right partitions
-            int coinsFromLeft = burst(nums, left, i - 1, memo);
-            int coinsFromRight = burst(nums, i + 1, right, memo);
-
             // Coins from bursting balloon i is calculated as:
             // nums[left - 1] * nums[i] * nums[right + 1]
             int coinsFromCurrent = getValue(nums, left - 1) * nums[i] * getValue(nums, right + 1);
+
+            // Coins from remaining left and right partitions
+            int coinsFromLeft = burst(nums, left, i - 1, memo);
+            int coinsFromRight = burst(nums, i + 1, right, memo);
 
             int currentTotalCoins = coinsFromCurrent + coinsFromLeft + coinsFromRight;
 

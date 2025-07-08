@@ -26,7 +26,7 @@ public class RodCutting {
   public static void main(String[] args) {
     int[] prices = {1, 5, 8, 9}; // Prices for rod pieces of length 1, 2, 3, 4
     int rodLength = prices.length;
-    int maxProfit = cutRod(prices, rodLength);
+    int maxProfit = computeMaxProfitOptimized(prices, rodLength);
     System.out.println("Maximum Profit: " + maxProfit);
   }
 
