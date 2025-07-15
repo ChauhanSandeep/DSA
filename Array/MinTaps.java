@@ -6,7 +6,7 @@ import java.util.List;
 
 
 /**
- * Given an array representing garden taps, where each element denotes the range of the tap at that index,
+ * Given an array representing garden taps, where each element denotes the range (left and right) of the tap at that index,
  * this solution finds the minimum number of taps required to water the entire garden.
  * Example:
  * Input: target = 5, ranges = [4, 3, 1, 2, 0, 0]

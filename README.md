@@ -6,7 +6,7 @@ A quick-reference guide to essential Java 8 (and below) syntaxes that make your 
 
 ## 📚 Collections & Maps
 
-```java
+``` java
 map.putIfAbsent(key, new ArrayList<>());
 map.putIfAbsent(key, k -> new ArrayList<>()).add(value);
 map.computeIfAbsent(key, k -> new ArrayList<>());
@@ -24,7 +24,7 @@ Collections.frequency(list, element);
 
 ## 🌀 Streams & Lambdas
 
-```java
+``` java
 list.stream().filter(x -> x > 0).collect(Collectors.toList());
 list.stream().map(String::toUpperCase).collect(Collectors.toList());
 list.stream().flatMap(List::stream).collect(Collectors.toList());
@@ -44,7 +44,7 @@ list.stream().min(Integer::compareTo);
 
 ## 📦 Collectors
 
-```java
+``` java
 Collectors.toList();
 Collectors.toSet();
 Collectors.toMap(k -> k, v -> v);
@@ -57,7 +57,7 @@ Collectors.joining(", ");
 
 ## 🔐 Optional
 
-```java
+``` java
 Optional.ofNullable(value).orElse(defaultValue);
 Optional.ofNullable(value).ifPresent(val -> doSomething(val));
 Optional.ofNullable(value).map(String::trim).orElse("default");
@@ -67,7 +67,7 @@ Optional.ofNullable(value).map(String::trim).orElse("default");
 
 ## 🔧 Functional Interfaces
 
-```java
+``` java
 Predicate<String> isEmpty = String::isEmpty;
 Function<String, Integer> length = String::length;
 Consumer<String> printer = System.out::println;
@@ -77,7 +77,7 @@ Consumer<String> printer = System.out::println;
 
 ## 🔁 ForEach & Method References
 
-```java
+``` java
 list.forEach(System.out::println);
 map.forEach((k, v) -> System.out.println(k + ": " + v));
 ```
@@ -86,7 +86,7 @@ map.forEach((k, v) -> System.out.println(k + ": " + v));
 
 ## 🧮 Arrays & List Helpers
 
-```java
+``` java
 Arrays.asList(1, 2, 3);
 new HashSet<>(list);
 Arrays.sort(arr);

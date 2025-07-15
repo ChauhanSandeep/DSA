@@ -9,13 +9,14 @@ import java.util.Stack;
  * Given a mathematical expression containing non-negative integers, '+', '-', '*', '/',
  * and parentheses '(' and ')', evaluate the expression following standard mathematical precedence.
  *
- * Approach:
- * - Use a stack to store values and compute based on the last encountered operator.
- * - Use recursion to evaluate subexpressions enclosed in parentheses.
- * - Handle integer division by truncating toward zero.
+ * Example:
+ * Input: "(1-(3*2+2)-3)+(9+8)"
+ * Output: 10
+ * Explanation: The expression evaluates to 10 by following the order of operations.
  *
- * Time Complexity: O(N), where N is the length of the expression.
- * Space Complexity: O(N), due to recursion depth and stack storage.
+ * Follow-up Questions:
+ * - Implement a version that supports variables and evaluation via a map: https://leetcode.com/problems/basic-calculator-iv/
+ * - How would you handle floating point numbers and operator precedence? Consider implementing a Shunting Yard algorithm.
  */
 public class BasicCalculator3 {
 
@@ -24,6 +25,15 @@ public class BasicCalculator3 {
         System.out.println("Result: " + new BasicCalculator3().calculate(expression));
     }
 
+    /**
+     * Approach:
+     * - Use a stack to store values and compute based on the last encountered operator.
+     * - Use recursion to evaluate subexpressions enclosed in parentheses.
+     * - Handle integer division by truncating toward zero.
+     *
+     * Time Complexity: O(N), where N is the length of the expression.
+     * Space Complexity: O(N), due to recursion depth and stack storage.
+     */
     public int calculate(String expression) {
         if (expression == null || expression.isEmpty()) {
             return 0; // Handle edge case of empty input

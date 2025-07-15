@@ -38,7 +38,7 @@ import java.util.Queue;
  * LeetCode Link: https://leetcode.com/problems/serialize-and-deserialize-binary-tree/
  */
 
-public class SerializeDeserialize {
+public class SerializeDeserializeBst {
 
     public static void main(String[] args) {
         // Example tree construction
@@ -49,16 +49,20 @@ public class SerializeDeserialize {
         root.right.right = new TreeNode(5);
 
         // Serialize the tree
-        String serializedString = new SerializeDeserialize().serialize(root);
+        String serializedString = new SerializeDeserializeBst().serialize(root);
         System.out.println("Serialized tree: " + serializedString);
 
         // Deserialize the string back into a tree
-        TreeNode deserializedNode = new SerializeDeserialize().deserialize(serializedString);
+        TreeNode deserializedNode = new SerializeDeserializeBst().deserialize(serializedString);
         System.out.println("Deserialized tree root: " + deserializedNode.val);
     }
 
     /**
      * Serializes a binary tree into a string representation.
+     * Approach:
+     * - Use level-order traversal (BFS) to visit each node.
+     * - Append the value of each node to a string.
+     * - Use "null" to represent missing children.
      *
      * @param root The root of the binary tree.
      * @return A string representing the serialized binary tree.
@@ -89,6 +93,11 @@ public class SerializeDeserialize {
 
     /**
      * Deserializes a string into a binary tree.
+     * Approach:
+     * - Split the serialized string into an array of node values.
+     * - Use a queue to reconstruct the tree level by level.
+     * * - For each node, create a new TreeNode and assign its left and right children
+     *  based on the next values in the array.
      *
      * @param data A string representing the serialized binary tree.
      * @return The root node of the deserialized binary tree.

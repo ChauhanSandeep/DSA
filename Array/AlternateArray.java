@@ -2,6 +2,20 @@ package Array;
 
 import java.util.Arrays;
 
+
+/**
+ * Given a sorted array, rearrange it so that:
+ * - The first element is the largest
+ * - The second element is the smallest
+ * - The third element is the second largest
+ * - The fourth element is the second smallest, and so on.
+ *
+ * Example:
+ * Input:  [1, 2, 3, 4, 5, 6]
+ * Output: [6, 1, 5, 2, 4, 3]
+ *
+ * GFG Link: https://www.geeksforgeeks.org/dsa/rearrange-array-maximum-minimum-form/?utm_source=chatgpt.com
+ */
 public class AlternateArray {
 
     public static void main(String[] args) {
@@ -19,15 +33,6 @@ public class AlternateArray {
     }
 
     /**
-     * Given a sorted array, rearrange it so that:
-     * - The first element is the largest
-     * - The second element is the smallest
-     * - The third element is the second largest
-     * - The fourth element is the second smallest, and so on.
-     *
-     * Example:
-     * Input:  [1, 2, 3, 4, 5, 6]
-     * Output: [6, 1, 5, 2, 4, 3]
      *
      * @param arr Input array (must be sorted)
      * Time Complexity: O(N)
@@ -96,12 +101,12 @@ public class AlternateArray {
      * Space Complexity: O(1) (in-place modification)
      */
     public void rearrangeInPlace(int[] arr) {
-        int n = arr.length;
-        int maxIndex = n - 1, minIndex = 0;
-        int maxElement = arr[n - 1] + 1; // Store a value greater than max in array to encode two numbers
+        int length = arr.length;
+        int maxIndex = length - 1, minIndex = 0;
+        int maxElement = arr[length - 1] + 1; // Store a value greater than max in array to encode two numbers
 
         // Encoding values into a single element
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < length; i++) {
             if (i % 2 == 0) { // Store max element at even indices
                 // we want to use arr[i] += newValue * maxElement;
                 // but the newValue might already be changed to a new value
@@ -114,7 +119,7 @@ public class AlternateArray {
         }
 
         // Decode values back to original range
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < length; i++) {
             /**
              * arr[i] = (oldValue + newValue * maxElement) // set previously encoded value
              * (oldValue + newValue * maxElement) / maxElement

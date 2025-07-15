@@ -6,11 +6,12 @@ package Array;
  *
  * You are given two integer arrays nums1 and nums2 of equal length.
  * You may choose a subarray from either of the arrays and splice it into the other
- * to maximize the total sum of the destination array.
+ * to maximize the total sum of the destination array. The splicing can be done at any index,
+ * and the subarray can be of any length (including zero).
  *
  * A splicing operation replaces a subarray from one array into the other (of the same indices).
  *
- * 📌 Example:
+ * Example:
  * Input:
  *   nums1 = [60, 60, 60]
  *   nums2 = [10, 90, 10]
@@ -20,7 +21,7 @@ package Array;
  * Explanation:
  * - Splice subarray [90] from nums2 into nums1 at index 1: [60, 90, 60] → sum = 210
  *
- * ✅ Follow-ups:
+ * Follow-ups:
  * - Can this be extended to k splices?
  *  → Yes, we can generalize the approach to allow multiple splices by iterating through all possible subarrays.
  * - What if the cost of splice varies by index?
@@ -74,8 +75,8 @@ public class MaxScoreSplicedArray {
    * The gain at index i is (source[i] - target[i]).
    * Uses Kadane’s algorithm to find the max subarray sum of the gain array.
    *
-   * 🔹 Time Complexity: O(N)
-   * 🔹 Space Complexity: O(1)
+   * Time Complexity: O(N)
+   * Space Complexity: O(1)
    *
    * @param source The array being spliced in
    * @param target The array being spliced into

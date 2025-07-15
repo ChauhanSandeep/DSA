@@ -15,14 +15,6 @@ import java.util.Arrays;
  * Output: 3
  * Explanation: Valid pairs are (2,1), (6,1), (6,5)
  *
- * ⚠️ Mathematical Observations:
- * - When x = 2, y = 3 ⇒ x^y = 8 < y^x = 9
- * - When x = 3, y = 2 ⇒ x^y = 27 > y^x = 8
- * - Special cases:
- *   ➤ x=0: always false
- *   ➤ x=1: only true if y=0
- *   ➤ x=2: only y > 4 works
- *
  * 🔍 Follow-ups:
  * 1. Why is binary search used? ➤ To efficiently count Ys > x, skipping brute-force
  * 2. Can this be solved without math.pow? ➤ Yes, avoid for small integers — use direct math rules

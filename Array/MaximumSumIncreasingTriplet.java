@@ -19,9 +19,6 @@ import java.util.stream.Stream;
  * Input:  [2, 5, 3, 1, 4, 9]
  * Output: 16  (2 + 5 + 9)
  *
- * Time Complexity: O(n log n)
- * Space Complexity: O(n)
- *
  * Follow-up Questions:
  * - Q: Can this be done in O(n)?
  *   A: Not easily. Maintaining prefix minimum/maximum and suffix max efficiently needs a TreeSet or Segment Tree.
@@ -44,8 +41,8 @@ public class MaximumSumIncreasingTriplet {
    *     - Use TreeSet to find max Ai < Aj to the left.
    *     - Use precomputed maxRight[j+1] to find Ak > Aj to the right.
    *
-   * @param list List of integers
-   * @return Maximum sum of valid increasing triplet
+   * Time Complexity: O(n log n) due to TreeSet operations.
+   * Space Complexity: O(n) for maxRight array and TreeSet.
    */
   public int findMaxTripletSum(List<Integer> list) {
     int length = list.size();
@@ -72,7 +69,7 @@ public class MaximumSumIncreasingTriplet {
 
       // Valid increasing triplet condition: Ai < Aj < Ak
       if (rightMax > current) {
-        Integer leftMax = sortedPrefixSet.lower(current); // largest Ai < current
+        Integer leftMax = sortedPrefixSet.lower(current); // max from left side but less than current
         if (leftMax != null) {
           int tripletSum = leftMax + current + rightMax;
           maxSum = Math.max(maxSum, tripletSum);

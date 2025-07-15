@@ -110,17 +110,17 @@ public class CheapestFlightWithStops {
      * ✅ Space Complexity: O(V), where V is the number of cities (vertices)
      */
     public int findCheapestPriceBellmanFord(int totalCities, int[][] flights, int source, int destination, int maxStops) {
-        // minCost[i] will hold the minimum cost to reach city i from source
+        // minCostFromSource[i] will hold the minimum cost to reach city i from source
         // Initialize all costs to infinity, except the source city
-        int[] minCost = new int[totalCities];
-        Arrays.fill(minCost, Integer.MAX_VALUE);
-        minCost[source] = 0;
+        int[] minCostFromSource = new int[totalCities];
+        Arrays.fill(minCostFromSource, Integer.MAX_VALUE);
+        minCostFromSource[source] = 0;
 
         // Perform up to (maxStops + 1) rounds of edge relaxation. Edge relaxation is the
         // process of updating the cost to reach a city if a cheaper route is found.
         for (int stops = 0; stops <= maxStops; stops++) {
             // Create a copy of the current cost array to prevent premature updates
-            int[] updatedCost = Arrays.copyOf(minCost, totalCities);
+            int[] copiedMinCostFromSource = Arrays.copyOf(minCostFromSource, totalCities);
 
             for (int[] flight : flights) {
                 int from = flight[0];
@@ -128,15 +128,15 @@ public class CheapestFlightWithStops {
                 int price = flight[2];
 
                 // Only relax if source city is reachable
-                if (minCost[from] != Integer.MAX_VALUE) {
-                    updatedCost[to] = Math.min(updatedCost[to], minCost[from] + price);
+                if (minCostFromSource[from] != Integer.MAX_VALUE) {
+                    copiedMinCostFromSource[to] = Math.min(copiedMinCostFromSource[to], minCostFromSource[from] + price);
                 }
             }
 
             // Move to the next level of relaxation
-            minCost = updatedCost;
+            minCostFromSource = copiedMinCostFromSource;
         }
 
-        return minCost[destination] == Integer.MAX_VALUE ? -1 : minCost[destination];
+        return minCostFromSource[destination] == Integer.MAX_VALUE ? -1 : minCostFromSource[destination];
     }
 }

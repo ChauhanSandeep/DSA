@@ -3,6 +3,9 @@ package LinkedList;
 import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
+import static Heap.MergeKLists.*;
+
+
 /**
  * ✅ Problem: Reverse Linked List
  * 🔗 LeetCode: https://leetcode.com/problems/reverse-linked-list/
@@ -24,7 +27,7 @@ import LinkedList.Util.ListNode;
  * - `reverseListRec()`: O(N) - Due to recursive function calls.
  * - `reverseInGroups()`: O(N) - Due to recursive calls.
  */
-public class ReverseList {
+public class ReverseLinkedList {
 
     public static void main(String[] args) {
         ListNode head = new ListNode(1);
@@ -58,15 +61,45 @@ public class ReverseList {
      * @return New head of the reversed linked list.
      */
     public static ListNode reverseList(ListNode head) {
-        ListNode prev = null, current = head, nextNode;
+        if (head == null || head.next == null)
+            return head;
 
-        while (current != null) {
-            nextNode = current.getNext(); // Store next node
-            current.setNext(prev); // Reverse link
-            prev = current; // Move prev forward
-            current = nextNode; // Move current forward
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        ListNode prev = dummy;
+        ListNode curr = head;
+        ListNode then = curr.next;
+
+        /**
+         * Complete states: prev = 0, curr = 1, then = 2
+         * 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null
+         *
+         * Complete states: prev = 0, curr = 1, then = 3
+         * 0 -> 2 -> 1 -> 3 -> 4 -> 5 -> 6 -> null
+         *
+         * Complete states: prev = 0, curr = 1, then = 4
+         * 0 -> 3 -> 2 -> 1 -> 4 -> 5 -> 6 -> null
+         *
+         * Complete states: prev = 0, curr = 1, then = 5
+         * 0 -> 4 -> 3 -> 2 -> 1 -> 5 -> 6 -> null
+         *
+         * Complete states: prev = 0, curr = 1, then = 6
+         * 0 -> 5 -> 4 -> 3 -> 2 -> 1 -> 6 -> null
+         *
+         * Basically this is a head-insertion method where we take the `then` node and insert it right after `prev`.
+         * We repeat this until `then` becomes null, which means we have processed all nodes.
+         */
+        while (then != null) {
+            curr.next = then.next;
+            then.next = prev.next;
+            prev.next = then;
+            then = curr.next;
+            System.out.println("Complete states: prev = " + prev.val + ", curr = " + curr.val + ", then = " + (then != null ? then.val : "null"));
+            printList(dummy.next);
         }
-        return prev; // New head of reversed list
+
+        return dummy.next;
     }
 
     /**

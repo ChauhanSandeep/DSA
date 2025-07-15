@@ -4,22 +4,23 @@ import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
 /**
- * ✅ Problem: Reverse Nodes in k-Group
- * 🔗 LeetCode: https://leetcode.com/problems/reverse-nodes-in-k-group/
- * 📚 Problem Statement:
+ * Problem: Reverse Nodes in k-Group
+ * LeetCode: https://leetcode.com/problems/reverse-nodes-in-k-group/
+ * Problem Statement:
  * Given the head of a linked list, reverse the nodes of the list `k` at a time and return the modified list.
  * If the number of nodes is not a multiple of `k`, then the remaining nodes at the end should remain unchanged.
  * For example, given the list 1 -> 2 -> 3 -> 4 -> 5 and k = 2,
+ * the output should be 2 -> 1 -> 4 -> 3 -> 5.
  *
- * 🔍 **Approach:**
- * 1️⃣ Count the total number of nodes.
- * 2️⃣ Reverse every group of `k` nodes while keeping track of links.
- * 3️⃣ Link the reversed segments correctly and preserve the remaining nodes.
+ * **Approach:**
+ * Count the total number of nodes.
+ * Reverse every group of `k` nodes while keeping track of links.
+ * Link the reversed segments correctly and preserve the remaining nodes.
  *
- * 📊 **Time Complexity:** O(N) - Each node is processed twice.
- * 🛠 **Space Complexity:** O(1) - Constant extra space is used.
+ * **Time Complexity:** O(N) - Each node is processed twice.
+ * **Space Complexity:** O(1) - Constant extra space is used.
  */
-public class ReverseKList {
+public class ReverseListInKGroup {
 
     public static void main(String[] args) {
         ListNode head = new ListNode(1);
@@ -30,7 +31,7 @@ public class ReverseKList {
         list.add(new ListNode(5));
 
         int k = 2;
-        ListNode result = new ReverseKList().reverseKGroup(head, k);
+        ListNode result = new ReverseListInKGroup().reverseKGroup(head, k);
         System.out.println("Reversed in groups of " + k + ": " + result);
     }
 
@@ -79,50 +80,40 @@ public class ReverseKList {
      * @return New head of the modified list.
      */
     public ListNode reverseKGroup(ListNode head, int k) {
-        if (head == null || k == 1) return head; // Edge case: No need to reverse
+        if (head == null || k <= 1) return head;
 
-        int totalNodes = countNodes(head);
-        ListNode dummy = new ListNode(0); // Dummy node for easy list manipulation
+        ListNode dummy = new ListNode(0);
         dummy.next = head;
 
-        ListNode prevTail = dummy; // Last node of the previous reversed group
-        ListNode curr = head;
+        ListNode groupPrev = dummy;
 
-        while (totalNodes >= k) {
-            ListNode groupHead = curr; // Store head of the current group
-            ListNode prev = null;
-            ListNode next = null;
+        while (true) {
+            // Step 1: Get the kth node ahead (to check if a full group exists)
+            ListNode kth = getKthNode(groupPrev, k);
+            if (kth == null) break;
 
-            // Reverse k nodes
-            for (int i = 0; i < k; i++) {
-                next = curr.next;
-                curr.next = prev;
-                prev = curr;
-                curr = next;
+            // Step 2: Reverse the group using head-insertion (with 'then' pointer)
+            ListNode curr = groupPrev.next;
+            ListNode then = curr.next;
+
+            for (int i = 1; i < k; i++) {
+                curr.next = then.next;
+                then.next = groupPrev.next;
+                groupPrev.next = then;
+                then = curr.next;
             }
 
-            // Link the reversed group
-            prevTail.next = prev;
-            groupHead.next = curr;
-            prevTail = groupHead; // Update prevTail for the next iteration
-
-            totalNodes -= k;
+            // Step 3: Move to the next group
+            groupPrev = curr; // `curr` is now at the end of the reversed group
         }
 
-        return dummy.next; // Return the new head (skip dummy node)
+        return dummy.next;
     }
 
-    /**
-     * Counts the number of nodes in a linked list.
-     * @param head Head of the list.
-     * @return Total node count.
-     */
-    private int countNodes(ListNode head) {
-        int count = 0;
-        while (head != null) {
-            count++;
-            head = head.next;
+    private ListNode getKthNode(ListNode start, int k) {
+        while (k-- > 0 && start != null) {
+            start = start.next;
         }
-        return count;
+        return start;
     }
 }

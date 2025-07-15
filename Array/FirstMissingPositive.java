@@ -3,10 +3,11 @@ package Array;
 import java.util.Arrays;
 
 /**
- * 🔹 Problem: First Missing Positive
- * 🔗 Leetcode: https://leetcode.com/problems/first-missing-positive/
+ * Problem: First Missing Positive
+ * Leetcode: https://leetcode.com/problems/first-missing-positive/
  *
  * Given an unsorted integer array, find the smallest missing positive integer.
+ * The array can contain duplicates and negative numbers.
  * You must implement an algorithm that runs in O(n) time and uses constant extra space.
  *
  * 📌 Example:
@@ -16,7 +17,7 @@ import java.util.Arrays;
  * Input: [1, 2, 0]
  * Output: 3
  *
- * ✅ Follow-up Questions:
+ * Follow-up Questions:
  * 1. Can you use a HashSet?
  *    → Yes, but violates constant space constraint.
  * 2. Can you use a modified cyclic sort instead of marking?
