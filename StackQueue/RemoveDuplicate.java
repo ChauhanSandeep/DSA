@@ -14,6 +14,9 @@ import java.util.Stack;
  * 🧪 Example:
  * Input:  s = "pbbcggttciiippooaais", k = 2
  * Output: "ps"
+ * Explanation:
+ * - "pbbcggttciiippooaais" → "pcggttciiippooaais" (remove "bb")
+ * similar steps continue until no more k-length duplicates remain.
  *
  * 🎯 Follow-up Questions:
  * 1. What if `k = 1`? ➤ All characters will be removed.
@@ -33,7 +36,7 @@ public class RemoveDuplicate {
     /**
      * Removes all adjacent duplicates in the input string where a character appears exactly `k` times.
      *
-     * 🧠 Algorithm:
+     * Algorithm:
      * - Use a stack to track characters and their frequencies.
      * - On encountering a character:
      *    • If it matches the top, increment frequency.
@@ -45,8 +48,8 @@ public class RemoveDuplicate {
      * @param k   The number of adjacent duplicates to remove.
      * @return A string with all adjacent k-length duplicates removed.
      *
-     * ⏱ Time Complexity: O(N), where N = str.length()
-     * 🧠 Space Complexity: O(N), for the stack storing char-count pairs.
+     * Time Complexity: O(N), where N = str.length()
+     * Space Complexity: O(N), for the stack storing char-count pairs.
      */
     public static String removeAdjacentDuplicates(String str, int k) {
         if (str == null || str.isEmpty() || k <= 1) {
@@ -61,7 +64,10 @@ public class RemoveDuplicate {
                 top.count++;
 
                 if (top.count == k) {
-                    stack.pop(); // Remove k-length adjacent duplicates
+                    // We are popping immediately without waiting for other characters because condition is for
+                    // exactly k adjacent duplicates to be removed. If the condition was top.count >= k, we would
+                    // have to wait for all characters to be processed before removing.
+                    stack.pop();
                 }
             } else {
                 stack.push(new CharFrequency(currentChar));

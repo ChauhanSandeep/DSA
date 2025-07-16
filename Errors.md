@@ -39,3 +39,4 @@ List<int[]> mutableList = new ArrayList<>(Arrays.asList(arr));
 List<String> mutableStringList = new ArrayList<>(Arrays.asList("a", "b", "c"));
 ```
 
+### Monotonically increasing stack is used to find the next and previous smaller elements

@@ -3,32 +3,23 @@ package DynamicProgramming;
 import java.util.Arrays;
 
 /**
- * Problem: Minimum Cuts for Palindromic Partitioning
- * 
- * Given a string `s`, return the minimum number of cuts required to partition 
+ * Problem: Palindrome Partitioning II
+ *
+ * Given a string `s`, return the minimum number of cuts needed to partition
  * it such that every substring in the partition is a palindrome.
- * 
+ *
  * Example:
- * Input: "aab"
- * Output: 1  (["aa", "b"])
- * 
- * Approach:
- * 1. **Recursive + Memoization (Top-Down)**:
- *    - Use recursion with memoization (`dp[start][end]`) to avoid recomputing.
- *    - Try all possible partitions and minimize cuts.
- * 2. **Dynamic Programming (Bottom-Up, O(N²) Optimal Solution)**:
- *    - Use a `dp[i]` array where `dp[i]` represents the **minimum cuts required**
- *      for the substring `s[0:i]`.
- *    - Precompute palindromic substrings using a 2D `isPalindrome` table.
- * 
- * Time Complexity:
- * - **Recursive (Memoized)**: O(N³) (due to repeated palindrome checks)
- * - **Bottom-Up DP (Optimized)**: O(N²)
- * 
- * Space Complexity:
- * - O(N²) for DP table in both approaches.
- * 
- * Related Problem: https://leetcode.com/problems/palindrome-partitioning-ii/
+ * Input: s = "aab"
+ * Output: 1
+ * Explanation: "aa|b" is a valid partition with only 1 cut.
+ *
+ * Leetcode Link: https://leetcode.com/problems/palindrome-partitioning-ii/
+ *
+ * Follow-up Questions:
+ * 1. Can you print all valid palindromic partitions?
+ *    - Yes, use backtracking + `isPalindrome[][]` DP table.
+ * 2. Can you solve this in O(N²) time and O(N) space?
+ *    - Yes, with optimized center-expansion palindrome check instead of full 2D table.
  */
 public class MinCutPalindrome {
 
@@ -37,30 +28,38 @@ public class MinCutPalindrome {
     }
 
     /**
-     * Recursive + Memoization Approach (O(N³))
+     * Top-down recursive approach with memoization.
+     *
+     * Strategy:
+     * - Try partitioning the string at all valid palindromic substrings.
+     * - Recursively compute min cuts on the remaining suffix.
+     * - Memoize overlapping subproblems with a 2D dp array.
+     *
+     * Time: O(N^3) due to repeated isPalindrome checks.
+     * Space: O(N^2) for memo table.
      */
-    public int minCut(String s) {
-        int n = s.length();
-        int[][] dp = new int[n][n]; // Memoization table for substring partitions
+    public int minCut(String str) {
+        int length = str.length();
+        int[][] dp = new int[length][length]; // dp[start][end] = min cuts needed for str[start:end]
         for (int[] row : dp) {
             Arrays.fill(row, -1);
         }
-        return minCutsRecursive(s, 0, n - 1, dp);
+        return minCutsRecursive(str, 0, length - 1, dp);
     }
 
-    private int minCutsRecursive(String s, int start, int end, int[][] dp) {
+    private int minCutsRecursive(String str, int start, int end, int[][] dp) {
         if (dp[start][end] != -1) return dp[start][end];
 
         // If the substring is already a palindrome, no cuts are needed
-        if (isPalindrome(s, start, end)) {
+        if (isPalindrome(str, start, end)) {
             dp[start][end] = 0;
             return 0;
         }
 
-        int minCuts = end - start; // Maximum possible cuts
+        int minCuts = end - start; // Initially assume max cuts (cut at every character)
         for (int i = start + 1; i <= end; i++) {
-            if (isPalindrome(s, start, i - 1)) {
-                minCuts = Math.min(minCuts, 1 + minCutsRecursive(s, i, end, dp));
+            if (isPalindrome(str, start, i - 1)) {
+                minCuts = Math.min(minCuts, 1 + minCutsRecursive(str, i, end, dp));
             }
         }
 
@@ -68,38 +67,48 @@ public class MinCutPalindrome {
         return minCuts;
     }
 
+
     /**
-     * Bottom-Up Dynamic Programming Approach (Optimized O(N²))
+     * Optimized Dynamic Programming Approach (Bottom-Up)
+     * Strategy:
+     * - Precompute all palindromic substrings using a DP table.
+     * - Let dp[i] be the min cuts needed for str[0..i].
+     * - For every end index, find all valid start indices that form palindromes.
+     * - Update dp[end] based on previous valid partitions.
+     *
+     * Time: O(N^2)
+     * Space: O(N^2)
      */
-    public int minCutDP(String s) {
-        int n = s.length();
-        boolean[][] isPalindrome = new boolean[n][n];
-        int[] dp = new int[n];
+    public int minCutDP(String str) {
+        int length = str.length();
+        boolean[][] isPalindrome = new boolean[length][length]; // isPalindrome[i][j] = true if str[i:j] is a palindrome
+        int[] dp = new int[length]; // dp[i] = min cuts needed for str[0..i]
 
         // Precompute palindrome substrings
-        for (int end = 0; end < n; end++) {
+        for (int end = 0; end < length; end++) {
             for (int start = 0; start <= end; start++) {
-                if (s.charAt(start) == s.charAt(end) && (end - start <= 2 || isPalindrome[start + 1][end - 1])) {
+                if (str.charAt(start) == str.charAt(end) && (end - start <= 2 || isPalindrome[start + 1][end - 1])) {
                     isPalindrome[start][end] = true;
                 }
             }
         }
 
         // Fill DP table
-        for (int end = 0; end < n; end++) {
-            if (isPalindrome[0][end]) {
-                dp[end] = 0; // No cut needed if whole substring is a palindrome
+        for (int right = 0; right < length; right++) {
+            if (isPalindrome[0][right]) {
+                dp[right] = 0; // No cut needed if whole substring is a palindrome
             } else {
-                dp[end] = end; // Max possible cuts (cut at every character)
-                for (int start = 1; start <= end; start++) {
-                    if (isPalindrome[start][end]) {
-                        dp[end] = Math.min(dp[end], 1 + dp[start - 1]);
+                dp[right] = right; // Max possible cuts (cut at every character)
+                for (int left = 1; left <= right; left++) {
+                    if (isPalindrome[left][right]) {
+                        int cutsBeforeLeft = dp[left - 1];
+                        dp[right] = Math.min(dp[right], 1 + cutsBeforeLeft);
                     }
                 }
             }
         }
 
-        return dp[n - 1];
+        return dp[length - 1];
     }
 
     /**

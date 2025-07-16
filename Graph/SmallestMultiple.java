@@ -6,17 +6,20 @@ import java.util.ArrayDeque;
 
 /**
  * Find the smallest multiple of a given number using only the digits 0 and 1.
- * 
+ * For example
+ * Input: num = 7
+ * Output: "111" (since 111 is the smallest multiple of 7 that consists only of 0s and 1s)
+ *
  * ### **Approach:**
  * - We use **Breadth-First Search (BFS)** to explore all possible numbers formed by 0s and 1s.
  * - Each number formed is represented by its remainder when divided by `num`.
  * - We track remainders using a queue and an array (`digitMap`) to store the last digit used.
  * - When remainder `0` is found, we backtrack to construct the valid multiple.
- * 
+ *
  * ### **Complexity Analysis:**
  * - **Time Complexity:** `O(N)`, where `N` is the given number. Each remainder (0 to N-1) is processed once.
  * - **Space Complexity:** `O(N)`, as we store `N` remainders and parent tracking.
- * 
+ *
  * **LeetCode Problem Reference:** (Not available, but inspired by similar BFS number construction problems)
  * YouTube Explanation: https://www.youtube.com/watch?v=Om47LiGTy8o
  */

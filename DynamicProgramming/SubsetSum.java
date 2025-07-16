@@ -5,18 +5,9 @@ import java.util.Map;
 
 /**
  * Problem: Count the number of subarrays with a given sum `k`.
- * 
+ *
  * Given an integer array `nums`, return the total number of continuous subarrays
- * whose sum equals `k`.
- *
- * **Approach: Prefix Sum + HashMap**
- * 1. Maintain a running prefix sum (`currentSum`).
- * 2. Use a **HashMap (prefixSumMap)** to store the count of prefix sums encountered so far.
- * 3. If `currentSum - k` exists in the map, it means there exists a subarray summing to `k`.
- * 4. Update the map to keep track of occurrences of each prefix sum.
- *
- * **Time Complexity:** O(N) → Single pass through the array.  
- * **Space Complexity:** O(N) → HashMap stores at most `N` prefix sums.  
+ * whose sum equals `k`. The array can contain both positive and negative integers.
  *
  * **LeetCode Problem:** https://leetcode.com/problems/subarray-sum-equals-k/
  */
@@ -27,6 +18,22 @@ public class SubsetSum {
         System.out.println("Number of subarrays with sum " + targetSum + ": " + countSubarraysWithSum(nums, targetSum));
     }
 
+    /**
+     * **Approach: Prefix Sum + HashMap**
+     * 1. Maintain a running prefix sum (`currentSum`).
+     * 2. Use a **HashMap (prefixSumMap)** to store the count of prefix sums encountered so far.
+     * 3. If `currentSum - k` exists in the map, it means there exists a subarray summing to `k`.
+     * 4. Update the map to keep track of occurrences of each prefix sum.
+     *
+     * Note: If all the numbers are positive then we can simply use a two-pointer technique,
+     *
+     * **Time Complexity:** O(N) → Single pass through the array.
+     * **Space Complexity:** O(N) → HashMap stores at most `N` prefix sums.
+     *
+     * @param nums Input array of integers.
+     * @param k Target sum for the subarrays.
+     * @return Number of continuous subarrays whose sum equals `k`.
+     */
     public static int countSubarraysWithSum(int[] nums, int k) {
         int currentSum = 0;
         int subarrayCount = 0;

@@ -8,15 +8,9 @@ import java.util.Stack;
  * Given a binary matrix, find the maximum area of a rectangle formed by 1s.
  * This is a variation of the "Largest Histogram Area" problem.
  *
- * Approach:
- * - Treat each row as the base of a histogram and compute the largest rectangle using a stack.
- * - Maintain an array of column heights, updating it as we traverse each row.
- * - Compute the largest rectangle in the histogram for each row.
- *
  * Problem Link: https://www.youtube.com/watch?v=St0Jf_VmG_g&list=PL_z_8CaSLPWdeOezg68SKkeLN4-T_jNHd&index=8
  *
- * Time Complexity: O(rows * cols), since each row computes a histogram in O(cols).
- * Space Complexity: O(cols) for storing histogram heights.
+
  */
 public class MaxBinaryRectangle {
 
@@ -30,11 +24,24 @@ public class MaxBinaryRectangle {
 
         MaxBinaryRectangle solver = new MaxBinaryRectangle();
         int maxArea = solver.findMaxRectangleArea(matrix);
-        System.out.println("Maximum Rectangle Area: " + maxArea);
+        System.out.println("Maximum Rectangle Area: " + maxArea); // output: 8
     }
 
     /**
-     * Computes the maximum rectangular area in a binary matrix.
+     * Approach:
+     * - Treat each row as the base of a histogram and compute the largest rectangle using a stack.
+     * - Maintain an array of column heights, updating it as we traverse each row.
+     * - Compute the largest rectangle in the histogram for each row.
+     *
+     * Steps:
+     * 1. Initialize a list to store the heights of each column based on the current row.
+     * 2. For each row, update the heights:
+     *    - If the cell is 1, increment the height from the previous row.
+     *    - If it is 0, reset the height to 0.
+     * 3. Use a stack to compute the largest rectangle area for the current histogram.
+     *
+     * Time Complexity: O(rows * cols), since each row computes a histogram in O(cols).
+     * Space Complexity: O(cols) for storing histogram heights.
      */
     public int findMaxRectangleArea(int[][] matrix) {
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) return 0;
@@ -44,7 +51,7 @@ public class MaxBinaryRectangle {
         List<Integer> heights = new ArrayList<>();
         int maxArea = 0;
 
-        // Initialize the histogram heights with the first row
+        // Step1: Initialize the histogram heights with the first row
         for (int col = 0; col < cols; col++) {
             heights.add(matrix[0][col]);
         }
@@ -52,12 +59,13 @@ public class MaxBinaryRectangle {
         // Compute the maximum rectangle for the first row
         maxArea = computeLargestHistogramArea(heights);
 
-        // Process remaining rows
         for (int row = 1; row < rows; row++) {
+            // Step2: Update heights based on the current row
             updateHeights(heights, matrix[row]);
+            // Step3: Compute the largest rectangle area for the updated histogram
             maxArea = Math.max(maxArea, computeLargestHistogramArea(heights));
         }
-        
+
         return maxArea;
     }
 
@@ -75,7 +83,8 @@ public class MaxBinaryRectangle {
     }
 
     /**
-     * Computes the largest rectangle area in a histogram using a stack.
+     * Computes the largest rectangle area in a histogram using monotonically increasing stack.
+     * For each bar, we find the shortest bar to the left and right, and calculate the area using the height of the popped bar.
      */
     private int computeLargestHistogramArea(List<Integer> heights) {
         Stack<Integer> stack = new Stack<>();
