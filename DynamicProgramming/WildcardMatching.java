@@ -6,27 +6,19 @@ import java.util.Arrays;
  * Problem: Wildcard Pattern Matching
  * LeetCode: https://leetcode.com/problems/wildcard-matching/
  *
- * Given an input string (str) and a pattern (pattern), implement
- * wildcard pattern matching with support for '?' and '*' where:
- * - '?' Matches any single character.
- * - '*' Matches any sequence of characters (including the empty sequence).
+ * Given an input string and a pattern, implement wildcard matching with support for:
+ * - '?' → matches any single character
+ * - '*' → matches any sequence of characters (including the empty sequence)
  *
- * Approach:
- * 1. **Dynamic Programming (Bottom-Up)**:
- *    - Use a `dp[i][j]` table where:
- *      - `dp[i][j]` = true if `str[0...i-1]` matches `pattern[0...j-1]`
- * 2. **Base Cases**:
- *    - Empty pattern only matches an empty string.
- *    - '*' at the beginning of the pattern can match an empty sequence.
- * 3. **Transition**:
- *    - If pattern[j-1] is '*':
- *      - Ignore '*' (`dp[i][j-1]`) OR match '*' with `str[i-1]` (`dp[i-1][j]`).
- *    - If pattern[j-1] is '?' or matches `str[i-1]`, take `dp[i-1][j-1]`.
- * 4. **Result**: `dp[str.length()][pattern.length()]` gives the final answer.
+ * Example:
+ * Input: str = "baaababac", pattern = "ba?a*ac"
+ * Output: true
+ * Explanation: '?' matches a, '*' matches "bab", so full match is possible.
  *
- * Complexity:
- * - Time: O(N * M) where N = str length, M = pattern length.
- * - Space: O(N * M) (can be optimized to O(M) using a rolling array).
+ * Follow-up Questions:
+ * - Can you optimize space to O(pattern.length())? (Yes, use rolling arrays)
+ * - Can you implement it using recursion + memoization? [LC link: https://leetcode.com/problems/wildcard-matching/]
+ *
  */
 public class WildcardMatching {
 
@@ -37,6 +29,27 @@ public class WildcardMatching {
         System.out.println(solver.isMatch(str, pattern)); // Expected: true
     }
 
+    /**
+     * Dynamic Programming Bottom-Up approach.
+     * Uses a 2D DP table to compute if str matches the pattern.
+     *
+     * Steps:
+     * 1. Initialize a DP table where dp[i][j] indicates if str[0...i-1] matches pattern[0...j-1].
+     * 2. Handle the base case where both str and pattern are empty.
+     * 3. Fill the first row for patterns starting with '*' since '*' can match an empty sequence.
+     * 4. Iterate through each character in str and pattern:
+     *   - If the current pattern character is '*', it can match zero characters (dp[i][j-1]) or one/more characters (dp[i-1][j]).
+     *   - If the current pattern character is '?', it matches any single character, or if it matches the current string character, we check the previous state (dp[i-1][j-1]).
+     *   - If the characters do not match and the pattern character is not '?', set dp[i][j] to false.
+     * 5. The final answer is found in dp[str.length()][pattern.length()].
+     *
+     * Time Complexity: O(N * M), where N = str.length, M = pattern.length
+     * Space Complexity: O(N * M)
+     *
+     * @param str     The input string
+     * @param pattern The wildcard pattern
+     * @return True if the pattern matches the string, false otherwise
+     */
     public boolean isMatch(String str, String pattern) {
         int strLen = str.length();
         int patternLen = pattern.length();
@@ -58,20 +71,20 @@ public class WildcardMatching {
         }
 
         // Fill the DP table
-        for (int i = 1; i <= strLen; i++) {
-            for (int j = 1; j <= patternLen; j++) {
-                char pChar = pattern.charAt(j - 1);
-                char sChar = str.charAt(i - 1);
+        for (int strIdx = 1; strIdx <= strLen; strIdx++) {
+            for (int patternIdx = 1; patternIdx <= patternLen; patternIdx++) {
+                char pChar = pattern.charAt(patternIdx - 1);
+                char sChar = str.charAt(strIdx - 1);
 
                 if (pChar == '*') {
-                    // '*' can match zero (`dp[i][j-1]`) or more characters (`dp[i-1][j]`)
-                    dp[i][j] = dp[i][j - 1] || dp[i - 1][j];
+                    // '*' can match zero (`dp[strIdx][patternIdx-1]`) or more characters (`dp[strIdx-1][patternIdx]`)
+                    dp[strIdx][patternIdx] = dp[strIdx][patternIdx - 1] || dp[strIdx - 1][patternIdx];
                 } else if (pChar == '?' || sChar == pChar) {
                     // '?' matches any character, or exact character match
-                    dp[i][j] = dp[i - 1][j - 1];
+                    dp[strIdx][patternIdx] = dp[strIdx - 1][patternIdx - 1];
                 } else {
                     // Characters don't match
-                    dp[i][j] = false;
+                    dp[strIdx][patternIdx] = false;
                 }
             }
         }

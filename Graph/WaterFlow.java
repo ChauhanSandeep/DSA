@@ -2,120 +2,151 @@ package Graph;
 
 import java.util.*;
 
+
 /**
- * Problem: Given an `m x n` matrix where each cell represents height, determine
- * how many cells can allow water to flow to both the top-left and bottom-right corners.
+ * Leetcode: https://leetcode.com/problems/pacific-atlantic-water-flow/
  *
- * Intuition:
- * - Water can flow from a higher or equal elevation to a lower one.
- * - Use BFS from both the top-left and bottom-right edges to mark reachable cells.
- * - Count the number of common cells reachable from both sources.
+ * --- Problem Statement ---
+ * Given an m x n matrix of non-negative integers representing the height of each cell in a island,
+ * the "Pacific ocean" touches the left and top edges, while the "Atlantic ocean" touches the right and bottom edges.
+ * Water can only flow from a cell to another one directly adjacent (up/down/left/right) with an equal or lower height.
+ * Return the list of grid coordinates where water can flow to **both** the Pacific and Atlantic ocean.
  *
- * Algorithm:
- * 1. **Initialization:**
- *    - Use two boolean matrices to track if water can reach from top-left and bottom-right.
- *    - Add boundary nodes to their respective BFS queues.
- * 2. **BFS Traversal:**
- *    - Expand from each queue, marking reachable cells.
- * 3. **Count Intersection:**
- *    - Count cells that are marked as reachable in both boolean matrices.
+ * --- Example ---
+ * Input:
+ * heights = [
+ *   [1,2,2,3,5],
+ *   [3,2,3,4,4],
+ *   [2,4,5,3,1],
+ *   [6,7,1,4,5],
+ *   [5,1,1,2,4]
+ * ]
+ * Output: Coordinates count = 7 (full list of coordinates not returned here)
  *
- * Time Complexity: **O(m * n)**  
- * - Each cell is processed at most twice (once per BFS), making it linear.
+ * --- Explanation ---
+ * Water can flow from any higher or same-height cell to a lower or same-height neighbor.
+ * We reverse the problem: instead of checking whether each cell can reach both oceans, we perform BFS/DFS
+ * from the Pacific and Atlantic boundaries and mark the reachable cells. The intersection gives the result.
  *
- * Space Complexity: **O(m * n)**  
- * - Boolean matrices store reachability status.
+ * --- Follow-Up Questions ---
+ * Q: Can you return the actual list of coordinates instead of just count?
+ * A: Yes, return `List<List<Integer>>` instead of count. See: https://leetcode.com/problems/pacific-atlantic-water-flow/
  *
- * Similar Problem: [LeetCode 417 - Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
+ * Q: Can we use DFS instead of BFS?
+ * A: Yes, DFS is also valid and easier to write recursively.
  */
 public class WaterFlow {
-    
-    private int rows, cols;
-    private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-    public static void main(String[] args) {
-        int[][] grid = {
-            {1, 2, 2, 3, 5},
-            {3, 2, 3, 4, 4},
-            {2, 4, 5, 3, 1},
-            {6, 7, 1, 4, 5},
-            {5, 1, 1, 2, 4}
-        };
-        System.out.println(new WaterFlow().countCommonWaterFlowCells(grid)); // Output: 7
+  private int numRows, numCols;
+  private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+  public static void main(String[] args) {
+    int[][] heights = {
+        {1, 2, 2, 3, 5},
+        {3, 2, 3, 4, 4},
+        {2, 4, 5, 3, 1},
+        {6, 7, 1, 4, 5},
+        {5, 1, 1, 2, 4}};
+    System.out.println(new WaterFlow().countPacificAtlanticReachableCells(heights)); // Output: 7
+  }
+
+  /**
+   * Returns the number of grid cells where water can flow to both Pacific and Atlantic oceans.
+   *
+   * --- Steps ---
+   * 1. Initialize two boolean matrices: one for Pacific-reachable and one for Atlantic-reachable cells.
+   * 2. For each matrix, start BFS from respective borders (top-left and bottom-right edges).
+   * 3. After marking reachable cells, count the intersection (cells reachable from both oceans).
+   *
+   * --- Algorithm ---
+   * BFS from both oceans.
+   *
+   * Time Complexity: O(m * n) — each cell is visited at most twice.
+   * Space Complexity: O(m * n) — boolean matrices and BFS queues.
+   */
+  public int countPacificAtlanticReachableCells(int[][] heights) {
+    if (heights == null || heights.length == 0) {
+      return 0;
     }
 
-    /**
-     * Counts the number of grid cells where water can flow from both the top-left and bottom-right edges.
-     *
-     * @param grid The height matrix.
-     * @return The count of common cells.
-     */
-    public int countCommonWaterFlowCells(int[][] grid) {
-        if (grid == null || grid.length == 0) return 0;
+    numRows = heights.length;
+    numCols = heights[0].length;
 
-        rows = grid.length;
-        cols = grid[0].length;
+    boolean[][] pacificReachable = new boolean[numRows][numCols];
+    boolean[][] atlanticReachable = new boolean[numRows][numCols];
 
-        boolean[][] canReachTopLeft = new boolean[rows][cols];
-        boolean[][] canReachBottomRight = new boolean[rows][cols];
+    Queue<int[]> pacificQueue = new LinkedList<>();
+    Queue<int[]> atlanticQueue = new LinkedList<>();
 
-        Queue<int[]> queueTopLeft = new LinkedList<>();
-        Queue<int[]> queueBottomRight = new LinkedList<>();
-
-        // Add top-left and bottom-right boundary nodes to BFS queues
-        for (int i = 0; i < rows; i++) {
-            queueTopLeft.add(new int[]{i, 0});
-            queueBottomRight.add(new int[]{i, cols - 1});
-            canReachTopLeft[i][0] = true;
-            canReachBottomRight[i][cols - 1] = true;
-        }
-        for (int j = 0; j < cols; j++) {
-            queueTopLeft.add(new int[]{0, j});
-            queueBottomRight.add(new int[]{rows - 1, j});
-            canReachTopLeft[0][j] = true;
-            canReachBottomRight[rows - 1][j] = true;
-        }
-
-        // Perform BFS for both top-left and bottom-right
-        bfs(grid, queueTopLeft, canReachTopLeft);
-        bfs(grid, queueBottomRight, canReachBottomRight);
-
-        // Count cells reachable from both top-left and bottom-right
-        int count = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (canReachTopLeft[i][j] && canReachBottomRight[i][j]) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
+    // Initialize Pacific (top row + left column) and Atlantic (bottom row + right column) BFS queues
+    // Top and left blocks can always reach Pacific, bottom and right blocks can always reach Atlantic
+    for (int row = 0; row < numRows; row++) {
+      pacificQueue.add(new int[]{row, 0});
+      atlanticQueue.add(new int[]{row, numCols - 1});
+      pacificReachable[row][0] = true;
+      atlanticReachable[row][numCols - 1] = true;
+    }
+    for (int col = 0; col < numCols; col++) {
+      pacificQueue.add(new int[]{0, col});
+      atlanticQueue.add(new int[]{numRows - 1, col});
+      pacificReachable[0][col] = true;
+      atlanticReachable[numRows - 1][col] = true;
     }
 
-    /**
-     * Performs BFS to mark all reachable cells in a given boolean matrix.
-     *
-     * @param grid    The height matrix.
-     * @param queue   The BFS queue containing the starting boundary cells.
-     * @param visited The boolean matrix marking reachable cells.
-     */
-    private void bfs(int[][] grid, Queue<int[]> queue, boolean[][] visited) {
-        while (!queue.isEmpty()) {
-            int[] cell = queue.poll();
-            int row = cell[0], col = cell[1];
+    // Run BFS for both Pacific and Atlantic borders
+    performBFS(heights, pacificQueue, pacificReachable);
+    performBFS(heights, atlanticQueue, atlanticReachable);
 
-            for (int[] dir : DIRECTIONS) {
-                int newRow = row + dir[0], newCol = col + dir[1];
-
-                // Check if the new cell is within bounds, unvisited, and has a valid flow condition
-                if (newRow >= 0 && newCol >= 0 && newRow < rows && newCol < cols &&
-                    !visited[newRow][newCol] && grid[newRow][newCol] >= grid[row][col]) {
-                    
-                    visited[newRow][newCol] = true;
-                    queue.add(new int[]{newRow, newCol});
-                }
-            }
+    // Count intersection: cells that can flow to both oceans
+    int reachableCellCount = 0;
+    for (int row = 0; row < numRows; row++) {
+      for (int col = 0; col < numCols; col++) {
+        if (pacificReachable[row][col] && atlanticReachable[row][col]) {
+          reachableCellCount++;
         }
+      }
     }
+
+    return reachableCellCount;
+  }
+
+  /**
+   * Performs BFS from the provided border cells and marks all reachable cells in the given matrix.
+   *
+   * @param heights The original height matrix.
+   * @param bfsQueue Queue initialized with border cells.
+   * @param visited Boolean matrix to mark reachable cells.
+   */
+  private void performBFS(int[][] heights, Queue<int[]> bfsQueue, boolean[][] visited) {
+    while (!bfsQueue.isEmpty()) {
+      // SELECT : Poll the next cell to process
+      int[] current = bfsQueue.poll();
+      int row = current[0], col = current[1];
+
+      // MARK(*) : Mark the current cell as visited
+      if(visited[row][col]) {
+        continue; // Skip if already visited
+      }
+      visited[row][col] = true;
+      // WORK(*) : Process the current cell. Processing here is just marking it as visited.
+
+      for (int[] direction : DIRECTIONS) {
+        int nextRow = row + direction[0];
+        int nextCol = col + direction[1];
+
+        // Skip if out of bounds or already visited
+        if (nextRow < 0 || nextCol < 0 || nextRow >= numRows || nextCol >= numCols) {
+          continue;
+        }
+        // ADD(*) : Add the non visited neighbor to the queue
+        if (!visited[nextRow][nextCol]) {
+          // Only allow water to flow to neighbors with height >= current cell (reverse of natural flow)
+          if (heights[nextRow][nextCol] >= heights[row][col]) {
+            visited[nextRow][nextCol] = true;
+            bfsQueue.add(new int[]{nextRow, nextCol});
+          }
+        }
+      }
+    }
+  }
 }

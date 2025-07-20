@@ -14,7 +14,7 @@ import java.util.List;
  * Given a weighted undirected graph with `n` nodes and a list of edges [u, v, weight],
  * partition the graph into `k` connected components such that the maximum cost
  * of any component is minimized. Cost is defined as the largest edge weight in that component.
- *
+ *f
  * Example:
  * Input: n = 5, edges = [[0,1,1],[1,2,3],[2,3,4],[3,4,2]], k = 2
  * Output: 3
@@ -55,7 +55,7 @@ public class MinimizeMaximumComponentCost {
     Arrays.sort(edges, Comparator.comparingInt(edge -> edge[2]));
 
     DSU disjointSet = new DSU(numNodes);
-    List<Integer> edgeWeightList = new ArrayList<>();
+    List<Integer> mstWeightList = new ArrayList<>();
 
     // Step 2: Build MST and record selected edge weights
     for (int[] edge : edges) {
@@ -64,7 +64,7 @@ public class MinimizeMaximumComponentCost {
       int weight = edge[2];
       if (disjointSet.union(nodeA, nodeB)) {
         // if these nodes were in different components, add this edge to MST
-        edgeWeightList.add(weight);
+        mstWeightList.add(weight);
       }
     }
 
@@ -74,11 +74,11 @@ public class MinimizeMaximumComponentCost {
     }
 
     // Step 3: Remove (k - 1) largest weights to form k components
-    Collections.sort(edgeWeightList); // Already sorted during Kruskal; but re-confirm here
-    int remainingEdges = edgeWeightList.size() - (numComponents - 1);
+    Collections.sort(mstWeightList); // Already sorted during Kruskal; but re-confirm here
+    int remainingEdges = mstWeightList.size() - (numComponents - 1);
 
     // Step 4: The answer is the maximum edge in the remaining MST
-    return edgeWeightList.get(remainingEdges - 1);
+    return mstWeightList.get(remainingEdges - 1);
   }
 
   /**
@@ -110,6 +110,7 @@ public class MinimizeMaximumComponentCost {
       if (rootX == rootY) {
         return false;
       }
+      // union by rank is not necessary here since we are not optimizing for size. Therefore, we can just attach one root to another.
       parent[rootX] = rootY;
       return true;
     }

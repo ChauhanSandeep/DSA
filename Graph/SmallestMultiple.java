@@ -7,8 +7,8 @@ import java.util.ArrayDeque;
 /**
  * Find the smallest multiple of a given number using only the digits 0 and 1.
  * For example
- * Input: num = 7
- * Output: "111" (since 111 is the smallest multiple of 7 that consists only of 0s and 1s)
+ * Input: num = 55
+ * Output: "110" (since 110 is the smallest multiple of 55 that consists only of 0s and 1s)
  *
  * ### **Approach:**
  * - We use **Breadth-First Search (BFS)** to explore all possible numbers formed by 0s and 1s.

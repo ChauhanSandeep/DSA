@@ -64,7 +64,7 @@ public class EvaluateDivision {
    * @return Array of results for each query.
    */
   public double[] evaluateEquations(List<List<String>> equations, double[] values, List<List<String>> queries) {
-    Map<String, Map<String, Double>> graph = buildGraph(equations, values);
+    Map<String, Map<String, Double>> graph = buildGraph(equations, values); // <source, <target, value>>
 
     double[] results = new double[queries.size()];
     for (int i = 0; i < queries.size(); i++) {

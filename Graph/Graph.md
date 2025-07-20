@@ -11,12 +11,12 @@
     - [Dijkstra's Algorithm](#dijkstras-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap]
     - [Bellman-Ford Algorithm](#bellman-ford-algorithm)
     - [Floyd-Warshall Algorithm](#floyd-warshall-algorithm)
+- [Disjoint Sets (Union-Find)](#disjoint-sets-union-find)
 - [Minimum Spanning Tree](#minimum-spanning-tree)
     - [Prim's Algorithm](#prims-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))`
     - [Kruskal's Algorithm](#kruskals-algorithm)
 - [Articulation Points and Bridges](#articulation-points-and-bridges)
 - [Kosaraju's Algorithm](#kosarajus-algorithm)
-- [Disjoint Sets (Union-Find)](#disjoint-sets-union-find)
 
 ## Introduction to Graphs
 A graph is a non-linear data structure consisting of vertices (or nodes) and edges that connect these vertices. Graphs are used to represent networks of many kinds, including social networks, computer networks, roads, and much more.
@@ -692,7 +692,7 @@ Bellman-Ford is a single-source shortest path algorithm that works even with neg
    - Why n - 1?
      - The longest possible simple path in a graph with n nodes has n - 1 edges.
      - So, to propagate information across all cities, you need n - 1 rounds of updates.
-   - “Relaxing an edge” means: Can I reach to from from more cheaply than I thought before?
+   - “Relaxing an edge” means: Can I reach `to` from `from` more cheaply than I thought before?
 3. After n - 1 rounds, if any edge can still be relaxed, it means you’ve found a cycle that can keep reducing cost forever — a trap!
 
 ### Java Implementation
@@ -1491,26 +1491,26 @@ public class KosarajuSCC {
     private List<List<Integer>> transposeGraph(List<List<Integer>> graph) {
         int V = graph.size();
         List<List<Integer>> transposed = new ArrayList<>(V);
-        
+
         for (int i = 0; i < V; i++) {
             transposed.add(new ArrayList<>());
         }
-        
+
         for (int v = 0; v < V; v++) {
             // For every edge v->u, add edge u->v in transposed graph
             for (int u : graph.get(v)) {
                 transposed.get(u).add(v);
             }
         }
-        
+
         return transposed;
     }
-    
+
     // DFS utility function
     private void dfsUtil(List<List<Integer>> graph, int v, boolean[] visited, List<Integer> scc) {
         visited[v] = true;
         scc.add(v);
-        
+
         // Recur for all adjacent vertices
         for (int adj : graph.get(v)) {
             if (!visited[adj]) {
@@ -1528,3 +1528,110 @@ public class KosarajuSCC {
 ### Example LeetCode Problems
 1. [LeetCode #1192: Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
 2. [LeetCode #802: Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
+
+## Eulerian Path, Circuit & Graph
+### What it is
+- An Euler Path is a trail that visits every edge exactly once, but does not necessarily end where it started.
+- An Euler Circuit (Cycle) is a path that visits every edge exactly once and starts and ends at the same vertex.
+- A graph that has an Euler Circuit is called an Eulerian Graph.
+- A graph that has only an Euler Path (not a circuit) is called a Semi-Eulerian Graph.
+
+### Key rules (for undirected graphs):
+- Eulerian Graph: All vertices have even degree, and the graph is connected.
+- Semi-Eulerian Graph: Exactly 2 vertices have odd degree, and the graph is connected.
+- If more than 2 vertices have odd degree → No Euler Path or Circuit.
+
+### Use Cases
+- Route planning (e.g., garbage truck, mail delivery)
+- Drawing problems (e.g., draw without lifting pen)
+- Bioinformatics (e.g., genome assembly using de Bruijn graphs)
+- Leetcode problems:
+  - Reconstruct Itinerary (LC 332)
+  - Cracking the Safe (LC 753)
+
+### Steps
+To find an Eulerian Circuit (or Path), we use Hierholzer’s Algorithm:
+1. Start from a vertex with:
+   - Any vertex (for circuit)
+   - A vertex with odd degree (for path)
+2.	Use DFS to explore and greedily follow edges, removing them after use.
+3.	When you reach a dead-end, backtrack and add the vertex to result.
+4.	Reverse the result at the end to get the Eulerian Path/Circuit.
+
+
+### Java Implementation
+
+Assumes the graph is connected and either Eulerian or Semi-Eulerian.
+
+```
+import java.util.*;
+
+public class EulerianPathFinder {
+
+/**
+ * Finds and returns an Eulerian Path or Circuit from the given undirected graph.
+ * Assumes the graph is connected and contains at most two vertices of odd degree.
+ *
+ * @param graph Map of node to list of neighbors
+ * @return List of nodes representing the Euler Path or Circuit
+ */
+public List<String> findEulerianPath(Map<String, List<String>> graph) {
+    // Make a deep copy because we'll modify it
+    Map<String, Deque<String>> adj = new HashMap<>();
+    for (String node : graph.keySet()) {
+        adj.put(node, new ArrayDeque<>(graph.get(node)));
+    }
+
+    // Find the starting node
+    String startNode = findStartNode(adj);
+    List<String> result = new ArrayList<>();
+    dfs(startNode, adj, result);
+
+    // Since nodes are added post DFS, reverse the result
+    Collections.reverse(result);
+    return result;
+}
+
+// Depth-first search to construct the path
+private void dfs(String node, Map<String, Deque<String>> adj, List<String> result) {
+    Deque<String> neighbors = adj.get(node);
+    while (neighbors != null && !neighbors.isEmpty()) {
+        String next = neighbors.pollFirst(); // remove the edge
+        // Also remove the reverse edge (since undirected)
+        adj.get(next).remove(node);
+        dfs(next, adj, result);
+    }
+    result.add(node); // Add to path after exploring all edges
+}
+
+// Helper to find the correct starting point
+private String findStartNode(Map<String, Deque<String>> adj) {
+    String start = null;
+    for (String node : adj.keySet()) {
+        int degree = adj.get(node).size();
+        if (degree % 2 == 1) {
+            // Semi-Eulerian: start from odd-degree node
+            return node;
+        }
+        if (start == null) {
+            start = node; // fallback if all degrees are even
+        }
+    }
+    return start;
+}
+
+// Example usage
+public static void main(String[] args) {
+    Map<String, List<String>> graph = new HashMap<>();
+    graph.put("A", new ArrayList<>(List.of("B", "C")));
+    graph.put("B", new ArrayList<>(List.of("A", "C")));
+    graph.put("C", new ArrayList<>(List.of("A", "B", "D")));
+    graph.put("D", new ArrayList<>(List.of("C")));
+
+    EulerianPathFinder solver = new EulerianPathFinder();
+    List<String> path = solver.findEulerianPath(graph);
+    System.out.println("Euler Path or Circuit: " + path);
+}
+
+}
+```

@@ -2,81 +2,78 @@ package DynamicProgramming;
 
 import java.util.*;
 
+
 /**
  * Problem: Word Break II
  * LeetCode: https://leetcode.com/problems/word-break-ii/
  *
+ * Problem Statement:
  * Given a string `s` and a dictionary of words `wordDict`, return all possible sentences
- * formed by inserting spaces such that each word is a valid dictionary word.
+ * where each word is a valid word in the dictionary.
  *
- * Constraints:
- * - The same word in `wordDict` may be reused multiple times.
- * - Return sentences in any order.
+ * Example:
+ * Input: s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]
+ * Output: ["cats and dog","cat sand dog"]
  *
- * Approach:
- * - Use recursion with backtracking to explore all possible segmentations.
- * - Optimize with memoization to cache results for previously computed substrings.
- * - Time Complexity: O(N^2 + 2^N), Space Complexity: O(N^2 + 2^N) (due to recursion depth and result storage).
+ * Approach: Top-Down DP using Recursion + Memoization
+ * - For every starting index, try all end indices
+ * - If substring from start to end is a valid word, recursively generate sentences from end index onward
+ * - Memoize results for each index to avoid recomputation
  */
 public class WordBreak2 {
-    public static void main(String[] args) {
-        String s = "catsanddog";
-        List<String> wordDict = Arrays.asList("cat", "cats", "and", "sand", "dog");
 
-        System.out.println("Backtracking: " + wordBreakBacktrack(s, wordDict));
-        System.out.println("Memoization: " + wordBreakMemoized(s, wordDict));
+  /**
+   * Steps:
+   * 1. Convert the wordDict list to a HashSet for O(1) lookups.
+   * 2. Use a recursive helper function that generates sentences starting from a given index.
+   * 3. For each possible end index, check if the substring from start to end is in the word set.
+   * 4. If it is, recursively generate sentences for the remaining substring.
+   * 5. Use a memoization map to store results for already computed start indices to avoid redundant calculations.
+   *
+   * Time Complexity: O(N^2), where N = length of string str
+   * Space Complexity: O(N), for recursion stack and memo array
+   *
+   * @param str
+   * @param wordDict
+   * @return
+   */
+  public List<String> wordBreakRecursiveApproach(String str, List<String> wordDict) {
+    Set<String> wordSet = new HashSet<>(wordDict);
+    Map<Integer, List<String>> memo = new HashMap<>();
+    return wordBreakRecursiveHelper(0, str, wordSet, memo);
+  }
+
+  private List<String> wordBreakRecursiveHelper(int start, String str, Set<String> wordSet, Map<Integer, List<String>> memo) {
+    if (memo.containsKey(start)) {
+      return memo.get(start);
     }
 
-    /**
-     * Approach 1: Recursive Backtracking
-     */
-    public static List<String> wordBreakBacktrack(String s, List<String> wordDict) {
-        Set<String> wordSet = new HashSet<>(wordDict);
-        List<String> result = new ArrayList<>();
-        backtrack(s, 0, wordSet, new ArrayList<>(), result);
-        return result;
+    List<String> result = new ArrayList<>();
+
+    // Base case: if we've reached the end of the string
+    if (start == str.length()) {
+      result.add(""); // Add empty string to allow sentence concatenation
+      return result;
     }
 
-    private static void backtrack(String str, int start, Set<String> dict, List<String> currWords, List<String> result) {
-        if (start == str.length()) {
-            result.add(String.join(" ", currWords));
-            return;
+    for (int end = start + 1; end <= str.length(); end++) {
+      String prefix = str.substring(start, end);
+
+      if (wordSet.contains(prefix)) {
+        List<String> suffixSentences = wordBreakRecursiveHelper(end, str, wordSet, memo);
+
+        for (String sentence : suffixSentences) {
+          // If sentence is empty, we don't need extra space
+          if (sentence.isEmpty()) {
+            result.add(prefix);
+          } else {
+            result.add(prefix + " " + sentence);
+          }
         }
-
-        for (int end = start + 1; end <= str.length(); end++) {
-            String word = str.substring(start, end);
-            if (dict.contains(word)) {
-                currWords.add(word);
-                backtrack(str, end, dict, currWords, result);
-                currWords.remove(currWords.size() - 1); // Backtrack
-            }
-        }
+      }
     }
 
-    /**
-     * Approach 2: Recursive + Memoization
-     */
-    public static List<String> wordBreakMemoized(String s, List<String> wordDict) {
-        Set<String> wordSet = new HashSet<>(wordDict);
-        Map<String, List<String>> memo = new HashMap<>();
-        return memoizedHelper(s, wordSet, memo);
-    }
-
-    private static List<String> memoizedHelper(String str, Set<String> dict, Map<String, List<String>> memo) {
-        if (memo.containsKey(str)) return memo.get(str);
-        if (str.isEmpty()) return Arrays.asList("");
-
-        List<String> result = new ArrayList<>();
-        for (int i = 1; i <= str.length(); i++) {
-            String prefix = str.substring(0, i);
-            if (dict.contains(prefix)) {
-                List<String> suffixWays = memoizedHelper(str.substring(i), dict, memo);
-                for (String sentence : suffixWays) {
-                    result.add(prefix + (sentence.isEmpty() ? "" : " ") + sentence);
-                }
-            }
-        }
-        memo.put(str, result);
-        return result;
-    }
+    memo.put(start, result);
+    return result;
+  }
 }
