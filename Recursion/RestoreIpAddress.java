@@ -1,81 +1,102 @@
-package recursion;
+package Recursion;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Problem: Given a string of digits, return all possible valid IP addresses.
- * - An IP address consists of **4 octets** (0-255) separated by dots.
- * - Each octet **cannot** have leading zeros (e.g., "01" is invalid).
- * - The input string should be used **entirely**.
+ * Leetcode Problem: https://leetcode.com/problems/restore-ip-addresses/
  *
- * Approach:
- * - **Backtracking**: Try placing a dot at valid positions and recurse.
- * - **Pruning**: If a segment is invalid, stop early to improve efficiency.
+ * Problem Statement:
+ * Given a string containing only digits, return all possible valid IP address combinations.
+ * A valid IP address consists of exactly four integers (each between 0 and 255) separated by dots.
+ * Each integer must not have leading zeros unless it is "0".
  *
- * Time Complexity: **O(3^4) ≈ O(81)** (Since each segment has at most 3 choices)
- * Space Complexity: **O(4) → O(1)** (Recursion depth is at most 4)
+ * Example:
+ * Input: "25525511135"
+ * Output: ["255.255.11.135", "255.255.111.35"]
  *
- * LeetCode Link: https://leetcode.com/problems/restore-ip-addresses/
+ * Follow-up Questions:
+ * 1. What if the string contains non-digit characters?
+ *    → Return empty list or throw validation error; current problem restricts to digits only.
+ * 2. Can you return only one valid IP?
+ *    → Yes. Exit early once the first valid result is found (modify recursion).
  */
 public class RestoreIpAddress {
+
     public static void main(String[] args) {
-        RestoreIpAddress obj = new RestoreIpAddress();
-        System.out.println("Valid IPs for '25525511135': " + obj.restoreIpAddresses("25525511135"));
-        System.out.println("Valid IPs for '0000': " + obj.restoreIpAddresses("0000"));
+        RestoreIpAddress resolver = new RestoreIpAddress();
+        System.out.println("Valid IPs for '25525511135': " + resolver.restoreIpAddresses("25525511135"));
+        System.out.println("Valid IPs for '0000': " + resolver.restoreIpAddresses("0000"));
     }
 
     /**
-     * Returns all valid IP addresses from the given numeric string.
+     * Returns all valid IP address combinations that can be formed from the input string.
      *
-     * @param s Input string consisting of digits.
-     * @return List of valid IP addresses.
+     * Steps:
+     * 1. Early return if the input length is invalid for an IP (must be 4 to 12 characters).
+     * 2. Use backtracking to explore all segmentations into 4 parts.
+     * 3. Each segment must be valid: 0–255 with no leading zero (except "0").
+     * 4. Collect combinations that consume all characters and have exactly 4 parts.
+     *
+     * Time Complexity: O(3^4) → Since each part can be 1 to 3 digits and there are 4 parts.
+     * Space Complexity: O(1) auxiliary (ignoring output list)
+     *
+     * @param s Input string of digits.
+     * @return List of all valid IP addresses.
      */
     public List<String> restoreIpAddresses(String s) {
-        List<String> result = new ArrayList<>();
-        if (s.length() < 4 || s.length() > 12) return result;  // Early exit for impossible cases
-        backtrack(s, 0, new ArrayList<>(), result);
-        return result;
+        List<String> validIPs = new ArrayList<>();
+        if (s == null || s.length() < 4 || s.length() > 12) return validIPs;
+
+        backtrack(s, 0, new ArrayList<>(), validIPs);
+        return validIPs;
     }
 
     /**
-     * Backtracking helper function to generate valid IP addresses.
+     * Recursive backtracking method to explore valid segmentations.
      *
-     * @param s      Input string of digits.
-     * @param index  Current index in the string.
-     * @param parts  Current segments of the IP address.
-     * @param result List to store valid IPs.
+     * @param input     Original input string.
+     * @param index     Current index in the string.
+     * @param segments  List of current segments built so far.
+     * @param results   List to collect all valid IP addresses.
      */
-    private void backtrack(String s, int index, List<String> parts, List<String> result) {
-        if (parts.size() == 4) {
-            if (index == s.length()) {
-                result.add(String.join(".", parts));
+    private void backtrack(String input, int index, List<String> segments, List<String> results) {
+        // Base case: exactly 4 segments and consumed all characters
+        if (segments.size() == 4) {
+            if (index == input.length()) {
+                results.add(String.join(".", segments));
             }
             return;
         }
 
+        // Try segment lengths of 1 to 3
         for (int len = 1; len <= 3; len++) {
-            if (index + len > s.length()) break;
+            if (index + len > input.length()) break;
 
-            String segment = s.substring(index, index + len);
-            if (isValidSegment(segment)) {
-                parts.add(segment);
-                backtrack(s, index + len, parts, result);
-                parts.remove(parts.size() - 1); // Backtrack
+            String candidate = input.substring(index, index + len);
+            if (isValidSegment(candidate)) {
+                segments.add(candidate);
+                backtrack(input, index + len, segments, results);
+                segments.remove(segments.size() - 1); // Backtrack step
             }
         }
     }
 
     /**
-     * Checks if a string is a valid IP address segment.
+     * Validates a potential IP segment.
      *
-     * @param segment String segment.
-     * @return True if valid, otherwise false.
+     * Rules:
+     * - Should be a number between 0 and 255
+     * - Cannot have leading zeros unless it's exactly "0"
+     *
+     * @param segment Substring segment to validate.
+     * @return True if valid, else false.
      */
     private boolean isValidSegment(String segment) {
-        if (segment.length() > 3 || segment.isEmpty()) return false;
-        if (segment.startsWith("0") && segment.length() > 1) return false; // "01", "001" are invalid
-        int num = Integer.parseInt(segment);
-        return num >= 0 && num <= 255;
+        if (segment == null || segment.isEmpty() || segment.length() > 3) return false;
+        if (segment.startsWith("0") && segment.length() > 1) return false;
+
+        int value = Integer.parseInt(segment);
+        return value >= 0 && value <= 255;
     }
 }

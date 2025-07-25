@@ -5,19 +5,10 @@ import java.util.LinkedList;
 
 /**
  * Problem: Evaluate the value of an arithmetic expression in Reverse Polish Notation (RPN).
- *
- * Intuition:
- * - Reverse Polish Notation (Postfix notation) processes operators after operands.
- * - We use a stack to evaluate expressions efficiently.
- *
- * Approach:
- * - Traverse the tokens:
- *   - If a number, push it onto the stack.
- *   - If an operator, pop the last two numbers from the stack, apply the operation, and push the result back.
- * - At the end, the stack contains the final result.
- *
- * Time Complexity: O(N) (Each token is processed once)
- * Space Complexity: O(N) (Stack usage for operands)
+ * Example:
+ * Input: ["2", "1", "+", "3", "*"]
+ * Output: 9
+ * Explanation: ((2 + 1) * 3) = 9
  *
  * Problem Link: https://leetcode.com/problems/evaluate-reverse-polish-notation/
  */
@@ -30,7 +21,18 @@ public class ReversePolishNotation {
     }
 
     /**
-     * Evaluates an arithmetic expression given in Reverse Polish Notation.
+     * Intuition:
+     * - Reverse Polish Notation (Postfix notation) processes operators after operands.
+     * - We use a stack to evaluate expressions efficiently.
+     *
+     * Approach:
+     * - Traverse the tokens:
+     *   - If a number, push it onto the stack.
+     *   - If an operator, pop the last two numbers from the stack, apply the operation, and push the result back.
+     * - At the end, the stack contains the final result.
+     *
+     * Time Complexity: O(N) (Each token is processed once)
+     * Space Complexity: O(N) (Stack usage for operands)
      *
      * @param tokens Array of strings representing numbers and operators.
      * @return The evaluated result as an integer.

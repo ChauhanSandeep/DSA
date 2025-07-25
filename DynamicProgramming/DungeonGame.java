@@ -2,145 +2,146 @@ package DynamicProgramming;
 
 /**
  * Problem: Dungeon Game
- * LeetCode Link: https://leetcode.com/problems/dungeon-game/
+ * LeetCode: https://leetcode.com/problems/dungeon-game/
  *
- * Description:
- * A knight is on an `m x n` dungeon grid, starting at the top-left corner (0,0).
- * The knight needs to reach the bottom-right corner (m-1, n-1).
- * Each cell contains a value:
- *   - Positive value: Increases knight's health.
- *   - Negative value: Decreases knight's health.
- *   - Zero: No effect.
- * The knight must always maintain at least 1 health point.
+ * Problem Statement:
+ * Given a 2D dungeon grid with each cell representing health points (positive for gain, negative for damage),
+ * determine the minimum initial health required for a knight to rescue the princess starting from the top-left
+ * corner and reaching the bottom-right. The knight can only move right or down, and health must never drop below 1.
  *
- * Goal:
- * Determine the minimum initial health required for the knight to safely reach the destination.
+ * Example:
+ * Input:
+ * [
+ *   [-2, -3,  3],
+ *   [-5,-10,  1],
+ *   [10, 30, -5]
+ * ]
+ * Output: 7
+ * Explanation: The knight needs at least 7 health to reach the princess.
  *
- * Approach:
- * - **Recursive (Top-down with Memoization)**: Uses DFS with memoization to explore all paths.
- * - **Iterative (Bottom-up Dynamic Programming)**: Uses a DP table to compute health backwards.
- *
- * Complexity Analysis:
- * - **Recursive DFS + Memoization**: O(m * n) time, O(m * n) space (due to recursion & memoization).
- * - **Iterative DP Approach**: O(m * n) time, O(m * n) space (DP table).
+ * Follow-up Interview Questions:
+ * - Can you optimize the space complexity to O(n) using a rolling array? (Yes)
+ *   https://leetcode.com/problems/dungeon-game/discuss/52827/O(n)-space-solution
+ * - What if knight can move in all four directions? (Cycle detection + memoized DFS)
  */
 public class DungeonGame {
 
-    public static void main(String[] args) {
-        int[][] dungeon = {
-                {-2, -3, 3},
-                {-5, -10, 1},
-                {10, 30, -5}
-        };
+  public static void main(String[] args) {
+    int[][] dungeon = {{-2, -3, 3}, {-5, -10, 1}, {10, 30, -5}};
 
-        DungeonGame solver = new DungeonGame();
-        System.out.println("Minimum HP (Recursive): " + solver.calculateMinimumHPRecursive(dungeon));
-        System.out.println("Minimum HP (Iterative DP): " + solver.calculateMinimumHPIterative(dungeon));
+    DungeonGame solver = new DungeonGame();
+    System.out.println("Minimum HP (Recursive): " + solver.calculateMinimumHealthRecursiveApproach(dungeon));
+    System.out.println("Minimum HP (Iterative DP): " + solver.calculateMinimumHealthIterativeApproach(dungeon));
+  }
+
+  /**
+   * Top-down recursive DFS with memoization to avoid recomputation.
+   *
+   * Steps:
+   * - Start from (0,0) and move to bottom-right.
+   * - At each step, calculate minimum HP needed to reach the destination.
+   * - Cache intermediate results using memo.
+   *
+   * Time Complexity: O(m * n)
+   * Space Complexity: O(m * n) due to recursion stack and memoization table
+   */
+  public int calculateMinimumHealthRecursiveApproach(int[][] dungeon) {
+      if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) {
+          return 1;
+      }
+
+    int rows = dungeon.length;
+    int cols = dungeon[0].length;
+    Integer[][] memo = new Integer[rows][cols];
+
+    // Required health at the starting cell to survive the path
+    int requiredHealth = minHealthRecHelper(dungeon, 0, 0, memo);
+
+    // Knight must start with at least 1 HP
+    return Math.max(1, -requiredHealth + 1);
+  }
+
+  /**
+   * DFS to calculate minimum HP deficit from current cell to bottom-right
+   */
+  private int minHealthRecHelper(int[][] dungeon, int row, int col, Integer[][] memo) {
+    int rows = dungeon.length;
+    int cols = dungeon[0].length;
+
+    // Boundary condition: invalid path
+    if (row >= rows || col >= cols) {
+      return Integer.MIN_VALUE;
     }
 
-    /**
-     * Recursive approach using DFS with memoization.
-     * 
-     * @param dungeon The given dungeon grid.
-     * @return The minimum initial health required.
-     */
-    public int calculateMinimumHPRecursive(int[][] dungeon) {
-        if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) {
-            return 1;
-        }
-        
-        int rows = dungeon.length;
-        int cols = dungeon[0].length;
-        Integer[][] memo = new Integer[rows][cols];
-
-        // Compute the minimum health required from (0,0) to (m-1, n-1)
-        int requiredHealth = dfs(dungeon, 0, 0, memo);
-
-        // Ensure knight starts with at least 1 HP
-        return Math.max(1, -requiredHealth + 1);
+    // Base case: bottom-right cell (princess cell)
+    if (row == rows - 1 && col == cols - 1) {
+      return Math.min(dungeon[row][col], 0); // health debt (<= 0)
     }
 
-    /**
-     * Depth-first search (DFS) with memoization.
-     */
-    private int dfs(int[][] dungeon, int row, int col, Integer[][] memo) {
-        int rows = dungeon.length;
-        int cols = dungeon[0].length;
+    // Check cached value
+    if (memo[row][col] != null) {
+      return memo[row][col];
+    }
 
-        // Out of bounds check
-        if (row >= rows || col >= cols) {
-            return Integer.MIN_VALUE;
-        }
+    // Recursive move options: right and down
+    int moveDownHealth = minHealthRecHelper(dungeon, row + 1, col, memo);
+    int moveRightHealth = minHealthRecHelper(dungeon, row, col + 1, memo);
 
-        // Base case: If at the bottom-right cell, minimum health required is min(dungeon value, 0)
+    // Choose the path which leads to least health deficit
+    int bestNextMove = Math.max(moveDownHealth, moveRightHealth);
+
+    // Add current cell effect and clamp to max 0 (i.e., worst deficit)
+    int currentDeficit = dungeon[row][col] + bestNextMove;
+
+    // Store min health deficit needed from this point
+    memo[row][col] = Math.min(currentDeficit, 0);
+    return memo[row][col];
+  }
+
+  /**
+   * Bottom-up DP approach that fills a table from destination to start.
+   *
+   * Steps:
+   * - Start from bottom-right and move to top-left.
+   * - At each cell, calculate minimum HP needed based on right and down cell.
+   * - Ensure knight always has at least 1 HP after visiting a cell.
+   *
+   * Time Complexity: O(m * n)
+   * Space Complexity: O(m * n)
+   */
+  public int calculateMinimumHealthIterativeApproach(int[][] dungeon) {
+      if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) {
+          return 1;
+      }
+
+    int rows = dungeon.length;
+    int cols = dungeon[0].length;
+    int[][] minHealth = new int[rows][cols];
+
+    for (int row = rows - 1; row >= 0; row--) {
+      for (int col = cols - 1; col >= 0; col--) {
+
+        // Bottom-right cell (destination)
         if (row == rows - 1 && col == cols - 1) {
-            return Math.min(dungeon[row][col], 0);
+          minHealth[row][col] = Math.max(1, 1 - dungeon[row][col]);
         }
-
-        // Check memoization table
-        if (memo[row][col] != null) {
-            return memo[row][col];
+        // Last row (can only move right)
+        else if (row == rows - 1) {
+          minHealth[row][col] = Math.max(minHealth[row][col + 1] - dungeon[row][col], 1);
         }
-
-        // Recursively find the minimum health needed for both possible moves (right & down)
-        int moveDown = dfs(dungeon, row + 1, col, memo);
-        int moveRight = dfs(dungeon, row, col + 1, memo);
-
-        // If both moves are invalid, return invalid value
-        if (moveDown == Integer.MIN_VALUE && moveRight == Integer.MIN_VALUE) {
-            return Integer.MIN_VALUE;
+        // Last column (can only move down)
+        else if (col == cols - 1) {
+          minHealth[row][col] = Math.max(minHealth[row + 1][col] - dungeon[row][col], 1);
         }
-
-        // Compute max health needed at the current cell
-        int maxHealthNeeded = dungeon[row][col] + Math.max(moveDown, moveRight);
-
-        // Memoize the result
-        memo[row][col] = Math.min(maxHealthNeeded, 0);
-
-        return memo[row][col];
+        // Internal cell: choose min between right and down move
+        else {
+          int healthIfMoveRight = Math.max(minHealth[row][col + 1] - dungeon[row][col], 1);
+          int healthIfMoveDown = Math.max(minHealth[row + 1][col] - dungeon[row][col], 1);
+          minHealth[row][col] = Math.min(healthIfMoveRight, healthIfMoveDown);
+        }
+      }
     }
 
-    /**
-     * Iterative DP approach (Bottom-up).
-     * 
-     * @param dungeon The given dungeon grid.
-     * @return The minimum initial health required.
-     */
-    public int calculateMinimumHPIterative(int[][] dungeon) {
-        if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) {
-            return 1;
-        }
-
-        int rows = dungeon.length;
-        int cols = dungeon[0].length;
-        int[][] dp = new int[rows][cols];
-
-        // Process cells from bottom-right to top-left
-        for (int row = rows - 1; row >= 0; row--) {
-            for (int col = cols - 1; col >= 0; col--) {
-                
-                // Base case: Bottom-right cell (destination)
-                if (row == rows - 1 && col == cols - 1) {
-                    dp[row][col] = Math.max(1, 1 - dungeon[row][col]);
-                }
-                // Last row (can only move right)
-                else if (row == rows - 1) {
-                    dp[row][col] = Math.max(dp[row][col + 1] - dungeon[row][col], 1);
-                }
-                // Last column (can only move down)
-                else if (col == cols - 1) {
-                    dp[row][col] = Math.max(dp[row + 1][col] - dungeon[row][col], 1);
-                }
-                // General case: Take the min health required from right or down cell
-                else {
-                    dp[row][col] = Math.min(
-                        Math.max(dp[row + 1][col] - dungeon[row][col], 1),
-                        Math.max(dp[row][col + 1] - dungeon[row][col], 1)
-                    );
-                }
-            }
-        }
-
-        return dp[0][0];
-    }
+    return minHealth[0][0];
+  }
 }

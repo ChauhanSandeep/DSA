@@ -3,13 +3,21 @@ package LinkedList;
 import LinkedList.Util.LinkedList;
 import LinkedList.Util.ListNode;
 
+
 /**
- * Problem: Check if a singly linked list is a palindrome.
+ * Problem: Given the head of a singly linked list, group all the nodes with odd indices together
+ * followed by the nodes with even indices, and return the reordered list.
+ *
+ * Example:
+ * Input: 1 -> 2 -> 3 -> 4 -> 5
+ * Output: 1 -> 3 -> 5 -> 2 -> 4
  *
  * Approach:
  * 1. Find the middle of the linked list using the slow-fast pointer approach.
  * 2. Reverse the second half of the list.
  * 3. Compare the first half with the reversed second half.
+ *     - If they are the same, the list is a palindrome.
+ *     - If they differ, the list is not a palindrome.
  * 4. Restore the list to its original state (useful in real-world scenarios).
  *
  * Time Complexity: O(N) - Traversing the list multiple times.
@@ -24,88 +32,50 @@ import LinkedList.Util.ListNode;
  */
 public class OddEvenLinkedList {
 
-    public static void main(String[] args) {
-        ListNode head = new ListNode(1);
-        LinkedList list = new LinkedList(head);
-        list.add(new ListNode(2));
-        list.add(new ListNode(3));
-        list.add(new ListNode(2));
-        list.add(new ListNode(1));
+  public static void main(String[] args) {
+    ListNode head = new ListNode(1);
+    LinkedList list = new LinkedList(head);
+    list.add(new ListNode(2));
+    list.add(new ListNode(3));
+    list.add(new ListNode(2));
+    list.add(new ListNode(1));
 
-        System.out.println("Is linked list palindrome? " + isPalindrome(head));
+    ListNode newHead = oddEvenList(head);
+    System.out.println("Reordered List: " + newHead);
+  }
+
+  /**
+   * Rearranges the list by grouping odd and even indexed nodes.
+   *
+   * Approach:
+   * 1. Use two pointers: one for odd indexed nodes and another for even indexed nodes.
+   * 2. Traverse the list, linking odd indexed nodes together and even indexed nodes together.
+   * 3. At the end, link the last odd indexed node to the head of the even indexed nodes.
+   *
+   * * Time Complexity: O(N) - where N is the number of nodes in the list.
+   * * Space Complexity: O(1) - no extra space used apart from pointers.
+   *
+   * @param head Head of the linked list.
+   * @return Reordered list with odd-indexed nodes first, then even-indexed.
+   */
+  public static ListNode oddEvenList(ListNode head) {
+      if (head == null || head.getNext() == null) {
+          return head;
+      }
+
+    ListNode odd = head;                     // Points to current odd node
+    ListNode even = head.getNext();          // Points to current even node
+    ListNode evenHead = even;                // To reconnect at the end
+
+    while (even != null && even.getNext() != null) {
+      odd.setNext(even.getNext());
+      odd = odd.getNext();
+
+      even.setNext(odd.getNext());
+      even = even.getNext();
     }
 
-    /**
-     * Checks if a given linked list is a palindrome.
-     * @param head Head node of the linked list.
-     * @return true if the list is a palindrome, otherwise false.
-     */
-    public static boolean isPalindrome(ListNode head) {
-        if (head == null || head.getNext() == null) {
-            return true; // Empty or single-node list is always a palindrome.
-        }
-
-        // Step 1: Find the middle of the list
-        ListNode middleNode = findMiddle(head);
-        ListNode secondHalfStart = reverseList(middleNode.getNext());
-
-        // Step 2: Compare the two halves
-        boolean isPalindrome = compareLists(head, secondHalfStart);
-
-        // Step 3: Restore the list to its original form
-        middleNode.setNext(reverseList(secondHalfStart));
-
-        return isPalindrome;
-    }
-
-    /**
-     * Finds the middle node of the linked list.
-     * @param head Head node of the list.
-     * @return Middle node of the list.
-     */
-    private static ListNode findMiddle(ListNode head) {
-        ListNode slowPointer = head;
-        ListNode fastPointer = head;
-
-        while (fastPointer != null && fastPointer.getNext() != null) {
-            slowPointer = slowPointer.getNext();
-            fastPointer = fastPointer.getNext().getNext();
-        }
-        return slowPointer;
-    }
-
-    /**
-     * Reverses a linked list.
-     * @param head Head of the list to be reversed.
-     * @return New head after reversal.
-     */
-    private static ListNode reverseList(ListNode head) {
-        ListNode prev = null;
-        ListNode current = head;
-
-        while (current != null) {
-            ListNode nextNode = current.getNext();
-            current.setNext(prev);
-            prev = current;
-            current = nextNode;
-        }
-        return prev;
-    }
-
-    /**
-     * Compares two linked lists for equality.
-     * @param first First list.
-     * @param second Second list (reversed).
-     * @return true if both lists are identical, otherwise false.
-     */
-    private static boolean compareLists(ListNode first, ListNode second) {
-        while (second != null) { // Only need to check the second half
-            if (first.getVal() != second.getVal()) {
-                return false;
-            }
-            first = first.getNext();
-            second = second.getNext();
-        }
-        return true;
-    }
+    odd.setNext(evenHead); // Attach even list after odd list
+    return head;
+  }
 }

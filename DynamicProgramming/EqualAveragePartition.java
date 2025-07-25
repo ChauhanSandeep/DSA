@@ -24,13 +24,32 @@ public class EqualAveragePartition {
     }
 
     /**
-     * Determines if the array can be split into two non-empty subsets with the same average.
+     * Determines if array can be partitioned into two subsets with equal averages
+     *
+     * Steps:
+     * - For equal averages: sum1/size1 = sum2/size2, which gives us
+     *          sum1*size2 = sum2*size1
+     * - Since sum1 + sum2 = totalSum and
+     *          size1 + size2 = totalLength
+     * - Therefore sum1 × (totalLength - size1) = (totalSum - sum1) × size1
+     *      sum1 × totalLength - sum1 × size1 = totalSum × size1 - sum1 × size1
+     *      sum1 × totalLength = totalSum × size1
+     *      sum1 = (totalSum × size1) / totalLength
+     * - For a valid partition to exist, sum1 must be an integer (since it's a sum of integers).
+     * Therefore: (totalSum × size1) % totalLength == 0
+     *
+     * Algorithm: Recursion with Memoization
+     * Time Complexity: O(N * Sum * N) = O(N^2 * Sum) where N is array length
+     * Space Complexity: O(N * Sum * N) for memoization + O(N) for recursion stack
+     *
+     * @param nums input array of integers
+     * @return true if equal average partition exists, false otherwise
      */
     public boolean canPartitionWithEqualAverage(int[] nums) {
         if (nums == null || nums.length < 2) return false;
 
         int totalSum = 0;
-        int n = nums.length;
+        int totalLength = nums.length;
 
         for (int num : nums) {
             totalSum += num;
@@ -40,9 +59,10 @@ public class EqualAveragePartition {
         Map<String, Boolean> memo = new HashMap<>();
 
         // Try different subset sizes
-        for (int subsetSize = 1; subsetSize < n; subsetSize++) {
-            if ((totalSum * subsetSize) % n == 0) { // Ensures integer subset sum
-                int targetSum = (totalSum * subsetSize) / n;
+        for (int subsetSize = 1; subsetSize < totalLength; subsetSize++) {
+            int mod = (totalSum * subsetSize) % totalLength; // as per the derived condition
+            if (mod == 0) { // Ensures integer subset sum
+                int targetSum = (totalSum * subsetSize) / totalLength;
                 if (canFindSubset(nums, 0, subsetSize, targetSum, memo)) {
                     return true;
                 }

@@ -6,13 +6,16 @@ import LinkedList.Util.ListNode;
 /**
  * ✅ Problem: Check if a linked list is a palindrome.
  * 🔗 LeetCode: https://leetcode.com/problems/palindrome-linked-list/
- * 
+ *
  * 🔍 **Approach:**
- * 1️⃣ Find the middle of the linked list using slow & fast pointers.  
- * 2️⃣ Reverse the second half of the list.  
- * 3️⃣ Compare the first half with the reversed second half.  
- * 
- * 📊 **Time Complexity:** O(N) - Traverses the list twice.  
+ * 1️⃣ Find the middle of the linked list using slow & fast pointers.
+ * 2️⃣ Reverse the second half of the list.
+ * 3️⃣ Compare the first half with the reversed second half.
+ *      - If they are the same, the list is a palindrome.
+ *      - If they differ, the list is not a palindrome.
+ * 4️⃣ Restore the list to its original state (optional, useful in real-world scenarios).
+ *
+ * 📊 **Time Complexity:** O(N) - Traverses the list twice.
  * 🛠 **Space Complexity:** O(1) - Uses constant extra space.
  */
 public class PalindromeList {
@@ -53,7 +56,7 @@ public class PalindromeList {
      */
     private static ListNode findMiddle(ListNode head) {
         ListNode slow = head, fast = head;
-        
+
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
@@ -76,7 +79,7 @@ public class PalindromeList {
             prev = curr;
             curr = next;
         }
-        
+
         return prev;
     }
 

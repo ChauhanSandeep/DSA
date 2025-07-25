@@ -3,128 +3,160 @@ package Heap;
 import LinkedList.Util.ListNode;
 import java.util.PriorityQueue;
 
+
 /**
- * LeetCode: https://leetcode.com/problems/merge-k-sorted-lists/
+ * ✅ Problem: Merge K Sorted Linked Lists
  *
- * Given k sorted linked lists, merge them into one sorted linked list.
+ * 🔗 Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/
  *
- * Approach 1: Min-Heap (Priority Queue)
- * - Use a Min-Heap (PriorityQueue) to store the head nodes of all lists.
- * - Extract the smallest node from the heap and append it to the result list.
- * - If the extracted node has a next node, push it into the heap.
+ * 🧩 Problem Statement:
+ * Given an array of `k` sorted linked lists, merge all the lists into one sorted linked list and return its head.
  *
- * Time Complexity: O(N log K) → N = total nodes, K = number of lists
- * Space Complexity: O(K) → Storing K elements in the heap
+ * 📌 Example:
+ * Input:
+ *   [
+ *     1 → 3 → 5 → 7,
+ *     2 → 4 → 6 → 8,
+ *     0 → 9 → 10 → 11
+ *   ]
+ * Output:
+ *   0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11
  *
- * Approach 2 (Optimized): Divide and Conquer (Merging Two Lists at a Time)
- * - Recursively merge lists in pairs using `mergeTwoLists()`.
- * - Reduces the problem size logarithmically.
- *
- * Time Complexity: O(N log K) → Same as the heap approach but reduces extra space.
- * Space Complexity: O(1) (iterative) / O(log K) (recursive calls)
+ * 🔄 Follow-up Questions:
+ * 1. Can you do it using Divide and Conquer instead of a heap?
+ *    🔗 https://leetcode.com/problems/merge-k-sorted-lists/discuss/10527/A-java-solution-based-on-divide-and-conquer
+ * 2. Can you merge them in-place without extra memory? → Not always, as linked list nodes are immutable in Leetcode.
+ * 3. What changes if the lists are streaming? → Use a real-time stream merge with a size-limited min-heap.
  */
 public class MergeKLists {
 
-    public static void main(String[] args) {
-        ListNode[] lists = new ListNode[3];
+  public static void main(String[] args) {
+    ListNode[] inputLists = new ListNode[3];
 
-        lists[0] = new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(7))));
-        lists[1] = new ListNode(2, new ListNode(4, new ListNode(6, new ListNode(8))));
-        lists[2] = new ListNode(0, new ListNode(9, new ListNode(10, new ListNode(11))));
+    inputLists[0] = new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(7))));
+    inputLists[1] = new ListNode(2, new ListNode(4, new ListNode(6, new ListNode(8))));
+    inputLists[2] = new ListNode(0, new ListNode(9, new ListNode(10, new ListNode(11))));
 
-        System.out.println("Merged List (Min-Heap Approach):");
-        printList(mergeKSortedLists(lists));
+    System.out.println("🔹 Merged List using Min-Heap:");
+    printList(mergeKSortedLists(inputLists));
 
-        System.out.println("\nMerged List (Divide & Conquer Approach):");
-        printList(mergeKSortedListsOptimized(lists));
+    System.out.println("\n🔹 Merged List using Divide & Conquer:");
+    printList(mergeKSortedListsOptimized(inputLists));
+  }
+
+  /**
+   * ✅ Approach 1: Merge K Sorted Lists using Min-Heap
+   *
+   * 🧠 Steps:
+   * 1. Insert the head of each non-null list into the min-heap.
+   * 2. Extract the node with the smallest value and append it to the result.
+   * 3. If that node has a `next`, push it into the heap.
+   * 4. Repeat until heap is empty.
+   *
+   * ⏱ Time Complexity: O(N log K), where N = total number of nodes, K = number of lists.
+   * 🧠 Space Complexity: O(K), to store K nodes in the heap at a time.
+   */
+  public static ListNode mergeKSortedLists(ListNode[] lists) {
+      if (lists == null || lists.length == 0) {
+          return null;
+      }
+
+    PriorityQueue<ListNode> minHeap = new PriorityQueue<>((node1, node2) -> Integer.compare(node1.val, node2.val));
+
+    // Add head of each list to the heap
+    for (ListNode node : lists) {
+      if (node != null) {
+        minHeap.offer(node);
+      }
     }
 
-    /**
-     * Merges k sorted linked lists using a Min-Heap (PriorityQueue).
-     * @param lists Array of sorted linked lists.
-     * @return The merged sorted linked list.
-     */
-    public static ListNode mergeKSortedLists(ListNode[] lists) {
-        if (lists == null || lists.length == 0) return null;
+    ListNode dummyHead = new ListNode(-1);
+    ListNode tail = dummyHead;
 
-        PriorityQueue<ListNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));
+    while (!minHeap.isEmpty()) {
+      ListNode smallest = minHeap.poll();
+      tail.next = smallest;
+      tail = smallest;
 
-        // Add the head node of each list to the heap
-        for (ListNode list : lists) {
-            if (list != null) {
-                minHeap.offer(list);
-            }
-        }
-
-        ListNode dummy = new ListNode(-1); // Dummy node to track result list
-        ListNode tail = dummy;
-
-        // Process heap until empty
-        while (!minHeap.isEmpty()) {
-            ListNode smallestNode = minHeap.poll();
-            tail.next = smallestNode;
-            tail = smallestNode;
-
-            if (smallestNode.next != null) {
-                minHeap.offer(smallestNode.next);
-            }
-        }
-        return dummy.next;
+      if (smallest.next != null) {
+        minHeap.offer(smallest.next);
+      }
     }
 
-    /**
-     * Optimized Approach: Merges k sorted linked lists using a Divide & Conquer strategy.
-     * @param lists Array of sorted linked lists.
-     * @return The merged sorted linked list.
-     */
-    public static ListNode mergeKSortedListsOptimized(ListNode[] lists) {
-        if (lists == null || lists.length == 0) return null;
-        return mergeLists(lists, 0, lists.length - 1);
+    return dummyHead.next;
+  }
+
+  /**
+   * ✅ Approach 2: Optimized Divide and Conquer
+   *
+   * Thinking process:
+   * - Instead of merging all lists pairwise, we can divide the list of lists into two halves,
+   *   merge each half recursively, and then merge the two sorted halves.
+   * - This reduces the number of merges and avoids excessive heap operations.
+   *
+   * ⏱ Time Complexity: O(N log K), where N = total number of nodes, K = number of lists.
+   * 🧠 Space Complexity:
+   *    - O(1) for iterative mergeTwoLists
+   *    - O(log K) due to recursive stack space
+   */
+  public static ListNode mergeKSortedListsOptimized(ListNode[] lists) {
+      if (lists == null || lists.length == 0) {
+          return null;
+      }
+    return mergeListsRecursive(lists, 0, lists.length - 1);
+  }
+
+  /**
+   * Helper method for recursive merge using Divide and Conquer.
+   */
+  private static ListNode mergeListsRecursive(ListNode[] lists, int left, int right) {
+      if (left == right) {
+          return lists[left];
+      }
+      if (left > right) {
+          return null;
+      }
+
+    int mid = left + (right - left) / 2;
+    ListNode leftMerged = mergeListsRecursive(lists, left, mid);
+    ListNode rightMerged = mergeListsRecursive(lists, mid + 1, right);
+
+    return mergeTwoSortedLists(leftMerged, rightMerged);
+  }
+
+  /**
+   * Merges two sorted linked lists into one sorted list.
+   * Uses iterative approach to minimize stack space.
+   */
+  private static ListNode mergeTwoSortedLists(ListNode l1, ListNode l2) {
+    ListNode dummy = new ListNode(-1);
+    ListNode current = dummy;
+
+    while (l1 != null && l2 != null) {
+      if (l1.val < l2.val) {
+        current.next = l1;
+        l1 = l1.next;
+      } else {
+        current.next = l2;
+        l2 = l2.next;
+      }
+      current = current.next;
     }
 
-    /**
-     * Helper function to recursively merge lists using divide and conquer.
-     */
-    private static ListNode mergeLists(ListNode[] lists, int left, int right) {
-        if (left == right) return lists[left]; // Base case: single list
-        if (left > right) return null; // Edge case: invalid indices
+    // Append the remaining list
+    current.next = (l1 != null) ? l1 : l2;
 
-        int mid = left + (right - left) / 2;
-        ListNode leftMerged = mergeLists(lists, left, mid);
-        ListNode rightMerged = mergeLists(lists, mid + 1, right);
-        return mergeTwoLists(leftMerged, rightMerged);
+    return dummy.next;
+  }
+
+  /**
+   * Utility method to print a linked list to console.
+   */
+  public static void printList(ListNode head) {
+    while (head != null) {
+      System.out.print(head.val + " → ");
+      head = head.next;
     }
-
-    /**
-     * Merges two sorted linked lists into one.
-     */
-    private static ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        ListNode dummy = new ListNode(-1);
-        ListNode tail = dummy;
-
-        while (l1 != null && l2 != null) {
-            if (l1.val < l2.val) {
-                tail.next = l1;
-                l1 = l1.next;
-            } else {
-                tail.next = l2;
-                l2 = l2.next;
-            }
-            tail = tail.next;
-        }
-
-        tail.next = (l1 != null) ? l1 : l2;
-        return dummy.next;
-    }
-
-    /**
-     * Prints a linked list.
-     */
-    public static void printList(ListNode head) {
-        while (head != null) {
-            System.out.print(head.val + " -> ");
-            head = head.next;
-        }
-        System.out.println("null");
-    }
+    System.out.println("null");
+  }
 }

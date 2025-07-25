@@ -5,7 +5,7 @@ package Array;
  *
  * You are given an integer array `nums` that was originally sorted in ascending order,
  * but then rotated at an unknown pivot. Given a target value, return its index if found,
- * else return -1. Must run in O(log N) time.
+ * else return -1. All the values of `nums` are unique.
  *
  * Leetcode Link:
  * https://leetcode.com/problems/search-in-rotated-sorted-array/
@@ -19,7 +19,7 @@ package Array;
  * - Can you do this with a recursive binary search?
  * - How to find the rotation pivot index itself?
  */
-public class BinarySearchRotatedSorted {
+public class RotatedSortedSearch {
 
   public static void main(String[] args) {
     int[] nums = {4, 5, 6, 7, 0, 1, 2};
@@ -49,10 +49,10 @@ public class BinarySearchRotatedSorted {
           return -1;
       }
 
-    int left = 0, right = nums.length - 1;
+    int left = 0;
+    int right = nums.length - 1;
 
     while (left <= right) {
-      // Prevent overflow
       int mid = left + (right - left) / 2;
 
       // Target found

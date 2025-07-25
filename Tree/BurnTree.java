@@ -113,17 +113,3 @@ public class BurnTree {
         propagateFire(node.right, time + 1);
     }
 }
-
-/**
- * Basic structure for a TreeNode.
- */
-class TreeNode {
-    int val;
-    TreeNode left, right;
-
-    public TreeNode(int value) {
-        this.val = value;
-        this.left = null;
-        this.right = null;
-    }
-}

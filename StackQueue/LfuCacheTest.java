@@ -4,144 +4,189 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+
 /**
- * Problem: Implement an LFU (Least Frequently Used) Cache.
- * 
- * <p>LeetCode Problem Link:
- * <a href="https://leetcode.com/problems/lfu-cache/">LFU Cache</a>
- * </p>
+ * Problem: Design and implement a data structure for LFU (Least Frequently Used) Cache.
  *
- * <p><b>Approach:</b></p>
- * - Uses **3 HashMaps**:
- *   1. `keyToValueMap`: Stores the mapping of `key -> value`.
- *   2. `keyToFrequencyMap`: Stores the mapping of `key -> frequency count`.
- *   3. `frequencyToKeysMap`: Stores the mapping of `frequency -> list of keys` (ordered using `LinkedHashSet`).
- * - Maintains a `minFrequency` to track the least frequently used element efficiently.
- * - When `capacity` is reached, removes the **least frequently used key**.
- * 
- * <p><b>Time Complexity:</b></p>
- * - **O(1)** for `get()` (HashMap + LinkedHashSet operations).
- * - **O(1)** for `put()` (Removals & insertions are constant time).
+ * Requirements:
+ * - get(key): Retrieve the value of the key if it exists, otherwise return -1.
+ * - put(key, value): Insert or update the value. If the cache reaches its capacity,
+ *   it should evict the least frequently used item. If there's a tie, evict the least recently used.
  *
- * <p><b>Space Complexity:</b> O(capacity) (HashMaps storing at most `capacity` keys).</p>
+ * Example:
+ * Input:
+ *   LFUCache cache = new LFUCache(2);
+ *   cache.put(1, 1);
+ *   cache.put(2, 2);
+ *   cache.get(1);       // returns 1
+ *   cache.put(3, 3);    // evicts key 2
+ *   cache.get(2);       // returns -1 (not found)
+ *   cache.get(3);       // returns 3
+ *   cache.put(4, 4);    // evicts key 1
+ *   cache.get(1);       // returns -1 (not found)
+ *   cache.get(3);       // returns 3
+ *   cache.get(4);       // returns 4
+ *
+ * Leetcode Link:
+ * https://leetcode.com/problems/lfu-cache/
+ *
+ * Follow-Up Questions:
+ * - Can you implement LFU cache using a double linked list instead of LinkedHashSet?
+ *   (Yes, it can give O(1) performance with more control over recency)
+ * - What would you change if frequency updates were batched or delayed?
+ *   (Use a lazy update mechanism and sync when accessed)
+ * - What if frequent inserts and gets happen in high-concurrency systems?
+ *   (Consider using ConcurrentHashMap + locking strategies or `java.util.concurrent` data structures)
  */
 class LFUCache {
-    private final int capacity;
-    private int minFrequency;
-    private final Map<Integer, Integer> keyToValueMap; // Stores key -> value
-    private final Map<Integer, Integer> keyToFrequencyMap; // Stores key -> frequency count
-    private final Map<Integer, LinkedHashSet<Integer>> frequencyToKeysMap; // Stores frequency -> list of keys
+  private final int capacity; // Maximum capacity of the cache
+  private int minFrequency; // Minimum frequency of any key in the cache
+  private final Map<Integer, Integer> keyToValueMap; // Maps keys to their values
+  private final Map<Integer, Integer> keyToFrequencyMap; // Maps keys to their frequency counts
+  // Maps frequencies to sets of keys with that frequency. LinkedHashSet is used to maintain insertion order for LRU eviction.
+  private final Map<Integer, LinkedHashSet<Integer>> frequencyToKeysMap;
+  public LFUCache(int capacity) {
+    this.capacity = capacity;
+    this.minFrequency = 0;
+    this.keyToValueMap = new HashMap<>();
+    this.keyToFrequencyMap = new HashMap<>();
+    this.frequencyToKeysMap = new HashMap<>();
+  }
 
-    public LFUCache(int capacity) {
-        this.capacity = capacity;
-        this.minFrequency = 0;
-        this.keyToValueMap = new HashMap<>();
-        this.keyToFrequencyMap = new HashMap<>();
-        this.frequencyToKeysMap = new HashMap<>();
-        frequencyToKeysMap.put(1, new LinkedHashSet<>());
+  /**
+   * Inserts or updates a key-value pair in the cache.
+   * If the cache exceeds its capacity, evicts the least frequently used item.
+   *
+   * Steps:
+   * - If capacity is 0, return immediately.
+   * - If key exists, update its value and frequency.
+   * - If capacity is reached, evict the least frequently used and least recently used key.
+   * - Insert new key with frequency 1 and reset minFrequency.
+   *
+   * Time Complexity: O(1)
+   * Space Complexity: O(capacity)
+   */
+  public void put(int key, int value) {
+      if (capacity == 0) {
+          return;
+      }
+
+      // If key already exists, update its value and frequency
+    if (keyToValueMap.containsKey(key)) {
+      keyToValueMap.put(key, value);
+      updateFrequency(key);
+      return;
     }
 
-    /**
-     * Retrieves the value of the key if it exists, otherwise returns -1.
-     * @param key The key to lookup.
-     * @return Value of the key if found, otherwise -1.
-     */
-    public int get(int key) {
-        if (!keyToValueMap.containsKey(key)) return -1;
-
-        // Update frequency
-        updateFrequency(key);
-        return keyToValueMap.get(key);
+    // If key does not exist, check if we need to evict
+    if (keyToValueMap.size() >= capacity) {
+      evictLeastFrequentKey();
     }
 
-    /**
-     * Inserts or updates the key-value pair in the cache.
-     * If the capacity is reached, it removes the least frequently used key.
-     * @param key   The key to insert or update.
-     * @param value The value to associate with the key.
-     */
-    public void put(int key, int value) {
-        if (capacity == 0) return;
+    // Insert the new key with value and frequency 1
+    keyToValueMap.put(key, value);
+    keyToFrequencyMap.put(key, 1);
+    frequencyToKeysMap.computeIfAbsent(1, unused -> new LinkedHashSet<>()).add(key);
+    minFrequency = 1;
+  }
 
-        // If key already exists, update value and frequency
-        if (keyToValueMap.containsKey(key)) {
-            keyToValueMap.put(key, value);
-            updateFrequency(key);
-            return;
-        }
-
-        // If cache is full, remove least frequently used key
-        if (keyToValueMap.size() >= capacity) {
-            removeLeastFrequentKey();
-        }
-
-        // Insert new key-value pair
-        keyToValueMap.put(key, value);
-        keyToFrequencyMap.put(key, 1);
-        frequencyToKeysMap.computeIfAbsent(1, k -> new LinkedHashSet<>()).add(key);
-        minFrequency = 1; // Reset min frequency to 1 since a new key is added
+  /**
+   * Retrieves the value for the given key if it exists and updates its frequency.
+   *
+   * Steps:
+   * - If key doesn't exist, return -1.
+   * - Otherwise:
+   *    - Update the frequency of the key.
+   *    - Return the value associated with the key.
+   *    - If the key is accessed, it becomes the most recently used for its frequency.
+   *    - If the frequency set becomes empty and was the minimum frequency, increment minFrequency.
+   *
+   * Time Complexity: O(1)
+   * Space Complexity: O(1)
+   */
+  public int get(int key) {
+    if (!keyToValueMap.containsKey(key)) {
+      return -1;
     }
 
-    /**
-     * Updates the frequency of an accessed key.
-     * @param key The key whose frequency is updated.
-     */
-    private void updateFrequency(int key) {
-        int currentFrequency = keyToFrequencyMap.get(key);
-        keyToFrequencyMap.put(key, currentFrequency + 1);
+    updateFrequency(key);
+    return keyToValueMap.get(key);
+  }
 
-        // Remove key from old frequency bucket
-        frequencyToKeysMap.get(currentFrequency).remove(key);
-        if (frequencyToKeysMap.get(currentFrequency).isEmpty()) {
-            frequencyToKeysMap.remove(currentFrequency);
-            if (minFrequency == currentFrequency) {
-                minFrequency++; // If removed, increase minFrequency
-            }
-        }
+  /**
+   * Updates the frequency count for a key and moves it to the new frequency bucket.
+   *
+   * Steps:
+   * - Retrieve current frequency and increment it.
+   * - Remove the key from its current frequency set.
+   * - update minFrequency if applicable.
+   * - Add the key to the new frequency bucket.
+   *
+   * Time Complexity: O(1)
+   * Space Complexity: O(1)
+   */
+  private void updateFrequency(int key) {
+    int currentFreq = keyToFrequencyMap.get(key);
+    int updatedFreq = currentFreq + 1;
+    keyToFrequencyMap.put(key, updatedFreq);
 
-        // Add key to new frequency bucket
-        frequencyToKeysMap.computeIfAbsent(currentFrequency + 1, k -> new LinkedHashSet<>()).add(key);
+    // Remove from current frequency bucket because frequency is being updated
+    LinkedHashSet<Integer> keysAtCurrentFreq = frequencyToKeysMap.get(currentFreq);
+    keysAtCurrentFreq.remove(key);
+
+    // If the current frequency set is empty, remove it from the map
+    if (keysAtCurrentFreq.isEmpty()) {
+      frequencyToKeysMap.remove(currentFreq);
+      if (minFrequency == currentFreq) {
+        // we are sure that minFrequency + 1 is be available becuase input key is now updatedFreq (minFrequency + 1)
+        minFrequency++;
+      }
     }
 
-    /**
-     * Removes the least frequently used key.
-     */
-    private void removeLeastFrequentKey() {
-        if (!frequencyToKeysMap.containsKey(minFrequency)) return;
+    // Add to updated frequency bucket
+    frequencyToKeysMap.computeIfAbsent(updatedFreq, unused -> new LinkedHashSet<>()).add(key);
+  }
 
-        // Get the least frequently used key
-        int keyToRemove = frequencyToKeysMap.get(minFrequency).iterator().next();
-        frequencyToKeysMap.get(minFrequency).remove(keyToRemove);
+  /**
+   * Evicts the least frequently used key from the cache.
+   * If there's a tie, the least recently used key is evicted (based on LinkedHashSet insertion order).
+   *
+   * Time Complexity: O(1)
+   * Space Complexity: O(1)
+   */
+  private void evictLeastFrequentKey() {
+    LinkedHashSet<Integer> keysAtMinFreq = frequencyToKeysMap.get(minFrequency);
+    int keyToRemove = keysAtMinFreq.iterator().next();
 
-        // Remove the key from all maps
-        keyToValueMap.remove(keyToRemove);
-        keyToFrequencyMap.remove(keyToRemove);
-
-        // Cleanup if the frequency list becomes empty
-        if (frequencyToKeysMap.get(minFrequency).isEmpty()) {
-            frequencyToKeysMap.remove(minFrequency);
-        }
+    // Remove the key from all maps
+    keysAtMinFreq.remove(keyToRemove);
+    if (keysAtMinFreq.isEmpty()) {
+      frequencyToKeysMap.remove(minFrequency);
     }
+
+    keyToValueMap.remove(keyToRemove);
+    keyToFrequencyMap.remove(keyToRemove);
+  }
 }
 
 /**
- * Driver class to test LFU Cache functionality.
+ * Driver code to test LFU Cache implementation.
  */
 public class LfuCacheTest {
-    public static void main(String[] args) {
-        LFUCache cache = new LFUCache(2);
-        
-        cache.put(1, 1);
-        cache.put(2, 2);
-        System.out.println(cache.get(1)); // Output: 1
-        
-        cache.put(3, 3); // Evicts key 2
-        System.out.println(cache.get(2)); // Output: -1 (not found)
-        System.out.println(cache.get(3)); // Output: 3
-        
-        cache.put(4, 4); // Evicts key 1
-        System.out.println(cache.get(1)); // Output: -1 (not found)
-        System.out.println(cache.get(3)); // Output: 3
-        System.out.println(cache.get(4)); // Output: 4
-    }
+  public static void main(String[] args) {
+    LFUCache cache = new LFUCache(2);
+
+    cache.put(1, 1);
+    cache.put(2, 2);
+    System.out.println(cache.get(1)); // returns 1
+
+    cache.put(3, 3); // evicts key 2
+    System.out.println(cache.get(2)); // returns -1
+    System.out.println(cache.get(3)); // returns 3
+
+    cache.put(4, 4); // evicts key 1
+    System.out.println(cache.get(1)); // returns -1
+    System.out.println(cache.get(3)); // returns 3
+    System.out.println(cache.get(4)); // returns 4
+  }
 }

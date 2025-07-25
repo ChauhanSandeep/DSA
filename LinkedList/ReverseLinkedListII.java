@@ -27,46 +27,52 @@ public class ReverseLinkedListII {
      * Reverses a sublist of the linked list from position `leftIndex` to `rightIndex`.
      *
      * Algorithm:
-     * - Use a dummy node before head to handle edge cases cleanly.
+     * - Use a dummy node before originalHead to handle edge cases cleanly.
      * - Traverse to the node just before `leftIndex` and keep reference to it (`prev`).
-     * - Reverse the sublist of length (rightIndex - leftIndex + 1) using iterative head insertion method.
+     * - Reverse the sublist of length (rightIndex - leftIndex + 1) using iterative originalHead insertion method.
      * - Stitch the reversed sublist back into the main list.
      *
      * Time Complexity: O(n)
      * Space Complexity: O(1)
      *
-     * @param head  The head of the linked list
+     * @param originalHead  The originalHead of the linked list
      * @param leftIndex  Start position (0-based)
      * @param rightIndex End position (0-based)
      * @return Head of the modified list
      */
-    public ListNode reverseBetween(ListNode head, int leftIndex, int rightIndex) {
-      if (head == null || leftIndex == rightIndex) {
-        return head;
+    public ListNode reverseBetween(ListNode originalHead, int startPosition, int endPosition) {
+      if (originalHead == null || startPosition == endPosition) {
+        return originalHead;
       }
 
-      ListNode dummy = new ListNode(0);
-      dummy.next = head;
+      // Step 1: Setup dummy node to handle edge case when reversal starts from originalHead
+      ListNode dummyHead = new ListNode(-1);
+      dummyHead.next = originalHead;
 
-      ListNode prev = dummy;
+      ListNode previousGroupEnd = dummyHead;
 
-      // Step 1: Move `prev` to node just before `leftIndex`
-      for (int i = 0; i < leftIndex; i++) {
-        prev = prev.next;
+      // Step 2: Traverse to the node just before the start of sublist
+      for (int i = 1; i < startPosition; i++) {
+        previousGroupEnd = previousGroupEnd.next;
       }
 
-      // Step 2: Reverse sublist using head-insertion method
-      ListNode curr = prev.next;      // Start of the sublist to reverse
-      ListNode then = curr.next;      // Node to be moved
+      // Step 3: Perform in-place reversal of the sublist
+      ListNode currentGroupStart = previousGroupEnd.next;
+      ListNode nodeToMove = currentGroupStart.next;
 
-      for (int i = 0; i < rightIndex - leftIndex; i++) {
-        curr.next = then.next;      // Detach `then` from list
-        then.next = prev.next;      // Point `then` to the front of the reversed sublist
-        prev.next = then;           // Insert `then` right after `prev`
-        then = curr.next;           // Move to next node to reverse
+      for (int i = 0; i < endPosition - startPosition; i++) {
+        // Detach nodeToMove
+        currentGroupStart.next = nodeToMove.next;
+
+        // Insert nodeToMove right after previousGroupEnd
+        nodeToMove.next = previousGroupEnd.next;
+        previousGroupEnd.next = nodeToMove;
+
+        // Move nodeToMove forward
+        nodeToMove = currentGroupStart.next;
       }
 
-      return dummy.next;
+      return dummyHead.next;
     }
 
     // Helper class definition for ListNode
