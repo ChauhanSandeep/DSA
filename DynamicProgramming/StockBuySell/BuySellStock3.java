@@ -1,58 +1,99 @@
 package DynamicProgramming.StockBuySell;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
+ * Best Time to Buy and Sell Stock III
  *
- * This program finds the maximum profit that can be made with at most two transactions.
- * - You may buy and sell a stock at most twice.
- * - You must sell the first stock before buying the second one.
+ * Problem Statement:
+ * You are given an array prices where prices[i] is the price of a given stock on the ith day.
+ * Find the maximum profit you can achieve. You may complete at most two transactions.
+ * Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the
+ * stock before you buy again).
  *
- * Approach:
- * - Use dynamic programming with two forward and backward passes:
- *   1. Left to right pass: Compute max profit if sold up to today.
- *   2. Right to left pass: Compute max profit if bought from today onwards.
- * - The final result is the maximum sum of both profits at each day.
+ * Example:
+ * Input: prices = [3,3,5,0,0,3,1,4]
+ * Output: 6
+ * Explanation: Buy on day 4 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+ * Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
+ * Total profit = 3 + 3 = 6.
  *
- * Time Complexity: O(N) - Two passes through the array.
- * Space Complexity: O(N) - Two extra arrays used.
+ * LeetCode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
+ *
+ * Follow-up Questions for FAANG Interviews:
+ * 1. What if we can make at most k transactions?
+ *  - LeetCode 188: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
+ * 2. How to optimize space complexity?
+ *  - Use state machine DP with O(1) space
+ * 3. What if transactions have different fees?
+ *  - Extend DP states to include variable fees
+ * 4. How to find actual transaction days?
+ *  - Track buy/sell decisions during DP computation
+ * 5. What if we want to minimize risk while maximizing profit?
+ *  - Add risk factor to profit calculation
+ * 6. Handle very large price arrays efficiently?
+ *  - Use divide and conquer or sliding window optimizations
  */
 public class BuySellStock3 {
 
-    public static void main(String[] args) {
-        int[] prices = {10, 22, 5, 75, 65, 80};
-        BuySellStock3 solution = new BuySellStock3();
-        System.out.println("Max profit with at most 2 transactions: " + solution.getMaxProfit(prices));
+  public static void main(String[] args) {
+    BuySellStock3 solution = new BuySellStock3();
+    int[] stockPrices = {3, 3, 5, 0, 0, 3, 1, 4};
+
+    System.out.println("Two-pass approach result: " + solution.maxProfitStateMachine(stockPrices)); // Output: 6
+  }
+
+  /**
+   * Finds maximum profit using state machine dynamic programming approach
+   *
+   * Algorithm: State Machine Dynamic Programming
+   * Steps:
+   * 1. Track 4 states: first buy, first sell, second buy, second sell
+   * 2. For each day, update all states based on optimal decisions
+   * 3. Each state represents maximum profit achievable in that state
+   *
+   * Time Complexity: O(n)
+   * Space Complexity: O(1) - only using constant extra space
+   */
+  public int[] maxProfitWithDays(int[] prices) {
+    if (prices == null || prices.length < 2) {
+      return new int[]{0, -1, -1, -1, -1}; // No profit, invalid days
     }
 
-    public int getMaxProfit(int[] prices) {
-        if (prices == null || prices.length < 2) return 0;
+    int length = prices.length;
+    int profitAfterFirstBuy = -prices[0];
+    int profitAfterFirstSell = 0;
+    int profitAfterSecondBuy = -prices[0];
+    int profitAfterSecondSell = 0;
 
-        int n = prices.length;
+    int firstBuyDay = 0;
+    int firstSellDay = -1;
+    int secondBuyDay = 0;
+    int secondSellDay = -1;
 
-        // Left to Right: Max profit if sold up to today
-        int minPriceSoFar = prices[0];
-        int[] maxProfitIfSoldUntilToday = new int[n];
-        
-        for (int i = 1; i < n; i++) {
-            minPriceSoFar = Math.min(minPriceSoFar, prices[i]);
-            maxProfitIfSoldUntilToday[i] = Math.max(maxProfitIfSoldUntilToday[i - 1], prices[i] - minPriceSoFar);
-        }
+    for (int day = 1; day < length; day++) {
 
-        // Right to Left: Max profit if bought from today onwards
-        int maxPriceAfter = prices[n - 1];
-        int[] maxProfitIfBoughtFromToday = new int[n];
-
-        for (int i = n - 2; i >= 0; i--) {
-            maxPriceAfter = Math.max(maxPriceAfter, prices[i]);
-            maxProfitIfBoughtFromToday[i] = Math.max(maxProfitIfBoughtFromToday[i + 1], maxPriceAfter - prices[i]);
-        }
-
-        // Compute max profit with at most 2 transactions
-        int maxProfit = 0;
-        for (int i = 0; i < n; i++) {
-            maxProfit = Math.max(maxProfit, maxProfitIfSoldUntilToday[i] + maxProfitIfBoughtFromToday[i]);
-        }
-
-        return maxProfit;
+      if (-prices[day] > profitAfterFirstBuy) {
+        // if price today is lower, then buy today
+        profitAfterFirstBuy = -prices[day];
+        firstBuyDay = day;
+      }
+      if (profitAfterFirstBuy + prices[day] > profitAfterFirstSell) {
+        // if selling today gives better profit, then sell today
+        profitAfterFirstSell = profitAfterFirstBuy + prices[day];
+        firstSellDay = day;
+      }
+      if (profitAfterFirstSell - prices[day] > profitAfterSecondBuy) {
+        // If buying today gives better profit after first sell, then buy today
+        profitAfterSecondBuy = profitAfterFirstSell - prices[day];
+        secondBuyDay = day;
+      }
+      if (profitAfterSecondBuy + prices[day] > profitAfterSecondSell) {
+        // if selling today gives better profit after second buy, then sell today
+        profitAfterSecondSell = profitAfterSecondBuy + prices[day];
+        secondSellDay = day;
+      }
     }
+
+    // Returns: [maxProfit, firstBuyDay, firstSellDay, secondBuyDay, secondSellDay]
+    return new int[]{profitAfterSecondSell, firstBuyDay, firstSellDay, secondBuyDay, secondSellDay};
+  }
 }
