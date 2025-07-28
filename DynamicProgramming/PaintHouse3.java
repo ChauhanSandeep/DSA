@@ -15,7 +15,14 @@ import java.util.Arrays;
  * If it is not possible, return -1.
  *
  * Example:
- * Input: houses = [0,0,0,0,0], cost = [[1,10],[10,1],[10,1],[1,10],[5,1]], m = 5, n = 2, target = 3
+ * Input: houses = [0,0,0,0,0],
+ * cost = [
+ * [1,10],
+ * [10,1],
+ * [10,1],
+ * [1,10],
+ * [5,1]
+ * ], m = 5, n = 2, target = 3
  * Output: 9
  * Explanation: Paint houses with colors [1,2,2,1,1] to get 3 neighborhoods [1],[2,2],[1,1] with cost 1+1+1+1+5=9.
  *
@@ -127,9 +134,9 @@ public class PaintHouse3 {
       for (int colorChoice = 1; colorChoice <= numColors; colorChoice++) {
         int newNeighborhoodCount = currentNeighborhoods + ((colorChoice != previousHouseColor) ? 1 : 0);
 
-        int costForThisColor =
-            paintingCosts[currentHouseIndex][colorChoice - 1] + findMinimumCostRecursive(houses, paintingCosts,
-                currentHouseIndex + 1, newNeighborhoodCount, colorChoice, targetNeighborhoods, numColors);
+        int costForThisColor = paintingCosts[currentHouseIndex][colorChoice - 1]
+            + findMinimumCostRecursive(houses, paintingCosts, currentHouseIndex + 1,
+            newNeighborhoodCount, colorChoice, targetNeighborhoods, numColors);
 
         minimumCostFromCurrentState = Math.min(minimumCostFromCurrentState, costForThisColor);
       }

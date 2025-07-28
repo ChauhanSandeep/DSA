@@ -33,6 +33,7 @@ import java.util.List;
  * Time Complexity: O(n * 2^n)
  * - There are 2^n possible partitions of the string.
  * - Checking if a substring is a palindrome takes O(n) in the worst case.
+ * - Copying the current partition to the result takes O(n) as well.
  *
  * Space Complexity: O(n)
  * - The recursion stack and the path list can take up to O(n) space.
@@ -77,21 +78,28 @@ public class PalindromePartitioning {
 
     /**
      * Helper to check if input[start..end] is a palindrome using memoization.
+     * Note: we could have also precomputed the palindromic substrings but that is not affecting the overall time complexity.
+     * So we are using this method to check if a substring is a palindrome.
      */
     private boolean isPalindrome(String input, int start, int end, Boolean[][] dp) {
-        if (dp[start][end] != null) {
-            return dp[start][end];
+        // Separate variables to avoid setting updated values in the dp array
+        int left = start;
+        int right = end;
+
+        // Base case: single character or empty substring
+        if (dp[left][right] != null) {
+            return dp[left][right];
         }
 
-        while (start <= end) {
-            if (input.charAt(start) != input.charAt(end)) {
-                dp[start][end] = false;
+        while (left < right) {
+            if (input.charAt(left) != input.charAt(right)) {
+                dp[left][right] = false;
                 return false;
             }
-            start++;
-            end--;
+            left++;
+            right--;
         }
-        dp[start][end] = true;
+        dp[left][right] = true;
         return true;
     }
 }

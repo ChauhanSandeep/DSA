@@ -23,16 +23,6 @@ package Array;
  */
 public class KthElement {
 
-  public static void main(String[] args) {
-    int[] arr1 = {9, 11, 19, 26, 32, 34, 45, 50, 56, 58, 61, 88};
-    int[] arr2 =
-        {1, 5, 5, 7, 9, 9, 11, 13, 13, 15, 18, 19, 19, 20, 21, 28, 28, 28, 29, 29, 30, 31, 39, 40, 44, 47, 47, 50, 52,
-            56, 57, 61, 61, 61, 66, 68, 69, 70, 70, 74, 75, 75, 77, 78, 79, 80, 82, 85, 87, 89, 90, 90, 90, 92, 93, 95,
-            97, 98, 98, 100};
-    int k = 64;
-    System.out.println("The " + k + "th element is: " + findKthElement(arr1, arr2, k));
-  }
-
   /**
    * Finds the Kth element in the union of two sorted arrays using binary search.
    *
@@ -66,29 +56,37 @@ public class KthElement {
       throw new IllegalArgumentException("k is out of bounds for combined array");
     }
 
-    // Define binary search bounds
-    int low = Math.max(0, k - len2); // because we can't take more than k from arr1
-    int high = Math.min(k, len1);    // because we can't take more than k from arr1
+    // Define binary search bounds of the smaller array
+    int low = Math.max( // The lowest index we can cut in arr1
+        0, // if k is less than len2, then we can take 0 elements from arr1 and all k elements from arr2
+        k - len2 // if k is greater than len2, then we have to take at least (k - len2) elements from arr1
+    );
+    int high = Math.min( // The highest index we can cut in arr1
+        k, // when k is less than len1, then we can take all k elements from arr1
+        len1 // when k is greater than len1, then we can take at most len1 elements from arr1
+    );
+
+
 
     while (low <= high) {
-      int partition1 = (low + high) / 2;
-      int partition2 = k - partition1;
+      int cutArr1 = (low + high) / 2;
+      int cutArr2 = k - cutArr1;
 
-      int left1 = (partition1 == 0) ? Integer.MIN_VALUE : arr1[partition1 - 1];
-      int left2 = (partition2 == 0) ? Integer.MIN_VALUE : arr2[partition2 - 1];
-      int right1 = (partition1 == len1) ? Integer.MAX_VALUE : arr1[partition1];
-      int right2 = (partition2 == len2) ? Integer.MAX_VALUE : arr2[partition2];
+      int leftMax1 = (cutArr1 != 0) ? arr1[cutArr1 - 1] : Integer.MIN_VALUE; // left partition max of arr1
+      int leftMax2 = (cutArr2 != 0) ? arr2[cutArr2 - 1] : Integer.MIN_VALUE; // left partition max of arr2
+      int rightMin1 = (cutArr1 == len1) ? Integer.MAX_VALUE : arr1[cutArr1]; // right partition min of arr1
+      int rightMin2 = (cutArr2 == len2) ? Integer.MAX_VALUE : arr2[cutArr2]; // right partition min of arr2
 
       // Found correct partition
-      if (left1 <= right2 && left2 <= right1) {
-        return Math.max(left1, left2);
+      if (leftMax1 <= rightMin2 && leftMax2 <= rightMin1) {
+        return Math.max(leftMax1, leftMax2);
       }
 
       // Move binary search boundaries
-      if (left1 > right2) {
-        high = partition1 - 1;
-      } else {
-        low = partition1 + 1;
+      if (leftMax1 > rightMin2) {
+        high = cutArr1 - 1;
+      } else if (leftMax2 > rightMin1) {
+        low = cutArr1 + 1;
       }
     }
 

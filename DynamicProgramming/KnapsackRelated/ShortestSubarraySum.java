@@ -36,6 +36,8 @@ public class ShortestSubarraySum {
      * - When the sum of the window is >= targetSum, try to shrink it from the left.
      * - Keep track of the minimum length of valid subarrays.
      *
+     * Condition: The array contains only positive integers.
+     *
      * Time: O(N), Space: O(1)
      */
   public int minSubArrayWithOnlyPositives(int targetSum, int[] numbers) {
@@ -96,7 +98,7 @@ public class ShortestSubarraySum {
         long prefixSum = 0;
         int result = length + 1;
 
-        Deque<Pair> monotonicIncreasingQueue = new ArrayDeque<>();
+        Deque<Pair> monotonicIncreasingQueue = new ArrayDeque<>(); // store Pair<index, prefixSum> increasing by prefixSum
 
         // Initial dummy prefix sum at index -1 (i.e., before array starts)
         monotonicIncreasingQueue.offerLast(new Pair(-1, 0L));

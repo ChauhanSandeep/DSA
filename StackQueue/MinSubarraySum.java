@@ -3,92 +3,102 @@ package StackQueue;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+
 /**
- * Sum of Subarray Minimums - Monotonic Stack Approach
- * ---------------------------------------------------
- * Given an array, return the sum of the minimum value in every subarray.
- * For example:
+ * Problem: Sum of Subarray Minimums
+ * -----------------------------------------
+ * Given an array of integers, return the sum of the minimum value of all possible contiguous subarrays.
+ *
+ * Example:
  * Input: arr = [3,1,2,4]
  * Output: 17
  * Explanation:
- * Subarrays are [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4].
- * Minimums are (taking min from each subarray) 3, 1, 2, 4, 1, 1, 2, 1, 1, 1.
- * Sum is 17.
+ * Subarrays = [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4]
+ * Minimums =   3,   1,   2,   4,   1,     1,      2,      1,       1,        1
+ * Total = 17
  *
- * **Approach:**
- * - Use a **monotonic increasing stack** to efficiently compute the contribution of each element.
- * - For each element `nums[i]`, determine:
- *   - `previousSmallerIndex`: The index of the closest smaller element on the left.
- *   - `nextSmallerIndex`: The index of the closest smaller element on the right.
- * - Each element contributes to **all subarrays where it is the minimum**.
- * - Formula: `(nums[i] * (i - previousSmallerIndex) * (nextSmallerIndex - i))`
+ * LeetCode Link: https://leetcode.com/problems/sum-of-subarray-minimums/
  *
- * **Time Complexity:** O(n)  (Each element is pushed/popped from the stack at most once)
- * **Space Complexity:** O(n) (Stack storage)
- *
- * **LeetCode Link:**
- * https://leetcode.com/problems/sum-of-subarray-minimums/
+ * 🔍 Follow-up Questions:
+ * 1. **Can we find the sum of maximums in subarrays using similar approach?**
+ *    - Yes, just reverse the comparison logic (use monotonic decreasing stack).
+ *    - Related: https://leetcode.com/problems/sum-of-subarray-ranges/
+ * 2. **Can we do it without stack?**
+ *    - Naively yes, but that takes O(N²) time. Stack is optimal O(N).
+ * 3. **Can we find how many subarrays each element is the minimum for?**
+ *    - Yes. That's the core of this approach using left and right spans.
  */
 public class MinSubarraySum {
 
-    private static final int MODULO = (int) 1e9 + 7;
+  private static final int MODULO = (int) 1e9 + 7;
 
-    public static void main(String[] args) {
-        int[] nums = {3, 5, 4, 12, 8, 10, 11, 4};
-        System.out.println("Sum of Subarray Minimums: " + new MinSubarraySum().sumSubarrayMins(nums));
+  public static void main(String[] args) {
+    int[] nums = {3, 5, 4, 12, 8, 10, 11, 4};
+    System.out.println("Sum of Subarray Minimums: " + new MinSubarraySum().sumSubarrayMins(nums));
+  }
+
+  /**
+   * Computes the sum of the minimum values across all subarrays of the input array.
+   *
+   * Approach:
+   * - Use a monotonic increasing stack to determine, for each element:
+   *   - The previous smaller element index (left boundary)
+   *   - The next smaller element index (right boundary)
+   * - For an element at index `i`, the total number of subarrays where it is the minimum is:
+   *      (i - previousSmallerIndex) * (nextSmallerIndex - i)
+   * - Its total contribution is:
+   *      nums[i] * leftCount * rightCount
+   * - Sum all such contributions modulo 1e9+7.
+   *
+   * Time Complexity: O(N) — each element is pushed and popped once from the stack.
+   * Space Complexity: O(N) — space used by the stack and intermediate variables.
+   *
+   * @param nums the input array
+   * @return sum of subarray minimums modulo 1e9+7
+   */
+  public int sumSubarrayMins(int[] nums) {
+      if (nums == null || nums.length == 0) {
+          return 0;
+      }
+
+    int length = nums.length;
+    long totalSum = 0;
+    Deque<Integer> stack = new ArrayDeque<>();
+    stack.push(-1);  // Sentinel value to handle left boundaries
+
+    for (int i = 0; i < length; i++) {
+      // Maintain a monotonic increasing stack
+      while (stack.peek() != -1 && nums[stack.peek()] > nums[i]) {
+        int mid = stack.pop();                // Current minimum
+        int left = stack.peek();              // Previous smaller element's index
+        int right = i;                        // Next smaller element's index
+        totalSum = (totalSum + computeContribution(nums[mid], left, mid, right)) % MODULO;
+      }
+      stack.push(i);
     }
 
-    /**
-     * Calculates the sum of the minimum values of all subarrays.
-     *
-     * @param nums Input array
-     * @return Sum of all subarray minimums modulo 1e9+7
-     */
-    public int sumSubarrayMins(int[] nums) {
-        if (nums == null || nums.length == 0) return 0; // Edge case: Empty input
-
-        int length = nums.length;
-        long result = 0;
-        Deque<Integer> increasingStack = new ArrayDeque<>(); // Monotonic increasing increasingStack
-
-        increasingStack.push(-1); // Sentinel value for boundary handling
-
-        // For each element find the left and right minimum indices. The current element is the minimum for all subarrays
-        // between the left and right minimum indices.
-        for (int i = 0; i < length; i++) {
-            while (increasingStack.peek() != -1 && nums[increasingStack.peek()] > nums[i]) {
-                // current element is smaller than the top of the increasingStack.
-                // So the current element is the next smaller element for the top of the increasingStack
-                int rightMinimumNumberIndex = i;
-                int currentMinNumberIndex = increasingStack.pop(); // the minimum element in the subarray between left and right minimum indices
-                int leftMinimumNumberIndex = increasingStack.peek();
-                result = (result + calculateContributionOfCurrentIndex(nums, leftMinimumNumberIndex, currentMinNumberIndex, rightMinimumNumberIndex)) % MODULO;
-            }
-            increasingStack.push(i);
-        }
-
-        // Process remaining elements in increasingStack
-        while (increasingStack.peek() != -1) {
-            // For these elements, the next smaller element is the end of the array
-            int rightMinimumNumberIndex = length;
-            int currentMinNumberIndex = increasingStack.pop(); // the minimum element in the subarray between left and right minimum indices
-            int leftMinimumNumberIndex = increasingStack.peek();
-            result = (result + calculateContributionOfCurrentIndex(nums, leftMinimumNumberIndex, currentMinNumberIndex, rightMinimumNumberIndex)) % MODULO;
-        }
-
-        return (int) result;
+    // Process remaining elements in stack for which no smaller element on the right
+    while (stack.peek() != -1) {
+      int mid = stack.pop();
+      int left = stack.peek();
+      int right = length;
+      totalSum = (totalSum + computeContribution(nums[mid], left, mid, right)) % MODULO;
     }
 
+    return (int) totalSum;
+  }
+
     /**
-     * Calculates the contribution of nums[currentIndex] being the minimum element
-     * for all subarrays between leftMinimumNumberIndex and rightMinimumNumberIndex.
+     * Helper method to compute the contribution of an element at index `midIndex` being the minimum
+     * in all subarrays between indices `leftIndex` and `rightIndex`.
      *
-     * Formula: nums[currentIndex] * (#subarrays where it's minimum)
-     *         = nums[currentIndex] * (currentIndex - leftMinimumNumberIndex) * (rightMinimumNumberIndex - currentIndex)
+     * Formula: value * (number of subarrays where it is minimum)
+     *  ie. value * (midIndex - leftIndex) * (rightIndex - midIndex)
      */
-    private long calculateContributionOfCurrentIndex(int[] nums, int leftMinimumNumberIndex, int currentIndex, int rightMinimumNumberIndex) {
-        int leftCount = currentIndex - leftMinimumNumberIndex;
-        int rightCount = rightMinimumNumberIndex - currentIndex;
-        return (long) nums[currentIndex] * leftCount * rightCount;
+    private long computeContribution(int value, int leftIndex, int midIndex, int rightIndex) {
+        int leftCombinations = midIndex - leftIndex;
+        int rightCombinations = rightIndex - midIndex;
+        int totalCombinations = leftCombinations * rightCombinations;
+        return (long) totalCombinations * value;
     }
 }

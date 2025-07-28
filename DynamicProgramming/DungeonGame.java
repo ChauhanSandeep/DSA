@@ -17,7 +17,8 @@ package DynamicProgramming;
  *   [10, 30, -5]
  * ]
  * Output: 7
- * Explanation: The knight needs at least 7 health to reach the princess.
+ * Explanation: The knight needs at least 7 health to reach the princess using path
+ * (0,0) [-2] -> (0,1) [-3] -> (0,2) [3] -> (1,2) [1] -> (2,2) [-5].
  *
  * Follow-up Interview Questions:
  * - Can you optimize the space complexity to O(n) using a rolling array? (Yes)

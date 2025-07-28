@@ -76,13 +76,13 @@ public class MinCutPalindrome {
      * - For every end index, find all valid start indices that form palindromes.
      * - Update dp[end] based on previous valid partitions.
      *
-     * Time: O(N^2)
-     * Space: O(N^2)
+     * Time: O(N^2) because we fill a 2D table for palindromes and iterate through it.
+     * Space: O(N^2) because of the palindrome table.
      */
     public int minCutDP(String str) {
         int length = str.length();
         boolean[][] isPalindrome = new boolean[length][length]; // isPalindrome[i][j] = true if str[i:j] is a palindrome
-        int[] dp = new int[length]; // dp[i] = min cuts needed for str[0..i]
+        int[] minCutsRequired = new int[length]; // minCutsRequired[i] = min cuts needed for str[0..i]
 
         // Precompute palindrome substrings
         for (int end = 0; end < length; end++) {
@@ -96,19 +96,22 @@ public class MinCutPalindrome {
         // Fill DP table
         for (int right = 0; right < length; right++) {
             if (isPalindrome[0][right]) {
-                dp[right] = 0; // No cut needed if whole substring is a palindrome
+                minCutsRequired[right] = 0; // No cut needed if whole substring is a palindrome
             } else {
-                dp[right] = right; // Max possible cuts (cut at every character)
+                minCutsRequired[right] = right; // Max possible cuts (cut at every character)
                 for (int left = 1; left <= right; left++) {
                     if (isPalindrome[left][right]) {
-                        int cutsBeforeLeft = dp[left - 1];
-                        dp[right] = Math.min(dp[right], 1 + cutsBeforeLeft);
+                        int cutsBeforeLeft = minCutsRequired[left - 1];
+                        minCutsRequired[right] = Math.min(
+                            minCutsRequired[right], // if we don't cut at left
+                            1 + cutsBeforeLeft // if we cut at left, adding 1 cut
+                        );
                     }
                 }
             }
         }
 
-        return dp[length - 1];
+        return minCutsRequired[length - 1];
     }
 
     /**

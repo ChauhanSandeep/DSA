@@ -74,7 +74,7 @@ class LFUCache {
       // If key already exists, update its value and frequency
     if (keyToValueMap.containsKey(key)) {
       keyToValueMap.put(key, value);
-      updateFrequency(key);
+      incrementFrequency(key);
       return;
     }
 
@@ -109,7 +109,7 @@ class LFUCache {
       return -1;
     }
 
-    updateFrequency(key);
+    incrementFrequency(key);
     return keyToValueMap.get(key);
   }
 
@@ -125,7 +125,7 @@ class LFUCache {
    * Time Complexity: O(1)
    * Space Complexity: O(1)
    */
-  private void updateFrequency(int key) {
+  private void incrementFrequency(int key) {
     int currentFreq = keyToFrequencyMap.get(key);
     int updatedFreq = currentFreq + 1;
     keyToFrequencyMap.put(key, updatedFreq);
@@ -138,7 +138,7 @@ class LFUCache {
     if (keysAtCurrentFreq.isEmpty()) {
       frequencyToKeysMap.remove(currentFreq);
       if (minFrequency == currentFreq) {
-        // we are sure that minFrequency + 1 is be available becuase input key is now updatedFreq (minFrequency + 1)
+        // we are sure that minFrequency + 1 is be available because input key is now updatedFreq (minFrequency + 1)
         minFrequency++;
       }
     }

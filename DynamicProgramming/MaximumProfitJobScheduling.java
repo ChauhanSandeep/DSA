@@ -44,7 +44,7 @@ public class MaximumProfitJobScheduling {
     int maxProfit = scheduler.jobScheduling(startTime, endTime, profit);
     System.out.println("Maximum Profit: " + maxProfit);  // Output: 120
 
-    int optimizedProfit = scheduler.jobSchedulingOptimized(startTime, endTime, profit);
+    int optimizedProfit = scheduler.jobScheduling(startTime, endTime, profit);
     System.out.println("Optimized Maximum Profit: " + optimizedProfit);  // Output: 120
   }
 

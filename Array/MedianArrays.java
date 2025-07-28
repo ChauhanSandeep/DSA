@@ -98,22 +98,24 @@ public class MedianArrays {
 
     int len1 = nums1.length, len2 = nums2.length;
     int low = 0, high = len1;
+    int totalMidPoint = (len1 + len2 + 1) / 2; // +1 to handle odd-length cases
 
     while (low <= high) {
       // cut in nums1 is at the middle of the current search range
       int cut1 = (low + high) / 2;
-      /**
-       * cut1 + cut2 = (len1 + len2 + 1) / 2 because cut1 + cut2 is the total number of elements in the left partition
-       * +1 is added to handle odd-length cases correctly.
-       * cut2 = (len1 + len2 + 1) / 2 - cut1
+
+      /*
+       As cut1 + cut2 should cover half of the total elements,
+       cut1 + cut2 = totalMidPoint   ------ Equation 1 (+1 added to handle odd-length cases)
+       Therefore cut2 = totalMidPoint - cut1
        */
-      int cut2 = (len1 + len2 + 1) / 2 - cut1;
+      int cut2 = totalMidPoint - cut1;
 
-      int leftMax1 = (cut1 == 0) ? Integer.MIN_VALUE : nums1[cut1 - 1];
-      int leftMax2 = (cut2 == 0) ? Integer.MIN_VALUE : nums2[cut2 - 1];
+      int leftMax1 = (cut1 != 0) ? nums1[cut1 - 1] : Integer.MIN_VALUE;
+      int leftMax2 = (cut2 != 0) ? nums2[cut2 - 1] : Integer.MIN_VALUE;
 
-      int rightMin1 = (cut1 == len1) ? Integer.MAX_VALUE : nums1[cut1];
-      int rightMin2 = (cut2 == len2) ? Integer.MAX_VALUE : nums2[cut2];
+      int rightMin1 = (cut1 != len1) ? nums1[cut1] : Integer.MAX_VALUE;
+      int rightMin2 = (cut2 != len2) ? nums2[cut2] : Integer.MAX_VALUE;
 
       // Correct partition found
       if (leftMax1 <= rightMin2 && leftMax2 <= rightMin1) {

@@ -55,8 +55,9 @@ public class TilingDominoes2 {
 
     if (length == 1) return 0; // 3x1 can't be fully tiled with 2x1 dominoes
 
-    int[] prev = new int[STATE_COUNT];
+    // curr[i] = x means that there are x ways to tile columns 1...col such that the current column ends in state i (bitmask i pattern)
     int[] curr;
+    int[] prev = new int[STATE_COUNT]; // similarly for previous column states
 
     // Base case: an imaginary column before the first is fully filled
     prev[FULL_MASK] = 1;
@@ -65,14 +66,14 @@ public class TilingDominoes2 {
       curr = new int[STATE_COUNT];
 
       // Transition logic:
-      curr[0b000] = prev[0b111];                                       // All empty → all filled by 3 horizontal dominos
-      curr[0b001] = prev[0b110];                                       // Last column ended with top 2 filled
-      curr[0b010] = prev[0b101];                                       // Last column ended with top+bottom filled
-      curr[0b011] = (prev[0b100] + prev[0b111]) % MOD;                 // 011 from 100 and 111
-      curr[0b100] = prev[0b011];                                       // 100 from 011
-      curr[0b101] = prev[0b010];                                       // 101 from 010
-      curr[0b110] = (prev[0b001] + prev[0b111]) % MOD;                 // 110 from 001 and 111
-      curr[0b111] = ((prev[0b000] + prev[0b011]) % MOD + prev[0b110]) % MOD; // 000/011/110 to 111
+      curr[0b000] = prev[0b111];                                       //
+      curr[0b001] = prev[0b110];                                       // By placing a horizontal domino in the first row
+      curr[0b010] = prev[0b101];                                       // By placing a horizontal domino in the second row
+      curr[0b011] = (prev[0b100] + prev[0b111]) % MOD;                 // By either (placing a horizontal domino in the first two rows) or (filling the first two rows with a vertical domino)
+      curr[0b100] = prev[0b011];                                       // By placing a horizontal domino in the third row
+      curr[0b101] = prev[0b010];                                       // By placing a horizontal domino in the first and third rows
+      curr[0b110] = (prev[0b001] + prev[0b111]) % MOD;                 // By either (placing 2 vertical dominoes in second and third rows) or (filling the first two rows with a vertical domino)
+      curr[0b111] = ((prev[0b000] + prev[0b011]) % MOD + prev[0b110]) % MOD; // By either (placing 3 horizontal dominoes) or (filling third row with a horizontal domino and the first two rows with a vertical domino)
 
       prev = curr; // Move to next column
     }

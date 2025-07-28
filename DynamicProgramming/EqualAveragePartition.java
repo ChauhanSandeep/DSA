@@ -37,6 +37,8 @@ public class EqualAveragePartition {
      *      sum1 = (totalSum × size1) / totalLength
      * - For a valid partition to exist, sum1 must be an integer (since it's a sum of integers).
      * Therefore: (totalSum × size1) % totalLength == 0
+     * - If we had to find the subarray, we could have simply used 2 pointers or sliding window,
+     * but here we need to check for subsets of different sizes so we use recursion with memoization.
      *
      * Algorithm: Recursion with Memoization
      * Time Complexity: O(N * Sum * N) = O(N^2 * Sum) where N is array length

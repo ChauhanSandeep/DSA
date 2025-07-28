@@ -13,6 +13,7 @@ import java.util.Arrays;
  * Example:
  * Input: n = 9, cuts = [5,6,1,4,2]
  * Output: 22
+ *
  * Explanation: If you try the given cuts ordering the cost will be 25.
  * There are much ordering with total cost <= 25, for example, the order [4, 6, 5, 2, 1] has total cost = 22 which is the minimum possible.
  *
@@ -39,7 +40,7 @@ public class MinCostCutStick {
      * 2. Sort the array so we can treat segments properly.
      * 3. Use memoization to avoid recalculating overlapping subproblems.
      *
-     * Time Complexity: O(m^3), where m is the number of cuts
+     * Time Complexity: O(m^3), where m is the number of cuts, because
      * Space Complexity: O(m^2) for memo + O(m) for call stack (recursive depth)
      *
      * @param stickLength the length of the stick
@@ -59,7 +60,7 @@ public class MinCostCutStick {
         Arrays.sort(allCuts);
 
         // Step 3: Create a memoization table
-        int[][] memo = new int[allCuts.length][allCuts.length];
+        int[][] memo = new int[allCuts.length][allCuts.length]; // memo[i][j] minimum cost to cut the stick between cuts[i] and cuts[j]
         // Initialize memo with -1 to indicate uncomputed states
         for (int[] row : memo) {
             Arrays.fill(row, -1);
@@ -95,9 +96,9 @@ public class MinCostCutStick {
       for (int cutIndex = leftCutIndex + 1; cutIndex < rightCutIndex; cutIndex++) {
         int leftCost = findMinCost(allCuts, leftCutIndex, cutIndex, memo);
         int rightCost = findMinCost(allCuts, cutIndex, rightCutIndex, memo);
-        int cutCost = allCuts[rightCutIndex] - allCuts[leftCutIndex]; // because leftCutIndex and rightCutIndex contains index number but actual length is allCuts[right] - allCuts[left]
+        int currStickLength = allCuts[rightCutIndex] - allCuts[leftCutIndex]; // because leftCutIndex and rightCutIndex contains index number but actual length is allCuts[right] - allCuts[left]
 
-        int totalCost = leftCost + rightCost + cutCost;
+        int totalCost = leftCost + rightCost + currStickLength;
         minCost = Math.min(minCost, totalCost);
       }
 
