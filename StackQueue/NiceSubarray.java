@@ -2,74 +2,115 @@ package StackQueue;
 
 import java.util.LinkedList;
 
+
 /**
  * Problem: Count Number of Nice Subarrays
+ * Leetcode Link: https://leetcode.com/problems/count-number-of-nice-subarrays/
  *
- * Given an array of integers `nums` and an integer `k`, return the number
- * of subarrays that contain exactly `k` odd numbers.
+ * Given an array of integers `nums` and an integer `k`, return the number of
+ * subarrays that contain exactly `k` odd numbers.
  *
  * Example:
  * Input: nums = [1, 1, 2, 1, 1], k = 3
  * Output: 2
- * Explanation: The two valid subarrays with 3 odd numbers are [1,1,2,1] and [1,2,1,1].
+ * Explanation: The two valid subarrays with 3 odd numbers are [1,1,2,1] and [1,2,1,1]
  *
- * Example where sliding window fails:
+ * Edge Case:
  * Input: nums = [2, 1, 1, 2, 1, 1], k = 3
- * Output with sliding window: [2, 1, 1, 2, 1], [1, 2, 1, 1]
- * Actual Output: 3 because the valid subarrays are:
- * [2, 1, 1, 2, 1], [1, 1, 2, 1], [1, 2, 1, 1]
+ * Output: 3 → Valid subarrays: [2,1,1,2,1], [1,1,2,1], [1,2,1,1]
  *
- * LeetCode Link: https://leetcode.com/problems/count-number-of-nice-subarrays/
+ * Follow-up Questions (FAANG-relevant):
+ * 1. Can you solve it with prefix sum and hash map for better generality?
+ *    - Yes, use a map to count how many times a certain count of odd numbers has occurred.
+ *    - Leetcode: https://leetcode.com/problems/count-number-of-nice-subarrays/
+ * 2. Can you extend this to return the actual subarrays (start, end indices)?
+ *    - This requires nested loops or pre-storing positions of odd numbers.
  */
 public class NiceSubarray {
 
-    public static void main(String[] args) {
-        int[] nums = {1, 1, 2, 1, 1};
-        int k = 3;
-        System.out.println(countNiceSubarrays(nums, k)); // Expected output: 2
+  public static void main(String[] args) {
+    int[] nums = {1, 1, 2, 1, 1};
+    int k = 3;
+    System.out.println("Number of nice subarrays: " + countNiceSubarraysUsingDeque(nums, k)); // Output: 2
+    System.out.println("Number of nice subarrays (PrefixSum): " + countNiceSubarraysPrefixSum(nums, k)); // Output: 2
+  }
+
+  /**
+   * Counts subarrays with exactly k odd numbers using a deque-based sliding window.
+   *
+   * Steps:
+   * - Track indices of odd numbers using a deque.
+   * - Maintain a window that contains exactly (k+1) odd indices (start and end boundary).
+   * - For each such window, the number of valid subarrays is determined by the number of even elements before
+   *   the first odd number in the window.
+   *
+   * Time Complexity: O(N), where N is the length of the array.
+   * Space Complexity: O(K), for the deque storing up to (k+1) indices.
+   *
+   * @param nums Input integer array
+   * @param k    Number of odd numbers required in a subarray
+   * @return Number of valid subarrays with exactly k odd numbers
+   */
+  public static int countNiceSubarraysUsingDeque(int[] nums, int k) {
+    LinkedList<Integer> oddIndices = new LinkedList<>();
+    oddIndices.offer(-1); // Sentinel to handle even prefix
+
+    int subarrayCount = 0;
+
+    for (int index = 0; index < nums.length; index++) {
+      if (nums[index] % 2 != 0) {
+        oddIndices.offerLast(index); // Track odd index
+      }
+
+      // Maintain window of (k + 1) odd indices
+      if (oddIndices.size() > k + 1) {
+        oddIndices.pollFirst();
+      }
+
+      // If valid window exists, count all subarrays that start after previous odd index and end at current
+      if (oddIndices.size() == k + 1) {
+        int firstOddIndex = oddIndices.get(1);
+        int previousOddIndex = oddIndices.get(0);
+        subarrayCount += firstOddIndex - previousOddIndex;
+      }
     }
 
-    /**
-     *
-     * Approach:
-     * - Use a **deque (LinkedList) to track indices of odd numbers**.
-     * - Maintain a **window** that ensures exactly `k` odd numbers.
-     * - Count subarrays that start between two consecutive odd indices.
-     *
-     * Time Complexity: **O(N)** (each element is processed at most twice)
-     * Space Complexity: **O(K)** (for storing odd indices in deque)
-     *
-     * @param nums Input array of integers
-     * @param k    The required count of odd numbers in a subarray
-     * @return Number of valid subarrays
-     */
-    public static int countNiceSubarrays(int[] nums, int k) {
-        LinkedList<Integer> oddIndices = new LinkedList<>();
-        oddIndices.offer(-1); // Initialize with -1 for easier calculations
+    return subarrayCount;
+  }
 
-        int count = 0;
+  /**
+   * Optimized approach using prefix sum and hashmap.
+   *
+   * Steps:
+   * - Count number of subarrays where count of odd numbers is exactly k.
+   * - Use a map to track how many times a particular prefix sum (count of odds so far) has occurred.
+   *
+   * Time Complexity: O(N)
+   * Space Complexity: O(N)
+   *
+   * @param nums Input integer array
+   * @param k    Number of odd numbers required in a subarray
+   * @return Number of valid subarrays with exactly k odd numbers
+   */
+  public static int countNiceSubarraysPrefixSum(int[] nums, int k) {
+    java.util.Map<Integer, Integer> prefixCountMap = new java.util.HashMap<>();
+    prefixCountMap.put(0, 1); // Prefix sum 0 has occurred once
 
-        for (int i = 0; i < nums.length; i++) {
-            // If the number is odd, store its index
-            if (nums[i] % 2 != 0) {
-                oddIndices.offerLast(i);
-            }
+    int oddCount = 0;
+    int result = 0;
 
-            // Maintain only (k+1) odd numbers in the window
-            while (oddIndices.size() > k + 1) {
-                oddIndices.pollFirst();
-            }
+    for (int num : nums) {
+      if (num % 2 != 0) {
+        oddCount++; // Count odd numbers
+      }
 
-            // If we have exactly k odd numbers, count valid subarrays
-            if (oddIndices.size() == k + 1) {
-                int startIndex = oddIndices.get(1); // First odd number in the window
-                int previousOddIndex = oddIndices.get(0); // Odd number before `startIndex`
-                // numbers after previousOddIndex and before startIndex are all even. So we can create valid subarray
-                // from all the even numbers between previousOddIndex and startIndex.
-                count += startIndex - previousOddIndex;
-            }
-        }
+      // If (oddCount - k) prefix has occurred, it forms a valid subarray
+      result += prefixCountMap.getOrDefault(oddCount - k, 0);
 
-        return count;
+      // Record this prefix count
+      prefixCountMap.put(oddCount, prefixCountMap.getOrDefault(oddCount, 0) + 1);
     }
+
+    return result;
+  }
 }

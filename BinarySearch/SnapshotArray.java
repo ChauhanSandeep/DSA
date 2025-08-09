@@ -10,7 +10,6 @@ import java.util.TreeMap;
  * It allows setting values, taking snapshots of the array, and retrieving values
  * from a specific snapshot efficiently.
  *
- * <p>
  * -------------------------------------
  * 🔍 Intuition:
  * -------------------------------------
@@ -28,6 +27,12 @@ import java.util.TreeMap;
  * -------------------------------------
  * - Maintain an array of lists (changeHistory), one for each index in the array.
  * - Each list contains pairs: [snapshotId, value]
+ * For example:
+ *  - changeHistory[0] = [[0, 0], [1, 5], [2, 10]] means:
+ *  - At snapshot 0, index 0 had value 0.
+ *  - At snapshot 1, index 0 was set to 5.
+ *  - At snapshot 2, index 0 was set to 10.
+ *
  * - When setting a value:
  *      → If the latest entry is for the current snapshot, update it.
  *      → Else, append a new pair.
@@ -55,7 +60,7 @@ public class SnapshotArray {
 
   // Stores change history for each index:
   // Each list contains pairs of [snapshotId, value]
-  private List<int[]>[] changeHistory; // changeHistory[index] = List of [snapshotId, value]
+  private List<int[]>[] changeHistory; // changeHistory[index] = List of values where index of value is the snapshotId
 
   // Constructor: Initialize the change history for each index
   public SnapshotArray(int length) {
@@ -83,19 +88,25 @@ public class SnapshotArray {
     }
   }
 
+  // Get the value at index from the snapshot with given snapshotId
+  public int get(int index, int targetSnapshotId) {
+    List<int[]> historyAtIndex = changeHistory[index];
+    // Binary search for the closest snapshotId which is less than or equal to targetSnapshotId
+    return findClosestSnapshotValue(targetSnapshotId, historyAtIndex);
+  }
+
   // Take a snapshot and return its ID
   public int snap() {
     return currentSnapshotId++;
   }
 
-  // Get the value at index from the snapshot with given snapshotId
-  public int get(int index, int targetSnapshotId) {
-    List<int[]> historyAtIndex = changeHistory[index];
-
+  /**
+   * Finds the closest snapshot value for a given target snapshot ID using binary search.
+   * This method assumes that the historyAtIndex is sorted by snapshotId.
+   */
+  private static int findClosestSnapshotValue(int targetSnapshotId, List<int[]> historyAtIndex) {
+    int result = 0; // Default value if no valid snapshot found
     int low = 0, high = historyAtIndex.size() - 1;
-    int result = 0;
-
-    // Binary search for the closest snapshotId ≤ targetSnapshotId
     while (low <= high) {
       int mid = (low + high) / 2;
       int[] entry = historyAtIndex.get(mid);
@@ -107,7 +118,6 @@ public class SnapshotArray {
         high = mid - 1;
       }
     }
-
     return result;
   }
 

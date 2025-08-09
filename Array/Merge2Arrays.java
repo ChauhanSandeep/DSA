@@ -73,12 +73,14 @@ public class Merge2Arrays {
    * `arr1` should contain all the smaller elements and `arr2` should contain larger elements.
    * After the swap is done, we sort both arrays to maintain order.
    *
+   * Note: This is variation of the insertion sort technique where we insert elements from `arr2` into `arr1` in sorted order.
+   *
    * Steps:
    * 1. Compare the largest element of `arr1` with the smallest element of `arr2`.
    * 2. If `arr1`'s element is greater, swap them.
    * 3. Repeat until all elements are in correct order.
    *
-   * Time Complexity: O(N + M) for the merge +  O(N log N + M log M) for sorting
+   * Time Complexity: O(N + M) for the merge +  O(N log N + M log M) for sorting. Overall O((N + M) log(N + M)).
    * Space Complexity: O(1) (in-place modification)
    */
   static void mergeArrays(int[] arr1, int[] arr2) {

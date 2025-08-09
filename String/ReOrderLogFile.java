@@ -5,23 +5,32 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Problem: Reorder Log Files
+ * LeetCode Problem: https://leetcode.com/problems/reorder-data-in-log-files/
  *
- * Intuition:
- * - Letter-logs come before digit-logs.
- * - Letter-logs are sorted lexicographically by content (ignoring identifier).
- * - If contents are identical, sort by identifier.
- * - Digit-logs retain their original order.
+ * Problem Statement:
+ * You are given an array of logs. Each log is a space-delimited string where the first word is an identifier.
+ * There are two types of logs:
+ *   1. Letter-logs: All words after the identifier consist of lowercase English letters.
+ *   2. Digit-logs: All words after the identifier consist of digits.
  *
- * Algorithm:
- * - Separate letter-logs and digit-logs.
- * - Sort letter-logs using a custom comparator.
- * - Concatenate sorted letter-logs and original digit-logs.
+ * Your task is to reorder these logs as follows:
+ *   - All letter-logs come before digit-logs.
+ *   - Letter-logs are sorted lexicographically by content. If content is the same, sort by identifier.
+ *   - Digit-logs should retain their original relative order.
  *
- * Time Complexity: O(M log M) - Sorting letter-logs (where M is the number of letter-logs).
- * Space Complexity: O(M) - To store letter-logs separately.
+ * Example:
+ * Input:  ["a1 9 2 3 1", "g1 act car", "zo4 4 7", "ab1 off key dog", "a8 act zoo", "a2 act car"]
+ * Output: ["a2 act car", "g1 act car", "a8 act zoo", "ab1 off key dog", "a1 9 2 3 1", "zo4 4 7"]
+ *
+ * LeetCode: https://leetcode.com/problems/reorder-data-in-log-files/
+ *
+ * Follow-up Questions:
+ * 1. Can you perform this in-place?
+ * — Not easily without auxiliary space because sorting of letter-logs is required.
+ * 2. How would you scale this for streaming logs?
+ * — Use a priority queue or external merge sort with file buffers.
  */
-public class ReorderLogFiles {
+public class ReOrderLogFile {
 
     public static void main(String[] args) {
         String[] logs = {
@@ -34,13 +43,21 @@ public class ReorderLogFiles {
     }
 
     /**
-     * Reorders log files so that:
-     * - Letter-logs appear before digit-logs.
-     * - Letter-logs are sorted lexicographically by content, and then by identifier.
-     * - Digit-logs maintain their relative order.
+     * Reorders the logs with letter-logs first (sorted by content and identifier),
+     * followed by digit-logs (in original order).
      *
-     * @param logs Array of log entries.
-     * @return Reordered logs.
+     * Steps:
+     * 1. Separate letter-logs and digit-logs.
+     * 2. Sort letter-logs:
+     *    - First by log content.
+     *    - If contents are equal, by identifier.
+     * 3. Append digit-logs at the end.
+     *
+     * Time Complexity: O(N log N) where N = number of letter-logs (due to sorting)
+     * Space Complexity: O(N) to store separate letter and digit logs
+     *
+     * @param logs Array of log strings
+     * @return Reordered log array
      */
     public static String[] reorderLogFiles(String[] logs) {
         if (logs == null || logs.length == 0) return logs;
@@ -48,7 +65,7 @@ public class ReorderLogFiles {
         List<String> letterLogs = new ArrayList<>();
         List<String> digitLogs = new ArrayList<>();
 
-        // Separate letter and digit logs
+        // Step 1: Separate letter-logs and digit-logs
         for (String log : logs) {
             if (isDigitLog(log)) {
                 digitLogs.add(log);
@@ -57,25 +74,33 @@ public class ReorderLogFiles {
             }
         }
 
-        // Sort letter logs: First by content, then by identifier
+        // Step 2: Sort letter-logs based on content, then identifier
         letterLogs.sort((log1, log2) -> {
             String[] split1 = log1.split(" ", 2);
             String[] split2 = log2.split(" ", 2);
+            String identifier1 = split1[0];
+            String identifier2 = split2[0];
+            String content1 = split1[1];
+            String content2 = split2[1];
 
-            int contentComparison = split1[1].compareTo(split2[1]);
-            return contentComparison != 0 ? contentComparison : split1[0].compareTo(split2[0]);
+            int cmp = content1.compareTo(content2);
+            if (cmp != 0) {
+                return cmp;
+            } else {
+                return identifier1.compareTo(identifier2);
+            }
         });
 
-        // Combine sorted letter logs and original order digit logs
+        // Step 3: Merge sorted letter-logs and original-order digit-logs
         letterLogs.addAll(digitLogs);
-        return letterLogs.toArray(new String[0]);
+        return letterLogs.toArray(new String[0]); // This converts List to String array
     }
 
     /**
-     * Checks if a log is a digit-log (i.e., content after the identifier consists of numbers).
+     * Checks whether a given log is a digit-log.
      *
-     * @param log Log entry.
-     * @return true if it's a digit-log, false otherwise.
+     * @param log The log string
+     * @return true if it's a digit-log; false if it's a letter-log
      */
     private static boolean isDigitLog(String log) {
         String[] parts = log.split(" ", 2);

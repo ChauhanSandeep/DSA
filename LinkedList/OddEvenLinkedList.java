@@ -1,7 +1,7 @@
 package LinkedList;
 
-import LinkedList.Util.LinkedList;
-import LinkedList.Util.ListNode;
+import LinkedList.LinkedList;
+import LinkedList.ListNode;
 
 
 /**

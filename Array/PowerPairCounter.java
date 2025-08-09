@@ -15,10 +15,18 @@ import java.util.Arrays;
  * Output: 3
  * Explanation: Valid pairs are (2,1), (6,1), (6,5)
  *
- * 🔍 Follow-ups:
- * 1. Why is binary search used? ➤ To efficiently count Ys > x, skipping brute-force
- * 2. Can this be solved without math.pow? ➤ Yes, avoid for small integers — use direct math rules
- * 3. Can you generalize for BigInteger? ➤ Yes, but would require `log` based comparison
+ * 🔍 FAANG level Follow-ups:
+ * Q: How do you handle edge cases like x or y being 0 or 1?
+ * A: Special rules for small values of x and y, e.g., 0^y = 0, 1^y = 1.
+ *
+ * Q: Can you optimize further for large arrays?
+ * A: Use sorting and binary search to efficiently count pairs.
+ *
+ * Q: What if we need to return the actual pairs instead of just the count?
+ * A: Modify the algorithm to store pairs in a list instead of counting.
+ *
+ * Q: How does this relate to other mathematical properties of numbers?
+ * A: Relates to logarithmic properties and growth rates of functions.
  */
 public class PowerPairCounter {
 

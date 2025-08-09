@@ -2,127 +2,153 @@ package Heap;
 
 import java.util.PriorityQueue;
 
+
 /**
+ * Problem: Kth Smallest Element in a Sorted Matrix
  * LeetCode: https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
  *
- * Given an n x n matrix where each row and column is sorted in ascending order,
+ * Given an n x n matrix where each row and each column is sorted in ascending order,
  * return the k-th smallest element in the matrix.
  *
- * Approach 1: Min-Heap (Priority Queue)
- * - Use a Min-Heap to extract the smallest element k times.
- * - Insert the first element of each row into the heap.
- * - Continue extracting and inserting until the k-th smallest element is found.
+ * Example:
+ * Input:
+ * matrix = [
+ *     [1, 5, 9],
+ *     [10, 11, 13],
+ *     [12, 13, 15]
+ * ]
+ * k = 8
+ * Output: 13
  *
- * Time Complexity: O(k log n) → Extracting from heap k times
- * Space Complexity: O(n) → Storing at most n elements in the heap
- *
- * Approach 2: Binary Search (Optimized)
- * - Search for the k-th smallest number within the matrix range.
- * - Use binary search on values instead of indices.
- * - Count elements ≤ mid and adjust the search range.
- *
- * Time Complexity: O(n log(max-min)) → Faster for large matrices
- * Space Complexity: O(1) → No extra space used
+ * Follow-up Questions (FAANG-style):
+ * 1. Can you optimize it for very large matrix where n is large and k is small?
+ *    - Yes, use a min-heap and only track minimal number of elements (heap size limited to number of rows).
+ * 2. What if matrix is not square?
+ *    - Modify heap logic accordingly to support m x n.
+ * 3. Can you solve it using constant space?
+ *    - Yes, Binary Search on value range uses O(1) extra space.
+ * 4. Can you find the kth largest element instead of smallest?
+ *    - Yes, adapt the heap or invert the matrix index logic.
+ *    - Related: https://leetcode.com/problems/kth-largest-element-in-an-array/
  */
 public class SortedMatrix {
 
-    public static void main(String[] args) {
-        int[][] matrix = {
-                {1, 5, 9},
-                {10, 11, 13},
-                {12, 13, 15}
-        };
-        int k = 8;
+  public static void main(String[] args) {
+    int[][] matrix = {{1, 5, 9}, {10, 11, 13}, {12, 13, 15}};
+    int k = 8;
 
-        System.out.println("Kth Smallest (Min-Heap): " + kthSmallestHeap(matrix, k)); // Expected: 13
-        System.out.println("Kth Smallest (Binary Search): " + kthSmallestBinarySearch(matrix, k)); // Expected: 13
+    System.out.println("Kth Smallest (Min-Heap): " + findKthSmallestUsingMinHeap(matrix, k)); // Expected: 13
+    System.out.println("Kth Smallest (Binary Search): " + findKthSmallestUsingBinarySearch(matrix, k)); // Expected: 13
+  }
+
+  /**
+   * Finds the k-th smallest element in a sorted matrix using a Min-Heap.
+   *
+   * Steps:
+   * 1. Insert the first element of each row into a min-heap.
+   * 2. Repeatedly extract the smallest element from heap.
+   * 3. For each extracted element, insert the next element from the same row (if exists).
+   * 4. After k extractions, return the last extracted element.
+   *
+   * Time Complexity: O(k * log n), where n is the number of rows
+   * Space Complexity: O(n) for the heap
+   */
+  public static int findKthSmallestUsingMinHeap(int[][] matrix, int k) {
+    int numRows = matrix.length;
+    PriorityQueue<HeapNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.value, b.value));
+
+    // Insert the first element of each row
+    for (int row = 0; row < numRows; row++) {
+      minHeap.offer(new HeapNode(row, 0, matrix[row][0]));
     }
 
-    /**
-     * Finds the k-th smallest element using a Min-Heap (Priority Queue).
-     * @param matrix Sorted matrix (n x n).
-     * @param k The k-th smallest element to find.
-     * @return The k-th smallest element.
-     */
-    public static int kthSmallestHeap(int[][] matrix, int k) {
-        int n = matrix.length;
-        PriorityQueue<MatrixNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.value, b.value));
+    int extractedValue = -1;
+    for (int count = 0; count < k; count++) {
+      HeapNode current = minHeap.poll();
+      extractedValue = current.value;
 
-        // Insert the first element of each row into the minHeap
-        for (int row = 0; row < n; row++) {
-            minHeap.offer(new MatrixNode(row, 0, matrix[row][0]));
-        }
-
-        // Extract the minimum element k times
-        for (int count = 1; count < k; count++) {
-            MatrixNode node = minHeap.poll();
-
-            if (node.col + 1 < n) { // If next element exists in the row, insert it
-                minHeap.offer(new MatrixNode(node.row, node.col + 1, matrix[node.row][node.col + 1]));
-            }
-        }
-
-        return minHeap.poll().value;
+      // Insert the next element in the same row if it exists
+      if (current.colIndex + 1 < matrix[0].length) {
+        int nextCol = current.colIndex + 1;
+        minHeap.offer(new HeapNode(current.rowIndex, nextCol, matrix[current.rowIndex][nextCol]));
+      }
     }
 
-    /**
-     * Optimized Binary Search approach to find k-th smallest element.
-     * @param matrix Sorted matrix (n x n).
-     * @param k The k-th smallest element to find.
-     * @return The k-th smallest element.
-     */
-    public static int kthSmallestBinarySearch(int[][] matrix, int k) {
-        int n = matrix.length;
-        int left = matrix[0][0], right = matrix[n - 1][n - 1];
+    return extractedValue;
+  }
 
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-            int count = countLessOrEqual(matrix, mid);
+  /**
+   * Finds the k-th smallest element using a Binary Search on value range.
+   *
+   * Steps:
+   * 1. Set low = smallest element, high = largest element.
+   * 2. While low < high:
+   *    - mid = (low + high) / 2
+   *    - Count number of elements ≤ mid
+   *    - If count < k, move low to mid+1
+   *    - Else move high to mid
+   * 3. When low == high, it's the k-th smallest element.
+   *
+   * Time Complexity: O(n * log(max - min))
+   * Space Complexity: O(1)
+   */
+  public static int findKthSmallestUsingBinarySearch(int[][] matrix, int k) {
+    int length = matrix.length;
+    int low = matrix[0][0];
+    int high = matrix[length - 1][length - 1];
 
-            if (count < k) {
-                left = mid + 1; // Need to search for larger values
-            } else {
-                right = mid; // Potential answer, keep searching for a smaller one
-            }
-        }
+    while (low < high) {
+      int mid = low + (high - low) / 2;
+      // Count how many elements are less than or equal to mid
+      int count = countLessThanOrEqual(matrix, mid);
 
-        return left;
+      if (count < k) {
+        low = mid + 1; // Move right to find larger values
+      } else {
+        high = mid; // Possible candidate, look for smaller
+      }
     }
 
-    /**
-     * Counts how many numbers are ≤ target in the sorted matrix.
-     * @param matrix Sorted matrix (n x n).
-     * @param target The value to compare against.
-     * @return The count of elements ≤ target.
-     */
-    private static int countLessOrEqual(int[][] matrix, int target) {
-        int n = matrix.length;
-        int row = n - 1, col = 0, count = 0;
+    return low;
+  }
 
-        while (row >= 0 && col < n) {
-            if (matrix[row][col] <= target) {
-                count += (row + 1); // All numbers above this row in current column are smaller
-                col++; // Move right
-            } else {
-                row--; // Move up
-            }
-        }
+  /**
+   * Helper method to count how many elements in matrix are ≤ target.
+   *
+   * Time: O(n)
+   * Space: O(1)
+   */
+  private static int countLessThanOrEqual(int[][] matrix, int target) {
+    int count = 0;
+    int length = matrix.length;
+    int row = length - 1; // Start from bottom-left
+    int col = 0;
 
-        return count;
+    while (row >= 0 && col < length) {
+      if (matrix[row][col] <= target) {
+        count += (row + 1); // All elements above current row are also <= target
+        col++; // Move to next column
+      } else {
+        row--; // Move up
+      }
     }
+
+    return count;
+  }
 }
 
 /**
- * Helper class to store matrix elements in the min-heap.
+ * Helper class representing a cell in the matrix.
+ * Used for maintaining row and column information along with the value.
  */
-class MatrixNode {
-    int row;
-    int col;
-    int value;
+class HeapNode {
+  int rowIndex;
+  int colIndex;
+  int value;
 
-    public MatrixNode(int row, int col, int value) {
-        this.row = row;
-        this.col = col;
-        this.value = value;
-    }
+  public HeapNode(int rowIndex, int colIndex, int value) {
+    this.rowIndex = rowIndex;
+    this.colIndex = colIndex;
+    this.value = value;
+  }
 }

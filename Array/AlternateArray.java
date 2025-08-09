@@ -67,29 +67,34 @@ public class AlternateArray {
      * Input:  [1, 2, 3, 4, 5, 6]
      * Output: [6, 1, 5, 2, 4, 3]
      *
-     * Key Insight:
-     *   If we choose a number `maxElement` greater than the maximum value in the array,
-     *   we can encode two values at index `i` like this:
+     * This section explains how to encode two values into a single array element using a mathematical trick. Here's a clearer explanation:
      *
-     *     arr[i] = originalValue + newValue * maxElement;
+     * ### Key Idea:
+     * We want to rearrange the array in-place without using extra space. To do this, we encode two values (`originalValue` and `newValue`) into one array element using a large number `maxElement` (greater than the maximum value in the array).
      *
-     *   Later:
-     *     - originalValue = arr[i] % maxElement
-     *     - newValue = arr[i] / maxElement
-
+     * The encoding formula is: `arr[i] = originalValue + newValue * maxElement`
      *
-     * Why it works:
-     *   - `% maxElement` extracts the original value since any multiple of `maxElement` will become 0.
-     *                         (oldValue + newValue * maxElement) % maxElement
-     *                       → (newValue * maxElement) % maxElement + oldValue % maxElement
-     *                       → 0 + oldValue % maxElement
-     *                       → oldValue
-     *   - `/ maxElement` extracts the new value, because `originalValue < maxElement`,
-     *                        (oldValue + newValue * maxElement) / maxElement
-     *                      → (newValue * maxElement) / maxElement + oldValue / maxElement
-     *                      → newValue + 0
-     *                      → newValue
-     *     so integer division drops it (i.e., `originalValue / maxElement == 0`).
+     * ### Decoding:
+     * 1. To extract the originalValue: originalValue = arr[i] % maxElement
+     *    This works because `newValue * maxElement` is a multiple of `maxElement`, so it becomes `0` when using modulo.
+     *
+     * 2. To extract the `newValue`:  newValue = arr[i] / maxElement
+     *    This works because integer division drops the `originalValue` part (since `originalValue < maxElement`).
+     *
+     * ### Why It Works:
+     * - Modulo isolates the originalValue:
+     *   (originalValue + newValue * maxElement) % maxElement
+     *   → (newValue * maxElement) % maxElement + originalValue % maxElement
+     *   → 0 + originalValue
+     *   → originalValue
+     *
+     * - Division isolates the newValue:
+     *   (originalValue + newValue * maxElement) / maxElement
+     *   → (newValue * maxElement) / maxElement + originalValue / maxElement
+     *   → newValue + 0
+     *   → newValue
+     *
+     * This trick allows us to store two values in one array slot and rearrange the array in-place.
      *
      * Assumptions:
      *   - Array is sorted in non-decreasing order.
@@ -111,10 +116,10 @@ public class AlternateArray {
                 // we want to use arr[i] += newValue * maxElement;
                 // but the newValue might already be changed to a new value
                 // applying modulo on that will give us the original value
-                arr[i] += (arr[maxIndex--] % maxElement) * maxElement;
+              arr[i] = arr[i] + (arr[maxIndex--] % maxElement) * maxElement;
             } else {
                 // Store min element at odd indices
-                arr[i] += (arr[minIndex++] % maxElement) * maxElement;
+              arr[i] = arr[i] + (arr[minIndex++] % maxElement) * maxElement;
             }
         }
 

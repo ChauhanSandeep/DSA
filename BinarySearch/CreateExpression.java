@@ -2,77 +2,90 @@ package BinarySearch;
 
 import java.util.Arrays;
 
+
 /**
- * Problem Description:
- * Given an integer array, generate a boolean expression string that evaluates to true
- * for all integers present in the array, and false otherwise.
+ * Problem: Generate Boolean Expression from Integer Array
+ * No direct LeetCode link available. Related idea: Range OR expressions for set membership checks.
  *
- * The result is a disjunctive expression (e.g., "x == 1 || x == 3 || x == 5").
+ * Problem Statement:
+ * Given an array of integers, generate a boolean expression string that evaluates to `true`
+ * only for the integers in the array, and `false` for everything else.
  *
- * Intuition:
- * We recursively split the sorted array and build a balanced OR-expression tree.
- * This improves readability and avoids generating long linear chains of OR conditions.
+ * Expression format: "x == 1 || x == 3 || x == 5"
  *
- * Algorithm:
- * - Sort the array to handle unordered input.
- * - Recursively divide the array and construct OR sub-expressions.
+ * Example:
+ * Input: [1, 3, 4]
+ * Output: ((x == 1 || x == 3) || x == 4)
  *
- * Time Complexity: O(n log n)
- * - O(n log n) due to sorting.
- * - O(n) to build the expression tree recursively.
- *
- * 🧠 Space Complexity: O(log n) for recursion stack.
- *
+ * Follow-up Questions:
+ * - Q: Can we optimize the expression by detecting contiguous ranges?
+ *   A: Yes. Instead of listing all values, express ranges as: `(x >= 1 && x <= 5)`.
+ *      Leetcode follow-up idea: https://leetcode.com/problems/summary-ranges/
+ * - Q: How would you optimize for large datasets (e.g., 10^6 values)?
+ *   A: Use Trie or Interval Trees to compact expression or generate bytecode instead of a string.
+ * - Q: Can you minimize the output string length further?
+ *   A: Merge contiguous numbers or use regular expressions (in case of strings).
  */
 public class CreateExpression {
 
-    public static void main(String[] args) {
-        int[] inputArray = {1, 3, 4, 5, 6, 10, 11, 12, 16, 19, 20};
-        // (((x == 1 || x == 3) || (x == 4 || x == 5)) || (((x == 6 || x == 10) || (x == 11 || x == 12)) || (x == 16 || (x == 19 || x == 20))))
-        String booleanExpression = buildBooleanExpression(inputArray);
-        System.out.println(booleanExpression);
+  /**
+   * Entry point for test execution.
+   */
+  public static void main(String[] args) {
+    int[] inputArray = {1, 3, 4, 5, 6, 10, 11, 12, 16, 19, 20};
+    String expression = buildBooleanExpression(inputArray);
+    System.out.println(expression);
+  }
+
+  /**
+   * Constructs a balanced boolean expression that evaluates to true for the given numbers.
+   *
+   * 📌 Steps:
+   * - Validate input and return empty string for empty arrays.
+   * - Sort the input for consistency.
+   * - Build balanced OR-tree recursively for better readability.
+   *
+   * ⏱ Time Complexity: O(n log n) for sorting + O(n) expression building
+   * 📦 Space Complexity: O(log n) recursion stack
+   *
+   * @param numbers Array of integers to build expression for
+   * @return String representing the boolean expression
+   */
+  public static String buildBooleanExpression(int[] numbers) {
+    if (numbers == null || numbers.length == 0) {
+      return "";  // Edge case: empty input
     }
 
-    /**
-     * Public method to create a boolean expression for a given array of integers.
-     *
-     * @param numbers Array of integers for which expression is to be built
-     * @return A string containing the boolean expression
-     */
-    public static String buildBooleanExpression(int[] numbers) {
-        if (numbers == null || numbers.length == 0) {
-            return ""; // Edge case: return empty expression for empty/null input
-        }
+    Arrays.sort(numbers); // Ensure deterministic structure
+    return constructExpression(numbers, 0, numbers.length - 1);
+  }
 
-        Arrays.sort(numbers); // Ensure the array is sorted for consistent behavior
-        return constructExpression(numbers, 0, numbers.length - 1);
+  /**
+   * Recursively builds a balanced boolean OR expression.
+   *
+   * 📌 Steps:
+   * - Base case 1: Single element → return (x == val)
+   * - Base case 2: Two elements → return (x == a || x == b)
+   * - Recursive case: Split array and recurse on left and right halves
+   *
+   * @param sortedNumbers Sorted array of integers
+   * @param start          Start index of subarray
+   * @param end            End index of subarray
+   * @return String containing OR-based expression for subarray
+   */
+  private static String constructExpression(int[] sortedNumbers, int start, int end) {
+    if (start == end) {
+      return "(x == " + sortedNumbers[start] + ")";
     }
 
-    /**
-     * Recursively constructs a balanced OR-expression.
-     *
-     * @param numbers Sorted array of integers
-     * @param start   Start index of current subarray
-     * @param end     End index of current subarray
-     * @return Boolean expression for the given subarray
-     */
-    private static String constructExpression(int[] numbers, int start, int end) {
-        // Base case: only one element
-        if (start == end) {
-            return "(x == " + numbers[start] + ")";
-        }
-
-        // Base case: two elements, join directly with OR
-        if (end - start == 1) {
-            return "(x == " + numbers[start] + " || x == " + numbers[end] + ")";
-        }
-
-        // Recursive case: split array and build OR expression
-        int mid = start + (end - start) / 2;
-
-        String leftExpr = constructExpression(numbers, start, mid);
-        String rightExpr = constructExpression(numbers, mid + 1, end);
-
-        return "(" + leftExpr + " || " + rightExpr + ")";
+    if (end - start == 1) {
+      return "(x == " + sortedNumbers[start] + " || x == " + sortedNumbers[end] + ")";
     }
+
+    int mid = start + (end - start) / 2;
+    String leftExpression = constructExpression(sortedNumbers, start, mid);
+    String rightExpression = constructExpression(sortedNumbers, mid + 1, end);
+
+    return "(" + leftExpression + " || " + rightExpression + ")";
+  }
 }

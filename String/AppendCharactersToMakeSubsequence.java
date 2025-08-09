@@ -3,7 +3,8 @@ package String;
 /**
  * Problem Statement:
  * Given two strings `s` and `t`, return the minimum number of characters that need to be appended to the end of `s`
- * so that `t` becomes a subsequence of `s`. A subsequence is a sequence that can be derived from another string
+ * so that `t` becomes a subsequence of `s`.
+ * A subsequence is a sequence that can be derived from another string
  * by deleting some or no characters without changing the order of the remaining characters.
  *
  * Example:
@@ -51,19 +52,19 @@ public class AppendCharactersToMakeSubsequence {
         return 0;
       }
 
-        int i = 0; // Pointer for source
-        int j = 0; // Pointer for target
+        int sourceIndex = 0; // Pointer for source
+        int targetIndex = 0; // Pointer for target
 
         // Traverse both strings to find matching subsequence
-        while (i < source.length() && j < target.length()) {
-            if (source.charAt(i) == target.charAt(j)) {
-                j++; // move both if characters match
+        while (sourceIndex < source.length() && targetIndex < target.length()) {
+            if (source.charAt(sourceIndex) == target.charAt(targetIndex)) {
+                targetIndex++; // move both if characters match
             }
-            i++; // always move pointer i
+            sourceIndex++; // always move pointer sourceIndex
         }
 
-        // j is the number of matched characters
-        // so (target.length() - j) characters need to be appended
-        return target.length() - j;
+        // targetIndex is the number of matched characters
+        // so (target.length() - targetIndex) characters need to be appended
+        return target.length() - targetIndex;
     }
 }

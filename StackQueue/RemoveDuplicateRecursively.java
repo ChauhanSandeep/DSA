@@ -1,6 +1,6 @@
 package StackQueue;
 
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Problem: Remove All Adjacent Duplicates in String II
@@ -23,7 +23,7 @@ import java.util.Stack;
  * 2. What if we want to remove all adjacent duplicates regardless of count? ➤ Use two-pointer approach.
  * 3. Can we do it in-place? ➤ Yes, with character array + index pointer stack.
  */
-public class RemoveDuplicate {
+public class RemoveDuplicateRecursively {
 
     public static void main(String[] args) {
         String input = "pbbcggttciiippooaais";

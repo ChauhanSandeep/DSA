@@ -1,4 +1,4 @@
-package LinkedList.Util;
+package LinkedList;
 
 /**
  * A utility class for singly linked list operations.

@@ -1,5 +1,9 @@
 package Array;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+
 /**
  * 🔹 Problem: Maximum Score of Spliced Array
  * 🔗 Leetcode: https://leetcode.com/problems/maximum-score-of-spliced-array/
@@ -21,11 +25,18 @@ package Array;
  * Explanation:
  * - Splice subarray [90] from nums2 into nums1 at index 1: [60, 90, 60] → sum = 210
  *
- * Follow-ups:
- * - Can this be extended to k splices?
- *  → Yes, we can generalize the approach to allow multiple splices by iterating through all possible subarrays.
- * - What if the cost of splice varies by index?
- *  → We can adjust the gain calculation to account for variable costs.
+ * FAANG level Follow-ups:
+ * Q: What if we can splice multiple subarrays?
+ * A: Extend the algorithm to handle multiple splice operations.
+ *
+ * Q: How to find the indices of the spliced subarrays?
+ * A: Track start and end indices during the maximum gain calculation.
+ *
+ * Q: Can we optimize for space complexity?
+ * A: Use in-place modifications or single-pass algorithms to reduce space usage.
+ *
+ * Q: How does this relate to other array manipulation problems?
+ * A: Similar to maximum sum subarray problems, but with splicing flexibility.
  */
 public class MaxScoreSplicedArray {
 
@@ -61,13 +72,21 @@ public class MaxScoreSplicedArray {
     int sum2 = arraySum(nums2);
 
     // Splice from nums2 into nums1. Gain = nums2[i] - nums1[i]
-    int maxGain1 = maxSubarrayGain(nums2, nums1);
+    SpliceResult spliceInto1 = maxSubarrayGainWithIndices(nums2, nums1);
 
     // Splice from nums1 into nums2. Gain = nums1[i] - nums2[i]
-    int maxGain2 = maxSubarrayGain(nums1, nums2);
+    SpliceResult spliceInto2 = maxSubarrayGainWithIndices(nums1, nums2);
 
     // Return the best possible final score
-    return Math.max(sum1 + maxGain1, sum2 + maxGain2);
+    int maxScore = Math.max(sum1 + spliceInto1.gain, sum2 + spliceInto2.gain);
+
+    if (sum1 + spliceInto1.gain >= sum2 + spliceInto2.gain) {
+      System.out.println("Splice nums2 into nums1 from index " + spliceInto1.start + " to " + spliceInto1.end);
+    } else {
+      System.out.println("Splice nums1 into nums2 from index " + spliceInto2.start + " to " + spliceInto2.end);
+    }
+
+    return maxScore;
   }
 
   /**
@@ -82,18 +101,31 @@ public class MaxScoreSplicedArray {
    * @param target The array being spliced into
    * @return Maximum gain obtainable
    */
-  private int maxSubarrayGain(int[] source, int[] target) {
-    int maxGain = 0;      // Maximum gain found
-    int currentGain = 0; // Current subarray gain being calculated
+  private SpliceResult maxSubarrayGainWithIndices(int[] source, int[] target) {
+    int maxGainSoFar = 0;
+    int maxGainEndingHere = 0;
 
-    // Calculate the gain for each index
+    int start = 0;
+    int tempStart = 0;
+    int end = -1;
+
     for (int i = 0; i < source.length; i++) {
       int gain = source[i] - target[i];
-      currentGain = Math.max(gain, currentGain + gain);
-      maxGain = Math.max(maxGain, currentGain);
+      maxGainEndingHere += gain;
+
+      if (maxGainEndingHere < 0) {
+        // Reset if the current gain is negative
+        maxGainEndingHere = 0;
+        tempStart = i + 1;
+      } else if (maxGainEndingHere > maxGainSoFar) {
+        // Update max gain and indices if we found a new maximum
+        maxGainSoFar = maxGainEndingHere;
+        start = tempStart;
+        end = i;
+      }
     }
 
-    return maxGain;
+    return new SpliceResult(maxGainSoFar, start, end);
   }
 
   private int arraySum(int[] arr) {
@@ -103,4 +135,17 @@ public class MaxScoreSplicedArray {
     }
     return sum;
   }
+
+  private class SpliceResult {
+    public int gain;  // Maximum gain from splicing
+    public int start; // Start index of the subarray spliced in
+    public int end;   // End index of the subarray spliced in
+
+    public SpliceResult(int gain, int start, int end) {
+      this.gain = gain;
+      this.start = start;
+      this.end = end;
+    }
+  }
+
 }

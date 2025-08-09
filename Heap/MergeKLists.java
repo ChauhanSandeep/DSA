@@ -1,6 +1,6 @@
 package Heap;
 
-import LinkedList.Util.ListNode;
+import LinkedList.ListNode;
 import java.util.PriorityQueue;
 
 

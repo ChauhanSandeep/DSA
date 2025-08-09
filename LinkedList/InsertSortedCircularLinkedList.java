@@ -1,6 +1,6 @@
 package LinkedList;
 
-import LinkedList.Util.ListNode;
+import LinkedList.ListNode;
 
 /**
  * Given a circular linked list that is sorted in ascending order, insert a value `insertVal`

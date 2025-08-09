@@ -6,6 +6,8 @@ import java.util.List;
 
 
 /**
+ * LeetCode Link: https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/
+ *
  * Given an array representing garden taps, where each element denotes the range (left and right) of the tap at that index,
  * this solution finds the minimum number of taps required to water the entire garden.
  * Example:
@@ -16,8 +18,6 @@ import java.util.List;
  * - Use a greedy algorithm to find the minimum number of taps needed.
  * - Each tap can water a range of plants. We need to find the minimum number of taps
  *   that can cover the entire garden from leftmost to rightmost.
- *
- * LeetCode Link: https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/
  *
  * Algorithm: Greedy Interval Covering with Precomputation
  * Time Complexity: O(n) - We process the garden length efficiently.
@@ -51,30 +51,30 @@ public class MinTaps {
    * @return Minimum taps required to fully water the garden, or `-1` if impossible
    */
   public int minTaps(int target, int[] ranges) {
-    int currentCoverageEnd = 0;  // Tracks the farthest point currently covered
-    int nextCoverageEnd = 0;     // Tracks the farthest extension possible
+    int areaCoveredByPreviousTaps = 0;  // Tracks the farthest point currently covered
+    int areaReachableByCurrentTap = 0;     // Tracks the farthest extension possible
     int tapsUsed = 0;            // Counts the number of taps turned on
 
-    while (currentCoverageEnd < target) {
+    while (areaCoveredByPreviousTaps < target) {
       // Find the tap that extends coverage the farthest within the current reachable range
       for (int i = 0; i < ranges.length; i++) {
-        int leftLimit = i - ranges[i];   // Left boundary of this tap's range
-        int rightLimit = i + ranges[i];  // Right boundary of this tap's range
+        int leftRange = i - ranges[i];   // Left boundary of this tap's range
+        int rightRange = i + ranges[i];  // Right boundary of this tap's range
 
         // If this tap covers the current uncovered area and extends beyond the current max
-        if (leftLimit <= currentCoverageEnd && rightLimit > nextCoverageEnd) {
-          nextCoverageEnd = rightLimit;
+        if (leftRange <= areaCoveredByPreviousTaps && rightRange > areaReachableByCurrentTap) {
+          areaReachableByCurrentTap = rightRange;
         }
       }
 
       // If no new coverage is found, it's impossible to cover the full garden
-        if (currentCoverageEnd == nextCoverageEnd) {
+        if (areaCoveredByPreviousTaps == areaReachableByCurrentTap) {
             return -1;
         }
 
       // Activate a tap and extend the coverage
       tapsUsed++;
-      currentCoverageEnd = nextCoverageEnd;
+      areaCoveredByPreviousTaps = areaReachableByCurrentTap;
     }
 
     return tapsUsed;
@@ -96,33 +96,33 @@ public class MinTaps {
    * @return List of taps' indices that need to be turned on to fully water the garden, or `[-1]` if impossible
    */
   public List<Integer> minTapsWithPath(int target, int[] ranges) {
-    int currentCoverageEnd = 0;  // Farthest point currently covered
-    int nextCoverageEnd = 0;     // Farthest extension possible
+    int areaCoveredByPreviousTaps = 0;  // Farthest point currently covered
+    int areaReachableByCurrentTap = 0;     // Farthest extension possible
     List<Integer> tapsUsedList = new ArrayList<>();  // List of tap indices used
 
-    while (currentCoverageEnd < target) {
+    while (areaCoveredByPreviousTaps < target) {
       int selectedTap = -1;  // Track the tap selected in this round
 
       // Find the tap that extends coverage the farthest within the current reachable range
       for (int i = 0; i < ranges.length; i++) {
-        int leftLimit = i - ranges[i];
-        int rightLimit = i + ranges[i];
+        int leftRange = i - ranges[i];
+        int rightRange = i + ranges[i];
 
         // If this tap covers the current uncovered area and extends beyond current max
-        if (leftLimit <= currentCoverageEnd && rightLimit > nextCoverageEnd) {
-          nextCoverageEnd = rightLimit;
+        if (leftRange <= areaCoveredByPreviousTaps && rightRange > areaReachableByCurrentTap) {
+          areaReachableByCurrentTap = rightRange;
           selectedTap = i;
         }
       }
 
       // If no new coverage is found, it's impossible to cover the garden
-      if (currentCoverageEnd == nextCoverageEnd) {
+      if (areaCoveredByPreviousTaps == areaReachableByCurrentTap) {
         return Arrays.asList(-1);  // Return [-1] to indicate failure
       }
 
       // Activate the selected tap and extend the coverage
       tapsUsedList.add(selectedTap);
-      currentCoverageEnd = nextCoverageEnd;
+      areaCoveredByPreviousTaps = areaReachableByCurrentTap;
     }
 
     return tapsUsedList;

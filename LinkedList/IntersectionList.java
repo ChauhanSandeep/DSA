@@ -1,8 +1,5 @@
 package LinkedList;
 
-import LinkedList.Util.LinkedList;
-import LinkedList.Util.ListNode;
-
 
 /**
  * Problem: Find the intersection node of two singly linked lists.

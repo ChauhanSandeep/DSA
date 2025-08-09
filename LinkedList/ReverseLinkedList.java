@@ -1,7 +1,7 @@
 package LinkedList;
 
-import LinkedList.Util.LinkedList;
-import LinkedList.Util.ListNode;
+import LinkedList.LinkedList;
+import LinkedList.ListNode;
 
 import static Heap.MergeKLists.*;
 
@@ -47,10 +47,6 @@ public class ReverseLinkedList {
 
         head = reverseListRec(head);
         System.out.println("After recursive reversal:");
-        list.printList();
-
-        head = reverseInGroups(head, 4);
-        System.out.println("After batch-wise reversal:");
         list.printList();
     }
 

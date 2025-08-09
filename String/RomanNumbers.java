@@ -3,107 +3,131 @@ package String;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
- * Utility class for converting between Roman numerals and integers.
- * 
- * Problem:
- * - Convert Roman numerals to an integer.
- * - Convert an integer to Roman numerals.
- * 
- * Approaches:
- * 1. **Roman to Integer:** 
- *    - Use a HashMap to store Roman numeral values.
- *    - Traverse the string, checking for subtraction cases (e.g., IV = 4, IX = 9).
- *    - Add or subtract values based on their relative magnitudes.
- * 
- * 2. **Integer to Roman:**
- *    - Use predefined values and corresponding symbols.
- *    - Iteratively subtract the largest possible value while appending the symbol.
- * 
- * Time Complexity:
- * - `romanToInteger()`: **O(N)** (Single pass through the string)
- * - `intToRoman()`: **O(1)** (Fixed set of Roman numeral values)
- * 
- * Space Complexity:
- * - **O(1)** (Constant extra space usage)
- * 
- * LeetCode Equivalent: https://leetcode.com/problems/integer-to-roman/ and https://leetcode.com/problems/roman-to-integer/
+ * Problem: Convert Roman numerals to integers and vice versa.
+ *
+ * LeetCode Links:
+ * - Roman to Integer: https://leetcode.com/problems/roman-to-integer/
+ * - Integer to Roman: https://leetcode.com/problems/integer-to-roman/
+ *
+ * Problem Statement:
+ * - You are given a Roman numeral and need to convert it to an integer.
+ * - You are given an integer (1 to 3999) and need to convert it to a Roman numeral.
+ *
+ * Example:
+ * - romanToInteger("MCMIV") → 1904
+ * - intToRoman(58) → "LVIII"
+ *
+ * Follow-up Questions (FAANG interview-style):
+ * 1. What if you had to support values > 3999?
+ *    - Roman numerals historically didn’t support large values, but you could use overlines or modern extensions.
+ * 2. How to validate whether a Roman numeral string is valid?
+ *    - Use regex: ^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
+ * 3. Can you design this as a bi-directional converter using a shared abstraction?
+ *    - Yes, using an Enum or Symbol table class to store mapping and invertibility.
  */
 public class RomanNumbers {
-    public static void main(String[] args) {
-        String romanNumeral = "MCMIV";
-        int integerValue = romanToInteger(romanNumeral);
-        System.out.println("Integer value for " + romanNumeral + " is " + integerValue);
 
-        int number = 58;
-        String romanResult = intToRoman(number);
-        System.out.println("Roman numeral for " + number + " is " + romanResult);
+  public static void main(String[] args) {
+    String roman = "MCMIV";
+    int num = 58;
+
+    System.out.println("Roman to Integer → " + roman + ": " + romanToInteger(roman));
+    System.out.println("Integer to Roman → " + num + ": " + intToRoman(num));
+  }
+
+  /**
+   * Converts a Roman numeral to an integer.
+   *
+   * Steps:
+   * - Traverse from right to left
+   * - Subtract if current value is less than the previous one (e.g., IV = 5 - 1)
+   * - Otherwise, add it to the result
+   *
+   * Algorithm: Greedy with reverse traversal
+   * Time Complexity: O(N)
+   * Space Complexity: O(1)
+   *
+   * @param roman Roman numeral string (e.g., "MCMIV")
+   * @return Integer equivalent
+   * @throws IllegalArgumentException for invalid input
+   */
+  public static int romanToInteger(String roman) {
+    if (roman == null || roman.isEmpty()) {
+      throw new IllegalArgumentException("Input Roman numeral cannot be null or empty");
     }
 
-    /**
-     * Converts a Roman numeral string to an integer.
-     * @param roman The Roman numeral string (e.g., "MCMIV").
-     * @return The corresponding integer value.
-     * @throws IllegalArgumentException if input is invalid.
-     */
-    public static int romanToInteger(String roman) {
-        if (roman == null || roman.trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid Roman numeral input.");
-        }
+    Map<Character, Integer> romanToIntMap = getRomanToIntMap();
 
-        // Mapping of Roman numerals to integer values
-        Map<Character, Integer> romanValues = new HashMap<>();
-        romanValues.put('I', 1);
-        romanValues.put('V', 5);
-        romanValues.put('X', 10);
-        romanValues.put('L', 50);
-        romanValues.put('C', 100);
-        romanValues.put('D', 500);
-        romanValues.put('M', 1000);
+    int total = 0;
+    int previousValue = 0;
 
-        int result = 0;
-        int prevValue = 0;
+    for (int i = roman.length() - 1; i >= 0; i--) {
+      char symbol = roman.charAt(i);
+      Integer currentValue = romanToIntMap.get(symbol);
 
-        // Traverse the Roman numeral string
-        for (int i = roman.length() - 1; i >= 0; i--) {
-            int currValue = romanValues.get(roman.charAt(i));
+      if (currentValue == null) {
+        throw new IllegalArgumentException("Invalid Roman numeral character: " + symbol);
+      }
 
-            // If current value is less than the previous one, subtract it (e.g., IV = 4)
-            if (currValue < prevValue) {
-                result -= currValue;
-            } else {
-                result += currValue;
-            }
-            prevValue = currValue;
-        }
+      if (currentValue < previousValue) {
+        total -= currentValue; // Subtractive case (e.g., IV = 5 - 1)
+      } else {
+        total += currentValue;
+      }
 
-        return result;
+      previousValue = currentValue;
     }
 
-    // Predefined values and corresponding Roman symbols for conversion
-    private static final int[] VALUES =    {1000, 900,  500, 400,  100,  90,  50,  40,   10,   9,   5,  4,   1};
-    private static final String[] SYMBOLS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX","V","IV","I"};
+    return total;
+  }
 
-    /**
-     * Converts an integer to a Roman numeral.
-     * @param num The integer value (1 ≤ num ≤ 3999).
-     * @return The corresponding Roman numeral string.
-     */
-    public static String intToRoman(int num) {
-        if (num <= 0 || num > 3999) {
-            throw new IllegalArgumentException("Input must be between 1 and 3999.");
-        }
-
-        StringBuilder roman = new StringBuilder();
-
-        // Convert number to Roman numeral by iterating through predefined values
-        for (int i = 0; i < VALUES.length && num > 0; i++) {
-            while (num >= VALUES[i]) {
-                num -= VALUES[i];
-                roman.append(SYMBOLS[i]);
-            }
-        }
-
-        return roman.toString();
+  /**
+   * Converts an integer to a Roman numeral.
+   *
+   * Steps:
+   * - Use predefined Roman symbols and values
+   * - While num >= symbol value, subtract and append symbol
+   *
+   * Algorithm: Greedy
+   * Time Complexity: O(1) – number of Roman symbols is constant
+   * Space Complexity: O(1)
+   *
+   * @param number Integer between 1 and 3999
+   * @return Roman numeral string
+   * @throws IllegalArgumentException if number is out of range
+   */
+  public static String intToRoman(int number) {
+    if (number <= 0 || number > 3999) {
+      throw new IllegalArgumentException("Input must be in range [1, 3999]");
     }
+
+    final int[] VALUES = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    final String[] SYMBOLS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+    StringBuilder result = new StringBuilder();
+
+    for (int i = 0; i < VALUES.length && number > 0; i++) {
+      while (number >= VALUES[i]) {
+        result.append(SYMBOLS[i]);
+        number -= VALUES[i];
+      }
+    }
+
+    return result.toString();
+  }
+
+  // Utility method to return Roman symbol to integer value mapping
+  private static Map<Character, Integer> getRomanToIntMap() {
+    Map<Character, Integer> romanToInt = new HashMap<>();
+    romanToInt.put('I', 1);
+    romanToInt.put('V', 5);
+    romanToInt.put('X', 10);
+    romanToInt.put('L', 50);
+    romanToInt.put('C', 100);
+    romanToInt.put('D', 500);
+    romanToInt.put('M', 1000);
+    return romanToInt;
+  }
 }

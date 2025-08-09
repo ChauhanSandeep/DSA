@@ -33,6 +33,42 @@ public class MaxEvents {
     }
 
     /**
+     * Using Greedy approach:
+     *
+     * Algorithm:
+     * - Always attend the event that ends the earliest.
+     * This ensures that we leave the most room for future events,
+     * maximizing the total number of events attended.
+     * * This greedy strategy works because by always choosing the event that finishes earliest,
+     * we leave the most room for future events,
+     * maximizing the total number you can attend.
+     *
+     * * Time Complexity: O(N log N) due to sorting.
+     * * Space Complexity: O(N) for the heap.
+     *
+     */
+    public int maxEventsGreedy(int[][] events) {
+        if (events == null || events.length == 0) return 0;
+
+        // Sort events by end day, then by start day for tie-breaking.
+        Arrays.sort(events, (a, b) -> a[1] == b[1] ? Integer.compare(a[0], b[0]) : Integer.compare(a[1], b[1]));
+
+        int eventsAttended = 0;
+        int lastEndDay = 0;
+
+        for (int[] event : events) {
+            // Attend the event only if it starts after the last attended event's end day.
+            if (event[0] > lastEndDay) {
+                eventsAttended++;
+                lastEndDay = event[1]; // Update the last end day to this event's end day.
+            }
+        }
+        return eventsAttended;
+    }
+
+    /**
+     * Using a Min-Heap:
+     *
      * Algorithm:
      * - Sort events by start time (then by end time for tie-breaking).
      * - Use a min-heap to track the earliest ending events available to attend.

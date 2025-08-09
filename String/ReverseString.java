@@ -1,44 +1,58 @@
 package String;
 
 /**
- * Reverse the words in a given sentence while preserving the order of characters within each word.
- * 
- * Approach:
- * - Split the string into words using space as a delimiter.
- * - Reverse the order of words and reassemble the sentence.
- * - Use StringBuilder for efficiency.
- * 
- * Time Complexity: O(N) - Each word is processed once.
- * Space Complexity: O(N) - Stores words in an array.
- * 
- * LeetCode Equivalent: https://leetcode.com/problems/reverse-words-in-a-string/
+ * ✅ LeetCode Problem: Reverse Words in a String
+ * 🔗 https://leetcode.com/problems/reverse-words-in-a-string/
+ *
+ * 🔹 Problem Statement:
+ * Given a string `sentence`, reverse the order of words. A word is defined as a sequence of non-space characters.
+ * The final string should have exactly one space between words and no leading/trailing spaces.
+ *
+ * 🔸 Example:
+ * Input:  "I like this code very much"
+ * Output: "much very code this like I"
+ *
+ * 🔍 Follow-up Questions:
+ * - Can you reverse the words **in-place** if given as a character array?
+ *   🔗 https://leetcode.com/problems/reverse-words-in-a-string-ii/
+ * - What if multiple spaces exist between words? (Already handled via `split("\\s+")`)
+ * - How would you implement this with O(1) extra space if allowed to modify the original string?
  */
 public class ReverseString {
+
     public static void main(String[] args) {
         String sentence = "I like this code very much";
         String reversedSentence = reverseWords(sentence);
-        System.out.println(reversedSentence);
+        System.out.println(reversedSentence);  // Output: "much very code this like I"
     }
 
     /**
-     * Reverses the words in a sentence.
+     * Reverses the words in a sentence while preserving the character order within each word.
      *
-     * @param sentence The input string containing words separated by spaces.
-     * @return A string with words in reverse order.
+     * @param sentence The original input string containing words separated by spaces.
+     * @return A new string with words in reversed order and trimmed spaces.
+     *
+     * 🔹 Steps:
+     * - Trim leading/trailing spaces.
+     * - Split the string by one or more spaces using regex `\\s+`.
+     * - Append words in reverse order using a StringBuilder.
+     *
+     * ⏱ Time Complexity: O(N), where N = total number of characters in the sentence.
+     * 🧠 Space Complexity: O(N), to store the split words and result string.
      */
     private static String reverseWords(String sentence) {
         if (sentence == null || sentence.isEmpty()) {
-            return sentence; // Handle edge case
+            return sentence; // Edge case: null or empty string
         }
 
-        String[] words = sentence.trim().split("\\s+"); // Splitting by one or more spaces
-        StringBuilder reversed = new StringBuilder();
+        String[] words = sentence.trim().split("\\s+");
+        StringBuilder result = new StringBuilder();
 
-        // Iterate backwards and append words
         for (int i = words.length - 1; i >= 0; i--) {
-            reversed.append(words[i]).append(" ");
+            result.append(words[i]);
+            if (i > 0) result.append(" "); // Avoid trailing space
         }
 
-        return reversed.toString().trim(); // Remove trailing space
+        return result.toString();
     }
 }

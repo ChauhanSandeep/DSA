@@ -1,60 +1,89 @@
 package String;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/count-and-say/
+ * LeetCode Problem: Count and Say
+ * https://leetcode.com/problems/count-and-say/
  *
- * The "Count and Say" sequence is a series of strings where each term is generated 
- * based on the description of the previous term.
+ * 🔹 Problem Statement:
+ * Given an integer `n`, generate the nth term of the "Count and Say" sequence.
  *
- * Intuition:
- * - Start with "1" as the base case.
- * - For each iteration, read the previous sequence and construct the next sequence.
- * - Count consecutive identical digits and describe them in the new sequence.
+ * The "Count and Say" sequence is a series of strings where each term is generated
+ * by reading aloud the digits of the previous term and counting the number of digits in groups of the same digit.
  *
- * Algorithm:
- * 1. Initialize the sequence with "1".
- * 2. Iterate up to `n` to generate subsequent terms.
- * 3. Use a loop to read characters from the previous term and build the new term.
- * 4. Maintain a count of consecutive characters and append to the new term accordingly.
+ * 🔸 Example:
+ * Input: n = 4
+ * Output: "1211"
+ * Explanation:
+ * - Term 1: "1"
+ * - Term 2: "11"        (one 1)
+ * - Term 3: "21"        (two 1s)
+ * - Term 4: "1211"      (one 2, one 1)
  *
- * Time Complexity: O(N * M), where N is the input number and M is the average length of sequences.
- * Space Complexity: O(M), since we store the sequence in a StringBuilder.
+ * Follow-up Questions:
+ * - How would you optimize memory if you don't need to store full intermediate sequences?
+ * Answer: You can use a single StringBuilder to build the next sequence without storing all previous terms.
+ * - Can this be generated without string builders using character arrays?
+ * Answer: Yes, by using a character array and managing indices.
  */
 public class CountAndSay {
-    public static void main(String[] args) {
-        CountAndSay solver = new CountAndSay();
-        System.out.println(solver.countAndSay(4));  // Output: "1211"
+
+  public static void main(String[] args) {
+    CountAndSay solver = new CountAndSay();
+    System.out.println(solver.countAndSay(4));  // Output: "1211"
+  }
+
+  /**
+   * Generates the nth term in the "Count and Say" sequence.
+   *
+   * @param n The sequence term to generate.
+   * @return The nth term as a string.
+   *
+   * Steps:
+   * - Start with base string "1".
+   * - Traverse the string and count consecutive characters.
+   * - Append count followed by the digit.
+   * - Repeat until reaching the nth term.
+   *
+   * ⏱ Time Complexity: O(N * M), where:
+   *     - N = input `n`
+   *     - M = average length of each generated term (which grows approximately ~2x each time)
+   * 🧠 Space Complexity: O(M), space used to build each term.
+   */
+  public String countAndSay(int n) {
+      if (n <= 0) {
+          return "";  // Handle invalid input
+      }
+
+    StringBuilder currentSequence = new StringBuilder("1");
+
+    for (int i = 1; i < n; i++) {
+      currentSequence = generateNextSequence(currentSequence);
     }
 
-    public String countAndSay(int n) {
-        if (n <= 0) return "";  // Edge case
+    return currentSequence.toString();
+  }
 
-        StringBuilder currentSequence = new StringBuilder("1");
+  // Generates the next sequence based on the previous sequence.
+  private StringBuilder generateNextSequence(StringBuilder sequence) {
+    StringBuilder nextSequence = new StringBuilder();
 
-        for (int i = 1; i < n; i++) {
-            currentSequence = generateNextSequence(currentSequence);
-        }
+    int count = 1;
+    char currChar = sequence.charAt(0);
 
-        return currentSequence.toString();
+    for (int i = 1; i < sequence.length(); i++) {
+      char nextChar = sequence.charAt(i);
+
+      if (nextChar == currChar) {
+        count++;
+      } else {
+        nextSequence.append(count).append(currChar);
+        currChar = nextChar;
+        count = 1;
+      }
     }
 
-    private StringBuilder generateNextSequence(StringBuilder previousSequence) {
-        StringBuilder nextSequence = new StringBuilder();
-        int count = 1;
-        char digit = previousSequence.charAt(0);
-
-        for (int i = 1; i < previousSequence.length(); i++) {
-            if (previousSequence.charAt(i) == digit) {
-                count++;  // Increment count if same character repeats
-            } else {
-                nextSequence.append(count).append(digit);
-                digit = previousSequence.charAt(i);
-                count = 1;
-            }
-        }
-
-        // Append the last counted character group
-        nextSequence.append(count).append(digit);
-        return nextSequence;
-    }
+    // Append the final group
+    nextSequence.append(count).append(currChar);
+    return nextSequence;
+  }
 }
