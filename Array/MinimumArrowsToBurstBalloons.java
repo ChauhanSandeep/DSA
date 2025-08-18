@@ -9,7 +9,8 @@ import java.util.List;
 
 /**
  * Problem Statement:
- * Given a list of balloons represented as intervals [start, end], you need to burst all balloons using the minimum number of arrows.
+ * Given a list of spherical balloons taped into the wall represented as intervals [xStart, xEnd]
+ * You need to burst all balloons using the minimum number of arrows.
  * One arrow can burst all balloons that overlap with the same x-coordinate.
  * Return the minimum number of arrows needed.
  *
@@ -45,29 +46,29 @@ public class MinimumArrowsToBurstBalloons {
      * Time Complexity: O(n log n) for sorting
      * Space Complexity: O(1) extra space
      *
-     * @param points Array of intervals representing balloon positions
+     * @param intervals Array of intervals representing balloon positions
      * @return Minimum number of arrows needed to burst all balloons
      */
-    public int findMinArrowShots(int[][] points) {
-        if (points == null || points.length == 0) {
+    public int findMinArrowShots(int[][] intervals) {
+        if (intervals == null || intervals.length == 0) {
             return 0;
         }
 
         // Sort intervals by end coordinate (ascending)
-        Arrays.sort(points, (a, b) -> Integer.compare(a[1], b[1]));
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[1], b[1]));
 
         int arrowCount = 1;
-        int lastArrowPos = points[0][1]; // First arrow at end of first balloon
+        int lastArrowPos = intervals[0][1]; // First arrow at end of first balloon
 
-        for (int i = 1; i < points.length; i++) {
-            int[] current = points[i];
+        for (int i = 1; i < intervals.length; i++) {
+            int[] currentInterval = intervals[i];
 
-            // If current balloon starts after last arrow’s reach, shoot a new arrow
-            if (current[0] > lastArrowPos) {
+            // If currentInterval balloon starts after last arrow’s reach, shoot a new arrow
+            if (currentInterval[0] > lastArrowPos) {
                 arrowCount++;
-                lastArrowPos = current[1]; // Update arrow position
+                lastArrowPos = currentInterval[1]; // Update arrow position
             }
-            // else, current balloon is already burst by the last arrow
+            // else, currentInterval balloon is already burst by the last arrow
         }
 
         return arrowCount;

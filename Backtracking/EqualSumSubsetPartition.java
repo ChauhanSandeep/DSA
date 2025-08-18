@@ -1,95 +1,106 @@
 package Backtracking;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
+
 
 /**
- * Problem: Partition an array into k subsets with equal sum.
+ * Problem:
+ * Given an array of integers `nums` and an integer `k`, determine if it can be partitioned
+ * into `k` subsets such that each subset has the same sum.
  *
- * LeetCode: https://leetcode.com/problems/partition-to-k-equal-sum-subsets/
+ * Example:
+ * Input: nums = [4,3,2,3,5,2,1], k = 4
+ * Output: true
+ * Explanation: It is possible to divide it into 4 subsets (5), (1, 4), (2,3), (2,3) with equal sums.
  *
- * Approach:
- * - Calculate the total sum of elements.
- * - If the sum is not divisible by k, return false (impossible to partition equally).
- * - Use backtracking with a boolean array to track used elements.
- * - Sort numbers in descending order (greedy optimization).
- * - Try forming subsets recursively, backtracking when necessary.
+ * LeetCode Link: https://leetcode.com/problems/partition-to-k-equal-sum-subsets/
  *
- * Complexity Analysis:
- * - Sorting: O(N log N)
- * - Backtracking: O(k * 2^N) in worst case
- * - Overall: Exponential time complexity (NP-Hard problem)
+ * Follow-up Questions:
+ * 1. How can we optimize further? → Use bitmask DP to reduce repeated states.
+ * 2. Can we solve without sorting? → Yes, but sorting helps prune the search space.
+ * 3. How to count the number of valid partitions instead of just checking existence?
  */
 public class EqualSumSubsetPartition {
-    public static void main(String[] args) {
-        int[] nums1 = {2, 2, 2, 2, 3, 4, 5};
-        int k1 = 4;
-        System.out.println(canPartitionKSubsets(nums1, k1)); // Output: true
 
-        int[] nums2 = {2, 3, 1, 2, 3, 4, 5};
-        int k2 = 4;
-        System.out.println(canPartitionKSubsets(nums2, k2)); // Output: false
+  public static void main(String[] args) {
+    int[] nums1 = {2, 2, 2, 2, 3, 4, 5};
+    int k1 = 4;
+    System.out.println(canPartitionKSubsets(nums1, k1)); // true
+
+    int[] nums2 = {2, 3, 1, 2, 3, 4, 5};
+    int k2 = 4;
+    System.out.println(canPartitionKSubsets(nums2, k2)); // false
+  }
+
+  /**
+   * Determines if the array can be partitioned into k subsets of equal sum.
+   *
+   * Intuition & Steps:
+   * 1. **Total Sum Check**:
+   *    - If the sum of all numbers is not divisible by k, partitioning is impossible.
+   * 2. **Target Subset Sum**:
+   *    - Each subset must sum to `totalSum / k`.
+   * 3. **Greedy Optimization via Sorting**:
+   *    - Sort in descending order so that larger numbers are placed earlier.
+   *    - This helps prune branches early when sums exceed the target.
+   * 4. **Backtracking**:
+   *    - Use a `boolean[] used` to track which elements are already placed.
+   *    - Fill subsets one by one.
+   *    - If current subset reaches target, start forming the next subset.
+   * 5. **Early Exit**:
+   *    - If only 1 subset remains, it's guaranteed to be valid.
+   *
+   * Time Complexity: O(k * 2^N) in worst case (NP-Hard)
+   * Because each element has two choices: include or exclude (resulting in 2^N combinations) and overall there are k subsets
+   * Space Complexity: O(N) for `used` array and recursion stack.
+   *
+   * @param nums Input array
+   * @param k    Number of subsets
+   * @return True if partition possible, false otherwise
+   */
+  public static boolean canPartitionKSubsets(int[] nums, int k) {
+    int totalSum = Arrays.stream(nums).sum();
+    if (totalSum % k != 0) {
+      return false;
     }
 
-    public static boolean canPartitionKSubsets(int[] nums, int k) {
-        int totalSum = Arrays.stream(nums).sum();
+    int target = totalSum / k;
 
-        // If total sum is not divisible by k, partitioning is impossible
-        if (totalSum % k != 0) return false;
+    // sort in descending order.
+    // This helps in pruning branches early. However, the worst case time complexity is still O(2^N)
+    nums = Arrays.stream(nums).boxed().sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue).toArray();
+    boolean[] used = new boolean[nums.length]; // used[i] = true if nums[i] is used
+    return backtrack(nums, used, 0, 0, k, target);
+  }
 
-        int targetSubsetSum = totalSum / k;
-
-        // Sort in descending order to optimize backtracking (greedy approach)
-        Arrays.sort(nums);
-        reverseArray(nums);
-
-        boolean[] used = new boolean[nums.length];
-
-        // Start backtracking from index 0
-        return backtrack(nums, used, 0, 0, k, targetSubsetSum);
+  /**
+   * Recursive backtracking to fill subsets.
+   */
+  private static boolean backtrack(int[] nums, boolean[] used, int startIndex, int currentSum, int remainingGroups,
+      int target) {
+    if (remainingGroups == 1) {
+      // Only 1 subset left
+      return true;
     }
 
-    /**
-     * Backtracking function to check if k subsets with equal sum can be formed.
-     */
-    private static boolean backtrack(int[] nums, boolean[] used, int startIdx, int currentSum, int remainingGroups, int targetSubsetSum) {
-        // If only one group remains, it's guaranteed to be valid
-        if (remainingGroups == 1) return true;
-
-        // If the current subset reaches the target sum, start filling the next subset
-        if (currentSum == targetSubsetSum) {
-            return backtrack(nums, used, 0, 0, remainingGroups - 1, targetSubsetSum);
-        }
-
-        for (int i = startIdx; i < nums.length; i++) {
-            if (used[i] || currentSum + nums[i] > targetSubsetSum) continue;
-
-            // Choose
-            used[i] = true;
-
-            // Explore
-            if (backtrack(nums, used, i + 1, currentSum + nums[i], remainingGroups, targetSubsetSum)) {
-                return true;
-            }
-
-            // Undo (Backtrack)
-            used[i] = false;
-        }
-
-        return false; // No valid partition found
+    if (currentSum == target) {
+      // Start filling the next subset
+      return backtrack(nums, used, 0, 0, remainingGroups - 1, target);
     }
 
-    /**
-     * Helper function to reverse an array in-place.
-     */
-    private static void reverseArray(int[] arr) {
-        int left = 0, right = arr.length - 1;
-        while (left < right) {
-            int temp = arr[left];
-            arr[left] = arr[right];
-            arr[right] = temp;
-            left++;
-            right--;
-        }
+    for (int i = startIndex; i < nums.length; i++) {
+      if (used[i] || currentSum + nums[i] > target) {
+        continue;
+      }
+
+      used[i] = true;
+      if (backtrack(nums, used, i + 1, currentSum + nums[i], remainingGroups, target)) {
+        return true;
+      }
+      used[i] = false; // backtrack
     }
+
+    return false;
+  }
 }

@@ -3,137 +3,144 @@ package Graph;
 import java.util.*;
 
 /**
- * LeetCode Problem: Word Ladder II (https://leetcode.com/problems/word-ladder-ii/)
+ * Problem: Word Ladder II
+ * LeetCode: https://leetcode.com/problems/word-ladder-ii/
  *
- * Problem Summary:
- * - Given `beginWord`, `endWord`, and a `wordList`, find all shortest transformation sequences
- *   from `beginWord` to `endWord`, where:
- *     1. Only one letter can be changed at a time.
- *     2. Each transformed word must exist in `wordList`.
- * - Return all such shortest transformation sequences.
+ * Problem Statement:
+ * Given two words, beginWord and endWord, and a dictionary's word list, find all shortest transformation
+ * sequences from beginWord to endWord, such that:
+ * 1. Only one letter can be changed at a time.
+ * 2. Each transformed word must exist in the word list.
  *
- * Intuition & Approach:
- * - **Step 1 (BFS)**: Construct a shortest-path graph using a level-based BFS.
- * - **Step 2 (Backtracking)**: Use DFS to explore all valid paths from `beginWord` to `endWord`.
+ * Example:
+ * Input:
+ *   beginWord = "hit"
+ *   endWord = "cog"
+ *   wordList = ["hot","dot","dog","lot","log","cog"]
+ * Output:
+ * [
+ *   ["hit","hot","dot","dog","cog"],
+ *   ["hit","hot","lot","log","cog"]
+ * ]
  *
- * Time Complexity:
- * - BFS Graph Construction: O(N * M * 26) ~ O(NM), where N = word count, M = word length.
- * - DFS Backtracking: O(NM), worst case.
- * - Overall: O(NM) (since each word has at most M * 26 neighbors)
+ * Follow-up Questions:
+ * 1. How to solve it using single-direction BFS instead of bidirectional BFS? (Less optimal, O(N*M*26) per level)
+ * 2. How to count only the shortest transformation length instead of generating paths? (Use BFS with level tracking)
+ * 3. How to handle extremely large dictionaries? (Use on-the-fly neighbor generation with hashing)
  *
- * Space Complexity: O(NM) (for graph storage, recursion stack, and auxiliary sets).
+ * Approach:
+ * - Use bidirectional BFS to construct an adjacency map that only stores shortest transformations.
+ * - Use DFS to backtrack and generate all shortest paths.
  */
-
 public class WordLadder2 {
 
-    private final Map<String, List<String>> adjacencyList = new HashMap<>(); // Graph of word transitions
-    private final List<List<String>> resultPaths = new ArrayList<>();
-    private final List<String> currentPath = new ArrayList<>();
-
-    public static void main(String[] args) {
-        String beginWord = "hit";
-        String endWord = "cog";
-        List<String> wordList = List.of("hot", "dot", "dog", "lot", "log", "cog");
-
-        WordLadder2 solver = new WordLadder2();
-        List<List<String>> shortestLadders = solver.findLadders(beginWord, endWord, wordList);
-        System.out.println(shortestLadders);
+  public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+    Set<String> dictionary = new HashSet<>(wordList);
+    if (!dictionary.contains(endWord)) {
+      return Collections.emptyList();
     }
 
-    /**
-     * Finds all shortest transformation sequences from beginWord to endWord.
-     */
-    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
-        Set<String> wordSet = new HashSet<>(wordList);
-        if (!wordSet.contains(endWord)) return resultPaths; // Early exit if no possible transformation
+    // Perform bidirectional BFS to create adjacency map
+    Map<String, List<String>> adjacencyMap = new HashMap<>();
+    boolean pathFound = bidirectionBfsToCreateAdjacencyMap(beginWord, endWord, dictionary, adjacencyMap);
 
-        // Step 1: Build the graph using BFS
-        if (!constructGraphBFS(beginWord, endWord, wordSet)) return resultPaths;
-
-        // Step 2: Find all paths using DFS backtracking
-        currentPath.add(beginWord);
-        explorePathsDFS(beginWord, endWord);
-        return resultPaths;
+    // Perform DFS to backtrack and find all shortest paths
+    List<List<String>> allPaths = new ArrayList<>();
+    if (pathFound) {
+      depthFirstSearch(beginWord, endWord, adjacencyMap, new ArrayList<>(), allPaths);
     }
+    return allPaths;
+  }
 
-    /**
-     * Uses BFS to build the shortest-path adjacency list for word transformations.
-     */
-    private boolean constructGraphBFS(String beginWord, String endWord, Set<String> wordSet) {
-        Queue<String> queue = new LinkedList<>();
-        queue.add(beginWord);
+  /**
+   * This method uses bidirectional BFS to construct an adjacency map that only stores shortest transformations.
+   * 1. It creates two frontiers, one for each direction (from beginWord to endWord and vice versa).
+   * 2. It expands the frontier with words that differ by one letter.
+   * 3. It uses a dictionary to filter out words that are not in the dictionary or already in the opposite frontier.
+   * 4. It adds transformed words to the adjacency map if they are not already present in the map.
+   * 5. It returns true if a path has been found, false otherwise.
+   */
+  private boolean bidirectionBfsToCreateAdjacencyMap(String beginWord, String endWord, Set<String> dictionary,
+      Map<String, List<String>> adjacencyMap) {
+    Set<String> frontSet = new HashSet<>(Collections.singleton(beginWord));
+    Set<String> backSet = new HashSet<>(Collections.singleton(endWord));
+    boolean pathFound = false; // Track if a path has been found
+    boolean reverse = false; // Track which direction to expand in bidirectional BFS
 
-        Map<String, Integer> wordLevel = new HashMap<>(); // Stores shortest distance from beginWord
-        wordLevel.put(beginWord, 0);
+    while (!frontSet.isEmpty() && !backSet.isEmpty() && !pathFound) {
+      // Expand smaller frontier for efficiency. We do expansion of frontSet always so keep it smaller
+      if (frontSet.size() > backSet.size()) {
+        Set<String> temp = frontSet;
+        frontSet = backSet;
+        backSet = temp;
+        reverse = !reverse;
+      }
 
-        boolean reachedEndWord = false;
-        int currentDepth = 0;
+      dictionary.removeAll(frontSet);
+      Set<String> neighborSet = new HashSet<>(); // Store words to be expanded in next level
 
-        while (!queue.isEmpty() && !reachedEndWord) {
-            currentDepth++;
-            int levelSize = queue.size();
-            Set<String> wordsToRemove = new HashSet<>();
+      for (String currentWord : frontSet) {
+        for (String transformedWord : generateTransformations(currentWord)) {
+          if (!dictionary.contains(transformedWord) && !backSet.contains(transformedWord)) {
+            // only proceed if a word is in the dictionary or already in the opposite frontier
+            continue;
+          }
 
-            for (int i = 0; i < levelSize; i++) {
-                String word = queue.poll();
-                List<String> neighbors = generateNeighbors(word, wordSet);
+          // reverse check is done because we are doing bidirectional BFS and we are expanding the smaller frontier
+          // so the word that we are expanding is the one that is in the opposite frontier
+          String from = reverse ? transformedWord : currentWord; // from contains currentWord
+          String to = reverse ? currentWord : transformedWord;  // to contains transformedWord
+          adjacencyMap.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
 
-                for (String neighbor : neighbors) {
-                    if (!wordLevel.containsKey(neighbor)) {
-                        wordLevel.put(neighbor, currentDepth);
-                        queue.add(neighbor);
-                    }
-                    if (wordLevel.get(neighbor) == currentDepth) { // Ensure shortest paths only
-                        adjacencyList.computeIfAbsent(word, k -> new ArrayList<>()).add(neighbor);
-                    }
-                    if (neighbor.equals(endWord)) reachedEndWord = true;
-                }
-                wordsToRemove.addAll(neighbors);
-            }
-
-            wordSet.removeAll(wordsToRemove); // Remove words that were visited in this level
+          if (backSet.contains(transformedWord)) {
+            pathFound = true; // Path found
+          } else {
+            neighborSet.add(transformedWord); // Add word to be expanded in next level
+          }
         }
-        return reachedEndWord;
+      }
+
+      frontSet = neighborSet;
     }
+    return pathFound;
+  }
 
-    /**
-     * Generates all valid one-letter transformations of a word that exist in the word list.
-     */
-    private List<String> generateNeighbors(String word, Set<String> wordSet) {
-        List<String> neighbors = new ArrayList<>();
-        char[] charArray = word.toCharArray();
+  /**
+   * This method uses DFS to backtrack and generate all shortest paths from beginWord to endWord.
+   */
+  private void depthFirstSearch(String currentWord, String endWord, Map<String, List<String>> adjacencyMap,
+      List<String> currentPath, List<List<String>> allPaths) {
 
-        for (int i = 0; i < charArray.length; i++) {
-            char originalChar = charArray[i];
+    // Base case
+    currentPath.add(currentWord);
 
-            for (char c = 'a'; c <= 'z'; c++) {
-                if (c == originalChar) continue; // Skip replacing with the same character
-                charArray[i] = c;
-                String newWord = new String(charArray);
-                if (wordSet.contains(newWord)) {
-                    neighbors.add(newWord);
-                }
-            }
-            charArray[i] = originalChar; // Restore original character
-        }
-        return neighbors;
+    // Recursive case
+    if (currentWord.equals(endWord)) {
+      allPaths.add(new ArrayList<>(currentPath));
+    } else if (adjacencyMap.containsKey(currentWord)) {
+      for (String nextWord : adjacencyMap.get(currentWord)) {
+        depthFirstSearch(nextWord, endWord, adjacencyMap, currentPath, allPaths);
+      }
     }
+    // Backtrack
+    currentPath.remove(currentPath.size() - 1);
+  }
 
-    /**
-     * Uses DFS to find all shortest paths from beginWord to endWord.
-     */
-    private void explorePathsDFS(String source, String destination) {
-        if (source.equals(destination)) {
-            resultPaths.add(new ArrayList<>(currentPath));
-            return;
-        }
-
-        if (!adjacencyList.containsKey(source)) return;
-
-        for (String neighbor : adjacencyList.get(source)) {
-            currentPath.add(neighbor);
-            explorePathsDFS(neighbor, destination);
-            currentPath.remove(currentPath.size() - 1); // Backtrack
-        }
+  /**
+   * Helper method to generate all possible transformations by swapping one letter
+   */
+  private List<String> generateTransformations(String word) {
+    List<String> transformations = new ArrayList<>();
+    char[] wordChars = word.toCharArray();
+    for (int i = 0; i < wordChars.length; i++) {
+      char originalChar = wordChars[i];
+      for (char c = 'a'; c <= 'z'; c++) {
+        if (c == originalChar) continue;
+        wordChars[i] = c;
+        transformations.add(new String(wordChars));
+      }
+      wordChars[i] = originalChar;
     }
+    return transformations;
+  }
 }
