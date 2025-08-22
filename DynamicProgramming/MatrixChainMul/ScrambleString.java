@@ -4,21 +4,47 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Determines if one string is a scrambled version of another.
- * LeetCode Link: https://leetcode.com/problems/scramble-string/
+ * Problem: Scramble String
  *
- * Approach:
- * - Recursively check if `s1` can be transformed into `s2` by swapping substrings.
- * - Use memoization to optimize repeated subproblems.
- * - Base case: If `s1.equals(s2)`, return true.
- * - Additional check: If `s1` and `s2` are not anagrams, return false early.
+ * Determines if one string is a scrambled version of another. In a scramble, a string can be transformed by recursively swapping any non-empty substrings.
  *
- * Time Complexity: O(N^4) (due to substring operations and recursive calls)
- * Space Complexity: O(N^3) (memoization table)
+ * Example:
+ * Input: s1 = "great", s2 = "rgeat"
+ * Output: true
+ *
+ * LeetCode: https://leetcode.com/problems/scramble-string/
+ *
+ * Follow-up Questions (FAANG-style):
+ * 1. Can you optimize further for very long strings?
+ *    - Use iterative DP table (O(N^4) time, O(N^3) space); see LeetCode editorial.
+ * 2. How do you adapt for multiple queries on (s1, s2) pairs?
+ *    - Use a global memoization map for caching subresults efficiently.
+ * 3. Can you check actual transformation sequence?
+ *    - Trace recursion and record each split/swap used in the transformation.
+ * 4. What if swaps must be balanced or minimal?
+ *    - Add constraints in recursion and minimize swap operations in DP.
  */
 public class ScrambleString {
     private final Map<String, Integer> memo = new HashMap<>();
 
+    /**
+     * Recursive + Memoization Solution
+     *
+     * Steps of Solution:
+     * - Base Case: If source equals target, return true.
+     * - Anagram Check: If source and target are not anagrams, return false.
+     * - Recursive Splitting: For each possible split index, check both no-swap and
+     * swap cases recursively.
+     * - Memoization: Cache results for (source, target) pairs to avoid recomputation.
+     *
+     * Algorithm: Top-down recursion with memoization
+     * Time Complexity: O(N^4) in worst case due to substring operations and splits
+     * Space Complexity: O(N^3) for memoization storage
+     *
+     * @param source Source string
+     * @param target Target string
+     * @return
+     */
     public int isScramble(final String source, final String target) {
         if (source.equals(target)) return 1;
         if (!areAnagrams(source, target)) return 0;

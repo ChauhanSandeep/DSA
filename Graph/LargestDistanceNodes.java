@@ -4,93 +4,63 @@ import java.util.*;
 
 /**
  * Problem: Find the largest distance (diameter) between any two nodes in a tree.
- * 
- * Intuition:
- * - A tree's **diameter** is the longest path between two of its nodes.
- * - This can be found using **two BFS traversals**:
- *   1. **Start BFS from any node (usually root)** → Find the farthest node (`nodeA`).
- *   2. **Start BFS from `nodeA`** → Find the farthest node (`nodeB`), and record the max distance.
- * - This works because BFS guarantees that we find the longest path in an unweighted graph.
- * 
- * Algorithm:
- * 1. **Build the adjacency list representation** of the tree.
- * 2. **Perform the first BFS from the root** to find `nodeA` (farthest from root).
- * 3. **Perform the second BFS from `nodeA`** to find `nodeB` and get the max distance.
- * 4. Return the maximum distance found.
- * 
- * Time Complexity: O(N) - We perform **two BFS traversals** in O(N) time.
- * Space Complexity: O(N) - For adjacency list and BFS queue.
- * 
- * LeetCode/InterviewBit Link: https://www.interviewbit.com/problems/largest-distance-between-nodes-of-a-tree/
+ *
+ * Problem Statement:
+ * - The diameter of a tree is defined as the length of the longest path between any two nodes.
+ * - Given a tree in the form of a parent array, find this largest distance.
+ *
+ * Example:
+ * Input: parentNodes = [-1, 0, 0, 0, 3]
+ * Output: 3
+ * Explanation: The longest path is between node 1 → 0 → 3 → 4, length = 3.
+ *
+ * LeetCode Link: https://leetcode.com/problems/diameter-of-binary-tree/ (binary tree variant)
+ * InterviewBit Link: https://www.interviewbit.com/problems/largest-distance-between-nodes-of-a-tree/
+ *
+ * Follow-up Questions:
+ * 1. Can you solve this using DFS instead of BFS?
+ *    - Yes, by recursively calculating depth and diameter from each node.
+ * 2. Can the algorithm be optimized to a single DFS traversal?
+ *    - Yes, DFS can compute the diameter in O(N) with a single pass.
+ * 3. What changes if the graph is not guaranteed to be a tree?
+ *    - We must detect cycles and ensure connectivity. The problem reduces to longest path in a graph (NP-hard).
  */
 public class LargestDistanceNodes {
+
     public static void main(String[] args) {
         List<Integer> parentNodes = Arrays.asList(-1, 0, 0, 0, 3);
-        System.out.println("Largest Distance: " + new LargestDistanceNodes().findLargestDistance(parentNodes));
+        System.out.println("Largest Distance (BFS method): " +
+            new LargestDistanceNodes().findLargestDistanceBFS(parentNodes));
+        System.out.println("Largest Distance (DFS method): " +
+            new LargestDistanceNodes().findLargestDistanceDFS(parentNodes));
     }
 
     /**
-     * Finds the largest distance (diameter) between any two nodes in the given tree.
+     * Finds the largest distance (diameter) between any two nodes using BFS (two-pass approach).
      *
-     * @param parentNodes List representing the parent-child relationships in the tree.
-     * @return The largest distance (diameter) between two nodes.
+     * Steps:
+     * 1. Build the adjacency list from parent array.
+     * 2. Run BFS from root to find farthest node (nodeA).
+     * 3. Run BFS from nodeA to find the farthest node (nodeB) and distance.
+     *
+     * Time Complexity: O(N) - Two BFS traversals.
+     * Space Complexity: O(N) - Adjacency list + BFS queue.
      */
-    public int findLargestDistance(List<Integer> parentNodes) {
-        int size = parentNodes.size();
-        List<List<Integer>> adjacencyList = buildGraph(parentNodes);
+    public int findLargestDistanceBFS(List<Integer> parentNodes) {
+        List<List<Integer>> adjacencyList = buildGraph(parentNodes); // <node, list of neighbors>
 
-        // First BFS: Find the farthest node from the root
-        int farthestNode = bfs(adjacencyList, findRoot(parentNodes))[0];
+        int root = findRoot(parentNodes);
 
-        // Second BFS: Find the max distance from the farthest node found in the first BFS
-        return bfs(adjacencyList, farthestNode)[1];
+        int[] farthestNodeAndItsDistanceFromRoot = bfs(adjacencyList, root); // Find farthest node from root
+        int farthestFromRoot = farthestNodeAndItsDistanceFromRoot[0];
+
+        int[] farthestNodeAndItsDistanceFromNode = bfs(adjacencyList, farthestFromRoot); // Find farthest node from farthest node
+        return farthestNodeAndItsDistanceFromNode[1];
     }
 
     /**
-     * Builds an adjacency list representation of the tree.
-     *
-     * @param parentNodes List where the index represents a node and the value represents its parent.
-     * @return Adjacency list representation of the tree.
-     */
-    private List<List<Integer>> buildGraph(List<Integer> parentNodes) {
-        int size = parentNodes.size();
-        List<List<Integer>> adjacencyList = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-            adjacencyList.add(new ArrayList<>());
-        }
-
-        for (int i = 0; i < size; i++) {
-            int parent = parentNodes.get(i);
-            if (parent != -1) {
-                adjacencyList.get(i).add(parent);
-                adjacencyList.get(parent).add(i);
-            }
-        }
-        return adjacencyList;
-    }
-
-    /**
-     * Finds the root node (node with parent -1).
-     *
-     * @param parentNodes List where the index represents a node and the value represents its parent.
-     * @return The root node index.
-     */
-    private int findRoot(List<Integer> parentNodes) {
-        for (int i = 0; i < parentNodes.size(); i++) {
-            if (parentNodes.get(i) == -1) return i;
-        }
-        return -1; // This should never happen as there is always a root.
-    }
-
-    /**
-     * Performs BFS to find the farthest node and its distance.
-     *
-     * @param adjacencyList The adjacency list representation of the tree.
-     * @param startNode The node from which BFS starts.
-     * @return An array where:
-     *         - result[0] is the farthest node found.
-     *         - result[1] is the distance to the farthest node.
+     * BFS to find farthest node and its distance from startNode.
+     * Returns [farthestNode, maxDistance].
      */
     private int[] bfs(List<List<Integer>> adjacencyList, int startNode) {
         int size = adjacencyList.size();
@@ -107,13 +77,11 @@ public class LargestDistanceNodes {
             int[] current = queue.poll();
             int node = current[0], distance = current[1];
 
-            // Update max distance and farthest node
             if (distance > maxDistance) {
                 maxDistance = distance;
                 farthestNode = node;
             }
 
-            // Traverse all adjacent nodes
             for (int neighbor : adjacencyList.get(node)) {
                 if (!visited[neighbor]) {
                     visited[neighbor] = true;
@@ -122,5 +90,96 @@ public class LargestDistanceNodes {
             }
         }
         return new int[]{farthestNode, maxDistance};
+    }
+
+    /**
+     * Finds the largest distance (diameter) between any two nodes using DFS in one pass.
+     *
+     * Steps:
+     * 1. Build the adjacency list from parent array.
+     * 2. Perform DFS that returns an array containing:
+     *      - [0] = max depth from this node
+     *      - [1] = max diameter found in the subtree
+     * 3. Return the diameter.
+     *
+     * Time Complexity: O(N)
+     * Space Complexity: O(N) - recursion stack + adjacency list.
+     */
+    public int findLargestDistanceDFS(List<Integer> parentNodes) {
+        List<List<Integer>> adjacencyList = buildGraph(parentNodes);
+        int root = findRoot(parentNodes);
+
+        // DFS returns [maxDepth, maxDiameter] for the root
+        int[] result = dfs(root, -1, adjacencyList);
+        return result[1]; // maxDiameter
+    }
+
+    /**
+     * DFS helper that returns [maxDepthFromNode, maxDiameterInSubtree]
+     *
+     * maxDepthFromNode = max depth from this node to a leaf
+     * maxDiameterInSubtree = max diameter in the subtree, either from children or through this node
+     */
+    private int[] dfs(int currentNode, int parentNode, List<List<Integer>> adjacencyList) {
+        int deepestNodeLength = 0, secondDeepestNodeLength = 0; // top two depths from children
+        int maxDiameterInSubtree = 0;
+
+        for (int neighbor : adjacencyList.get(currentNode)) {
+            if (neighbor == parentNode) continue;
+
+            int[] childResult = dfs(neighbor, currentNode, adjacencyList);
+            int childDepth = childResult[0];
+            int childDiameter = childResult[1];
+
+            // track top two max depths
+            if (childDepth > deepestNodeLength) {
+                secondDeepestNodeLength = deepestNodeLength;
+                deepestNodeLength = childDepth;
+            } else if (childDepth > secondDeepestNodeLength) {
+                secondDeepestNodeLength = childDepth;
+            }
+
+            // track max diameter seen in children
+            maxDiameterInSubtree = Math.max(maxDiameterInSubtree, childDiameter);
+        }
+
+        // local diameter through this node
+        int diameterThroughThisNode = deepestNodeLength + secondDeepestNodeLength;
+
+        // max diameter, either from subtree or through this node
+        int maxDiameter = Math.max(maxDiameterInSubtree, diameterThroughThisNode);
+
+        // return [maxDepthFromNode, maxDiameterInSubtree]
+        return new int[]{deepestNodeLength + 1, maxDiameter};
+    }
+
+    /**
+     * Builds an adjacency list representation of the tree.
+     */
+    private List<List<Integer>> buildGraph(List<Integer> parentNodes) {
+        int size = parentNodes.size();
+        List<List<Integer>> adjacencyList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            adjacencyList.add(new ArrayList<>());
+        }
+        for (int i = 0; i < size; i++) {
+            int parent = parentNodes.get(i);
+            int child = i;
+            if (parent != -1) {
+                adjacencyList.get(child).add(parent);
+                adjacencyList.get(parent).add(child);
+            }
+        }
+        return adjacencyList;
+    }
+
+    /**
+     * Finds the root node (node with parent -1).
+     */
+    private int findRoot(List<Integer> parentNodes) {
+        for (int i = 0; i < parentNodes.size(); i++) {
+            if (parentNodes.get(i) == -1) return i;
+        }
+        throw new IllegalArgumentException("Tree must have a root node.");
     }
 }

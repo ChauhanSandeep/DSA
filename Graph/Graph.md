@@ -8,12 +8,12 @@
     - [Topological Sort using DFS](#dfs-based-topological-sort-implementation)
     - [Kahn's Algorithm (PREFERRED)](#kahns-algorithm-based-appraoch) `(SELECT → MARK(*) → WORK → ADD(*))` [In Queue with 0 In-Degree]
 - [Shortest Path Algorithms](#shortest-path-algorithms)
-    - [Dijkstra's Algorithm](#dijkstras-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap]
+    - [Dijkstra's Algorithm](#dijkstras-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with total path distance]
     - [Bellman-Ford Algorithm](#bellman-ford-algorithm)
     - [Floyd-Warshall Algorithm](#floyd-warshall-algorithm)
 - [Disjoint Sets (Union-Find)](#disjoint-sets-union-find)
 - [Minimum Spanning Tree](#minimum-spanning-tree)
-    - [Prim's Algorithm](#prims-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))`
+    - [Prim's Algorithm](#prims-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with individual Nodes]
     - [Kruskal's Algorithm](#kruskals-algorithm)
 - [Articulation Points and Bridges](#articulation-points-and-bridges)
 - [Kosaraju's Algorithm](#kosarajus-algorithm)
@@ -752,7 +752,7 @@ public class BellmanFord {
 
         // If we can reach `from` and it offers a cheaper path to `to`, update it
         if (shortestDistances[from] != Integer.MAX_VALUE &&
-            shortestDistances[from] + weight < shortestDistances[to]) {
+            shortestDistances[to] > shortestDistances[from] + weight ) {
           shortestDistances[to] = shortestDistances[from] + weight;
         }
       }

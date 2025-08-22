@@ -1,108 +1,113 @@
 package AmazonOa;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+
+/**
+ * Problem: Find the resource with the highest number of accesses within any 5-minute window.
+ *
+ * Input: Logs in the form [timestamp, user, resource]
+ * Example:
+ * logs1 = [
+ *   {"58523", "user_1", "resource_1"},
+ *   {"62314", "user_2", "resource_2"},
+ *   {"54001", "user_1", "resource_3"},
+ *   {"200",   "user_6", "resource_5"},
+ *   {"215",   "user_6", "resource_4"},
+ *   {"54060", "user_2", "resource_3"},
+ *   {"53760", "user_3", "resource_3"},
+ *   {"58522", "user_22","resource_1"},
+ *   {"53651", "user_5", "resource_3"},
+ *   {"2",     "user_6", "resource_1"},
+ *   {"100",   "user_6", "resource_6"},
+ *   {"400",   "user_7", "resource_2"},
+ *   {"100",   "user_8", "resource_6"},
+ *   {"54359", "user_1", "resource_3"}
+ * ]
+ *
+ * Output: [resource_3, 3]  // meaning resource_3 had 3 accesses in some 5-minute window
+ *
+ * LeetCode Similar Problem:
+ * - Analyze User Website Visit Pattern: https://leetcode.com/problems/analyze-user-website-visit-pattern/
+ *
+ * Follow-up Questions:
+ * 1. Can we generalize the window size (not fixed at 5 minutes)?
+ *    - Yes, make the window size configurable as a parameter.
+ * 2. How to handle very large logs efficiently?
+ *    - Use streaming algorithms with sliding windows instead of sorting all timestamps.
+ * 3. What if we also want the users who accessed in that window?
+ *    - Maintain user IDs in the sliding window while counting.
+ */
 public class CoinbaseRound1 {
 
-    public static void main(String[] argv) {
-        String[][] logs1 = new String[][] {
-                { "58523", "user_1", "resource_1" },
-                { "62314", "user_2", "resource_2" },
-                { "54001", "user_1", "resource_3" },
-                { "200", "user_6", "resource_5" },
-                { "215", "user_6", "resource_4" },
-                { "54060", "user_2", "resource_3" },
-                { "53760", "user_3", "resource_3" },
-                { "58522", "user_22", "resource_1" },
-                { "53651", "user_5", "resource_3" },
-                { "2", "user_6", "resource_1" },
-                { "100", "user_6", "resource_6" },
-                { "400", "user_7", "resource_2" },
-                { "100", "user_8", "resource_6" },
-                { "54359", "user_1", "resource_3"},
-        };
+  public static void main(String[] args) {
+    String[][] logs1 =
+        {{"58523", "user_1", "resource_1"}, {"62314", "user_2", "resource_2"}, {"54001", "user_1", "resource_3"},
+            {"200", "user_6", "resource_5"}, {"215", "user_6", "resource_4"}, {"54060", "user_2", "resource_3"},
+            {"53760", "user_3", "resource_3"}, {"58522", "user_22", "resource_1"}, {"53651", "user_5", "resource_3"},
+            {"2", "user_6", "resource_1"}, {"100", "user_6", "resource_6"}, {"400", "user_7", "resource_2"},
+            {"100", "user_8", "resource_6"}, {"54359", "user_1", "resource_3"},};
 
-        String[][] logs2 = new String[][] {
-                {"300", "user_1", "resource_3"},
-                {"599", "user_1", "resource_3"},
-                {"900", "user_1", "resource_3"},
-                {"1199", "user_1", "resource_3"},
-                {"1200", "user_1", "resource_3"},
-                {"1201", "user_1", "resource_3"},
-                {"1202", "user_1", "resource_3"}
-        };
+    String[] result = mostAccessedResource(logs1, 300);
+    System.out.println(Arrays.toString(result));
+  }
 
-        String[][] logs3 = new String[][] {
-                {"300", "user_10", "resource_5"}
-        };
+  /**
+   * Steps:
+   * 1. Parse logs and group timestamps by resource
+   * 2. For each resource, find max access count within any given window (e.g., 300 seconds)
+   * 3. Return resource with the maximum count
+   *
+   * Algorithm: Sliding Window
+   * Time Complexity: O(N log N) due to sorting timestamps per resource
+   * Space Complexity: O(N) for storing timestamps
+   */
+  public static String[] mostAccessedResource(String[][] logs, int windowSize) {
+      if (logs == null || logs.length == 0) {
+          return null;
+      }
 
-        // Map<String, List<String>> res2 = getLogTime(logs2);
-        // System.out.println(res2);
-        // Map<String, List<String>> res3 = getLogTime(logs3);
-        // System.out.println(res3);
-
-        String[] res1 = mostAccessedResource(logs1);
-        System.out.println(Arrays.toString(res1));
-
+    // Map resource -> list of access timestamps
+    Map<String, List<Integer>> resourceToTimestamps = new HashMap<>();
+    for (String[] log : logs) {
+      int timestamp = Integer.parseInt(log[0]);
+      String resource = log[2];
+      resourceToTimestamps.computeIfAbsent(resource, k -> new ArrayList<>()).add(timestamp);
     }
 
+    String maxResource = "";
+    int maxAccessCount = 0;
 
-    public static String[] mostAccessedResource(String[][] logs) {
-        if(logs == null || logs.length == 0 || logs[0].length == 0) return null;
-        Map<String, List<Integer>> map = new HashMap<>();
+    // Evaluate each resource
+    for (Map.Entry<String, List<Integer>> entry : resourceToTimestamps.entrySet()) {
+      String resource = entry.getKey();
+      List<Integer> timestamps = entry.getValue();
 
-
-        for(String[] log: logs) {
-            Integer timestamp = Integer.parseInt(log[0]);
-            String user = log[1];
-            String resource = log[2];
-
-            List<Integer> timestampList = map.getOrDefault(resource, new ArrayList<>());
-            timestampList.add(timestamp);
-            map.put(resource, timestampList);
-        }
-
-        String maxResource = "";
-        int maxCount = 0;
-
-        for(Map.Entry<String, List<Integer>> entry: map.entrySet()) {
-            String resource = entry.getKey();
-            System.out.println(resource);
-            List<Integer> timestamps = entry.getValue();
-            int count = getCount(timestamps);
-            if(count > maxCount) {
-                maxResource = resource;
-                maxCount = count;
-            }
-        }
-
-        return new String[]{maxResource, String.valueOf(maxCount)};
-
+      int count = getMaxAccessInWindow(timestamps, windowSize);
+      if (count > maxAccessCount) {
+        maxResource = resource;
+        maxAccessCount = count;
+      }
     }
 
-    private static int getCount(List<Integer> timestamps) {
-        Collections.sort(timestamps);
-        System.out.println(timestamps);
-        int maxLen = 0;
+    return new String[]{maxResource, String.valueOf(maxAccessCount)};
+  }
 
-        for(int i=0; i<timestamps.size(); i++) {
-            int currLen = 1;
-            for(int j=i+1; j<timestamps.size(); j++) {
-                if(timestamps.get(j) - timestamps.get(i) <= 300) {
-                    currLen++;
-                }else{
-                    break;
-                }
-            }
-            if(currLen > maxLen) {
-                maxLen = currLen;
-            }
-        }
-        return maxLen;
+  /**
+   * Sliding window to compute max accesses within a time window
+   */
+  private static int getMaxAccessInWindow(List<Integer> timestamps, int windowSize) {
+    Collections.sort(timestamps);
+    int maxCount = 0;
+    int left = 0;
+
+    // Expand right pointer, shrink left pointer as needed
+    for (int right = 0; right < timestamps.size(); right++) {
+      while (timestamps.get(right) - timestamps.get(left) > windowSize) {
+        left++;
+      }
+      maxCount = Math.max(maxCount, right - left + 1);
     }
+    return maxCount;
+  }
 }

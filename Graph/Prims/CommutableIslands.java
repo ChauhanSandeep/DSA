@@ -1,48 +1,81 @@
 package Graph.Prims;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
 /**
- * There are `vertices` islands and there are M bridges connecting them.
- * Each bridge has some cost attached to it.
- * We need to find bridges with minimal cost such that all islands are connected.
- * It is guaranteed that input data will contain at least one possible scenario
- * in which all islands are connected with each other.
+ * Problem: Minimum Cost to Connect All Islands
+ *
+ * Statement:
+ * There are `vertices` islands and M possible bridges between them.
+ * Each bridge has a cost. We need to find the minimum total cost to
+ * connect all islands so that they form a single connected component.
+ * It is guaranteed that at least one spanning structure exists.
+ *
+ * Example:
+ * Input (edges):
+ *  [ [1,2,1], [2,3,4], [1,4,3], [4,3,2], [1,3,10] ]
+ * Output:
+ *  6  (bridges chosen: [1-2 @1], [4-3 @2], [1-4 @3])
+ *
+ * LeetCode Similar Problem:
+ * - Min Cost to Connect All Points: https://leetcode.com/problems/min-cost-to-connect-all-points/
+ *
+ * Follow-up Questions:
+ * 1. How would you solve this if the graph was disconnected?
+ *    - Detect connectivity using DFS/BFS; if disconnected, no spanning tree exists.
+ * 2. Can you solve using Kruskal's algorithm instead of Prim's?
+ *    - Yes, Kruskal sorts all edges and uses Union-Find to connect components.
+ * 3. What is the time complexity difference between Prim’s and Kruskal’s?
+ *    - Prim’s: O(E log V), Kruskal’s: O(E log E). Choice depends on graph density.
  */
 public class CommutableIslands {
-    public static void main(String[] args) {
-        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
-        graph.add((ArrayList<Integer>) Stream.of(1, 2, 1).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(2, 3, 4).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(1, 4, 3).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(4, 3, 2).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(1, 3, 10).collect(toList()));
 
-        int minCost = new CommutableIslands().solve(4, graph);
-        System.out.println(minCost);
+    public static void main(String[] args) {
+        List<List<Integer>> edges = new ArrayList<>();
+        edges.add(Stream.of(1, 2, 1).collect(toList()));
+        edges.add(Stream.of(2, 3, 4).collect(toList()));
+        edges.add(Stream.of(1, 4, 3).collect(toList()));
+        edges.add(Stream.of(4, 3, 2).collect(toList()));
+        edges.add(Stream.of(1, 3, 10).collect(toList()));
+
+        int minCost = new CommutableIslands().findMinimumCost(4, edges);
+        System.out.println(minCost); // Expected 6
     }
 
     /**
-     * This works on Prim's algorithm
-     * Remove -> Mark* -> Work -> Add*
-     * remove from queue -> mark not visited -> print -> add not visited
+     * Uses Prim’s algorithm to compute MST cost
      *
-     * @param vertices number of vertices in input 1 to `vertices`
-     * @param input list of edges in graph format -> [vertex1, vertex2, weight]
-     * @return min cost of spanning all vertices
+     * Steps:
+     * 1. Build adjacency list from input
+     * 2. Initialize min-heap with (vertex=1, weight=0)
+     * 3. While heap not empty:
+     *      - Extract min edge
+     *      - If vertex not visited:
+     *          - Mark visited
+     *          - Add edge weight to result
+     *          - Push all neighbors into heap
+     *
+     * Time Complexity: O(E log V) where E = edges, V = vertices
+     * Space Complexity: O(V + E)
+     *
+     * @param vertices number of vertices (1-based indexing)
+     * @param input edges in format [v1, v2, weight]
+     * @return minimum spanning tree cost
      */
-    private int solve(int vertices, ArrayList<ArrayList<Integer>> input) {
-        int result = 0;
-        ArrayList<Edge>[] graph = new ArrayList[vertices + 1];
+    public int findMinimumCost(int vertices, List<List<Integer>> input) {
+        int totalCost = 0;
+
+        // Build adjacency list
+        List<Edge>[] graph = new ArrayList[vertices + 1];
         for (int i = 0; i <= vertices; i++) {
             graph[i] = new ArrayList<>();
         }
-
-        for (ArrayList<Integer> edge : input) {
+        for (List<Integer> edge : input) {
             int v1 = edge.get(0);
             int v2 = edge.get(1);
             int weight = edge.get(2);
@@ -51,36 +84,39 @@ public class CommutableIslands {
             graph[v2].add(new Edge(v2, v1, weight));
         }
 
-        PriorityQueue<Pair> queue = new PriorityQueue<>((a, b) -> a.weight - b.weight);
-        queue.add(new Pair(1, 0, 0));
+        // Min-heap based on weight
+        PriorityQueue<VertexInfo> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.weight, b.weight));
+        minHeap.add(new VertexInfo(1, 0, 0)); // Dummy starting parent
+
         boolean[] visited = new boolean[vertices + 1];
 
-        /**
-         * Take Pair with min weight from queue.
-         * Add its weight to result
-         * Put non-visited neighbor pairs in queue
-         */
-        while (!queue.isEmpty()) {
-            Pair curr = queue.poll();
+        while (!minHeap.isEmpty()) {
+            // 1. SELECT
+            VertexInfo current = minHeap.poll();
 
-            if (!visited[curr.vertex]) {
-                visited[curr.vertex] = true;
-                if (curr.parentVertex != 0) {
-                    // System.out.println("[from:" + curr.vertex + " to:" + curr.parentVertex + " @weight:" + curr.weight + "]");
-                    result += curr.weight;
+            // 2. MARK(*)
+            if (!visited[current.vertex]) {
+                visited[current.vertex] = true;
+
+                // 3. WORK
+                if (current.parentVertex != 0) { // Skip for the dummy starting parent because it has no weight
+                    totalCost += current.weight;
                 }
 
-                for (Edge edge : graph[curr.vertex]) {
+                // 4. ADD(*)
+                for (Edge edge : graph[current.vertex]) {
                     if (!visited[edge.neighbor]) {
-                        queue.add(new Pair(edge.neighbor, curr.vertex, edge.weight));
+                        minHeap.add(new VertexInfo(edge.neighbor, current.vertex, edge.weight));
                     }
-
                 }
             }
         }
-        return result;
+        return totalCost;
     }
 
+    /**
+     * Graph edge representation
+     */
     static class Edge {
         int source;
         int neighbor;
@@ -93,18 +129,18 @@ public class CommutableIslands {
         }
     }
 
-    static class Pair {
+    /**
+     * Helper Pair for Prim’s algorithm
+     */
+    static class VertexInfo {
         int vertex;
         int parentVertex;
         int weight;
 
-        public Pair(int vertex, int parentVertex, int weight) {
+        public VertexInfo(int vertex, int parentVertex, int weight) {
             this.vertex = vertex;
             this.parentVertex = parentVertex;
             this.weight = weight;
         }
     }
-
 }
-
-
