@@ -1,4 +1,4 @@
-package tree;
+package Tree;
 
 /**
  * Given a binary tree, find the maximum path sum from one node to another node in the tree.
@@ -35,7 +35,7 @@ public class MaxPathSum {
 
         // Calling the method to find the max path sum
         int result = new MaxPathSum().maxPathSum(root);
-        
+
         // Printing the result
         System.out.println("Maximum Path Sum: " + result);
     }
@@ -50,10 +50,10 @@ public class MaxPathSum {
     public int maxPathSum(TreeNode root) {
         // If the tree is empty, return 0 as no path exists
         if (root == null) return 0;
-        
+
         // Call the helper function to calculate max path sum from root
         findMaxPathSum(root);
-        
+
         // Return the final result (maximum path sum found)
         return maxSum;
     }
@@ -87,7 +87,7 @@ public class MaxPathSum {
     static class TreeNode {
         int val;
         TreeNode left, right;
-        
+
         TreeNode(int val) {
             this.val = val;
             this.left = this.right = null;
