@@ -78,4 +78,42 @@ public class OddEvenLinkedList {
     odd.setNext(evenHead); // Attach even list after odd list
     return head;
   }
+
+  /**
+   * Alternative approach using explicit odd and even list construction.
+   * This approach is more intuitive but uses slightly more space for dummy nodes.
+   *
+   * Time Complexity: O(n)
+   * Space Complexity: O(1)
+   */
+  public ListNode oddEvenListAlternative(ListNode head) {
+    if (head == null) return null;
+
+    // Create dummy heads for odd and even lists
+    ListNode oddDummy = new ListNode(0);
+    ListNode evenDummy = new ListNode(0);
+    ListNode oddTail = oddDummy;
+    ListNode evenTail = evenDummy;
+
+    boolean isOddIndex = true;
+
+    while (head != null) {
+      if (isOddIndex) {
+        oddTail.next = head;
+        oddTail = oddTail.next;
+      } else {
+        evenTail.next = head;
+        evenTail = evenTail.next;
+      }
+
+      head = head.next;
+      isOddIndex = !isOddIndex;
+    }
+
+    // Terminate even list and connect odd list to even list
+    evenTail.next = null;
+    oddTail.next = evenDummy.next;
+
+    return oddDummy.next;
+  }
 }
