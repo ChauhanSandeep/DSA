@@ -1,19 +1,22 @@
 package Array;
 
+import java.util.Arrays;
+
+
 /**
  * Search Insert Position
- * 
+ *
  * Problem: Find index where target should be inserted in sorted array to maintain order.
  * Array contains distinct values.
- * 
+ *
  * Example: nums = [1,3,5,6], target = 5 -> Output: 2
  * Target 5 is found at index 2.
- * 
- * Example: nums = [1,3,5,6], target = 2 -> Output: 1  
+ *
+ * Example: nums = [1,3,5,6], target = 2 -> Output: 1
  * Target 2 should be inserted at index 1.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/search-insert-position
- * 
+ *
  * Follow-up Questions:
  * - What if array contains duplicates? (Find leftmost or rightmost insertion point)
  * - How to handle floating point targets? (Same binary search logic)
@@ -23,16 +26,16 @@ public class SearchInsertPosition {
 
     /**
      * Finds insertion position using binary search.
-     * 
+     *
      * Algorithm:
      * 1. Use binary search to find target or insertion point
      * 2. If target found, return its index
      * 3. If not found, left pointer indicates insertion position
      * 4. Maintain invariant: left always points to insertion position
-     * 
+     *
      * Time Complexity: O(log n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param nums sorted array of distinct integers
      * @param target value to search or insert
      * @return index where target is found or should be inserted

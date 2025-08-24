@@ -1,9 +1,6 @@
 package StackQueue;
 
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation of an LRU (Least Recently Used) Cache
@@ -46,16 +43,33 @@ public class LruCacheTest {
     }
 }
 
+class LruNode {
+    int key;
+    int value;
+    LruNode prev;
+    LruNode next;
+
+    public LruNode(int key, int value) {
+        this.key = key;
+        this.value = value;
+    }
+}
+
 // Queue used in this will cause O(n) time complexity to fetch a item (To remove a item etc)
 // Check LruCacheTestImproved
 class LruCache {
-    LinkedList<Node> lruQueue = new LinkedList<>();
-    Map<Integer, Node> cacheMap = new HashMap<>();
-    int capacity;
+    private final int capacity;
+    private final Map<Integer, LruNode> cacheMap = new HashMap<>();
+    private final LruNode head = new LruNode(0, 0); // dummy head
+    private final LruNode tail = new LruNode(0, 0); // dummy tail
 
+    // Initialize the doubly linked list
     public LruCache(int capacity) {
         this.capacity = capacity;
+        head.next = tail;
+        tail.prev = head;
     }
+
 
     /**
      * To get value from cache
@@ -63,11 +77,12 @@ class LruCache {
      * @return
      */
     public int get(int key) {
-        if(!cacheMap.containsKey(key)) return -1;
+        if (!cacheMap.containsKey(key)) return -1;
 
-        Node node = cacheMap.get(key);
-        lruQueue.remove(node);
-        lruQueue.addFirst(node);
+        LruNode node = cacheMap.get(key);
+        // Move the accessed node to the front (most recently used)
+        removeNode(node);
+        addToFront(node);
         return node.value;
     }
 
@@ -77,25 +92,37 @@ class LruCache {
      * @param value
      */
     public void set(int key, int value) {
-        if(!cacheMap.containsKey(key)) {
-            Node node = new Node(key, value);
-            lruQueue.addFirst(node);
-            cacheMap.put(key, node);
-        }else {
-            Node node = cacheMap.get(key);
-            lruQueue.remove(node);
+        if (cacheMap.containsKey(key)) {
+            // If key exists, update the value and move to front
+            LruNode node = cacheMap.get(key);
             node.value = value;
-            lruQueue.addFirst(node);
-            cacheMap.put(key, node);
-        }
-
-        int currCapacity = cacheMap.size();
-        while(currCapacity > capacity) {
-            Node node = lruQueue.pollLast();
-            cacheMap.remove(node.key);
-            currCapacity--;
+            removeNode(node);
+            addToFront(node);
+        } else {
+            // If cache is full, remove the least recently used item
+            if (cacheMap.size() >= capacity) {
+                LruNode toRemove = tail.prev;
+                removeNode(toRemove);
+                cacheMap.remove(toRemove.key);
+            }
+            // Add new node to the front
+            LruNode newNode = new LruNode(key, value);
+            addToFront(newNode);
+            cacheMap.put(key, newNode);
         }
     }
 
+    // Helper method to remove a node from the doubly linked list
+    private void removeNode(LruNode node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
 
+    // Helper method to add a node to the front of the doubly linked list
+    private void addToFront(LruNode node) {
+        node.next = head.next;
+        node.prev = head;
+        head.next.prev = node;
+        head.next = node;
+    }
 }

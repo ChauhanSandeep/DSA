@@ -601,7 +601,7 @@ public class WordSearchII {
             int maxWordLength = Arrays.stream(words).mapToInt(String::length).max().orElse(0);
             
             // Simplified complexity estimation
-            complexity = (long) m * n * Math.pow(4, Math.min(maxWordLength, 10));
+            complexity = (long) ((long) m * n * (long) Math.pow(4, Math.min(maxWordLength, 10)));
             
             return complexity;
         }

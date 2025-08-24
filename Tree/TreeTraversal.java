@@ -1,6 +1,7 @@
 package Tree;
 
 import java.util.Stack;
+import Tree.Node;
 
 /**
  * TreeTraversal performs various tree traversal methods (Preorder, Inorder, and Postorder)
@@ -180,19 +181,5 @@ public class TreeTraversal {
         while (!out.isEmpty()) {
             System.out.print(out.pop() + " ");
         }
-    }
-}
-
-/**
- * Node class representing a single node in a binary tree.
- */
-class Node {
-    int data;
-    Node left, right;
-
-    // Constructor to initialize a node with a given value.
-    Node(int data) {
-        this.data = data;
-        left = right = null;
     }
 }

@@ -53,7 +53,7 @@ public class App {
 
             // Signal philosophers to stop
             for (Philosopher philosopher : philosophers) {
-                philosopher.setFull(true);
+                philosopher.setFull();
             }
 
         } finally {
@@ -65,7 +65,7 @@ public class App {
 
             // Print the number of times each philosopher has eaten
             for (Philosopher philosopher : philosophers) {
-                System.out.println("Philosopher " + philosopher.getId() + " ate " + philosopher.getEatingCounter() + " times.");
+                System.out.println("Philosopher " + philosopher.getPhilosopherId() + " ate " + philosopher.getEatingCounter() + " times.");
             }
         }
     }

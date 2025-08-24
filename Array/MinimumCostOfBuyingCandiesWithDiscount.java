@@ -1,18 +1,20 @@
 package Array;
 
 import java.util.*;
+import java.util.stream.IntStream;
+
 
 /**
  * Minimum Cost Of Buying Candies With Discount
- * 
+ *
  * Problem: Buy all candies with minimum cost. For every 2 candies bought at full price,
  * get 1 candy free (cheapest among the 3).
- * 
+ *
  * Example: cost = [1,2,3] -> Output: 5
  * Buy candies costing 2 and 3, get candy costing 1 for free. Total = 2 + 3 = 5.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/minimum-cost-of-buying-candies-with-discount
- * 
+ *
  * Follow-up Questions:
  * - What if discount is k candies for every n bought? (Generalize the grouping logic)
  * - How to maximize savings instead of minimize cost? (Choose groups optimally)
@@ -22,16 +24,16 @@ public class MinimumCostOfBuyingCandiesWithDiscount {
 
     /**
      * Calculates minimum cost to buy all candies with discount.
-     * 
+     *
      * Algorithm:
      * 1. Sort candy costs in descending order (expensive first)
      * 2. Group candies in sets of 3, taking 2 most expensive and getting cheapest free
      * 3. For remaining candies (less than 3), buy all at full price
      * 4. Sum up all costs excluding free candies
-     * 
+     *
      * Time Complexity: O(n log n) due to sorting
      * Space Complexity: O(1) if sorting in-place, O(n) for Arrays.sort()
-     * 
+     *
      * @param cost array of candy costs
      * @return minimum cost to buy all candies
      */

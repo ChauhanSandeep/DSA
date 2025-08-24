@@ -1,16 +1,20 @@
 package Array;
 
+import java.util.*;
+import java.util.stream.IntStream;
+
+
 /**
  * Range Addition
- * 
+ *
  * Problem: Apply range updates efficiently. Given length n and list of updates [start, end, inc],
  * return final array after applying all updates.
- * 
+ *
  * Example: length = 5, updates = [[1,3,2],[2,4,3],[0,2,-2]] -> Output: [-2,0,3,5,3]
  * Start with [0,0,0,0,0], apply updates to get final array.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/range-addition
- * 
+ *
  * Follow-up Questions:
  * - How to handle updates dynamically? (Use segment tree with lazy propagation)
  * - What if we need range queries too? (Combine with range query data structure)
@@ -20,16 +24,16 @@ public class RangeAddition {
 
     /**
      * Applies range updates efficiently using difference array technique.
-     * 
+     *
      * Algorithm:
      * 1. Use difference array to mark range updates
      * 2. For update [start, end, inc]: diff[start] += inc, diff[end+1] -= inc
      * 3. Compute prefix sum of difference array to get final result
      * 4. This converts O(k*n) naive approach to O(k+n)
-     * 
+     *
      * Time Complexity: O(k + n) where k is number of updates, n is array length
      * Space Complexity: O(n) for difference array
-     * 
+     *
      * @param length size of the array
      * @param updates list of [startIndex, endIndex, increment] updates
      * @return final array after all updates
@@ -69,7 +73,7 @@ public class RangeAddition {
 
         for (int[] update : updates) {
             int start = update[0];
-            int end = update[1]; 
+            int end = update[1];
             int inc = update[2];
 
             // Add increment at start position

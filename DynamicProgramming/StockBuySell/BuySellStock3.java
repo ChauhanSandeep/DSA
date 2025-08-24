@@ -38,7 +38,7 @@ public class BuySellStock3 {
     BuySellStock3 solution = new BuySellStock3();
     int[] stockPrices = {3, 3, 5, 0, 0, 3, 1, 4};
 
-    System.out.println("Two-pass approach result: " + solution.maxProfitStateMachine(stockPrices)); // Output: 6
+    System.out.println("Two-pass approach result: " + solution.maxProfitWithDays(stockPrices)); // Output: 6
   }
 
   /**

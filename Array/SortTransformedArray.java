@@ -1,15 +1,18 @@
 package Array;
 
+import java.util.Arrays;
+
+
 /**
  * Sort Transformed Array
- * 
+ *
  * Problem: Transform sorted array using quadratic function f(x) = ax² + bx + c and return result in sorted order.
- * 
+ *
  * Example: nums = [-4,-2,2,4], a = 1, b = 3, c = 5 -> Output: [3,9,15,33]
  * f(-4) = 16 - 12 + 5 = 9, f(-2) = 4 - 6 + 5 = 3, f(2) = 4 + 6 + 5 = 15, f(4) = 16 + 12 + 5 = 33
- * 
+ *
  * LeetCode: https://leetcode.com/problems/sort-transformed-array
- * 
+ *
  * Follow-up Questions:
  * - What if function is cubic or higher degree? (Use similar two-pointer approach)
  * - How to handle floating point coefficients? (Same algorithm applies)
@@ -19,16 +22,16 @@ public class SortTransformedArray {
 
     /**
      * Sorts transformed array using two-pointer technique based on parabola properties.
-     * 
+     *
      * Algorithm:
      * 1. If a > 0: parabola opens upward, extremes have larger values
-     * 2. If a < 0: parabola opens downward, extremes have smaller values  
+     * 2. If a < 0: parabola opens downward, extremes have smaller values
      * 3. If a = 0: linear function, order depends on sign of b
      * 4. Use two pointers from ends, compare transformed values, fill result accordingly
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(n) for result array
-     * 
+     *
      * @param nums sorted input array
      * @param a coefficient of x²
      * @param b coefficient of x

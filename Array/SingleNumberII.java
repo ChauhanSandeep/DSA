@@ -151,7 +151,7 @@ public class SingleNumberII {
             int count = 0;
 
             for (int num : nums) {
-                if ((num >> bit) & 1) {
+                if (((num >> bit) & 1) == 1) {
                     count++;
                 }
             }

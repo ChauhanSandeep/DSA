@@ -40,7 +40,7 @@ public class BuySellStock0 {
     int maxProfit = solution.maxProfit(stockPrices);
     System.out.println("Maximum Profit: " + maxProfit); // Output: 75
 
-    int maxProfitOptimized = solution.maxProfitOptimized(stockPrices);
+    int maxProfitOptimized = solution.maxProfit(stockPrices);
     System.out.println("Optimized Maximum Profit: " + maxProfitOptimized); // Output: 75
   }
 

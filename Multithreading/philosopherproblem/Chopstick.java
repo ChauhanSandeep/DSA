@@ -7,10 +7,10 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Represents a chopstick used by philosophers in the Dining Philosophers problem.
  * Each chopstick can be picked up or put down using locking mechanisms to avoid race conditions.
- * 
+ *
  * Problem: Dining Philosophers Problem (Concurrency Control)
  * Algorithm: Used a tryLock() mechanism to prevent deadlock by setting a timeout.
- * 
+ *
  * @author [Your Name]
  */
 public class Chopstick {
@@ -30,7 +30,7 @@ public class Chopstick {
     /**
      * Attempts to pick up the chopstick.
      * Uses tryLock() with a timeout to avoid deadlock.
-     * 
+     *
      * @param philosopher The philosopher attempting to pick up the chopstick.
      * @param state LEFT or RIGHT chopstick
      * @return true if the philosopher successfully picks up the chopstick, false otherwise.
@@ -38,7 +38,7 @@ public class Chopstick {
      */
     public boolean pickUp(Philosopher philosopher, State state) throws InterruptedException {
         if (chopstickLock.tryLock(10, TimeUnit.MILLISECONDS)) {
-            System.out.println("Philosopher " + philosopher.getId() + " picked up " + state + " chopstick " + chopstickId);
+            System.out.println("Philosopher " + philosopher.getPhilosopherId() + " picked up " + state + " chopstick " + chopstickId);
             return true;
         }
         return false; // Could not acquire the chopstick within the timeout
@@ -47,12 +47,12 @@ public class Chopstick {
     /**
      * Releases the chopstick after use.
      * Unlocks the chopstick to allow other philosophers to use it.
-     * 
+     *
      * @param philosopher The philosopher putting down the chopstick.
      * @param state LEFT or RIGHT chopstick
      */
     public void putDown(Philosopher philosopher, State state) {
         chopstickLock.unlock();
-        System.out.println("Philosopher " + philosopher.getId() + " put down " + state + " chopstick " + chopstickId);
+        System.out.println("Philosopher " + philosopher.getPhilosopherId() + " put down " + state + " chopstick " + chopstickId);
     }
 }

@@ -1,15 +1,20 @@
 package Array;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+
 /**
  * Single Number
- * 
+ *
  * Problem: Find element that appears once in array where every other element appears twice.
- * 
+ *
  * Example: nums = [2,2,1] -> Output: 1
  * Element 1 appears once, elements 2 appears twice.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/single-number
- * 
+ *
  * Follow-up Questions:
  * - What if every element appears 3 times except one? (Use bit manipulation with mod 3)
  * - How to find two numbers that appear once? (XOR all, then separate using differing bit)
@@ -19,16 +24,16 @@ public class SingleNumber {
 
     /**
      * Finds single number using XOR bit manipulation.
-     * 
+     *
      * Algorithm:
      * 1. XOR all elements together
      * 2. Identical numbers cancel out (a ^ a = 0)
      * 3. Zero doesn't affect other numbers (0 ^ a = a)
      * 4. Result is the single number that doesn't have a pair
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param nums array where every element appears twice except one
      * @return the element that appears exactly once
      */
@@ -168,7 +173,7 @@ public class SingleNumber {
         return Arrays.stream(nums)
                 .boxed()
                 .collect(Collectors.groupingBy(
-                    Function.identity(), 
+                    Function.identity(),
                     Collectors.counting()))
                 .entrySet()
                 .stream()

@@ -22,6 +22,30 @@ public class Philosopher implements Runnable {
     private final AtomicBoolean hasFinishedEating;  // Ensures thread-safe state management
     private int eatingCounter = 0;  // Tracks the number of times the philosopher has eaten
 
+    public int getPhilosopherId() {
+        return philosopherId;
+    }
+
+    public Chopstick getLowerChopstick() {
+        return lowerChopstick;
+    }
+
+    public Chopstick getHigherChopstick() {
+        return higherChopstick;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
+
+    public AtomicBoolean getHasFinishedEating() {
+        return hasFinishedEating;
+    }
+
+    public int getEatingCounter() {
+        return eatingCounter;
+    }
+
     /**
      * Initializes a philosopher with assigned chopsticks.
      * The chopsticks are assigned in increasing order to reduce deadlock probability.
@@ -80,5 +104,12 @@ public class Philosopher implements Runnable {
         System.out.println("Philosopher " + philosopherId + " is eating...");
         eatingCounter++;
         TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
+    }
+
+    /**
+     * Sets the philosopher's state to full, signaling them to stop eating.
+     */
+    public void setFull() {
+        hasFinishedEating.set(true);
     }
 }

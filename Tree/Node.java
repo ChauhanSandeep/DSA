@@ -1,4 +1,4 @@
-package tree;
+package Tree;
 
 /**
  * Node class to represent a node in a binary tree.
