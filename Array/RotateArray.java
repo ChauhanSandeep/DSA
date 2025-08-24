@@ -1,15 +1,19 @@
 package Array;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+
 /**
  * Rotate Array
- * 
+ *
  * Problem: Rotate array to the right by k steps in-place.
- * 
+ *
  * Example: nums = [1,2,3,4,5,6,7], k = 3 -> Output: [5,6,7,1,2,3,4]
  * Rotate right by 3: last 3 elements move to front.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/rotate-array
- * 
+ *
  * Follow-up Questions:
  * - How to rotate left instead of right? (Use k = n - k)
  * - What if k > n? (Use k % n to avoid unnecessary rotations)
@@ -19,15 +23,15 @@ public class RotateArray {
 
     /**
      * Rotates array using three-step reversal approach.
-     * 
+     *
      * Algorithm:
      * 1. Reverse entire array: [1,2,3,4,5,6,7] -> [7,6,5,4,3,2,1]
      * 2. Reverse first k elements: [5,6,7,4,3,2,1]
      * 3. Reverse remaining n-k elements: [5,6,7,1,2,3,4]
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - in-place rotation
-     * 
+     *
      * @param nums array to rotate
      * @param k number of positions to rotate right
      */

@@ -12,7 +12,7 @@ package tree;
 public class Node {
 
     // Data stored at the current node.
-    int data;
+    public int data;
 
     // Reference to the left child of the node.
     public Node left;

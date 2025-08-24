@@ -35,14 +35,14 @@ public class LeftView {
         //    7   8  12  15
         //               /
         //             14
-        Node root = new Node(10);
-        root.left = new Node(2);
-        root.right = new Node(3);
-        root.left.left = new Node(7);
-        root.left.right = new Node(8);
-        root.right.right = new Node(15);
-        root.right.left = new Node(12);
-        root.right.right.left = new Node(14);
+        TreeNode root = new TreeNode(10);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
+        root.left.left = new TreeNode(7);
+        root.left.right = new TreeNode(8);
+        root.right.right = new TreeNode(15);
+        root.right.left = new TreeNode(12);
+        root.right.right.left = new TreeNode(14);
 
         // Print the left view of the tree
         List<Integer> leftNodes = printLeftView(root);
@@ -56,14 +56,14 @@ public class LeftView {
      * @param root The root node of the binary tree.
      * @return A list containing the left view of the binary tree.
      */
-    public static List<Integer> printLeftView(Node root) {
+    public static List<Integer> printLeftView(TreeNode root) {
         List<Integer> result = new ArrayList<>();
         if (root == null) {
             return result;  // Return empty list if tree is empty
         }
 
         // Initialize a queue for level-order traversal (BFS)
-        Queue<Node> queue = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
         queue.offer(root);
 
         // Perform level-order traversal
@@ -72,11 +72,11 @@ public class LeftView {
 
             // Traverse all nodes at the current level
             for (int i = 0; i < size; i++) {
-                Node node = queue.poll();  // Get the current node
+                TreeNode node = queue.poll();  // Get the current node
 
                 // If it's the first node at this level, add it to the result
                 if (i == 0) {
-                    result.add(node.data);
+                    result.add(node.val);
                 }
 
                 // Add the left and right children of the current node to the queue for next level
@@ -96,12 +96,3 @@ public class LeftView {
 /**
  * Definition for a binary tree node.
  */
-class Node {
-    int data;
-    Node left, right;
-
-    Node(int data) {
-        this.data = data;
-        left = right = null;
-    }
-}

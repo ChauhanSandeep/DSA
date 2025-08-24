@@ -1,16 +1,19 @@
 package Array;
 
+import java.util.Arrays;
+
+
 /**
  * Sign Of The Product Of An Array
- * 
+ *
  * Problem: Return sign of the product of all elements in array.
  * Return 1 if positive, -1 if negative, 0 if zero.
- * 
+ *
  * Example: nums = [-1,-2,-3,-4,3,2,1] -> Output: 1
  * Product is positive due to even number of negative values.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/sign-of-the-product-of-an-array
- * 
+ *
  * Follow-up Questions:
  * - What if array contains very large numbers? (Current approach avoids overflow)
  * - How to handle floating point numbers? (Same logic applies)
@@ -20,16 +23,16 @@ public class SignOfTheProductOfAnArray {
 
     /**
      * Determines sign of product by counting negative numbers.
-     * 
+     *
      * Algorithm:
      * 1. If any element is zero, product is zero
      * 2. Count number of negative elements
      * 3. Even count of negatives → positive, odd count → negative
      * 4. This avoids potential integer overflow from actual multiplication
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param nums input array of integers
      * @return 1 if product positive, -1 if negative, 0 if zero
      */

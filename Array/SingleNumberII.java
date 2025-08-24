@@ -1,15 +1,17 @@
 package Array;
 
+import java.util.*;
+
 /**
  * Single Number II
- * 
+ *
  * Problem: Find element that appears once in array where every other element appears three times.
- * 
+ *
  * Example: nums = [2,2,3,2] -> Output: 3
  * Element 3 appears once, element 2 appears three times.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/single-number-ii
- * 
+ *
  * Follow-up Questions:
  * - What if elements appear k times except one? (Use bit manipulation with mod k)
  * - How to handle negative numbers? (Same bit manipulation works)
@@ -19,16 +21,16 @@ public class SingleNumberII {
 
     /**
      * Finds single number using bit manipulation with modular arithmetic.
-     * 
+     *
      * Algorithm:
      * 1. For each bit position, count how many numbers have that bit set
      * 2. If count % 3 != 0, the single number has that bit set
      * 3. Reconstruct the single number from these bits
      * 4. Works because numbers appearing 3 times contribute 0 or 3 to each bit count
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param nums array where every element appears 3 times except one
      * @return the element that appears exactly once
      */
@@ -41,7 +43,7 @@ public class SingleNumberII {
 
             // Count how many numbers have this bit set
             for (int num : nums) {
-                if ((num >> bit) & 1) {
+                if (((num >> bit) & 1) == 1) {
                     count++;
                 }
             }

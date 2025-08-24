@@ -1,17 +1,21 @@
 package Array;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+
 /**
  * Number Of Laser Beams In A Bank
- * 
+ *
  * Problem: Given bank layout with security devices ('1') and empty space ('0'),
  * calculate total laser beams. Each device shoots lasers to all devices in next row with devices.
- * 
+ *
  * Example: bank = ["011001","000000","010100","001000"] -> Output: 8
  * Row 0 has 3 devices, row 2 has 2 devices, row 3 has 1 device.
  * Beams: 3*2 (row 0 to 2) + 2*1 (row 2 to 3) = 6 + 2 = 8.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/number-of-laser-beams-in-a-bank
- * 
+ *
  * Follow-up Questions:
  * - What if devices can shoot in all directions? (Consider all pairs across all rows)
  * - How to handle 3D bank layout? (Extend logic to 3D grid)
@@ -21,16 +25,16 @@ public class NumberOfLaserBeamsInABank {
 
     /**
      * Counts total laser beams between security devices.
-     * 
+     *
      * Algorithm:
      * 1. For each row, count number of security devices ('1's)
      * 2. Skip rows with no devices (they don't participate in laser beams)
      * 3. For consecutive rows with devices, multiply device counts
      * 4. Sum all products to get total laser beams
-     * 
+     *
      * Time Complexity: O(m*n) where m is rows, n is columns
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param bank array of strings representing bank layout
      * @return total number of laser beams
      */

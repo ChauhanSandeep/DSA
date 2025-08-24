@@ -1,17 +1,19 @@
 package Array;
 
 import java.util.*;
+import java.util.stream.IntStream;
+
 
 /**
  * Height Checker
- * 
+ *
  * Problem: Count students not in correct positions compared to non-decreasing height order.
- * 
+ *
  * Example: heights = [1,1,4,2,1,3] -> Output: 3
  * Expected order: [1,1,1,2,3,4]. Indices 2,4,5 are incorrect.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/height-checker
- * 
+ *
  * Follow-up Questions:
  * - How to get indices of misplaced students? (Store indices instead of counting)
  * - What if we want students in decreasing order? (Sort in reverse order)
@@ -21,15 +23,15 @@ public class HeightChecker {
 
     /**
      * Counts students not in correct height order position.
-     * 
+     *
      * Algorithm:
      * 1. Create expected array by sorting the heights
      * 2. Compare original with expected position by position
      * 3. Count positions where heights don't match
-     * 
+     *
      * Time Complexity: O(n log n) due to sorting
      * Space Complexity: O(n) for the expected array
-     * 
+     *
      * @param heights array of student heights
      * @return count of students in wrong positions
      */

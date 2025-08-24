@@ -1,15 +1,22 @@
 package Array;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+
+
 /**
  * Two Sum II Input Array Is Sorted
- * 
+ *
  * Problem: Find two numbers in sorted array that add up to target. Return 1-indexed positions.
- * 
+ *
  * Example: numbers = [2,7,11,15], target = 9 -> Output: [1,2]
  * numbers[0] + numbers[1] = 2 + 7 = 9, so return [1,2] (1-indexed).
- * 
+ *
  * LeetCode: https://leetcode.com/problems/two-sum-ii-input-array-is-sorted
- * 
+ *
  * Follow-up Questions:
  * - What if multiple pairs exist? (Problem guarantees exactly one solution)
  * - How to find all pairs that sum to target? (Continue search after finding each pair)
@@ -19,17 +26,17 @@ public class TwoSumIIInputArrayIsSorted {
 
     /**
      * Finds two numbers that sum to target using two-pointer technique.
-     * 
+     *
      * Algorithm:
      * 1. Use two pointers: left at start, right at end
      * 2. If sum equals target, return indices (1-indexed)
      * 3. If sum < target, move left pointer right (increase sum)
      * 4. If sum > target, move right pointer left (decrease sum)
      * 5. Continue until target found
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param numbers sorted array of integers
      * @param target sum to find
      * @return 1-indexed positions of two numbers that sum to target
@@ -203,7 +210,7 @@ public class TwoSumIIInputArrayIsSorted {
         int index2 = result[1] - 1;
 
         // Check bounds
-        if (index1 < 0 || index1 >= numbers.length || 
+        if (index1 < 0 || index1 >= numbers.length ||
             index2 < 0 || index2 >= numbers.length) {
             return false;
         }

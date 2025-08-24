@@ -1,16 +1,20 @@
 package Array;
 
+import java.util.*;
+import java.util.stream.IntStream;
+
+
 /**
  * Rearrange Array Elements By Sign
- * 
+ *
  * Problem: Given array with equal number of positive and negative integers,
  * rearrange so that positive and negative numbers alternate, starting with positive.
- * 
+ *
  * Example: nums = [3,1,-2,-5,2,-4] -> Output: [3,-2,1,-5,2,-4]
  * Alternate positive and negative while maintaining relative order within each type.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/rearrange-array-elements-by-sign
- * 
+ *
  * Follow-up Questions:
  * - What if counts of positive/negative are different? (Handle remaining elements separately)
  * - How to minimize space usage? (In-place rearrangement is complex but possible)
@@ -20,16 +24,16 @@ public class RearrangeArrayElementsBySign {
 
     /**
      * Rearranges array to alternate positive and negative numbers.
-     * 
+     *
      * Algorithm:
      * 1. Use two pointers: one for positive positions (0,2,4,...), one for negative (1,3,5,...)
      * 2. Iterate through original array
      * 3. Place positive numbers at even indices, negative numbers at odd indices
      * 4. Maintain relative order within each type
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(n) for result array
-     * 
+     *
      * @param nums input array with equal positive and negative numbers
      * @return rearranged array alternating positive and negative
      */

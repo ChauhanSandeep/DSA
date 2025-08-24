@@ -36,14 +36,14 @@ public class TreeTraversal {
                       / \
                      9   8
         */
-        Node root = new Node(5);
-        root.left = new Node(4);
-        root.left.right = new Node(14);
-        root.left.left = new Node(3);
-        root.right = new Node(6);
-        root.right.right = new Node(7);
-        root.right.right.left = new Node(9);
-        root.right.right.right = new Node(8);
+        TreeNode root = new TreeNode(5);
+        root.left = new TreeNode(4);
+        root.left.right = new TreeNode(14);
+        root.left.left = new TreeNode(3);
+        root.right = new TreeNode(6);
+        root.right.right = new TreeNode(7);
+        root.right.right.left = new TreeNode(9);
+        root.right.right.right = new TreeNode(8);
 
         System.out.println("Postorder traversal (recursive):");
         postorder(root);
@@ -65,42 +65,42 @@ public class TreeTraversal {
      * Recursive Postorder Traversal.
      * In Postorder, the left subtree is visited first, followed by the right subtree, and then the root.
      *
-     * @param node The current node.
+     * @param root The current node.
      */
-    static void postorder(Node node) {
-        if (node == null) return;
+    static void postorder(TreeNode root) {
+        if (root == null) return;
 
-        postorder(node.left); // Traverse left subtree
-        postorder(node.right); // Traverse right subtree
-        System.out.print(node.data + "->"); // Visit the node
+        postorder(root.left); // Traverse left subtree
+        postorder(root.right); // Traverse right subtree
+        System.out.print(root.val + "->"); // Visit the node
     }
 
     /**
      * Recursive Inorder Traversal.
      * In Inorder, the left subtree is visited first, followed by the root, and then the right subtree.
      *
-     * @param node The current node.
+     * @param root The current node.
      */
-    static void inorder(Node node) {
-        if (node == null) return;
+    static void inorder(TreeNode root) {
+        if (root == null) return;
 
-        inorder(node.left); // Traverse left subtree
-        System.out.print(node.data + "->"); // Visit the node
-        inorder(node.right); // Traverse right subtree
+        inorder(root.left); // Traverse left subtree
+        System.out.print(root.val + "->"); // Visit the node
+        inorder(root.right); // Traverse right subtree
     }
 
     /**
      * Recursive Preorder Traversal.
      * In Preorder, the root is visited first, followed by the left subtree, and then the right subtree.
      *
-     * @param node The current node.
+     * @param root The current node.
      */
-    static void preorder(Node node) {
-        if (node == null) return;
+    static void preorder(TreeNode root) {
+        if (root == null) return;
 
-        System.out.print(node.data + "->"); // Visit the node
-        preorder(node.left); // Traverse left subtree
-        preorder(node.right); // Traverse right subtree
+        System.out.print(root.val + "->"); // Visit the node
+        preorder(root.left); // Traverse left subtree
+        preorder(root.right); // Traverse right subtree
     }
 
     /**
@@ -110,9 +110,9 @@ public class TreeTraversal {
      *
      * @param root The root of the tree.
      */
-    public static void inorderIterative(Node root) {
-        Stack<Node> stack = new Stack<>();
-        Node curr = root;
+    public static void inorderIterative(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode curr = root;
 
         while (curr != null || !stack.isEmpty()) {
             // Reach the leftmost Node of the current Node
@@ -122,7 +122,7 @@ public class TreeTraversal {
             }
             // Current must be null at this point
             curr = stack.pop();
-            System.out.print(curr.data + "->");
+            System.out.print(curr.val + "->");
             // Visit the right subtree
             curr = curr.right;
         }
@@ -135,15 +135,15 @@ public class TreeTraversal {
      *
      * @param root The root of the tree.
      */
-    public static void preorderIterative(Node root) {
+    public static void preorderIterative(TreeNode root) {
         if (root == null) return;
 
-        Stack<Node> stack = new Stack<>();
+        Stack<TreeNode> stack = new Stack<>();
         stack.push(root);
 
         while (!stack.isEmpty()) {
-            Node curr = stack.pop(); // Pop the top node
-            System.out.print(curr.data + "->"); // Visit the node
+            TreeNode curr = stack.pop(); // Pop the top node
+            System.out.print(curr.val + "->"); // Visit the node
 
             // Right child is pushed first so the left child is processed first (LIFO order)
             if (curr.right != null) stack.push(curr.right);
@@ -158,18 +158,18 @@ public class TreeTraversal {
      *
      * @param root The root of the tree.
      */
-    public static void postorderIterative(Node root) {
+    public static void postorderIterative(TreeNode root) {
         if (root == null) return;
 
-        Stack<Node> stack = new Stack<>();
+        Stack<TreeNode> stack = new Stack<>();
         Stack<Integer> out = new Stack<>();
 
         stack.push(root);
 
         // Process nodes in the same way as Postorder
         while (!stack.isEmpty()) {
-            Node curr = stack.pop();
-            out.push(curr.data); // Push data into the output stack
+            TreeNode curr = stack.pop();
+            out.push(curr.val); // Push data into the output stack
 
             // Push left and right children into the stack
             if (curr.left != null) stack.push(curr.left);

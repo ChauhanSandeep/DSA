@@ -69,7 +69,7 @@ public class KthLargestFinder {
    *
    * QuickSelect partitions the array and recursively finds the kth largest element without sorting the whole array.
    *
-   * @param inputArray The input array.
+   * @param nums The input array.
    * @param k The kth largest to find.
    * @return The kth largest element.
    */
@@ -121,5 +121,17 @@ public class KthLargestFinder {
     int temp = nums[i];
     nums[i] = nums[j];
     nums[j] = temp;
+  }
+
+  private static boolean isValidInput(int[] inputArray, int k) {
+    if (inputArray == null || inputArray.length == 0) {
+      System.out.println("Error: Input array cannot be null or empty");
+      return false;
+    }
+    if (k <= 0 || k > inputArray.length) {
+      System.out.println("Error: k must be between 1 and the length of the array");
+      return false;
+    }
+    return true;
   }
 }

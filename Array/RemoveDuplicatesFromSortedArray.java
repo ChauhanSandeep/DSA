@@ -1,16 +1,18 @@
 package Array;
 
+import java.util.*;
+
 /**
  * Remove Duplicates From Sorted Array
- * 
+ *
  * Problem: Remove duplicates from sorted array in-place. Return new length.
  * Each unique element should appear only once, maintaining relative order.
- * 
+ *
  * Example: nums = [1,1,2] -> Output: 2, nums = [1,2,_]
  * Remove duplicates so nums becomes [1,2] with length 2.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/remove-duplicates-from-sorted-array
- * 
+ *
  * Follow-up Questions:
  * - How to remove duplicates from unsorted array? (Use set or sort first)
  * - What if each element can appear at most k times? (Generalize comparison logic)
@@ -20,16 +22,16 @@ public class RemoveDuplicatesFromSortedArray {
 
     /**
      * Removes duplicates from sorted array using two-pointer technique.
-     * 
+     *
      * Algorithm:
      * 1. Use slow pointer for position of next unique element
      * 2. Use fast pointer to scan through array
      * 3. When new unique element found, place it at slow pointer position
      * 4. Return slow pointer + 1 as new array length
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param nums sorted array with duplicates
      * @return new length after removing duplicates
      */

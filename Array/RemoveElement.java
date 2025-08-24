@@ -1,16 +1,22 @@
 package Array;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+
 /**
  * Remove Element
- * 
+ *
  * Problem: Remove all occurrences of given value from array in-place.
  * Return new length. Order of remaining elements can be changed.
- * 
+ *
  * Example: nums = [3,2,2,3], val = 3 -> Output: 2, nums = [2,2,_,_]
  * Remove all occurrences of 3, resulting in [2,2] with length 2.
- * 
+ *
  * LeetCode: https://leetcode.com/problems/remove-element
- * 
+ *
  * Follow-up Questions:
  * - What if we need to maintain original order? (Use two-pointer technique)
  * - How to remove multiple different values? (Generalize condition)
@@ -20,16 +26,16 @@ public class RemoveElement {
 
     /**
      * Removes all occurrences of val using two-pointer technique.
-     * 
+     *
      * Algorithm:
      * 1. Use slow pointer for next position to place non-val element
      * 2. Use fast pointer to scan through array
      * 3. When non-val element found, place it at slow pointer position
      * 4. Return slow pointer as new array length
-     * 
+     *
      * Time Complexity: O(n) where n is array length
      * Space Complexity: O(1) - only using constant extra space
-     * 
+     *
      * @param nums input array
      * @param val value to remove
      * @return new length after removing val

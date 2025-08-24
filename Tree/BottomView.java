@@ -68,7 +68,7 @@ public class BottomView {
             int horizontalDistance = current.horizontalDistance;
 
             // Update the map with the last seen node at this horizontal distance
-            bottomViewMap.put(horizontalDistance, node.data);
+            bottomViewMap.put(horizontalDistance, node.val);
 
             // Enqueue left child with horizontalDistance - 1
             if (node.left != null) {
@@ -82,20 +82,6 @@ public class BottomView {
 
         // Collect the bottom view nodes in order
         return new ArrayList<>(bottomViewMap.values());
-    }
-}
-
-/**
- * Represents a tree node with additional information for horizontal distance.
- */
-class TreeNode {
-    int data;
-    TreeNode left, right;
-
-    public TreeNode(int value) {
-        this.data = value;
-        this.left = null;
-        this.right = null;
     }
 }
 

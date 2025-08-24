@@ -1,16 +1,19 @@
 package Array;
 
+import java.util.Arrays;
+
+
 /**
  * Range Sum Query 2D Immutable
- * 
+ *
  * Problem: Design data structure to efficiently calculate sum of elements in 2D region.
  * Matrix is immutable after construction.
- * 
+ *
  * Example: matrix = [[3,0,1,4,2],[5,6,3,2,1],[1,2,0,1,5],[4,1,0,1,7],[1,0,3,0,5]]
  * sumRegion(2,1,4,3) should return 8 (sum of region from (2,1) to (4,3)).
- * 
+ *
  * LeetCode: https://leetcode.com/problems/range-sum-query-2d-immutable
- * 
+ *
  * Follow-up Questions:
  * - How to handle updates to matrix? (Use 2D Fenwick tree or segment tree)
  * - What if queries are much more frequent than construction? (Current solution is optimal)
@@ -22,15 +25,15 @@ public class RangeSumQuery2DImmutable {
 
     /**
      * Constructs the data structure with 2D prefix sum for fast range queries.
-     * 
+     *
      * Algorithm:
      * 1. Build 2D prefix sum array where prefixSum[i][j] = sum of rectangle from (0,0) to (i-1,j-1)
      * 2. Use inclusion-exclusion principle: prefixSum[i][j] = matrix[i-1][j-1] + prefixSum[i-1][j] + prefixSum[i][j-1] - prefixSum[i-1][j-1]
      * 3. Pad with extra row/column of zeros for easier boundary handling
-     * 
+     *
      * Time Complexity: O(m*n) for construction
      * Space Complexity: O(m*n) for prefix sum array
-     * 
+     *
      * @param matrix input 2D matrix
      */
     public RangeSumQuery2DImmutable(int[][] matrix) {
@@ -47,7 +50,7 @@ public class RangeSumQuery2DImmutable {
         // Build prefix sum array
         for (int i = 1; i <= m; i++) {
             for (int j = 1; j <= n; j++) {
-                prefixSum[i][j] = matrix[i-1][j-1] + prefixSum[i-1][j] + 
+                prefixSum[i][j] = matrix[i-1][j-1] + prefixSum[i-1][j] +
                                  prefixSum[i][j-1] - prefixSum[i-1][j-1];
             }
         }
@@ -55,15 +58,15 @@ public class RangeSumQuery2DImmutable {
 
     /**
      * Returns sum of elements in rectangle from (row1,col1) to (row2,col2) inclusive.
-     * 
+     *
      * Algorithm:
      * 1. Use inclusion-exclusion principle on prefix sum array
      * 2. Sum = prefixSum[row2+1][col2+1] - prefixSum[row1][col2+1] - prefixSum[row2+1][col1] + prefixSum[row1][col1]
      * 3. The +1 offsets account for the extra padding in prefix sum array
-     * 
+     *
      * Time Complexity: O(1) per query
      * Space Complexity: O(1)
-     * 
+     *
      * @param row1 top row of region (inclusive)
      * @param col1 left column of region (inclusive)
      * @param row2 bottom row of region (inclusive)
@@ -74,7 +77,7 @@ public class RangeSumQuery2DImmutable {
         if (prefixSum == null) return 0;
 
         // Apply inclusion-exclusion principle
-        return prefixSum[row2 + 1][col2 + 1] - prefixSum[row1][col2 + 1] - 
+        return prefixSum[row2 + 1][col2 + 1] - prefixSum[row1][col2 + 1] -
                prefixSum[row2 + 1][col1] + prefixSum[row1][col1];
     }
 
@@ -108,7 +111,7 @@ public class RangeSumQuery2DImmutable {
             // Rest of the matrix
             for (int i = 1; i < m; i++) {
                 for (int j = 1; j < n; j++) {
-                    prefixSum[i][j] = matrix[i][j] + prefixSum[i-1][j] + 
+                    prefixSum[i][j] = matrix[i][j] + prefixSum[i-1][j] +
                                      prefixSum[i][j-1] - prefixSum[i-1][j-1];
                 }
             }

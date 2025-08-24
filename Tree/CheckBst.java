@@ -26,11 +26,11 @@ public class CheckBst {
         //     / \  
         //    1   3
 
-        Node root = new Node(4);
-        root.left = new Node(2);
-        root.right = new Node(5);
-        root.left.left = new Node(1);
-        root.left.right = new Node(3);
+        TreeNode root = new TreeNode(4);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(5);
+        root.left.left = new TreeNode(1);
+        root.left.right = new TreeNode(3);
 
         System.out.println("Is the tree a BST? " + isBST(root));
     }
@@ -41,7 +41,7 @@ public class CheckBst {
      * @param root The root node of the binary tree.
      * @return True if the tree is a BST, false otherwise.
      */
-    public static boolean isBST(Node root) {
+    public static boolean isBST(TreeNode root) {
         return isBstRec(root, Integer.MAX_VALUE, Integer.MIN_VALUE);
     }
 
@@ -53,30 +53,17 @@ public class CheckBst {
      * @param min The minimum allowable value for the current node.
      * @return True if the subtree rooted at the current node is a BST, false otherwise.
      */
-    private static boolean isBstRec(Node node, int max, int min) {
+    private static boolean isBstRec(TreeNode node, int max, int min) {
         if (node == null) return true; // An empty subtree is always a valid BST.
 
         // Check if the current node's value is within the valid range (min, max).
-        if (node.data <= min || node.data >= max) {
+        if (node.val <= min || node.val >= max) {
             return false;
         }
 
         // Recursively check the left and right subtrees with updated boundaries.
-        return isBstRec(node.left, node.data, min) &&
-               isBstRec(node.right, max, node.data);
+        return isBstRec(node.left, node.val, min) &&
+               isBstRec(node.right, max, node.val);
     }
 }
 
-/**
- * Node structure for a binary tree.
- */
-class Node {
-    int data;
-    Node left, right;
-
-    public Node(int value) {
-        this.data = value;
-        this.left = null;
-        this.right = null;
-    }
-}
