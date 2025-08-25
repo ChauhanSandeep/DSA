@@ -84,7 +84,7 @@ public class FurthestBuildingYouCanReach {
      */
     public int furthestBuilding(int[] heights, int bricks, int ladders) {
         // Min-heap to store the largest jumps where ladders are used
-        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        PriorityQueue<Integer> ladderJumpMinHeap = new PriorityQueue<>();
 
         for (int i = 0; i < heights.length - 1; i++) {
             int diff = heights[i + 1] - heights[i];
@@ -95,16 +95,16 @@ public class FurthestBuildingYouCanReach {
             }
 
             // If we have ladders remaining, use a ladder for this jump
-            if (minHeap.size() < ladders) {
-                minHeap.offer(diff);
+            if (ladderJumpMinHeap.size() < ladders) {
+                ladderJumpMinHeap.offer(diff);
             } else {
                 // No ladders left, check if we can replace the smallest ladder jump with bricks
-                if (!minHeap.isEmpty() && diff > minHeap.peek()) {
+                if (!ladderJumpMinHeap.isEmpty() && diff > ladderJumpMinHeap.peek()) {
                     // Replace the smallest ladder jump with bricks
-                    int smallestLadderJump = minHeap.poll();
+                    int smallestLadderJump = ladderJumpMinHeap.poll();
                     if (bricks >= smallestLadderJump) {
                         bricks -= smallestLadderJump;
-                        minHeap.offer(diff); // Use ladder for the current (larger) jump
+                        ladderJumpMinHeap.offer(diff); // Use ladder for the current (larger) jump
                     } else {
                         // Not enough bricks to replace the smallest ladder jump
                         return i;

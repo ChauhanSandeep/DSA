@@ -85,8 +85,18 @@ public class IsSubsequence {
     /**
      * Follow-up solution for checking multiple source strings against the same target
      * This solution preprocesses the target string for efficient lookups
+     *
+     * Steps:
+     * 1. Preprocess the target string to create a map of character to list of indices
+     *   where each character appears in the target string.
+     *   2. For each character in the source string, use binary search to find the next occurrence
+     *   in the target string that comes after the last matched index.
+     *   3. If we can find all characters in order, return true; otherwise, return false.
+     *
+     * Time Complexity: O(n + m log n) where n is the length of target and m is the length of source
+     * Space Complexity: O(n) for storing the character indices
      */
-    public boolean isSubsequenceOptimized(String source, String target) {
+    public boolean isSubsequenceForMultipleSources(String source, String target) {
         // Preprocess the target string to create a map of character to list of indices
         // where each character appears in the target string
         Map<Character, List<Integer>> charToIndices = new HashMap<>();
@@ -94,9 +104,7 @@ public class IsSubsequence {
         // Populate the map with character indices
         for (int i = 0; i < target.length(); i++) {
             char c = target.charAt(i);
-            if (!charToIndices.containsKey(c)) {
-                charToIndices.put(c, new ArrayList<>());
-            }
+            charToIndices.putIfAbsent(c, new ArrayList<>());
             charToIndices.get(c).add(i);
         }
 
@@ -132,6 +140,9 @@ public class IsSubsequence {
     /**
      * Alternative solution using Java's built-in indexOf method
      * This is more concise but may be slightly less efficient for very large inputs
+     *
+     * Time Complexity: O(n*m) in the worst case, where n is the length of source and m is the length of target
+     * Space Complexity: O(1)
      */
     public boolean isSubsequenceUsingIndexOf(String source, String target) {
         int currentIndex = -1;

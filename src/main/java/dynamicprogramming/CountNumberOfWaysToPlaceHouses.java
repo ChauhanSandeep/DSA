@@ -56,36 +56,39 @@ public class CountNumberOfWaysToPlaceHouses {
      * Calculates the number of ways to place houses on both sides of the street.
      *
      * Steps to solve:
-     * 1. For one side of the street, the problem reduces to counting binary strings of length n with no two consecutive 1's.
+     * 1. For one side of the street, the problem reduces to counting binary strings of length plotCount with no two consecutive 1's.
      * 2. We can use dynamic programming where dp[i] represents the number of ways to arrange houses up to position i.
      * 3. The recurrence relation is: dp[i] = dp[i-1] + dp[i-2] (similar to Fibonacci)
      * 4. For the other side of the street, the count would be the same since both sides are identical.
      * 5. The total number of ways is (ways_for_one_side * ways_for_other_side) % MOD.
      *
-     * @param n The number of plots on each side of the street
+     * Time Complexity: O(n)
+     * Space Complexity: O(n) for the DP array, can be optimized to O(1) with two variables.
+     *
+     * @param plotCount The number of plots on each side of the street
      * @return The number of ways to place houses on both sides of the street modulo 10^9 + 7
      */
-    public int countHousePlacements(int n) {
-        if (n == 0) {
+    public int countHousePlacements(int plotCount) {
+        if (plotCount == 0) {
             return 0;
         }
-        if (n == 1) {
+        if (plotCount == 1) {
             return 4; // Base case: 2^2 = 4 possible arrangements
         }
 
         // For one side of the street
-        long[] dp = new long[n + 1];
+        long[] dp = new long[plotCount + 1];
         dp[0] = 1; // Empty arrangement
         dp[1] = 2; // Either place a house or not at position 1
 
-        for (int i = 2; i <= n; i++) {
+        for (int i = 2; i <= plotCount; i++) {
             // Either place a house at position i (then can't place at i-1)
             // or don't place at position i (then can make any choice for i-1)
             dp[i] = (dp[i-1] + dp[i-2]) % MOD;
         }
 
         // Total ways is (ways for one side) * (ways for other side)
-        return (int)((dp[n] * dp[n]) % MOD);
+        return (int)((dp[plotCount] * dp[plotCount]) % MOD);
     }
 
     /**
@@ -97,19 +100,22 @@ public class CountNumberOfWaysToPlaceHouses {
      * 3. For each position i, the current count is the sum of the counts for i-1 and i-2.
      * 4. We update the previous two values as we iterate through the positions.
      * 5. The result is the square of the count for one side, modulo 10^9 + 7.
+     *
+     * Time Complexity: O(n)
+     * Space Complexity: O(1)
      */
-    public int countHousePlacementsOptimized(int n) {
-        if (n == 0) {
+    public int countHousePlacementsOptimized(int plotCount) {
+        if (plotCount == 0) {
             return 0;
         }
-        if (n == 1) {
+        if (plotCount == 1) {
             return 4;
         }
 
         long prevPrev = 1; // dp[0] = 1 (empty arrangement)
         long prev = 2;     // dp[1] = 2 (place or not place at position 1)
 
-        for (int i = 2; i <= n; i++) {
+        for (int i = 2; i <= plotCount; i++) {
             long current = (prev + prevPrev) % MOD;
             prevPrev = prev;
             prev = current;
@@ -126,6 +132,9 @@ public class CountNumberOfWaysToPlaceHouses {
      * 2. The nth Fibonacci number can be computed in O(log n) time using matrix exponentiation.
      * 3. The number of ways for one side is (n+2)th Fibonacci number.
      * 4. The result is the square of this value, modulo 10^9 + 7.
+     *
+     * Time Complexity: O(log n)
+     * Space Complexity: O(1)
      */
     public int countHousePlacementsMatrixExp(int n) {
         if (n == 0) return 0;

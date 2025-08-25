@@ -78,7 +78,7 @@ public class CourseScheduleIII {
         Arrays.sort(courses, (a, b) -> a[1] - b[1]);
 
         // Max-heap to store the durations of the courses taken
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+        PriorityQueue<Integer> durationsMaxHeap = new PriorityQueue<>((a, b) -> b - a);
 
         int currentTime = 0;
 
@@ -88,15 +88,15 @@ public class CourseScheduleIII {
 
             // Add the current course's duration to our schedule
             currentTime += duration;
-            maxHeap.offer(duration);
+            durationsMaxHeap.offer(duration);
 
             // If we've exceeded the deadline, remove the longest course
             if (currentTime > lastDay) {
-                currentTime -= maxHeap.poll();
+                currentTime -= durationsMaxHeap.poll();
             }
         }
 
-        return maxHeap.size();
+        return durationsMaxHeap.size();
     }
 
     /**

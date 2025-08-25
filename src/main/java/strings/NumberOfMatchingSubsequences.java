@@ -25,76 +25,108 @@ import java.util.*;
 public class NumberOfMatchingSubsequences {
 
     /**
-     * Counts words that are subsequences of string s using waiting lists approach.
+     * Counts how many words from the given list are subsequences of the input text.
      *
      * Algorithm:
-     * 1. Create 26 waiting lists (buckets) for each letter a-z
-     * 2. Initially place all words in bucket corresponding to their first character
-     * 3. For each character in s, process all words waiting for that character
-     * 4. Move each word to next waiting bucket or mark as complete
-     * 5. Count completed words as valid subsequences
+     * - Maintain 26 buckets (a–z), each storing words currently waiting for that character.
+     * - Place every word into the bucket of its first required character.
+     * - Iterate over each character of the target:
+     *     - Take all words from that character’s bucket (they are waiting for it).
+     *     - Remove the matched character from each word:
+     *         - If no characters remain → the word is fully matched (count++).
+     *         - Otherwise → move the word to the bucket of its next required character.
      *
-     * Time Complexity: O(s.length() + sum of all word lengths)
-     * Space Complexity: O(number of words) for the waiting lists
+     * Dry Run:
+     * text = "abcde", words = ["a", "bb", "acd", "ace"]
      *
-     * @param s Target string to check subsequences against
-     * @param words Array of words to check if they are subsequences of s
-     * @return Number of words that are subsequences of s
+     * Initial buckets:
+     *   'a': ["a", "acd", "ace"]
+     *   'b': ["bb"]
+     *
+     * Step 1: process 'a'
+     *   - "a" → fully matched ✅
+     *   - "acd" → now "cd" → move to 'c'
+     *   - "ace" → now "ce" → move to 'c'
+     *
+     * Step 2: process 'b'
+     *   - "bb" → now "b" → move to 'b'
+     *
+     * Step 3: process 'c'
+     *   - "cd" → now "d" → move to 'd'
+     *   - "ce" → now "e" → move to 'e'
+     *
+     * Step 4: process 'd'
+     *   - "d" → fully matched ✅
+     *
+     * Step 5: process 'e'
+     *   - "e" → fully matched ✅
+     *
+     * Final count = 3 ("a", "acd", "ace")
+     *
+     * Complexity:
+     * Each word progresses one character at a time → O(|target| + total word length).
+     * @param target Target string to check subsequences against
+     * @param words Array of words to check if they are subsequences of target
+     * @return Number of words that are subsequences of target
      */
-    public int numMatchingSubseq(String s, String[] words) {
-        if (s == null || words == null) {
-            return 0;
-        }
-
-        // Create waiting lists for each character a-z
-        List<WordPointer>[] waitingLists = new List[26];
+    public int numMatchingSubseq(String target, String[] words) {
+        // Buckets for words waiting on each character ('a' to 'z')
+        List<StringBuilder>[] waitingBuckets = new List[26];
         for (int i = 0; i < 26; i++) {
-            waitingLists[i] = new ArrayList<>();
+            waitingBuckets[i] = new ArrayList<>();
         }
 
-        // Initialize waiting lists with all words
+        // Place each word in the bucket of the first character it is waiting for
         for (String word : words) {
-            if (word.length() > 0) {
-                char firstChar = word.charAt(0);
-                waitingLists[firstChar - 'a'].add(new WordPointer(word, 0));
-            }
+            char firstChar = word.charAt(0);
+            waitingBuckets[firstChar - 'a'].add(new StringBuilder(word));
         }
 
-        int matchCount = 0;
+        int matchingSubsequences = 0;
 
-        // Process each character in s
-        for (char c : s.toCharArray()) {
-            int charIndex = c - 'a';
-            List<WordPointer> currentWaitingList = waitingLists[charIndex];
-            waitingLists[charIndex] = new ArrayList<>(); // Reset current waiting list
+        // Process each character of the main string
+        for (char currentChar : target.toCharArray()) {
+            List<StringBuilder> waitingList = waitingBuckets[currentChar - 'a'];
+            // Reset this bucket because we'll redistribute its words
+            waitingBuckets[currentChar - 'a'] = new ArrayList<>();
 
-            // Process all words waiting for current character
-            for (WordPointer wp : currentWaitingList) {
-                wp.index++; // Move to next character in word
+            // Update all words waiting for this character
+            for (StringBuilder currentWord : waitingList) {
+                currentWord.deleteCharAt(0); // remove matched char
 
-                if (wp.index == wp.word.length()) {
-                    // Word is completely matched
-                    matchCount++;
+                if (currentWord.length() == 0) {
+                    // Word completely matched
+                    matchingSubsequences++;
                 } else {
-                    // Move word to waiting list for its next character
-                    char nextChar = wp.word.charAt(wp.index);
-                    waitingLists[nextChar - 'a'].add(wp);
+                    // Move word to the bucket of its next required character
+                    char nextRequiredChar = currentWord.charAt(0);
+                    waitingBuckets[nextRequiredChar - 'a'].add(currentWord);
                 }
             }
         }
 
-        return matchCount;
+        return matchingSubsequences;
     }
 
     /**
      * Alternative approach using binary search on pre-computed character positions.
+     *
+     * Algorithm:
+     * 1. Pre-compute positions of each character in target string
+     * 2. For each word, use binary search to find if it is a subse
+     * quence of target
+     * 3. Maintain the last matched index to ensure order is preserved
+     * 4. Count words that are confirmed as subsequences
+     *
+     * Time Complexity: O(target.length() + m * log n) where m is number of words and n is average word length
+     * Space Complexity: O(n) for storing character positions
      */
-    public int numMatchingSubseqBinarySearch(String s, String[] words) {
+    public int numMatchingSubseqBinarySearch(String target, String[] words) {
         // Pre-compute positions of each character in s
         Map<Character, List<Integer>> charPositions = new HashMap<>();
 
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
+        for (int i = 0; i < target.length(); i++) {
+            char c = target.charAt(i);
             charPositions.computeIfAbsent(c, k -> new ArrayList<>()).add(i);
         }
 
@@ -107,17 +139,6 @@ public class NumberOfMatchingSubsequences {
         }
 
         return matchCount;
-    }
-
-    // Helper class to track word and current index being matched
-    private static class WordPointer {
-        String word;
-        int index;
-
-        WordPointer(String word, int index) {
-            this.word = word;
-            this.index = index;
-        }
     }
 
     // Helper method to check subsequence using binary search

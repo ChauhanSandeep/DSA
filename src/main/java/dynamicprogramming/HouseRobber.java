@@ -40,11 +40,6 @@ package dynamicprogramming;
  *    Answer: We can solve it by taking the maximum of two cases: rob houses[0..n-2] or rob houses[1..n-1],
  *    since the first and last houses are adjacent in a circle.
  *
- * 2. What if you can't rob two adjacent houses, but can rob any non-adjacent houses?
- *    Answer: The current solution already handles this constraint by considering the maximum of
- *    robbing the current house plus the amount from two houses back, or skipping the current house
- *    and keeping the amount from the previous house.
- *
  * 3. How would you modify your solution to also return which houses to rob?
  *    Answer: We can modify the solution to keep track of the chosen houses by maintaining an array
  *    that stores the indices of the robbed houses at each step. We would need to backtrack through

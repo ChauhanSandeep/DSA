@@ -15,6 +15,7 @@ package dynamicprogramming;
  * Example 2:
  * Input: word1 = "leetcode", word2 = "etco"
  * Output: 4
+ * Explanation: You need four steps to make leetcode to etco. (delete 'l', 'e', 'd', 'e')
  *
  * Approach:
  * This problem can be reduced to finding the length of the longest common subsequence (LCS) between the two strings.
@@ -23,9 +24,6 @@ package dynamicprogramming;
  *
  * We can solve this using dynamic programming where dp[i][j] represents the length of the LCS of
  * word1[0..i-1] and word2[0..j-1].
- *
- * Time Complexity: O(m*n) where m and n are the lengths of word1 and word2
- * Space Complexity: O(m*n) for the DP table, which can be optimized to O(min(m,n))
  *
  * Follow-up Questions:
  * 1. What if we can perform insertions and deletions?
@@ -53,30 +51,33 @@ public class DeleteOperationForTwoStrings {
      *    b. If the current characters match, dp[i][j] = dp[i-1][j-1] + 1.
      *    c. If they don't match, dp[i][j] = max(dp[i-1][j], dp[i][j-1]).
      *
+     * Time Complexity: O(m*n) where m and n are the lengths of word1 and word2
+     * Space Complexity: O(m*n) for the DP table, which can be optimized to O(min(m,n))
+     *
      * @param word1 The first input string
      * @param word2 The second input string
      * @return The minimum number of deletions required
      */
     public int minDistance(String word1, String word2) {
-        int m = word1.length();
-        int n = word2.length();
+        int length1 = word1.length();
+        int length2 = word2.length();
 
         // dp[i][j] represents the LCS of word1[0..i-1] and word2[0..j-1]
-        int[][] dp = new int[m + 1][n + 1];
+        int[][] dp = new int[length1 + 1][length2 + 1];
 
         // Fill the DP table
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
+        for (int index1 = 1; index1 <= length1; index1++) {
+            for (int index2 = 1; index2 <= length2; index2++) {
+                if (word1.charAt(index1 - 1) == word2.charAt(index2 - 1)) {
+                    dp[index1][index2] = dp[index1 - 1][index2 - 1] + 1;
                 } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                    dp[index1][index2] = Math.max(dp[index1 - 1][index2], dp[index1][index2 - 1]);
                 }
             }
         }
 
-        int lcsLength = dp[m][n];
-        return (m - lcsLength) + (n - lcsLength);
+        int lcsLength = dp[length1][length2];
+        return (length1 - lcsLength) + (length2 - lcsLength);
     }
 
     /**
@@ -95,19 +96,21 @@ public class DeleteOperationForTwoStrings {
             word2 = temp;
         }
 
-        int m = word1.length();
-        int n = word2.length();
+        int length1 = word1.length();
+        int length2 = word2.length();
 
         // Use two 1D arrays instead of a 2D array
-        int[] prev = new int[n + 1];
-        int[] curr = new int[n + 1];
+        int[] prev = new int[length2 + 1]; // stores the previous row of the DP table
+        int[] curr = new int[length2 + 1]; // stores the current row of the DP table
 
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
-                    curr[j] = prev[j - 1] + 1;
-                } else {
-                    curr[j] = Math.max(prev[j], curr[j - 1]);
+        for (int index1 = 1; index1 <= length1; index1++) {
+            for (int index2 = 1; index2 <= length2; index2++) {
+                if (word1.charAt(index1 - 1) == word2.charAt(index2 - 1)) { // Characters match
+                    curr[index2] = prev[index2 - 1] + 1;
+                } else { // Characters don't match
+                    // Take the maximum of the two possible options.
+                    // prev[index2] contains dp[i-1][j] and curr[index2 - 1] contains dp[i][j-1]
+                    curr[index2] = Math.max(prev[index2], curr[index2 - 1]);
                 }
             }
 
@@ -117,8 +120,8 @@ public class DeleteOperationForTwoStrings {
             curr = temp;
         }
 
-        int lcsLength = prev[n];
-        return (m - lcsLength) + (n - lcsLength);
+        int lcsLength = prev[length2];
+        return (length1 - lcsLength) + (length2 - lcsLength);
     }
 
     /**
