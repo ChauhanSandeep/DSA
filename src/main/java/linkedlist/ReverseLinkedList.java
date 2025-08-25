@@ -1,7 +1,5 @@
 package linkedlist;
 
-import static heap.MergeKLists.*;
-
 
 /**
  * ✅ Problem: Reverse Linked List
@@ -89,7 +87,6 @@ public class ReverseLinkedList {
             prev.next = then;
             then = curr.next;
             System.out.println("Complete states: prev = " + prev.val + ", curr = " + curr.val + ", then = " + (then != null ? then.val : "null"));
-            printList(dummy.next);
         }
 
         return dummy.next;

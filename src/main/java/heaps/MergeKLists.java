@@ -1,8 +1,8 @@
 package heaps;
 
-import linkedlist.ListNode;
 import java.util.PriorityQueue;
 
+// Private inner class for ListNode
 
 /**
  * ✅ Problem: Merge K Sorted Linked Lists
@@ -29,6 +29,22 @@ import java.util.PriorityQueue;
  * 3. What changes if the lists are streaming? → Use a real-time stream merge with a size-limited min-heap.
  */
 public class MergeKLists {
+    // Private inner class for ListNode
+    private static class ListNode {
+        int val;
+        ListNode next;
+        
+        ListNode() {}
+        
+        ListNode(int val) { 
+            this.val = val; 
+        }
+        
+        ListNode(int val, ListNode next) { 
+            this.val = val; 
+            this.next = next; 
+        }
+    }
 
   public static void main(String[] args) {
     ListNode[] inputLists = new ListNode[3];
