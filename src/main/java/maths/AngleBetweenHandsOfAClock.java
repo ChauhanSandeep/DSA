@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.math;
+package maths;
 
 /**
  * Problem: Angle Between Hands of a Clock

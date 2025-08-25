@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.greedy;
+package greedy;
 
 /**
  * Problem: Minimum Moves to Reach Target Score

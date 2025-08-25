@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.binarysearch;
+package binarysearch;
 
 /**
  * Problem: Single Element in a Sorted Array

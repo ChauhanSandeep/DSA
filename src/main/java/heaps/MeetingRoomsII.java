@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.heap;
+package heaps;
 
 import java.util.PriorityQueue;
 import java.util.Arrays;

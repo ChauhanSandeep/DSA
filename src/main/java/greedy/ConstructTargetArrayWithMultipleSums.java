@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.greedy;
+package greedy;
 
 import java.util.PriorityQueue;
 

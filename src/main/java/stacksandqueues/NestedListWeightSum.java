@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.stack;
+package stacksandqueues;
 
 import java.util.List;
 

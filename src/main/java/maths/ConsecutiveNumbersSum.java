@@ -1,4 +1,4 @@
-package com.sandeep.frazsheet.sorting;
+package maths;
 
 /**
  * Problem: Consecutive Numbers Sum
