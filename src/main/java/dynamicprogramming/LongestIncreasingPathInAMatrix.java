@@ -72,6 +72,9 @@ public class LongestIncreasingPathInAMatrix {
      * 5. For each direction, check if the next cell is within bounds and has a greater value.
      * 6. Update the maximum path length found so far.
      *
+     * Time Complexity: O(m*n) where m is the number of rows and n is the number of columns
+     * Space Complexity: O(m*n) for the memoization table
+     *
      * @param matrix The input matrix of integers
      * @return The length of the longest increasing path
      */
@@ -100,7 +103,8 @@ public class LongestIncreasingPathInAMatrix {
     }
 
     /**
-     * Helper method to perform DFS and find the longest increasing path starting from (i,j)
+     * Helper method to perform DFS and find the longest increasing path starting from (i,j).
+     * This also updates memo table with the max path length found from this cell.
      */
     private int dfs(int[][] matrix, int i, int j, int[][] memo) {
         // If we've already computed the result for this cell, return it
@@ -214,62 +218,5 @@ public class LongestIncreasingPathInAMatrix {
         }
 
         return maxLength;
-    }
-
-    /**
-     * Space-optimized solution using a 1D array for memoization
-     *
-     * This approach reduces the space complexity by using a 1D array instead of a 2D array for memoization.
-     * The index in the 1D array is calculated as i * cols + j.
-     */
-    public int longestIncreasingPathOptimized(int[][] matrix) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-            return 0;
-        }
-
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int maxLength = 0;
-
-        // Use a 1D array for memoization
-        int[] memo = new int[rows * cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                int currentLength = dfsOptimized(matrix, i, j, memo, cols);
-                maxLength = Math.max(maxLength, currentLength);
-            }
-        }
-
-        return maxLength;
-    }
-
-    /**
-     * Helper method for the space-optimized solution
-     */
-    private int dfsOptimized(int[][] matrix, int i, int j, int[] memo, int cols) {
-        int index = i * cols + j;
-
-        // If we've already computed the result for this cell, return it
-        if (memo[index] != 0) {
-            return memo[index];
-        }
-
-        int maxPathLength = 1;
-
-        // Explore all four directions
-        for (int[] dir : DIRECTIONS) {
-            int newRow = i + dir[0];
-            int newCol = j + dir[1];
-
-            if (isValid(matrix, newRow, newCol) && matrix[newRow][newCol] > matrix[i][j]) {
-                int currentLength = 1 + dfsOptimized(matrix, newRow, newCol, memo, cols);
-                maxPathLength = Math.max(maxPathLength, currentLength);
-            }
-        }
-
-        // Memoize the result
-        memo[index] = maxPathLength;
-        return maxPathLength;
     }
 }

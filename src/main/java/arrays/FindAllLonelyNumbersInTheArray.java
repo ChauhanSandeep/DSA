@@ -63,48 +63,19 @@ public class FindAllLonelyNumbersInTheArray {
 
     /**
      * Cleaner implementation with stream API
-     * Time Complexity: O(n), Space Complexity: O(n)
+     * Time Complexity: O(n),
+     * Space Complexity: O(n)
      */
     public List<Integer> findLonelyStream(int[] nums) {
-        Map<Integer, Integer> freq = new HashMap<>();
+        Map<Integer, Integer> freqMap = new HashMap<>();
         for (int num : nums) {
-            freq.put(num, freq.getOrDefault(num, 0) + 1);
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
         }
 
-        return freq.keySet().stream()
-                .filter(num -> freq.get(num) == 1 &&
-                              !freq.containsKey(num - 1) &&
-                              !freq.containsKey(num + 1))
+        return freqMap.keySet().stream()
+                .filter(num -> freqMap.get(num) == 1 &&
+                              !freqMap.containsKey(num - 1) &&
+                              !freqMap.containsKey(num + 1))
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-    }
-
-    /**
-     * Set-based approach (two passes)
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public List<Integer> findLonelySet(int[] nums) {
-        List<Integer> result = new ArrayList<>();
-        Set<Integer> seen = new HashSet<>();
-        Set<Integer> duplicates = new HashSet<>();
-
-        // First pass: identify unique vs duplicate numbers
-        for (int num : nums) {
-            if (seen.contains(num)) {
-                duplicates.add(num);
-            } else {
-                seen.add(num);
-            }
-        }
-
-        // Second pass: check unique numbers for loneliness
-        for (int num : seen) {
-            if (!duplicates.contains(num) &&
-                !seen.contains(num - 1) &&
-                !seen.contains(num + 1)) {
-                result.add(num);
-            }
-        }
-
-        return result;
     }
 }

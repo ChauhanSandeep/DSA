@@ -37,28 +37,28 @@ public class MaxIncreaseToKeepCitySkyline {
      * @return maximum total increase possible
      */
     public int maxIncreaseKeepingSkyline(int[][] grid) {
-        int n = grid.length;
+        int length = grid.length;
 
         // Calculate max height in each row
-        int[] rowMax = new int[n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        int[] rowMax = new int[length];
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
                 rowMax[i] = Math.max(rowMax[i], grid[i][j]);
             }
         }
 
         // Calculate max height in each column
-        int[] colMax = new int[n];
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
+        int[] colMax = new int[length];
+        for (int j = 0; j < length; j++) {
+            for (int i = 0; i < length; i++) {
                 colMax[j] = Math.max(colMax[j], grid[i][j]);
             }
         }
 
         // Calculate total possible increase
         int totalIncrease = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
                 int maxPossibleHeight = Math.min(rowMax[i], colMax[j]);
                 totalIncrease += maxPossibleHeight - grid[i][j];
             }
@@ -72,60 +72,26 @@ public class MaxIncreaseToKeepCitySkyline {
      * Time Complexity: O(n²), Space Complexity: O(1)
      */
     public int maxIncreaseKeepingSkylineOptimized(int[][] grid) {
-        int n = grid.length;
+        int length = grid.length;
         int totalIncrease = 0;
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
                 // Calculate row maximum
                 int rowMax = 0;
-                for (int col = 0; col < n; col++) {
+                for (int col = 0; col < length; col++) {
                     rowMax = Math.max(rowMax, grid[i][col]);
                 }
 
                 // Calculate column maximum
                 int colMax = 0;
-                for (int row = 0; row < n; row++) {
+                for (int row = 0; row < length; row++) {
                     colMax = Math.max(colMax, grid[row][j]);
                 }
 
                 // Add possible increase for this position
                 int maxPossibleHeight = Math.min(rowMax, colMax);
                 totalIncrease += maxPossibleHeight - grid[i][j];
-            }
-        }
-
-        return totalIncrease;
-    }
-
-    /**
-     * Stream-based approach using Java 8 features
-     * Time Complexity: O(n²), Space Complexity: O(n)
-     */
-    public int maxIncreaseKeepingSkylineStream(int[][] grid) {
-        int n = grid.length;
-
-        // Calculate row maximums using streams
-        int[] rowMax = new int[n];
-        for (int i = 0; i < n; i++) {
-            rowMax[i] = Arrays.stream(grid[i]).max().orElse(0);
-        }
-
-        // Calculate column maximums
-        int[] colMax = new int[n];
-        for (int j = 0; j < n; j++) {
-            final int col = j;
-            colMax[j] = Arrays.stream(grid)
-                             .mapToInt(row -> row[col])
-                             .max()
-                             .orElse(0);
-        }
-
-        // Calculate total increase
-        int totalIncrease = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                totalIncrease += Math.min(rowMax[i], colMax[j]) - grid[i][j];
             }
         }
 

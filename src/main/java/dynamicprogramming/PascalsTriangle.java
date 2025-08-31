@@ -49,7 +49,7 @@ import java.util.List;
 public class PascalsTriangle {
 
     /**
-     * Iterative Solution
+     * Iterative Solution (Optimal)
      *
      * Approach:
      * 1. Initialize the result list with the first row [1]
@@ -62,19 +62,19 @@ public class PascalsTriangle {
      * Space Complexity: O(1) excluding output, O(n²) including output
      */
     public List<List<Integer>> generate(int numRows) {
-        List<List<Integer>> triangle = new ArrayList<>();
+        List<List<Integer>> result = new ArrayList<>();
 
         if (numRows <= 0) {
-            return triangle;
+            return result;
         }
 
         // First row is always [1]
         List<Integer> firstRow = new ArrayList<>();
         firstRow.add(1);
-        triangle.add(firstRow);
+        result.add(firstRow);
 
         for (int rowNum = 1; rowNum < numRows; rowNum++) {
-            List<Integer> prevRow = triangle.get(rowNum - 1);
+            List<Integer> prevRow = result.get(rowNum - 1);
             List<Integer> currentRow = new ArrayList<>();
 
             // First element is always 1
@@ -88,10 +88,10 @@ public class PascalsTriangle {
             // Last element is always 1
             currentRow.add(1);
 
-            triangle.add(currentRow);
+            result.add(currentRow);
         }
 
-        return triangle;
+        return result;
     }
 
     /**
@@ -106,7 +106,7 @@ public class PascalsTriangle {
      * Space Complexity: O(1) excluding output
      */
     public List<List<Integer>> generateMath(int numRows) {
-        List<List<Integer>> triangle = new ArrayList<>();
+        List<List<Integer>> result = new ArrayList<>();
 
         for (int i = 0; i < numRows; i++) {
             List<Integer> row = new ArrayList<>();
@@ -119,48 +119,10 @@ public class PascalsTriangle {
                 value = value * (i - j) / (j + 1);
             }
 
-            triangle.add(row);
+            result.add(row);
         }
 
-        return triangle;
-    }
-
-    /**
-     * Get a specific row of Pascal's Triangle (0-indexed)
-     *
-     * @param rowIndex The 0-based row index
-     * @return The row at the given index
-     */
-    public List<Integer> getRow(int rowIndex) {
-        List<Integer> row = new ArrayList<>();
-
-        // Use the combination formula to generate each element
-        for (int j = 0; j <= rowIndex; j++) {
-            row.add(combination(rowIndex, j));
-        }
-
-        return row;
-    }
-
-    /**
-     * Helper method to calculate combination C(n, k)
-     */
-    private int combination(int n, int k) {
-        // To avoid integer overflow, use long for intermediate calculations
-        long result = 1;
-
-        // Since C(n, k) = C(n, n-k), we can optimize by using the smaller k
-        if (k > n - k) {
-            k = n - k;
-        }
-
-        // Calculate value of [n * (n-1) * ... * (n-k+1)] / [k * (k-1) * ... * 1]
-        for (int i = 0; i < k; i++) {
-            result = result * (n - i);
-            result = result / (i + 1);
-        }
-
-        return (int) result;
+        return result;
     }
 
     public static void main(String[] args) {
@@ -179,10 +141,6 @@ public class PascalsTriangle {
         // Test mathematical approach
         System.out.println("\nMathematical Approach (5 rows):");
         printTriangle(solution.generateMath(5));
-
-        // Test getting a specific row
-        System.out.println("\nRow at index 3 (0-based):");
-        System.out.println(solution.getRow(3));  // Expected: [1, 3, 3, 1]
     }
 
     // Helper method to print the triangle

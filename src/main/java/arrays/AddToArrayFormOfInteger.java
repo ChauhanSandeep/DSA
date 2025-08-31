@@ -14,9 +14,12 @@ import java.util.*;
  * LeetCode: https://leetcode.com/problems/add-to-array-form-of-integer
  *
  * Follow-up Questions:
- * - How would you handle very large numbers that exceed integer limits? (Use BigInteger or string manipulation)
- * - Can you solve this without using extra space? (Current solution uses O(log k) extra space)
- * - What if k could be negative? (Handle subtraction case)
+ * Que - How would you handle very large numbers that exceed integer limits?
+ * Ans - (Use BigInteger or string manipulation)
+ * Que - Can you solve this without using extra space?
+ * Ans - (Modify the input array if possible, otherwise use a linked list)
+ * Que - What if k could be negative?
+ * Ans - Need to handle borrowing and negative results, more complex logic required.
  */
 public class AddToArrayFormOfInteger {
 
@@ -47,15 +50,18 @@ public class AddToArrayFormOfInteger {
             // Get current digit from nums array (0 if out of bounds)
             int currentDigit = index >= 0 ? nums[index] : 0;
 
+            // Get last digit of k
+            int kDigit = k%10;
+            k = k/10;
+
             // Add current digit + last digit of k + carry
-            int sum = currentDigit + (k % 10) + carry;
+            int sum = currentDigit + kDigit + carry;
 
             // Add the unit digit to result
             result.add(sum % 10);
 
             // Update carry and move to next digit of k
             carry = sum / 10;
-            k /= 10;
             index--;
         }
 
@@ -66,7 +72,14 @@ public class AddToArrayFormOfInteger {
 
     /**
      * Alternative approach using string conversion (less efficient but more intuitive)
-     * Time Complexity: O(N + log K), Space Complexity: O(N + log K)
+     * This approach may lead to overflow for very large numbers and would not be allowed in an interview setting.
+     *
+     * Steps:
+     * 1. Convert array to number, add k
+     * 2. Convert result back to array form
+     *
+     * Time Complexity: O(N + log K),
+     * Space Complexity: O(N + log K)
      */
     public List<Integer> addToArrayFormAlternative(int[] nums, int k) {
         // Convert array to number, add k, then convert back

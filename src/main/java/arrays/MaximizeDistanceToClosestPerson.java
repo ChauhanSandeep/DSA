@@ -22,6 +22,61 @@ import java.util.Arrays;
 public class MaximizeDistanceToClosestPerson {
 
     /**
+     * Two-pass approach for clarity (Optimized)
+     *
+     * Steps:
+     * 1. First pass: Calculate distance to closest occupied seat on left
+     * 2. Second pass: Calculate distance to closest occupied seat on right
+     * 3. For each empty seat, distance to closest person = min(leftDistance, rightDistance)
+     * 4. Track seat with maximum such distance
+     *
+     * Time Complexity: O(n),
+     * Space Complexity: O(n)
+     */
+    public int maxDistToClosestTwoPass(int[] seats) {
+        int size = seats.length;
+        int[] leftDistance = new int[size]; // Distance to closest person on left
+        int[] rightDistance = new int[size]; // Distance to closest person on right
+
+        Arrays.fill(leftDistance, Integer.MAX_VALUE);
+        Arrays.fill(rightDistance, Integer.MAX_VALUE);
+
+        // Calculate distance to closest person on left
+        for (int i = 0; i < size; i++) {
+            if (seats[i] == 1) {
+                leftDistance[i] = 0;
+            } else if (i > 0) {
+                leftDistance[i] = leftDistance[i-1] + 1;
+            }
+        }
+
+        // Calculate distance to closest person on right
+        for (int i = size - 1; i >= 0; i--) {
+            if (seats[i] == 1) {
+                rightDistance[i] = 0;
+            } else if (i < size - 1) {
+                rightDistance[i] = rightDistance[i+1] + 1;
+            }
+        }
+
+        // Find seat with maximum distance to closest person
+        int maxDistance = 0;
+        int bestSeat = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (seats[i] == 0) {
+                int distance = Math.min(leftDistance[i], rightDistance[i]);
+                if (distance > maxDistance) {
+                    maxDistance = distance;
+                    bestSeat = i;
+                }
+            }
+        }
+
+        return bestSeat;
+    }
+
+    /**
      * Finds seat that maximizes distance to closest person.
      *
      * Algorithm:
@@ -75,95 +130,5 @@ public class MaximizeDistanceToClosestPerson {
         }
 
         return Math.min(leftDistance, rightDistance);
-    }
-
-    /**
-     * Optimized approach using segment analysis
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int maxDistToClosestOptimized(int[] seats) {
-        int n = seats.length;
-        int maxDistance = 0;
-        int bestSeat = 0;
-
-        int lastOccupied = -1;
-
-        for (int i = 0; i < n; i++) {
-            if (seats[i] == 1) {
-                if (lastOccupied == -1) {
-                    // Handle segment at beginning
-                    if (i > maxDistance) {
-                        maxDistance = i;
-                        bestSeat = 0;
-                    }
-                } else {
-                    // Handle segment between two occupied seats
-                    int segmentLength = i - lastOccupied - 1;
-                    if (segmentLength > 0) {
-                        int distance = (segmentLength + 1) / 2;
-                        if (distance > maxDistance) {
-                            maxDistance = distance;
-                            bestSeat = lastOccupied + distance;
-                        }
-                    }
-                }
-                lastOccupied = i;
-            }
-        }
-
-        // Handle segment at the end
-        if (lastOccupied != -1 && n - 1 - lastOccupied > maxDistance) {
-            maxDistance = n - 1 - lastOccupied;
-            bestSeat = n - 1;
-        }
-
-        return bestSeat;
-    }
-
-    /**
-     * Two-pass approach for clarity
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public int maxDistToClosestTwoPass(int[] seats) {
-        int n = seats.length;
-        int[] leftDistance = new int[n];
-        int[] rightDistance = new int[n];
-
-        Arrays.fill(leftDistance, Integer.MAX_VALUE);
-        Arrays.fill(rightDistance, Integer.MAX_VALUE);
-
-        // Calculate distance to closest person on left
-        for (int i = 0; i < n; i++) {
-            if (seats[i] == 1) {
-                leftDistance[i] = 0;
-            } else if (i > 0) {
-                leftDistance[i] = leftDistance[i-1] + 1;
-            }
-        }
-
-        // Calculate distance to closest person on right
-        for (int i = n - 1; i >= 0; i--) {
-            if (seats[i] == 1) {
-                rightDistance[i] = 0;
-            } else if (i < n - 1) {
-                rightDistance[i] = rightDistance[i+1] + 1;
-            }
-        }
-
-        // Find seat with maximum distance to closest person
-        int maxDistance = 0;
-        int bestSeat = 0;
-
-        for (int i = 0; i < n; i++) {
-            if (seats[i] == 0) {
-                int distance = Math.min(leftDistance[i], rightDistance[i]);
-                if (distance > maxDistance) {
-                    maxDistance = distance;
-                    bestSeat = i;
-                }
-            }
-        }
-
-        return bestSeat;
     }
 }

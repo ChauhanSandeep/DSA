@@ -33,46 +33,24 @@ public class PartitioningIntoMinimumNumberOfDeciBinaryNumbers {
      * Finds minimum number of deci-binary numbers needed to sum to given number.
      *
      * Algorithm:
-     * 1. Key insight: minimum count equals the maximum digit in the number
-     * 2. Each deci-binary number can contribute at most 1 to any digit position
-     * 3. Position with largest digit d requires exactly d deci-binary numbers
-     * 4. All other positions can be satisfied within these d numbers
-     * 5. Simply find and return the maximum digit
+     * Key insight: minimum count equals the maximum digit in the number because each
+     * deci-binary number can contribute at most 1 to any digit position
+     *
+     * 1. Each deci-binary number can contribute at most 1 to any digit position
+     * 2. Position with largest digit d requires exactly d deci-binary numbers
+     * 3. All other positions can be satisfied within these d numbers
+     * 4. Simply find and return the maximum digit
      *
      * Time Complexity: O(n) where n is length of input string
      * Space Complexity: O(1) - only uses constant extra space
      *
-     * @param n String representation of positive decimal integer
+     * @param input String representation of positive decimal integer
      * @return Minimum number of deci-binary numbers needed to sum to n
      */
-    public int minPartitions(String n) {
-        if (n == null || n.isEmpty()) {
-            return 0;
-        }
-
+    public int minPartitions(String input) {
         int maxDigit = 0;
 
-        // Find the maximum digit in the number
-        for (char c : n.toCharArray()) {
-            int digit = c - '0';
-            maxDigit = Math.max(maxDigit, digit);
-
-            // Early termination optimization
-            if (maxDigit == 9) {
-                break;
-            }
-        }
-
-        return maxDigit;
-    }
-
-    /**
-     * Alternative approach using Character.getNumericValue for digit extraction.
-     */
-    public int minPartitionsAlternative(String n) {
-        int maxDigit = 0;
-
-        for (char c : n.toCharArray()) {
+        for (char c : input.toCharArray()) {
             int digit = Character.getNumericValue(c);
             maxDigit = Math.max(maxDigit, digit);
 
@@ -87,8 +65,8 @@ public class PartitioningIntoMinimumNumberOfDeciBinaryNumbers {
     /**
      * Stream-based approach for functional programming style.
      */
-    public int minPartitionsStream(String n) {
-        return n.chars()
+    public int minPartitionsStream(String input) {
+        return input.chars()
                 .map(c -> c - '0')
                 .max()
                 .orElse(0);

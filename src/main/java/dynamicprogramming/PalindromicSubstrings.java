@@ -60,23 +60,23 @@ public class PalindromicSubstrings {
      * Time Complexity: O(n²) - Each expansion can take O(n) time in the worst case
      * Space Complexity: O(1) - Only constant extra space is used
      */
-    public int countSubstrings(String s) {
-        if (s == null || s.length() == 0) {
+    public int countSubstrings(String input) {
+        if (input == null || input.length() == 0) {
             return 0;
         }
 
         count = 0;
 
-        for (int i = 0; i < s.length(); i++) {
-            expandAroundCenter(s, i, i);      // Odd length palindromes
-            expandAroundCenter(s, i, i + 1);  // Even length palindromes
+        for (int i = 0; i < input.length(); i++) {
+            expandAroundCenter(input, i, i);      // Odd length palindromes
+            expandAroundCenter(input, i, i + 1);  // Even length palindromes
         }
 
         return count;
     }
 
-    private void expandAroundCenter(String s, int left, int right) {
-        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+    private void expandAroundCenter(String input, int left, int right) {
+        while (left >= 0 && right < input.length() && input.charAt(left) == input.charAt(right)) {
             count++;
             left--;
             right++;

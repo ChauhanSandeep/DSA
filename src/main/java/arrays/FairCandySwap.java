@@ -95,7 +95,8 @@ public class FairCandySwap {
 
     /**
      * Brute force approach for verification
-     * Time Complexity: O(n * m), Space Complexity: O(1)
+     * Time Complexity: O(n * m),
+     * Space Complexity: O(1)
      */
     public int[] fairCandySwapBruteForce(int[] aliceSizes, int[] bobSizes) {
         int aliceTotal = Arrays.stream(aliceSizes).sum();

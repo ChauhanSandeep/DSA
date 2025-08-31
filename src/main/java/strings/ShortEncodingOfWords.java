@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * LeetCode 820. Short Encoding of Words
  *
- * A valid encoding of an array of words is any reference string s and array of indices indices such that:
+ * A valid encoding of an array of words is any reference string s and array of indices such that:
  * words[i] = s.substring(indices[i], indices[i] + words[i].length())
  * We want to find the encoding with the minimum length.
  *
@@ -13,6 +13,9 @@ import java.util.*;
  * Input: words = ["time", "me", "bell"]
  * Output: 10
  * Explanation: A valid encoding would be s = "time#bell#" and indices = [0, 2, 5].
+ * words[0] = "time", the substring of s starting from indices[0] = 0 to the next '#' is "time#"
+ * words[1] = "me", the substring of s starting from indices[1] = 2 to the next '#' is "me#"
+ * words[2] = "bell", the substring of s starting from indices[2] = 5 to the next '#' is "bell#"
  *
  * LeetCode Link: https://leetcode.com/problems/short-encoding-of-words/
  *
@@ -66,6 +69,9 @@ public class ShortEncodingOfWords {
 
     /**
      * Trie-based approach for more efficient processing of large word lists.
+     *
+     * Time Complexity: O(sum of word_length) for building trie
+     * Space Complexity: O(sum of word_lengths) for trie storage
      */
     public int minimumLengthEncodingTrie(String[] words) {
         TrieNode root = new TrieNode();

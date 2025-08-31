@@ -1,5 +1,9 @@
 package strings;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * LeetCode 788. Rotated Digits
  *
@@ -7,7 +11,10 @@ package strings;
  * we get a valid number that is different from x. Each digit must be rotated - we cannot choose to leave it alone.
  *
  * A number is valid if each digit remains a digit after rotation. Here are the valid rotations of each digit:
- * 0 -> 0, 1 -> 1, 2 -> 5, 5 -> 2, 6 -> 9, 8 -> 8, 9 -> 6
+ * 0 -> 0, 1 -> 1, 8 -> 8
+ * 2 -> 5, 5 -> 2
+ * 6 -> 9, 9 -> 6
+ * Rest of the digits do not rotate to any other number and become invalid.
  *
  * Example 1:
  * Input: n = 10
@@ -24,6 +31,9 @@ package strings;
  */
 public class RotatedDigits {
 
+    private final Set<Integer> INVALID_DIGITS = new HashSet<>(Arrays.asList(3, 4, 7));
+    private final Set<Integer> ROTATING_DIGITS = new HashSet<>(Arrays.asList(2, 5, 6, 9));
+
     /**
      * Counts good numbers from 1 to n where rotation produces different valid number.
      *
@@ -31,7 +41,7 @@ public class RotatedDigits {
      * 1. For each number from 1 to n, check if it's a good number
      * 2. A good number must contain at least one digit that changes when rotated (2,5,6,9)
      * 3. A good number cannot contain invalid digits (3,4,7) that don't have rotations
-     * 4. Valid unchanged digits (0,1,8) are allowed but at least one changing digit required
+     * 4. Valid unchanged digits (0,1,8) are allowed but at least one changing digit required otherwise number will be unchanged
      * 5. Count all numbers satisfying these conditions
      *
      * Time Complexity: O(n * log n) where n is input number (log n for digit processing per number)
@@ -60,12 +70,12 @@ public class RotatedDigits {
             int digit = num % 10;
 
             // Check for invalid digits (3, 4, 7)
-            if (digit == 3 || digit == 4 || digit == 7) {
+            if (INVALID_DIGITS.contains(digit)) {
                 return false;
             }
 
             // Check for rotating digits (2, 5, 6, 9)
-            if (digit == 2 || digit == 5 || digit == 6 || digit == 9) {
+            if (ROTATING_DIGITS.contains(digit)) {
                 hasRotatingDigit = true;
             }
 
@@ -75,56 +85,5 @@ public class RotatedDigits {
         }
 
         return hasRotatingDigit;
-    }
-
-    /**
-     * Optimized approach using string processing for clearer logic.
-     */
-    public int rotatedDigitsString(int n) {
-        int goodCount = 0;
-
-        for (int i = 1; i <= n; i++) {
-            String numStr = String.valueOf(i);
-
-            if (isGoodNumberString(numStr)) {
-                goodCount++;
-            }
-        }
-
-        return goodCount;
-    }
-
-    // Helper method using string approach
-    private boolean isGoodNumberString(String num) {
-        boolean hasRotatingDigit = false;
-
-        for (char c : num.toCharArray()) {
-            // Check for invalid digits
-            if (c == '3' || c == '4' || c == '7') {
-                return false;
-            }
-
-            // Check for rotating digits
-            if (c == '2' || c == '5' || c == '6' || c == '9') {
-                hasRotatingDigit = true;
-            }
-        }
-
-        return hasRotatingDigit;
-    }
-
-    /**
-     * Dynamic programming approach for optimization (advanced).
-     */
-    public int rotatedDigitsDP(int n) {
-        // dp[i][0] = count of numbers <= i with only 0,1,8 (same after rotation)
-        // dp[i][1] = count of numbers <= i that are good numbers
-
-        String nStr = String.valueOf(n);
-        int len = nStr.length();
-
-        // For simplicity, using the direct approach
-        // Full DP implementation would be more complex
-        return rotatedDigits(n);
     }
 }

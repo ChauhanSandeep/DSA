@@ -3,11 +3,25 @@ package arrays;
 /**
  * Matrix Block Sum
  *
- * Problem: For each position (i,j), calculate sum of elements in block of size (2k+1) x (2k+1)
- * centered at (i,j). Return matrix with these block sums.
+ * Problem: Given a m x n matrix mat and an integer k, return a matrix answer where each answer[i][j] is the
+ * sum of all elements mat[r][c] for:
  *
- * Example: mat = [[1,2,3],[4,5,6],[7,8,9]], k = 1 -> Output: [[12,21,16],[27,45,33],[24,39,28]]
- * Each position contains sum of its k-radius neighborhood.
+ * i - k <= r <= i + k,
+ * j - k <= c <= j + k, and
+ *
+ * Example: mat = [
+ *      [1,2,3],
+ *      [4,5,6],
+ *      [7,8,9]
+ *    ], k = 1
+ * -> Output: [
+ *      [12,21,16],
+ *      [27,45,33],
+ *      [24,39,28]
+ *   ]
+ * Explanation:
+ * For position (1,1), block includes all elements, sum = 45.
+ * For position (0,0), block includes elements (0,0),(0,1),(1,0),(1,1), sum = 12.
  *
  * LeetCode: https://leetcode.com/problems/matrix-block-sum
  *
@@ -36,30 +50,30 @@ public class MatrixBlockSum {
      * @return matrix with block sums
      */
     public int[][] matrixBlockSum(int[][] mat, int k) {
-        int m = mat.length;
-        int n = mat[0].length;
+        int rows = mat.length;
+        int cols = mat[0].length;
 
-        // Build prefix sum matrix
-        int[][] prefixSum = new int[m + 1][n + 1];
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
+        // Build prefix sum matrix. prefixSum[i][j] is sum of elements in rectangle (0,0) to (i-1,j-1)
+        int[][] prefixSum = new int[rows + 1][cols + 1];
+        for (int i = 1; i <= rows; i++) {
+            for (int j = 1; j <= cols; j++) {
                 prefixSum[i][j] = mat[i-1][j-1] + prefixSum[i-1][j] +
                                  prefixSum[i][j-1] - prefixSum[i-1][j-1];
             }
         }
 
         // Calculate block sums
-        int[][] result = new int[m][n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        int[][] result = new int[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 // Determine block boundaries
-                int r1 = Math.max(0, i - k);
-                int c1 = Math.max(0, j - k);
-                int r2 = Math.min(m - 1, i + k);
-                int c2 = Math.min(n - 1, j + k);
+                int topRow = Math.max(0, i - k);
+                int leftCol = Math.max(0, j - k);
+                int bottomRow = Math.min(rows - 1, i + k);
+                int rightCol = Math.min(cols - 1, j + k);
 
                 // Use prefix sum to calculate block sum
-                result[i][j] = getSumFromPrefix(prefixSum, r1, c1, r2, c2);
+                result[i][j] = getSumFromPrefix(prefixSum, topRow, leftCol, bottomRow, rightCol);
             }
         }
 
@@ -67,36 +81,11 @@ public class MatrixBlockSum {
     }
 
     // Helper method to get sum from prefix sum matrix
-    private int getSumFromPrefix(int[][] prefixSum, int r1, int c1, int r2, int c2) {
-        return prefixSum[r2 + 1][c2 + 1] - prefixSum[r1][c2 + 1] -
-               prefixSum[r2 + 1][c1] + prefixSum[r1][c1];
-    }
-
-    /**
-     * Brute force approach for verification (less efficient)
-     * Time Complexity: O(m*n*k²), Space Complexity: O(1)
-     */
-    public int[][] matrixBlockSumBruteForce(int[][] mat, int k) {
-        int m = mat.length;
-        int n = mat[0].length;
-        int[][] result = new int[m][n];
-
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                int sum = 0;
-
-                // Sum all elements in k-radius block
-                for (int r = Math.max(0, i - k); r <= Math.min(m - 1, i + k); r++) {
-                    for (int c = Math.max(0, j - k); c <= Math.min(n - 1, j + k); c++) {
-                        sum += mat[r][c];
-                    }
-                }
-
-                result[i][j] = sum;
-            }
-        }
-
-        return result;
+    private int getSumFromPrefix(int[][] prefixSum, int topRow, int leftCol, int bottomRow, int rightCol) {
+        return prefixSum[bottomRow + 1][rightCol + 1]
+            - prefixSum[topRow][rightCol + 1]
+            - prefixSum[bottomRow + 1][leftCol]
+            + prefixSum[topRow][leftCol];
     }
 
     /**
@@ -104,22 +93,22 @@ public class MatrixBlockSum {
      * Time Complexity: O(m*n), Space Complexity: O(n) for each row
      */
     public int[][] matrixBlockSumOptimized(int[][] mat, int k) {
-        int m = mat.length;
-        int n = mat[0].length;
-        int[][] result = new int[m][n];
+        int rows = mat.length;
+        int cols = mat[0].length;
+        int[][] result = new int[rows][cols];
 
         // For each row, maintain column prefix sums
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 int sum = 0;
 
-                int r1 = Math.max(0, i - k);
-                int c1 = Math.max(0, j - k);
-                int r2 = Math.min(m - 1, i + k);
-                int c2 = Math.min(n - 1, j + k);
+                int topRow = Math.max(0, i - k);
+                int leftCol = Math.max(0, j - k);
+                int bottomRow = Math.min(rows - 1, i + k);
+                int rightCol = Math.min(cols - 1, j + k);
 
-                for (int r = r1; r <= r2; r++) {
-                    for (int c = c1; c <= c2; c++) {
+                for (int r = topRow; r <= bottomRow; r++) {
+                    for (int c = leftCol; c <= rightCol; c++) {
                         sum += mat[r][c];
                     }
                 }

@@ -22,7 +22,8 @@ import java.util.*;
  * Explanation: One of the longest word chains is ["xb", "xbc", "cxbc", "pcxbc", "pcxbcf"].
  *
  * Approach:
- * We'll use dynamic programming to solve this problem. The key insight is that for each word, we can remove one character at a time and check if the resulting word exists in our set of words.
+ * We'll use dynamic programming to solve this problem. The key insight is that for each word, we can remove
+ * one character at a time and check if the resulting word exists in our set of words.
  *
  * Steps to solve:
  * 1. Sort the words by their lengths to ensure we process shorter words before longer ones.
@@ -30,9 +31,6 @@ import java.util.*;
  * 3. For each word, try removing each character and check if the resulting word exists in our map.
  * 4. Update the maximum chain length for the current word based on its predecessors.
  * 5. Keep track of the overall maximum chain length.
- *
- * Time Complexity: O(N * L^2) where N is the number of words and L is the maximum length of a word
- * Space Complexity: O(N) for the hash map
  *
  * Follow-up Questions:
  * 1. What if we need to return the actual longest word chain instead of just its length?
@@ -58,6 +56,11 @@ public class LongestStringChain {
      * 3. For each word, generate all possible predecessors by removing one character.
      * 4. For each predecessor, if it exists in the map, update the current word's chain length.
      * 5. Keep track of the maximum chain length found.
+     *
+     * Time Complexity: O(N * L^2) where N is the number of words and L is the maximum length of a word
+     *      N because we process each word (contribution O(N)), and L^2 because for each word of length L, we iterate
+     *      over each character (contributionO(L)) and each predecessor generation takes (contribution O(L)) time.
+     * Space Complexity: O(N) for the hash map
      *
      * @param words The array of words
      * @return The length of the longest word chain

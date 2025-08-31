@@ -41,29 +41,30 @@ public class ReverseInteger {
      * Time Complexity: O(log n) where n is the input number (number of digits)
      * Space Complexity: O(1) - only uses constant extra space
      *
-     * @param x Input integer to reverse
+     * @param input Input integer to reverse
      * @return Reversed integer, or 0 if overflow would occur
      */
-    public int reverse(int x) {
+    public int reverse(int input) {
         int result = 0;
 
-        while (x != 0) {
-            int digit = x % 10;
-            x /= 10;
+        while (input != 0) {
+            int lastDigit = input % 10;
+            input /= 10;
 
             // Check for overflow before updating result
-            // Integer.MAX_VALUE = 2147483647, Integer.MIN_VALUE = -2147483648
-            if (result > Integer.MAX_VALUE / 10 ||
-                (result == Integer.MAX_VALUE / 10 && digit > 7)) {
+            // Integer.MAX_VALUE = 2147483647
+            // So if current result > 214748364 or (result == 214748364 and lastDigit > 7) then overflow
+            if (result > Integer.MAX_VALUE / 10 || (result == Integer.MAX_VALUE / 10 && lastDigit > 7)) {
                 return 0; // Positive overflow
             }
 
-            if (result < Integer.MIN_VALUE / 10 ||
-                (result == Integer.MIN_VALUE / 10 && digit < -8)) {
+            // Integer.MIN_VALUE = -2147483648
+            // So if current result < -214748364 or (result == -214748364 and lastDigit < -8) then overflow
+            if (result < Integer.MIN_VALUE / 10 || (result == Integer.MIN_VALUE / 10 && lastDigit < -8)) {
                 return 0; // Negative overflow
             }
 
-            result = result * 10 + digit;
+            result = result * 10 + lastDigit;
         }
 
         return result;
@@ -71,6 +72,8 @@ public class ReverseInteger {
 
     /**
      * Alternative approach using long for overflow detection.
+     * Note: This is less efficient due to use of long, but simpler logic.
+     * Not recommended for interviews
      */
     public int reverseWithLong(int x) {
         long result = 0;

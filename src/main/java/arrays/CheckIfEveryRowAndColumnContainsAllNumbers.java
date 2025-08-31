@@ -8,7 +8,12 @@ import java.util.*;
  * Problem: Given an n x n matrix, determine if it's valid (every row and column contains
  * all integers from 1 to n exactly once).
  *
- * Example: matrix = [[1,2,3],[2,3,1],[3,1,2]] -> Output: true
+ * Example: matrix = [
+ *      [1,2,3],
+ *      [2,3,1],
+ *      [3,1,2]
+ *      ]
+ * -> Output: true
  * Each row and column contains {1,2,3} exactly once.
  *
  * LeetCode: https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers
@@ -21,64 +26,26 @@ import java.util.*;
 public class CheckIfEveryRowAndColumnContainsAllNumbers {
 
     /**
-     * Validates if matrix is a valid Latin square (each row/column has 1 to n).
-     *
-     * Algorithm:
-     * 1. For each row, use set to track seen numbers
-     * 2. Verify each row contains exactly numbers 1 to n
-     * 3. For each column, use set to track seen numbers
-     * 4. Verify each column contains exactly numbers 1 to n
-     * 5. Return true only if all rows and columns are valid
-     *
-     * Time Complexity: O(n²) where n is matrix dimension
-     * Space Complexity: O(n) for the temporary sets
-     *
-     * @param matrix n x n integer matrix
-     * @return true if every row and column contains all numbers from 1 to n
-     */
-    public boolean checkValid(int[][] matrix) {
-        int n = matrix.length;
-
-        // Check all rows
-        for (int i = 0; i < n; i++) {
-            Set<Integer> seen = new HashSet<>();
-            for (int j = 0; j < n; j++) {
-                int value = matrix[i][j];
-                // Check if value is in valid range and not duplicate
-                if (value < 1 || value > n || !seen.add(value)) {
-                    return false;
-                }
-            }
-        }
-
-        // Check all columns
-        for (int j = 0; j < n; j++) {
-            Set<Integer> seen = new HashSet<>();
-            for (int i = 0; i < n; i++) {
-                int value = matrix[i][j];
-                // Check if value is in valid range and not duplicate
-                if (value < 1 || value > n || !seen.add(value)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Optimized approach using boolean arrays instead of sets
-     * Time Complexity: O(n²), Space Complexity: O(n)
+     *
+     * Steps:
+     * 1. For each row, use a boolean array to track seen numbers
+     * 2. For each column, use a boolean array to track seen numbers
+     * 3. If any number is out of range or already seen, return false
+     * 4. If all rows and columns are valid, return true
+     *
+     * Time Complexity: O(n²), where n is the size of the matrix
+     * Space Complexity: O(n) where n is the size of the matrix (for boolean arrays)
      */
     public boolean checkValidOptimized(int[][] matrix) {
-        int n = matrix.length;
+        int length = matrix.length;
 
         // Check rows
-        for (int i = 0; i < n; i++) {
-            boolean[] seen = new boolean[n + 1]; // Index 0 unused
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < length; i++) {
+            boolean[] seen = new boolean[length + 1]; // Index 0 unused
+            for (int j = 0; j < length; j++) {
                 int value = matrix[i][j];
-                if (value < 1 || value > n || seen[value]) {
+                if (value < 1 || value > length || seen[value]) {
                     return false;
                 }
                 seen[value] = true;
@@ -86,11 +53,11 @@ public class CheckIfEveryRowAndColumnContainsAllNumbers {
         }
 
         // Check columns
-        for (int j = 0; j < n; j++) {
-            boolean[] seen = new boolean[n + 1]; // Index 0 unused
-            for (int i = 0; i < n; i++) {
+        for (int j = 0; j < length; j++) {
+            boolean[] seen = new boolean[length + 1]; // Index 0 unused
+            for (int i = 0; i < length; i++) {
                 int value = matrix[i][j];
-                if (value < 1 || value > n || seen[value]) {
+                if (value < 1 || value > length || seen[value]) {
                     return false;
                 }
                 seen[value] = true;

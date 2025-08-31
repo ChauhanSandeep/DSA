@@ -143,14 +143,14 @@ public class MaximumPointsFromCards {
      * Space Complexity: O(n)
      */
     public int maxScoreDP(int[] cardPoints, int k) {
-        int n = cardPoints.length;
+        int totalCards = cardPoints.length;
         int[] leftSum = new int[k + 1];
         int[] rightSum = new int[k + 1];
 
         // Calculate prefix sums from left and right
         for (int i = 0; i < k; i++) {
             leftSum[i + 1] = leftSum[i] + cardPoints[i];
-            rightSum[i + 1] = rightSum[i] + cardPoints[n - 1 - i];
+            rightSum[i + 1] = rightSum[i] + cardPoints[totalCards - 1 - i];
         }
 
         // Try all possible splits

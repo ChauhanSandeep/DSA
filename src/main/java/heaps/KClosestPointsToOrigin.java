@@ -30,9 +30,7 @@ import java.util.Random;
  *
  * 3. How would you solve this in a distributed system with millions of points?
  *    Answer: Use MapReduce with local k-closest computation followed by global merge.
- *    Related: https://leetcode.com/problems/k-closest-points-to-origin/
  *
- * @author Sandeep
  */
 public class KClosestPointsToOrigin {
 
@@ -145,86 +143,10 @@ public class KClosestPointsToOrigin {
         points[j] = temp;
     }
 
-    /**
-     * Sorting approach for comparison (less efficient for small k).
-     *
-     * Time Complexity: O(n log n)
-     * Space Complexity: O(1) excluding result
-     */
-    public int[][] kClosestSorting(int[][] points, int k) {
-        Arrays.sort(points, (a, b) ->
-            Integer.compare(getSquaredDistance(a), getSquaredDistance(b))
-        );
-        return Arrays.copyOfRange(points, 0, k);
-    }
-
-    /**
-     * Min-heap approach (alternative when k is close to n).
-     * More efficient when we need most of the points.
-     *
-     * Time Complexity: O(n log n)
-     * Space Complexity: O(n)
-     */
-    public int[][] kClosestMinHeap(int[][] points, int k) {
-        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) ->
-            Integer.compare(getSquaredDistance(a), getSquaredDistance(b))
-        );
-
-        for (int[] point : points) {
-            minHeap.offer(point);
-        }
-
-        int[][] result = new int[k][2];
-        for (int i = 0; i < k; i++) {
-            result[i] = minHeap.poll();
-        }
-
-        return result;
-    }
-
     // Calculate squared distance from origin (avoid sqrt for efficiency)
     private int getSquaredDistance(int[] point) {
         return point[0] * point[0] + point[1] * point[1];
     }
 
-    /**
-     * Generic distance calculation method for extensibility.
-     *
-     * @param point1 First point
-     * @param point2 Second point
-     * @return Squared distance between points
-     */
-    private int getSquaredDistance(int[] point1, int[] point2) {
-        int dx = point1[0] - point2[0];
-        int dy = point1[1] - point2[1];
-        return dx * dx + dy * dy;
-    }
 
-    /**
-     * Find k closest points to arbitrary center point.
-     *
-     * @param points Array of points
-     * @param center Center point [x, y]
-     * @param k Number of closest points
-     * @return k closest points to center
-     */
-    public int[][] kClosestToPoint(int[][] points, int[] center, int k) {
-        PriorityQueue<int[]> maxHeap = new PriorityQueue<>((a, b) ->
-            Integer.compare(getSquaredDistance(b, center), getSquaredDistance(a, center))
-        );
-
-        for (int[] point : points) {
-            maxHeap.offer(point);
-            if (maxHeap.size() > k) {
-                maxHeap.poll();
-            }
-        }
-
-        int[][] result = new int[k][2];
-        for (int i = 0; i < k; i++) {
-            result[i] = maxHeap.poll();
-        }
-
-        return result;
-    }
 }

@@ -6,7 +6,13 @@ package arrays;
  * Problem: A matrix is an X-Matrix if all elements on the main diagonal and anti-diagonal
  * are non-zero, and all other elements are zero.
  *
- * Example: matrix = [[2,0,0,1],[0,3,1,0],[0,5,2,0],[4,0,0,2]] -> Output: true
+ * Example: matrix = [
+ *      [2,0,0,1],
+ *      [0,3,1,0],
+ *      [0,5,2,0],
+ *      [4,0,0,2]
+ *      ]
+ *      -> Output: true
  * Diagonal and anti-diagonal elements are non-zero, others are zero.
  *
  * LeetCode: https://leetcode.com/problems/check-if-matrix-is-x-matrix
@@ -39,9 +45,10 @@ public class CheckIfMatrixIsXMatrix {
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                boolean isOnDiagonal = (i == j) || (i + j == n - 1);
+                boolean isDiagonal = i - j == 0;
+                boolean isAntiDiagonal = i + j == n - 1;
 
-                if (isOnDiagonal) {
+                if (isDiagonal || isAntiDiagonal) {
                     // Diagonal elements must be non-zero
                     if (matrix[i][j] == 0) {
                         return false;
@@ -51,29 +58,6 @@ public class CheckIfMatrixIsXMatrix {
                     if (matrix[i][j] != 0) {
                         return false;
                     }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Alternative implementation with cleaner logic
-     * Time Complexity: O(n²), Space Complexity: O(1)
-     */
-    public boolean checkXMatrixAlternative(int[][] matrix) {
-        int n = matrix.length;
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                // Check if position is on main diagonal or anti-diagonal
-                if (i == j || i + j == n - 1) {
-                    // On diagonal - must be non-zero
-                    if (matrix[i][j] == 0) return false;
-                } else {
-                    // Not on diagonal - must be zero
-                    if (matrix[i][j] != 0) return false;
                 }
             }
         }

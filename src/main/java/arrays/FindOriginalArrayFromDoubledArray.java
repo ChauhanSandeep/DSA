@@ -6,7 +6,8 @@ import java.util.*;
  * Find Original Array From Doubled Array
  *
  * Problem: Given an array of integers, determine if it's a doubled array.
- * A doubled array contains pairs where one element is exactly twice the other.
+ * An original array is transformed into a doubled array changed by appending twice the value of
+ * every element in original, and then randomly shuffling the resulting array.
  *
  * Example: changed = [1,3,4,2,6,8] -> Output: [1,3,4]
  * Original array [1,3,4] becomes [1,3,4,2,6,8] when doubled.
@@ -37,13 +38,13 @@ public class FindOriginalArrayFromDoubledArray {
      * @return original array or empty array if not possible
      */
     public int[] findOriginalArray(int[] changed) {
-        int n = changed.length;
-        if (n % 2 == 1) return new int[0];
+        int length = changed.length;
+        if (length % 2 == 1) return new int[0];
 
         // Count frequencies
-        Map<Integer, Integer> freq = new HashMap<>();
+        Map<Integer, Integer> freqMap = new HashMap<>();
         for (int num : changed) {
-            freq.put(num, freq.getOrDefault(num, 0) + 1);
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
         }
 
         // Sort to process smaller elements first
@@ -51,23 +52,23 @@ public class FindOriginalArrayFromDoubledArray {
         List<Integer> result = new ArrayList<>();
 
         for (int num : changed) {
-            if (freq.get(num) == 0) continue;
+            if (freqMap.get(num) == 0) continue;
 
             // Special case for zero
             if (num == 0) {
-                if (freq.get(0) >= 2) {
+                if (freqMap.get(0) >= 2) {
                     result.add(0);
-                    freq.put(0, freq.get(0) - 2);
+                    freqMap.put(0, freqMap.get(0) - 2);
                 } else {
                     return new int[0];
                 }
             } else {
                 // Check if double exists
                 int doubled = num * 2;
-                if (freq.getOrDefault(doubled, 0) > 0) {
+                if (freqMap.getOrDefault(doubled, 0) > 0) {
                     result.add(num);
-                    freq.put(num, freq.get(num) - 1);
-                    freq.put(doubled, freq.get(doubled) - 1);
+                    freqMap.put(num, freqMap.get(num) - 1);
+                    freqMap.put(doubled, freqMap.get(doubled) - 1);
                 } else {
                     return new int[0];
                 }
@@ -79,7 +80,8 @@ public class FindOriginalArrayFromDoubledArray {
 
     /**
      * Alternative approach using TreeMap for automatic sorting
-     * Time Complexity: O(n log n), Space Complexity: O(n)
+     * Time Complexity: O(n log n),
+     * Space Complexity: O(n)
      */
     public int[] findOriginalArrayTreeMap(int[] changed) {
         if (changed.length % 2 == 1) return new int[0];

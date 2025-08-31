@@ -5,6 +5,7 @@ package arrays;
  *
  * Problem: Given a flowerbed (0=empty, 1=flower) and integer n, determine if n new flowers
  * can be planted without violating the no-adjacent-flowers rule.
+ * The rule is that no two flowers can be planted in adjacent plots.
  *
  * Example: flowerbed = [1,0,0,0,1], n = 1 -> Output: true
  * Can plant one flower at index 2: [1,0,1,0,1]
@@ -59,7 +60,11 @@ public class CanPlaceFlowers {
 
     /**
      * Alternative approach without modifying input array
-     * Time Complexity: O(m), Space Complexity: O(1)
+     * In this approach, when a flower is planted, we skip the next position
+     * since we cannot plant adjacent flowers.
+     *
+     * Time Complexity: O(m) where m is length of flowerbed
+     * Space Complexity: O(1) - no extra space used
      */
     public boolean canPlaceFlowersNoModify(int[] flowerbed, int n) {
         int length = flowerbed.length;

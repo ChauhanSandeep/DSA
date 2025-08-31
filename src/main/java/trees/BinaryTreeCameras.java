@@ -4,13 +4,20 @@ package trees;
  * Binary Tree Cameras
  *
  * Problem Statement:
- * You are given the root of a binary tree. We install cameras on the tree nodes where each camera at a node can monitor its parent, itself, and its immediate children.
+ * You are given the root of a binary tree. We install cameras on the tree nodes where each camera at a node can
+ * monitor its parent, itself, and its immediate children.
  * Return the minimum number of cameras needed to monitor all nodes of the tree.
  *
  * Example:
  * Input: root = [0,0,null,0,0]
+                0
+               /
+              0
+            /  \
+           0    0
  * Output: 1
  * Explanation: One camera at the root's left child can monitor all nodes.
+ *
  *
  * LeetCode Link: https://leetcode.com/problems/binary-tree-cameras
  *
@@ -86,8 +93,10 @@ public class BinaryTreeCameras {
      */
     public int minCameraCoverDP(TreeNode root) {
         int[] result = dpHelper(root);
+        int withCamera = result[0];
+        int coveredNoCamera = result[1];
         // Min of: root has camera OR root covered by children
-        return Math.min(result[0], result[1]);
+        return Math.min(withCamera, coveredNoCamera);
     }
 
     // Returns [with_camera_cost, covered_without_camera_cost, not_covered_cost]
@@ -97,24 +106,32 @@ public class BinaryTreeCameras {
         }
 
         int[] left = dpHelper(node.left);
+        int leftWithCamera = left[0];
+        int leftCoveredNoCamera = left[1];
+        int leftNotCovered = left[2];
+
         int[] right = dpHelper(node.right);
+        int rightWithCamera = right[0];
+        int rightCoveredNoCamera = right[1];
+        int rightNotCovered = right[2];
 
-        // Cost if current node has camera
-        int withCamera = 1 + Math.min(Math.min(left[0], left[1]), left[2]) +
-                        Math.min(Math.min(right[0], right[1]), right[2]);
+        // If current node has a camera, then add 1 + min of all states of children
+        int withCamera = 1 + Math.min(Math.min(leftWithCamera, leftCoveredNoCamera), leftNotCovered) +
+                        Math.min(Math.min(rightWithCamera, rightCoveredNoCamera), rightNotCovered);
 
-        // Cost if current node covered but no camera
-        int coveredWithoutCamera = Math.min(left[0] + right[0],
-                                          Math.min(left[0] + right[1], left[1] + right[0]));
+        // If current node covered but no camera, at least one child must have camera
+        int coveredWithoutCamera = Math.min(leftWithCamera + rightWithCamera,
+                                    Math.min(leftWithCamera + rightCoveredNoCamera,
+                                        leftCoveredNoCamera + rightWithCamera));
 
         // Cost if current node not covered (both children covered without camera)
-        int notCovered = left[1] + right[1];
+        int notCovered = leftCoveredNoCamera + rightCoveredNoCamera;
 
         return new int[]{withCamera, coveredWithoutCamera, notCovered};
     }
 
     // Definition for a binary tree node
-    public static class TreeNode {
+    private static class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;

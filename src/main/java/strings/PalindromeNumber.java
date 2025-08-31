@@ -36,7 +36,9 @@ public class PalindromeNumber {
      * 3. Compare original number with reversed number
      * 4. Return true if they match
      *
-     * Time Complexity: O(log n) where n is the input number (number of digits)
+     * Time Complexity: O(log n) where n is the input number
+     * This is log because we're working in base 10, and the number of digits in a number is proportional to log₁₀ of that number.
+     *
      * Space Complexity: O(1) - only uses constant extra space
      *
      * @param x Input integer to check for palindrome
@@ -62,10 +64,14 @@ public class PalindromeNumber {
 
     /**
      * Optimized approach by only reversing half the number.
+     *
+     * Time Complexity: O(log n) where n is the input number
+     * Space Complexity: O(1) - only uses constant extra space
      */
     public boolean isPalindromeOptimized(int x) {
         // Handle edge cases
         if (x < 0 || (x % 10 == 0 && x != 0)) {
+            // return false if negative or ends with 0 (but not 0 itself)
             return false;
         }
 
@@ -84,6 +90,9 @@ public class PalindromeNumber {
 
     /**
      * String conversion approach for comparison (not recommended for follow-up).
+     *
+     * Time Complexity: O(log n) where n is the input number
+     * Space Complexity: O(n) for string storage
      */
     public boolean isPalindromeString(int x) {
         if (x < 0) {
