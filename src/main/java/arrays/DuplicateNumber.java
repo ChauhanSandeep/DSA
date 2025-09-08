@@ -32,7 +32,49 @@ public class DuplicateNumber {
   }
 
   /**
-   * Floyd’s Tortoise and Hare (Cycle Detection) Algorithm.
+   * Alternative Solution (Negation - MODIFIES ARRAY)
+   *
+   * Negation Approach - VIOLATES the "do not modify array" constraint.
+   * This approach is O(n) time and O(1) space but modifies the input.
+   * Useful when array modification is allowed (like in LeetCode 442).
+   *
+   * Algorithm:
+   * 1. Iterate through each number in the array.
+   * 2. For each number, calculate the index it points to (value - 1 for 0-based index).
+   * 3. Negate the value at that index to mark it as visited.
+   * 4. If you encounter a negative value at that index, it means the index has been visited before → duplicate found.
+   * 5. Return the duplicate number.
+   *
+   * Time Complexity: O(n)
+   * Space Complexity: O(1)
+   * @param nums the input array (will be modified)
+   * @return the duplicate number
+   */
+  public int findDuplicateUsingNegation(int[] nums) {
+    // We assume nums contains integers in the range [1, n]
+    // where n = nums.length - 1 (pigeonhole principle ensures a duplicate exists).
+
+    for (int i = 0; i < nums.length; i++) {
+      // Convert value to index (shift by -1 for 0-based indexing).
+      int indexToVisit = Math.abs(nums[i]) - 1;
+
+      // If the value at this index is already negative,
+      // it means we've visited this index before → duplicate found.
+      if (nums[indexToVisit] < 0) {
+        return Math.abs(nums[i]);
+      }
+
+      // Mark this index as visited by negating its value.
+      nums[indexToVisit] = -nums[indexToVisit];
+    }
+
+    // By problem constraints, we should never reach here.
+    return -1;
+  }
+
+  /**
+   * Optimized Solution - Cycle Detection (Floyd's Tortoise and Hare)
+   *
    * Treat the array as a linked list where each index points to nums[i],
    * and find the start of the cycle, which is the duplicate number.
    *
