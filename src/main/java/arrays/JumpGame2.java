@@ -82,17 +82,18 @@ public class JumpGame2 {
    */
   public int minJumpsGreedy(int[] nums) {
     int jumpsTaken = 0;
-    int currentJumpEnd = 0;
-    int farthestReach = 0;
+    int currentReachable = 0;
+    int maxReachable = 0;
 
     for (int i = 0; i < nums.length - 1; i++) {
       // Update farthest reach from this index
-      farthestReach = Math.max(farthestReach, i + nums[i]);
+      maxReachable = Math.max(maxReachable, i + nums[i]);
 
       // If we have reached the end of current jump coverage
-      if (i == currentJumpEnd) {
+      if (i == currentReachable) {
+        if (maxReachable <= i) return -1; // Cannot reach further
         jumpsTaken++;
-        currentJumpEnd = farthestReach;
+        currentReachable = maxReachable;
       }
     }
 

@@ -4,32 +4,24 @@ import java.util.*;
 
 
 /**
- * 🔗 LeetCode: https://leetcode.com/problems/queue-reconstruction-by-height/
- *
- * Problem: Reconstruct the queue from a list of people.
- * Each person is represented as an array [h, k], where:
- *  - h = height of the person
- *  - k = number of people in front of them who have height >= h
- *
- * ✅ You must return a queue (array of people) such that:
- *  - People are positioned according to their `k` values.
+ * Problem Statement:
+ * You are given an array of people, where people[i] = [h_i, k_i] represents the ith person of height h_i with exactly k_i other people in front who have a height greater than or equal to h_i.
+ * Reconstruct and return the queue that is represented by the input array people. The returned queue should be formatted as an array queue, where queue[j] = [h_j, k_j] is the attributes of the jth person in the reconstructed queue (queue[0] is the person at the front of the queue).
  *
  * Example:
- * Input:  [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
+ * Input: people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
  * Output: [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+ * Explanation: Person with height 5 and k=0 is first, followed by height 7 k=0, and so on, satisfying all k conditions.
  *
- * ✅ Approach:
- *    1. Sort the input by descending height (`h`) and then by ascending `k`.
- *    2. Insert each person at index `k` in the list.
- *
- * Time Complexity: O(n²) (due to insertion at index in list)
- * Space Complexity: O(n)
+ * LeetCode Link: https://leetcode.com/problems/queue-reconstruction-by-height/
  *
  * Follow-up Questions:
- * - Q: Can we optimize this to O(n log n)?
- *   A: No, because list insertion at index `k` is inherently O(n) in the worst case.
- * - Q: Can we use a different data structure to improve performance?
- *   A: Balanced BST or segment tree could help in variations, but not needed here.
+ * 1. How would you reconstruct if k represented people behind instead of in front?
+ *    - Reverse the logic: sort by height ascending and insert from the end or adjust indices accordingly.
+ * 2. What if we need to minimize the total height difference between adjacent people after reconstruction?
+ *    - The reconstruction is unique based on constraints; if multiple possible, we'd need additional sorting or DP.
+ * 3. How to handle if the input may not form a valid queue (invalid k values)?
+ *    - Add validation during insertion to check if k is feasible, but problem assumes valid input.
  */
 public class QueueReconstructionByHeight {
 
@@ -40,14 +32,22 @@ public class QueueReconstructionByHeight {
   }
 
   /**
-   * Reconstructs the queue based on height and the number of people in front.
+   * Reconstructs the queue by sorting people by height descending and k ascending, then inserting at k index.
+   * This is the optimal greedy approach.
    *
-   * Steps:
-   *    1. Sort by height descending, then by k-value ascending.
-   *    2. Insert each person at index = k in the final queue.
+   * Step-by-step explanation:
+   * 1. Sort the people array: first by height in descending order, then by k in ascending order for ties.
+   * 2. Initialize an empty list for the result.
+   * 3. For each person in the sorted array, insert them at index equal to their k value in the result list. This works because:
+   *    - Taller people are placed first, so when we insert a shorter person at index k, there are already k taller or equal-height people in front of them.
+   * 4. Convert the list back to a 2D array and return.
    *
-   * @param people array of people represented as [height, k]
-   * @return the reconstructed queue
+   * Algorithm: Greedy Sort and Insert
+   * Time Complexity: O(n^2) - Due to insertions in list (worst-case O(n) per insertion), but acceptable for n <= 1100.
+   * Space Complexity: O(n) - For the result list.
+   *
+   * @param people the input array of [height, k] pairs
+   * @return the reconstructed queue as 2D array
    */
   public static int[][] reconstructQueue(int[][] people) {
     if (people == null || people.length == 0) {
@@ -57,15 +57,16 @@ public class QueueReconstructionByHeight {
     // Step 1: Sort by height descending, then k ascending
     Arrays.sort(people, (p1, p2) -> {
       if (p1[0] != p2[0]) {
-        return Integer.compare(p2[0], p1[0]); // Descending height
+        return Integer.compare(p2[0], p1[0]); // Taller first
       } else {
-        return Integer.compare(p1[1], p2[1]); // Ascending k
+        return Integer.compare(p1[1], p2[1]); // Smaller k first for the same height
       }
     });
     // Here the array would be [{7, 0}, {7, 1}, {6, 1}, {5, 0}, {5, 2}, {4, 4}]
 
     // Step 2: Insert into list based on k position
     List<int[]> queue = new LinkedList<>();
+
     for (int[] person : people) {
       queue.add(person[1], person); // Insert person at index k
     }

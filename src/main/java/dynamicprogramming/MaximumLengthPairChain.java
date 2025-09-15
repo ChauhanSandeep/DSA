@@ -1,6 +1,7 @@
 package dynamicprogramming;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 
 /**
@@ -116,7 +117,7 @@ public class MaximumLengthPairChain {
     }
 
     // Sort pairs by end time (second element) for greedy selection
-    Arrays.sort(pairIntervals, (firstPair, secondPair) -> Integer.compare(firstPair[1], secondPair[1]));
+    Arrays.sort(pairIntervals, Comparator.comparingInt(pair -> pair[1]));
 
     int chainLength = 0;
     int lastSelectedEnd = Integer.MIN_VALUE;

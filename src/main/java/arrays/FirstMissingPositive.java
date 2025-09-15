@@ -1,25 +1,26 @@
 package arrays;
 
 /**
- * Problem: First Missing Positive
- * Leetcode: https://leetcode.com/problems/first-missing-positive/
+ * Problem Statement:
+ * Given an unsorted integer array nums, return the smallest positive integer that is not present in nums.
+ * The algorithm must run in O(n) time and use O(1) auxiliary space.
  *
- * Given an unsorted integer array, find the smallest missing positive integer.
- * The array can contain duplicates and negative numbers.
- * You must implement an algorithm that runs in O(n) time and uses constant extra space.
- *
- * 📌 Example:
- * Input: [3, 4, -1, 1]
+ * Example:
+ * Input: nums = [3,4,-1,1]
  * Output: 2
+ * Explanation: The array contains 1, 3, 4, and -1. The positive integers present are 1, 3, 4.
+ * The smallest missing positive is 2.
  *
- * Input: [1, 2, 0]
- * Output: 3
+ * LeetCode Link: https://leetcode.com/problems/first-missing-positive/
  *
  * Follow-up Questions:
- * 1. Can you use a HashSet?
- *    → Yes, but violates constant space constraint.
- * 2. Can you use a modified cyclic sort instead of marking?
- *    → Yes, possible alternative.
+ * 1. What if we need to find the kth missing positive integer instead of the first?
+ *    - We can modify the approach to count missing positives up to k, or use binary search on the count of present numbers up to a certain value.
+ *      Relevant problem: https://leetcode.com/problems/kth-missing-positive-number/
+ * 2. How would you handle this if the array contained duplicates?
+ *    - The current approach already handles duplicates by ignoring them during placement or marking, as we only care about presence of each positive from 1 to n.
+ * 3. What if the array is read-only and we cannot modify it?
+ *    - We would need to use extra space like a set for tracking presence, but that violates O(1) space; alternatively, find a way to compute without modification, possibly with math, but it's challenging for O(n) time.
  */
 public class FirstMissingPositive {
 
@@ -30,69 +31,58 @@ public class FirstMissingPositive {
     }
 
     /**
-     * Finds the first missing positive number from an unsorted array using index marking.
+     * Using marking (negating values) to track presence.
      *
-     * 🔹 Algorithm Overview:
-     * - Ignore non-positive numbers and numbers greater than the array size (they can't affect the result).
-     * - Use index marking by negating the value at the position corresponding to each number.
-     * - The first index with a positive number indicates the missing value.
+     * Step-by-step explanation:
+     * 1. Replace all non-positive numbers with n+1 (out of range).
+     * 2. For each number in [1, n], use it as index and negate the value there to mark presence.
+     *    - Use absolute value to handle already negated indices.
+     * 3. Scan for the first non-negative value; its index +1 is missing.
+     * 4. If all marked, return n+1. Handle case where 1 is missing separately if needed.
      *
-     * 🔹 Steps:
-     * 1. Check if 1 is missing → return 1 early.
-     * 2. Normalize invalid numbers (<=0 or > N) to 1.
-     * 3. Use array index as a hash to mark presence via negative values.
-     * 4. Scan array to find first index with a positive value.
-     *
-     * 🔹 Time Complexity: O(N)
-     * 🔹 Space Complexity: O(1) (in-place modification)
+     * Algorithm: Index Marking
+     * Time Complexity: O(n) - Two passes over the array.
+     * Space Complexity: O(1) - In-place modification.
      *
      * @param nums the input array of integers
      * @return the smallest missing positive integer
      */
-    public int firstMissingPositive(int[] nums) {
+    public int firstMissingPositive(int[] nums) { // [3,4,-1,1]
         int length = nums.length;
+        boolean containsOne = false;
 
-        // Step 1: Check if 1 is present
-        boolean hasOne = false;
-        for (int num : nums) {
-            if (num == 1) {
-                hasOne = true;
-                break;
-            }
-        }
-        if (!hasOne) return 1;
-
-        // Step 2: Replace invalid elements (≤0 or > N) with 1
+        // Step 1: Replace non-positive and out-of-range with 1 (temporarily), and check if 1 is present
         for (int i = 0; i < length; i++) {
+            if (nums[i] == 1) {
+                containsOne = true;
+            }
             if (nums[i] <= 0 || nums[i] > length) {
                 nums[i] = 1;
             }
         }
+        // [3,4,1,1]
 
-        // Step 3: Use index marking (negate value at index = num) to indicate presence
+        // If 1 is not present, it's the answer (edge case)
+        if (!containsOne) {
+            return 1;
+        }
+
+        // Step 2: Mark presence by negating at index abs(num) - 1
         for (int i = 0; i < length; i++) {
-            int currentValue = Math.abs(nums[i]);
-
-            // Mark nums[currentValue] as negative to indicate presence of currentValue
-            if (currentValue == length) {
-                // Special case: use index 0 to mark presence of length
-                nums[0] = -Math.abs(nums[0]);
-            } else {
-                nums[currentValue] = -Math.abs(nums[currentValue]);
+            int index = Math.abs(nums[i]) - 1;
+            if (nums[index] > 0) {
+                nums[index] = -nums[index];
             }
         }
 
-        // Step 4: First index with positive value => missing number
-        for (int i = 1; i < length; i++) {
+        // Step 3: Find the first positive (unmarked) index
+        for (int i = 0; i < length; i++) {
             if (nums[i] > 0) {
-                return i;
+                return i + 1;
             }
         }
 
-        // Check for presence of length
-        if (nums[0] > 0) return length;
-
-        // All 1 to N present
+        // All marked, missing is n + 1
         return length + 1;
     }
 }

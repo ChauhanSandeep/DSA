@@ -1,21 +1,29 @@
 package arrays;
 
+import java.util.HashMap;
+import java.util.Map;
+
+
 /**
- * 🔹 Problem: Minimum Window Substring
- * 🔗 LeetCode: https://leetcode.com/problems/minimum-window-substring/
+ * Problem Statement:
+ * Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window.
+ * If there is no such substring, return the empty string "". The testcases will be generated such that the answer is unique.
  *
- * Given two strings `source` and `target` of lengths m and n respectively, return the minimum window in `source`
- * which contains all the characters of `target`. If no such window exists, return the empty string "".
- *
- * 📌 Example:
- * Input: source = "ADOBECODEBANC", target = "ABC"
+ * Example:
+ * Input: s = "ADOBECODEBANC", t = "ABC"
  * Output: "BANC"
+ * Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
  *
- * ✅ Follow-up:
- * - What if the character set is Unicode?
- * *   → Use a HashMap for frequency counting instead of fixed-size arrays.
- * - Can you optimize space for large target sets?
- * *   → Use a sliding window with two pointers and only store necessary characters.
+ * LeetCode Link: https://leetcode.com/problems/minimum-window-substring/
+ *
+ * Follow-up Questions:
+ * 1. Could you find an algorithm that runs in O(m + n) time?
+ *    - Yes, the sliding window approach below achieves O(m + n) by using frequency maps and two pointers, visiting each character at most twice.
+ * 2. What if we need to find all minimum windows instead of just one?
+ *    - Modify the algorithm to collect all windows of the minimum length found, instead of just the first one.
+ * 3. How would you handle if the window must contain exactly the characters in t, no extras?
+ *    - That's a different problem (permutation in string); use similar sliding window but ensure window size == t.length().
+ *      Relevant problem: https://leetcode.com/problems/permutation-in-string/
  */
 public class MinWindowSubstring {
 
@@ -27,75 +35,150 @@ public class MinWindowSubstring {
   }
 
   /**
-   * Finds the smallest window in `source` that contains all characters from `target`.
+   * Finds the minimum window substring using sliding window with frequency counts.
+   * This is the optimal O(m + n) approach.
    *
-   * ✅ Algorithm: Sliding Window + Frequency Counting
-   * - Build a frequency map for `target`
-   * - Expand `right` pointer to include valid chars
-   * - Contract `left` pointer to shrink window while still valid
-   * - Track and update the minimum window
+   * Step-by-step explanation:
+   * 1. If target is empty, return "" (edge case).
+   * 2. Create frequency maps: targetFreq for target'source characters, windowFreq for current window.
+   * 3. Initialize two pointers left and right, and counters for matchedChars (matched required counts) and requiredChars (unique in target).
+   * 4. Expand right: Add source[right] to windowFreq; if it matches targetFreq and windowFreq count == targetFreq count, increment matchedChars.
+   * 5. When matchedChars == requiredChars (valid window), try to minimize by moving left:
+   *    - Update result if current window is smaller.
+   *    - Remove source[left] from windowFreq; if it drops below targetFreq, decrement matchedChars.
+   *    - Increment left.
+   * 6. Continue until right reaches end.
+   * 7. Return the substring if found, else "".
    *
-   * Time Complexity: O(N), where N = length of `source`
-   * Space Complexity: O(1), assuming ASCII character set (128-size arrays)
+   * Algorithm: Sliding Window
+   * Time Complexity: O(m + n) - Each character visited at most twice (by left and right).
+   * Space Complexity: O(1) - Maps size up to 52 (assuming English letters), constant.
    *
-   * @param source The source string to search within
-   * @param target The target string to find in the window
-   * @return The minimum window substring containing all characters from target
+   * @param source the source string
+   * @param target the target string
+   * @return the minimum window substring or "" if none
    */
   public String minWindow(String source, String target) {
-      if (source.isEmpty() || target.isEmpty()) {
-          return "";
-      }
-
-    // Step 1: Build frequency map for target characters
-    int[] targetFreq = new int[128];
-    for (char ch : target.toCharArray()) {
-      targetFreq[ch]++;
+    if (target.isEmpty()) {
+      return "";
     }
 
-    // Step 2: Initialize sliding window pointers and helpers
-    int left = 0, right = 0;
-    int required = target.length();  // Total required chars to match
-    int minLen = Integer.MAX_VALUE;
-    int minStart = 0;
+    Map<Character, Integer> targetFreq = new HashMap<>(); // Frequency of chars in target
+    Map<Character, Integer> windowFreq = new HashMap<>(); // Frequency of chars in current window of source
 
-    int[] windowFreq = new int[128];  // Current sliding window character frequency
+    // Fill targetFreq map
+    for (char c : target.toCharArray()) {
+      targetFreq.put(c, targetFreq.getOrDefault(c, 0) + 1);
+    }
 
-    // Step 3: Start sliding the window
-    while (right < source.length()) {
-      char rightChar = source.charAt(right);
+    int requiredChars = targetFreq.size(); // Unique chars in target
+    int matchedChars = 0; // How many unique chars have met required frequency
 
-      // If it's a target character, add to windowFreq
-      if (targetFreq[rightChar] > 0) {
-        windowFreq[rightChar]++;
-        if (windowFreq[rightChar] <= targetFreq[rightChar]) {
-          required--;  // One less character to satisfy
-        }
+    int[] minWindowIndices = {-1, -1}; // [start, end] of min window
+    int minWindowLength = Integer.MAX_VALUE;
+
+    int left = 0;
+    for (int right = 0; right < source.length(); right++) {
+      char currentChar = source.charAt(right);
+      windowFreq.put(currentChar, windowFreq.getOrDefault(currentChar, 0) + 1);
+
+      // If this char is needed and we have enough
+      if (targetFreq.containsKey(currentChar) && windowFreq.get(currentChar).equals(targetFreq.get(currentChar))) {
+        matchedChars++;
       }
 
-      // Step 4: Try to shrink from the left while window is still valid
-      while (required == 0) {
-        int windowSize = right - left + 1;
-        if (windowSize < minLen) {
-          minLen = windowSize;
-          minStart = left;
+      // Valid window: try to minimize
+      while (matchedChars == requiredChars && left <= right) {
+        // Update min window
+        if (right - left + 1 < minWindowLength) {
+          minWindowIndices[0] = left;
+          minWindowIndices[1] = right;
+          minWindowLength = right - left + 1;
+        }
+
+        // Remove left char
+        char leftChar = source.charAt(left);
+        windowFreq.put(leftChar, windowFreq.get(leftChar) - 1);
+
+        // If we dropped below required
+        if (targetFreq.containsKey(leftChar) && windowFreq.get(leftChar) < targetFreq.get(leftChar)) {
+          matchedChars--;
+        }
+
+        left++;
+      }
+    }
+
+    return (minWindowIndices[0] != -1) ? source.substring(minWindowIndices[0], minWindowIndices[1] + 1) : "";
+  }
+
+  /**
+   * Alternative approach using arrays for frequency (optimized for ASCII chars).
+   * This is another efficient method, O(m + n), better constant factors for large alphabets.
+   *
+   * Step-by-step explanation:
+   * 1. Use int[128] for targetFreq and windowFreq (assuming ASCII).
+   * 2. Filter unique chars in target to compute requiredChars accurately.
+   * 3. Proceed similarly with two pointers.
+   * 4. This avoids HashMap overhead.
+   *
+   * Algorithm: Sliding Window with Arrays
+   * Time Complexity: O(m + n)
+   * Space Complexity: O(1) - Fixed size arrays.
+   *
+   * @param source the source string
+   * @param target the target string
+   * @return the minimum window substring or "" if none
+   */
+  public String minWindowAlt(String source, String target) {
+    if (target.isEmpty()) {
+      return "";
+    }
+
+    int[] targetFreq = new int[128];
+    int[] windowFreq = new int[128];
+    int requiredChars = 0;
+
+    // Fill targetFreq and count unique
+    for (char c : target.toCharArray()) {
+      if (targetFreq[c] == 0) {
+        requiredChars++;
+      }
+      targetFreq[c]++;
+    }
+
+    int matchedChars = 0;
+    int left = 0;
+    int[] minWindowIndices = {-1, -1};
+    int minWindowLength = Integer.MAX_VALUE;
+
+    for (int right = 0; right < source.length(); right++) {
+      char currentChar = source.charAt(right);
+      windowFreq[currentChar]++;
+
+      if (targetFreq[currentChar] > 0 && windowFreq[currentChar] == targetFreq[currentChar]) {
+        matchedChars++;
+      }
+
+      while (matchedChars == requiredChars && left <= right) {
+        if (right - left + 1 < minWindowLength) {
+          minWindowIndices[0] = left;
+          minWindowIndices[1] = right;
+          minWindowLength = right - left + 1;
         }
 
         char leftChar = source.charAt(left);
-        if (targetFreq[leftChar] > 0) {
-          windowFreq[leftChar]--;
-          if (windowFreq[leftChar] < targetFreq[leftChar]) {
-            required++;  // We lost a necessary char
-          }
+        windowFreq[leftChar]--;
+
+        if (targetFreq[leftChar] > 0 && windowFreq[leftChar] < targetFreq[leftChar]) {
+          matchedChars--;
         }
 
-        left++;  // Shrink window
+        left++;
       }
-
-      right++;  // Expand window
     }
 
-    // Step 5: Return the best window found
-    return minLen == Integer.MAX_VALUE ? "" : source.substring(minStart, minStart + minLen);
+    return (minWindowIndices[0] != -1) ? source.substring(minWindowIndices[0], minWindowIndices[1] + 1) : "";
   }
+
 }

@@ -69,7 +69,7 @@ public class BurstBalloon {
             Arrays.fill(row, -1);
         }
 
-        return burst(nums, 0, length - 1, memo);
+        return burstRecHelper(nums, 0, length - 1, memo);
     }
 
     /**
@@ -81,7 +81,7 @@ public class BurstBalloon {
      * @param memo memoization table
      * @return max coins collected
      */
-    private int burst(int[] nums, int left, int right, int[][] memo) {
+    private int burstRecHelper(int[] nums, int left, int right, int[][] memo) {
         // Base case: no balloons to burst
         if (left > right) {
             return 0;
@@ -101,8 +101,8 @@ public class BurstBalloon {
             int coinsFromCurrent = getValue(nums, left - 1) * nums[i] * getValue(nums, right + 1);
 
             // Coins from remaining left and right partitions
-            int coinsFromLeft = burst(nums, left, i - 1, memo);
-            int coinsFromRight = burst(nums, i + 1, right, memo);
+            int coinsFromLeft = burstRecHelper(nums, left, i - 1, memo);
+            int coinsFromRight = burstRecHelper(nums, i + 1, right, memo);
 
             int currentTotalCoins = coinsFromCurrent + coinsFromLeft + coinsFromRight;
 

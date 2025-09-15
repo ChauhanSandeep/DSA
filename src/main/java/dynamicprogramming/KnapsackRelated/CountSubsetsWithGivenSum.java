@@ -27,12 +27,11 @@ public class CountSubsetsWithGivenSum {
      * Intuition:
      * - Try including or excluding each number.
      * - Every time we reach target sum 0, it’s a valid subset.
-     * - Memoize to avoid re-computation.
+     * - Memoize to avoid re-computation
+     * - Base Cases:
+     *  - If target is 0, we found a valid subset (count as 1).
+     *  - If index is 0, check if arr[0] == target (count as 1 if true, else 0).
      *
-     * Approach:
-     * - Base Case:
-     *      -> If target == 0, we found a valid subset, return 1.
-     *      -> If index == 0, check if the first element itself is equal to target.
      *
      * Time Complexity: O(size * targetSum)
      * Space Complexity: O(size * targetSum) for memo + O(size) recursion stack
@@ -64,12 +63,10 @@ public class CountSubsetsWithGivenSum {
      *
      * Intuition:
      * - dp[i][j] means: number of ways to make sum 'j' using first 'i' elements.
-     * - Build solution bottom-up.
-     *
-     * Approach:
-     * - Base: dp[i][0] = 1 (empty subset for sum 0).
-     * - Transition:
-     *      -> dp[i][j] = dp[i-1][j] + dp[i-1][j-arr[i-1]] (exclude + include ways)
+     * - For each element, we can either include it (if it doesn't exceed current sum) or exclude it.
+     * - Initialize dp[i][0] = 1 for all i (sum 0 is possible with empty subset).
+     * - Fill the dp table iteratively.
+     * - Final answer will be in dp[size][targetSum].
      *
      * Time Complexity: O(size * targetSum)
      * Space Complexity: O(size * targetSum)
@@ -83,10 +80,14 @@ public class CountSubsetsWithGivenSum {
 
         for (int elementIndex = 1; elementIndex < size + 1; elementIndex++) {
             for (int currentSum = 0; currentSum < targetSum + 1; currentSum++) {
-                dp[elementIndex][currentSum] = dp[elementIndex-1][currentSum]; // exclude the current element
+                int waysIfNotTaken = dp[elementIndex-1][currentSum]; // exclude the current element
+
+                int waysIfTaken = 0;
                 if (arr[elementIndex-1] <= currentSum) {
-                    dp[elementIndex][currentSum] += dp[elementIndex-1][currentSum-arr[elementIndex-1]]; // include current element
+                    waysIfTaken = dp[elementIndex-1][currentSum-arr[elementIndex-1]]; // include current element
                 }
+
+                dp[elementIndex][currentSum] = waysIfNotTaken + waysIfTaken;
             }
         }
         return dp[size][targetSum];

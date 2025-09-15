@@ -60,6 +60,46 @@ public class JumpGame {
   }
 
   /**
+   * Determines if the last index can be reached using a greedy approach tracking the maximum reachable index.
+   * This is the optimal O(n) solution.
+   *
+   * Step-by-step explanation:
+   * 1. Initialize maxReach to 0.
+   * 2. Iterate through the array from 0 to n-1.
+   * 3. If current index i > maxReach, return false (cannot reach here).
+   * 4. Update maxReach = max(maxReach, i + nums[i]).
+   * 5. If maxReach >= n-1, return true.
+   * 6. After loop, return true if maxReach >= n-1, else false.
+   *
+   * Algorithm: Greedy
+   * Time Complexity: O(n) - Single pass through the array.
+   * Space Complexity: O(1) - Constant space.
+   *
+   * @param nums the array of maximum jump lengths
+   * @return true if last index is reachable, false otherwise
+   */
+  public boolean canJump(int[] nums) {
+    int length = nums.length;
+    if (length <= 1) {
+      return true; // Already at the end or single element
+    }
+
+    int maxReachable = 0;
+
+    for (int i = 0; i < length; i++) {
+      if (i > maxReachable) {
+        return false; // Cannot reach this position
+      }
+      // Update the farthest we can reach
+      maxReachable = Math.max(maxReachable, i + nums[i]);
+      if (maxReachable >= length - 1) {
+        return true; // Can reach or beyond the end
+      }
+    }
+    return false;
+  }
+
+  /**
    * Optimized Greedy approach.
    *
    * Steps:
@@ -74,13 +114,13 @@ public class JumpGame {
    * This is the most efficient solution and is suitable for interviews.
    */
   public static boolean canJumpGreedy(int[] nums) {
-    int lastReachableIndex = nums.length - 1;
+    int minStartIndexToReachEnd = nums.length - 1;
 
     for (int i = nums.length - 2; i >= 0; i--) {
-      if (i + nums[i] >= lastReachableIndex) {
-        lastReachableIndex = i;
+      if (i + nums[i] >= minStartIndexToReachEnd) {
+        minStartIndexToReachEnd = i;
       }
     }
-    return lastReachableIndex == 0;
+    return minStartIndexToReachEnd == 0;
   }
 }

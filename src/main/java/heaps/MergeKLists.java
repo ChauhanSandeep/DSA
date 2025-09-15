@@ -1,18 +1,19 @@
 package heaps;
 
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
 // Private inner class for ListNode
 
 /**
- * ✅ Problem: Merge K Sorted Linked Lists
+ * Problem: Merge K Sorted Linked Lists
  *
- * 🔗 Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/
+ * Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/
  *
- * 🧩 Problem Statement:
+ * Problem Statement:
  * Given an array of `k` sorted linked lists, merge all the lists into one sorted linked list and return its head.
  *
- * 📌 Example:
+ * Example:
  * Input:
  *   [
  *     1 → 3 → 5 → 7,
@@ -25,40 +26,19 @@ import java.util.PriorityQueue;
  * 🔄 Follow-up Questions:
  * 1. Can you do it using Divide and Conquer instead of a heap?
  *    🔗 https://leetcode.com/problems/merge-k-sorted-lists/discuss/10527/A-java-solution-based-on-divide-and-conquer
- * 2. Can you merge them in-place without extra memory? → Not always, as linked list nodes are immutable in Leetcode.
- * 3. What changes if the lists are streaming? → Use a real-time stream merge with a size-limited min-heap.
+ * 2. Can you merge them in-place without extra memory?
+ *    - Not always, as linked list nodes are immutable in Leetcode.
+ * 3. What changes if the lists are streaming?
+ *    - Use a real-time stream merge with a size-limited min-heap.
+ * 4. How would you merge k sorted arrays instead of lists?
+ *    - Similar heap approach, but use indices for each array to track progress.
+ * 5. What if k is very large and lists are huge, causing memory issues?
+ *    - Use external sorting or merge in a tournament fashion to reduce memory, but heap is efficient for n total nodes.
+ *      Relevant problem: https://leetcode.com/problems/merge-sorted-array/
+ * 6. How to merge without extra space?
+ *    - Not possible efficiently without modifying lists, but divide and conquer can be done recursively with O(log k) space.
  */
 public class MergeKLists {
-    // Private inner class for ListNode
-    private static class ListNode {
-        int val;
-        ListNode next;
-        
-        ListNode() {}
-        
-        ListNode(int val) { 
-            this.val = val; 
-        }
-        
-        ListNode(int val, ListNode next) { 
-            this.val = val; 
-            this.next = next; 
-        }
-    }
-
-  public static void main(String[] args) {
-    ListNode[] inputLists = new ListNode[3];
-
-    inputLists[0] = new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(7))));
-    inputLists[1] = new ListNode(2, new ListNode(4, new ListNode(6, new ListNode(8))));
-    inputLists[2] = new ListNode(0, new ListNode(9, new ListNode(10, new ListNode(11))));
-
-    System.out.println("🔹 Merged List using Min-Heap:");
-    printList(mergeKSortedLists(inputLists));
-
-    System.out.println("\n🔹 Merged List using Divide & Conquer:");
-    printList(mergeKSortedListsOptimized(inputLists));
-  }
 
   /**
    * ✅ Approach 1: Merge K Sorted Lists using Min-Heap
@@ -77,7 +57,7 @@ public class MergeKLists {
           return null;
       }
 
-    PriorityQueue<ListNode> minHeap = new PriorityQueue<>((node1, node2) -> Integer.compare(node1.val, node2.val));
+    PriorityQueue<ListNode> minHeap = new PriorityQueue<>(Comparator.comparingInt(node -> node.val));
 
     // Add head of each list to the heap
     for (ListNode node : lists) {
@@ -174,5 +154,36 @@ public class MergeKLists {
       head = head.next;
     }
     System.out.println("null");
+  }
+
+  public static void main(String[] args) {
+    ListNode[] inputLists = new ListNode[3];
+
+    inputLists[0] = new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(7))));
+    inputLists[1] = new ListNode(2, new ListNode(4, new ListNode(6, new ListNode(8))));
+    inputLists[2] = new ListNode(0, new ListNode(9, new ListNode(10, new ListNode(11))));
+
+    System.out.println("🔹 Merged List using Min-Heap:");
+    printList(mergeKSortedLists(inputLists));
+
+    System.out.println("\n🔹 Merged List using Divide & Conquer:");
+    printList(mergeKSortedListsOptimized(inputLists));
+  }
+
+  // Private inner class for ListNode
+  private static class ListNode {
+    int val;
+    ListNode next;
+
+    ListNode() {}
+
+    ListNode(int val) {
+      this.val = val;
+    }
+
+    ListNode(int val, ListNode next) {
+      this.val = val;
+      this.next = next;
+    }
   }
 }

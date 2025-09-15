@@ -56,14 +56,17 @@ public class MergeKSortedArrays {
     }
 
     PriorityQueue<ArrayEntry> minHeap = new PriorityQueue<>((a, b) -> {
-      return Integer.compare(a.array[a.pointerIdx], b.array[b.pointerIdx]);
+      int[] arrA = arrays.get(a.arrayIndex);
+      int[] arrB = arrays.get(b.arrayIndex);
+      return Integer.compare(arrA[a.pointerIndex], arrB[b.pointerIndex]);
     });
     int totalElements = 0;
 
     // Add the first element of each non-empty array to the heap
-    for (int[] array : arrays) {
+    for (int i = 0; i < arrays.size(); i++) {
+      int[] array = arrays.get(i);
       if (array != null && array.length > 0) {
-        minHeap.offer(new ArrayEntry(array, 0));
+        minHeap.offer(new ArrayEntry(i, 0));
         totalElements += array.length;
       }
     }
@@ -73,11 +76,12 @@ public class MergeKSortedArrays {
 
     while (!minHeap.isEmpty()) {
       ArrayEntry entry = minHeap.poll();
-      result[resultIndex++] = entry.array[entry.pointerIdx];
+      int[] currentArray = arrays.get(entry.arrayIndex);
+      result[resultIndex++] = currentArray[entry.pointerIndex];
 
       // Push the next element from the same array (if any)
-      if (entry.pointerIdx + 1 < entry.array.length) {
-        minHeap.offer(new ArrayEntry(entry.array, entry.pointerIdx + 1));
+      if (entry.pointerIndex + 1 < currentArray.length) {
+        minHeap.offer(new ArrayEntry(entry.arrayIndex, entry.pointerIndex + 1));
       }
     }
 
@@ -89,13 +93,18 @@ public class MergeKSortedArrays {
    * - The source array
    * - The current index within that array
    */
+  /**
+   * Represents an entry in the heap that keeps track of:
+   * - arrayIndex: Index of the array in the original list
+   * - pointerIndex: Current position within that array
+   */
   private static class ArrayEntry {
-    int[] array;
-    int pointerIdx;
+    int arrayIndex;    // Index of the array in the original list
+    int pointerIndex;  // Current position within the array
 
-    public ArrayEntry(int[] array, int pointerIdx) {
-      this.array = array;
-      this.pointerIdx = pointerIdx;
+    public ArrayEntry(int arrayIndex, int pointerIndex) {
+      this.arrayIndex = arrayIndex;
+      this.pointerIndex = pointerIndex;
     }
   }
 }

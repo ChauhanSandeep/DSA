@@ -63,9 +63,10 @@ public class RotatedSortedSearchWithDuplicates {
               return true;
             }
 
-            // Handle duplicates: if left, mid, and right are same, shrink range
-            // This is necessary to avoid infinite loops in cases of duplicates.
+            // Handle duplicates: shrink the search space
+            // This is because we cannot determine which side is sorted, so we move both pointers inward
             // Hope is that while inward movement we will find a non-duplicate due to rotated sorted nature
+            // This is safe because we are not skipping any potential target, we confirmed that nums[mid] != target
             if (nums[left] == nums[mid] && nums[mid] == nums[right]) {
                 left++;
                 right--;
