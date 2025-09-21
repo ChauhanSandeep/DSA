@@ -16,8 +16,15 @@ import java.util.Arrays;
  * You want to minimize the number of trials in the worst case.
  *
  * Example:
- * Input: eggs = 2, floors = 10
+ * Input: k = 3, n = 14
  * Output: 4
+ * Explanation: With 3 eggs and 14 floors, the minimum number of trials in the worst case is 4.
+ * One optimal strategy is:
+ * - Drop from floor 4: If it breaks, check floors 1-3 with 2 eggs (3 trials).
+ * - If it doesn't break, drop from floor 8: If it breaks, check floors 5-7 with 2 eggs (3 trials).
+ * - If it doesn't break, drop from floor 11: If it breaks, check floors 9-10 with 2 eggs (3 trials).
+ * - If it doesn't break, drop from floor 14: If it breaks, check floors 12-13 with 2 eggs (3 trials).
+ * In all scenarios, the worst-case number of trials is 4.
  *
  * Follow-up Questions:
  * 1. Can we optimize using Binary Search in the recursion?
@@ -54,7 +61,7 @@ public class EggDropProblem {
    * @return Minimum number of attempts required.
    */
   public int minTrialsRecursive(int eggs, int floors) {
-    int[][] memo = new int[eggs + 1][floors + 1];
+    int[][] memo = new int[eggs + 1][floors + 1]; // memo[i][j] = min trials for i eggs and j floors
     for (int[] row : memo) {
       Arrays.fill(row, -1);
     }

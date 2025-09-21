@@ -3,23 +3,37 @@ package arrays;
 import java.util.Arrays;
 
 /**
- * ✅ Problem: Sort Colors (a.k.a. Sort 0s, 1s, and 2s)
+ * Sort Colors - LeetCode Problem 75
  *
- * Given an array containing only 0s, 1s, and 2s, sort the array in-place such that elements of the same value are adjacent,
- * and in the order 0s → 1s → 2s.
+ * Problem Statement:
+ * Given an array nums with n objects colored red, white, or blue, sort them in-place
+ * so that objects of the same color are adjacent, with colors in the order red, white, blue.
+ * Use integers 0, 1, and 2 to represent red, white, and blue respectively.
+ * Must solve without using library's sort function.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/sort-colors/
+ * Example:
+ * Input: nums = [2,0,2,1,1,0]
+ * Output: [0,0,1,1,2,2]
+ * Explanation: All red (0) objects first, then white (1), then blue (2).
+ * The Dutch National Flag algorithm partitions in one pass: 0s to left,
+ * 2s to right, 1s naturally end up in middle.
  *
- * 🧠 Example:
- * Input:  [2, 0, 2, 1, 1, 0]
- * Output: [0, 0, 1, 1, 2, 2]
+ * LeetCode Link: https://leetcode.com/problems/sort-colors/
  *
- * 🚩 This is a classic application of the **Dutch National Flag** problem by Edsger Dijkstra.
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you extend this to k colors instead of 3?
+ *    Answer: Use counting sort O(n+k) or modified quicksort with k-way partitioning.
  *
- * 🔍 Follow-ups:
- * 1. Can you solve it using one-pass and constant space? ✅ Yes, see below.
- * 2. Can you do this without using counting sort or extra space? ✅ Done here.
- * 3. What if the input is a stream or linked list? ➤ Would need to modify approach (e.g., counting first pass or bucket-based).
+ * 2. What if we need to maintain relative order of equal elements (stable sort)?
+ *    Answer: Dutch Flag isn't stable. Use counting sort or merge sort for stability.
+ *    Related: LeetCode 324 - Wiggle Sort II (requires stable partitioning)
+ *
+ * 3. How to handle this problem if colors have priorities other than 0<1<2?
+ *    Answer: Map priorities to indices, apply Dutch Flag, then map back.
+ *
+ * 4. What if memory access is expensive and we want to minimize swaps?
+ *    Answer: Use counting sort - only 2 passes, no swaps needed.
+ *    Related: LeetCode 41 - First Missing Positive (cycle sort minimizes writes)
  */
 public class SortColors {
 
@@ -30,6 +44,42 @@ public class SortColors {
   }
 
   /**
+   * Steps:
+   * 1. Count occurrences of 0s, 1s, and 2s using a frequency array.
+   * 2. Overwrite the original array based on the counts.
+   *    - Fill in 0s first, then 1s, and finally 2s.
+   *
+   * This method ensures that we sort the colors in two passes:
+   * - First pass to count frequencies.
+   * - Second pass to overwrite the original array.
+   *
+   * Time Complexity: O(n) — two passes through the array
+   * Space Complexity: O(1) — fixed size frequency array
+   * @param nums Array containing only 0, 1, and 2
+   */
+  public static void sortColorsUsingFreqArray(int[] nums) {
+    int[] freq = new int[3];
+    for (int num : nums) {
+      freq[num]++;
+    }
+
+    int index = 0;
+    int freqIndex = 0;
+
+    while (index < nums.length) {
+      if (freq[freqIndex] == 0) {
+        freqIndex++;
+      } else {
+        nums[index++] = freqIndex;
+        freq[freqIndex]--;
+      }
+    }
+
+  }
+
+  /**
+   * Optimal Dutch National Flag Algorithm (Single Pass, In-Place)
+   *
    * Sorts the input array containing 0s, 1s, and 2s using three pointers:
    * - `zeroPointer` tracks position to place 0s
    * - `twoPointer` tracks position to place 2s
@@ -51,19 +101,25 @@ public class SortColors {
 
     int zeroPointer = 0;              // Where to place next 0
     int twoPointer = nums.length - 1; // Where to place next 2
-    int current = 0;
+    int currentPointer = 0;
 
-    while (current <= twoPointer) {
-      if (nums[current] == 0) {
-        swap(nums, zeroPointer, current);
-        zeroPointer++;
-        current++;
-      } else if (nums[current] == 2) {
-        swap(nums, current, twoPointer);
-        twoPointer--;
-        // Do not increment current here: the swapped-in element may be 0/1/2
-      } else {
-        current++; // When nums[current] == 1
+    while (currentPointer <= twoPointer) {
+      switch (nums[currentPointer]) {
+        case 0:
+          swap(nums, zeroPointer, currentPointer);
+          zeroPointer++;
+          currentPointer++;
+          break;
+        case 2:
+          swap(nums, currentPointer, twoPointer);
+          twoPointer--;
+          // Do not increment currentPointer here: the swapped-in element may be 0/1/2
+          break;
+        case 1:
+          currentPointer++;
+          break;
+        default:
+          throw new IllegalArgumentException("Array can only contain 0, 1, or 2");
       }
     }
   }

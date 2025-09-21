@@ -2,26 +2,92 @@
 
 ## Matrix Chain Multiplication (MCM)
 
-### Logic:
+### How to know that a problem is related to MCM?
+Not every problem is exactly MCM, but many are variations or analogs (e.g., the "Minimum Cost to Cut a Stick" problem you referenced earlier is a direct analog). You can identify MCM-like problems by these characteristics:
 
-- **Given**: A sequence of matrices `A1, A2, ..., An`.
-- **Goal**: Find the most efficient way (minimum number of scalar multiplications) to multiply them together.
+- Sequence of Operations on a Chain/Interval: The problem involves a linear sequence (e.g., matrices, segments, or items) where you perform associative operations (like multiplication, cutting, or merging) in an order that affects the total cost.
+- Cost Depends on Boundaries and Subproblems: The cost of an operation is based on the "dimensions" or "lengths" of the current segment (e.g., matrix sizes or stick lengths). Subproblems are defined over intervals/subchains, and the total cost is the sum of subproblem costs plus a boundary-dependent cost.
+- Optimization Goal: You need to minimize (or sometimes maximize) the total cost by choosing the optimal order or split points. The operations are exhaustive (all items must be processed).
+- Overlapping Subproblems and Optimal Substructure: Solving smaller intervals optimally contributes to the larger solution, with many reusable subcomputations—perfect for dynamic programming.
 
-### Key Intuition:
-- **Matrix multiplication is associative** but **not commutative** — order matters for cost.
-- The cost of multiplying two matrices `A[i..k]` and `A[k+1..j]` depends on their dimensions.
-- **Idea**: Try every possible partition (`k`) between `i` and `j`, recursively solve for left and right, and combine them with current multiplication cost.
+##### Common Indicators:
+- Problems phrased as "find min/max cost to process a sequence" (e.g., multiply matrices, cut a stick/rod, burst balloons).
+- Involves trying all possible split points (k) in a range [i, j] and adding a cost like arr[i] * arr[k] * arr[j] (or similar, like length(j - i)).
 
-### Approach:
-1. Define a DP function `dp(i, j)` = minimum cost to multiply matrices from index `i` to `j`.
-2. For every `k` between `i` and `j-1`, calculate:
+---
+### Generic Steps to Follow for Matrix Chain Multiplication
+This is bottom-up (tabulation) approach,but a top-down (memoization) variant follows similar logic.
 
-dp(i, j) = min over all k (dp(i, k) + dp(k+1, j) + cost of multiplying result of (i..k) and (k+1..j))
+1. **Characterize the Optimal Substructure**:
+  - Define the problem recursively: The min cost for multiplying matrices from i to j is the min over all split points k (i ≤ k < j) of [cost(i to k) + cost(k+1 to j) + cost of combining them (e.g., dimensions[i-1] * dimensions[k] * dimensions[j])].
+  - Base case: Cost for a single matrix (i == j) is 0.
 
-where cost is `dimensions[i-1] * dimensions[k] * dimensions[j]`.
-3. Base case: If `i == j`, only one matrix → no cost (`dp(i, i) = 0`).
+2. **Set Up the DP Table**:
+  - Create a 2D array dp[n+1][n+1], where dp[i][j] = min cost to multiply matrices from i to j (1-based indexing often used).
+  - Initialize diagonals (dp[i][i] = 0) and unused parts (e.g., lower triangle) to infinity or ignore them.
 
-**Thus, MCM = Partition at every index ➔ Solve left & right recursively ➔ Add combination cost ➔ Pick the minimum.**
+3. **Fill the DP Table Bottom-Up**:
+  - Iterate over chain lengths (l) from 2 to n (number of matrices).
+  - For each length l:
+    - Iterate over starting index i from 1 to (n - l + 1).
+    - Set j = i + l - 1 (end of current chain).
+    - Initialize dp[i][j] to a large number (e.g., infinity).
+    - For each possible split k from i to j-1:
+      - Compute temp_cost = dp[i][k] + dp[k+1][j] + dimensions[i-1] * dimensions[k] * dimensions[j].
+      - Update dp[i][j] = min(dp[i][j], temp_cost).
+  - This builds from small chains to the full chain.
+
+4. **Extract the Result**:
+  - The answer is dp[n], the min cost for the entire chain.[10]
+
+5. **(Optional) Reconstruct the Solution**:
+  - If needed, track split points (e.g., in another table) to print the optimal parenthesization/order.
+---
+### Generic Code Template for MCM
+
+```java
+public int matrixChainMultiplication(int[] inputArr) {  // inputArr = array of inputArr, size inputLength+1 for inputLength matrices
+  // Step 1: Initialize variables and determine the number of matrices
+  int inputLength = inputArr.length - 1;  // Number of matrices is one less than inputArr array length
+
+  // Step 2: Create and initialize DP table
+  int[][] dp = new int[inputLength + 1][inputLength + 1];
+  for (int[] row : dp) {
+    Arrays.fill(row, Integer.MAX_VALUE / 2);  // Avoid overflow
+  }
+
+  // Step 3: Fill diagonal elements (base case - single matrix has 0 cost)
+  for (int i = 1; i <= inputLength; i++) {
+    dp[i][i] = 0;
+  }
+
+  // Step 4: Fill DP table for chains of increasing length
+  for (int length = 2; length <= inputLength; length++) {  // Chain length from 2 to inputLength
+
+    // Step 5: For each starting position of current chain length
+    for (int i = 1; i <= inputLength - length + 1; i++) {
+
+      // Step 6: Calculate ending position for current chain
+      int j = i + length - 1;
+
+      // Step 7: Try all possible intermediate split points
+      for (int intermediateIndex = i; intermediateIndex < j; intermediateIndex++) {
+
+        // Step 8: Calculate cost for current split
+        int cost = dp[i][intermediateIndex] +
+            dp[intermediateIndex + 1][j] +
+            inputArr[i - 1] * inputArr[intermediateIndex] * inputArr[j];
+
+        // Step 9: Update minimum cost for current subproblem
+        dp[i][j] = Math.min(dp[i][j], cost);
+      }
+    }
+  }
+
+  // Step 10: Return the minimum cost for the entire chain
+  return dp[1][inputLength];  // Fixed: was dp[10][inputLength] which was incorrect
+}
+```
 
 ---
 

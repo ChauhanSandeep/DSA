@@ -1,4 +1,4 @@
-package graph;
+package graphs;
 
 /**
  * Problem: Word Search (LeetCode #79)

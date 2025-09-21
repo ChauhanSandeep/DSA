@@ -39,6 +39,81 @@ public class ReverseNodesInKGroup {
     }
 
     /**
+     * Two-pointer approach with clear separation of concerns.
+     * Separates node identification from reversal logic.
+     *
+     * Steps:
+     * - Identify k nodes for the current group.
+     * - Reverse the identified group.
+     * - Reconnect the reversed group with the rest of the list.
+     * - Repeat until fewer than k nodes remain.
+     *
+     * Time Complexity: O(n) where n is number of nodes
+     * Space Complexity: O(1) - in-place reversal
+     *
+     * @param head Head of the linked list
+     * @param k Group size for reversal
+     * @return Modified list head after k-group reversals
+     */
+    public ListNode reverseKGroupTwoPointer(ListNode head, int k) {
+        if (head == null || k == 1) return head;
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode prevGroupEndNode = dummy;
+
+        while (hasKNodes(prevGroupEndNode.next, k)) {
+            ListNode currGroupStartNode = prevGroupEndNode.next;
+            ListNode currGroupEndNode = getKthNode(currGroupStartNode, k);
+            ListNode nextGroupStartNode = currGroupEndNode.next;
+
+            // Reverse current group
+            ListNode reversedHead = reverseList(currGroupStartNode, currGroupEndNode);
+
+            // Reconnect
+            prevGroupEndNode.next = reversedHead;
+            currGroupStartNode.next = nextGroupStartNode;
+            prevGroupEndNode = currGroupStartNode;
+        }
+
+        return dummy.next;
+    }
+
+    // Check if there are at least k nodes starting from head
+    private boolean hasKNodes(ListNode head, int k) {
+        while (k > 0 && head != null) {
+            head = head.next;
+            k--;
+        }
+        return k == 0;
+    }
+
+    // Get the kth node (1-indexed)
+    private ListNode getKthNode(ListNode head, int k) {
+        while (k > 1 && head != null) {
+            head = head.next;
+            k--;
+        }
+        return head;
+    }
+
+    // Reverse list from start to end (inclusive) and return new head
+    private ListNode reverseList(ListNode start, ListNode end) {
+        ListNode prev = end.next;
+        ListNode current = start;
+
+        while (current != end) {
+            ListNode next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+
+        current.next = prev;
+        return end; // New head
+    }
+
+    /**
      * Recursive approach - elegant but uses O(n/k) stack space.
      *
      * Algorithm: Divide and conquer recursion
@@ -178,68 +253,6 @@ public class ReverseNodesInKGroup {
 
             prev.next = current;
         }
-    }
-
-    /**
-     * Two-pointer approach with clear separation of concerns.
-     * Separates node identification from reversal logic.
-     */
-    public ListNode reverseKGroupTwoPointer(ListNode head, int k) {
-        if (head == null || k == 1) return head;
-
-        ListNode dummy = new ListNode(0);
-        dummy.next = head;
-        ListNode prevGroupEnd = dummy;
-
-        while (hasKNodes(prevGroupEnd.next, k)) {
-            ListNode groupStart = prevGroupEnd.next;
-            ListNode groupEnd = getKthNode(groupStart, k);
-            ListNode nextGroupStart = groupEnd.next;
-
-            // Reverse current group
-            ListNode reversedHead = reverseList(groupStart, groupEnd);
-
-            // Reconnect
-            prevGroupEnd.next = reversedHead;
-            groupStart.next = nextGroupStart;
-            prevGroupEnd = groupStart;
-        }
-
-        return dummy.next;
-    }
-
-    // Check if there are at least k nodes starting from head
-    private boolean hasKNodes(ListNode head, int k) {
-        while (k > 0 && head != null) {
-            head = head.next;
-            k--;
-        }
-        return k == 0;
-    }
-
-    // Get the kth node (1-indexed)
-    private ListNode getKthNode(ListNode head, int k) {
-        while (k > 1 && head != null) {
-            head = head.next;
-            k--;
-        }
-        return head;
-    }
-
-    // Reverse list from start to end (inclusive)
-    private ListNode reverseList(ListNode start, ListNode end) {
-        ListNode prev = end.next;
-        ListNode current = start;
-
-        while (current != end) {
-            ListNode next = current.next;
-            current.next = prev;
-            prev = current;
-            current = next;
-        }
-
-        current.next = prev;
-        return end; // New head
     }
 
     /**

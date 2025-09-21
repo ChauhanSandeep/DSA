@@ -1,24 +1,37 @@
 package linkedlist;
 
 /**
- * Problem: Swap nodes in pairs in a given linked list.
+ * Swap Nodes in Pairs - LeetCode Problem 24
  *
- * Given a singly linked list, swap every two adjacent nodes and return the modified list.
+ * Problem Statement:
+ * Given a linked list, swap every two adjacent nodes and return its head.
+ * You must solve the problem without modifying the values in the list's nodes
+ * (i.e., only nodes themselves may be changed).
  *
  * Example:
- * Input:  1 -> 2 -> 3 -> 4
- * Output: 2 -> 1 -> 4 -> 3
- *
- * Approach:
- * - Use a dummy node to simplify edge cases.
- * - Traverse the list in pairs and swap nodes by adjusting pointers.
- * - Maintain a `prev` pointer to keep track of the previous node for proper linking.
- * - Iterate until we reach the end of the list.
- *
- * Time Complexity: O(N) - We traverse the list once.
- * Space Complexity: O(1) - No extra space is used apart from a few pointers.
+ * Input: head = [1,2,3,4]
+ * Output: [2,1,4,3]
+ * Explanation: Swap (1,2) to get (2,1), swap (3,4) to get (4,3).
+ * The iterative approach uses dummy node to simplify edge cases and three pointers
+ * to manage the swapping: prev (before pair), curr (first node), next (second node).
  *
  * LeetCode Link: https://leetcode.com/problems/swap-nodes-in-pairs/
+ *
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you swap every k adjacent nodes instead of pairs?
+ *    Answer: Extend the algorithm with k-node groups, use similar pointer manipulation.
+ *    Related: LeetCode 25 - https://leetcode.com/problems/reverse-nodes-in-k-group/
+ *
+ * 2. What if we need to swap nodes at specific positions (not adjacent)?
+ *    Answer: Use two-pass approach to locate nodes, then swap with careful pointer updates.
+ *    Related: LeetCode 1721 - https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
+ *
+ * 3. How to handle this for doubly linked list?
+ *    Answer: Additional prev pointer maintenance for both directions during swaps.
+ *
+ * 4. What if we need to reverse pairs instead of swapping?
+ *    Answer: Same algorithm works since swapping two nodes effectively reverses the pair.
+ *    Related: LeetCode 206 - https://leetcode.com/problems/reverse-linked-list/
  */
 public class SwapPairs {
 
@@ -44,7 +57,7 @@ public class SwapPairs {
    *     [second] -> [first] -> [next]
    *
    * Approach:
-   *  1. Use a **dummy node** to simplify swapping at the head of the list.
+   *  1. Use a dummy node to simplify swapping at the head of the list.
    *  2. Initialize two pointers:
    *     - `previous`: Points to the end of the processed part.
    *     - `head`: Points to the current pair’s first node.
@@ -66,7 +79,7 @@ public class SwapPairs {
     ListNode dummy = new ListNode(-1);
     dummy.next = head;
 
-    ListNode previous = dummy;  // End of the last processed group
+    ListNode previousPairEndNode = dummy;  // End of the last processed group
 
     // Loop till at least two nodes remain to be swapped
     while (head != null && head.next != null) {
@@ -74,24 +87,24 @@ public class SwapPairs {
       // Step 1: Identify nodes to be swapped
       ListNode firstNode = head;
       ListNode secondNode = head.next;
-      ListNode nextGroupHead = secondNode.next;
+      ListNode nextPairStartNode = secondNode.next;
 
       // Step 2: Perform the swap (actual pointer manipulation)
-      previous.next = secondNode;         // Connect previous group to second
+      previousPairEndNode.next = secondNode;         // Connect previousPairEndNode group to second
       secondNode.next = firstNode;        // second -> first
-      firstNode.next = nextGroupHead;     // first -> next group's head
+      firstNode.next = nextPairStartNode;     // first -> next group's head
 
       // Step 3: Move pointers ahead for next swap
-      previous = firstNode;       // previous should point to the end of the newly swapped pair
-      head = nextGroupHead;       // head moves to the start of the next pair
+      previousPairEndNode = firstNode;       // previousPairEndNode should point to the end of the newly swapped pair
+      head = nextPairStartNode;       // head moves to the start of the next pair
 
       /*
        * 1 -> 2 -> 3 -> 4
        * dummy -> 2 -> 1 -> 3 -> 4
-       * previous = 1, head = 3
+       * previousPairEndNode = 1, head = 3
        *
        * dummy -> 2 -> 1 -> 4 -> 3
-       * previous = 3, head = null (loop ends)
+       * previousPairEndNode = 3, head = null (loop ends)
        */
     }
 

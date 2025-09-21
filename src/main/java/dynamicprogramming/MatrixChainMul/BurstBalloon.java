@@ -21,13 +21,14 @@ import java.util.Arrays;
  * - nums = [3,1,5,8] --> [3,5,8] --> [3,8] --> [8] --> []
  * - coins =  3*1*5    +   3*5*8   +  1*3*8  + 1*8*1 = 167
  *
- * Approach:
- * - Uses **Dynamic Programming** with the concept of partitions.
- * - Defines `dp[left][right]` as the maximum coins that can be obtained by bursting balloons in the range `[left, right]`.
- * - Iterates over all possible partition points and calculates the best gain for each subproblem.
- *
- * Time Complexity: **O(n^3)** (Nested loops iterating over `n`, solving `n^2` subproblems)
- * Space Complexity: **O(n^2)** (DP table storing results for all `[left, right]` ranges)
+ * Follow-up Questions:
+ * 1. How would the solution change if we wanted to minimize the coins instead?
+ *      - We could modify the DP to take min instead of max, but the problem is about max; minimization might not make sense in this context as coins are positive.
+ * 2. What if balloons could be burst in groups?
+ *      - That would require a different DP state, perhaps segmenting into groups, but here it's individual bursts.
+ * 3. How to handle if some balloons give negative coins?
+ *      - DP would still work, but we'd need to consider if skipping is allowed; here all must be burst.
+ * Relevant follow-up problem: https://leetcode.com/problems/matrix-chain-multiplication/ (similar interval DP optimization).
  */
 public class BurstBalloon {
 

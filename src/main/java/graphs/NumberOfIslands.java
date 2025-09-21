@@ -1,4 +1,4 @@
-package graph;
+package graphs;
 
 /**
  * Number of Islands problem

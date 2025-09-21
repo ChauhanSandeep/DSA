@@ -1,4 +1,4 @@
-package graph;
+package graphs;
 
 import java.util.*;
 
@@ -15,7 +15,7 @@ import java.util.*;
  *   Input: routes = [
      *   [7,12], // route is 7 -> 12 -> 7 -> 12
      *   [4,5,15], // route is 4 -> 5 -> 15 -> 4 -> 5 -> 15
-     *   [6],
+     *   [6], // route is 6 -> 6
      *   [15,19],
      *   [19,12,13]
  *   ], source = 4, destination = 13
@@ -23,13 +23,20 @@ import java.util.*;
  *   Explanation:
  *   4 ->[Bus 1]-> 15 ->[Bus 3]-> 19 ->[Bus 4]-> 13.
  *
- * Follow-Up Questions:
- * - What if you need to return the path/stops traversed?
- *   (Use BFS predecessor map to reconstruct path; see LeetCode Discuss for implementation tips.)
- * - What if buses can be taken multiple times or there are express routes?
- *   (Allow revisiting routes if a more optimal path can be found.)
+ * Follow-up Questions for FAANG Interviews:
+ * 1. What if we need to find all possible paths with minimum transfers?
+ *    Answer: Modify BFS to store all paths at the minimum level before returning.
+ * 2. How would you handle dynamic bus routes that change over time?
+ *    Answer: Implement event-driven updates to the stop-to-routes mapping and cache invalidation.
+ * 3. What if bus routes have different costs or travel times?
+ *    Answer: Use Dijkstra's algorithm with priority queue instead of BFS.
+ * 4. How to optimize for memory when dealing with very large route networks?
+ *    Answer: Use compressed representations, lazy loading, or external storage for route mappings.
  *
- * Related Link: https://leetcode.com/problems/bus-routes/
+ * Related Problems:
+ * - LeetCode 1311: Get Watched Videos by Your Friends: https://leetcode.com/problems/get-watched-videos-by-your-friends/
+ * - LeetCode 1129: Shortest Path with Alternating Colors: https://leetcode.com/problems/shortest-path-with-alternating-colors/
+ * - LeetCode 847: Shortest Path Visiting All Nodes: https://leetcode.com/problems/shortest-path-visiting-all-nodes/
  */
 public class MinBuses {
   public static void main(String[] args) {
@@ -43,7 +50,7 @@ public class MinBuses {
     int source = 4;
     int destination = 13;
     MinBuses minBusesSolver = new MinBuses();
-    int minBuses = minBusesSolver.numBusesToDestination(routes, source, destination);
+    int minBuses = minBusesSolver.numBusesToDestinationUsingBfs(routes, source, destination);
     System.out.println("Minimum buses required from " + source + " to " + destination + ": " + minBuses);
   }
 
@@ -59,15 +66,16 @@ public class MinBuses {
    *
    * Algorithm: Breadth-First Search (BFS)
    * - Each bus route is processed once, and each stop is queued as needed.
-   * - Time Complexity: O(N * K) where N is the number of routes, K is the average number of stops per route.
-   * - Space Complexity: O(N + S), where S is number of unique stops.
+   *
+   * Time Complexity: O(N * K) where N is the number of routes, K is the average number of stops per route.
+   * Space Complexity: O(N + S), where S is number of unique stops.
    *
    * @param routes      Array of bus routes, each route is an array of bus stops.
    * @param source      Starting stop.
    * @param destination Target stop.
    * @return Minimum number of buses required, or -1 if no possible route.
    */
-  public int numBusesToDestination(int[][] routes, int source, int destination) {
+  public int numBusesToDestinationUsingBfs(int[][] routes, int source, int destination) {
     if (source == destination) return 0;
 
     // Map each stop to a set of bus route indices it appears in.
@@ -81,8 +89,10 @@ public class MinBuses {
     Queue<Integer> stopsQueue = new LinkedList<>();
     Set<Integer> visitedStops = new HashSet<>();
     Set<Integer> visitedRoutes = new HashSet<>();
+
     stopsQueue.offer(source);
     visitedStops.add(source);
+
     int busesTaken = 0;
 
     // Standard BFS
@@ -92,16 +102,18 @@ public class MinBuses {
       for (int i = 0; i < currentLevelSize; i++) {
         int currentStop = stopsQueue.poll();
         Set<Integer> possibleRoutes = stopToRoutesMap.getOrDefault(currentStop, Collections.emptySet());
+
         for (int routeIdx : possibleRoutes) {
           if (visitedRoutes.contains(routeIdx)) continue;
           visitedRoutes.add(routeIdx);
-          for (int stop : routes[routeIdx]) {
+          for (int stop : routes[routeIdx]) { // All stops in this route
             if (stop == destination) return busesTaken; // Found destination
             if (visitedStops.add(stop)) { // true if stop was not already present
               stopsQueue.offer(stop);
             }
           }
         }
+
       }
     }
     return -1; // Destination unreachable
@@ -133,18 +145,21 @@ public class MinBuses {
         stopToRoutes.computeIfAbsent(stop, k -> new HashSet<>()).add(i);
       }
     }
-    Set<Integer> visitedRoutesFromSource = new HashSet<>();
-    Set<Integer> visitedRoutesFromDest = new HashSet<>();
+
+    // Routes available at source and destination
     Set<Integer> sourceRoutes = stopToRoutes.getOrDefault(source, new HashSet<>());
     Set<Integer> destRoutes = stopToRoutes.getOrDefault(destination, new HashSet<>());
 
     // If there's no connection at either endpoint
     if (sourceRoutes.isEmpty() || destRoutes.isEmpty()) return -1;
 
+    // Queues for BFS from both ends. Each queue holds route indices.
     Queue<Integer> sourceQueue = new LinkedList<>(sourceRoutes);
     Queue<Integer> destQueue = new LinkedList<>(destRoutes);
-    for (int route : sourceRoutes) visitedRoutesFromSource.add(route);
-    for (int route : destRoutes) visitedRoutesFromDest.add(route);
+
+
+    Set<Integer> visitedRoutesFromSource = new HashSet<>(sourceRoutes);
+    Set<Integer> visitedRoutesFromDest = new HashSet<>(destRoutes);
 
     int busesTaken = 1;
 

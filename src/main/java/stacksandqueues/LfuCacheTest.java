@@ -6,12 +6,16 @@ import java.util.Map;
 
 
 /**
- * Problem: Design and implement a data structure for LFU (Least Frequently Used) Cache.
+ * Problem: LFU Cache
  *
- * Requirements:
- * - get(key): Retrieve the value of the key if it exists, otherwise return -1.
- * - put(key, value): Insert or update the value. If the cache reaches its capacity,
- *   it should evict the least frequently used item. If there's a tie, evict the least recently used.
+ * Design and implement a data structure for Least Frequently Used (LFU) cache.
+ * The LFUCache should support the following operations: get and put.
+ * - get(key) - Get the value (will always be positive) of the key if the key exists in the cache,
+ *              otherwise return -1.
+ * - put(key, value) - Set or insert the value if the key is not already present. When the cache
+ *                     reaches its capacity, it should invalidate the least frequently used item before
+ *                     inserting a new item. For this problem, when there is a tie (i.e., two or more keys
+ *                     with the same frequency), the least recently used key would be evicted.
  *
  * Example:
  * Input:
@@ -138,7 +142,7 @@ class LFUCache {
     if (keysAtCurrentFreq.isEmpty()) {
       frequencyToKeysMap.remove(currentFreq);
       if (minFrequency == currentFreq) {
-        // we are sure that minFrequency + 1 is be available because input key is now updatedFreq (minFrequency + 1)
+        // we are sure that minFrequency + 1 will be available because input key is now updatedFreq (minFrequency + 1)
         minFrequency++;
       }
     }

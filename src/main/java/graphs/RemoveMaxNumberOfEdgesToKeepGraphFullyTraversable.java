@@ -1,4 +1,4 @@
-package graph;
+package graphs;
 
 /**
  * Alice and Bob have an undirected graph of n nodes and 3 types of edges:

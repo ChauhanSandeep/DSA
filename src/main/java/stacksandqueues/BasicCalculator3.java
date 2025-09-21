@@ -3,21 +3,45 @@ package stacksandqueues;
 import java.util.Stack;
 
 /**
- * Problem: Basic Calculator III
- * LeetCode Link: https://leetcode.com/problems/basic-calculator-iii/
+ * Basic Calculator III - LeetCode Problem 772
  *
- * Given a mathematical expression containing non-negative integers, '+', '-', '*', '/',
- * and parentheses '(' and ')', evaluate the expression following standard mathematical precedence.
+ * Problem Statement:
+ * Implement a basic calculator to evaluate a simple expression string.
+ * The expression string contains non-negative integers, +, -, *, /, (, and ).
+ * Integer division truncates towards zero. The expression is always valid.
+ * All intermediate results are within 32-bit signed integer range.
  *
  * Example:
- * Input: "(1-(3*2+2)-3)+(9+8)"
- * Output: 10
- * Explanation: The expression evaluates to 10 by following the order of operations.
+ * Input: s = "2*(5+5*2)/3+(6/2+8)"
+ * Output: 21
+ * Explanation: ((2*(5+10))/3) + (3+8) = (2*15)/3 + 11 = 30/3 + 11 = 10 + 11 = 21
+ * This combines operator precedence (* and / before + and -) with parentheses handling.
  *
- * Follow-up Questions:
- * - Implement a version that supports variables and evaluation via a map: https://leetcode.com/problems/basic-calculator-iv/
- * - How would you handle floating point numbers and operator precedence? Consider implementing a Shunting Yard algorithm.
+ * LeetCode Link: https://leetcode.com/problems/basic-calculator-iii/
+ *
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you handle floating point numbers?
+ *    Answer: Modify parsing to handle decimal points, use double instead of int.
+ *
+ * 2. What if we need to support additional operators like ^ (exponentiation)?
+ *    Answer: Add new precedence level in recursive descent parser or extend stack approach.
+ *    Related: Build expression evaluator with custom operators
+ *
+ * 3. How would you optimize for repeated evaluation of similar expressions?
+ *    Answer: Parse once into AST/bytecode, then evaluate multiple times.
+ *
+ * 4. What if expressions can have variables (like "2*x + 3*y")?
+ *    Answer: Symbol table for variables, modify parser to handle identifiers.
+ *    Related: LeetCode 736 - Parse Lisp Expression
+ *
+ * 5. How would you mplement a version that supports variables and evaluation via a map?
+ *    Answer: https://leetcode.com/problems/basic-calculator-iv/
+ *
+ * 6. How would you handle floating point numbers and operator precedence?
+ *    Answer: Consider implementing a Shunting Yard algorithm.
+ *
  */
+
 public class BasicCalculator3 {
 
     public static void main(String[] args) {
@@ -26,13 +50,17 @@ public class BasicCalculator3 {
     }
 
     /**
-     * Approach:
-     * - Use a stack to store values and compute based on the last encountered operator.
-     * - Use recursion to evaluate subexpressions enclosed in parentheses.
-     * - Handle integer division by truncating toward zero.
+     * Evaluates mathematical expression with +, -, *, /, and parentheses.
      *
-     * Time Complexity: O(N), where N is the length of the expression.
-     * Space Complexity: O(N), due to recursion depth and stack storage.
+     * Algorithm: Stack-based approach with operator precedence handling
+     * - Use stack to defer lower precedence operations like +, -
+     * - Handle high precedence operations like *, / immediately
+     * - Process parentheses recursively by finding matching closing parenthesis
+     * - Final result is sum of all stack elements
+     *
+     * Time Complexity: O(n) - single pass through string
+     * Space Complexity: O(n) - stack space for numbers and recursion
+     *
      */
     public int calculate(String expression) {
         if (expression == null || expression.isEmpty()) {
@@ -61,18 +89,9 @@ public class BasicCalculator3 {
             }
 
             if (currentChar == '(') {
-                // Handle subexpression recursively
-                int parenthesisDepth = 1;
-                int innerIndex = currIndex + 1;
-                while (innerIndex < expression.length() && parenthesisDepth > 0) {
-                    if (expression.charAt(innerIndex) == '(') parenthesisDepth++;
-                    else if (expression.charAt(innerIndex) == ')') parenthesisDepth--;
-                    innerIndex++;
-                }
-
-                // Recursively evaluate subexpression
-                int evaluatedSubExpression = calculate(expression.substring(currIndex + 1, innerIndex - 1));
-                currIndex = innerIndex; // Move `currIndex` past the closing parenthesis
+                int closingParCurrIndex = findClosingParenthesis(expression, currIndex);
+                int evaluatedSubExpression = calculate(expression.substring(currIndex + 1, closingParCurrIndex - 1));
+                currIndex = closingParCurrIndex; // Move index to character after closing parenthesis
                 applyToStack(numberStack, lastOperator, evaluatedSubExpression);
                 continue;
             }
@@ -111,5 +130,19 @@ public class BasicCalculator3 {
                 stack.push(stack.pop() / value);
                 break;
         }
+    }
+
+    /**
+     * Finds the index just after the matching closing parenthesis for the opening parenthesis at startIndex.
+     */
+    private int findClosingParenthesis(String expression, int startIndex) {
+        int parenthesisDepth = 1;
+        int index = startIndex + 1;
+        while (index < expression.length() && parenthesisDepth > 0) {
+            if (expression.charAt(index) == '(') parenthesisDepth++;
+            else if (expression.charAt(index) == ')') parenthesisDepth--;
+            index++;
+        }
+        return index;
     }
 }

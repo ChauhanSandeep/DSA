@@ -1,4 +1,4 @@
-package graph;
+package graphs;
 
 /**
  * 1052. Grumpy Bookstore Owner

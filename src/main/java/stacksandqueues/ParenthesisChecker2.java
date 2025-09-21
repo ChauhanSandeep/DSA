@@ -120,6 +120,7 @@ public class ParenthesisChecker2 {
     // Construct the valid string by skipping invalid indices
     StringBuilder validString = new StringBuilder();
     int removalIndex = 0;
+
     for (int i = 0; i < str.length(); i++) {
       if (removalIndex < indicesToRemove.size() && i == indicesToRemove.get(removalIndex)) {
         removalIndex++;
@@ -127,6 +128,7 @@ public class ParenthesisChecker2 {
         validString.append(str.charAt(i));
       }
     }
+
     return validString.toString();
   }
 }

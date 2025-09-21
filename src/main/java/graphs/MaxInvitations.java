@@ -1,36 +1,41 @@
-package graph;
+package graphs;
 
 import java.util.*;
 
 
 /**
- * LeetCode 2127: Maximum Employees to Be Invited to a Meeting
- * Problem Link: https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/
+ * A company is organizing a meeting and has a list of n employees, waiting to be invited.
+ * They have arranged for a large circular table, capable of seating any number of employees.
+ * The employees are numbered from 0 to n - 1. Each employee has a favorite person and they will
+ * attend the meeting only if they can sit next to their favorite person at the table.
+ * The favorite person of an employee is not themself.
  *
- * Problem Statement:
- * Given an array 'favorite' where favorite[i] is the employee that employee 'i' prefers to sit next to,
- * find the maximum number of employees that can be invited to a circular meeting table such that:
- * - Each invited employee sits directly next to their favorite employee.
- * - The arrangement forms a valid circular seating.
+ * Given a 0-indexed integer array favorite, where favorite[i] denotes the favorite person of
+ * the ith employee, return the maximum number of employees that can be invited to the meeting.
  *
  * Example:
  * Input: favorite = [2,2,1,2]
  * Output: 3
- * Explanation: Employee 0 likes 2, employee 1 likes 2, employee 2 likes 1, employee 3 likes 2.
- * We can invite employees 1, 2, 3 where 1 sits next to 2, 2 sits next to 1, and they form a valid circle.
+ * Explanation: The maximum number of employees that can be invited to the meeting is 3.
+ * Employee 0 can sit next to employee 2, employee 1 can sit next to employee 2, and employee 2
+ * can sit next to employee 1. This forms a circular arrangement where everyone sits next to their favorite.
  *
- * Approach:
- * The key insight is that the graph forms a functional graph (each node has exactly one outgoing edge).
- * We need to handle two cases:
- * 1. Large cycles (size > 2): We can invite all members of the largest cycle.
- * 2. Two-node mutual cycles: We can combine multiple 2-cycles with their incoming chains.
+ * LeetCode: https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/
  *
- * Follow-up Questions:
- * - What if employees can have multiple favorites? (Convert to bipartite matching problem)
- * - How to handle dynamic updates to favorites? (Maintain cycle information incrementally)
+ * Follow-up Questions for FAANG Interviews:
+ * 1. What if employees have multiple favorite people they can sit next to?
+ *    Answer: Use maximum bipartite matching or modify to handle weighted graph preferences.
+ * 2. How would you handle dynamic changes to favorite relationships during the meeting?
+ *    Answer: Implement incremental graph algorithms with efficient updates to cycle detection.
+ * 3. What if the table has limited capacity or specific seating constraints?
+ *    Answer: Add constraint satisfaction problem solving with backtracking or integer programming.
+ * 4. How to optimize for very large numbers of employees (10^6+)?
+ *    Answer: Use parallel processing for independent components, compressed graph representations.
  *
- * Time Complexity: O(N) - Each node is processed exactly once
- * Space Complexity: O(N) - For arrays and data structures
+ * Related Problems:
+ * - LeetCode 207: Course Schedule (Cycle Detection)
+ * - LeetCode 210: Course Schedule II (Topological Sort)
+ * - LeetCode 1059: All Paths from Source Lead to Destination
  */
 public class MaxInvitations {
 
@@ -51,11 +56,19 @@ public class MaxInvitations {
    *   → Cycles: A → B → C → A or A ↔ B
    *
    * Two Possibilities in graph:
-   * 1. **Big cycle (size > 2):** Can seat all of them in a circle. But only **one such cycle** can be used,
+   * 1. Big cycle (size > 2): A big cycle is a cycle in the graph with more than two employees, e.g., A → B → C → A.
+   *    You Can seat all of them in a circle. But only one such cycle can be used,
    *    because multiple disconnected cycles can't be connected together in one big circle.
-   * 2. **2-cycles (A ↔ B):** You can use **multiple such pairs** and add longest incoming chains to both A and B.
+   * 2. 2-cycles (A ↔ B): A 2-cycle is a mutual favorite pair, e.g., A ↔ B (A likes B, B likes A).
+   *    You can use multiple such pairs and add longest incoming chains to both A and B.
    *    These structures can be placed one after another in a larger circular arrangement.
    *
+   * Steps:
+   * Step 1: Model as directed graph (each person points to their favorite)
+   * Step 2: Remove chains using topological sort to find cycle lengths
+   * Step 3: Calculate longest chains leading into each person
+   * Step 4: Process cycles - either one large cycle OR multiple small cycles with chains
+   * Step 5: Return maximum of the two possibilities
    * Final answer = max(largest cycle size, sum of all 2-cycles + their incoming chains)
    *
    * Time Complexity: O(N)
@@ -66,39 +79,26 @@ public class MaxInvitations {
    */
   public int maximumInvitations(int[] favorites) {
     int totalEmployees = favorites.length;
-    boolean[] isProcessed = new boolean[totalEmployees];
+    boolean[] isProcessed = new boolean[totalEmployees]; // Node is considered processed when removed in topological sort
 
     // Step 1: Calculate in-degrees for topological sorting
-    int[] inDegreeCount = new int[totalEmployees];
-    for (int employee = 0; employee < totalEmployees; employee++) {
-      inDegreeCount[favorites[employee]]++;
+    int[] inDegree = new int[totalEmployees];
+    for (int favorite : favorites) {
+      inDegree[favorite]++;
     }
 
     // Step 2: Remove nodes with no incoming edges (start of chains)
-    Queue<Integer> processingQueue = new LinkedList<>();
+    Queue<Integer> queue = new LinkedList<>();
     for (int employee = 0; employee < totalEmployees; employee++) {
-      if (inDegreeCount[employee] == 0) {
+      if (inDegree[employee] == 0) {
         isProcessed[employee] = true;
-        processingQueue.offer(employee);
+        queue.offer(employee);
       }
     }
 
-    // Step 3: Calculate longest chain leading to each node
-    int[] longestIncomingChain = new int[totalEmployees]; // longestIncomingChain[i] = length of longest chain leading to employee i
-    while (!processingQueue.isEmpty()) {
-      int currentEmployee = processingQueue.poll();
-      int favoriteEmployee = favorites[currentEmployee];
-
-      // Update the longest chain to the favorite employee
-      longestIncomingChain[favoriteEmployee] =
-          Math.max(longestIncomingChain[favoriteEmployee], longestIncomingChain[currentEmployee] + 1);
-
-      // Remove this edge and check if favorites becomes a leaf
-      if (--inDegreeCount[favoriteEmployee] == 0) {
-        isProcessed[favoriteEmployee] = true;
-        processingQueue.offer(favoriteEmployee);
-      }
-    }
+    // Step 3: Calculate the longest chain leading to each node
+    // maxChainLen[i] = length of longest chain leading to employee i
+    int[] maxChainLen = getMaxChainLength(favorites, totalEmployees, queue, inDegree, isProcessed);
 
     // Step 4: Process remaining cycles
     int largestCycleSize = 0;
@@ -135,8 +135,8 @@ public class MaxInvitations {
           // So, we compute the contribution of this 2-cycle as:
           // 2 (for A and B) + longest incoming chain to A + longest incoming chain to B
           int mutualFav1 = employee;
-          int mutulaFav2 = favorites[employee];
-          totalTwoCycleContribution += 2 + longestIncomingChain[mutualFav1] + longestIncomingChain[mutulaFav2];
+          int mutualFav2 = favorites[employee];
+          totalTwoCycleContribution += 2 + maxChainLen[mutualFav1] + maxChainLen[mutualFav2];
         } else {
           // Regular Cycle of size > 2 (like A → B → C → A)
           //
@@ -153,5 +153,26 @@ public class MaxInvitations {
 
     // Return the maximum possible invitations
     return Math.max(largestCycleSize, totalTwoCycleContribution);
+  }
+
+  private static int[] getMaxChainLength(int[] favorites, int totalEmployees, Queue<Integer> queue, int[] inDegree,
+      boolean[] isProcessed) {
+    int[] maxChainLen = new int[totalEmployees]; // maxChainLen[i] = length of longest chain leading to employee i
+
+    while (!queue.isEmpty()) {
+      int currentEmployee = queue.poll();
+      int favoriteEmployee = favorites[currentEmployee];
+
+      // Update the longest chain to the favorite employee
+      maxChainLen[favoriteEmployee] = Math.max(maxChainLen[favoriteEmployee], maxChainLen[currentEmployee] + 1);
+
+      // Remove this edge and check if favorites becomes a leaf
+      inDegree[favoriteEmployee]--;
+      if (inDegree[favoriteEmployee] == 0) {
+        isProcessed[favoriteEmployee] = true;
+        queue.offer(favoriteEmployee);
+      }
+    }
+    return maxChainLen;
   }
 }

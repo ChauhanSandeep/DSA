@@ -4,35 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * LeetCode: https://leetcode.com/problems/permutation-sequence/
+ * Permutation Sequence - LeetCode Problem 60
  *
- * Problem: Given `n`, which represents a sequence [1, 2, ..., n], find the `k`-th lexicographically smallest permutation.
+ * Problem Statement:
+ * The set [1, 2, 3, ..., n] contains a total of n! unique permutations.
+ * By listing and labeling all of the permutations in order, return the kth permutation sequence.
+ * Permutations are ordered lexicographically and k is 1-indexed.
+ *
  * Example : n = 4, k = 17
  * Output: "3214"
  * Explanation: The 17-th permutation of [1, 2, 3, 4] is "3214".
  *
+ * LeetCode Link: https://leetcode.com/problems/permutation-sequence/
  *
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you find the lexicographic rank of a given permutation?
+ *    Answer: Reverse the process - count smaller elements and multiply by factorials.
+ *    Related: Calculate permutation index from sequence
  *
- * Approach:
- * - Compute (n-1)! to determine the size of each "block" of permutations.
- * - Use the k-th index to determine which number should be fixed in each step.
- * - Reduce k and adjust the factorial dynamically to determine subsequent numbers.
- * - Remove used numbers to avoid repetition.
+ * 2. What if we need to generate all permutations between two given permutations?
+ *    Answer: Find ranks of both permutations, iterate through intermediate ranks.
+ *    Related: LeetCode 31 - Next Permutation
  *
- * Step-by-step trace for n = 4, k = 17 (zero-based k = 16):
+ * 3. How to handle permutations with repeated elements?
+ *    Answer: Modify factorials to account for repetitions using multinomial coefficients.
  *
- * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
- * | Step | Available Numbers | Factorial | k   | Index = k / factorial  | Picked Digit  | New k = k % factorial  |
- * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
- * | 1    | [1, 2, 3, 4]      |(4-1)! = 6 | 16  | 2                      | 3             | 4                      |
- * | 2    | [1, 2, 4]         |(3-1)! = 2 | 4   | 2                      | 4             | 0                      |
- * | 3    | [1, 2]            |(2-1)! = 1 | 0   | 0                      | 1             | 0                      |
- * | 4    | [2]               |(1-1)! = 1 | 0   | 0                      | 2             | -                      |
- * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
- * Final Permutation: "3412"
- *
- * Time Complexity:  O(n) → We iterate through `n` elements and perform constant-time operations.
- * Space Complexity: O(n) → We store `n` elements in a list.
+ * 4. What if we need the kth permutation in different ordering (not lexicographic)?
+ *    Answer: Apply custom comparison function and use similar factorial-based calculation.
+ *    Related: Custom permutation ordering problems
  */
 public class KthPermutation {
     public static void main(String[] args) {
@@ -43,6 +42,27 @@ public class KthPermutation {
 
     /**
      * Returns the k-th permutation of numbers from 1 to n.
+     *
+     * Approach:
+     * - Compute (n-1)! to determine the size of each "block" of permutations.
+     * - Use the k-th index to determine which number should be fixed in each step.
+     * - Reduce k and adjust the factorial dynamically to determine subsequent numbers.
+     * - Remove used numbers to avoid repetition.
+     *
+     * Step-by-step trace for n = 4, k = 17 (zero-based k = 16):
+     *
+     * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+     * | Step | Available Numbers | Factorial | k   | Index = k / factorial  | Picked Digit  | New k = k % factorial  |
+     * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+     * | 1    | [1, 2, 3, 4]      |(4-1)! = 6 | 16  | 2                      | 3             | 4                      |
+     * | 2    | [1, 2, 4]         |(3-1)! = 2 | 4   | 2                      | 4             | 0                      |
+     * | 3    | [1, 2]            |(2-1)! = 1 | 0   | 0                      | 1             | 0                      |
+     * | 4    | [2]               |(1-1)! = 1 | 0   | 0                      | 2             | -                      |
+     * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+     * Final Permutation: "3412"
+     *
+     * Time Complexity:  O(n) → We iterate through `n` elements and perform constant-time operations.
+     * Space Complexity: O(n) → We store `n` elements in a list.
      *
      * @param n The size of the sequence (1, 2, ..., n).
      * @param k The k-th permutation to return.
@@ -76,5 +96,64 @@ public class KthPermutation {
         }
 
         return permutation.toString();
+    }
+
+    /**
+     * Optimized recursive approach that stops early once kth permutation is found.
+     * Avoids generating all n! permutations when we only need the kth one.
+     *
+     * Steps:
+     * 1. Use a boolean array to track used numbers.
+     * 2. Build the current permutation step-by-step.
+     * 3. Maintain a counter to track how many permutations have been generated.
+     * 4. Stop recursion and return the result once the counter matches k.
+     *
+     * Time Complexity: O(k * n) in best case, O(n! * n) in worst case
+     * Because we may need to generate up to k permutations, each taking O(n) time to build.
+     * In worst case where k is the last permutation, we may generate all n! permutations, leading to O(n! * n).
+     *
+     * Space Complexity: O(n) for recursion stack + current permutation
+     */
+    public String getPermutationRecursiveApproach(int n, int k) {
+        boolean[] used = new boolean[n + 1];
+        StringBuilder currentPermutation = new StringBuilder();
+        int[] counter = {0}; // Use array to make it mutable in recursion
+
+        String result = generatePermutationRec(n, k, currentPermutation, used, counter);
+        return result != null ? result : "";
+    }
+
+    // Helper method for early stopping approach
+    private String generatePermutationRec(int n, int k, StringBuilder current, boolean[] used, int[] counter) {
+        // Base case: complete permutation found
+        if (current.length() == n) {
+            counter[0]++;
+            if (counter[0] == k) {
+                return current.toString(); // Found kth permutation!
+            }
+            return null; // Continue searching
+        }
+
+        // Try each unused number
+        // Start from 1 to n to maintain lexicographical order
+        for (int i = 1; i <= n; i++) {
+            if (!used[i]) {
+                // Choose
+                used[i] = true;
+                current.append(i);
+
+                // Recurse
+                String result = generatePermutationRec(n, k, current, used, counter);
+                if (result != null) {
+                    return result; // Found it, propagate up
+                }
+
+                // Backtrack
+                current.deleteCharAt(current.length() - 1);
+                used[i] = false;
+            }
+        }
+
+        return null; // Not found in this branch
     }
 }

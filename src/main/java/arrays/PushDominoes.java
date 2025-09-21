@@ -1,26 +1,37 @@
 package arrays;
 
 /**
- * ✅ Problem: Push Dominoes
+ * Push Dominoes - LeetCode Problem 838
  *
- * You are given a string dominoes representing the initial state of some dominoes.
- * Each character can be:
- *   - 'L': domino pushed to the left
- *   - 'R': domino pushed to the right
- *   - '.': upright domino
+ * Problem Statement:
+ * There are n dominoes in a line, placed vertically upright. Initially, some dominoes
+ * are pushed either to the left or right simultaneously. Each second, falling dominoes
+ * push adjacent dominoes in their direction. When a domino receives equal forces from
+ * both sides, it remains upright. Find the final state after all dominoes stop moving.
  *
- * After applying all forces, return a string representing the final state.
- *
- * 🔗 Leetcode: https://leetcode.com/problems/push-dominoes/
- *
- * 🔁 Example:
- * Input: ".L.R...LR..L.."
+ * Example:
+ * Input: dominoes = ".L.R...LR..L.."
  * Output: "LL.RR.LLRRLL.."
+ * Explanation: The 'L' at position 1 causes dominoes to its left to fall left.
+ * The 'R' at position 3 causes dominoes to its right to fall right until they
+ * meet the force from 'L' at position 7. Forces balance at position 5, keeping it upright.
  *
- * 🔍 Follow-up questions:
- * 1. Can you do this in-place? ✅ Done using two-pointer approach.
- * 2. What if dominoes can also be diagonal (e.g., 45°)? Requires physics simulation – not in scope.
- * 3. How would you handle real-time updates? (e.g., stream of changes). ➤ Segment tree or union-find.
+ * LeetCode Link: https://leetcode.com/problems/push-dominoes/
+ *
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you handle if dominoes could be pushed with different strengths?
+ *    Answer: Modify force calculation to account for varying initial force magnitudes.
+ *
+ * 2. What if dominoes could be pushed at different times (not simultaneously)?
+ *    Answer: Use BFS/simulation with timestamps to process forces in chronological order.
+ *    Related: LeetCode 1136 - Parallel Courses (topological ordering with time)
+ *
+ * 3. How to extend this to 2D grid of dominoes?
+ *    Answer: Similar force propagation but in 4 directions, using BFS from all initial sources.
+ *
+ * 4. What if we need to minimize the number of initial pushes to achieve a target state?
+ *    Answer: Dynamic programming or backtracking to find optimal initial configuration.
+ *    Related: LeetCode 1284 - Minimum Number of Flips to Convert Binary Matrix
  */
 public class PushDominoes {
 

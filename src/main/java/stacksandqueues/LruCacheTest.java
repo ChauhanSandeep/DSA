@@ -1,128 +1,178 @@
 package stacksandqueues;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Implementation of an LRU (Least Recently Used) Cache
- * - LRUCache(int capacity) Initialize the LRU cache with positive size capacity.
- * - int get(int key) Return the value of the key if the key exists, otherwise return -1.
- * - void put(int key, int value) Update the value of the key if the key exists. Otherwise, add the key-value pair to
- * the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+ * LRU Cache - LeetCode Problem 146
  *
- * The functions get and put must each run in O(1) average time complexity.
+ * Problem Statement:
+ * Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+ * Implement the LRUCache class with get(key) and put(key, value) operations.
+ * When capacity is reached, invalidate the least recently used item before inserting new item.
+ * Both operations must run in O(1) average time complexity.
  *
- * <p>LeetCode Problem Link:
- * <a href="https://leetcode.com/problems/lru-cache/">LRU Cache</a>
- * </p>
+ * Example:
+ * LRUCache lRUCache = new LRUCache(2);
+ * lRUCache.put(1, 1); // cache is {1=1}
+ * lRUCache.put(2, 2); // cache is {1=1, 2=2}
+ * lRUCache.get(1);    // return 1, cache is {2=2, 1=1} (1 moved to most recent)
+ * lRUCache.put(3, 3); // evicts key 2, cache is {1=1, 3=3}
  *
- * <p><b>Approach:</b></p>
- * - Uses **LinkedHashMap** with `accessOrder = true` to maintain LRU order.
- * - **Overrides `removeEldestEntry`** to automatically remove the least recently used entry.
- * - Provides **O(1) time complexity** for `get()` and `put()` operations.
+ * LeetCode Link: https://leetcode.com/problems/lru-cache/
  *
- * <p><b>Time Complexity:</b></p>
- * - **O(1) for `get(key)`** (Direct lookup via HashMap).
- * - **O(1) for `put(key, value)`** (Insertion & reordering in LinkedHashMap).
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you implement a thread-safe LRU cache for concurrent access?
+ *    Answer: Use ConcurrentHashMap + synchronized blocks, or lock-free algorithms with atomic operations.
+ *    Related: Design thread-safe data structures
  *
- * <p><b>Space Complexity:</b> O(capacity) (Stores up to `capacity` items).</p>
+ * 2. What if we need LFU (Least Frequently Used) instead of LRU?
+ *    Answer: Add frequency counter to nodes, maintain frequency-based ordering.
+ *    Related: LeetCode 460 - https://leetcode.com/problems/lfu-cache/
+ *
+ * 3. How to implement cache with TTL (Time To Live) expiration?
+ *    Answer: Add timestamp to nodes, background cleanup thread for expired entries.
+ *
+ * 4. What if we need to persist cache to disk for recovery?
+ *    Answer: Implement write-through or write-back policies with serialization.
+ *    Related: Design distributed cache systems
  */
+class LRUCache {
+  private final int capacity; // Maximum capacity of the cache
+  private final Map<Integer, DoublyListNode> keyNodeMap; // mapping between key and node (for O(1) access)
+  private final DoublyLinkedList usageOrderList; // Doubly linked list to maintain usage order
+
+  public LRUCache(int capacity) {
+    this.capacity = capacity;
+    this.keyNodeMap = new HashMap<>();
+    this.usageOrderList = new DoublyLinkedList();
+  }
+
+  /**
+   * Fetch value for the given key.
+   * If key exists, move the corresponding node to the head (most recently used).
+   */
+  public int get(int key) {
+    if (!keyNodeMap.containsKey(key)) {
+      return -1;
+    }
+
+    DoublyListNode node = keyNodeMap.get(key);
+    usageOrderList.moveToHead(node); // Mark as recently used
+    return node.value;
+  }
+
+  /**
+   * Insert or update the (key, value) pair.
+   * Move the node to the head if it already exists.
+   * If the key is new and capacity is exceeded, evict the least recently used node.
+   */
+  public void put(int key, int value) {
+    if (keyNodeMap.containsKey(key)) {
+      // Key already exists, update value and move to head
+      DoublyListNode existingNode = keyNodeMap.get(key);
+      existingNode.value = value; // Update value
+      usageOrderList.moveToHead(existingNode); // Mark as recently used
+    } else {
+      // New key, create a new node and add to the head
+      DoublyListNode newNode = new DoublyListNode(key, value);
+      usageOrderList.addToHead(newNode);
+      keyNodeMap.put(key, newNode);
+
+      if (keyNodeMap.size() > capacity) {
+        DoublyListNode lruNode = usageOrderList.removeTail(); // Evict LRU
+        keyNodeMap.remove(lruNode.key);
+      }
+    }
+  }
+}
+
+/**
+ * Doubly Linked List Node class for LRU Cache.
+ */
+class DoublyListNode {
+  int key;
+  int value;
+  DoublyListNode prev;
+  DoublyListNode next;
+
+  public DoublyListNode(int key, int value) {
+    this.key = key;
+    this.value = value;
+  }
+}
+
+/**
+ * Doubly Linked List to maintain usage order.
+ * Most recently used node is near the head.
+ * Least recently used node is near the tail.
+ */
+class DoublyLinkedList {
+  private final DoublyListNode head;
+  private final DoublyListNode tail;
+
+  public DoublyLinkedList() {
+    head = new DoublyListNode(-1, -1); // Dummy head
+    tail = new DoublyListNode(-1, -1); // Dummy tail
+    head.next = tail;
+    tail.prev = head;
+  }
+
+  /**
+   * Add node right after dummy head (most recently used position).
+   */
+  public void addToHead(DoublyListNode node) {
+    node.next = head.next;
+    node.prev = head;
+
+    head.next.prev = node;
+    head.next = node;
+  }
+
+  /**
+   * Move an existing node to the front of the list (most recently used).
+   */
+  public void moveToHead(DoublyListNode node) {
+    removeNode(node);
+    addToHead(node);
+  }
+
+  /**
+   * Remove the least recently used node (before dummy tail) and return it.
+   */
+  public DoublyListNode removeTail() {
+    if (tail.prev == head) {
+      return null; // List is empty
+    }
+
+    DoublyListNode lruNode = tail.prev;
+    removeNode(lruNode);
+    return lruNode;
+  }
+
+  /**
+   * Remove a node from its current position in the list.
+   */
+  private void removeNode(DoublyListNode node) {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+  }
+}
+
 public class LruCacheTest {
-    public static void main(String[] args) {
-        LruCache cache = new LruCache(2);
-        cache.set(1, 10);
-        cache.set(2, 20);
-        System.out.println("Value for the key: 1 is " + cache.get(1));
+  public static void main(String[] args) {
+    LRUCache cache = new LRUCache(2);
 
-        cache.set(3, 30);
-        System.out.println("Value for the key: 2 is " + cache.get(2));
+    cache.put(1, 1); // Cache = [1]
+    cache.put(2, 2); // Cache = [2, 1]
+    System.out.println(cache.get(1)); // Output: 1 (Cache = [1, 2])
 
-        cache.set(4, 40);
-        System.out.println("Value for the key: 1 is " + cache.get(1));
-        System.out.println("Value for the key: 3 is " + cache.get(3));
-        System.out.println("Value for the key: 4 is " + cache.get(4));
-    }
-}
+    cache.put(3, 3); // Evicts key 2, Cache = [3, 1]
+    System.out.println(cache.get(2)); // Output: -1 (not found)
 
-class LruNode {
-    int key;
-    int value;
-    LruNode prev;
-    LruNode next;
-
-    public LruNode(int key, int value) {
-        this.key = key;
-        this.value = value;
-    }
-}
-
-// Queue used in this will cause O(n) time complexity to fetch a item (To remove a item etc)
-// Check LruCacheTestImproved
-class LruCache {
-    private final int capacity;
-    private final Map<Integer, LruNode> cacheMap = new HashMap<>();
-    private final LruNode head = new LruNode(0, 0); // dummy head
-    private final LruNode tail = new LruNode(0, 0); // dummy tail
-
-    // Initialize the doubly linked list
-    public LruCache(int capacity) {
-        this.capacity = capacity;
-        head.next = tail;
-        tail.prev = head;
-    }
-
-
-    /**
-     * To get value from cache
-     * @param key
-     * @return
-     */
-    public int get(int key) {
-        if (!cacheMap.containsKey(key)) return -1;
-
-        LruNode node = cacheMap.get(key);
-        // Move the accessed node to the front (most recently used)
-        removeNode(node);
-        addToFront(node);
-        return node.value;
-    }
-
-    /**
-     * To add the key, value to cache
-     * @param key
-     * @param value
-     */
-    public void set(int key, int value) {
-        if (cacheMap.containsKey(key)) {
-            // If key exists, update the value and move to front
-            LruNode node = cacheMap.get(key);
-            node.value = value;
-            removeNode(node);
-            addToFront(node);
-        } else {
-            // If cache is full, remove the least recently used item
-            if (cacheMap.size() >= capacity) {
-                LruNode toRemove = tail.prev;
-                removeNode(toRemove);
-                cacheMap.remove(toRemove.key);
-            }
-            // Add new node to the front
-            LruNode newNode = new LruNode(key, value);
-            addToFront(newNode);
-            cacheMap.put(key, newNode);
-        }
-    }
-
-    // Helper method to remove a node from the doubly linked list
-    private void removeNode(LruNode node) {
-        node.prev.next = node.next;
-        node.next.prev = node.prev;
-    }
-
-    // Helper method to add a node to the front of the doubly linked list
-    private void addToFront(LruNode node) {
-        node.next = head.next;
-        node.prev = head;
-        head.next.prev = node;
-        head.next = node;
-    }
+    cache.put(4, 4); // Evicts key 1, Cache = [4, 3]
+    System.out.println(cache.get(1)); // Output: -1
+    System.out.println(cache.get(3)); // Output: 3
+    System.out.println(cache.get(4)); // Output: 4
+  }
 }

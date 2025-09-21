@@ -1,4 +1,4 @@
-package graph;
+package graphs;
 
 /**
  * In this problem, a rooted tree is a directed graph such that, there is exactly one node (the root)
