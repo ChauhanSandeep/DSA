@@ -6,20 +6,36 @@ import java.util.List;
 
 
 /**
- * Problem:
- * Given an integer array `nums` that may contain duplicates, return all possible subsets (the power set),
- * ensuring that each subset is unique.
+ * Given an integer array nums that may contain duplicates, return all possible subsets
+ * (the power set). The solution set must not contain duplicate subsets. Return the
+ * answer in any order.
+ *
+ * The key challenge is handling duplicate elements in the input array to avoid
+ * generating duplicate subsets. Unlike the basic subsets problem, we need special
+ * logic to skip consecutive duplicates during backtracking.
  *
  * Example:
- * Input: nums = [2, 1, 2]
- * Output: [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]
+ * Input: nums = [1,2,2]
+ * Output: [[],[1],[1,2],[1,2,2],[2],[2,2]]
+ * Explanation: Notice we don't have two [1,2] subsets even though there are two 2's.
+ * The algorithm groups duplicates and skips them appropriately to avoid redundant subsets.
  *
- * LeetCode Link: https://leetcode.com/problems/subsets-ii/
+ * LeetCode: https://leetcode.com/problems/subsets-ii/
  *
- * Follow-up Questions:
- * 1. How to return subsets in lexicographical order? → Sorting handles this automatically.
- * 2. How to solve without sorting? → Use a `Set<List<Integer>>` but sorting is more efficient.
- * 3. How to solve iteratively instead of backtracking? → Use iterative subset generation with duplicate check.
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How would you modify this to find subsets of a specific size k with duplicates?
+ *    Answer: Add size parameter to backtracking and stop when currentSubset.size() == k.
+ * 2. What if you need to return subsets in lexicographic order?
+ *    Answer: Current approach already provides lexicographic order due to sorting and systematic exploration.
+ * 3. How to optimize memory usage when input contains many duplicates?
+ *    Answer: Use count-based approach or iterative generation with space-efficient representations.
+ * 4. What if we need to generate subsets with specific constraints (sum, product, etc.)?
+ *    Answer: Add constraint validation during backtracking with early pruning for invalid branches.
+ *
+ * Related Problems:
+ * - LeetCode 78: Subsets (Without duplicates)
+ * - LeetCode 40: Combination Sum II (Sum with duplicates)
+ * - LeetCode 47: Permutations II (Permutations with duplicates)
  */
 public class Subset2 {
 
@@ -50,22 +66,17 @@ public class Subset2 {
    * @return List of unique subsets.
    */
   public static List<List<Integer>> subsetsWithDup(int[] nums) {
-    List<List<Integer>> result = new ArrayList<>();
+    List<List<Integer>> allSubsets = new ArrayList<>();
     Arrays.sort(nums); // Sorting helps in easily detecting duplicates
-    generateUniqueSubsets(nums, 0, new ArrayList<>(), result);
-    return result;
+    generateUniqueSubsets(nums, 0, new ArrayList<>(), allSubsets);
+    return allSubsets;
   }
 
   /**
    * Recursive helper to generate subsets, skipping duplicates.
-   *
-   * @param nums Sorted input array.
-   * @param index Current index to process.
-   * @param current Current subset being built.
-   * @param result Final list of unique subsets.
    */
-  private static void generateUniqueSubsets(int[] nums, int index, List<Integer> current, List<List<Integer>> result) {
-    result.add(new ArrayList<>(current));
+  private static void generateUniqueSubsets(int[] nums, int index, List<Integer> currentSubset, List<List<Integer>> allSubsets) {
+    allSubsets.add(new ArrayList<>(currentSubset));
 
     for (int i = index; i < nums.length; i++) {
       // Skip duplicates in the same recursion branch, because the same number is already in subset using nums[i - 1]
@@ -74,13 +85,60 @@ public class Subset2 {
       }
 
       // Include nums[i] in current subset
-      current.add(nums[i]);
+      currentSubset.add(nums[i]);
 
       // Recurse for the next element
-      generateUniqueSubsets(nums, i + 1, current, result);
+      generateUniqueSubsets(nums, i + 1, currentSubset, allSubsets);
 
       // Backtrack: remove last added element
-      current.remove(current.size() - 1);
+      currentSubset.remove(currentSubset.size() - 1);
     }
+  }
+
+  /**
+   * Iterative approach to generate all unique subsets from the given array with duplicates.
+   * Steps:
+   * 1. Sort the array to group duplicates together.
+   * 2. Start with an empty subset.
+   * 3. For each number, add it to all existing subsets to create new subsets.
+   * 4. If the current number is a duplicate of the previous, only add it to subsets
+   *    created in the previous step to avoid duplicates.
+   *
+   * Example
+   * input [1, 2, 2]
+   * 	1.	Sort → [1, 2, 2]
+   * 	2.	Start: [[]]
+   * 	3.	Add 1 → [[], [1]]
+   * 	4.	Add 2 (first 2): expand all [[], [1]] → [[], [1], [2], [1,2]]
+   * 	5.	Add 2 (second 2): it’s duplicate, so expand only subsets created in last step ([2], [1,2]) → [[], [1], [2], [1,2], [2,2], [1,2,2]]
+   *
+   * Time Complexity: O(2^N) - Each element can either be included or excluded.
+   * Space Complexity: O(2^N) - Storing all subsets.
+   */
+  public List<List<Integer>> subsetsWithDupIterative(int[] nums) {
+    Arrays.sort(nums); // Step 1: sort to group duplicates together
+
+    List<List<Integer>> allSubsets = new ArrayList<>();
+    allSubsets.add(new ArrayList<>());
+
+    int startIndex = 0, endIndex = 0;
+
+    for (int i = 0; i < nums.length; i++) {
+      startIndex = 0;
+
+      // Step 2: if current element is duplicate, only expand subsets created in the previous iteration
+      if (i > 0 && nums[i] == nums[i - 1]) {
+        startIndex = endIndex + 1;
+      }
+
+      endIndex = allSubsets.size() - 1;
+
+      for (int j = startIndex; j <= endIndex; j++) {
+        List<Integer> newSubset = new ArrayList<>(allSubsets.get(j));
+        newSubset.add(nums[i]);
+        allSubsets.add(newSubset);
+      }
+    }
+    return allSubsets;
   }
 }

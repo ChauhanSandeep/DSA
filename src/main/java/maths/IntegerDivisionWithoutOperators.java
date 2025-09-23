@@ -80,7 +80,7 @@ public class IntegerDivisionWithoutOperators {
      * Mathematical Insight:
      * - Division finds how many times divisor fits into dividend
      * - Optimization: find largest 2^k such that divisor * 2^k <= dividend
-     * - Subtract divisor * 2^k and repeat with remainder
+     * - Subtract (divisor * 2^k) and repeat with remainder
      * - Use bit shifting for efficient power-of-2 multiplication
      *
      * Time Complexity: O(log^2 n) where n is the quotient
@@ -98,7 +98,7 @@ public class IntegerDivisionWithoutOperators {
 
         // Determine if result should be positive or negative
         // XOR of sign bits: same signs -> positive, different signs -> negative
-        boolean isResultPositive = (dividend < 0) == (divisor < 0);
+        boolean isResultPositive = (dividend > 0) ^ (divisor > 0);
 
         // Convert to unsigned long to handle absolute values safely
         // This prevents overflow when dealing with Integer.MIN_VALUE

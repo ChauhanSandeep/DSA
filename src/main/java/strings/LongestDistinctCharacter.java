@@ -1,34 +1,45 @@
-package string;
+package strings;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * https://leetcode.com/problems/longest-substring-without-repeating-characters/
+ * Longest Substring Without Repeating Characters
  *
- * ### Problem Statement:
- * Given a string, find the length of the longest substring that contains only unique characters.
+ * Given a string s, find the length of the longest substring without repeating characters.
+ * A substring is a contiguous sequence of characters within a string.
  *
- * ### Example:
- * Input: "abababcdefababcdab"
- * Output: 7
- * Explanation: The longest substring is "abcdef"
+ * The solution must find the maximum length of any contiguous subsequence where each
+ * character appears at most once. This is different from subsequences which don't need
+ * to be contiguous.
  *
- * ### Approach: Sliding Window + HashMap
- * - Maintain a sliding window of unique characters.
- * - Use a HashMap to store the last seen index of each character.
- * - If a duplicate is encountered, move the start pointer right after the last seen index.
- * - At each step, compute the window size and update the max.
+ * Example:
+ * Input: s = "abcabcbb"
+ * Output: 3
+ * Explanation: The longest substring without repeating characters is "abc", with length 3.
  *
- * ### Time Complexity: O(n), where n = input length
- * Each character is visited at most twice.
+ * Example:
+ * Input: s = "pwwkew"
+ * Output: 3
+ * Explanation: The longest substring is "wke" with length 3. Note that "pwke" is a
+ * subsequence (not substring) and therefore doesn't count.
  *
- * ### Space Complexity: O(min(n, a)), where a = alphabet size
- * Map stores most `a` characters (typically 26 for lowercase).
+ * LeetCode: https://leetcode.com/problems/longest-substring-without-repeating-characters/
  *
- * ### Follow-up:
- * - What if you need the **substring itself**, not just the length? Store start & end indices.
- * - Can you solve it with constant space assuming only ASCII? Yes, use an int[128] array.
+ * Follow-up Questions for FAANG Interviews:
+ * 1. What if we need to return the actual substring instead of just the length?
+ *    Answer: Track starting index and length of best window, then return s.substring(start, start + length).
+ * 2. How would you handle Unicode characters or very large character sets?
+ *    Answer: Use HashMap instead of fixed array, or implement with character encoding considerations.
+ * 3. What if the string is extremely long (billions of characters) and doesn't fit in memory?
+ *    Answer: Use streaming approach with buffered reading and sliding window over chunks.
+ * 4. How to modify this for "at most k distinct characters" or "exactly k distinct characters"?
+ *    Answer: Modify condition to check distinct character count instead of duplicates.
+ *
+ * Related Problems:
+ * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
+ * - LeetCode 340: Longest Substring with At Most K Distinct Characters
+ * - LeetCode 424: Longest Repeating Character Replacement
  */
 public class LongestDistinctCharacter {
 
@@ -40,6 +51,20 @@ public class LongestDistinctCharacter {
 
   /**
    * Finds the length of the longest substring with all unique characters.
+   * Steps:
+   * 1. Use a sliding window defined by two pointers (start, end).
+   * 2. Expand the end pointer to include new characters.
+   * 3. If a duplicate character is found, move the start pointer to one position
+   *   after the last occurrence of that character to maintain uniqueness.
+   *   4. Track the maximum length of the window during the process.
+   * Key insights:
+   *  - Sliding window efficiently finds longest unique substring in O(n) time.
+   *  - HashMap tracks last seen indices of characters for quick duplicate checks.
+   *  - Each character is processed at most twice (once by end, once by start), ensuring linear complexity.
+   *
+   * Time Complexity: O(n) — Each character is processed at most twice.
+   * Space Complexity: O(min(m, n)) — HashMap stores characters in the current window,
+   *   where m is the character set size and n is the string length.
    *
    * @param input Input string
    * @return Length of longest substring with all distinct characters
