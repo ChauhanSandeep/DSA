@@ -13,16 +13,24 @@ package strings;
  * Example 1:
  * Input: colors = "aabaa", neededTime = [1,3,2,1,1]
  * Output: 3
- * Explanation: Remove balloons at indices 0 and 4 (cost 1+1=2) or remove balloon at index 1 (cost 3).
- * The minimum cost is 3.
+ * Explanation: Remove balloons at indices 0 and 4 (cost 1+1=2) to make "aba".
  *
  * LeetCode Link: https://leetcode.com/problems/minimum-time-to-make-rope-colorful/
  *
- * Follow-up Questions:
- * - How would you modify for k consecutive same colors? (Extend grouping logic)
- * - Can you optimize for very large arrays with few color changes? (Skip processing if no consecutive duplicates)
- * - How would you handle multiple color strings? (Process each string independently)
- * - What if we want to maximize remaining balloons instead of minimize time? (Keep maximum time balloon in each group)
+ * Follow-up Questions for FAANG Interviews:
+ * 1. What if we can rearrange balloons instead of just removing them?
+ *    Answer: Use greedy sorting to place same colors non-adjacently, minimizing total cost.
+ * 2. How would you handle 3D rope (grid) where no adjacent cells can have same color?
+ *    Answer: Apply same principle with 4-directional or 8-directional adjacency checks.
+ * 3. What if removal costs change dynamically during the process?
+ *    Answer: Use priority queue to always process most expensive operations last.
+ * 4. How to modify for "at most k consecutive same colors allowed"?
+ *    Answer: Extend grouping logic to only remove when group size > k, keep k most expensive.
+ *
+ * Related Problems:
+ * - LeetCode 1047: Remove All Adjacent Duplicates In String
+ * - LeetCode 1209: Remove All Adjacent Duplicates in String II
+ * - LeetCode 1578: Minimum Deletion Cost to Avoid Repeating Letters (same problem)
  */
 public class MinimumTimeToMakeRopeColorful {
 
@@ -48,36 +56,53 @@ public class MinimumTimeToMakeRopeColorful {
             return 0;
         }
 
-        int totalCost = 0;
-        int i = 0;
+        int minTotalTime = 0;
+        int index = 0;
 
-        while (i < colors.length()) {
-            char currentColor = colors.charAt(i);
+        while (index < colors.length()) {
+            char groupColor = colors.charAt(index);
 
             // Find all consecutive balloons with same color
-            int groupSum = neededTime[i];
-            int maxTimeInGroup = neededTime[i];
-            int j = i + 1;
+            int groupTotalTime = neededTime[index];
+            int maxTimeInGroup = neededTime[index];
+            int nextIndex = index + 1;
 
-            while (j < colors.length() && colors.charAt(j) == currentColor) {
-                groupSum += neededTime[j];
-                maxTimeInGroup = Math.max(maxTimeInGroup, neededTime[j]);
-                j++;
+            while (nextIndex < colors.length() && colors.charAt(nextIndex) == groupColor) {
+                groupTotalTime += neededTime[nextIndex];
+                maxTimeInGroup = Math.max(maxTimeInGroup, neededTime[nextIndex]);
+                nextIndex++;
             }
 
             // If group has more than 1 balloon, remove all except the one with max time
-            if (j > i + 1) {
-                totalCost += groupSum - maxTimeInGroup;
+            if (nextIndex > index + 1) {
+                minTotalTime += groupTotalTime - maxTimeInGroup;
             }
 
-            i = j;
+            index = nextIndex;
         }
 
-        return totalCost;
+        return minTotalTime;
     }
 
     /**
      * Alternative single-pass approach without grouping.
+     * Intuition:
+     * When we find two consecutive balloons of the same color,
+     * we can immediately decide to remove the one with the smaller needed time.
+     * This way, we don't need to explicitly group all consecutive same colors.
+     *
+     * Algorithm:
+     * 1. Iterate through the colors array starting from the second balloon
+     * 2. If current balloon color matches previous, add the smaller needed time to total cost
+     *    and keep the larger needed time for future comparisons
+     * 3. Continue until end of array
+     *
+     * Time Complexity: O(n) where n is number of balloons
+     * Space Complexity: O(1) - only uses constant extra space
+     *
+     * @param colors String representing colors of balloons
+     * @param neededTime Array of time needed to remove each balloon
+     * @return Minimum time to make rope colorful
      */
     public int minCostOptimized(String colors, int[] neededTime) {
         int totalCost = 0;

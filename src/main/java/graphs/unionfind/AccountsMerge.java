@@ -1,4 +1,4 @@
-package graphs;
+package graphs.unionfind;
 
 import java.util.*;
 
@@ -52,24 +52,24 @@ public class AccountsMerge {
             return new ArrayList<>();
         }
 
-        UnionFind uf = new UnionFind(accounts.size());
+        UnionFind unionFind = new UnionFind(accounts.size());
         Map<String, String> emailToName = new HashMap<>();
         Map<String, Integer> emailToAccountId = new HashMap<>();
 
         // Build mappings and union accounts with common emails
-        for (int i = 0; i < accounts.size(); i++) {
-            List<String> account = accounts.get(i);
+        for (int accountId = 0; accountId < accounts.size(); accountId++) {
+            List<String> account = accounts.get(accountId);
             String name = account.get(0);
 
-            for (int j = 1; j < account.size(); j++) {
-                String email = account.get(j);
+            for (int emailIndex = 1; emailIndex < account.size(); emailIndex++) {
+                String email = account.get(emailIndex);
                 emailToName.put(email, name);
 
                 if (emailToAccountId.containsKey(email)) {
                     // Union current account with the account that already has this email
-                    uf.union(i, emailToAccountId.get(email));
+                    unionFind.union(accountId, emailToAccountId.get(email));
                 } else {
-                    emailToAccountId.put(email, i);
+                    emailToAccountId.put(email, accountId);
                 }
             }
         }
@@ -79,7 +79,7 @@ public class AccountsMerge {
         for (Map.Entry<String, Integer> entry : emailToAccountId.entrySet()) {
             String email = entry.getKey();
             int accountId = entry.getValue();
-            int root = uf.find(accountId);
+            int root = unionFind.findRoot(accountId);
 
             rootToEmails.computeIfAbsent(root, k -> new TreeSet<>()).add(email);
         }
@@ -106,25 +106,25 @@ public class AccountsMerge {
         private int[] parent;
         private int[] rank;
 
-        public UnionFind(int n) {
-            parent = new int[n];
-            rank = new int[n];
-            for (int i = 0; i < n; i++) {
+        public UnionFind(int size) {
+            parent = new int[size];
+            rank = new int[size];
+            for (int i = 0; i < size; i++) {
                 parent[i] = i;
                 rank[i] = 1;
             }
         }
 
-        public int find(int x) {
-            if (parent[x] != x) {
-                parent[x] = find(parent[x]); // Path compression
+        public int findRoot(int account) {
+            if (parent[account] != account) {
+                parent[account] = findRoot(parent[account]); // Path compression
             }
-            return parent[x];
+            return parent[account];
         }
 
-        public void union(int x, int y) {
-            int rootX = find(x);
-            int rootY = find(y);
+        public void union(int accountX, int accountY) {
+            int rootX = findRoot(accountX);
+            int rootY = findRoot(accountY);
 
             if (rootX != rootY) {
                 // Union by rank

@@ -11,7 +11,14 @@ import java.util.*;
  * you can eliminate at most k obstacles. If it is not possible to find such walk, return -1.
  *
  * Example:
- * Input: grid = [[0,0,0],[1,1,0],[0,0,0],[0,1,1],[0,0,0]], k = 1
+ * Input: grid = [
+ *      [0,0,0],
+ *      [1,1,0],
+ *      [0,0,0],
+ *      [0,1,1],
+ *      [0,0,0]
+ * ],
+ * k = 1
  * Output: 6
  * Explanation: The shortest path without eliminating any obstacle is 10.
  * The shortest path with one obstacle elimination at position (3,2) is 6.
@@ -65,7 +72,7 @@ public class ShortestPathInAGridWithObstaclesElimination {
 
         // BFS with state tracking
         Queue<State> queue = new LinkedList<>();
-        boolean[][][] visited = new boolean[rows][cols][k + 1];
+        boolean[][][] visited = new boolean[rows][cols][k + 1]; // visited[row][col][remaining_k] = true if visited
 
         // Directions: up, right, down, left
         int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};

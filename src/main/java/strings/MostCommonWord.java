@@ -79,6 +79,18 @@ public class MostCommonWord {
 
     /**
      * Alternative approach using character-by-character parsing for better control.
+     *
+     * Steps:
+     * 1. Use StringBuilder to build words character by character.
+     * 2. Handle punctuation and spaces manually.
+     * 3. Count frequencies and track maximum in a single pass.
+     *
+     * Time Complexity: O(n + m) where n is paragraph length, m is banned array size
+     * Space Complexity: O(n + m) for word storage and banned set
+     *
+     * @param paragraph Input text containing words and punctuation
+     * @param banned Array of words that should be ignored
+     * @return Most frequent word that is not banned
      */
     public String mostCommonWordOptimized(String paragraph, String[] banned) {
         Set<String> bannedSet = new HashSet<>(Arrays.asList(banned));

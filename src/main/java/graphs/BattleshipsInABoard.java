@@ -9,7 +9,11 @@ package graphs;
  * where k can be of any size. At least one horizontal or vertical cell separates between two battleships.
  *
  * Example:
- * Input: board = [["X",".",".","X"],[".",".",".","X"],[".",".",".","X"]]
+ * Input: board = [
+ * ["X",".",".","X"],
+ * [".",".",".","X"],
+ * [".",".",".","X"]
+ * ]
  * Output: 2
  * Explanation: There are 2 battleships on the board.
  *
@@ -86,6 +90,10 @@ public class BattleshipsInABoard {
     /**
      * Alternative DFS approach that finds connected components.
      * This approach modifies the board by marking visited cells.
+     *
+     * Steps:
+     * 1. For each 'X' cell, initiate a DFS to mark the entire battleship as visited.
+     * 2. Increment the battleship count for each DFS initiation.
      *
      * Time Complexity: O(m * n)
      * Space Complexity: O(m * n) for recursion stack in worst case

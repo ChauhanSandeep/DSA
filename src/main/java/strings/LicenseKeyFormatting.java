@@ -19,24 +19,27 @@ public class LicenseKeyFormatting {
      * Formats license key by grouping characters and converting to uppercase.
      *
      * Algorithm:
-     * 1. Remove all dashes and convert to uppercase
-     * 2. Calculate first group size (remainder when dividing by k)
-     * 3. Build result by taking appropriate number of characters for each group
-     * 4. Add dashes between groups
+     * 1. Initialize a StringBuilder for the result and a counter for characters in the current group.
+     * 2. Traverse the input string from end to start:
+     *   - If the character is not a dash, append its uppercase version to the result
+     *   and increment the counter.
+     *   - If the counter reaches groupSize, append a dash to the result and reset the counter.
+     * 3. After processing all characters, reverse the result string to get the correct order
+     *  and return it.
      *
      * Time Complexity: O(n) where n is length of input string
      * Space Complexity: O(n) for the result string
      */
-    public String licenseKeyFormatting(String s, int k) {
+    public String licenseKeyFormatting(String key, int groupSize) {
         StringBuilder result = new StringBuilder();
         int count = 0;
 
         // Process from right to left
-        for (int i = s.length() - 1; i >= 0; i--) {
-            char c = s.charAt(i);
+        for (int i = key.length() - 1; i >= 0; i--) {
+            char c = key.charAt(i);
 
             if (c != '-') {
-                if (count == k) {
+                if (count == groupSize) {
                     result.append('-');
                     count = 0;
                 }

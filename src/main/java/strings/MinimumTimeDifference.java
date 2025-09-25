@@ -88,6 +88,17 @@ public class MinimumTimeDifference {
 
     /**
      * Alternative approach using boolean array for O(n) time complexity.
+     * Steps:
+     * 1. Use a boolean array of size 1440 to mark existing time points.
+     * 2. If a time point already exists, return 0 immediately.
+     * 3. Traverse the boolean array to find minimum difference between consecutive time points.
+     * 4. Handle circular difference between last and first time points.
+     *
+     * Time Complexity: O(n) where n is number of time points
+     * Space Complexity: O(1) since the size of boolean array is fixed (1440)
+     *
+     * @param timePoints List of time strings in "HH:MM" format
+     * @return Minimum difference in minutes between any two time points
      */
     public int findMinDifferenceOptimized(List<String> timePoints) {
         boolean[] timeExists = new boolean[1440]; // 24 * 60 minutes in a day
@@ -102,8 +113,9 @@ public class MinimumTimeDifference {
             timeExists[minutes] = true;
         }
 
-        // Find first and last time points, and minimum consecutive difference
-        int firstTime = -1, lastTime = -1, prevTime = -1;
+        int firstTime = -1; // First time point found in array
+        int lastTime = -1; // Last time point found in array
+        int prevTime = -1; // Previous time point for difference calculation
         int minDiff = Integer.MAX_VALUE;
 
         for (int i = 0; i < 1440; i++) {
@@ -121,7 +133,7 @@ public class MinimumTimeDifference {
         }
 
         // Check circular difference (last to first + 24 hours)
-        minDiff = Math.min(minDiff, firstTime + 1440 - lastTime);
+        minDiff = Math.min(minDiff, (firstTime + 1440) - lastTime);
 
         return minDiff;
     }

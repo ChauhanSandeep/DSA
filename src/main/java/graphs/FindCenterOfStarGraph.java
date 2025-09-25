@@ -71,6 +71,10 @@ public class FindCenterOfStarGraph {
      * Alternative approach using degree counting.
      * This approach validates that the graph is indeed a star graph.
      *
+     * Steps:
+     * 1. Count the degree of each node using a HashMap.
+     * 2. The center node will have a degree of n-1 (where n is number of nodes).
+     *
      * Time Complexity: O(n) where n is number of edges
      * Space Complexity: O(v) where v is number of vertices
      */
@@ -100,6 +104,9 @@ public class FindCenterOfStarGraph {
                 maxDegree = degreeCount.get(node2);
                 centerNode = node2;
             }
+        }
+        if (maxDegree != edges.length + 1) {
+            return -1; // Not a valid star graph
         }
 
         return centerNode;

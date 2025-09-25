@@ -5,6 +5,7 @@ package strings;
  *
  * Your friend is typing his name into a keyboard. Sometimes, when typing a character c,
  * the key might get long pressed, and the character will be typed 1 or more times.
+ * Find out if the typed string could be a result of the name being typed with some
  *
  * Example:
  * Input: name = "alex", typed = "aaleex"
@@ -19,43 +20,55 @@ public class LongPressedName {
      * Checks if typed string could be result of long pressing name.
      *
      * Algorithm:
-     * 1. Use two pointers to compare characters in both strings
-     * 2. For each character, count occurrences in both strings
-     * 3. typed must have at least as many occurrences as name
-     * 4. Both pointers must reach end simultaneously
+     * 1. Use two pointers to traverse name and typed.
+     * 2. If characters match, move both pointers.
+     * 3. If they don't match, check if typed char matches previous name char (
+     * long press). If not, return false.
+     * 4. After traversing name, ensure any remaining typed chars match last name char
+     * (long press).
      *
      * Time Complexity: O(n + m) where n, m are lengths of name, typed
      * Space Complexity: O(1) - only uses constant extra space
      */
     public boolean isLongPressedName(String name, String typed) {
-        int i = 0, j = 0;
+        int nameIndex = 0;
+        int typedIndex = 0;
 
-        while (i < name.length() && j < typed.length()) {
-            if (name.charAt(i) != typed.charAt(j)) {
-                return false;
-            }
+        int nameLength = name.length();
+        int typedLength = typed.length();
 
-            char currentChar = name.charAt(i);
-            int nameCount = 0, typedCount = 0;
+        while (nameIndex < nameLength && typedIndex < typedLength) {
+            char nameChar = name.charAt(nameIndex);
+            char typedChar = typed.charAt(typedIndex);
 
-            // Count consecutive characters in name
-            while (i < name.length() && name.charAt(i) == currentChar) {
-                nameCount++;
-                i++;
-            }
-
-            // Count consecutive characters in typed
-            while (j < typed.length() && typed.charAt(j) == currentChar) {
-                typedCount++;
-                j++;
-            }
-
-            // typed must have at least as many as name
-            if (typedCount < nameCount) {
-                return false;
+            if (nameChar == typedChar) {
+                // Characters match: advance both pointers
+                nameIndex++;
+                typedIndex++;
+            } else {
+                // Mismatch: typed char must be a repeat of the previous name char
+                if (nameIndex == 0 || typedChar != name.charAt(nameIndex - 1)) {
+                    return false;
+                }
+                // Skip repeated typed character
+                typedIndex++;
             }
         }
 
-        return i == name.length() && j == typed.length();
+        // If we didn’t finish consuming name, typed is too short
+        if (nameIndex < nameLength) {
+            return false;
+        }
+
+        // Any remaining characters in typed must equal the last char of name
+        char lastNameChar = name.charAt(nameLength - 1);
+        while (typedIndex < typedLength) {
+            if (typed.charAt(typedIndex) != lastNameChar) {
+                return false;
+            }
+            typedIndex++;
+        }
+
+        return true;
     }
 }
