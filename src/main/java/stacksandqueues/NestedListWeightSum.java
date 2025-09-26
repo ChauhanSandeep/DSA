@@ -28,8 +28,6 @@ import java.util.*;
  *
  * 3. What if the nested structure is extremely deep?
  *    Answer: Use iterative approach with explicit stack to avoid stack overflow.
- *
- * @author Sandeep
  */
 public class NestedListWeightSum {
 
@@ -99,7 +97,7 @@ public class NestedListWeightSum {
             return 0;
         }
 
-        Queue<NestedIntegerWithDepth> queue = new LinkedList<NestedIntegerWithDepth>();
+        Queue<NestedIntegerWithDepth> queue = new LinkedList<>();
 
         // Initialize queue with first level elements
         for (NestedInteger element : nestedList) {
@@ -124,140 +122,6 @@ public class NestedListWeightSum {
         return totalSum;
     }
 
-    /**
-     * Level-order traversal approach similar to BFS.
-     * Processes each depth level completely before moving to next.
-     *
-     * Time Complexity: O(n)
-     * Space Complexity: O(w) where w is maximum width
-     */
-    public int depthSumLevelOrder(List<NestedInteger> nestedList) {
-        if (nestedList == null || nestedList.isEmpty()) {
-            return 0;
-        }
-
-        java.util.Queue<NestedInteger> queue = new java.util.LinkedList<>(nestedList);
-        int depth = 1;
-        int totalSum = 0;
-
-        while (!queue.isEmpty()) {
-            int levelSize = queue.size();
-
-            // Process all elements at current depth level
-            for (int i = 0; i < levelSize; i++) {
-                NestedInteger element = queue.poll();
-
-                if (element.isInteger()) {
-                    totalSum += element.getInteger() * depth;
-                } else {
-                    // Add nested elements to queue for next level
-                    queue.addAll(element.getList());
-                }
-            }
-
-            depth++; // Move to next depth level
-        }
-
-        return totalSum;
-    }
-
-    /**
-     * Functional programming approach using streams and recursion.
-     * More concise but may be less readable.
-     *
-     * Time Complexity: O(n)
-     * Space Complexity: O(d)
-     */
-    public int depthSumFunctional(List<NestedInteger> nestedList) {
-        return depthSumFunctionalHelper(nestedList, 1);
-    }
-
-    private int depthSumFunctionalHelper(List<NestedInteger> nestedList, int depth) {
-        return nestedList.stream()
-                .mapToInt(element -> {
-                    if (element.isInteger()) {
-                        return element.getInteger() * depth;
-                    } else {
-                        return depthSumFunctionalHelper(element.getList(), depth + 1);
-                    }
-                })
-                .sum();
-    }
-
-    /**
-     * Advanced version that also returns structure analysis.
-     * Useful for debugging and understanding nested structure.
-     */
-    public AnalysisResult depthSumWithAnalysis(List<NestedInteger> nestedList) {
-        StructureAnalyzer analyzer = new StructureAnalyzer();
-        int sum = analyzeAndSum(nestedList, 1, analyzer);
-
-        return new AnalysisResult(sum, analyzer.maxDepth, analyzer.totalElements, analyzer.totalLists);
-    }
-
-    private int analyzeAndSum(List<NestedInteger> nestedList, int depth, StructureAnalyzer analyzer) {
-        analyzer.maxDepth = Math.max(analyzer.maxDepth, depth);
-        analyzer.totalLists++;
-
-        int sum = 0;
-
-        for (NestedInteger element : nestedList) {
-            if (element.isInteger()) {
-                sum += element.getInteger() * depth;
-                analyzer.totalElements++;
-            } else {
-                sum += analyzeAndSum(element.getList(), depth + 1, analyzer);
-            }
-        }
-
-        return sum;
-    }
-
-    /**
-     * Validates the nested structure for potential issues.
-     *
-     * @param nestedList Input nested list
-     * @return ValidationResult with any detected issues
-     */
-    public ValidationResult validateStructure(List<NestedInteger> nestedList) {
-        ValidationResult result = new ValidationResult();
-
-        try {
-            validateHelper(nestedList, 1, result, new java.util.HashSet<>());
-        } catch (Exception e) {
-            result.valid = false;
-            result.errorMessage = e.getMessage();
-        }
-
-        return result;
-    }
-
-    private void validateHelper(List<NestedInteger> nestedList, int depth,
-                               ValidationResult result, java.util.Set<Object> visited) {
-        if (depth > 1000) { // Arbitrary deep nesting limit
-            throw new RuntimeException("Nesting too deep: " + depth);
-        }
-
-        result.maxDepth = Math.max(result.maxDepth, depth);
-
-        for (NestedInteger element : nestedList) {
-            if (element.isInteger()) {
-                result.integerCount++;
-            } else {
-                result.listCount++;
-
-                // Check for potential cycles (simplified check)
-                if (visited.contains(element)) {
-                    throw new RuntimeException("Potential cycle detected");
-                }
-
-                visited.add(element);
-                validateHelper(element.getList(), depth + 1, result, visited);
-                visited.remove(element);
-            }
-        }
-    }
-
     // Helper classes for advanced functionality
     static class NestedIntegerWithDepth {
         NestedInteger nestedInteger;
@@ -266,49 +130,6 @@ public class NestedListWeightSum {
         NestedIntegerWithDepth(NestedInteger nestedInteger, int depth) {
             this.nestedInteger = nestedInteger;
             this.depth = depth;
-        }
-    }
-
-    static class StructureAnalyzer {
-        int maxDepth = 0;
-        int totalElements = 0;
-        int totalLists = 0;
-    }
-
-    static class AnalysisResult {
-        int weightedSum;
-        int maxDepth;
-        int totalElements;
-        int totalLists;
-
-        AnalysisResult(int weightedSum, int maxDepth, int totalElements, int totalLists) {
-            this.weightedSum = weightedSum;
-            this.maxDepth = maxDepth;
-            this.totalElements = totalElements;
-            this.totalLists = totalLists;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("Sum: %d, MaxDepth: %d, Elements: %d, Lists: %d",
-                               weightedSum, maxDepth, totalElements, totalLists);
-        }
-    }
-
-    static class ValidationResult {
-        boolean valid = true;
-        String errorMessage = "";
-        int maxDepth = 0;
-        int integerCount = 0;
-        int listCount = 0;
-
-        @Override
-        public String toString() {
-            if (!valid) {
-                return "Invalid: " + errorMessage;
-            }
-            return String.format("Valid - Depth: %d, Integers: %d, Lists: %d",
-                               maxDepth, integerCount, listCount);
         }
     }
 }

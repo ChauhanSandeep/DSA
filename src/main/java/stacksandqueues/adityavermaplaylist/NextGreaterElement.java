@@ -12,7 +12,7 @@ import java.util.Stack;
  * greater element for an element x is the first greater element on the right.
  * If no greater element exists, return -1 for that element.
  *
- * LeetCode Link: https://leetcode.com/problems/next-greater-element-ii/
+ * LeetCode Link: https://leetcode.com/problems/next-greater-element-i/
  *
  * Example:
  * Input:   [11, 3, 21, 30]

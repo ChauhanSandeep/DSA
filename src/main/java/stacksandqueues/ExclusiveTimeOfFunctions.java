@@ -69,7 +69,8 @@ public class ExclusiveTimeOfFunctions {
             if (entry.operation.equals("start")) {
                 // If there's a function running, add its exclusive time
                 if (!stack.isEmpty()) {
-                    result[stack.peek()] += entry.timestamp - previousTime;
+                    int existingFunctionId = stack.peek();
+                    result[existingFunctionId] += entry.timestamp - previousTime;
                 }
 
                 // Push new function to stack and update time
