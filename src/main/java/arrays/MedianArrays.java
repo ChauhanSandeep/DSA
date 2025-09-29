@@ -50,25 +50,28 @@ public class MedianArrays {
       }
 
     int len1 = nums1.length, len2 = nums2.length;
-    int total = len1 + len2;
-    int mid = total / 2;
+    int totalSize = len1 + len2;
+    int mid = totalSize / 2;
 
-    int i = 0, j = 0, count = 0;
-    double prev = 0, curr = 0;
+    int pointer1 = 0;
+    int pointer2 = 0;
+    int count = 0;
+    double prevNum = 0;
+    double currNum = 0;
 
     while (count <= mid) {
-      prev = curr;
+      prevNum = currNum;
 
-      if (i < len1 && (j >= len2 || nums1[i] < nums2[j])) {
-        curr = nums1[i++];
+      if (pointer1 < len1 && (pointer2 >= len2 || nums1[pointer1] < nums2[pointer2])) {
+        currNum = nums1[pointer1++];
       } else {
-        curr = nums2[j++];
+        currNum = nums2[pointer2++];
       }
 
       count++;
     }
 
-    return (total % 2 == 0) ? (prev + curr) / 2.0 : curr;
+    return (totalSize % 2 == 0) ? (prevNum + currNum) / 2.0 : currNum;
   }
 
   /**
@@ -96,8 +99,11 @@ public class MedianArrays {
           return findMedianBinarySearch(nums2, nums1);
       }
 
-    int len1 = nums1.length, len2 = nums2.length;
-    int low = 0, high = len1;
+    int len1 = nums1.length;
+    int len2 = nums2.length;
+
+    int low = 0;
+    int high = len1;
     int totalMidPoint = (len1 + len2 + 1) / 2; // +1 to handle odd-length cases
 
     while (low <= high) {

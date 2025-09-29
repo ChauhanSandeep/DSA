@@ -7,199 +7,126 @@ import java.util.stream.IntStream;
 /**
  * Range Addition
  *
- * Problem: Apply range updates efficiently. Given length n and list of updates [start, end, inc],
- * return final array after applying all updates.
+ * Given an array of length n initialized with all 0's and k update operations,
+ * apply all updates and return the modified array. Each operation is represented
+ * as a triplet [startIndex, endIndex, inc] which increments each element of
+ * subarray from startIndex to endIndex (both inclusive) with inc.
  *
- * Example: length = 5, updates = [[1,3,2],[2,4,3],[0,2,-2]] -> Output: [-2,0,3,5,3]
- * Start with [0,0,0,0,0], apply updates to get final array.
+ * Key challenge: Efficiently handle potentially many range updates without
+ * iterating through each range for every update, which would be O(n*k) complexity.
+ *
+ * Core insight: Use difference array technique to mark range boundaries instead
+ * of updating individual elements. This reduces complexity from O(n*k) to O(n+k).
+ *
+ * Example:
+ * Input: length = 5, updates = [[1,3,2],[2,4,3],[0,2,-2]]
+ * Output: [-2,0,3,5,3]
+ *
+ * Process:
+ * - Initial: [0,0,0,0,0]
+ * - After [1,3,2]: [0,2,2,2,0]
+ * - After [2,4,3]: [0,2,5,5,3]
+ * - After [0,2,-2]: [-2,0,3,5,3]
  *
  * LeetCode: https://leetcode.com/problems/range-addition
  *
- * Follow-up Questions:
- * - How to handle updates dynamically? (Use segment tree with lazy propagation)
- * - What if we need range queries too? (Combine with range query data structure)
- * - Can we handle 2D range updates? (Extend difference array to 2D)
+ * Follow-up Questions for FAANG Interviews:
+ * 1. How to handle 2D range updates on a matrix?
+ *    Answer: Extend to 2D difference array with boundary marking at corners of update rectangles.
+ * 2. What if updates come in real-time and we need query results immediately?
+ *    Answer: Use segment tree with lazy propagation for O(log n) updates and queries.
+ * 3. How to optimize when many updates affect overlapping ranges?
+ *    Answer: Consider coordinate compression or merge overlapping updates before processing.
+ * 4. What if we need to support both range updates and range queries?
+ *    Answer: Implement using Fenwick tree or segment tree with lazy propagation.
+ *
+ * Related Problems:
+ * - LeetCode 598: Range Addition II
+ * - LeetCode 307: Range Sum Query - Mutable
+ * - LeetCode 1109: Corporate Flight Bookings (Same pattern)
  */
 public class RangeAddition {
 
     /**
-     * Applies range updates efficiently using difference array technique.
+     * Applies range updates using difference array technique for optimal efficiency.
      *
-     * Algorithm:
-     * 1. Use difference array to mark range updates
-     * 2. For update [start, end, inc]: diff[start] += inc, diff[end+1] -= inc
-     * 3. Compute prefix sum of difference array to get final result
-     * 4. This converts O(k*n) naive approach to O(k+n)
+     * Algorithm: Difference Array with Boundary Marking
+     * Core principle: Instead of updating each element in a range, mark only the
+     * boundaries where changes begin and end. Use prefix sum to reconstruct final array.
      *
-     * Time Complexity: O(k + n) where k is number of updates, n is array length
-     * Space Complexity: O(n) for difference array
+     * Key steps:
+     * 1. For each update [start, end, inc], mark diff[start] += inc (range begins)
+     * 2. Mark diff[end+1] -= inc (range ends, if within bounds)
+     * 3. Compute prefix sum to propagate boundary changes across entire array
      *
-     * @param length size of the array
-     * @param updates list of [startIndex, endIndex, increment] updates
-     * @return final array after all updates
+     * Why this works: When computing prefix sum, the increment at diff[start]
+     * propagates through all subsequent positions until cancelled by decrement
+     * at diff[end+1]. Multiple overlapping ranges automatically combine through addition.
+     *
+     * Time Complexity: O(n + k) where n = array length, k = number of updates
+     * Space Complexity: O(n) for difference array storage
+     *
+     * @param length initial array length (all zeros)
+     * @param updates array of [startIndex, endIndex, increment] operations
+     * @return modified array after applying all range updates
      */
     public int[] getModifiedArray(int length, int[][] updates) {
-        int[] diff = new int[length + 1]; // Extra space to handle end+1 safely
+        // Initialize difference array to track boundary changes
+        int[] differenceArray = new int[length];
 
-        // Apply all updates to difference array
+        // Process each range update by marking boundaries
         for (int[] update : updates) {
-            int start = update[0];
-            int end = update[1];
-            int inc = update[2];
+            int startIndex = update[0];
+            int endIndex = update[1];
+            int increment = update[2];
 
-            diff[start] += inc;
-            if (end + 1 < length) {
-                diff[end + 1] -= inc;
+            // Mark start of range: increment begins affecting elements from here
+            differenceArray[startIndex] += increment;
+
+            // Mark end of range: increment stops affecting elements after endIndex
+            // Boundary check prevents array index out of bounds
+            if (endIndex + 1 < length) {
+                differenceArray[endIndex + 1] -= increment;
             }
         }
 
-        // Convert difference array to actual values using prefix sum
-        int[] result = new int[length];
-        result[0] = diff[0];
-
+        // Apply prefix sum to convert boundary markers into final values
+        // Each position accumulates all increments that affect it
         for (int i = 1; i < length; i++) {
-            result[i] = result[i - 1] + diff[i];
+            differenceArray[i] += differenceArray[i - 1];
         }
 
-        return result;
+        return differenceArray;
     }
 
     /**
-     * Alternative implementation with bounds checking
-     * Time Complexity: O(k + n), Space Complexity: O(n)
+     * Brute force implementation for verification and educational purposes.
+     * Directly applies each range update without optimization.
+     *
+     * Time Complexity: O(n * k) - inefficient for large inputs
+     * Space Complexity: O(n) - for result array only
+     *
+     * @param length initial array length
+     * @param updates array of range update operations
+     * @return modified array after all updates
      */
-    public int[] getModifiedArraySafe(int length, int[][] updates) {
-        int[] diff = new int[length + 1];
+    public int[] getModifiedArrayBruteForce(int length, int[][] updates) {
+        int[] result = new int[length];
 
+        // Apply each update by directly modifying range elements
         for (int[] update : updates) {
             int start = update[0];
             int end = update[1];
-            int inc = update[2];
+            int increment = update[2];
 
-            // Add increment at start position
-            if (start < length) {
-                diff[start] += inc;
-            }
-
-            // Subtract increment at position after end
-            if (end + 1 < length) {
-                diff[end + 1] -= inc;
-            }
-        }
-
-        // Build result using prefix sum
-        int[] result = new int[length];
-        int prefixSum = 0;
-
-        for (int i = 0; i < length; i++) {
-            prefixSum += diff[i];
-            result[i] = prefixSum;
-        }
-
-        return result;
-    }
-
-    /**
-     * Naive approach for comparison (less efficient)
-     * Time Complexity: O(k * n), Space Complexity: O(n)
-     */
-    public int[] getModifiedArrayNaive(int length, int[][] updates) {
-        int[] result = new int[length];
-
-        // Apply each update by iterating through the range
-        for (int[] update : updates) {
-            int start = update[0];
-            int end = update[1];
-            int inc = update[2];
-
+            // Update each element in range individually
             for (int i = start; i <= end; i++) {
-                result[i] += inc;
+                result[i] += increment;
             }
         }
 
         return result;
     }
 
-    /**
-     * In-place version using the result array as difference array
-     * Time Complexity: O(k + n), Space Complexity: O(1) extra
-     */
-    public int[] getModifiedArrayInPlace(int length, int[][] updates) {
-        int[] result = new int[length];
 
-        // Use result array as difference array first
-        for (int[] update : updates) {
-            int start = update[0];
-            int end = update[1];
-            int inc = update[2];
-
-            result[start] += inc;
-            if (end + 1 < length) {
-                result[end + 1] -= inc;
-            }
-        }
-
-        // Convert to prefix sum in-place
-        for (int i = 1; i < length; i++) {
-            result[i] += result[i - 1];
-        }
-
-        return result;
-    }
-
-    /**
-     * Stream-based approach using Java 8
-     * Time Complexity: O(k + n), Space Complexity: O(n)
-     */
-    public int[] getModifiedArrayStream(int length, int[][] updates) {
-        int[] diff = new int[length + 1];
-
-        // Apply updates using streams
-        Arrays.stream(updates).forEach(update -> {
-            int start = update[0];
-            int end = update[1];
-            int inc = update[2];
-
-            diff[start] += inc;
-            if (end + 1 < length) {
-                diff[end + 1] -= inc;
-            }
-        });
-
-        // Convert to result using stream
-        return IntStream.range(0, length)
-                .map(i -> IntStream.rangeClosed(0, i).map(j -> diff[j]).sum())
-                .toArray();
-    }
-
-    /**
-     * Helper method to demonstrate the difference array concept
-     */
-    public void explainDifferenceArray(int length, int[][] updates) {
-        int[] diff = new int[length + 1];
-
-        System.out.println("Applying updates to difference array:");
-        for (int[] update : updates) {
-            int start = update[0];
-            int end = update[1];
-            int inc = update[2];
-
-            System.out.printf("Update [%d,%d,%d]: ", start, end, inc);
-            diff[start] += inc;
-            if (end + 1 < length) {
-                diff[end + 1] -= inc;
-            }
-            System.out.println(Arrays.toString(Arrays.copyOf(diff, length)));
-        }
-
-        System.out.println("Converting to final array using prefix sum:");
-        int[] result = new int[length];
-        result[0] = diff[0];
-        System.out.println("Step 0: " + Arrays.toString(result));
-
-        for (int i = 1; i < length; i++) {
-            result[i] = result[i - 1] + diff[i];
-            System.out.printf("Step %d: %s\n", i, Arrays.toString(result));
-        }
-    }
 }
