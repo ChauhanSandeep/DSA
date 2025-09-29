@@ -1,5 +1,8 @@
 package bitwiseoperation;
 
+import java.util.Arrays;
+
+
 /**
  * LeetCode Problem: https://leetcode.com/problems/maximum-good-people-based-on-statements/
  *
@@ -27,9 +30,9 @@ package bitwiseoperation;
  *
  * Follow-up Questions (for interviews):
  * - What if the size of `statements` is very large (say > 25)?
- *   👉 Brute-force is not feasible, need constraint propagation or SAT solvers.
+ *   Brute-force is not feasible, need constraint propagation or SAT solvers.
  * - Can we avoid using strings and work directly with bits?
- *   👉 Yes, you can optimize memory and speed using bitwise operations on integers.
+ *   Yes, you can optimize memory and speed using bitwise operations on integers.
  */
 public class MaxGoodPeople {
 
@@ -96,6 +99,79 @@ public class MaxGoodPeople {
           if (statement != assumedGood) {
             // Contradiction found: a good person lied
             return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Implementation using backtracking for better understanding.
+   *
+   * Algorithm: Recursive Backtracking with Pruning
+   * Step 1: Try assigning each person as good or bad recursively
+   * Step 2: At each level, check if current partial assignment is consistent
+   * Step 3: Prune branches early if inconsistency is detected
+   * Step 4: Continue recursion only for promising branches
+   * Step 5: Track maximum good count found across all valid complete assignments
+   *
+   * Time Complexity: O(2ⁿ × n²) in worst case, but with pruning can be much better
+   * Space Complexity: O(n) for recursion stack depth
+   *
+   * @param statements the statements matrix
+   * @return maximum number of good people using backtracking
+   */
+  public int maximumGoodBacktracking(int[][] statements) {
+    if (statements == null || statements.length == 0) {
+      return 0;
+    }
+
+    int size = statements.length;
+    int[] assignments = new int[size]; // 0 = bad, 1 = good, -1 = unknown
+    Arrays.fill(assignments, -1);
+
+    return backtrack(0, assignments, statements, 0);
+  }
+
+  // Recursive backtracking helper
+  private int backtrack(int personIndex, int[] assignments, int[][] statements, int currentGoodCount) {
+    int size = statements.length;
+
+    // Base case: all people assigned
+    if (personIndex == size) {
+      return isValidAssignment(assignments, statements, size) ? currentGoodCount : 0;
+    }
+
+    int maxFound = 0;
+
+    // Step 1: Try assigning current person as bad (0)
+    assignments[personIndex] = 0;
+    if (isValidAssignment(assignments, statements, personIndex)) {
+      maxFound = Math.max(maxFound, backtrack(personIndex + 1, assignments, statements, currentGoodCount));
+    }
+
+    // Step 1: Try assigning current person as good (1)
+    assignments[personIndex] = 1;
+    if (isValidAssignment(assignments, statements, personIndex)) {
+      maxFound = Math.max(maxFound, backtrack(personIndex + 1, assignments, statements, currentGoodCount + 1));
+    }
+
+    // Backtrack
+    assignments[personIndex] = -1;
+    return maxFound;
+  }
+
+  // Check if the assignment is valid till the last assigned person
+  private boolean isValidAssignment(int[] assignment, int[][] statements, int lastAssigned) {
+    // Check statements involving assigned people
+    for (int i = 0; i <= lastAssigned; i++) {
+      if (assignment[i] == 1) { // If person i is good
+        for (int j = 0; j <= lastAssigned; j++) {
+          if (statements[i][j] != 2) { // If statement was made
+            if (assignment[j] != statements[i][j]) {
+              return false; // Good person's statement contradicted
+            }
           }
         }
       }
