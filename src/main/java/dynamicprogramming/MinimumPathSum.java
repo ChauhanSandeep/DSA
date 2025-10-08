@@ -143,48 +143,4 @@ public class MinimumPathSum {
 
         return minSumCurrentRow[numCols - 1];
     }
-
-    /**
-     * Alternative approach modifying input grid in-place to save space.
-     *
-     * Algorithm Steps:
-     * 1. Modify the input grid directly to store minimum path sums
-     * 2. Fill first row and column as cumulative sums
-     * 3. For remaining cells, update grid[i][j] = min(grid[i-1][j], grid[i][j-1]) + original_value
-     * 4. Return grid[m-1][n-1]
-     *
-     * Time Complexity: O(m * n)
-     * Space Complexity: O(1) - modifies input grid
-     *
-     * @param pathGrid 2D grid with non-negative integers (will be modified)
-     * @return Minimum sum of path from top-left to bottom-right
-     */
-    public int minPathSumInPlace(int[][] pathGrid) {
-        if (pathGrid == null || pathGrid.length == 0 || pathGrid[0].length == 0) {
-            return 0;
-        }
-
-        int numRows = pathGrid.length;
-        int numCols = pathGrid[0].length;
-
-        // Fill first row: cumulative sum from left
-        for (int colIndex = 1; colIndex < numCols; colIndex++) {
-            pathGrid[0][colIndex] += pathGrid[0][colIndex - 1];
-        }
-
-        // Fill first column: cumulative sum from above
-        for (int rowIndex = 1; rowIndex < numRows; rowIndex++) {
-            pathGrid[rowIndex][0] += pathGrid[rowIndex - 1][0];
-        }
-
-        // Fill remaining cells: minimum of paths from above and left
-        for (int rowIndex = 1; rowIndex < numRows; rowIndex++) {
-            for (int colIndex = 1; colIndex < numCols; colIndex++) {
-                pathGrid[rowIndex][colIndex] += Math.min(pathGrid[rowIndex - 1][colIndex],
-                    pathGrid[rowIndex][colIndex - 1]);
-            }
-        }
-
-        return pathGrid[numRows - 1][numCols - 1];
-    }
 }

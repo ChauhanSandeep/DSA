@@ -31,7 +31,27 @@ package dynamicprogramming.KnapsackRelated;
  */
 public class MinimumFlipsForNonNegativeSum {
 
-
+  /**
+   * Returns the minimum number of flips required to make the sum of the array
+   * non-negative and as close to zero as possible.
+   *
+   * Intuition:
+   * Flipping an element `x` changes the total sum by `-2*x`. To minimize the non-negative sum,
+   * we want to flip a subset of elements whose total is as close as possible to `totalSum/2`.
+   *
+   * Approach:
+   * 1. Calculate total sum of the array.
+   * 2. Set target as `totalSum / 2`.
+   * 3. Use a DP table where `dp[i][j]` represents the minimum number of elements needed
+   *    to achieve sum `j` using the first `i` elements.
+   * 4. Fill the DP table considering both taking and not taking each element.
+   * 5. Finally, find the largest achievable sum ≤ target and return the corresponding minimum flips.
+   *
+   * Time Complexity: O(n * target) where n is number of elements and target is totalSum/2
+   * Space Complexity: O(n * target) for the DP table
+   * @param arr
+   * @return
+   */
   public static int minFlipsToNonNegativeClosestZero(int[] arr) {
     int size = arr.length;
     int totalSum = 0;

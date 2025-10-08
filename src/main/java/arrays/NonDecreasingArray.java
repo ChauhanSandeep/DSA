@@ -3,18 +3,36 @@ package arrays;
 /**
  * Non Decreasing Array
  *
- * Problem: Determine if array can be made non-decreasing by modifying at most one element.
+ * Problem Statement:
+ * Given an array nums with n integers, check if it could become non-decreasing
+ * by modifying at most one element. We define an array as non-decreasing if
+ * nums[i] <= nums[i + 1] holds for every i (0-based) such that (0 <= i <= n - 2).
  *
- * Example: nums = [4,2,3] -> Output: true
- * Change 4 to 1 or change 2 to 4: [1,2,3] or [4,4,3] (then change 3 to 4).
- * Actually, change 4 to something ≤ 2: [1,2,3] works.
+ * Example:
+ * Input: nums = [4,2,3]
+ * Output: true
+ * Explanation: You could modify the first 4 to 1 to get a non-decreasing array [1,2,3].
  *
- * LeetCode: https://leetcode.com/problems/non-decreasing-array
+ * Input: nums = [4,2,1]
+ * Output: false
+ * Explanation: You cannot get a non-decreasing array by modifying at most one element.
+ *
+ * LeetCode Link: https://leetcode.com/problems/non-decreasing-array/
  *
  * Follow-up Questions:
- * - What if we can modify at most k elements? (Use dynamic programming)
- * - How to find the actual element to modify? (Track modification during scan)
- * - What if modification has different costs? (Choose optimal modification)
+ * 1. What if we can modify at most k elements instead of just one?
+ *    Answer: Use DP or greedy with modification counter, checking feasibility at each step.
+ * 2. What if we want to find the minimum number of modifications needed?
+ *    Answer: Count all violations and use greedy strategy to fix maximum violations with minimum changes.
+ * 3. How would you handle the case where we want strictly increasing array?
+ *    Answer: Change condition from nums[i] <= nums[i+1] to nums[i] < nums[i+1].
+ * 4. What if the array can be rotated before checking?
+ *    Answer: Try all possible rotation points and check each rotated version.
+ *
+ * Related Problems:
+ * - 2289. Steps to Make Array Non-decreasing: https://leetcode.com/problems/steps-to-make-array-non-decreasing/
+ * - 2263. Make Array Non-decreasing or Non-increasing
+ * - 300. Longest Increasing Subsequence
  */
 public class NonDecreasingArray {
 
@@ -36,10 +54,10 @@ public class NonDecreasingArray {
      * @return true if can be made non-decreasing with ≤1 modification
      */
     public boolean checkPossibility(int[] nums) {
-        int n = nums.length;
+        int size = nums.length;
         int violations = 0;
 
-        for (int i = 0; i < n - 1; i++) {
+        for (int i = 0; i < size - 1; i++) {
             if (nums[i] > nums[i + 1]) {
                 violations++;
 
@@ -54,7 +72,7 @@ public class NonDecreasingArray {
                 } else {
                     // Option 2: Modify nums[i+1] to be >= nums[i]
                     // Check if this doesn't violate constraint with nums[i+2]
-                    if (i + 2 >= n || nums[i] <= nums[i + 2]) {
+                    if (i + 2 >= size || nums[i] <= nums[i + 2]) {
                         nums[i + 1] = nums[i]; // Modify nums[i+1]
                     } else {
                         return false; // Can't fix this violation
@@ -68,15 +86,21 @@ public class NonDecreasingArray {
 
     /**
      * Alternative approach without modifying input array
+     * Algorithm:
+     * 1. Identify the index of the first violation
+     * 2. Check if modifying either nums[i] or nums[i+1] can
+     *  fix the violation without causing new violations
+     * 3. Return true if fixable, else false
+     *
      * Time Complexity: O(n), Space Complexity: O(1)
      */
     public boolean checkPossibilityNoModify(int[] nums) {
-        int n = nums.length;
+        int size = nums.length;
         int violations = 0;
         int violationIndex = -1;
 
         // Find violations
-        for (int i = 0; i < n - 1; i++) {
+        for (int i = 0; i < size - 1; i++) {
             if (nums[i] > nums[i + 1]) {
                 violations++;
                 if (violations > 1) return false;
@@ -90,77 +114,12 @@ public class NonDecreasingArray {
         // Check if we can fix the single violation
         int i = violationIndex;
 
-        // Can we modify nums[i] to fix violation?
+        // Can we modify nums[i] to fix violation? If yes, we can make it the same as nums[i+1]
         boolean canModifyLeft = (i == 0) || (nums[i - 1] <= nums[i + 1]);
 
-        // Can we modify nums[i+1] to fix violation?
-        boolean canModifyRight = (i + 2 >= n) || (nums[i] <= nums[i + 2]);
+        // Can we modify nums[i+1] to fix violation? If yes, we can make nums[i+1] the same as nums[i]
+        boolean canModifyRight = (i + 2 >= size) || (nums[i] <= nums[i + 2]);
 
         return canModifyLeft || canModifyRight;
-    }
-
-    /**
-     * Detailed approach that tracks what modifications are made
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public boolean checkPossibilityDetailed(int[] nums) {
-        int n = nums.length;
-        int modificationCount = 0;
-
-        for (int i = 0; i < n - 1; i++) {
-            if (nums[i] <= nums[i + 1]) continue;
-
-            // Found violation: nums[i] > nums[i+1]
-            modificationCount++;
-
-            if (modificationCount > 1) return false;
-
-            // Decide how to fix: modify nums[i] or nums[i+1]
-            if (i == 0) {
-                // At beginning, safe to modify nums[i]
-                nums[i] = nums[i + 1];
-            } else if (i == n - 2) {
-                // At end, safe to modify nums[i+1]
-                nums[i + 1] = nums[i];
-            } else {
-                // In middle, need to check both options
-                if (nums[i - 1] <= nums[i + 1]) {
-                    // Can modify nums[i] without breaking left constraint
-                    nums[i] = nums[i + 1];
-                } else if (nums[i] <= nums[i + 2]) {
-                    // Can modify nums[i+1] without breaking right constraint
-                    nums[i + 1] = nums[i];
-                } else {
-                    // Neither modification works
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Clean implementation focusing on the core logic
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public boolean checkPossibilityClean(int[] nums) {
-        int count = 0;
-
-        for (int i = 1; i < nums.length; i++) {
-            if (nums[i - 1] > nums[i]) {
-                count++;
-                if (count > 1) return false;
-
-                // Fix violation by choosing appropriate modification
-                if (i == 1 || nums[i - 2] <= nums[i]) {
-                    nums[i - 1] = nums[i];
-                } else {
-                    nums[i] = nums[i - 1];
-                }
-            }
-        }
-
-        return true;
     }
 }

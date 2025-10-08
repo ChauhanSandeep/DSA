@@ -3,23 +3,36 @@ package dynamicprogramming;
 import java.util.Arrays;
 
 /**
- * Problem: Palindrome Partitioning II
+ * Palindrome Partitioning II
  *
- * Given a string `s`, return the minimum number of cuts needed to partition
- * it such that every substring in the partition is a palindrome.
+ * Problem Statement:
+ * Given a string s, partition s such that every substring of the partition is a palindrome.
+ * Return the minimum cuts needed for a palindrome partitioning of s.
  *
  * Example:
  * Input: s = "aab"
  * Output: 1
- * Explanation: "aa|b" is a valid partition with only 1 cut.
+ * Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cut.
  *
- * Leetcode Link: https://leetcode.com/problems/palindrome-partitioning-ii/
+ * Input: s = "aba"
+ * Output: 0
+ * Explanation: "aba" is already a palindrome, so 0 cuts are needed.
+ *
+ * Input: s = "abcde"
+ * Output: 4
+ * Explanation: Each character needs to be separate: ["a","b","c","d","e"] requires 4 cuts.
+ *
+ * LeetCode Link: https://leetcode.com/problems/palindrome-partitioning-ii
  *
  * Follow-up Questions:
- * 1. Can you print all valid palindromic partitions?
- *    - Yes, use backtracking + `isPalindrome[][]` DP table.
- * 2. Can you solve this in O(N²) time and O(N) space?
- *    - Yes, with optimized center-expansion palindrome check instead of full 2D table.
+ * 1. What if we want to find all possible partitions with minimum cuts instead of just the count?
+ *    Answer: Modify DP to store actual partitions and backtrack to reconstruct all optimal solutions.
+ * 2. How would you handle very long strings (n > 10^4)?
+ *    Answer: Use space optimizations, rolling arrays, or consider approximation algorithms.
+ * 3. What if we want to minimize the maximum length of palindromic segments instead of cuts?
+ *    Answer: Use different DP state definition focusing on segment lengths rather than cut count.
+ * 4. How to extend to allow at most k non-palindromic segments?
+ *    Answer: Add another dimension to DP state tracking number of non-palindromic segments used.
  */
 public class MinCutPalindrome {
 

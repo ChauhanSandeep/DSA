@@ -5,21 +5,49 @@ import java.util.stream.Collectors;
 
 
 /**
- * Number Of Laser Beams In A Bank
+ * 2125. Number of Laser Beams in a Bank
  *
- * Problem: Given bank layout with security devices ('1') and empty space ('0'),
- * calculate total laser beams. Each device shoots lasers to all devices in next row with devices.
+ * Problem Statement:
+ * Anti-theft security devices are activated inside a bank. You are given a 0-indexed
+ * binary string array bank representing the floor plan of the bank, which is an m x n
+ * 2D matrix. bank[i] represents the ith row, consisting of '0's and '1's.
+ * '0' means the cell is empty, while '1' means the cell has a security device.
  *
- * Example: bank = ["011001","000000","010100","001000"] -> Output: 8
- * Row 0 has 3 devices, row 2 has 2 devices, row 3 has 1 device.
- * Beams: 3*2 (row 0 to 2) + 2*1 (row 2 to 3) = 6 + 2 = 8.
+ * There is one laser beam between any two security devices if both conditions are met:
+ * 1. The two devices are located on two different rows: r1 and r2, where r1 < r2.
+ * 2. For each row i where r1 < i < r2, there are no security devices in the ith row.
  *
- * LeetCode: https://leetcode.com/problems/number-of-laser-beams-in-a-bank
+ * Laser beams are independent. Return the total number of laser beams in the bank.
+ *
+ * Example:
+ * Input: bank = [
+ *  "011001",
+ *  "000000",
+ *  "010100",
+ *  "001000"
+ *  ]
+ * Output: 8
+ * Explanation: Row 0 has 3 devices, row 2 has 2 devices, row 3 has 1 device.
+ * Beams between row 0 and row 2: 3 × 2 = 6 beams
+ * Beams between row 2 and row 3: 2 × 1 = 2 beams
+ * Total: 6 + 2 = 8 beams
+ *
+ * LeetCode Link: https://leetcode.com/problems/number-of-laser-beams-in-a-bank/
  *
  * Follow-up Questions:
- * - What if devices can shoot in all directions? (Consider all pairs across all rows)
- * - How to handle 3D bank layout? (Extend logic to 3D grid)
- * - What if different devices have different ranges? (Add range constraints)
+ * 1. What if laser beams can pass through other devices but are blocked by walls?
+ *    Answer: Modify condition to check for wall characters instead of device characters between rows.
+ * 2. How would you handle 3D laser beams between floors?
+ *    Answer: Extend to 3D array and check all three dimensions for clear paths between devices.
+ * 3. What if we need to find the maximum beams between any two consecutive rows?
+ *    Answer: Track maximum product of consecutive non-empty row device counts during iteration.
+ * 4. How to optimize for very sparse matrices with few devices?
+ *    Answer: Precompute only rows with devices and their counts, then process pairs directly.
+ *
+ * Related Problems:
+ * - 1854. Maximum Population Year: https://leetcode.com/problems/maximum-population-year/
+ * - 849. Maximize Distance to Closest Person: https://leetcode.com/problems/maximize-distance-to-closest-person/
+ * - 598. Range Addition II: https://leetcode.com/problems/range-addition-ii/
  */
 public class NumberOfLaserBeamsInABank {
 

@@ -1,83 +1,69 @@
 package arrays;
 
 /**
- * Plus One
+ * 66. Plus One
  *
- * Problem: Given array representing a large integer, increment it by one and return result.
- * Each element represents a single digit in left-to-right order.
+ * Problem Statement:
+ * You are given a large integer represented as an integer array digits, where each
+ * digits[i] is the ith digit of the integer. The digits are ordered from most
+ * significant to least significant in left-to-right order. The large integer does
+ * not contain any leading zeros. Increment the large integer by one and return
+ * the resulting array of digits.
  *
- * Example: digits = [1,2,3] -> Output: [1,2,4]
- * The number 123 + 1 = 124, so return [1,2,4].
+ * Example:
+ * Input: digits = [1,2,3]
+ * Output: [1,2,4]
+ * Explanation: The array represents the integer 123. Incrementing by one gives
+ * 123 + 1 = 124. Thus, the result should be [1,2,4].
  *
- * LeetCode: https://leetcode.com/problems/plus-one
+ * Input: digits = [9,9]
+ * Output: [1,0,0]
+ * Explanation: 99 + 1 = 100, so we need to add a new leading digit.
+ *
+ * LeetCode Link: https://leetcode.com/problems/plus-one/
  *
  * Follow-up Questions:
- * - How to add any number k instead of just 1? (Similar carry logic with k)
- * - What if digits can be negative? (Handle sign separately)
- * - Can we solve without creating new array? (Only when no overflow, otherwise need extra space)
+ * 1. What if we need to add a number other than 1?
+ *    Answer: Extend the algorithm to handle carry propagation for any addend, not just 1.
+ * 2. How would you handle negative numbers represented as arrays?
+ *    Answer: Add sign bit handling and implement subtraction logic for negative results.
+ * 3. What if we need to support floating point numbers?
+ *    Answer: Split into integer and fractional parts, handle decimal point position.
+ * 4. How to optimize for very large arrays with sparse operations?
+ *    Answer: Use compressed representations or segment-based processing for efficiency.
+ *
+ * Related Problems:
+ * - 67. Add Binary: https://leetcode.com/problems/add-binary/
+ * - 415. Add Strings: https://leetcode.com/problems/add-strings/
+ * - 989. Add to Array-Form of Integer: https://leetcode.com/problems/add-to-array-form-of-integer/
  */
 public class PlusOne {
 
     /**
-     * Increments array-represented number by one.
-     *
+     * Implementation with explicit carry tracking
      * Algorithm:
-     * 1. Start from rightmost digit (least significant)
-     * 2. Add 1 to current digit
-     * 3. If result < 10, we're done
-     * 4. If result = 10, set current digit to 0 and carry 1 to next position
-     * 5. If we reach leftmost digit with carry, prepend 1 to result
+     * 1. Start from the last digit and add 1 (initial carry)
+     * 2. Update the digit and calculate new carry
+     * 3. If carry remains after processing all digits, create new array with leading 1
      *
-     * Time Complexity: O(n) where n is number of digits
-     * Space Complexity: O(1) if no overflow, O(n+1) if overflow occurs
-     *
-     * @param digits array representing digits of a number
-     * @return array representing digits of number + 1
-     */
-    public int[] plusOne(int[] digits) {
-        int n = digits.length;
-
-        // Process digits from right to left
-        for (int i = n - 1; i >= 0; i--) {
-            // Add 1 to current digit
-            digits[i]++;
-
-            // If no carry needed, we're done
-            if (digits[i] < 10) {
-                return digits;
-            }
-
-            // Set current digit to 0 (carry will be handled in next iteration)
-            digits[i] = 0;
-        }
-
-        // If we reach here, we had carry from most significant digit
-        // Need to create new array with additional digit
-        int[] result = new int[n + 1];
-        result[0] = 1; // All other positions are 0 by default
-
-        return result;
-    }
-
-    /**
-     * Alternative implementation with explicit carry tracking
-     * Time Complexity: O(n), Space Complexity: O(1) or O(n+1)
+     * Time Complexity: O(n),
+     * Space Complexity: O(1) or O(n+1)
      */
     public int[] plusOneWithCarry(int[] digits) {
         int carry = 1; // We're adding 1
-        int n = digits.length;
+        int size = digits.length;
 
-        for (int i = n - 1; i >= 0 && carry > 0; i--) {
+        for (int i = size - 1; i >= 0 && carry > 0; i--) {
             int sum = digits[i] + carry;
             digits[i] = sum % 10;
             carry = sum / 10;
         }
 
-        // If still have carry, need new array
+        // If still have carry after iterating complete array. We need new array to handle overflow
         if (carry > 0) {
-            int[] result = new int[n + 1];
+            int[] result = new int[size + 1];
             result[0] = carry;
-            System.arraycopy(digits, 0, result, 1, n);
+            System.arraycopy(digits, 0, result, 1, size);
             return result;
         }
 
@@ -85,34 +71,20 @@ public class PlusOne {
     }
 
     /**
-     * Recursive approach for educational purposes
-     * Time Complexity: O(n), Space Complexity: O(n) due to recursion stack
-     */
-    public int[] plusOneRecursive(int[] digits) {
-        return plusOneHelper(digits, digits.length - 1);
-    }
-
-    private int[] plusOneHelper(int[] digits, int index) {
-        // Base case: adding to position before first digit
-        if (index < 0) {
-            int[] result = new int[digits.length + 1];
-            result[0] = 1;
-            System.arraycopy(digits, 0, result, 1, digits.length);
-            return result;
-        }
-
-        digits[index]++;
-
-        if (digits[index] < 10) {
-            return digits; // No carry needed
-        }
-
-        digits[index] = 0;
-        return plusOneHelper(digits, index - 1);
-    }
-
-    /**
-     * Optimized for common case of no overflow
+     * Optimized for common case of no overflow.
+     * What we need to understand is that the only time we need to
+     * create a new array is when all the digits are 9.
+     * In all other cases, we can simply increment the last digit
+     * that is not 9 and set all following digits to 0. This appraoch uses this insight
+     * to optimize for the common case where no carry is needed.
+     *
+     * Algorithm:
+     * 1. Check if the last digit is less than 9, if so increment
+     *   and return.
+     * 2. If last digit is 9, iterate backwards to find first non-9 digit,
+     *   increment it, and set all following digits to 0.
+     * 3. If all digits are 9, create new array with leading 1  and rest 0s.
+     *
      * Time Complexity: O(n), Space Complexity: O(1) average case
      */
     public int[] plusOneOptimized(int[] digits) {
@@ -123,7 +95,7 @@ public class PlusOne {
             return digits;
         }
 
-        // Handle carry case
+        // Handle carry case. Iterate backwards and set 9s to 0. Once we find a non-9, increment it and return.
         for (int i = lastIndex; i >= 0; i--) {
             if (digits[i] < 9) {
                 digits[i]++;
@@ -132,36 +104,9 @@ public class PlusOne {
             digits[i] = 0;
         }
 
-        // All digits were 9, need overflow handling
+        // If we are at this point means that all digits were 9, need overflow handling
         int[] result = new int[digits.length + 1];
         result[0] = 1;
         return result;
-    }
-
-    /**
-     * Generalized version that can add any single digit
-     * Time Complexity: O(n), Space Complexity: O(1) or O(n+1)
-     */
-    public int[] addDigit(int[] digits, int digitToAdd) {
-        if (digitToAdd < 0 || digitToAdd > 9) {
-            throw new IllegalArgumentException("Digit must be between 0 and 9");
-        }
-
-        int carry = digitToAdd;
-
-        for (int i = digits.length - 1; i >= 0 && carry > 0; i--) {
-            int sum = digits[i] + carry;
-            digits[i] = sum % 10;
-            carry = sum / 10;
-        }
-
-        if (carry > 0) {
-            int[] result = new int[digits.length + 1];
-            result[0] = carry;
-            System.arraycopy(digits, 0, result, 1, digits.length);
-            return result;
-        }
-
-        return digits;
     }
 }
