@@ -51,8 +51,8 @@ public class PathSum2 {
     }
 
     // Helper method for DFS with backtracking
-    private void dfsWithBacktracking(TreeNode node, int remainingSum,
-                                   List<Integer> currentPath, List<List<Integer>> result) {
+    private void dfsWithBacktracking(TreeNode node, int remainingSum, List<Integer> currentPath,
+        List<List<Integer>> result) {
         if (node == null) {
             return;
         }
@@ -75,51 +75,13 @@ public class PathSum2 {
     }
 
     /**
-     * Alternative approach without modifying shared path list.
-     *
-     * Algorithm: DFS with Path Copying
-     * - Create new path list for each recursive call
-     * - No need for backtracking since each call has its own path
-     * - Less memory efficient but simpler logic
-     *
-     * Time Complexity: O(n²) - same as above
-     * Space Complexity: O(n²) - more memory due to path copying
-     */
-    public List<List<Integer>> pathSumWithCopying(TreeNode root, int targetSum) {
-        List<List<Integer>> result = new ArrayList<>();
-        dfsWithCopying(root, targetSum, new ArrayList<>(), result);
-        return result;
-    }
-
-    // Helper with path copying
-    private void dfsWithCopying(TreeNode node, int remainingSum,
-                              List<Integer> pathSoFar, List<List<Integer>> result) {
-        if (node == null) {
-            return;
-        }
-
-        // Create new path with current node added
-        List<Integer> newPath = new ArrayList<>(pathSoFar);
-        newPath.add(node.val);
-        remainingSum -= node.val;
-
-        // If leaf and sum matches, add to result
-        if (node.left == null && node.right == null && remainingSum == 0) {
-            result.add(newPath);
-        } else {
-            // Continue with new path
-            dfsWithCopying(node.left, remainingSum, newPath, result);
-            dfsWithCopying(node.right, remainingSum, newPath, result);
-        }
-    }
-
-    /**
      * Iterative approach using stack.
      *
      * Algorithm: DFS with Stack
-     * - Use stack to store (node, remainingSum, pathSoFar) tuples
-     * - Process nodes iteratively
-     * - Create new paths for each child
+     * - Use a stack to simulate recursion
+     * - Each stack entry holds current node, remaining sum, and path so far
+     * - Process nodes until stack is empty
+     * - When leaf is reached with sum = 0, add path to result
      *
      * Time Complexity: O(n²)
      * Space Complexity: O(n²)
@@ -176,48 +138,6 @@ public class PathSum2 {
             this.remainingSum = remainingSum;
             this.path = path;
         }
-    }
-
-    /**
-     * Memory optimized approach using StringBuilder for path representation.
-     *
-     * Useful when you need to return paths as strings instead of lists.
-     * More memory efficient for very deep trees.
-     */
-    public List<String> pathSumAsStrings(TreeNode root, int targetSum) {
-        List<String> result = new ArrayList<>();
-        dfsWithStringPath(root, targetSum, new StringBuilder(), result);
-        return result;
-    }
-
-    // Helper using string representation
-    private void dfsWithStringPath(TreeNode node, int remainingSum,
-                                 StringBuilder pathBuilder, List<String> result) {
-        if (node == null) {
-            return;
-        }
-
-        // Save original length for backtracking
-        int originalLength = pathBuilder.length();
-
-        // Add current node to path
-        if (pathBuilder.length() > 0) {
-            pathBuilder.append("->");
-        }
-        pathBuilder.append(node.val);
-        remainingSum -= node.val;
-
-        // If leaf and sum matches
-        if (node.left == null && node.right == null && remainingSum == 0) {
-            result.add(pathBuilder.toString());
-        } else {
-            // Continue to children
-            dfsWithStringPath(node.left, remainingSum, pathBuilder, result);
-            dfsWithStringPath(node.right, remainingSum, pathBuilder, result);
-        }
-
-        // Backtrack
-        pathBuilder.setLength(originalLength);
     }
 
     // Definition for a binary tree node

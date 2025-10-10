@@ -1,31 +1,42 @@
 package arrays;
 
 /**
- * You are given an n x n 2D matrix representing an image, rotate the image by 90 degrees (clockwise).
- * You have to rotate the image in-place, which means you have to modify the input 2D matrix directly.
- * DO NOT allocate another 2D matrix and do the rotation.
+ * 48. Rotate Image
  *
- * Example 1:
+ * Problem Statement:
+ * You are given an n x n 2D matrix representing an image, rotate the image by 90
+ * degrees clockwise. You have to rotate the image in-place, which means you have
+ * to modify the input 2D matrix directly. DO NOT allocate another 2D matrix and
+ * do the rotation.
+ *
+ * Example:
  * Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
  * Output: [[7,4,1],[8,5,2],[9,6,3]]
+ * Explanation: Rotate the matrix 90 degrees clockwise.
+ * Original:        After rotation:
+ * 1 2 3      →     7 4 1
+ * 4 5 6            8 5 2
+ * 7 8 9            9 6 3
  *
- * Example 2:
  * Input: matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
  * Output: [[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
  *
- * LeetCode: https://leetcode.com/problems/rotate-image/
+ * LeetCode Link: https://leetcode.com/problems/rotate-image/
  *
  * Follow-up Questions:
- * 1. How would you rotate the image counter-clockwise instead?
- *    - We could reverse the order of the transpose or reverse each column instead of each row.
- * 2. What if the matrix is not square?
- *    - For non-square matrices, rotation would change the dimensions (m×n → n×m).
- * 3. How would you rotate the image by 180 degrees?
- *    - We could either rotate 90 degrees twice or reverse both rows and columns.
+ * 1. How would you rotate the matrix counterclockwise by 90 degrees?
+ *    Answer: Transpose first, then reverse each row (opposite order of clockwise).
+ * 2. What if we need to rotate by 180 degrees or 270 degrees?
+ *    Answer: Apply 90-degree rotation multiple times, or use direct transformation formulas.
+ * 3. How would you handle rectangular matrices (not n x n)?
+ *    Answer: Rotation of non-square matrices requires creating a new matrix with swapped dimensions.
+ * 4. What if we need to rotate by arbitrary angles (not multiples of 90)?
+ *    Answer: Use transformation matrices with sine and cosine calculations for general rotation.
  *
  * Related Problems:
- * - Rotate Array (https://leetcode.com/problems/rotate-array/)
- * - Determine Whether Matrix Can Be Obtained By Rotation (https://leetcode.com/problems/determine-whether-matrix-can-be-obtained-by-rotation/)
+ * - 54. Spiral Matrix: https://leetcode.com/problems/spiral-matrix/
+ * - 73. Set Matrix Zeroes: https://leetcode.com/problems/set-matrix-zeroes/
+ * - 289. Game of Life: https://leetcode.com/problems/game-of-life/
  */
 public class RotateImage {
     /**

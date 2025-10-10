@@ -40,12 +40,12 @@ public class ValidateBinarySearchTree {
      * @param root root of binary tree
      * @return true if tree is valid BST, false otherwise
      */
-    public boolean isValidBST(TreeNode root) {
-        return validateWithBounds(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    public boolean isValidBstRecursiveApproach(TreeNode root) {
+        return isValidRecHelper(root, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
     // Helper method to validate with min/max bounds
-    private boolean validateWithBounds(TreeNode node, long minVal, long maxVal) {
+    private boolean isValidRecHelper(TreeNode node, long minVal, long maxVal) {
         if (node == null) {
             return true;
         }
@@ -56,54 +56,23 @@ public class ValidateBinarySearchTree {
         }
 
         // Recursively validate subtrees with updated bounds
-        return validateWithBounds(node.left, minVal, node.val) &&
-               validateWithBounds(node.right, node.val, maxVal);
-    }
-
-    /**
-     * Alternative approach using inorder traversal.
-     *
-     * Algorithm: Inorder Traversal Validation
-     * - Inorder traversal of BST should give sorted sequence
-     * - Track previous value and ensure current >= previous
-     * - If any violation found, return false
-     *
-     * Time Complexity: O(n) - visit each node once
-     * Space Complexity: O(h) - recursion stack depth
-     */
-    private Integer previousValue = null;
-
-    public boolean isValidBSTInorder(TreeNode root) {
-        previousValue = null;
-        return inorderValidate(root);
-    }
-
-    // Helper for inorder validation
-    private boolean inorderValidate(TreeNode node) {
-        if (node == null) {
-            return true;
-        }
-
-        // Validate left subtree
-        if (!inorderValidate(node.left)) {
-            return false;
-        }
-
-        // Check current node
-        if (previousValue != null && node.val <= previousValue) {
-            return false;
-        }
-        previousValue = node.val;
-
-        // Validate right subtree
-        return inorderValidate(node.right);
+        return isValidRecHelper(node.left, minVal, node.val) &&
+               isValidRecHelper(node.right, node.val, maxVal);
     }
 
     /**
      * Iterative inorder approach using stack.
+     * More space-efficient for very deep trees. Avoids recursion stack overflow issues.
      *
-     * More space-efficient for very deep trees.
-     * Avoids recursion stack overflow issues.
+     * Algorithm:
+     * 1. Use a stack to perform iterative inorder traversal
+     * 2. Keep track of the previous node's value
+     * 3. For each node, ensure current value > previous value
+     * 4. If any violation occurs, return false.
+     * 5. If traversal completes without violations, return true.
+     *
+     * Time Complexity: O(n) - visit each node once
+     * Space Complexity: O(h) - stack space for tree height
      */
     public boolean isValidBSTIterative(TreeNode root) {
         Stack<TreeNode> stack = new Stack<>();
@@ -131,49 +100,6 @@ public class ValidateBinarySearchTree {
         }
 
         return true;
-    }
-
-    /**
-     * Approach using custom validation with node info.
-     *
-     * Returns validation info including min/max values in subtree.
-     * Useful when you need subtree statistics.
-     */
-    static class ValidationInfo {
-        boolean isValid;
-        int minVal;
-        int maxVal;
-
-        ValidationInfo(boolean isValid, int minVal, int maxVal) {
-            this.isValid = isValid;
-            this.minVal = minVal;
-            this.maxVal = maxVal;
-        }
-    }
-
-    public boolean isValidBSTWithInfo(TreeNode root) {
-        return validateWithInfo(root).isValid;
-    }
-
-    // Helper that returns validation info
-    private ValidationInfo validateWithInfo(TreeNode node) {
-        if (node == null) {
-            return new ValidationInfo(true, Integer.MAX_VALUE, Integer.MIN_VALUE);
-        }
-
-        ValidationInfo leftInfo = validateWithInfo(node.left);
-        ValidationInfo rightInfo = validateWithInfo(node.right);
-
-        // Check if current subtree is valid BST
-        boolean isValid = leftInfo.isValid && rightInfo.isValid &&
-                         (node.left == null || leftInfo.maxVal < node.val) &&
-                         (node.right == null || rightInfo.minVal > node.val);
-
-        // Calculate min/max for current subtree
-        int minVal = (node.left == null) ? node.val : leftInfo.minVal;
-        int maxVal = (node.right == null) ? node.val : rightInfo.maxVal;
-
-        return new ValidationInfo(isValid, minVal, maxVal);
     }
 
     // Definition for a binary tree node
