@@ -10,8 +10,8 @@ import java.util.*;
  * You start on square 1 of the board. In each move, starting from square curr, do the following:
  * Choose a destination square next with a label in the range [curr + 1, min(curr + 6, n²)].
  * If next has a snake or ladder, you must move to the destination of that snake or ladder.
- * The game ends when you reach the square n². Return the least number of moves required to reach
- * the square n². If it is not possible, return -1.
+ * The game ends when you reach the square n².
+ * Return the least number of moves required to reach the square n². If it is not possible, return -1.
  *
  * Example:
  * Input: board = [[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1]]
@@ -57,8 +57,8 @@ public class SnakesAndLadders {
             return -1;
         }
 
-        int n = board.length;
-        int target = n * n;
+        int length = board.length;
+        int target = length * length;
 
         // Convert 2D board to 1D for easier navigation
         int[] flatBoard = convertTo1D(board);
@@ -72,10 +72,10 @@ public class SnakesAndLadders {
         int moves = 0;
 
         while (!queue.isEmpty()) {
-            int size = queue.size();
+            int queueSize = queue.size();
             moves++;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < queueSize; i++) {
                 int current = queue.poll();
 
                 // Try all possible dice rolls (1-6)
@@ -112,19 +112,19 @@ public class SnakesAndLadders {
 
     // Convert 2D board to 1D array using Boustrophedon numbering
     private int[] convertTo1D(int[][] board) {
-        int n = board.length;
-        int[] flatBoard = new int[n * n + 1];
+        int length = board.length;
+        int[] flatBoard = new int[length * length + 1];
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
                 // Calculate position based on Boustrophedon pattern
                 int position;
                 if (i % 2 == 0) {
                     // Even rows: left to right
-                    position = (n - 1 - i) * n + j + 1;
+                    position = ((length - 1 - i) * length) + (j + 1);
                 } else {
                     // Odd rows: right to left
-                    position = (n - 1 - i) * n + (n - 1 - j) + 1;
+                    position = ((length - 1 - i) * length) + ((length - 1 - j) + 1);
                 }
                 flatBoard[position] = board[i][j];
             }

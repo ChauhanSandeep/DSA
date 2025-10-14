@@ -63,7 +63,7 @@ public class CopyListWithRandomPointer {
     public Node copyRandomList(Node head) {
         if (head == null) return null;
 
-        Map<Node, Node> nodeMap = new HashMap<>();
+        Map<Node, Node> nodeMap = new HashMap<>(); // <Original Node, Copied Node>
 
         // First pass: Create all nodes and store mapping
         Node current = head;
@@ -86,7 +86,10 @@ public class CopyListWithRandomPointer {
 
     /**
      * Space-optimized approach using interweaving technique.
-     * Creates copied nodes between original nodes to avoid using extra space.
+     * Interweaving technique:
+     * 1. Create copied nodes and place them next to original nodes
+     * 2. Set random pointers for copied nodes
+     * 3. Separate the two lists
      *
      * Algorithm:
      * 1. Create copied nodes and interweave with original nodes
@@ -102,7 +105,7 @@ public class CopyListWithRandomPointer {
     public Node copyRandomListOptimized(Node head) {
         if (head == null) return null;
 
-        // Step 1: Create copied nodes and interweave
+        // Pass 1: Create copied nodes and place them next to original nodes
         Node current = head;
         while (current != null) {
             Node copiedNode = new Node(current.val);
@@ -111,7 +114,7 @@ public class CopyListWithRandomPointer {
             current = copiedNode.next;
         }
 
-        // Step 2: Set random pointers for copied nodes
+        // Pass 2: Set random pointers for copied nodes
         current = head;
         while (current != null) {
             if (current.random != null) {
@@ -120,7 +123,7 @@ public class CopyListWithRandomPointer {
             current = current.next.next;
         }
 
-        // Step 3: Separate the two lists
+        // Pass 3: Separate the two lists
         Node copiedHead = head.next;
         Node originalCurrent = head;
         Node copiedCurrent = copiedHead;
@@ -136,30 +139,5 @@ public class CopyListWithRandomPointer {
         }
 
         return copiedHead;
-    }
-
-    /**
-     * Recursive approach with memoization.
-     * Uses HashMap to avoid infinite recursion on cycles.
-     */
-    public Node copyRandomListRecursive(Node head) {
-        return copyHelper(head, new HashMap<>());
-    }
-
-    // Helper method for recursive approach
-    private Node copyHelper(Node node, Map<Node, Node> visited) {
-        if (node == null) return null;
-
-        if (visited.containsKey(node)) {
-            return visited.get(node);
-        }
-
-        Node copiedNode = new Node(node.val);
-        visited.put(node, copiedNode);
-
-        copiedNode.next = copyHelper(node.next, visited);
-        copiedNode.random = copyHelper(node.random, visited);
-
-        return copiedNode;
     }
 }

@@ -35,6 +35,15 @@ public class ValidParenthesisString {
     /**
      * Validates parenthesis string with wildcards using range tracking approach.
      *
+     * The idea is that we maintain a range of possible open parentheses counts as we iterate through the string.
+     * At each step, we update the range based on the current character:
+     * - '(' : increment both min and max (must add one open)
+     * - ')' : decrement both min and max, ensure min >= 0 (close one open)
+     * - '*' : decrement min (use as ')'), increment max (use as '(')
+     *
+     * If at any point maxOpen < 0, it means we can't balance the string, so we return false.
+     * At the end, we check if 0 is within the range [minOpen, maxOpen].
+     *
      * Algorithm:
      * 1. Track range of possible open parentheses count: [minOpen, maxOpen]
      * 2. For '(': increment both min and max (must add one open)
@@ -54,6 +63,7 @@ public class ValidParenthesisString {
             return true;
         }
 
+        // Min and max possible open parentheses
         int minOpen = 0; // Minimum possible open parentheses
         int maxOpen = 0; // Maximum possible open parentheses
 
@@ -68,25 +78,33 @@ public class ValidParenthesisString {
                 maxOpen--;
             } else { // c == '*'
                 // Can treat as ')', '(', or empty
-                minOpen = Math.max(0, minOpen - 1); // Treat as ')'
+                minOpen = Math.max(0, minOpen - 1); // Treat as ')'. If goes negative, reset to 0 (taking * as empty string)
                 maxOpen++; // Treat as '('
             }
 
-            // If maximum possible opens becomes negative, impossible to balance
+            // If maximum possible opens becomes negative anywhere in traversal, its impossible to balance
             if (maxOpen < 0) {
                 return false;
             }
         }
 
-        // Valid if we can have exactly 0 open parentheses at the end
+        // Valid if 0 is within the range of possible open parentheses
         return minOpen <= 0 && maxOpen >= 0;
     }
 
     /**
-     * Alternative two-pass approach for validation.
+     * Two-pass approach.
+     *
+     * Algorithm:
+     * 1. First pass: left to right, check if we can balance all ')'. Here we treat '*' as '('
+     * 2. Second pass: right to left, check if we can balance all '('. Here we treat '*' as ')'
+     * 3. If both passes are valid, return true
+     *
+     * Time Complexity: O(n) where n is length of stringf
+     * Space Complexity: O(1) - only uses constant extra space
      */
     public boolean checkValidStringTwoPass(String s) {
-        // First pass: left to right, check if we can balance all ')'
+        // First pass: left to right, check if we can balance all ')'. Here we treat '*' as '('
         int balance = 0;
         for (char c : s.toCharArray()) {
             if (c == '(' || c == '*') {
@@ -100,7 +118,7 @@ public class ValidParenthesisString {
             }
         }
 
-        // Second pass: right to left, check if we can balance all '('
+        // Second pass: right to left, check if we can balance all '('. Here we treat '*' as ')'
         balance = 0;
         for (int i = s.length() - 1; i >= 0; i--) {
             char c = s.charAt(i);
@@ -116,60 +134,5 @@ public class ValidParenthesisString {
         }
 
         return true;
-    }
-
-    /**
-     * Dynamic Programming approach for educational purposes.
-     */
-    public boolean checkValidStringDP(String s) {
-        int n = s.length();
-        // dp[i][j] = true if substring s[i...j] can be made valid
-        boolean[][] dp = new boolean[n][n];
-
-        // Base case: single characters
-        for (int i = 0; i < n; i++) {
-            if (s.charAt(i) == '*') {
-                dp[i][i] = true;
-            }
-        }
-
-        // Fill DP table for increasing lengths
-        for (int len = 2; len <= n; len++) {
-            for (int i = 0; i <= n - len; i++) {
-                int j = i + len - 1;
-
-                // Case 1: s[i] and s[j] form a pair
-                char left = s.charAt(i);
-                char right = s.charAt(j);
-
-                if ((left == '(' || left == '*') && (right == ')' || right == '*')) {
-                    if (len == 2) {
-                        dp[i][j] = true;
-                    } else if (dp[i + 1][j - 1]) {
-                        dp[i][j] = true;
-                    }
-                }
-
-                // Case 2: split into two valid substrings
-                for (int k = i; k < j; k++) {
-                    if (dp[i][k] && dp[k + 1][j]) {
-                        dp[i][j] = true;
-                        break;
-                    }
-                }
-
-                // Case 3: s[i] is treated as empty (if it's '*')
-                if (s.charAt(i) == '*' && dp[i + 1][j]) {
-                    dp[i][j] = true;
-                }
-
-                // Case 4: s[j] is treated as empty (if it's '*')
-                if (s.charAt(j) == '*' && dp[i][j - 1]) {
-                    dp[i][j] = true;
-                }
-            }
-        }
-
-        return dp[0][n - 1];
     }
 }

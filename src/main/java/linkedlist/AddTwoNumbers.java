@@ -52,23 +52,23 @@ public class AddTwoNumbers {
      * Time Complexity: O(max(m, n)) where m and n are lengths of the two lists
      * Space Complexity: O(max(m, n)) for the result list
      *
-     * @param l1 First number as linked list in reverse order
-     * @param l2 Second number as linked list in reverse order
+     * @param node1 First number as linked list in reverse order
+     * @param node2 Second number as linked list in reverse order
      * @return Sum as linked list in reverse order
      */
-    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+    public ListNode addTwoNumbers(ListNode node1, ListNode node2) {
         // Handle edge cases
-        if (l1 == null) return l2;
-        if (l2 == null) return l1;
+        if (node1 == null) return node2;
+        if (node2 == null) return node1;
 
         ListNode dummyHead = new ListNode(0);
         ListNode current = dummyHead;
         int carry = 0;
 
         // Process both lists and handle carry
-        while (l1 != null || l2 != null || carry > 0) {
-            int digit1 = (l1 != null) ? l1.val : 0;
-            int digit2 = (l2 != null) ? l2.val : 0;
+        while (node1 != null || node2 != null || carry > 0) {
+            int digit1 = (node1 != null) ? node1.val : 0;
+            int digit2 = (node2 != null) ? node2.val : 0;
 
             int sum = digit1 + digit2 + carry;
             carry = sum / 10;
@@ -77,43 +77,10 @@ public class AddTwoNumbers {
             current = current.next;
 
             // Move to next nodes if available
-            if (l1 != null) l1 = l1.next;
-            if (l2 != null) l2 = l2.next;
+            if (node1 != null) node1 = node1.next;
+            if (node2 != null) node2 = node2.next;
         }
 
         return dummyHead.next;
-    }
-
-    /**
-     * Alternative recursive approach for adding two numbers.
-     * This approach is more elegant but uses O(max(m,n)) stack space.
-     *
-     * @param l1 First number as linked list
-     * @param l2 Second number as linked list
-     * @return Sum as linked list
-     */
-    public ListNode addTwoNumbersRecursive(ListNode l1, ListNode l2) {
-        return addTwoNumbersHelper(l1, l2, 0);
-    }
-
-    // Helper method for recursive approach
-    private ListNode addTwoNumbersHelper(ListNode l1, ListNode l2, int carry) {
-        // Base case: both lists are null and no carry
-        if (l1 == null && l2 == null && carry == 0) {
-            return null;
-        }
-
-        int digit1 = (l1 != null) ? l1.val : 0;
-        int digit2 = (l2 != null) ? l2.val : 0;
-        int sum = digit1 + digit2 + carry;
-
-        ListNode resultNode = new ListNode(sum % 10);
-        resultNode.next = addTwoNumbersHelper(
-            (l1 != null) ? l1.next : null,
-            (l2 != null) ? l2.next : null,
-            sum / 10
-        );
-
-        return resultNode;
     }
 }
