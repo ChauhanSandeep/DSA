@@ -1,154 +1,166 @@
 package arrays;
 
 /**
- * Minimum Domino Rotations For Equal Row
+ * Problem: Minimum Domino Rotations For Equal Row
  *
- * Problem: Given two rows of dominoes, find minimum rotations to make all dominoes
- * in one row have the same value. Return -1 if impossible.
+ * In a row of dominoes, tops[i] and bottoms[i] represent the top and bottom halves
+ * of the ith domino. A domino is a tile with two numbers from 1 to 6 - one on each
+ * half of the tile. We may rotate the ith domino, so that tops[i] and bottoms[i]
+ * swap values.
  *
- * Example: tops = [2,1,2,4,2,2], bottoms = [5,2,6,2,3,2] -> Output: 2
- * Can make all tops = 2 with 2 rotations, or all bottoms = 2 with 3 rotations.
+ * Return the minimum number of rotations so that all the values in tops are the same,
+ * or all the values in bottoms are the same. If it cannot be done, return -1.
+ *
+ * Example:
+ * Input:
+ * tops =    [2,1,2,4,2,2],
+ * bottoms = [5,2,6,2,3,2]
+ * Output: 2
+ * Explanation:
+ * We can rotate the second and fourth dominoes to make all top values equal to 2.
+ * After:  tops=[2,2,2,2,2,2], bottoms=[5,1,6,4,3,2]
+ *
+ * Input: tops = [3,5,1,2,3], bottoms = [3,6,3,3,4]
+ * Output: -1
+ * Explanation: No single value can fill an entire row after rotations.
  *
  * LeetCode: https://leetcode.com/problems/minimum-domino-rotations-for-equal-row
  *
  * Follow-up Questions:
- * - What if we have more than 2 rows? (Check all possible target values across all rows)
- * - How to handle case with multiple valid solutions? (Return minimum among all)
- * - What if rotation cost varies? (Use dynamic programming with costs)
+ * 1. Q: What if dominoes could have values outside 1-6 range?
+ *    A: The algorithm works the same, just need to adjust data structures accordingly.
+ *
+ * 2. Q: How would you handle the case where multiple solutions exist with same minimum?
+ *    A: Current solution returns the minimum count. Could be modified to return all optimal configurations.
+ *
+ * 3. Q: What if we could rearrange dominoes in addition to rotating them?
+ *    A: That would be a different problem requiring sorting/greedy approach for placement.
+ *
+ * 4. Q: How would you optimize for very large arrays?
+ *    A: Current O(n) solution is already optimal. Could use early termination optimizations.
+ *
+ * Related Problems:
+ * - Best Meeting Point: https://leetcode.com/problems/best-meeting-point/
+ * - Minimum Moves to Equal Array Elements II: https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/
+ * - Flip String to Monotone Increasing: https://leetcode.com/problems/flip-string-to-monotone-increasing/
  */
 public class MinimumDominoRotationsForEqualRow {
 
     /**
-     * Finds minimum rotations to make one row uniform.
+     * Finds minimum rotations by checking candidate values from first domino.
      *
      * Algorithm:
-     * 1. Only values from first domino can make entire row uniform
-     * 2. Check if tops[0] can make all tops uniform or all bottoms uniform
-     * 3. Check if bottoms[0] can make all tops uniform or all bottoms uniform
-     * 4. For each candidate, count rotations needed and verify feasibility
-     * 5. Return minimum rotations among all valid possibilities
+     * 1. For a solution to exist, the target value must appear in every domino
+     * 2. The only possible target values are tops[0] and bottoms[0] (from first domino)
+     * 3. For each candidate, check if it appears in all dominoes (top or bottom)
+     * 4. Count rotations needed to make all tops or all bottoms equal to candidate
+     * 5. Return minimum rotations among all valid configurations
      *
      * Time Complexity: O(n) where n is number of dominoes
-     * Space Complexity: O(1) - only using constant extra space
+     * Space Complexity: O(1) using constant extra space
      *
-     * @param tops top values of dominoes
-     * @param bottoms bottom values of dominoes
+     * @param tops array representing top values of dominoes
+     * @param bottoms array representing bottom values of dominoes
      * @return minimum rotations needed, or -1 if impossible
      */
     public int minDominoRotations(int[] tops, int[] bottoms) {
-        int n = tops.length;
-
-        // Check if we can make all tops equal to tops[0]
-        int rotationsTopToTop = getRotations(tops, bottoms, tops[0], true);
-
-        // Check if we can make all bottoms equal to tops[0]
-        int rotationsTopToBottom = getRotations(tops, bottoms, tops[0], false);
-
-        // Check if we can make all tops equal to bottoms[0]
-        int rotationsBottomToTop = getRotations(tops, bottoms, bottoms[0], true);
-
-        // Check if we can make all bottoms equal to bottoms[0]
-        int rotationsBottomToBottom = getRotations(tops, bottoms, bottoms[0], false);
-
-        // Find minimum among valid options
-        int minRotations = Integer.MAX_VALUE;
-
-        if (rotationsTopToTop != -1) minRotations = Math.min(minRotations, rotationsTopToTop);
-        if (rotationsTopToBottom != -1) minRotations = Math.min(minRotations, rotationsTopToBottom);
-        if (rotationsBottomToTop != -1) minRotations = Math.min(minRotations, rotationsBottomToTop);
-        if (rotationsBottomToBottom != -1) minRotations = Math.min(minRotations, rotationsBottomToBottom);
-
-        return minRotations == Integer.MAX_VALUE ? -1 : minRotations;
-    }
-
-    /**
-     * Helper method to calculate rotations needed for a specific target and row
-     *
-     * @param tops top values
-     * @param bottoms bottom values
-     * @param target target value to achieve uniformity
-     * @param targetTop true if making top row uniform, false for bottom row
-     * @return number of rotations needed, or -1 if impossible
-     */
-    private int getRotations(int[] tops, int[] bottoms, int target, boolean targetTop) {
-        int rotations = 0;
-
-        for (int i = 0; i < tops.length; i++) {
-            if (targetTop) {
-                // Want all tops to be target
-                if (tops[i] == target) {
-                    // Already correct, no rotation needed
-                    continue;
-                } else if (bottoms[i] == target) {
-                    // Can rotate to get target on top
-                    rotations++;
-                } else {
-                    // Neither top nor bottom has target - impossible
-                    return -1;
-                }
-            } else {
-                // Want all bottoms to be target
-                if (bottoms[i] == target) {
-                    // Already correct, no rotation needed
-                    continue;
-                } else if (tops[i] == target) {
-                    // Can rotate to get target on bottom
-                    rotations++;
-                } else {
-                    // Neither top nor bottom has target - impossible
-                    return -1;
-                }
-            }
+        if (tops == null || bottoms == null || tops.length != bottoms.length) {
+            return -1;
         }
 
-        return rotations;
-    }
+        int length = tops.length;
 
-    /**
-     * Optimized approach checking only necessary candidates
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int minDominoRotationsOptimized(int[] tops, int[] bottoms) {
-        // Only two possible candidates: tops[0] and bottoms[0]
+        // Try both values from the first domino as potential targets
         int candidate1 = tops[0];
         int candidate2 = bottoms[0];
 
-        int result = Integer.MAX_VALUE;
+        // Check minimum rotations for first candidate
+        int rotationsForCandidate1 = getMinRotations(tops, bottoms, candidate1);
 
-        // Check candidate1
-        int rotations1Top = checkCandidate(tops, bottoms, candidate1, true);
-        int rotations1Bottom = checkCandidate(tops, bottoms, candidate1, false);
+        // Check minimum rotations for second candidate (if different)
+        int rotationsForCandidate2 = getMinRotations(tops, bottoms, candidate2);
 
-        if (rotations1Top != -1) result = Math.min(result, rotations1Top);
-        if (rotations1Bottom != -1) result = Math.min(result, rotations1Bottom);
-
-        // Check candidate2 (only if different from candidate1)
-        if (candidate2 != candidate1) {
-            int rotations2Top = checkCandidate(tops, bottoms, candidate2, true);
-            int rotations2Bottom = checkCandidate(tops, bottoms, candidate2, false);
-
-            if (rotations2Top != -1) result = Math.min(result, rotations2Top);
-            if (rotations2Bottom != -1) result = Math.min(result, rotations2Bottom);
-        }
-
-        return result == Integer.MAX_VALUE ? -1 : result;
+        // Return minimum of valid rotations, or -1 if none possible
+        int minRotations = Math.min(rotationsForCandidate1, rotationsForCandidate2);
+        return minRotations == Integer.MAX_VALUE ? -1 : minRotations;
     }
 
-    // Helper method for optimized approach
-    private int checkCandidate(int[] tops, int[] bottoms, int target, boolean makeTopUniform) {
-        int rotations = 0;
+    // Helper method to calculate minimum rotations for a target value
+    private int getMinRotations(int[] tops, int[] bottoms, int target) {
+        int rotationsToMakeAllTopsEqual = 0;
+        int rotationsToMakeAllBottomsEqual = 0;
 
         for (int i = 0; i < tops.length; i++) {
-            boolean hasTarget = (tops[i] == target) || (bottoms[i] == target);
-            if (!hasTarget) return -1; // Impossible
+            // Check if target value exists in current domino
+            if (tops[i] != target && bottoms[i] != target) {
+                return Integer.MAX_VALUE; // Impossible to achieve target
+            }
 
-            if (makeTopUniform) {
-                if (tops[i] != target) rotations++;
-            } else {
-                if (bottoms[i] != target) rotations++;
+            // Count rotations needed for all tops to be target
+            if (tops[i] != target) {
+                rotationsToMakeAllTopsEqual++; // Need to rotate this domino
+            }
+
+            // Count rotations needed for all bottoms to be target
+            if (bottoms[i] != target) {
+                rotationsToMakeAllBottomsEqual++; // Need to rotate this domino
             }
         }
 
-        return rotations;
+        // Return minimum rotations between making all tops or all bottoms equal
+        return Math.min(rotationsToMakeAllTopsEqual, rotationsToMakeAllBottomsEqual);
+    }
+
+    /**
+     * Alternative approach using frequency counting for all possible values.
+     * More comprehensive but slightly less efficient for this specific problem.
+     *
+     * Algorithm:
+     * 1. Count frequency of each value (1-6) in tops, bottoms, and combined
+     * 2. For each value that appears in all dominoes, calculate minimum rotations
+     * 3. A value appears in all dominoes if: topCount + bottomCount - bothCount = n
+     * 4. Return minimum rotations among all valid target values
+     *
+     * Time Complexity: O(n) where n is number of dominoes
+     * Space Complexity: O(1) using fixed-size arrays for counting
+     *
+     * @param tops array representing top values of dominoes
+     * @param bottoms array representing bottom values of dominoes
+     * @return minimum rotations needed, or -1 if impossible
+     */
+    public int minDominoRotationsAlternative(int[] tops, int[] bottoms) {
+        if (tops == null || bottoms == null || tops.length != bottoms.length) {
+            return -1;
+        }
+
+        int length = tops.length;
+        int[] topCount = new int[7];     // Count of each value in tops (1-6)
+        int[] bottomCount = new int[7];  // Count of each value in bottoms (1-6)
+        int[] bothCount = new int[7];    // Count where same value appears in both
+
+        // Count frequencies
+        for (int i = 0; i < length; i++) {
+            topCount[tops[i]]++;
+            bottomCount[bottoms[i]]++;
+            if (tops[i] == bottoms[i]) {
+                bothCount[tops[i]]++;
+            }
+        }
+
+        int result = Integer.MAX_VALUE;
+
+        // Check each possible value (1-6)
+        for (int value = 1; value <= 6; value++) {
+            // Check if this value can fill entire row
+            if (topCount[value] + bottomCount[value] - bothCount[value] == length) {
+                // Calculate rotations needed
+                int rotationsForTops = length - topCount[value];
+                int rotationsForBottoms = length - bottomCount[value];
+
+                result = Math.min(result, Math.min(rotationsForTops, rotationsForBottoms));
+            }
+        }
+
+        return result == Integer.MAX_VALUE ? -1 : result;
     }
 }
