@@ -1,4 +1,4 @@
-package graph.Dijkstra;
+package graphs.Dijkstra;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;

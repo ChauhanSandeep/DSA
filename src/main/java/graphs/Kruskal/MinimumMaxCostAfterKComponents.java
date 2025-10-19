@@ -1,4 +1,4 @@
-package graph.Kruskal;
+package graphs.Kruskal;
 
 import java.util.*;
 

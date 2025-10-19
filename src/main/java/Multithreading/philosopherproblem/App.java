@@ -1,4 +1,4 @@
-package multithreading.philosopherproblem;
+package Multithreading.philosopherproblem;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

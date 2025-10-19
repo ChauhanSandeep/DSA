@@ -1,4 +1,4 @@
-package multithreading.philosopherproblem;
+package Multithreading.philosopherproblem;
 
 /**
  * Represents the state of a chopstick in the Dining Philosophers problem.

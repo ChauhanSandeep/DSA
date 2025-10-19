@@ -1,4 +1,4 @@
-package multithreading.utilities;
+package Multithreading.utilities;
 
 /**
  * Problem: Print Odd and Even numbers using two threads in sequence.

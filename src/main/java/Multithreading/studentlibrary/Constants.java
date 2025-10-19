@@ -1,4 +1,4 @@
-package multithreading.studentlibrary;
+package Multithreading.studentlibrary;
 
 /**
  * Defines global constants for the Student Library simulation.

@@ -1,4 +1,4 @@
-package multithreading.concurrentcollections;
+package Multithreading.concurrentcollections;
 
 import java.util.ArrayList;
 import java.util.Collections;

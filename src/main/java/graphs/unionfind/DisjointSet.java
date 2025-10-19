@@ -1,4 +1,4 @@
-package graph.unionfind;
+package graphs.unionfind;
 
 public class DisjointSet {
   private int[] parent; // parent[i] is the parent of i
