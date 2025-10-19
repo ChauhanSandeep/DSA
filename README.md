@@ -24,7 +24,7 @@ This repository is organized into various categories covering different topics i
 
 ## 🎯 LeetCode Problems
 
-For a complete, categorized list of all **317 LeetCode problems** with their solutions in this repository, please refer to:
+For a complete, categorized list of all **537 LeetCode problems** with their solutions in this repository, please refer to:
 
 ### 📋 [LEETCODE_PROBLEMS.md](LEETCODE_PROBLEMS.md)
 
