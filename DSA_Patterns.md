@@ -816,6 +816,12 @@ These are **tactical, reusable coding patterns** that appear across multiple DSA
 
 **Key Idea:** Use array indices as hash keys by negating values at `nums[i] - 1` to mark that number `i` has been seen, achieving O(1) space without extra data structures.
 
+**LeetCode Problems:**
+- [442. Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)
+- [448. Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)
+- [41. First Missing Positive](https://leetcode.com/problems/first-missing-positive/)
+- [287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/) (with modification)
+
 **Code Snippet:**
 ```java
 // Mark presence by negating value at index
@@ -841,6 +847,12 @@ for (int i = 0; i < nums.length; i++) {
 **Problem Context:** Finding subarrays with specific sum properties (zero sum, sum equals k, subarray divisibility).
 
 **Key Idea:** Store cumulative sums in a HashMap; if the same prefix sum appears twice, the subarray between those indices has sum zero (or use `prefixSum - target` for sum k problems).
+
+**LeetCode Problems:**
+- [560. Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
+- [523. Continuous Subarray Sum](https://leetcode.com/problems/continuous-subarray-sum/)
+- [525. Contiguous Array](https://leetcode.com/problems/contiguous-array/)
+- [974. Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
 
 **Code Snippet:**
 ```java
@@ -869,6 +881,11 @@ for (int i = 0; i < nums.length; i++) {
 **Problem Context:** Finding maximum XOR pairs, detecting single numbers, or bit manipulation optimization problems.
 
 **Key Idea:** Build XOR results bit-by-bit from MSB to LSB, using HashSet to check if complementary prefixes exist that can set each bit greedily.
+
+**LeetCode Problems:**
+- [421. Maximum XOR of Two Numbers in an Array](https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/)
+- [1707. Maximum XOR With an Element From Array](https://leetcode.com/problems/maximum-xor-with-an-element-from-array/)
+- [1938. Maximum Genetic Difference Query](https://leetcode.com/problems/maximum-genetic-difference-query/)
 
 **Code Snippet:**
 ```java
@@ -901,6 +918,13 @@ for (int i = 31; i >= 0; i--) {
 
 **Key Idea:** Maintain a monotonic stack (increasing/decreasing) and pop elements when a larger/smaller element is found, resolving their "next greater/smaller" in one pass.
 
+**LeetCode Problems:**
+- [496. Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
+- [503. Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)
+- [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
+- [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+- [901. Online Stock Span](https://leetcode.com/problems/online-stock-span/)
+
 **Code Snippet:**
 ```java
 Stack<Integer> stack = new Stack<>();  // Store indices
@@ -927,6 +951,11 @@ for (int i = 0; i < n; i++) {
 **Problem Context:** Finding duplicates in arrays where values point to indices, or detecting cycles in functional graphs.
 
 **Key Idea:** Treat array as linked list where `next = nums[current]`, then apply two-pointer cycle detection to find the cycle entrance (the duplicate).
+
+**LeetCode Problems:**
+- [287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
+- [142. Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
+- [202. Happy Number](https://leetcode.com/problems/happy-number/)
 
 **Code Snippet:**
 ```java
@@ -957,6 +986,10 @@ return slow;  // The duplicate number
 **Problem Context:** Deep copying linked lists with random pointers or complex references without extra space.
 
 **Key Idea:** Interweave copied nodes with original nodes (original→copy→original→copy), set pointers using relationships, then separate lists.
+
+**LeetCode Problems:**
+- [138. Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/)
+- [133. Clone Graph](https://leetcode.com/problems/clone-graph/) (uses similar HashMap concept)
 
 **Code Snippet:**
 ```java
@@ -991,6 +1024,12 @@ while (curr != null) {
 
 **Key Idea:** Track running sum/product; if it becomes unfavorable (negative for sum, < 1 for product), reset to current element as new potential starting point.
 
+**LeetCode Problems:**
+- [53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
+- [152. Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)
+- [918. Maximum Sum Circular Subarray](https://leetcode.com/problems/maximum-sum-circular-subarray/)
+- [1749. Maximum Absolute Sum of Any Subarray](https://leetcode.com/problems/maximum-absolute-sum-of-any-subarray/)
+
 **Code Snippet:**
 ```java
 int maxSum = Integer.MIN_VALUE;
@@ -1019,6 +1058,13 @@ return maxSum;
 
 **Key Idea:** Instead of maintaining full DP array, keep only the last two values needed, reducing space from O(n) to O(1).
 
+**LeetCode Problems:**
+- [198. House Robber](https://leetcode.com/problems/house-robber/)
+- [213. House Robber II](https://leetcode.com/problems/house-robber-ii/)
+- [70. Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
+- [509. Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)
+- [1137. N-th Tribonacci Number](https://leetcode.com/problems/n-th-tribonacci-number/)
+
 **Code Snippet:**
 ```java
 int prev2 = nums[0];           // dp[i-2]
@@ -1044,6 +1090,11 @@ return prev1;
 
 **Key Idea:** XOR gives sum without carry, AND shifted left gives carry; iterate until no carry remains.
 
+**LeetCode Problems:**
+- [371. Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
+- [67. Add Binary](https://leetcode.com/problems/add-binary/)
+- [989. Add to Array-Form of Integer](https://leetcode.com/problems/add-to-array-form-of-integer/)
+
 **Code Snippet:**
 ```java
 while (b != 0) {
@@ -1065,6 +1116,11 @@ return a;
 **Problem Context:** Finding maximum/minimum in all windows of size k, maintaining order in dynamic range queries.
 
 **Key Idea:** Use monotonic deque to maintain potential maximums in decreasing order; remove from front when outside window, from back when smaller than current.
+
+**LeetCode Problems:**
+- [239. Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)
+- [1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/)
+- [862. Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/)
 
 **Code Snippet:**
 ```java
@@ -1099,6 +1155,13 @@ for (int i = 0; i < nums.length; i++) {
 
 **Key Idea:** Binary search not on array indices but on the range of possible answers; use a feasibility function to check if an answer works.
 
+**LeetCode Problems:**
+- [1011. Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
+- [410. Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)
+- [875. Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)
+- [1552. Magnetic Force Between Two Balls](https://leetcode.com/problems/magnetic-force-between-two-balls/)
+- [1482. Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)
+
 **Code Snippet:**
 ```java
 int left = maxElement, right = totalSum;
@@ -1130,6 +1193,12 @@ private boolean isFeasible(int[] nums, int capacity, int k) {
 
 **Key Idea:** Use `computeIfAbsent` to avoid null checks and make code cleaner when values are collections or complex objects.
 
+**LeetCode Problems:**
+- [49. Group Anagrams](https://leetcode.com/problems/group-anagrams/)
+- [582. Kill Process](https://leetcode.com/problems/kill-process/)
+- [692. Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/)
+- [1152. Analyze User Website Visit Pattern](https://leetcode.com/problems/analyze-user-website-visit-pattern/)
+
 **Code Snippet:**
 ```java
 Map<Integer, List<Integer>> graph = new HashMap<>();
@@ -1155,6 +1224,12 @@ graph.computeIfAbsent(node, k -> new ArrayList<>()).add(neighbor);
 **Problem Context:** Reversing arrays, strings, or portions of sequences without extra space.
 
 **Key Idea:** Use two pointers (start and end) moving toward center, swapping elements until they meet.
+
+**LeetCode Problems:**
+- [189. Rotate Array](https://leetcode.com/problems/rotate-array/)
+- [344. Reverse String](https://leetcode.com/problems/reverse-string/)
+- [151. Reverse Words in a String](https://leetcode.com/problems/reverse-words-in-a-string/)
+- [186. Reverse Words in a String II](https://leetcode.com/problems/reverse-words-in-a-string-ii/)
 
 **Code Snippet:**
 ```java
@@ -1182,6 +1257,12 @@ private void reverse(int[] arr, int start, int end) {
 
 **Key Idea:** XOR has properties `a ^ a = 0` and `a ^ 0 = a`, so XORing all elements cancels duplicates leaving only the unique one.
 
+**LeetCode Problems:**
+- [136. Single Number](https://leetcode.com/problems/single-number/)
+- [137. Single Number II](https://leetcode.com/problems/single-number-ii/)
+- [260. Single Number III](https://leetcode.com/problems/single-number-iii/)
+- [540. Single Element in a Sorted Array](https://leetcode.com/problems/single-element-in-a-sorted-array/)
+
 **Code Snippet:**
 ```java
 int unique = 0;
@@ -1202,6 +1283,13 @@ return unique;  // All duplicates cancel out
 **Problem Context:** Linked list operations (merge, insert, delete) where head might change.
 
 **Key Idea:** Create a dummy node pointing to head; all operations treat it uniformly, eliminating special cases for head operations.
+
+**LeetCode Problems:**
+- [21. Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
+- [83. Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/)
+- [82. Remove Duplicates from Sorted List II](https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/)
+- [203. Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/)
+- [86. Partition List](https://leetcode.com/problems/partition-list/)
 
 **Code Snippet:**
 ```java
