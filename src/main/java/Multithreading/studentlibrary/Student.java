@@ -1,4 +1,4 @@
-package multithreading.studentlibrary;
+package Multithreading.studentlibrary;
 
 import java.util.Random;
 

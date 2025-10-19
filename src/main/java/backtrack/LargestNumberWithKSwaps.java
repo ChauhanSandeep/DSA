@@ -1,4 +1,4 @@
-package greedy;
+package backtrack;
 
 /**
  * Problem: Largest Number in K Swaps

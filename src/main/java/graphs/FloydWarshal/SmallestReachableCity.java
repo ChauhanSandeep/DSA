@@ -1,4 +1,4 @@
-package graph.FloydWarshal;
+package graphs.FloydWarshal;
 
 import java.util.Arrays;
 

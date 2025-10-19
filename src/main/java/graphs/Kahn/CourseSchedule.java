@@ -1,4 +1,4 @@
-package graph.Kahn;
+package graphs.Kahn;
 
 import java.util.*;
 

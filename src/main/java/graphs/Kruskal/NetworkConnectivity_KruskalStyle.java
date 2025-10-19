@@ -1,4 +1,4 @@
-package graph.Kruskal;
+package graphs.Kruskal;
 
 /**
  * There are n computers labeled from 0 to n - 1.

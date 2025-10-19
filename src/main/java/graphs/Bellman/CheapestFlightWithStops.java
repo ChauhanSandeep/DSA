@@ -1,4 +1,4 @@
-package graph.Bellman;
+package graphs.Bellman;
 
 import java.util.*;
 

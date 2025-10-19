@@ -1,4 +1,4 @@
-package multithreading.philosopherproblem;
+package Multithreading.philosopherproblem;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package bitwise;
+package bitwiseoperation;
 
 import java.util.*;
 

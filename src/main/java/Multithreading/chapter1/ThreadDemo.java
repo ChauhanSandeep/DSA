@@ -1,4 +1,4 @@
-package multithreading.chapter1;
+package Multithreading.chapter1;
 
 /**
  * Demonstrates different ways to create and execute threads in Java.

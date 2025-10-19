@@ -1,4 +1,4 @@
-package tree;
+package trees;
 
 /**
  * Given a Binary Search Tree (BST) and two node values, this program finds the Lowest Common Ancestor (LCA) of the two nodes.
