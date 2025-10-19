@@ -1,4 +1,4 @@
-package arrays;
+package com.sandeep.frazsheet.twopointers;
 
 import java.util.*;
 
