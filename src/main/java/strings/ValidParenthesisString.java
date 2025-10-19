@@ -100,7 +100,7 @@ public class ValidParenthesisString {
      * 2. Second pass: right to left, check if we can balance all '('. Here we treat '*' as ')'
      * 3. If both passes are valid, return true
      *
-     * Time Complexity: O(n) where n is length of stringf
+     * Time Complexity: O(n) where n is length of string
      * Space Complexity: O(1) - only uses constant extra space
      */
     public boolean checkValidStringTwoPass(String s) {
