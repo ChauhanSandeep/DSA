@@ -95,7 +95,7 @@ public class SortTheMatrixDiagonally {
  *    c\. Swap the current element with the minimum found, sorting the diagonal in ascending order.
  * 2\. Repeat for all diagonals, ensuring each is sorted independently.
  *
- * Time Complexity: O(m\*n\*min(m, n)), where m and n are matrix dimensions.
+ * Time Complexity: O(m*n*min(m, n)), where m and n are matrix dimensions.
  * Space Complexity: O(1), as sorting is done in-place.
  */
     public int[][] diagonalSortInPlace(int[][] mat) {
