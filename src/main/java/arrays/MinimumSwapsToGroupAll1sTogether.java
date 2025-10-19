@@ -1,20 +1,45 @@
 package arrays;
 
 /**
- * Minimum Swaps To Group All 1s Together
+ * Problem: Minimum Swaps to Group All 1's Together
  *
- * Problem: Given binary array, find minimum swaps to group all 1s together.
- * A swap exchanges two elements in the array.
+ * Given a binary array data, return the minimum number of swaps required to group all 1's
+ * present in the array together in any place in the array. A swap means exchanging the
+ * positions of two elements in the array.
  *
- * Example: data = [1,0,1,0,1] -> Output: 1
- * Can group all 1s together: [1,1,1,0,0] with 1 swap.
+ * Example:
+ * Input: data = [1,0,1,0,1]
+ * Output: 1
+ * Explanation:
+ * There are 3 ways to group all 1's together:
+ * - [1,1,1,0,0] using 1 swap
+ * - [0,1,1,1,0] using 2 swaps
+ * - [0,0,1,1,1] using 1 swap
+ * The minimum is 1.
+ *
+ * Input: data = [0,0,0,1,0]
+ * Output: 0
+ * Explanation: Since there is only one 1, no swaps needed.
  *
  * LeetCode: https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together
  *
  * Follow-up Questions:
- * - What if we want to group all 0s together? (Apply same logic with 0s and 1s swapped)
- * - How to handle case with no 1s? (Return 0, no swaps needed)
- * - What if swaps have different costs? (Use dynamic programming)
+ * 1. Q: What if the array is circular (like problem 2134)?
+ *    A: Extend the array by duplicating it and apply the same sliding window technique.
+ *
+ * 2. Q: What if we want to group all 0's together instead of 1's?
+ *    A: Same approach but count 0's and find window with maximum 0's.
+ *
+ * 3. Q: How would you handle very large arrays with memory constraints?
+ *    A: Current O(1) space solution is already optimal for memory usage.
+ *
+ * 4. Q: What if swaps have different costs based on distance?
+ *    A: Would require dynamic programming approach to minimize total cost.
+ *
+ * Related Problems:
+ * - Minimum Swaps to Group All 1's Together II: https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/
+ * - Minimum Adjacent Swaps for K Consecutive Ones: https://leetcode.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/
+ * - Sliding Window Maximum: https://leetcode.com/problems/sliding-window-maximum/
  */
 public class MinimumSwapsToGroupAll1sTogether {
 
@@ -69,110 +94,5 @@ public class MinimumSwapsToGroupAll1sTogether {
         return minSwaps;
     }
 
-    /**
-     * Alternative implementation with explicit window tracking
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int minSwapsExplicitWindow(int[] data) {
-        int totalOnes = 0;
-        for (int val : data) {
-            totalOnes += val;
-        }
 
-        if (totalOnes <= 1) return 0;
-
-        int n = data.length;
-        int left = 0, right = 0;
-        int onesInWindow = 0;
-        int maxOnesInWindow = 0;
-
-        // Expand window to desired size
-        while (right < totalOnes) {
-            onesInWindow += data[right];
-            right++;
-        }
-
-        maxOnesInWindow = onesInWindow;
-
-        // Slide window through rest of array
-        while (right < n) {
-            // Remove leftmost element
-            onesInWindow -= data[left];
-            left++;
-
-            // Add rightmost element
-            onesInWindow += data[right];
-            right++;
-
-            maxOnesInWindow = Math.max(maxOnesInWindow, onesInWindow);
-        }
-
-        // Minimum swaps = total ones - maximum ones we can keep in any window
-        return totalOnes - maxOnesInWindow;
-    }
-
-    /**
-     * Circular array approach (handles wraparound)
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int minSwapsCircular(int[] data) {
-        int onesCount = 0;
-        for (int num : data) {
-            if (num == 1) onesCount++;
-        }
-
-        if (onesCount <= 1) return 0;
-
-        int n = data.length;
-        int maxOnesInWindow = 0;
-
-        // Try all possible windows (including circular)
-        for (int start = 0; start < n; start++) {
-            int onesInCurrentWindow = 0;
-
-            // Count 1s in current window
-            for (int i = 0; i < onesCount; i++) {
-                int index = (start + i) % n;
-                if (data[index] == 1) {
-                    onesInCurrentWindow++;
-                }
-            }
-
-            maxOnesInWindow = Math.max(maxOnesInWindow, onesInCurrentWindow);
-        }
-
-        return onesCount - maxOnesInWindow;
-    }
-
-    /**
-     * Prefix sum approach for different perspective
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public int minSwapsPrefixSum(int[] data) {
-        int n = data.length;
-        int totalOnes = 0;
-
-        for (int num : data) {
-            totalOnes += num;
-        }
-
-        if (totalOnes <= 1) return 0;
-
-        // Build prefix sum array
-        int[] prefixSum = new int[n + 1];
-        for (int i = 0; i < n; i++) {
-            prefixSum[i + 1] = prefixSum[i] + data[i];
-        }
-
-        int maxOnesInWindow = 0;
-        int windowSize = totalOnes;
-
-        // Check all windows using prefix sum
-        for (int i = 0; i <= n - windowSize; i++) {
-            int onesInWindow = prefixSum[i + windowSize] - prefixSum[i];
-            maxOnesInWindow = Math.max(maxOnesInWindow, onesInWindow);
-        }
-
-        return totalOnes - maxOnesInWindow;
-    }
 }

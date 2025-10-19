@@ -109,29 +109,6 @@ public class KthSmallestElementInABst {
     }
 
     /**
-     * Alternative approach: collect all values first, then return kth.
-     *
-     * Less efficient but simpler to understand.
-     * Use when k is close to n or multiple queries are expected.
-     */
-    public int kthSmallestCollectAll(TreeNode root, int k) {
-        List<Integer> values = new ArrayList<>();
-        collectInorder(root, values);
-        return values.get(k - 1);
-    }
-
-    // Helper to collect all values in inorder
-    private void collectInorder(TreeNode node, List<Integer> values) {
-        if (node == null) {
-            return;
-        }
-
-        collectInorder(node.left, values);
-        values.add(node.val);
-        collectInorder(node.right, values);
-    }
-
-    /**
      * Follow-up: If BST is modified frequently, use augmented BST.
      *
      * Add size field to each node indicating subtree size.

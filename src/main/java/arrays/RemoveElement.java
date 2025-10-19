@@ -1,26 +1,50 @@
 package arrays;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
-
+import java.util.*;
 
 /**
- * Remove Element
+ * Problem: Remove Element
  *
- * Problem: Remove all occurrences of given value from array in-place.
- * Return new length. Order of remaining elements can be changed.
+ * Given an integer array nums and an integer val, remove all occurrences of val in nums
+ * in-place. The order of the elements may be changed. Return the number of elements in
+ * nums which are not equal to val.
  *
- * Example: nums = [3,2,2,3], val = 3 -> Output: 2, nums = [2,2,_,_]
- * Remove all occurrences of 3, resulting in [2,2] with length 2.
+ * Consider the number of elements in nums which are not equal to val be k, to get accepted,
+ * you need to do the following things:
+ * - Change the array nums such that the first k elements of nums contain the elements
+ *   which are not equal to val. The remaining elements of nums are not important as well
+ *   as the size of nums.
+ * - Return k.
+ *
+ * Example:
+ * Input: nums = [3,2,2,3], val = 3
+ * Output: 2, nums = [2,2,_,_]
+ * Explanation: Your function should return k = 2, with the first two elements of nums being 2.
+ * It does not matter what you leave beyond the returned k.
+ *
+ * Input: nums = [0,1,2,2,3,0,4,2], val = 2
+ * Output: 5, nums = [0,1,3,0,4,_,_,_]
+ * Explanation: The first 5 elements contain all non-2 values: [0,1,3,0,4]
  *
  * LeetCode: https://leetcode.com/problems/remove-element
  *
  * Follow-up Questions:
- * - What if we need to maintain original order? (Use two-pointer technique)
- * - How to remove multiple different values? (Generalize condition)
- * - What if removal is expensive but assignment is cheap? (Use swap technique)
+ * 1. Q: What if the order of remaining elements must be preserved?
+ *    A: Current solution already preserves relative order of non-val elements.
+ *
+ * 2. Q: How would you optimize when most elements equal val?
+ *    A: Use swap-from-end approach to avoid unnecessary writes.
+ *
+ * 3. Q: What if you needed to remove multiple different values?
+ *    A: Could use HashSet to check if element should be removed, same two-pointer approach.
+ *
+ * 4. Q: How would you handle very large arrays where val is rare?
+ *    A: Current O(n) solution is optimal, but could add early termination if tracking remaining val count.
+ *
+ * Related Problems:
+ * - Remove Duplicates from Sorted Array: https://leetcode.com/problems/remove-duplicates-from-sorted-array/
+ * - Move Zeroes: https://leetcode.com/problems/move-zeroes/
+ * - Remove Duplicates from Sorted Array II: https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
  */
 public class RemoveElement {
 
@@ -28,174 +52,37 @@ public class RemoveElement {
      * Removes all occurrences of val using two-pointer technique.
      *
      * Algorithm:
-     * 1. Use slow pointer for next position to place non-val element
-     * 2. Use fast pointer to scan through array
-     * 3. When non-val element found, place it at slow pointer position
-     * 4. Return slow pointer as new array length
+     * 1. Use writeIndex to track position for next valid element
+     * 2. Iterate through array with enhanced for loop
+     * 3. When element != val, place it at writeIndex and increment writeIndex
+     * 4. When element == val, skip it (don't write, don't increment writeIndex)
+     * 5. Return writeIndex as count of remaining valid elements
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Time Complexity: O(n) where n is length of array
+     * Space Complexity: O(1) using constant extra space
      *
-     * @param nums input array
-     * @param val value to remove
-     * @return new length after removing val
+     * @param nums array to remove elements from
+     * @param val value to remove from array
+     * @return number of elements remaining after removal
      */
     public int removeElement(int[] nums, int val) {
-        int slow = 0; // Position for next non-val element
+        if (nums == null) {
+            return 0;
+        }
 
-        for (int fast = 0; fast < nums.length; fast++) {
+        // Index to write next valid element (not equal to val)
+        int writeIndex = 0;
+
+        // Process each element in the array
+        for (int currentElement : nums) {
             // Keep element if it's not equal to val
-            if (nums[fast] != val) {
-                nums[slow] = nums[fast];
-                slow++;
-            }
-        }
-
-        return slow;
-    }
-
-    /**
-     * Optimized approach using swap technique (fewer writes when val is rare)
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int removeElementSwap(int[] nums, int val) {
-        int left = 0;
-        int right = nums.length - 1;
-
-        while (left <= right) {
-            if (nums[left] == val) {
-                // Swap with element from right
-                nums[left] = nums[right];
-                right--;
-            } else {
-                left++;
-            }
-        }
-
-        return left;
-    }
-
-    /**
-     * Alternative implementation maintaining order
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int removeElementMaintainOrder(int[] nums, int val) {
-        int writeIndex = 0;
-
-        for (int readIndex = 0; readIndex < nums.length; readIndex++) {
-            if (nums[readIndex] != val) {
-                if (writeIndex != readIndex) {
-                    nums[writeIndex] = nums[readIndex];
-                }
+            if (currentElement != val) {
+                nums[writeIndex] = currentElement;
                 writeIndex++;
             }
+            // Skip elements equal to val (don't write them)
         }
 
         return writeIndex;
-    }
-
-    /**
-     * Generic version that removes elements based on predicate
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int removeElementIf(int[] nums, Predicate<Integer> shouldRemove) {
-        int writeIndex = 0;
-
-        for (int i = 0; i < nums.length; i++) {
-            if (!shouldRemove.test(nums[i])) {
-                nums[writeIndex] = nums[i];
-                writeIndex++;
-            }
-        }
-
-        return writeIndex;
-    }
-
-    /**
-     * Version that returns actual remaining elements
-     * Time Complexity: O(n), Space Complexity: O(n) for result
-     */
-    public int[] removeElementReturnArray(int[] nums, int val) {
-        List<Integer> remaining = new ArrayList<>();
-
-        for (int num : nums) {
-            if (num != val) {
-                remaining.add(num);
-            }
-        }
-
-        return remaining.stream().mapToInt(Integer::intValue).toArray();
-    }
-
-    /**
-     * Counting approach (useful when you just need the count)
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int countRemainingElements(int[] nums, int val) {
-        int count = 0;
-
-        for (int num : nums) {
-            if (num != val) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    /**
-     * Stream-based approach for functional programming
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public int removeElementStream(int[] nums, int val) {
-        int[] remaining = Arrays.stream(nums)
-                               .filter(x -> x != val)
-                               .toArray();
-
-        // Copy back to original array
-        System.arraycopy(remaining, 0, nums, 0, remaining.length);
-
-        return remaining.length;
-    }
-
-    /**
-     * In-place removal with explicit gap handling
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int removeElementExplicitGaps(int[] nums, int val) {
-        int gapStart = -1; // Start of current gap
-        int writePos = 0;
-
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[i] == val) {
-                // Start or extend gap
-                if (gapStart == -1) {
-                    gapStart = i;
-                }
-            } else {
-                // Non-val element found
-                if (gapStart != -1) {
-                    // Fill gap
-                    nums[gapStart] = nums[i];
-                    gapStart++;
-                }
-                writePos = (gapStart == -1) ? i + 1 : gapStart;
-            }
-        }
-
-        return writePos;
-    }
-
-    /**
-     * Helper method to verify removal correctness
-     */
-    public boolean verifyRemoval(int[] nums, int newLength, int val) {
-        // Check that first newLength elements don't contain val
-        for (int i = 0; i < newLength; i++) {
-            if (nums[i] == val) {
-                return false;
-            }
-        }
-        return true;
     }
 }

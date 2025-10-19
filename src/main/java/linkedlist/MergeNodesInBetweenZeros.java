@@ -59,8 +59,9 @@ public class MergeNodesInBetweenZeros {
     public ListNode mergeNodes(ListNode head) {
         if (head == null || head.next == null) return null;
 
-        ListNode dummyHead = new ListNode(0);
-        ListNode resultTail = dummyHead;
+        ListNode resultHead = new ListNode(0);
+        ListNode resultTail = resultHead;
+
         ListNode current = head.next; // Skip the initial zero
 
         while (current != null) {
@@ -84,12 +85,19 @@ public class MergeNodesInBetweenZeros {
             }
         }
 
-        return dummyHead.next;
+        return resultHead.next;
     }
 
     /**
      * In-place solution that modifies existing nodes to save space.
      * Reuses the first non-zero node in each segment to store the sum.
+     *
+     * Algorithm:
+     * 1. Skip the initial zero node
+     * 2. For each segment between zeros, calculate the sum
+     * 3. Store sum in the first node of the segment
+     * 4. Skip the zero and find next segment
+     * 5. Return the modified linked list
      *
      * Time Complexity: O(n)
      * Space Complexity: O(1)
@@ -126,37 +134,5 @@ public class MergeNodesInBetweenZeros {
         }
 
         return resultHead;
-    }
-
-    /**
-     * Recursive approach for merging nodes between zeros.
-     * Uses recursion to process each segment.
-     */
-    public ListNode mergeNodesRecursive(ListNode head) {
-        return mergeHelper(head.next); // Skip initial zero
-    }
-
-    // Helper method for recursive approach
-    private ListNode mergeHelper(ListNode node) {
-        if (node == null) return null;
-
-        int sum = 0;
-        ListNode current = node;
-
-        // Calculate sum until zero
-        while (current != null && current.val != 0) {
-            sum += current.val;
-            current = current.next;
-        }
-
-        // Create result node with sum
-        ListNode resultNode = new ListNode(sum);
-
-        // Recursively process remaining segments
-        if (current != null && current.next != null) {
-            resultNode.next = mergeHelper(current.next);
-        }
-
-        return resultNode;
     }
 }

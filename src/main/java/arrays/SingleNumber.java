@@ -6,19 +6,43 @@ import java.util.stream.Collectors;
 
 
 /**
- * Single Number
+ * 136. Single Number
  *
- * Problem: Find element that appears once in array where every other element appears twice.
+ * Problem Statement:
+ * Given a non-empty array of integers nums, every element appears exactly twice
+ * except for one element that appears only once. Find that single element.
+ * You must implement a solution with a linear runtime complexity and use only
+ * constant extra space.
  *
- * Example: nums = [2,2,1] -> Output: 1
- * Element 1 appears once, elements 2 appears twice.
+ * Example:
+ * Input: nums = [2,2,1]
+ * Output: 1
+ * Explanation: All numbers except 1 appear exactly twice.
  *
- * LeetCode: https://leetcode.com/problems/single-number
+ * Input: nums = [4,1,2,1,2]
+ * Output: 4
+ * Explanation: All numbers except 4 appear exactly twice.
+ *
+ * Input: nums = [1]
+ * Output: 1
+ * Explanation: Single element array returns that element.
+ *
+ * LeetCode Link: https://leetcode.com/problems/single-number/
  *
  * Follow-up Questions:
- * - What if every element appears 3 times except one? (Use bit manipulation with mod 3)
- * - How to find two numbers that appear once? (XOR all, then separate using differing bit)
- * - Can we solve with different space/time constraints? (Sorting: O(n log n) time, O(1) space)
+ * 1. What if every element appears three times except one that appears once?
+ *    Answer: Use bit manipulation with counters for each bit position or state machines.
+ *    Related: https://leetcode.com/problems/single-number-ii/
+ * 2. What if there are exactly two elements that appear once and others appear twice?
+ *    Answer: Use XOR to get combined result, then use bit manipulation to separate the two numbers.
+ *    Related: https://leetcode.com/problems/single-number-iii/
+ * 3. How would you solve this if extra space was allowed?
+ *    Answer: Use HashSet or HashMap to track element frequencies.
+ *
+ * Related Problems:
+ * - 137. Single Number II: https://leetcode.com/problems/single-number-ii/
+ * - 260. Single Number III: https://leetcode.com/problems/single-number-iii/
+ * - 540. Single Element in a Sorted Array: https://leetcode.com/problems/single-element-in-a-sorted-array/
  */
 public class SingleNumber {
 
@@ -49,7 +73,12 @@ public class SingleNumber {
 
     /**
      * Mathematical approach using sum formula
-     * Time Complexity: O(n), Space Complexity: O(n) for set
+     * Logic is that if we sum unique elements and multiply by 2,
+     * then subtract the sum of all elements, we get the single element.
+     * This works because all other elements appear twice.
+     *
+     * Time Complexity: O(n),
+     * Space Complexity: O(n) for set
      */
     public int singleNumberMath(int[] nums) {
         Set<Integer> uniqueElements = new HashSet<>();
@@ -68,8 +97,14 @@ public class SingleNumber {
     }
 
     /**
-     * Hash map approach for counting frequencies
-     * Time Complexity: O(n), Space Complexity: O(n)
+     * Naive Approach : Hash map approach for counting frequencies
+     * Algorithm:
+     * 1. Use a hash map to count occurrences of each element
+     * 2. Iterate through the map to find the element with frequency 1
+     * 3. Return that element
+     *
+     * Time Complexity: O(n),
+     * Space Complexity: O(n)
      */
     public int singleNumberHashMap(int[] nums) {
         Map<Integer, Integer> frequency = new HashMap<>();
@@ -87,110 +122,5 @@ public class SingleNumber {
         }
 
         return -1; // Should never reach here given problem constraints
-    }
-
-    /**
-     * Hash set approach (add/remove pattern)
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public int singleNumberHashSet(int[] nums) {
-        Set<Integer> seen = new HashSet<>();
-
-        for (int num : nums) {
-            if (seen.contains(num)) {
-                seen.remove(num); // Remove duplicate
-            } else {
-                seen.add(num); // Add first occurrence
-            }
-        }
-
-        // Only element left is the single one
-        return seen.iterator().next();
-    }
-
-    /**
-     * Sorting approach
-     * Time Complexity: O(n log n), Space Complexity: O(1)
-     */
-    public int singleNumberSorting(int[] nums) {
-        Arrays.sort(nums);
-
-        // Check pairs starting from index 0
-        for (int i = 0; i < nums.length - 1; i += 2) {
-            if (nums[i] != nums[i + 1]) {
-                return nums[i]; // Found single element
-            }
-        }
-
-        // Single element is the last one
-        return nums[nums.length - 1];
-    }
-
-    /**
-     * Stream-based XOR approach
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int singleNumberStream(int[] nums) {
-        return Arrays.stream(nums).reduce(0, (a, b) -> a ^ b);
-    }
-
-    /**
-     * Recursive XOR approach
-     * Time Complexity: O(n), Space Complexity: O(n) due to recursion stack
-     */
-    public int singleNumberRecursive(int[] nums) {
-        return singleNumberHelper(nums, 0);
-    }
-
-    private int singleNumberHelper(int[] nums, int index) {
-        if (index == nums.length) {
-            return 0;
-        }
-
-        return nums[index] ^ singleNumberHelper(nums, index + 1);
-    }
-
-    /**
-     * Bit manipulation with explicit loop
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int singleNumberBitManipulation(int[] nums) {
-        int single = 0;
-
-        // XOR all numbers
-        for (int i = 0; i < nums.length; i++) {
-            single ^= nums[i];
-        }
-
-        return single;
-    }
-
-    /**
-     * Generic solution using frequency analysis
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public int singleNumberGeneric(int[] nums) {
-        return Arrays.stream(nums)
-                .boxed()
-                .collect(Collectors.groupingBy(
-                    Function.identity(),
-                    Collectors.counting()))
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() == 1)
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(-1);
-    }
-
-    /**
-     * Helper method to demonstrate XOR properties
-     */
-    public void demonstrateXORProperties() {
-        System.out.println("XOR Properties:");
-        System.out.println("5 ^ 5 = " + (5 ^ 5)); // 0
-        System.out.println("0 ^ 7 = " + (0 ^ 7)); // 7
-        System.out.println("3 ^ 5 ^ 3 = " + (3 ^ 5 ^ 3)); // 5
-        System.out.println("Commutative: 3 ^ 5 = " + (3 ^ 5) + ", 5 ^ 3 = " + (5 ^ 3));
     }
 }

@@ -4,213 +4,81 @@ import java.util.Arrays;
 
 
 /**
- * Search Insert Position
+ * 35. Search Insert Position
  *
- * Problem: Find index where target should be inserted in sorted array to maintain order.
- * Array contains distinct values.
+ * Problem Statement:
+ * Given a sorted array of distinct integers and a target value, return the index
+ * if the target is found. If not, return the index where it would be if it were
+ * inserted in order. You must write an algorithm with O(log n) runtime complexity.
  *
- * Example: nums = [1,3,5,6], target = 5 -> Output: 2
- * Target 5 is found at index 2.
+ * Example:
+ * Input: nums = [1,3,5,6], target = 5
+ * Output: 2
+ * Explanation: Target 5 is found at index 2.
  *
- * Example: nums = [1,3,5,6], target = 2 -> Output: 1
- * Target 2 should be inserted at index 1.
+ * Input: nums = [1,3,5,6], target = 2
+ * Output: 1
+ * Explanation: Target 2 should be inserted at index 1 to maintain sorted order.
  *
- * LeetCode: https://leetcode.com/problems/search-insert-position
+ * Input: nums = [1,3,5,6], target = 7
+ * Output: 4
+ * Explanation: Target 7 should be inserted at the end (index 4).
+ *
+ * LeetCode Link: https://leetcode.com/problems/search-insert-position/
  *
  * Follow-up Questions:
- * - What if array contains duplicates? (Find leftmost or rightmost insertion point)
- * - How to handle floating point targets? (Same binary search logic)
- * - What if we want to find all possible insertion positions? (Handle duplicate ranges)
+ * 1. What if the array contains duplicates and we want the leftmost insertion point?
+ *    Answer: The current algorithm already handles this by using >= comparison.
+ * 2. What if we want to find the rightmost insertion point for duplicates?
+ *    Answer: Modify the condition to use > instead of >= in binary search.
+ * 3. How would you handle this if the array was not sorted?
+ *    Answer: Either sort first (O(n log n)) or use linear search (O(n)).
+ * 4. What if we need to insert multiple elements efficiently?
+ *    Answer: Collect all elements, sort them, and use merge-like approach.
+ *
+ * Related Problems:
+ * - 34. Find First and Last Position of Element in Sorted Array: https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/
+ * - 278. First Bad Version: https://leetcode.com/problems/first-bad-version/
+ * - 704. Binary Search: https://leetcode.com/problems/binary-search/
  */
 public class SearchInsertPosition {
 
-    /**
-     * Finds insertion position using binary search.
-     *
-     * Algorithm:
-     * 1. Use binary search to find target or insertion point
-     * 2. If target found, return its index
-     * 3. If not found, left pointer indicates insertion position
-     * 4. Maintain invariant: left always points to insertion position
-     *
-     * Time Complexity: O(log n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
-     *
-     * @param nums sorted array of distinct integers
-     * @param target value to search or insert
-     * @return index where target is found or should be inserted
-     */
-    public int searchInsert(int[] nums, int target) {
-        int left = 0;
-        int right = nums.length - 1;
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-
-            if (nums[mid] == target) {
-                return mid;
-            } else if (nums[mid] < target) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
-        }
-
-        // When loop ends, left is the insertion position
-        return left;
+  /**
+   * Using traditional binary search bounds.
+   * This version uses [left, right] inclusive bounds which is more intuitive for some.
+   *
+   * Algorithm: Inclusive bounds binary search
+   * 1. Use inclusive left and right bounds (right = nums.length - 1)
+   * 2. Handle three cases in each iteration: equal, less than, greater than
+   * 3. When target is found, return immediately
+   * 4. When not found, left will point to insertion position
+   *
+   * Time Complexity: O(log n) - binary search
+   * Space Complexity: O(1) - constant space
+   *
+   * This approach is more explicit about the three comparison cases.
+   */
+  public int searchInsertInclusive(int[] nums, int target) {
+    if (nums == null || nums.length == 0) {
+      return 0;
     }
 
-    /**
-     * Alternative implementation with explicit insertion logic
-     * Time Complexity: O(log n), Space Complexity: O(1)
-     */
-    public int searchInsertExplicit(int[] nums, int target) {
-        int left = 0;
-        int right = nums.length;
+    int left = 0;
+    int right = nums.length - 1;
 
-        // Find leftmost position where nums[i] >= target
-        while (left < right) {
-            int mid = left + (right - left) / 2;
+    while (left <= right) {
+      int mid = left + (right - left) / 2;
 
-            if (nums[mid] < target) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-
-        return left;
+      if (nums[mid] == target) {
+        return mid; // Found exact match
+      } else if (nums[mid] < target) {
+        left = mid + 1; // Search right half
+      } else {
+        right = mid - 1; // Search left half
+      }
     }
 
-    /**
-     * Recursive binary search approach
-     * Time Complexity: O(log n), Space Complexity: O(log n) due to recursion
-     */
-    public int searchInsertRecursive(int[] nums, int target) {
-        return binarySearchRecursive(nums, target, 0, nums.length - 1);
-    }
-
-    private int binarySearchRecursive(int[] nums, int target, int left, int right) {
-        if (left > right) {
-            return left; // Insertion position
-        }
-
-        int mid = left + (right - left) / 2;
-
-        if (nums[mid] == target) {
-            return mid;
-        } else if (nums[mid] < target) {
-            return binarySearchRecursive(nums, target, mid + 1, right);
-        } else {
-            return binarySearchRecursive(nums, target, left, mid - 1);
-        }
-    }
-
-    /**
-     * Linear search approach (less efficient but simpler)
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int searchInsertLinear(int[] nums, int target) {
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[i] >= target) {
-                return i;
-            }
-        }
-
-        // Target should be inserted at end
-        return nums.length;
-    }
-
-    /**
-     * Using built-in binary search for comparison
-     * Time Complexity: O(log n), Space Complexity: O(1)
-     */
-    public int searchInsertBuiltIn(int[] nums, int target) {
-        int index = Arrays.binarySearch(nums, target);
-
-        if (index >= 0) {
-            return index; // Found
-        } else {
-            return -(index + 1); // Convert negative insertion point
-        }
-    }
-
-    /**
-     * Generic version that works with any comparable type
-     * Time Complexity: O(log n), Space Complexity: O(1)
-     */
-    public <T extends Comparable<T>> int searchInsertGeneric(T[] nums, T target) {
-        int left = 0;
-        int right = nums.length - 1;
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            int comparison = nums[mid].compareTo(target);
-
-            if (comparison == 0) {
-                return mid;
-            } else if (comparison < 0) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
-        }
-
-        return left;
-    }
-
-    /**
-     * Version handling duplicate elements (finds leftmost insertion point)
-     * Time Complexity: O(log n), Space Complexity: O(1)
-     */
-    public int searchInsertLeftmost(int[] nums, int target) {
-        int left = 0;
-        int right = nums.length;
-
-        // Find leftmost position where nums[i] >= target
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-
-            if (nums[mid] < target) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-
-        return left;
-    }
-
-    /**
-     * Version handling duplicate elements (finds rightmost insertion point)
-     * Time Complexity: O(log n), Space Complexity: O(1)
-     */
-    public int searchInsertRightmost(int[] nums, int target) {
-        int left = 0;
-        int right = nums.length;
-
-        // Find leftmost position where nums[i] > target
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-
-            if (nums[mid] <= target) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-
-        return left;
-    }
-
-    /**
-     * Helper method to validate binary search invariants
-     */
-    private boolean validateInsertionPosition(int[] nums, int target, int position) {
-        // Check that insertion maintains sorted order
-        boolean leftOk = (position == 0) || (nums[position - 1] < target);
-        boolean rightOk = (position == nums.length) || (nums[position] >= target);
-
-        return leftOk && rightOk;
-    }
+    // When loop ends, left points to insertion position
+    return left;
+  }
 }

@@ -49,9 +49,16 @@ public class FlattenNestedListIterator {
 
     /**
      * Approach 1: Flatten during construction using recursion.
+     * Good enough Naive Approach.
      * Pre-processes all elements and stores them in a queue.
      *
-     * Time Complexity: O(n) for constructor, O(1) for next() and hasNext()
+     * Algorithm
+     * 1. Initialize a queue to store flattened integers.
+     * 2. Iterate through the nested list and flatten it.
+     * 3. Add each integer to the queue.
+     * 4. Return the queue.
+     *
+     * Time Complexity: O(n) for constructor, and O(1) for next() and hasNext()
      * Space Complexity: O(n) for storing all flattened integers
      */
     public static class NestedIterator {
@@ -102,6 +109,12 @@ public class FlattenNestedListIterator {
      * Approach 2: Lazy evaluation using stack (more memory efficient).
      * Only processes elements as needed, avoiding unnecessary memory usage.
      *
+     * Algorithm:
+     * 1. Use a stack to store elements of the nested list.
+     * 2. Add elements in reverse order to maintain correct sequence.
+     * 3. In hasNext(), flatten the top of the stack if it's a list.
+     * 4. In next(), return the top of the stack.
+     *
      * Time Complexity: O(1) amortized for next() and hasNext()
      * Space Complexity: O(d) where d is the maximum depth of nesting
      */
@@ -141,7 +154,6 @@ public class FlattenNestedListIterator {
         public boolean hasNext() {
             while (!stack.isEmpty()) {
                 NestedInteger current = stack.peek();
-
                 if (current.isInteger()) {
                     return true;
                 }
@@ -153,52 +165,6 @@ public class FlattenNestedListIterator {
                 // Add elements in reverse order to maintain sequence
                 for (int i = currentList.size() - 1; i >= 0; i--) {
                     stack.push(currentList.get(i));
-                }
-            }
-
-            return false;
-        }
-    }
-
-    /**
-     * Approach 3: Iterator-based approach using index tracking.
-     * Maintains current position and navigates through structure.
-     */
-    public static class NestedIteratorIndexed {
-        private List<NestedInteger> nestedList;
-        private Stack<Iterator<NestedInteger>> iteratorStack;
-        private Stack<NestedInteger> valueStack;
-
-        public NestedIteratorIndexed(List<NestedInteger> nestedList) {
-            this.iteratorStack = new Stack<>();
-            this.valueStack = new Stack<>();
-
-            this.iteratorStack.push(nestedList.iterator());
-        }
-
-        public Integer next() {
-            // hasNext() guarantees that valueStack has an integer
-            return valueStack.pop().getInteger();
-        }
-
-        public boolean hasNext() {
-            while (!iteratorStack.isEmpty()) {
-                if (!valueStack.isEmpty()) {
-                    return true;
-                }
-
-                Iterator<NestedInteger> currentIterator = iteratorStack.peek();
-
-                if (currentIterator.hasNext()) {
-                    NestedInteger element = currentIterator.next();
-
-                    if (element.isInteger()) {
-                        valueStack.push(element);
-                    } else {
-                        iteratorStack.push(element.getList().iterator());
-                    }
-                } else {
-                    iteratorStack.pop();
                 }
             }
 

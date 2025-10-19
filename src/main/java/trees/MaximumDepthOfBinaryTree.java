@@ -38,13 +38,13 @@ public class MaximumDepthOfBinaryTree {
      * @param root root of binary tree
      * @return maximum depth of tree
      */
-    public int maxDepth(TreeNode root) {
+    public int maxDepthRecursive(TreeNode root) {
         if (root == null) {
             return 0;
         }
 
-        int leftDepth = maxDepth(root.left);
-        int rightDepth = maxDepth(root.right);
+        int leftDepth = maxDepthRecursive(root.left);
+        int rightDepth = maxDepthRecursive(root.right);
 
         return 1 + Math.max(leftDepth, rightDepth);
     }
@@ -136,38 +136,6 @@ public class MaximumDepthOfBinaryTree {
             this.node = node;
             this.depth = depth;
         }
-    }
-
-    /**
-     * One-liner recursive solution.
-     *
-     * Demonstrates concise recursive thinking.
-     * Same logic as main solution but more compact.
-     */
-    public int maxDepthOneLiner(TreeNode root) {
-        return root == null ? 0 : 1 + Math.max(maxDepthOneLiner(root.left), maxDepthOneLiner(root.right));
-    }
-
-    /**
-     * Solution using tail recursion optimization approach.
-     *
-     * While Java doesn't optimize tail recursion, this shows the pattern.
-     * Useful in languages that do optimize tail calls.
-     */
-    public int maxDepthTailRecursive(TreeNode root) {
-        return maxDepthHelper(root, 0);
-    }
-
-    // Helper for tail recursive approach
-    private int maxDepthHelper(TreeNode node, int currentDepth) {
-        if (node == null) {
-            return currentDepth;
-        }
-
-        int leftMax = maxDepthHelper(node.left, currentDepth + 1);
-        int rightMax = maxDepthHelper(node.right, currentDepth + 1);
-
-        return Math.max(leftMax, rightMax);
     }
 
     // Definition for a binary tree node

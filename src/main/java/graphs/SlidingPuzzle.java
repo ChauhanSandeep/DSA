@@ -12,9 +12,16 @@ import java.util.*;
  * If it is impossible for the state of the board to be solved, return -1.
  *
  * Example:
- * Input: board = [[1,2,3],[4,0,5]]
+ * Input: board = [
+ *      [1,2,3],
+ *      [4,0,5]
+ * ]
  * Output: 1
  * Explanation: Swap the 0 and the 5 in one move.
+ * Result board : [
+ *      [1,2,3],
+ *      [4,5,0]
+ * ]
  *
  * LeetCode: https://leetcode.com/problems/sliding-puzzle
  *
@@ -58,7 +65,7 @@ public class SlidingPuzzle {
             return -1;
         }
 
-        String start = boardToString(board);
+        String start = boardToString(board); // like "123405"
 
         // Early termination if already solved
         if (start.equals(TARGET)) {
@@ -90,10 +97,10 @@ public class SlidingPuzzle {
         };
 
         while (!queue.isEmpty()) {
-            int size = queue.size();
+            int queueSize = queue.size();
             moves++;
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < queueSize; i++) {
                 String current = queue.poll();
 
                 // Find position of 0
@@ -120,22 +127,22 @@ public class SlidingPuzzle {
 
     // Convert 2D board to string representation
     private String boardToString(int[][] board) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                sb.append(board[i][j]);
+                builder.append(board[i][j]);
             }
         }
-        return sb.toString();
+        return builder.toString();
     }
 
     // Swap characters at two positions in string
-    private String swap(String s, int i, int j) {
-        char[] chars = s.toCharArray();
-        char temp = chars[i];
-        chars[i] = chars[j];
-        chars[j] = temp;
-        return new String(chars);
+    private String swap(String board, int source, int target) {
+        char[] charArray = board.toCharArray();
+        char temp = charArray[source];
+        charArray[source] = charArray[target];
+        charArray[target] = temp;
+        return new String(charArray);
     }
 
     // Check if puzzle is solvable using inversion count
@@ -143,6 +150,7 @@ public class SlidingPuzzle {
         int inversions = 0;
         String withoutZero = state.replace("0", "");
 
+        // Puzzle is solvable if number of inversions is even
         for (int i = 0; i < withoutZero.length(); i++) {
             for (int j = i + 1; j < withoutZero.length(); j++) {
                 if (withoutZero.charAt(i) > withoutZero.charAt(j)) {

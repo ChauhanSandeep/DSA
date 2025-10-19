@@ -15,9 +15,19 @@ import java.util.Arrays;
  * LeetCode: https://leetcode.com/problems/sign-of-the-product-of-an-array
  *
  * Follow-up Questions:
- * - What if array contains very large numbers? (Current approach avoids overflow)
- * - How to handle floating point numbers? (Same logic applies)
- * - Can we determine sign without counting? (Use running sign product)
+ * 1. What if we need to handle very large arrays where overflow is a concern?
+ *    Answer: The current approach already handles this by not computing actual product.
+ * 2. How would you modify this to return the actual product instead of just sign?
+ *    Answer: Use BigInteger for arbitrary precision arithmetic or implement modular arithmetic.
+ * 3. What if we need to find the sign of product of subarrays?
+ *    Answer: Use prefix arrays to track sign changes and zero positions for range queries.
+ * 4. How would you handle floating point numbers in the array?
+ *    Answer: Apply same logic but handle special cases like NaN and infinity.
+ *
+ * Related Problems:
+ * - 238. Product of Array Except Self: https://leetcode.com/problems/product-of-array-except-self/
+ * - 152. Maximum Product Subarray: https://leetcode.com/problems/maximum-product-subarray/
+ * - 1464. Maximum Product of Two Elements in an Array: https://leetcode.com/problems/maximum-product-of-two-elements-in-an-array/
  */
 public class SignOfTheProductOfAnArray {
 
@@ -54,135 +64,12 @@ public class SignOfTheProductOfAnArray {
     }
 
     /**
-     * Alternative using running sign product
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int arraySignRunningProduct(int[] nums) {
-        int sign = 1;
-
-        for (int num : nums) {
-            if (num == 0) {
-                return 0;
-            }
-
-            if (num < 0) {
-                sign = -sign;
-            }
-        }
-
-        return sign;
-    }
-
-    /**
-     * Mathematical approach using Integer.signum()
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int arraySignMath(int[] nums) {
-        int result = 1;
-
-        for (int num : nums) {
-            result *= Integer.signum(num);
-
-            if (result == 0) {
-                return 0; // Early termination if zero found
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Stream-based functional approach
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int arraySignStream(int[] nums) {
-        // Check if any element is zero
-        boolean hasZero = Arrays.stream(nums).anyMatch(x -> x == 0);
-        if (hasZero) return 0;
-
-        // Count negative numbers
-        long negativeCount = Arrays.stream(nums).filter(x -> x < 0).count();
-
-        return (negativeCount % 2 == 0) ? 1 : -1;
-    }
-
-    /**
-     * Using reduce operation
+     * Using Stream with reduce operation
      * Time Complexity: O(n), Space Complexity: O(1)
      */
     public int arraySignReduce(int[] nums) {
         return Arrays.stream(nums)
                 .map(Integer::signum)
                 .reduce(1, (a, b) -> a * b);
-    }
-
-    /**
-     * Verbose approach showing all cases explicitly
-     * Time Complexity: O(n), Space Complexity: O(1)
-     */
-    public int arraySignVerbose(int[] nums) {
-        boolean hasZero = false;
-        int negativeCount = 0;
-
-        for (int num : nums) {
-            if (num == 0) {
-                hasZero = true;
-            } else if (num < 0) {
-                negativeCount++;
-            }
-            // Positive numbers don't affect the sign calculation
-        }
-
-        if (hasZero) {
-            return 0;
-        }
-
-        if (negativeCount % 2 == 0) {
-            return 1; // Even negatives → positive
-        } else {
-            return -1; // Odd negatives → negative
-        }
-    }
-
-    /**
-     * Early termination version for better average performance
-     * Time Complexity: O(n) worst case, O(k) average where k is position of first zero
-     * Space Complexity: O(1)
-     */
-    public int arraySignEarlyTermination(int[] nums) {
-        int negativeCount = 0;
-
-        for (int num : nums) {
-            if (num == 0) {
-                return 0; // Immediate return
-            }
-
-            if (num < 0) {
-                negativeCount++;
-            }
-        }
-
-        return (negativeCount % 2 == 0) ? 1 : -1;
-    }
-
-    /**
-     * Helper method to validate result by computing actual product sign
-     * (Only for testing with small arrays to avoid overflow)
-     */
-    public int validateWithActualProduct(int[] nums) {
-        long product = 1;
-
-        for (int num : nums) {
-            product *= num;
-
-            // Prevent overflow by checking sign early
-            if (product == 0) return 0;
-            if (product > Integer.MAX_VALUE || product < Integer.MIN_VALUE) {
-                // For very large products, just return current sign
-                return product > 0 ? 1 : -1;
-            }
-        }
-
-        return product > 0 ? 1 : (product < 0 ? -1 : 0);
     }
 }

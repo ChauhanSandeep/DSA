@@ -52,9 +52,10 @@ public class VerifyingAnAlienDictionary {
         }
 
         // Create character order mapping
-        int[] charOrder = new int[26];
+        int[] charOrder = new int[26]; // charOrder contains the index of each character in the alien order
         for (int i = 0; i < order.length(); i++) {
-            charOrder[order.charAt(i) - 'a'] = i;
+            int normalizedChar = order.charAt(i) - 'a';
+            charOrder[normalizedChar] = i;
         }
 
         // Check each adjacent pair of words
@@ -90,76 +91,5 @@ public class VerifyingAnAlienDictionary {
         // All compared characters are equal, check lengths
         // Shorter word should come first
         return word1.length() <= word2.length();
-    }
-
-    /**
-     * Alternative approach using custom comparator logic inline.
-     */
-    public boolean isAlienSortedInline(String[] words, String order) {
-        int[] charOrder = new int[26];
-        for (int i = 0; i < order.length(); i++) {
-            charOrder[order.charAt(i) - 'a'] = i;
-        }
-
-        for (int i = 0; i < words.length - 1; i++) {
-            String word1 = words[i];
-            String word2 = words[i + 1];
-
-            boolean foundDifference = false;
-
-            // Compare characters
-            for (int j = 0; j < Math.min(word1.length(), word2.length()); j++) {
-                int order1 = charOrder[word1.charAt(j) - 'a'];
-                int order2 = charOrder[word2.charAt(j) - 'a'];
-
-                if (order1 > order2) {
-                    return false;
-                } else if (order1 < order2) {
-                    foundDifference = true;
-                    break;
-                }
-            }
-
-            // If no difference found and first word is longer, it's incorrect
-            if (!foundDifference && word1.length() > word2.length()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Optimized approach with early termination and cleaner comparison logic.
-     */
-    public boolean isAlienSortedOptimized(String[] words, String order) {
-        // Create order mapping
-        int[] orderMap = new int[26];
-        for (int i = 0; i < 26; i++) {
-            orderMap[order.charAt(i) - 'a'] = i;
-        }
-
-        // Check adjacent pairs
-        for (int i = 1; i < words.length; i++) {
-            if (compareWords(words[i - 1], words[i], orderMap) > 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    // Helper method that returns comparison result like compareTo
-    private int compareWords(String word1, String word2, int[] orderMap) {
-        int i = 0;
-        while (i < word1.length() && i < word2.length()) {
-            int diff = orderMap[word1.charAt(i) - 'a'] - orderMap[word2.charAt(i) - 'a'];
-            if (diff != 0) {
-                return diff;
-            }
-            i++;
-        }
-
-        return word1.length() - word2.length();
     }
 }
