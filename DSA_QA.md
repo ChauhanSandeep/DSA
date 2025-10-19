@@ -83,12 +83,14 @@ for (int fast = 1; fast < nums.length; fast++) {
 **Space Complexity:** O(1) - in-place
 
 **Practice Problems:**
-- [Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
-- [3Sum](https://leetcode.com/problems/3sum/)
-- [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
-- [Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
-- [Sort Colors (Dutch National Flag)](https://leetcode.com/problems/sort-colors/)
-- [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+- [ ] [Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
+- [ ] [3Sum](https://leetcode.com/problems/3sum/)
+- [ ] [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
+- [ ] [Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
+- [ ] [Sort Colors (Dutch National Flag)](https://leetcode.com/problems/sort-colors/)
+- [ ] [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+- [ ] [4Sum](https://leetcode.com/problems/4sum/)
+- [ ] [Remove Element](https://leetcode.com/problems/remove-element/)
 
 ---
 
@@ -134,8 +136,105 @@ while (left < right) {
 **Time:** O(n), **Space:** O(1)
 
 **Practice Problems:**
-- [Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
-- [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+- [ ] [Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
+- [ ] [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+- [ ] [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/)
+
+---
+
+### Question: How do you solve problems involving subarrays with specific sum conditions efficiently?
+
+**Answer:**
+
+**Pattern Recognition:** When dealing with subarray sums, consider:
+- **Prefix Sum + HashMap** for exact sum conditions
+- **Two Pointers** for sorted arrays or monotonic conditions
+- **Sliding Window** for positive numbers only
+
+**Prefix Sum Approach for Subarray Sum Equals K:**
+
+```java
+int subarraySum(int[] nums, int k) {
+    Map<Integer, Integer> prefixSumCount = new HashMap<>();
+    prefixSumCount.put(0, 1);  // Base case: empty subarray
+    
+    int count = 0, currentSum = 0;
+    for (int num : nums) {
+        currentSum += num;
+        
+        // Check if there exists a prefix sum such that
+        // currentSum - prefixSum = k
+        if (prefixSumCount.containsKey(currentSum - k)) {
+            count += prefixSumCount.get(currentSum - k);
+        }
+        
+        prefixSumCount.merge(currentSum, 1, Integer::sum);
+    }
+    return count;
+}
+```
+
+**Key Insight:** 
+- Use `prefixSum[i] - prefixSum[j] = k` to find subarrays
+- Store prefix sums in HashMap for O(1) lookup
+- Works with negative numbers (unlike sliding window)
+
+**Two Pointers for Two Sum Variants:**
+```java
+// Find all unique triplets that sum to zero
+List<List<Integer>> threeSum(int[] nums) {
+    Arrays.sort(nums);
+    List<List<Integer>> result = new ArrayList<>();
+    
+    for (int i = 0; i < nums.length - 2; i++) {
+        // Skip duplicates for first number
+        if (i > 0 && nums[i] == nums[i-1]) continue;
+        
+        int left = i + 1, right = nums.length - 1;
+        int target = -nums[i];
+        
+        while (left < right) {
+            int sum = nums[left] + nums[right];
+            if (sum == target) {
+                result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                
+                // Skip duplicates
+                while (left < right && nums[left] == nums[left+1]) left++;
+                while (left < right && nums[right] == nums[right-1]) right--;
+                
+                left++;
+                right--;
+            } else if (sum < target) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+    }
+    return result;
+}
+```
+
+**Advanced Pattern - Two Sum with Multiplicity:**
+- Use frequency map when elements can repeat
+- Calculate combinations using combinatorics
+
+**Common Variations:**
+- **Subarray Sum Equals K:** Prefix sum + HashMap
+- **Subarray Sum Divisible by K:** Use modulo arithmetic
+- **Maximum Size Subarray Sum Equals K:** Track first occurrence of each prefix sum
+- **Shortest Subarray with Sum at Least K:** Monotonic deque
+
+**Time:** O(n) with HashMap, O(n log n) with sorting
+**Space:** O(n) for HashMap
+
+**Practice Problems:**
+- [ ] [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
+- [ ] [Continuous Subarray Sum](https://leetcode.com/problems/continuous-subarray-sum/)
+- [ ] [Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
+- [ ] [Maximum Size Subarray Sum Equals k](https://leetcode.com/problems/maximum-size-subarray-sum-equals-k/)
+- [ ] [3Sum Closest](https://leetcode.com/problems/3sum-closest/)
+- [ ] [4Sum II](https://leetcode.com/problems/4sum-ii/)
 
 ---
 
@@ -208,12 +307,14 @@ for (int right = 0; right < s.length(); right++) {
 **Space Complexity:** O(k) for hash map (k = distinct elements)
 
 **Practice Problems:**
-- [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
-- [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
-- [Longest Substring with At Most K Distinct Characters](https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/)
-- [Maximum Sum Subarray of Size K](https://leetcode.com/problems/maximum-average-subarray-i/)
-- [Fruit Into Baskets](https://leetcode.com/problems/fruit-into-baskets/)
-- [Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/)
+- [ ] [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+- [ ] [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
+- [ ] [Longest Substring with At Most K Distinct Characters](https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/)
+- [ ] [Maximum Sum Subarray of Size K](https://leetcode.com/problems/maximum-average-subarray-i/)
+- [ ] [Fruit Into Baskets](https://leetcode.com/problems/fruit-into-baskets/)
+- [ ] [Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/)
+- [ ] [Permutation in String](https://leetcode.com/problems/permutation-in-string/)
+- [ ] [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
 
 ---
 
@@ -263,8 +364,8 @@ for (int i = 0; i < n; i++) {
 **Time:** O(n), **Space:** O(k)
 
 **Practice Problems:**
-- [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)
-- [Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/)
+- [ ] [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)
+- [ ] [Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/)
 
 ---
 
@@ -343,12 +444,12 @@ return left;
 - Off-by-one errors: Be clear about inclusive/exclusive bounds
 
 **Practice Problems:**
-- [Binary Search](https://leetcode.com/problems/binary-search/)
-- [Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
-- [Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)
-- [Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
-- [Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)
-- [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)
+- [ ] [Binary Search](https://leetcode.com/problems/binary-search/)
+- [ ] [Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
+- [ ] [Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)
+- [ ] [Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
+- [ ] [Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)
+- [ ] [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)
 
 ---
 
@@ -395,10 +496,123 @@ return -1;
 **Time:** O(log n), **Space:** O(1)
 
 **Practice Problems:**
-- [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
-- [Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
-- [Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
-- [Find Minimum in Rotated Sorted Array II](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
+- [ ] [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+- [ ] [Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
+- [ ] [Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
+- [ ] [Find Minimum in Rotated Sorted Array II](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
+
+---
+
+### Question: How do you solve complex binary search problems like finding median of two sorted arrays?
+
+**Answer:**
+
+**Problem:** Find median of two sorted arrays in O(log(min(m,n))) time.
+
+**Key Insight:** Use binary search to partition both arrays such that:
+1. Left partition has same number of elements as right partition
+2. All elements in left partition ≤ all elements in right partition
+
+**Approach:**
+```java
+double findMedianSortedArrays(int[] nums1, int[] nums2) {
+    // Ensure nums1 is smaller for efficiency
+    if (nums1.length > nums2.length) {
+        return findMedianSortedArrays(nums2, nums1);
+    }
+    
+    int m = nums1.length, n = nums2.length;
+    int left = 0, right = m;
+    
+    while (left <= right) {
+        // Partition nums1 at i, nums2 at j
+        int partition1 = (left + right) / 2;
+        int partition2 = (m + n + 1) / 2 - partition1;
+        
+        // Handle edge cases with Integer.MIN_VALUE and MAX_VALUE
+        int maxLeft1 = (partition1 == 0) ? Integer.MIN_VALUE : nums1[partition1 - 1];
+        int minRight1 = (partition1 == m) ? Integer.MAX_VALUE : nums1[partition1];
+        
+        int maxLeft2 = (partition2 == 0) ? Integer.MIN_VALUE : nums2[partition2 - 1];
+        int minRight2 = (partition2 == n) ? Integer.MAX_VALUE : nums2[partition2];
+        
+        // Check if we found the correct partition
+        if (maxLeft1 <= minRight2 && maxLeft2 <= minRight1) {
+            // Found correct partition
+            if ((m + n) % 2 == 0) {
+                return (Math.max(maxLeft1, maxLeft2) + Math.min(minRight1, minRight2)) / 2.0;
+            } else {
+                return Math.max(maxLeft1, maxLeft2);
+            }
+        } else if (maxLeft1 > minRight2) {
+            // Too many elements in left of nums1, move partition left
+            right = partition1 - 1;
+        } else {
+            // Too few elements in left of nums1, move partition right
+            left = partition1 + 1;
+        }
+    }
+    
+    throw new IllegalArgumentException("Input arrays are not sorted");
+}
+```
+
+**Why This Works:**
+- Binary search on smaller array minimizes search space
+- Partition ensures balanced halves
+- Cross-check ensures proper ordering
+
+**Advanced Binary Search Patterns:**
+
+**1. Minimize/Maximize with Feasibility Check:**
+```java
+// Template for problems like "minimize maximum" or "maximize minimum"
+int binarySearchOnAnswer(int[] arr, int k) {
+    int left = minPossible, right = maxPossible;
+    int result = -1;
+    
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (isFeasible(arr, mid, k)) {
+            result = mid;  // Found a feasible solution
+            right = mid - 1;  // Try to find better (smaller)
+        } else {
+            left = mid + 1;  // Need larger value
+        }
+    }
+    return result;
+}
+
+boolean isFeasible(int[] arr, int capacity, int k) {
+    // Check if 'capacity' satisfies problem constraints
+    // This varies by problem
+    return true;
+}
+```
+
+**2. Finding K-th Smallest in Matrix:**
+- Use binary search on value range
+- Count elements ≤ mid in each row
+
+**3. Aggressive Cows / Magnetic Force:**
+- Binary search on minimum distance
+- Greedy placement validation
+
+**Common Advanced Patterns:**
+- **Median of Two Sorted Arrays:** Partition + binary search
+- **K-th Smallest in Sorted Matrix:** Value-based binary search + counting
+- **Allocate Minimum Pages:** Binary search on answer space
+- **Magnetic Force Between Two Balls:** Binary search + greedy validation
+
+**Time:** O(log(min(m,n))) for median problem
+**Space:** O(1)
+
+**Practice Problems:**
+- [ ] [Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/)
+- [ ] [K-th Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+- [ ] [Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/)
+- [ ] [Magnetic Force Between Two Balls](https://leetcode.com/problems/magnetic-force-between-two-balls/)
+- [ ] [Minimize Max Distance to Gas Station](https://leetcode.com/problems/minimize-max-distance-to-gas-station/)
 
 ---
 
@@ -475,12 +689,12 @@ map.getOrDefault(key, 0);
 ```
 
 **Practice Problems:**
-- [Two Sum](https://leetcode.com/problems/two-sum/)
-- [Group Anagrams](https://leetcode.com/problems/group-anagrams/)
-- [Valid Anagram](https://leetcode.com/problems/valid-anagram/)
-- [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
-- [Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)
-- [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)
+- [ ] [Two Sum](https://leetcode.com/problems/two-sum/)
+- [ ] [Group Anagrams](https://leetcode.com/problems/group-anagrams/)
+- [ ] [Valid Anagram](https://leetcode.com/problems/valid-anagram/)
+- [ ] [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
+- [ ] [Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)
+- [ ] [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)
 
 ---
 
@@ -548,12 +762,12 @@ for (char c : s.toCharArray()) {
 - Consider both odd and even length palindromes
 
 **Practice Problems:**
-- [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)
-- [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)
-- [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
-- [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
-- [Edit Distance](https://leetcode.com/problems/edit-distance/)
-- [Implement strStr()](https://leetcode.com/problems/implement-strstr/)
+- [ ] [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)
+- [ ] [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)
+- [ ] [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
+- [ ] [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
+- [ ] [Edit Distance](https://leetcode.com/problems/edit-distance/)
+- [ ] [Implement strStr()](https://leetcode.com/problems/implement-strstr/)
 
 ---
 
@@ -637,13 +851,13 @@ return false;
 **Space Complexity:** O(1) for in-place operations
 
 **Practice Problems:**
-- [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
-- [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
-- [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
-- [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
-- [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
-- [Reorder List](https://leetcode.com/problems/reorder-list/)
-- [Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)
+- [ ] [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
+- [ ] [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
+- [ ] [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
+- [ ] [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
+- [ ] [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
+- [ ] [Reorder List](https://leetcode.com/problems/reorder-list/)
+- [ ] [Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)
 
 ---
 
@@ -729,13 +943,13 @@ while (!queue.isEmpty()) {
 - **Deque:** Need both LIFO and FIFO operations
 
 **Practice Problems:**
-- [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)
-- [Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
-- [Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
-- [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
-- [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
-- [Min Stack](https://leetcode.com/problems/min-stack/)
-- [Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)
+- [ ] [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)
+- [ ] [Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
+- [ ] [Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
+- [ ] [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+- [ ] [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+- [ ] [Min Stack](https://leetcode.com/problems/min-stack/)
+- [ ] [Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)
 
 ---
 
@@ -855,12 +1069,12 @@ TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 - Iterative: O(w) for BFS (w = max width)
 
 **Practice Problems:**
-- [Binary Tree Inorder Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/)
-- [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
-- [Binary Tree Zigzag Level Order Traversal](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/)
-- [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
-- [Path Sum](https://leetcode.com/problems/path-sum/)
-- [Path Sum II](https://leetcode.com/problems/path-sum-ii/)
+- [ ] [Binary Tree Inorder Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/)
+- [ ] [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+- [ ] [Binary Tree Zigzag Level Order Traversal](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/)
+- [ ] [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
+- [ ] [Path Sum](https://leetcode.com/problems/path-sum/)
+- [ ] [Path Sum II](https://leetcode.com/problems/path-sum-ii/)
 
 ---
 
@@ -908,10 +1122,186 @@ boolean isValidBST(TreeNode root) {
 **Time:** O(n), **Space:** O(h)
 
 **Practice Problems:**
-- [Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)
-- [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
-- [Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
-- [Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
+- [ ] [Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)
+- [ ] [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+- [ ] [Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+- [ ] [Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
+
+---
+
+### Question: How do you solve advanced tree problems like serialize/deserialize and tree construction?
+
+**Answer:**
+
+**Serialize and Deserialize Binary Tree:**
+
+**Preorder Approach:**
+```java
+public class Codec {
+    // Serialize tree to string using preorder traversal
+    public String serialize(TreeNode root) {
+        StringBuilder sb = new StringBuilder();
+        serializeHelper(root, sb);
+        return sb.toString();
+    }
+    
+    private void serializeHelper(TreeNode node, StringBuilder sb) {
+        if (node == null) {
+            sb.append("null,");
+            return;
+        }
+        sb.append(node.val).append(",");
+        serializeHelper(node.left, sb);
+        serializeHelper(node.right, sb);
+    }
+    
+    // Deserialize string back to tree
+    public TreeNode deserialize(String data) {
+        Queue<String> nodes = new LinkedList<>(Arrays.asList(data.split(",")));
+        return deserializeHelper(nodes);
+    }
+    
+    private TreeNode deserializeHelper(Queue<String> nodes) {
+        String val = nodes.poll();
+        if (val.equals("null")) return null;
+        
+        TreeNode node = new TreeNode(Integer.parseInt(val));
+        node.left = deserializeHelper(nodes);
+        node.right = deserializeHelper(nodes);
+        return node;
+    }
+}
+```
+
+**Construct Binary Tree from Traversals:**
+
+```java
+// Construct from Inorder and Preorder
+TreeNode buildTree(int[] preorder, int[] inorder) {
+    Map<Integer, Integer> inorderMap = new HashMap<>();
+    for (int i = 0; i < inorder.length; i++) {
+        inorderMap.put(inorder[i], i);
+    }
+    return build(preorder, 0, preorder.length - 1,
+                 inorder, 0, inorder.length - 1, inorderMap);
+}
+
+TreeNode build(int[] preorder, int preStart, int preEnd,
+               int[] inorder, int inStart, int inEnd,
+               Map<Integer, Integer> inorderMap) {
+    if (preStart > preEnd || inStart > inEnd) return null;
+    
+    int rootVal = preorder[preStart];
+    TreeNode root = new TreeNode(rootVal);
+    
+    int inRootIndex = inorderMap.get(rootVal);
+    int leftSize = inRootIndex - inStart;
+    
+    root.left = build(preorder, preStart + 1, preStart + leftSize,
+                     inorder, inStart, inRootIndex - 1, inorderMap);
+    root.right = build(preorder, preStart + leftSize + 1, preEnd,
+                      inorder, inRootIndex + 1, inEnd, inorderMap);
+    
+    return root;
+}
+```
+
+**Morris Traversal (O(1) Space Inorder):**
+
+```java
+List<Integer> inorderTraversal(TreeNode root) {
+    List<Integer> result = new ArrayList<>();
+    TreeNode current = root;
+    
+    while (current != null) {
+        if (current.left == null) {
+            // No left subtree, visit current and go right
+            result.add(current.val);
+            current = current.right;
+        } else {
+            // Find inorder predecessor
+            TreeNode predecessor = current.left;
+            while (predecessor.right != null && predecessor.right != current) {
+                predecessor = predecessor.right;
+            }
+            
+            if (predecessor.right == null) {
+                // Create thread to current node
+                predecessor.right = current;
+                current = current.left;
+            } else {
+                // Thread already exists, remove it and visit current
+                predecessor.right = null;
+                result.add(current.val);
+                current = current.right;
+            }
+        }
+    }
+    return result;
+}
+```
+
+**Binary Tree Maximum Path Sum:**
+
+```java
+int maxPathSum(TreeNode root) {
+    int[] maxSum = new int[]{Integer.MIN_VALUE};
+    maxPathSumHelper(root, maxSum);
+    return maxSum[0];
+}
+
+int maxPathSumHelper(TreeNode node, int[] maxSum) {
+    if (node == null) return 0;
+    
+    // Get max path sum from left and right (ignore negative paths)
+    int left = Math.max(0, maxPathSumHelper(node.left, maxSum));
+    int right = Math.max(0, maxPathSumHelper(node.right, maxSum));
+    
+    // Update global max (path through current node)
+    maxSum[0] = Math.max(maxSum[0], left + right + node.val);
+    
+    // Return max path sum including current node
+    return node.val + Math.max(left, right);
+}
+```
+
+**Advanced Tree Patterns:**
+
+**1. Segment Tree (Range Queries):**
+- Build: O(n)
+- Query/Update: O(log n)
+- Use for: Range sum, min, max queries
+
+**2. Fenwick Tree (Binary Indexed Tree):**
+- Simpler than segment tree
+- Prefix sums in O(log n)
+
+**3. Trie (Prefix Tree):**
+- Insert/Search: O(L) where L is word length
+- Use for: Autocomplete, spell check, IP routing
+
+**4. Tree DP:**
+- Diameter of tree
+- Maximum path sum
+- Distance problems
+
+**Key Insights:**
+- **Serialization:** Preorder + null markers uniquely identify tree
+- **Construction:** Need 2 traversals (one must be inorder for binary tree)
+- **Morris Traversal:** Threading allows O(1) space traversal
+- **Path Problems:** Often need to track global max separately from returned value
+
+**Time Complexity:** Most O(n)
+**Space Complexity:** O(n) for recursion, O(1) for Morris
+
+**Practice Problems:**
+- [ ] [Serialize and Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)
+- [ ] [Construct Binary Tree from Preorder and Inorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+- [ ] [Binary Tree Maximum Path Sum](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+- [ ] [Binary Tree Cameras](https://leetcode.com/problems/binary-tree-cameras/)
+- [ ] [Vertical Order Traversal of a Binary Tree](https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/)
+- [ ] [Recover Binary Search Tree](https://leetcode.com/problems/recover-binary-search-tree/)
+- [ ] [Count Complete Tree Nodes](https://leetcode.com/problems/count-of-smaller-numbers-after-self/)
 
 ---
 
@@ -1018,13 +1408,13 @@ class UnionFind {
 - **Union-Find:** Nearly O(1) per operation with path compression
 
 **Practice Problems:**
-- [Number of Islands](https://leetcode.com/problems/number-of-islands/)
-- [Clone Graph](https://leetcode.com/problems/clone-graph/)
-- [Course Schedule](https://leetcode.com/problems/course-schedule/)
-- [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)
-- [Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
-- [Graph Valid Tree](https://leetcode.com/problems/graph-valid-tree/)
-- [Number of Connected Components in an Undirected Graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
+- [ ] [Number of Islands](https://leetcode.com/problems/number-of-islands/)
+- [ ] [Clone Graph](https://leetcode.com/problems/clone-graph/)
+- [ ] [Course Schedule](https://leetcode.com/problems/course-schedule/)
+- [ ] [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)
+- [ ] [Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
+- [ ] [Graph Valid Tree](https://leetcode.com/problems/graph-valid-tree/)
+- [ ] [Number of Connected Components in an Undirected Graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
 
 ---
 
@@ -1088,10 +1478,10 @@ int[] dijkstra(List<int[]>[] graph, int src, int n) {
 **Space:** O(V)
 
 **Practice Problems:**
-- [Network Delay Time](https://leetcode.com/problems/network-delay-time/)
-- [Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
-- [Path With Minimum Effort](https://leetcode.com/problems/path-with-minimum-effort/)
-- [Swim in Rising Water](https://leetcode.com/problems/swim-in-rising-water/)
+- [ ] [Network Delay Time](https://leetcode.com/problems/network-delay-time/)
+- [ ] [Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
+- [ ] [Path With Minimum Effort](https://leetcode.com/problems/path-with-minimum-effort/)
+- [ ] [Swim in Rising Water](https://leetcode.com/problems/swim-in-rising-water/)
 
 ---
 
@@ -1149,9 +1539,172 @@ boolean dfs(int node, List<List<Integer>> graph, int[] state) {
 - Directed graph has cycle ↔ No topological ordering exists
 
 **Practice Problems:**
-- [Redundant Connection](https://leetcode.com/problems/redundant-connection/)
-- [Redundant Connection II](https://leetcode.com/problems/redundant-connection-ii/)
-- [Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
+- [ ] [Redundant Connection](https://leetcode.com/problems/redundant-connection/)
+- [ ] [Redundant Connection II](https://leetcode.com/problems/redundant-connection-ii/)
+- [ ] [Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
+
+---
+
+### Question: How do you solve advanced graph problems like finding articulation points and bridges?
+
+**Answer:**
+
+**Articulation Points (Cut Vertices):** Nodes whose removal increases the number of connected components.
+
+**Bridges (Cut Edges):** Edges whose removal increases the number of connected components.
+
+**Tarjan's Algorithm for Finding Bridges:**
+
+```java
+class BridgeFinder {
+    private int time = 0;
+    private List<List<Integer>> bridges = new ArrayList<>();
+    
+    void findBridges(int n, List<List<Integer>> adj) {
+        int[] disc = new int[n];      // Discovery time
+        int[] low = new int[n];       // Lowest discovery time reachable
+        boolean[] visited = new boolean[n];
+        Arrays.fill(disc, -1);
+        Arrays.fill(low, -1);
+        
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                dfs(i, -1, adj, disc, low, visited);
+            }
+        }
+    }
+    
+    void dfs(int u, int parent, List<List<Integer>> adj, 
+             int[] disc, int[] low, boolean[] visited) {
+        visited[u] = true;
+        disc[u] = low[u] = time++;
+        
+        for (int v : adj.get(u)) {
+            if (v == parent) continue;  // Skip parent edge
+            
+            if (visited[v]) {
+                // Back edge: update low value
+                low[u] = Math.min(low[u], disc[v]);
+            } else {
+                // Tree edge: recurse
+                dfs(v, u, adj, disc, low, visited);
+                low[u] = Math.min(low[u], low[v]);
+                
+                // Check if edge (u, v) is a bridge
+                if (low[v] > disc[u]) {
+                    bridges.add(Arrays.asList(u, v));
+                }
+            }
+        }
+    }
+}
+```
+
+**Articulation Points:**
+
+```java
+void findArticulationPoints(int u, int parent, List<List<Integer>> adj,
+                            int[] disc, int[] low, boolean[] visited,
+                            Set<Integer> articulationPoints) {
+    visited[u] = true;
+    disc[u] = low[u] = time++;
+    int children = 0;
+    
+    for (int v : adj.get(u)) {
+        if (v == parent) continue;
+        
+        if (visited[v]) {
+            low[u] = Math.min(low[u], disc[v]);
+        } else {
+            children++;
+            findArticulationPoints(v, u, adj, disc, low, visited, articulationPoints);
+            low[u] = Math.min(low[u], low[v]);
+            
+            // u is articulation point if:
+            // 1. u is root and has 2+ children, OR
+            // 2. u is not root and low[v] >= disc[u]
+            if (parent == -1 && children > 1) {
+                articulationPoints.add(u);
+            }
+            if (parent != -1 && low[v] >= disc[u]) {
+                articulationPoints.add(u);
+            }
+        }
+    }
+}
+```
+
+**Key Concepts:**
+
+1. **Discovery Time (disc[u]):** When node u is first visited
+2. **Low Value (low[u]):** Minimum discovery time reachable from subtree of u
+3. **Bridge Condition:** `low[v] > disc[u]` means no back edge from v's subtree to u's ancestors
+4. **Articulation Point:** Either root with 2+ children, or non-root where `low[v] >= disc[u]`
+
+**Strongly Connected Components (Kosaraju's Algorithm):**
+
+```java
+void findSCCs(int n, List<List<Integer>> adj) {
+    // Step 1: Fill stack with finish times (DFS on original graph)
+    Stack<Integer> stack = new Stack<>();
+    boolean[] visited = new boolean[n];
+    
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfsFinish(i, adj, visited, stack);
+        }
+    }
+    
+    // Step 2: Create transpose graph
+    List<List<Integer>> transpose = new ArrayList<>();
+    for (int i = 0; i < n; i++) transpose.add(new ArrayList<>());
+    
+    for (int u = 0; u < n; u++) {
+        for (int v : adj.get(u)) {
+            transpose.get(v).add(u);
+        }
+    }
+    
+    // Step 3: DFS on transpose in stack order
+    Arrays.fill(visited, false);
+    List<List<Integer>> sccs = new ArrayList<>();
+    
+    while (!stack.isEmpty()) {
+        int node = stack.pop();
+        if (!visited[node]) {
+            List<Integer> scc = new ArrayList<>();
+            dfsSCC(node, transpose, visited, scc);
+            sccs.add(scc);
+        }
+    }
+}
+```
+
+**Advanced Graph Algorithms:**
+
+**1. Minimum Spanning Tree:**
+- **Kruskal's:** Sort edges, use Union-Find - O(E log E)
+- **Prim's:** Priority queue from source - O(E log V)
+
+**2. Network Flow:**
+- **Ford-Fulkerson:** Find augmenting paths - O(E × max_flow)
+- **Edmonds-Karp:** BFS for paths - O(V × E²)
+
+**3. All-Pairs Shortest Path:**
+- **Floyd-Warshall:** DP approach - O(V³)
+
+**Time Complexity:**
+- Tarjan's Algorithm: O(V + E)
+- Kosaraju's SCC: O(V + E)
+- Kruskal's MST: O(E log E)
+
+**Practice Problems:**
+- [ ] [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
+- [ ] [Evaluate Division](https://leetcode.com/problems/evaluate-division/)
+- [ ] [Accounts Merge](https://leetcode.com/problems/accounts-merge/)
+- [ ] [Smallest String With Swaps](https://leetcode.com/problems/smallest-string-with-swaps/)
+- [ ] [Optimize Water Distribution](https://leetcode.com/problems/optimize-water-distribution-in-a-village/)
+- [ ] [Min Cost to Connect All Points](https://leetcode.com/problems/min-cost-to-connect-all-points/)
 
 ---
 
@@ -1227,13 +1780,13 @@ return Arrays.stream(dp).max().getAsInt();
 - Track different states (holding, not holding, cooldown)
 
 **Practice Problems:**
-- [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
-- [House Robber](https://leetcode.com/problems/house-robber/)
-- [Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
-- [Coin Change](https://leetcode.com/problems/coin-change/)
-- [Word Break](https://leetcode.com/problems/word-break/)
-- [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
-- [Edit Distance](https://leetcode.com/problems/edit-distance/)
+- [ ] [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
+- [ ] [House Robber](https://leetcode.com/problems/house-robber/)
+- [ ] [Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
+- [ ] [Coin Change](https://leetcode.com/problems/coin-change/)
+- [ ] [Word Break](https://leetcode.com/problems/word-break/)
+- [ ] [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
+- [ ] [Edit Distance](https://leetcode.com/problems/edit-distance/)
 
 ---
 
@@ -1323,11 +1876,11 @@ return dp[amount] > amount ? -1 : dp[amount];
 **Time:** O(n × W), **Space:** O(W) with optimization
 
 **Practice Problems:**
-- [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)
-- [Target Sum](https://leetcode.com/problems/target-sum/)
-- [Coin Change](https://leetcode.com/problems/coin-change/)
-- [Coin Change 2](https://leetcode.com/problems/coin-change-2/)
-- [Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/)
+- [ ] [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)
+- [ ] [Target Sum](https://leetcode.com/problems/target-sum/)
+- [ ] [Coin Change](https://leetcode.com/problems/coin-change/)
+- [ ] [Coin Change 2](https://leetcode.com/problems/coin-change-2/)
+- [ ] [Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/)
 
 ---
 
@@ -1393,10 +1946,143 @@ int matrixChainMultiplication(int[] dims) {
 **Time:** O(n³), **Space:** O(n²)
 
 **Practice Problems:**
-- [Burst Balloons](https://leetcode.com/problems/burst-balloons/)
-- [Minimum Cost Tree From Leaf Values](https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/)
-- [Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)
-- [Stone Game VII](https://leetcode.com/problems/stone-game-vii/)
+- [ ] [Burst Balloons](https://leetcode.com/problems/burst-balloons/)
+- [ ] [Minimum Cost Tree From Leaf Values](https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/)
+- [ ] [Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)
+- [ ] [Stone Game VII](https://leetcode.com/problems/stone-game-vii/)
+
+---
+
+### Question: How do you solve state machine DP problems like stock trading with constraints?
+
+**Answer:**
+
+**Pattern Recognition:** State machine DP is used when:
+- Multiple states exist (holding stock, not holding, cooldown)
+- State transitions have specific rules
+- Need to track different possibilities at each step
+
+**Best Time to Buy and Sell Stock with Cooldown:**
+
+```java
+int maxProfit(int[] prices) {
+    if (prices.length <= 1) return 0;
+    
+    int n = prices.length;
+    // States: hold (currently holding stock), sold (just sold), rest (resting/can buy)
+    int[] hold = new int[n];
+    int[] sold = new int[n];
+    int[] rest = new int[n];
+    
+    hold[0] = -prices[0];  // Buy on day 0
+    sold[0] = 0;           // Can't sell on day 0
+    rest[0] = 0;           // No action on day 0
+    
+    for (int i = 1; i < n; i++) {
+        hold[i] = Math.max(hold[i-1], rest[i-1] - prices[i]);  // Keep holding or buy
+        sold[i] = hold[i-1] + prices[i];  // Sell today
+        rest[i] = Math.max(rest[i-1], sold[i-1]);  // Rest or after cooldown
+    }
+    
+    return Math.max(sold[n-1], rest[n-1]);
+}
+```
+
+**Space Optimized (O(1)):**
+```java
+int maxProfit(int[] prices) {
+    int hold = Integer.MIN_VALUE;  // Max profit when holding stock
+    int sold = 0;                   // Max profit just after selling
+    int rest = 0;                   // Max profit when resting
+    
+    for (int price : prices) {
+        int prevSold = sold;
+        sold = hold + price;
+        hold = Math.max(hold, rest - price);
+        rest = Math.max(rest, prevSold);
+    }
+    
+    return Math.max(sold, rest);
+}
+```
+
+**Stock with K Transactions:**
+
+```java
+int maxProfit(int k, int[] prices) {
+    int n = prices.length;
+    if (n <= 1 || k == 0) return 0;
+    
+    // If k >= n/2, it's like unlimited transactions
+    if (k >= n / 2) {
+        int maxProfit = 0;
+        for (int i = 1; i < n; i++) {
+            if (prices[i] > prices[i-1]) {
+                maxProfit += prices[i] - prices[i-1];
+            }
+        }
+        return maxProfit;
+    }
+    
+    // dp[i][j][0] = max profit on day i with at most j transactions, not holding
+    // dp[i][j][1] = max profit on day i with at most j transactions, holding
+    int[][][] dp = new int[n][k+1][2];
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= k; j++) {
+            if (i == 0) {
+                dp[i][j][0] = 0;
+                dp[i][j][1] = -prices[i];
+                continue;
+            }
+            if (j == 0) {
+                dp[i][j][0] = 0;
+                dp[i][j][1] = Integer.MIN_VALUE / 2;
+                continue;
+            }
+            
+            dp[i][j][0] = Math.max(dp[i-1][j][0], dp[i-1][j][1] + prices[i]);
+            dp[i][j][1] = Math.max(dp[i-1][j][1], dp[i-1][j-1][0] - prices[i]);
+        }
+    }
+    
+    return dp[n-1][k][0];
+}
+```
+
+**Key Patterns for State Machine DP:**
+
+1. **Define States Clearly:**
+   - What configurations are possible?
+   - What does each state represent?
+
+2. **State Transitions:**
+   - Draw state diagram
+   - Identify legal transitions
+
+3. **Base Cases:**
+   - Initialize states for day 0 or empty input
+
+4. **Optimization:**
+   - Often can reduce space from O(n×states) to O(states)
+   - Use rolling arrays or variables
+
+**Common State Machine Problems:**
+- **Stock Trading:** Multiple states (holding, not holding, cooldown)
+- **House Robber III:** States based on tree structure
+- **Paint House:** States for different colors
+- **Maximum Alternating Subsequence:** States for increasing/decreasing
+
+**Time:** O(n × states) or O(n × k × states)
+**Space:** O(n × states) or O(states) with optimization
+
+**Practice Problems:**
+- [ ] [Best Time to Buy and Sell Stock with Cooldown](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+- [ ] [Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/)
+- [ ] [Best Time to Buy and Sell Stock with Transaction Fee](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+- [ ] [Maximum Alternating Subsequence Sum](https://leetcode.com/problems/maximum-alternating-subsequence-sum/)
+- [ ] [House Robber III](https://leetcode.com/problems/house-robber-iii/)
+- [ ] [Knight Dialer](https://leetcode.com/problems/knight-dialer/)
 
 ---
 
@@ -1493,13 +2179,13 @@ if (i > start && nums[i] == nums[i - 1]) continue;
 **Space:** O(n) for recursion depth
 
 **Practice Problems:**
-- [Permutations](https://leetcode.com/problems/permutations/)
-- [Subsets](https://leetcode.com/problems/subsets/)
-- [Combination Sum](https://leetcode.com/problems/combination-sum/)
-- [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
-- [N-Queens](https://leetcode.com/problems/n-queens/)
-- [Word Search](https://leetcode.com/problems/word-search/)
-- [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)
+- [ ] [Permutations](https://leetcode.com/problems/permutations/)
+- [ ] [Subsets](https://leetcode.com/problems/subsets/)
+- [ ] [Combination Sum](https://leetcode.com/problems/combination-sum/)
+- [ ] [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
+- [ ] [N-Queens](https://leetcode.com/problems/n-queens/)
+- [ ] [Word Search](https://leetcode.com/problems/word-search/)
+- [ ] [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)
 
 ---
 
@@ -1590,12 +2276,12 @@ class MedianFinder {
 - **Build Heap:** O(n)
 
 **Practice Problems:**
-- [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)
-- [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)
-- [Merge K Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
-- [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)
-- [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
-- [Ugly Number II](https://leetcode.com/problems/ugly-number-ii/)
+- [ ] [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)
+- [ ] [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)
+- [ ] [Merge K Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
+- [ ] [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)
+- [ ] [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
+- [ ] [Ugly Number II](https://leetcode.com/problems/ugly-number-ii/)
 
 ---
 
@@ -1657,12 +2343,12 @@ return true;
 **Time:** Usually O(n log n) due to sorting
 
 **Practice Problems:**
-- [Jump Game](https://leetcode.com/problems/jump-game/)
-- [Jump Game II](https://leetcode.com/problems/jump-game-ii/)
-- [Gas Station](https://leetcode.com/problems/gas-station/)
-- [Minimum Number of Arrows to Burst Balloons](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/)
-- [Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)
-- [Meeting Rooms II](https://leetcode.com/problems/meeting-rooms-ii/)
+- [ ] [Jump Game](https://leetcode.com/problems/jump-game/)
+- [ ] [Jump Game II](https://leetcode.com/problems/jump-game-ii/)
+- [ ] [Gas Station](https://leetcode.com/problems/gas-station/)
+- [ ] [Minimum Number of Arrows to Burst Balloons](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/)
+- [ ] [Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)
+- [ ] [Meeting Rooms II](https://leetcode.com/problems/meeting-rooms-ii/)
 
 ---
 
@@ -1755,13 +2441,13 @@ a ^= b;
 **Time:** O(1) for most operations, O(log n) for counting bits
 
 **Practice Problems:**
-- [Single Number](https://leetcode.com/problems/single-number/)
-- [Single Number II](https://leetcode.com/problems/single-number-ii/)
-- [Missing Number](https://leetcode.com/problems/missing-number/)
-- [Power of Two](https://leetcode.com/problems/power-of-two/)
-- [Counting Bits](https://leetcode.com/problems/counting-bits/)
-- [Hamming Distance](https://leetcode.com/problems/hamming-distance/)
-- [Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
+- [ ] [Single Number](https://leetcode.com/problems/single-number/)
+- [ ] [Single Number II](https://leetcode.com/problems/single-number-ii/)
+- [ ] [Missing Number](https://leetcode.com/problems/missing-number/)
+- [ ] [Power of Two](https://leetcode.com/problems/power-of-two/)
+- [ ] [Counting Bits](https://leetcode.com/problems/counting-bits/)
+- [ ] [Hamming Distance](https://leetcode.com/problems/hamming-distance/)
+- [ ] [Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
 
 ---
 
@@ -1914,11 +2600,11 @@ class LRUCache {
 ```
 
 **Practice Problems:**
-- [LRU Cache](https://leetcode.com/problems/lru-cache/)
-- [LFU Cache](https://leetcode.com/problems/lfu-cache/)
-- [Design HashMap](https://leetcode.com/problems/design-hashmap/)
-- [Min Stack](https://leetcode.com/problems/min-stack/)
-- [Implement Trie (Prefix Tree)](https://leetcode.com/problems/implement-trie-prefix-tree/)
+- [ ] [LRU Cache](https://leetcode.com/problems/lru-cache/)
+- [ ] [LFU Cache](https://leetcode.com/problems/lfu-cache/)
+- [ ] [Design HashMap](https://leetcode.com/problems/design-hashmap/)
+- [ ] [Min Stack](https://leetcode.com/problems/min-stack/)
+- [ ] [Implement Trie (Prefix Tree)](https://leetcode.com/problems/implement-trie-prefix-tree/)
 
 ---
 
