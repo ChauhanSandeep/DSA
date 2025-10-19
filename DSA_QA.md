@@ -82,6 +82,14 @@ for (int fast = 1; fast < nums.length; fast++) {
 **Time Complexity:** O(n) - single pass
 **Space Complexity:** O(1) - in-place
 
+**Practice Problems:**
+- [Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
+- [3Sum](https://leetcode.com/problems/3sum/)
+- [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
+- [Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
+- [Sort Colors (Dutch National Flag)](https://leetcode.com/problems/sort-colors/)
+- [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+
 ---
 
 ### Question: How do you approach container/trap water problems?
@@ -124,6 +132,10 @@ while (left < right) {
 - **Trapping Rain Water:** Sum water trapped at each position
 
 **Time:** O(n), **Space:** O(1)
+
+**Practice Problems:**
+- [Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
+- [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
 
 ---
 
@@ -195,6 +207,14 @@ for (int right = 0; right < s.length(); right++) {
 **Time Complexity:** O(n) - each element visited at most twice
 **Space Complexity:** O(k) for hash map (k = distinct elements)
 
+**Practice Problems:**
+- [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+- [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
+- [Longest Substring with At Most K Distinct Characters](https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/)
+- [Maximum Sum Subarray of Size K](https://leetcode.com/problems/maximum-average-subarray-i/)
+- [Fruit Into Baskets](https://leetcode.com/problems/fruit-into-baskets/)
+- [Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/)
+
 ---
 
 ### Question: What's the pattern for solving "Sliding Window Maximum" type problems?
@@ -241,6 +261,10 @@ for (int i = 0; i < n; i++) {
 - Back removal: maintain decreasing order
 
 **Time:** O(n), **Space:** O(k)
+
+**Practice Problems:**
+- [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)
+- [Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/)
 
 ---
 
@@ -318,6 +342,14 @@ return left;
 - Infinite loops: Ensure left/right always update
 - Off-by-one errors: Be clear about inclusive/exclusive bounds
 
+**Practice Problems:**
+- [Binary Search](https://leetcode.com/problems/binary-search/)
+- [Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
+- [Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)
+- [Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
+- [Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)
+- [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)
+
 ---
 
 ### Question: How do you handle binary search in rotated sorted arrays?
@@ -361,6 +393,12 @@ return -1;
 - **Find Minimum:** Modify to find rotation point
 
 **Time:** O(log n), **Space:** O(1)
+
+**Practice Problems:**
+- [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+- [Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
+- [Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
+- [Find Minimum in Rotated Sorted Array II](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
 
 ---
 
@@ -436,6 +474,14 @@ map.merge(key, 1, Integer::sum);
 map.getOrDefault(key, 0);
 ```
 
+**Practice Problems:**
+- [Two Sum](https://leetcode.com/problems/two-sum/)
+- [Group Anagrams](https://leetcode.com/problems/group-anagrams/)
+- [Valid Anagram](https://leetcode.com/problems/valid-anagram/)
+- [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
+- [Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)
+- [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)
+
 ---
 
 ## Strings
@@ -500,6 +546,14 @@ for (char c : s.toCharArray()) {
 - Strings are immutable in Java → use StringBuilder
 - Array of 26 integers faster than HashMap for lowercase letters
 - Consider both odd and even length palindromes
+
+**Practice Problems:**
+- [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)
+- [Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)
+- [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
+- [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
+- [Edit Distance](https://leetcode.com/problems/edit-distance/)
+- [Implement strStr()](https://leetcode.com/problems/implement-strstr/)
 
 ---
 
@@ -581,6 +635,15 @@ return false;
 
 **Time Complexity:** Most operations O(n)
 **Space Complexity:** O(1) for in-place operations
+
+**Practice Problems:**
+- [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
+- [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
+- [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
+- [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
+- [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
+- [Reorder List](https://leetcode.com/problems/reorder-list/)
+- [Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)
 
 ---
 
@@ -664,6 +727,15 @@ while (!queue.isEmpty()) {
 - **Stack:** LIFO needed, matching pairs, monotonic properties
 - **Queue:** FIFO needed, BFS, level-order traversal
 - **Deque:** Need both LIFO and FIFO operations
+
+**Practice Problems:**
+- [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)
+- [Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
+- [Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
+- [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+- [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+- [Min Stack](https://leetcode.com/problems/min-stack/)
+- [Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)
 
 ---
 
@@ -782,6 +854,14 @@ TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 - Recursive: O(h) stack space (h = height)
 - Iterative: O(w) for BFS (w = max width)
 
+**Practice Problems:**
+- [Binary Tree Inorder Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/)
+- [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+- [Binary Tree Zigzag Level Order Traversal](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/)
+- [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
+- [Path Sum](https://leetcode.com/problems/path-sum/)
+- [Path Sum II](https://leetcode.com/problems/path-sum-ii/)
+
 ---
 
 ### Question: How do you validate a Binary Search Tree?
@@ -826,6 +906,12 @@ boolean isValidBST(TreeNode root) {
 **Why Inorder Works:** BST's inorder traversal is strictly increasing.
 
 **Time:** O(n), **Space:** O(h)
+
+**Practice Problems:**
+- [Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)
+- [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+- [Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+- [Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
 
 ---
 
@@ -931,6 +1017,15 @@ class UnionFind {
 - **BFS/DFS:** Time O(V + E), Space O(V)
 - **Union-Find:** Nearly O(1) per operation with path compression
 
+**Practice Problems:**
+- [Number of Islands](https://leetcode.com/problems/number-of-islands/)
+- [Clone Graph](https://leetcode.com/problems/clone-graph/)
+- [Course Schedule](https://leetcode.com/problems/course-schedule/)
+- [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)
+- [Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
+- [Graph Valid Tree](https://leetcode.com/problems/graph-valid-tree/)
+- [Number of Connected Components in an Undirected Graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
+
 ---
 
 ### Question: Explain Dijkstra's algorithm and when to use it vs other shortest path algorithms.
@@ -992,6 +1087,12 @@ int[] dijkstra(List<int[]>[] graph, int src, int n) {
 **Time:** O((V + E) log V) with binary heap
 **Space:** O(V)
 
+**Practice Problems:**
+- [Network Delay Time](https://leetcode.com/problems/network-delay-time/)
+- [Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
+- [Path With Minimum Effort](https://leetcode.com/problems/path-with-minimum-effort/)
+- [Swim in Rising Water](https://leetcode.com/problems/swim-in-rising-water/)
+
 ---
 
 ### Question: How do you detect and handle cycles in graphs?
@@ -1046,6 +1147,11 @@ boolean dfs(int node, List<List<Integer>> graph, int[] state) {
 
 **Topological Sort Connection:**
 - Directed graph has cycle ↔ No topological ordering exists
+
+**Practice Problems:**
+- [Redundant Connection](https://leetcode.com/problems/redundant-connection/)
+- [Redundant Connection II](https://leetcode.com/problems/redundant-connection-ii/)
+- [Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
 
 ---
 
@@ -1119,6 +1225,15 @@ return Arrays.stream(dp).max().getAsInt();
 **5. State Machine DP:**
 - Stock Buy/Sell problems
 - Track different states (holding, not holding, cooldown)
+
+**Practice Problems:**
+- [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
+- [House Robber](https://leetcode.com/problems/house-robber/)
+- [Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
+- [Coin Change](https://leetcode.com/problems/coin-change/)
+- [Word Break](https://leetcode.com/problems/word-break/)
+- [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
+- [Edit Distance](https://leetcode.com/problems/edit-distance/)
 
 ---
 
@@ -1207,6 +1322,13 @@ return dp[amount] > amount ? -1 : dp[amount];
 
 **Time:** O(n × W), **Space:** O(W) with optimization
 
+**Practice Problems:**
+- [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)
+- [Target Sum](https://leetcode.com/problems/target-sum/)
+- [Coin Change](https://leetcode.com/problems/coin-change/)
+- [Coin Change 2](https://leetcode.com/problems/coin-change-2/)
+- [Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/)
+
 ---
 
 ### Question: How do you approach interval DP problems?
@@ -1269,6 +1391,12 @@ int matrixChainMultiplication(int[] dims) {
 - Minimum Cost Tree from Leaf Values
 
 **Time:** O(n³), **Space:** O(n²)
+
+**Practice Problems:**
+- [Burst Balloons](https://leetcode.com/problems/burst-balloons/)
+- [Minimum Cost Tree From Leaf Values](https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/)
+- [Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)
+- [Stone Game VII](https://leetcode.com/problems/stone-game-vii/)
 
 ---
 
@@ -1364,6 +1492,15 @@ if (i > start && nums[i] == nums[i - 1]) continue;
 **Time:** Often O(2ⁿ) or O(n!)
 **Space:** O(n) for recursion depth
 
+**Practice Problems:**
+- [Permutations](https://leetcode.com/problems/permutations/)
+- [Subsets](https://leetcode.com/problems/subsets/)
+- [Combination Sum](https://leetcode.com/problems/combination-sum/)
+- [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
+- [N-Queens](https://leetcode.com/problems/n-queens/)
+- [Word Search](https://leetcode.com/problems/word-search/)
+- [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)
+
 ---
 
 ## Heaps & Priority Queues
@@ -1452,6 +1589,14 @@ class MedianFinder {
 - **Peek:** O(1)
 - **Build Heap:** O(n)
 
+**Practice Problems:**
+- [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)
+- [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)
+- [Merge K Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
+- [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)
+- [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
+- [Ugly Number II](https://leetcode.com/problems/ugly-number-ii/)
+
 ---
 
 ## Greedy Algorithms
@@ -1510,6 +1655,14 @@ return true;
 3. Verify no future constraints violated
 
 **Time:** Usually O(n log n) due to sorting
+
+**Practice Problems:**
+- [Jump Game](https://leetcode.com/problems/jump-game/)
+- [Jump Game II](https://leetcode.com/problems/jump-game-ii/)
+- [Gas Station](https://leetcode.com/problems/gas-station/)
+- [Minimum Number of Arrows to Burst Balloons](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/)
+- [Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)
+- [Meeting Rooms II](https://leetcode.com/problems/meeting-rooms-ii/)
 
 ---
 
@@ -1600,6 +1753,15 @@ a ^= b;
 - **Hamming Distance:** Count differing bits
 
 **Time:** O(1) for most operations, O(log n) for counting bits
+
+**Practice Problems:**
+- [Single Number](https://leetcode.com/problems/single-number/)
+- [Single Number II](https://leetcode.com/problems/single-number-ii/)
+- [Missing Number](https://leetcode.com/problems/missing-number/)
+- [Power of Two](https://leetcode.com/problems/power-of-two/)
+- [Counting Bits](https://leetcode.com/problems/counting-bits/)
+- [Hamming Distance](https://leetcode.com/problems/hamming-distance/)
+- [Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
 
 ---
 
@@ -1750,6 +1912,13 @@ class LRUCache {
     // Helper methods: moveToHead, addToHead, removeTail, removeNode
 }
 ```
+
+**Practice Problems:**
+- [LRU Cache](https://leetcode.com/problems/lru-cache/)
+- [LFU Cache](https://leetcode.com/problems/lfu-cache/)
+- [Design HashMap](https://leetcode.com/problems/design-hashmap/)
+- [Min Stack](https://leetcode.com/problems/min-stack/)
+- [Implement Trie (Prefix Tree)](https://leetcode.com/problems/implement-trie-prefix-tree/)
 
 ---
 
