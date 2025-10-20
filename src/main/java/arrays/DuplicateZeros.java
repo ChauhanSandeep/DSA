@@ -3,21 +3,57 @@ package arrays;
 import java.util.Arrays;
 
 /**
- * Duplicate Zeros
+ * LeetCode Problem 1089: Duplicate Zeros
  *
- * Problem: Given array, duplicate each zero, shifting remaining elements to the right.
- * Perform operation in-place without changing array length.
+ * Problem Statement:
+ * Given a fixed-length integer array arr, duplicate each occurrence of zero, shifting the
+ * remaining elements to the right. Note that elements beyond the length of the original
+ * array are not written. Do the above modifications to the input array in-place and do
+ * not return anything.
  *
- * Example: arr =  [1,0,2,3,0,4,5]
- *              -> [1,0,0,2,3,0,0]
- * First 0 becomes [0,0], second 0 becomes [0,0], elements shift right.
+ * Example 1:
+ * Input: arr = [1,0,2,3,0,4,5,0]
+ * Output: [1,0,0,2,3,0,0,4]
+ * Explanation: After calling your function, the input array is modified to [1,0,0,2,3,0,0,4].
+ * The first 0 at index 1 is duplicated, pushing elements right. The second 0 at index 4 is
+ * also duplicated. The elements 5 and 0 at the end are pushed beyond the array length and
+ * are discarded.
  *
- * LeetCode: https://leetcode.com/problems/duplicate-zeros
+ * Example 2:
+ * Input: arr = [1,2,3]
+ * Output: [1,2,3]
+ * Explanation: No zeros to duplicate, array remains unchanged.
+ *
+ * Constraints:
+ * 1 <= arr.length <= 10^4
+ * 0 <= arr[i] <= 9
+ *
+ * LeetCode Link: https://leetcode.com/problems/duplicate-zeros/
  *
  * Follow-up Questions:
- * - How to duplicate other values instead of zeros? (Change condition in algorithm)
- * - What if we can change array length? (Use additional space for simpler implementation)
- * - How to duplicate elements k times instead of once? (Modify duplication logic)
+ * 1. Q: How would you solve this if you needed to duplicate any specific value, not just zeros?
+ *    A: Generalize the solution by parameterizing the target value. The two-pass algorithm
+ *    remains the same: count occurrences of the target value in the first pass, then fill
+ *    the array backward in the second pass, duplicating the target value when encountered.
+ *
+ * 2. Q: What if the array can grow dynamically and we don't need to discard elements?
+ *    A: Use a simple forward iteration with ArrayList or similar dynamic structure. When a
+ *    zero is found, insert another zero. This becomes O(n^2) for array shifting but O(n)
+ *    with ArrayList. Related: https://leetcode.com/problems/insert-interval/
+ *
+ * 3. Q: How would you optimize if zeros are very sparse (few zeros in a large array)?
+ *    A: The current optimal solution is already efficient for sparse zeros since we only
+ *    process elements once. However, you could maintain a list of zero indices and only
+ *    shift segments between zeros, potentially improving cache locality.
+ *
+ * 4. Q: Can you solve this with a single pass instead of two passes?
+ *    A: A true single-pass solution is challenging because we need to know the final position
+ *    of each element before moving it. However, you could use extra space with a temporary
+ *    array for a single-pass solution, which violates the O(1) space constraint.
+ *
+ * 5. Q: How would you handle the case where we need to duplicate zeros k times instead of once?
+ *    A: Modify the counting logic to multiply zero count by k, and in the backward pass,
+ *    insert k copies of zero instead of 2. The algorithm structure remains the same.
  */
 public class DuplicateZeros {
 
@@ -39,11 +75,11 @@ public class DuplicateZeros {
      */
     public void duplicateZeros(int[] arr) {
         int arrLength = arr.length;
-        int zeros = (int) Arrays.stream(arr).filter(num -> num == 0).count();
+        int zeroCount = (int) Arrays.stream(arr).filter(num -> num == 0).count();
 
         // Write position considering duplicates. The size is more than the original array size
         // because zeroes will expand the result. this initially may go out of bounds
-        int writeIndex = arrLength + zeros - 1;
+        int writeIndex = arrLength + zeroCount - 1;
         // Read position in the original array
         int readIndex = arrLength - 1; // Original array end
 

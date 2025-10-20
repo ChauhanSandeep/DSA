@@ -69,7 +69,7 @@ public class MinimumSwapsToGroupAll1sTogether {
         // Edge case: no 1s or all are 1s
         if (onesCount <= 1) return 0;
 
-        int n = data.length;
+        int length = data.length;
         int windowSize = onesCount;
 
         // Count 0s in first window
@@ -78,16 +78,12 @@ public class MinimumSwapsToGroupAll1sTogether {
             if (data[i] == 0) zerosInWindow++;
         }
 
-        int minSwaps = zerosInWindow;
+        int minSwaps = zerosInWindow; // these 0s need to be swapped
 
-        // Slide the window and update count
-        for (int i = windowSize; i < n; i++) {
-            // Remove element going out of window
-            if (data[i - windowSize] == 0) zerosInWindow--;
-
-            // Add new element coming into window
-            if (data[i] == 0) zerosInWindow++;
-
+        // Slide the window using start and end indices
+        for (int start = 1, end = windowSize; end < length; start++, end++) {
+            if (data[start - 1] == 0) zerosInWindow--;
+            if (data[end] == 0) zerosInWindow++;
             minSwaps = Math.min(minSwaps, zerosInWindow);
         }
 

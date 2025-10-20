@@ -1,34 +1,74 @@
 package arrays;
 
 /**
- * Matrix Block Sum
+ * LeetCode Problem 1314: Matrix Block Sum
  *
- * Problem: Given a m x n matrix mat and an integer k, return a matrix answer where each answer[i][j] is the
- * sum of all elements mat[r][c] for:
+ * Problem Statement:
+ * Given an m x n matrix mat and an integer k, return a matrix answer where each
+ * answer[i][j] is the sum of all elements mat[r][c] for:
+ * - i - k <= r <= i + k
+ * - j - k <= c <= j + k
+ * - (r, c) is a valid position in the matrix
  *
- * i - k <= r <= i + k,
- * j - k <= c <= j + k, and
+ * In other words, for each cell in the answer matrix, calculate the sum of all elements
+ * in a rectangular block that extends k positions in all four directions from that cell's
+ * corresponding position in the original matrix.
  *
- * Example: mat = [
+ * Example 1:
+ * Input: mat = [[1,2,3],[4,5,6],[7,8,9]], k = 1
+ * Output: [[12,21,16],[27,45,33],[24,39,28]]
+ * Explanation: For position (0,0), the block includes elements from rows [0,1] and columns
+ * [0,1], which are 1,2,4,5, summing to 12. For position (1,1), the block includes all 9
+ * elements (since k=1 allows reaching all positions from center), summing to 45.
+ *
+ * Example 2:
+ * Input: mat = [
  *      [1,2,3],
  *      [4,5,6],
  *      [7,8,9]
- *    ], k = 1
- * -> Output: [
- *      [12,21,16],
- *      [27,45,33],
- *      [24,39,28]
- *   ]
- * Explanation:
- * For position (1,1), block includes all elements, sum = 45.
- * For position (0,0), block includes elements (0,0),(0,1),(1,0),(1,1), sum = 12.
+ * ], k = 2
+ * Output: [
+ *      [45,45,45],
+ *      [45,45,45],
+ *      [45,45,45]]
+ * Explanation: With k=2, from any position we can reach all cells in the matrix, so every
+ * position has the sum of all elements (45).
  *
- * LeetCode: https://leetcode.com/problems/matrix-block-sum
+ * Constraints:
+ * - m == mat.length
+ * - n == mat[i].length
+ * - 1 <= m, n, k <= 100
+ * - 1 <= mat[i][j] <= 100
+ *
+ * LeetCode Link: https://leetcode.com/problems/matrix-block-sum/
  *
  * Follow-up Questions:
- * - How to handle different block shapes? (Modify boundary calculations)
- * - What if k can be different for rows vs columns? (Use separate kRow, kCol parameters)
- * - Can we solve without prefix sums? (Yes, but O(n²k²) vs O(n²))
+ * 1. Q: How would you solve this if queries are made with different k values multiple times?
+ *    A: Precompute the 2D prefix sum once (O(m*n) time). Then for each query with different k,
+ *    compute the answer in O(m*n) time using the precomputed prefix sum. This is more efficient
+ *    than recomputing prefix sums for each query.
+ *
+ * 2. Q: What if the matrix is very large and sparse (many zeros)?
+ *    A: Use a sparse matrix representation (like HashMap with coordinates as keys). Only store
+ *    non-zero values and their positions. When computing block sums, only iterate over non-zero
+ *    elements within the range. Related: https://leetcode.com/problems/sparse-matrix-multiplication/
+ *
+ * 3. Q: How would you extend this to 3D matrices (cuboid blocks)?
+ *    A: Use 3D prefix sums. The formula extends to: prefixSum[i][j][k] = mat[i][j][k] +
+ *    prefixSum[i-1][j][k] + prefixSum[i][j-1][k] + prefixSum[i][j][k-1] - prefixSum[i-1][j-1][k]
+ *    - prefixSum[i-1][j][k-1] - prefixSum[i][j-1][k-1] + prefixSum[i-1][j-1][k-1].
+ *    Query formula becomes more complex with 8 terms.
+ *
+ * 4. Q: What if we need to find the maximum block sum instead of computing all blocks?
+ *    A: Use the same 2D prefix sum approach but iterate through all possible positions to find
+ *    the maximum. This still maintains O(m*n) time complexity for the search after prefix sum
+ *    computation. Related: https://leetcode.com/problems/maximum-sum-of-rectangle-no-larger-than-k/
+ *
+ * 5. Q: How would you handle updates to the matrix elements dynamically?
+ *    A: For frequent updates, consider using a 2D Binary Indexed Tree (Fenwick Tree) or 2D
+ *    Segment Tree. Updates would be O(log m * log n) and range sum queries would also be
+ *    O(log m * log n), making it efficient for dynamic scenarios. Static prefix sum becomes
+ *    inefficient if matrix changes frequently.
  */
 public class MatrixBlockSum {
 
