@@ -203,7 +203,3 @@ int rightChild = 2 * i + 2;
 - `RangeSumQueryMutable.java` - Basic segment tree + BIT alternative
 - `MyCalendarThree.java` - Lazy propagation example
 - `TheSkylineProblem.java` - Advanced with coordinate compression
-
----
-
-**Quick Interview Prep**: Master the basic template, understand the 3 query cases, practice #307. You're ready! 🚀
