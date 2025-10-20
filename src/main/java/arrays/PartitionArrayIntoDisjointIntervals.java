@@ -85,35 +85,40 @@ public class PartitionArrayIntoDisjointIntervals {
     }
 
     /**
-     * Optimized single-pass approach
+     * Optimized single-pass approach for partitioning the array.
      *
-     * Algorithm:
-     * 1. Track maxSoFar (max in left partition) and maxEndingHere (max in entire array so far)
-     * 2. Iterate through array, updating maxEndingHere
-     * 3. If current element < maxSoFar, extend left partition to current index
-     *   and update maxSoFar to maxEndingHere
-     * 4. Return partitionIndex + 1
+     * Intuition:
+     * - We track the maximum value in the left partition (`leftMax`) and the maximum value
+     *   seen so far (`currentMax`).
+     * - If we find an element smaller than `leftMax`, it means the left partition must
+     *   include this element, so we extend the left partition and update `leftMax`.
      *
-     * Time Complexity: O(n), Space Complexity: O(1)
+     * Steps:
+     * 1. Initialize `leftMax` and `currentMax` to the first element.
+     * 2. Iterate through the array:
+     *    - Update `currentMax` to the max seen so far.
+     *    - If the current element is less than `leftMax`, extend the left partition to this index,
+     *      and update `leftMax` to `currentMax`.
+     * 3. Return the size of the left partition.
+     *
+     * Time Complexity: O(n)
+     * Space Complexity: O(1)
      */
     public int partitionDisjointOptimized(int[] nums) {
-        int size = nums.length;
-        int maxSoFar = nums[0];
-        int maxEndingHere = nums[0];
-        int partitionIndex = 0;
+        int length = nums.length;
+        int leftMax = nums[0];
+        int currentMax = nums[0];
+        int leftPartitionEnd = 0;
 
-        for (int i = 1; i < size; i++) {
-            maxEndingHere = Math.max(maxEndingHere, nums[i]);
-
-            // If current element is smaller than max so far,
-            // we need to extend left partition
-            if (nums[i] < maxSoFar) {
-                partitionIndex = i;
-                maxSoFar = maxEndingHere;
+        for (int i = 1; i < length; i++) {
+            currentMax = Math.max(currentMax, nums[i]);
+            if (nums[i] < leftMax) {
+                leftPartitionEnd = i;
+                leftMax = currentMax;
             }
         }
 
-        return partitionIndex + 1;
+        return leftPartitionEnd + 1;
     }
 
     /**
@@ -148,4 +153,6 @@ public class PartitionArrayIntoDisjointIntervals {
 
         return size - 1;
     }
+
+
 }
