@@ -12,7 +12,13 @@ import java.util.*;
  * Return key points where the skyline height changes as [[x1,y1],[x2,y2],...] sorted by x-coordinate.
  *
  * Example:
- * Input: buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]
+ * Input: buildings = [
+ *      [2,  9,  10],
+ *      [3,  7,  15],
+ *      [5,  12, 12],
+ *      [15, 20, 10],
+ *      [19, 24, 8]
+ * ]
  * Output: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]
  * Explanation: At x=2, building starts with height 10. At x=3, taller building (height 15) starts.
  * At x=7, the tallest building ends, height drops to 12. Pattern continues until all buildings end.

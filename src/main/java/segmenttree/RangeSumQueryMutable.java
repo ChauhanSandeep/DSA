@@ -33,6 +33,69 @@ public class RangeSumQueryMutable {
   private final BinaryIndexedTree fenwickTree;
 
   /**
+   * Binary Indexed Tree (Fenwick Tree) implementation for efficient range sum queries.
+   * Uses 1-based indexing for easier bit manipulation operations.
+   *
+   * Time Complexity: O(log n)
+   * Space Complexity: O(n)
+   */
+  private static class BinaryIndexedTree {
+    private final int[] tree; // contains the sums of ranges
+
+    /**
+     * Constructs a Binary Indexed Tree (Fenwick Tree) with the given size.
+     * @param size The size of the array to be managed by the BIT.
+     */
+    public BinaryIndexedTree(int size) {
+      this.tree = new int[size + 1]; // 1-indexed array
+    }
+
+    /**
+     * Adds delta to the element at position index.
+     * Updates all relevant nodes in the BIT structure.
+     *
+     * Steps:
+     * 1. Start from index and add delta to tree[index].
+     * 2. Move to the next responsible index by adding the lowest set bit. The movement patterns is
+     *    1 -> 2 -> 4 -> 8 -> 16 -> ...
+     * 3. Repeat until index exceeds tree size.
+     *
+     * @param index the position to update (1-based index)
+     * @param delta the value to add
+     */
+    public void add(int index, int delta) {
+      while (index < tree.length) {
+        tree[index] += delta;
+        index += getLowBit(index); // Move to next responsible index
+      }
+    }
+
+    /**
+     * Returns prefix sum from index 1 to index (inclusive).
+     * Traverses from index towards root accumulating sums.
+     *
+     * Steps:
+     * 1. Initialize sum to 0.
+     * 2. While index > 0, add tree[index] to sum.
+     * 3. Move to parent index by subtracting the lowest set bit.
+     * 4. Return the accumulated sum.
+     */
+    public int getPrefix(int index) {
+      int sum = 0;
+      while (index > 0) {
+        sum += tree[index];
+        index -= getLowBit(index); // Move to parent index
+      }
+      return sum;
+    }
+
+    // Returns the lowest set bit of index (index & -index)
+    private int getLowBit(int index) {
+      return index & (-index);
+    }
+  }
+
+  /**
    * Initializes the NumArray object with the integer array nums.
    *
    * Algorithm: Binary Indexed Tree Construction
@@ -57,7 +120,8 @@ public class RangeSumQueryMutable {
 
     // Build the fenwick tree by adding each element
     for (int i = 0; i < nums.length; i++) {
-      fenwickTree.add(i + 1, nums[i]); // Convert to 1-indexed
+      int val = nums[i];
+      fenwickTree.add(i + 1, val); // Convert to 1-indexed
     }
   }
 
@@ -108,50 +172,6 @@ public class RangeSumQueryMutable {
     }
 
     return fenwickTree.getPrefix(right + 1) - fenwickTree.getPrefix(left);
-  }
-
-  /**
-   * Binary Indexed Tree (Fenwick Tree) implementation for efficient range sum queries.
-   * Uses 1-based indexing for easier bit manipulation operations.
-   *
-   * Time Complexity: O(log n)
-   * Space Complexity: O(n)
-   */
-  private static class BinaryIndexedTree {
-    private final int[] tree;
-
-    public BinaryIndexedTree(int size) {
-      this.tree = new int[size + 1]; // 1-indexed array
-    }
-
-    /**
-     * Adds delta to the element at position index.
-     * Updates all relevant nodes in the BIT structure.
-     */
-    public void add(int index, int delta) {
-      while (index < tree.length) {
-        tree[index] += delta;
-        index += getLowBit(index); // Move to next responsible index
-      }
-    }
-
-    /**
-     * Returns prefix sum from index 1 to index (inclusive).
-     * Traverses from index towards root accumulating sums.
-     */
-    public int getPrefix(int index) {
-      int sum = 0;
-      while (index > 0) {
-        sum += tree[index];
-        index -= getLowBit(index); // Move to parent index
-      }
-      return sum;
-    }
-
-    // Returns the lowest set bit of index (index & -index)
-    private int getLowBit(int index) {
-      return index & (-index);
-    }
   }
 
 
