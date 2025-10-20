@@ -29,149 +29,127 @@ package segmenttree;
  */
 public class RangeSumQueryMutable {
 
-  private final int[] originalNums;
-  private final BinaryIndexedTree fenwickTree;
+  private final int[] nums;  // Keep track of original array values
+  private final BinaryIndexedTree bit;
 
   /**
-   * Binary Indexed Tree (Fenwick Tree) implementation for efficient range sum queries.
-   * Uses 1-based indexing for easier bit manipulation operations.
+   * Binary Indexed Tree (Fenwick Tree) - A tree that efficiently handles prefix sum queries.
    *
-   * Time Complexity: O(log n)
-   * Space Complexity: O(n)
+   * CORE IDEA: Instead of storing individual elements, we store "cumulative contributions"
+   * where each index is responsible for a specific range of elements.
+   *
+   * How it works:
+   * - Uses 1-based indexing (index 0 is unused)
+   * - Each index i covers a range determined by its lowest set bit
+   * - Index 4 (100 in binary) covers 4 elements: [1,2,3,4]
+   * - Index 6 (110 in binary) covers 2 elements: [5,6]
+   * - Index 8 (1000 in binary) covers 8 elements: [1,2,3,4,5,6,7,8]
+   *
+   * Time: O(log n) for both update and query
+   * Space: O(n)
    */
   private static class BinaryIndexedTree {
-    private final int[] tree; // contains the sums of ranges
+    private final int[] tree; // Each position stores sum for its responsible range
 
-    /**
-     * Constructs a Binary Indexed Tree (Fenwick Tree) with the given size.
-     * @param size The size of the array to be managed by the BIT.
-     */
     public BinaryIndexedTree(int size) {
-      this.tree = new int[size + 1]; // 1-indexed array
+      this.tree = new int[size + 1]; // +1 because we use 1-based indexing
     }
 
     /**
-     * Adds delta to the element at position index.
-     * Updates all relevant nodes in the BIT structure.
+     * Add a value to position i (1-based index).
+     * This propagates the change UP the tree to all ancestors.
      *
-     * Steps:
-     * 1. Start from index and add delta to tree[index].
-     * 2. Move to the next responsible index by adding the lowest set bit. The movement patterns is
-     *    1 -> 2 -> 4 -> 8 -> 16 -> ...
-     * 3. Repeat until index exceeds tree size.
+     * INTUITION: When we update position i, we need to update all tree nodes
+     * that include position i in their range.
      *
-     * @param index the position to update (1-based index)
-     * @param delta the value to add
+     * Example: add(3, 5) updates positions 3→4→8→16...
+     * - Position 3: responsible for [3,3], add 5
+     * - Position 4: responsible for [1,4], add 5
+     * - Position 8: responsible for [1,8], add 5
      */
-    public void add(int index, int delta) {
-      while (index < tree.length) {
-        tree[index] += delta;
-        index += getLowBit(index); // Move to next responsible index
+    public void add(int i, int delta) {
+      while (i < tree.length) {
+        tree[i] += delta;
+        i += i & (-i); // Move to next ancestor using lowest set bit
       }
     }
 
     /**
-     * Returns prefix sum from index 1 to index (inclusive).
-     * Traverses from index towards root accumulating sums.
+     * Get prefix sum from 1 to i (inclusive).
+     * This traverses DOWN the tree collecting partial sums.
      *
-     * Steps:
-     * 1. Initialize sum to 0.
-     * 2. While index > 0, add tree[index] to sum.
-     * 3. Move to parent index by subtracting the lowest set bit.
-     * 4. Return the accumulated sum.
+     * INTUITION: To get sum[1...i], we collect sums from tree nodes
+     * whose ranges end exactly at or before position i.
+     *
+     * Example: prefixSum(7) queries positions 7→6→4→0
+     * - Position 7: get sum for [7,7]
+     * - Position 6: get sum for [5,6]
+     * - Position 4: get sum for [1,4]
+     * Total = sum[1,4] + sum[5,6] + sum[7,7] = sum[1,7]
      */
-    public int getPrefix(int index) {
+    public int prefixSum(int i) {
       int sum = 0;
-      while (index > 0) {
-        sum += tree[index];
-        index -= getLowBit(index); // Move to parent index
+      while (i > 0) {
+        sum += tree[i];
+        i -= i & (-i); // Move to parent using lowest set bit
       }
       return sum;
     }
-
-    // Returns the lowest set bit of index (index & -index)
-    private int getLowBit(int index) {
-      return index & (-index);
-    }
   }
 
-  /**
-   * Initializes the NumArray object with the integer array nums.
-   *
-   * Algorithm: Binary Indexed Tree Construction
-   * Step 1: Store original array for calculating deltas during updates
-   * Step 2: Initialize BIT with size n+1 (1-indexed for easier bit manipulation)
-   * Step 3: Add each element to BIT using add operation
-   *
-   * Time Complexity: O(n log n) where n is length of nums
-   * Space Complexity: O(n) for BIT array and original array storage
-   *
-   * @param nums the input integer array
-   */
   public RangeSumQueryMutable(int[] nums) {
     if (nums == null) {
-      originalNums = new int[0];
-      fenwickTree = new BinaryIndexedTree(0);
+      this.nums = new int[0];
+      this.bit = new BinaryIndexedTree(0);
       return;
     }
 
-    this.originalNums = nums.clone();
-    this.fenwickTree = new BinaryIndexedTree(nums.length);
+    this.nums = nums.clone();
+    this.bit = new BinaryIndexedTree(nums.length);
 
-    // Build the fenwick tree by adding each element
+    // Initialize the tree by adding each element
     for (int i = 0; i < nums.length; i++) {
-      int val = nums[i];
-      fenwickTree.add(i + 1, val); // Convert to 1-indexed
+      bit.add(i + 1, nums[i]); // Convert to 1-based indexing
     }
   }
 
   /**
-   * Updates the value of nums[index] to val.
+   * Update array[index] to newValue.
    *
-   * Algorithm: Delta Update in BIT
-   * Step 1: Calculate delta = newValue - oldValue
-   * Step 2: Add delta to BIT at position (index + 1) to maintain 1-indexing
-   * Step 3: Update original array with new value
-   *
-   * Time Complexity: O(log n)
-   * Space Complexity: O(1)
-   *
-   * @param index the index to update
-   * @param val the new value
+   * STRATEGY: Instead of rebuilding the tree, we calculate the difference
+   * between old and new values and add this difference to the tree.
    */
-  public void update(int index, int val) {
-    if (index < 0 || index >= originalNums.length) {
-      return; // Handle invalid index
+  public void update(int index, int newValue) {
+    if (index < 0 || index >= nums.length) {
+      return;
     }
 
-    int delta = val - originalNums[index];
-    fenwickTree.add(index + 1, delta); // Convert to 1-indexed
-    originalNums[index] = val;
+    int oldValue = nums[index];
+    int difference = newValue - oldValue;
+
+    bit.add(index + 1, difference); // Update tree with difference
+    nums[index] = newValue; // Update our copy
   }
 
   /**
-   * Returns the sum of elements from left to right inclusive.
+   * Calculate sum of elements from left to right (inclusive).
    *
-   * Algorithm: Prefix Sum Difference
-   * Step 1: Get prefix sum up to right index
-   * Step 2: Get prefix sum up to (left - 1) index
-   * Step 3: Return difference to get range sum
+   * STRATEGY: Use prefix sum property
+   * sum[left, right] = prefixSum[right] - prefixSum[left-1]
    *
-   * Formula: sumRange(left, right) = prefixSum(right) - prefixSum(left - 1)
-   *
-   * Time Complexity: O(log n)
-   * Space Complexity: O(1)
-   *
-   * @param left the left boundary index
-   * @param right the right boundary index
-   * @return sum of elements in the range [left, right]
+   * Example: sum[2,5] = prefixSum[5] - prefixSum[1]
+   *         = (nums[0]+nums[1]+nums[2]+nums[3]+nums[4]) - (nums[0])
+   *         = nums[1]+nums[2]+nums[3]+nums[4]
    */
   public int sumRange(int left, int right) {
-    if (left < 0 || right >= originalNums.length || left > right) {
-      return 0; // Handle invalid range
+    if (left < 0 || right >= nums.length || left > right) {
+      return 0;
     }
 
-    return fenwickTree.getPrefix(right + 1) - fenwickTree.getPrefix(left);
+    int rightSum = bit.prefixSum(right + 1); // Sum from 1 to right+1 (1-based)
+    int leftSum = bit.prefixSum(left);       // Sum from 1 to left (1-based)
+
+    return rightSum - leftSum;
   }
 
 
