@@ -30,70 +30,75 @@ Range: [1] [1-2] [3] [1-4] [5]
 ## Core Template
 
 ```java
-class FenwickTree {
-    int[] tree;
-    int n;
+class BinaryIndexedTree {
+    private final int[] tree;
+    private final int size;
     
-    // 1-indexed: tree[0] unused, actual data at tree[1] to tree[n]
-    public FenwickTree(int n) {
-        this.n = n;
-        tree = new int[n + 1];
-    }
-    
-    // Build from array: O(n log n)
-    public FenwickTree(int[] nums) {
-        n = nums.length;
-        tree = new int[n + 1];
-        for (int i = 0; i < n; i++) {
-            add(i + 1, nums[i]);  // Convert 0-indexed to 1-indexed
-        }
+    // 1-indexed: tree[0] unused, actual data at tree[1] to tree[size]
+    public BinaryIndexedTree(int size) {
+        this.size = size;
+        this.tree = new int[size + 1];
     }
     
     // Add delta to index (1-indexed): O(log n)
-    void add(int idx, int delta) {
-        while (idx <= n) {
-            tree[idx] += delta;
-            idx += lowBit(idx);  // Move to next responsible index
+    public void add(int index, int delta) {
+        while (index <= size) {
+            tree[index] += delta;
+            index += getLowBit(index);  // Move to next responsible index
         }
     }
     
-    // Get prefix sum [1, idx]: O(log n)
-    int prefixSum(int idx) {
+    // Get prefix sum [1, index]: O(log n)
+    public int getPrefix(int index) {
         int sum = 0;
-        while (idx > 0) {
-            sum += tree[idx];
-            idx -= lowBit(idx);  // Move to parent
+        while (index > 0) {
+            sum += tree[index];
+            index -= getLowBit(index);  // Move to parent
         }
         return sum;
     }
     
-    // Range sum [L, R] (1-indexed): O(log n)
-    int rangeSum(int L, int R) {
-        return prefixSum(R) - prefixSum(L - 1);
-    }
-    
-    // Point update: set index to value (1-indexed)
-    void update(int idx, int val, int oldVal) {
-        add(idx, val - oldVal);
-    }
-    
     // Get lowest set bit (also called LSB)
-    int lowBit(int x) {
-        return x & (-x);
+    private int getLowBit(int index) {
+        return index & (-index);
+    }
+}
+
+// Usage with 0-indexed array
+class NumArray {
+    private final int[] originalNums;
+    private final BinaryIndexedTree fenwickTree;
+    
+    public NumArray(int[] nums) {
+        this.originalNums = nums.clone();
+        this.fenwickTree = new BinaryIndexedTree(nums.length);
+        for (int i = 0; i < nums.length; i++) {
+            fenwickTree.add(i + 1, nums[i]);  // Convert to 1-indexed
+        }
+    }
+    
+    public void update(int index, int val) {
+        int delta = val - originalNums[index];
+        fenwickTree.add(index + 1, delta);  // Convert to 1-indexed
+        originalNums[index] = val;
+    }
+    
+    public int sumRange(int left, int right) {
+        return fenwickTree.getPrefix(right + 1) - fenwickTree.getPrefix(left);
     }
 }
 ```
 
 ## How It Works
 
-### The Low Bit Magic: `x & (-x)`
+### The Low Bit Magic: `index & (-index)`
 
 **What it does**: Isolates the rightmost set bit
 
 ```
-x = 6 (binary: 110)
--x (two's complement): ...11111010
-x & (-x) = 010 (binary) = 2
+index = 6 (binary: 110)
+-index (two's complement): ...11111010
+index & (-index) = 010 (binary) = 2
 
 Index 6 is responsible for range [5, 6] (length = 2)
 ```
@@ -101,62 +106,66 @@ Index 6 is responsible for range [5, 6] (length = 2)
 ### Update Operation
 
 ```java
-add(idx, delta):
-    while (idx <= n):
-        tree[idx] += delta
-        idx += lowBit(idx)  // Jump to next index that needs update
+add(index, delta):
+    while (index <= size):
+        tree[index] += delta
+        index += getLowBit(index)  // Jump to next index that needs update
 ```
 
 **Example**: Update index 3
 - Update tree[3] (covers [3])
-- Jump to 3 + lowBit(3) = 3 + 1 = 4
+- Jump to 3 + getLowBit(3) = 3 + 1 = 4
 - Update tree[4] (covers [1-4])
-- Jump to 4 + lowBit(4) = 4 + 4 = 8
-- Continue until idx > n
+- Jump to 4 + getLowBit(4) = 4 + 4 = 8
+- Continue until index > size
 
 ### Query Operation
 
 ```java
-prefixSum(idx):
+getPrefix(index):
     sum = 0
-    while (idx > 0):
-        sum += tree[idx]
-        idx -= lowBit(idx)  // Jump to parent
+    while (index > 0):
+        sum += tree[index]
+        index -= getLowBit(index)  // Jump to parent
     return sum
 ```
 
 **Example**: Query prefix sum up to index 7
 - Add tree[7] (covers [7])
-- Jump to 7 - lowBit(7) = 7 - 1 = 6
+- Jump to 7 - getLowBit(7) = 7 - 1 = 6
 - Add tree[6] (covers [5-6])
-- Jump to 6 - lowBit(6) = 6 - 2 = 4
+- Jump to 6 - getLowBit(6) = 6 - 2 = 4
 - Add tree[4] (covers [1-4])
-- idx becomes 0, stop
+- index becomes 0, stop
 
 ## Complete Example with 0-indexed Input
 
+See the full implementation in `RangeSumQueryMutable.java` which uses this exact pattern:
+
 ```java
 // Problem: Range Sum Query - Mutable (LeetCode #307)
-class NumArray {
-    FenwickTree bit;
-    int[] nums;
+public class RangeSumQueryMutable {
+    private final int[] originalNums;
+    private final BinaryIndexedTree fenwickTree;
     
-    public NumArray(int[] nums) {
-        this.nums = nums.clone();
-        bit = new FenwickTree(nums.length);
+    public RangeSumQueryMutable(int[] nums) {
+        this.originalNums = nums.clone();
+        this.fenwickTree = new BinaryIndexedTree(nums.length);
+        
+        // Build the fenwick tree by adding each element
         for (int i = 0; i < nums.length; i++) {
-            bit.add(i + 1, nums[i]);  // Convert to 1-indexed
+            fenwickTree.add(i + 1, nums[i]);  // Convert to 1-indexed
         }
     }
     
     public void update(int index, int val) {
-        int delta = val - nums[index];
-        bit.add(index + 1, delta);  // Convert to 1-indexed
-        nums[index] = val;
+        int delta = val - originalNums[index];
+        fenwickTree.add(index + 1, delta);  // Convert to 1-indexed
+        originalNums[index] = val;
     }
     
     public int sumRange(int left, int right) {
-        return bit.prefixSum(right + 1) - bit.prefixSum(left);
+        return fenwickTree.getPrefix(right + 1) - fenwickTree.getPrefix(left);
     }
 }
 ```
@@ -166,40 +175,43 @@ class NumArray {
 For 2D range sum queries (e.g., LeetCode #304 extension):
 
 ```java
-class FenwickTree2D {
-    int[][] tree;
-    int rows, cols;
+class BinaryIndexedTree2D {
+    private final int[][] tree;
+    private final int rows;
+    private final int cols;
     
-    public FenwickTree2D(int rows, int cols) {
+    public BinaryIndexedTree2D(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-        tree = new int[rows + 1][cols + 1];
+        this.tree = new int[rows + 1][cols + 1];
     }
     
-    void add(int r, int c, int delta) {
-        for (int i = r; i <= rows; i += lowBit(i)) {
-            for (int j = c; j <= cols; j += lowBit(j)) {
+    public void add(int row, int col, int delta) {
+        for (int i = row; i <= rows; i += getLowBit(i)) {
+            for (int j = col; j <= cols; j += getLowBit(j)) {
                 tree[i][j] += delta;
             }
         }
     }
     
-    int prefixSum(int r, int c) {
+    public int getPrefix(int row, int col) {
         int sum = 0;
-        for (int i = r; i > 0; i -= lowBit(i)) {
-            for (int j = c; j > 0; j -= lowBit(j)) {
+        for (int i = row; i > 0; i -= getLowBit(i)) {
+            for (int j = col; j > 0; j -= getLowBit(j)) {
                 sum += tree[i][j];
             }
         }
         return sum;
     }
     
-    int rangeSum(int r1, int c1, int r2, int c2) {
-        return prefixSum(r2, c2) - prefixSum(r1 - 1, c2) 
-             - prefixSum(r2, c1 - 1) + prefixSum(r1 - 1, c1 - 1);
+    public int getRangeSum(int row1, int col1, int row2, int col2) {
+        return getPrefix(row2, col2) - getPrefix(row1 - 1, col2) 
+             - getPrefix(row2, col1 - 1) + getPrefix(row1 - 1, col1 - 1);
     }
     
-    int lowBit(int x) { return x & (-x); }
+    private int getLowBit(int index) { 
+        return index & (-index); 
+    }
 }
 ```
 
@@ -208,31 +220,33 @@ class FenwickTree2D {
 ### Key Formulas
 ```java
 // Low bit (rightmost set bit)
-lowBit(x) = x & (-x)
+getLowBit(index) = index & (-index)
 
-// Range sum [L, R]
-rangeSum(L, R) = prefixSum(R) - prefixSum(L - 1)
+// Range sum [left, right]
+rangeSum = getPrefix(right) - getPrefix(left - 1)
 
 // Index conversion (0-indexed to 1-indexed)
-bitIndex = arrayIndex + 1
+fenwickIndex = arrayIndex + 1
 ```
 
 ### Common Operations
 ```java
-// Point update: change nums[i] to val
-add(i + 1, val - nums[i])
+// Point update: change originalNums[index] to val
+int delta = val - originalNums[index];
+fenwickTree.add(index + 1, delta);
 
 // Range query: sum from left to right
-prefixSum(right + 1) - prefixSum(left)
+fenwickTree.getPrefix(right + 1) - fenwickTree.getPrefix(left)
 
-// Point query: get value at index i
-prefixSum(i + 1) - prefixSum(i)
+// Point query: get value at index
+fenwickTree.getPrefix(index + 1) - fenwickTree.getPrefix(index)
 ```
 
 ### Why 1-indexed?
-- Bit manipulation `x & (-x)` returns 0 for x=0
+- Bit manipulation `index & (-index)` returns 0 for index=0
 - 1-indexed avoids special case handling
 - Tree naturally starts from index 1
+- Easier bit manipulation operations
 
 ## Fenwick Tree vs Segment Tree
 
@@ -251,14 +265,14 @@ prefixSum(i + 1) - prefixSum(i)
 **Q**: Why use Fenwick Tree over Segment Tree?
 - **A**: Simpler code, less space (n vs 4n), easier to implement in interviews when only prefix sums needed.
 
-**Q**: Can Fenwick Tree handle range updates?
+**Q**: Can Binary Indexed Tree handle range updates?
 - **A**: Yes, but complex. Use difference array technique: maintain BIT of differences, requires two BITs for range update + range query.
 
 **Q**: Why is it called Binary Indexed Tree?
-- **A**: Uses binary representation of indices to determine parent-child relationships via bit manipulation.
+- **A**: Uses binary representation of indices to determine parent-child relationships via bit manipulation with `getLowBit()`.
 
 **Q**: What's the time complexity to build from scratch?
-- **A**: O(n log n) if using repeated add(). Can be optimized to O(n) with direct construction.
+- **A**: O(n log n) if using repeated `add()`. Can be optimized to O(n) with direct construction.
 
 ## LeetCode Problems for FAANG
 
@@ -278,20 +292,20 @@ prefixSum(i + 1) - prefixSum(i)
 ## Common Mistakes
 
 ❌ Forgetting to use 1-indexed (accessing tree[0])  
-❌ Not converting 0-indexed input to 1-indexed  
-❌ Using `x & x - 1` instead of `x & (-x)`  
-❌ Wrong range sum formula: should be `prefixSum(R) - prefixSum(L-1)`  
-❌ Initializing tree size as `n` instead of `n+1`
+❌ Not converting 0-indexed input to 1-indexed (should use `index + 1`)  
+❌ Using `index & index - 1` instead of `index & (-index)`  
+❌ Wrong range sum formula: should be `getPrefix(right) - getPrefix(left - 1)`  
+❌ Initializing tree size as `size` instead of `size + 1`
 
 ## Implementation Tips
 
 ### Fast Build (O(n) instead of O(n log n))
 ```java
 void buildFast(int[] nums) {
-    for (int i = 1; i <= n; i++) {
+    for (int i = 1; i <= size; i++) {
         tree[i] += nums[i - 1];
-        int j = i + lowBit(i);
-        if (j <= n) tree[j] += tree[i];
+        int j = i + getLowBit(i);
+        if (j <= size) tree[j] += tree[i];
     }
 }
 ```
@@ -300,16 +314,17 @@ void buildFast(int[] nums) {
 Find index where prefix sum >= target:
 ```java
 int findIndex(int target) {
-    int idx = 0, mask = Integer.highestOneBit(n);
+    int index = 0;
+    int mask = Integer.highestOneBit(size);
     while (mask > 0) {
-        int next = idx + mask;
-        if (next <= n && tree[next] < target) {
-            idx = next;
-            target -= tree[next];
+        int nextIndex = index + mask;
+        if (nextIndex <= size && tree[nextIndex] < target) {
+            index = nextIndex;
+            target -= tree[nextIndex];
         }
         mask >>= 1;
     }
-    return idx + 1;
+    return index + 1;
 }
 ```
 
@@ -328,4 +343,4 @@ Need range queries and updates?
 
 ---
 
-**Quick Interview Prep**: Master the basic template, understand `lowBit(x) = x & (-x)`, and practice #307. Remember 1-indexing! 🚀
+**Quick Interview Prep**: Master the basic template, understand `getLowBit(index) = index & (-index)`, and practice #307. Remember 1-indexing! 🚀

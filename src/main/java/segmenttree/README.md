@@ -26,46 +26,61 @@ Array: `[1, 3, 5, 7]`
 
 ```java
 class SegmentTree {
-    int[] tree, nums;
-    int n;
+    private final int[] nums;
+    private final int[] segmentTree;
+    private final int arraySize;
     
     public SegmentTree(int[] nums) {
-        this.nums = nums;
-        n = nums.length;
-        tree = new int[4 * n];
-        build(0, 0, n - 1);
+        this.nums = nums.clone();
+        this.arraySize = nums.length;
+        this.segmentTree = new int[4 * arraySize];
+        buildTree(0, 0, arraySize - 1);
     }
     
     // Build: O(n)
-    void build(int node, int start, int end) {
+    private void buildTree(int segmentTreeIndex, int start, int end) {
         if (start == end) {
-            tree[node] = nums[start];
+            segmentTree[segmentTreeIndex] = nums[start];
             return;
         }
-        int mid = (start + end) / 2;
-        build(2*node+1, start, mid);
-        build(2*node+2, mid+1, end);
-        tree[node] = tree[2*node+1] + tree[2*node+2];
+        int mid = start + (end - start) / 2;
+        int leftChildIndex = 2 * segmentTreeIndex + 1;
+        int rightChildIndex = 2 * segmentTreeIndex + 2;
+        
+        buildTree(leftChildIndex, start, mid);
+        buildTree(rightChildIndex, mid + 1, end);
+        segmentTree[segmentTreeIndex] = segmentTree[leftChildIndex] + segmentTree[rightChildIndex];
     }
     
     // Query: O(log n) - Three cases: no overlap, complete overlap, partial overlap
-    int query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return 0;  // No overlap
-        if (L <= start && end <= R) return tree[node];  // Complete overlap
-        int mid = (start + end) / 2;  // Partial overlap
-        return query(2*node+1, start, mid, L, R) + query(2*node+2, mid+1, end, L, R);
+    private int queryTree(int treeIndex, int start, int end, int leftRange, int rightRange) {
+        if (rightRange < start || leftRange > end) return 0;  // No overlap
+        if (leftRange <= start && end <= rightRange) return segmentTree[treeIndex];  // Complete overlap
+        
+        // Partial overlap
+        int mid = start + (end - start) / 2;
+        int leftChildIndex = 2 * treeIndex + 1;
+        int rightChildIndex = 2 * treeIndex + 2;
+        return queryTree(leftChildIndex, start, mid, leftRange, rightRange) 
+             + queryTree(rightChildIndex, mid + 1, end, leftRange, rightRange);
     }
     
     // Update: O(log n)
-    void update(int node, int start, int end, int idx, int val) {
+    private void updateTree(int treeIndex, int start, int end, int updateIndex, int updateValue) {
         if (start == end) {
-            tree[node] = val;
+            segmentTree[treeIndex] = updateValue;
             return;
         }
-        int mid = (start + end) / 2;
-        if (idx <= mid) update(2*node+1, start, mid, idx, val);
-        else update(2*node+2, mid+1, end, idx, val);
-        tree[node] = tree[2*node+1] + tree[2*node+2];
+        int mid = start + (end - start) / 2;
+        int leftChildIndex = 2 * treeIndex + 1;
+        int rightChildIndex = 2 * treeIndex + 2;
+        
+        if (updateIndex <= mid) {
+            updateTree(leftChildIndex, start, mid, updateIndex, updateValue);
+        } else {
+            updateTree(rightChildIndex, mid + 1, end, updateIndex, updateValue);
+        }
+        segmentTree[treeIndex] = segmentTree[leftChildIndex] + segmentTree[rightChildIndex];
     }
 }
 ```
@@ -74,19 +89,19 @@ class SegmentTree {
 
 **Range Minimum:**
 ```java
-tree[node] = Math.min(tree[2*node+1], tree[2*node+2]);
+segmentTree[treeIndex] = Math.min(segmentTree[leftChildIndex], segmentTree[rightChildIndex]);
 // Return Integer.MAX_VALUE for no overlap
 ```
 
 **Range Maximum:**
 ```java
-tree[node] = Math.max(tree[2*node+1], tree[2*node+2]);
+segmentTree[treeIndex] = Math.max(segmentTree[leftChildIndex], segmentTree[rightChildIndex]);
 // Return Integer.MIN_VALUE for no overlap
 ```
 
 **Range GCD:**
 ```java
-tree[node] = gcd(tree[2*node+1], tree[2*node+2]);
+segmentTree[treeIndex] = gcd(segmentTree[leftChildIndex], segmentTree[rightChildIndex]);
 ```
 
 ## Lazy Propagation (Range Updates)
@@ -95,63 +110,75 @@ tree[node] = gcd(tree[2*node+1], tree[2*node+2]);
 
 ```java
 class LazySegmentTree {
-    int[] tree, lazy;
-    int n;
+    private final int[] segmentTree;
+    private final int[] lazy;
+    private final int arraySize;
     
     public LazySegmentTree(int[] nums) {
-        n = nums.length;
-        tree = new int[4 * n];
-        lazy = new int[4 * n];
-        build(nums, 0, 0, n - 1);
+        this.arraySize = nums.length;
+        this.segmentTree = new int[4 * arraySize];
+        this.lazy = new int[4 * arraySize];
+        buildTree(nums, 0, 0, arraySize - 1);
     }
     
-    void build(int[] nums, int node, int start, int end) {
+    private void buildTree(int[] nums, int treeIndex, int start, int end) {
         if (start == end) {
-            tree[node] = nums[start];
+            segmentTree[treeIndex] = nums[start];
             return;
         }
-        int mid = (start + end) / 2;
-        build(nums, 2*node+1, start, mid);
-        build(nums, 2*node+2, mid+1, end);
-        tree[node] = tree[2*node+1] + tree[2*node+2];
+        int mid = start + (end - start) / 2;
+        int leftChildIndex = 2 * treeIndex + 1;
+        int rightChildIndex = 2 * treeIndex + 2;
+        
+        buildTree(nums, leftChildIndex, start, mid);
+        buildTree(nums, rightChildIndex, mid + 1, end);
+        segmentTree[treeIndex] = segmentTree[leftChildIndex] + segmentTree[rightChildIndex];
     }
     
-    void pushLazy(int node, int start, int end) {
-        if (lazy[node] != 0) {
-            tree[node] += (end - start + 1) * lazy[node];
+    private void pushLazy(int treeIndex, int start, int end) {
+        if (lazy[treeIndex] != 0) {
+            segmentTree[treeIndex] += (end - start + 1) * lazy[treeIndex];
             if (start != end) {
-                lazy[2*node+1] += lazy[node];
-                lazy[2*node+2] += lazy[node];
+                lazy[2 * treeIndex + 1] += lazy[treeIndex];
+                lazy[2 * treeIndex + 2] += lazy[treeIndex];
             }
-            lazy[node] = 0;
+            lazy[treeIndex] = 0;
         }
     }
     
-    // Range Update: Add 'delta' to all elements in [L, R]
-    void updateRange(int node, int start, int end, int L, int R, int delta) {
-        pushLazy(node, start, end);
-        if (start > R || end < L) return;
-        if (L <= start && end <= R) {
-            tree[node] += (end - start + 1) * delta;
+    // Range Update: Add 'delta' to all elements in [updateLeft, updateRight]
+    private void updateRange(int treeIndex, int start, int end, 
+                            int updateLeft, int updateRight, int delta) {
+        pushLazy(treeIndex, start, end);
+        if (start > updateRight || end < updateLeft) return;
+        
+        if (updateLeft <= start && end <= updateRight) {
+            segmentTree[treeIndex] += (end - start + 1) * delta;
             if (start != end) {
-                lazy[2*node+1] += delta;
-                lazy[2*node+2] += delta;
+                lazy[2 * treeIndex + 1] += delta;
+                lazy[2 * treeIndex + 2] += delta;
             }
             return;
         }
-        int mid = (start + end) / 2;
-        updateRange(2*node+1, start, mid, L, R, delta);
-        updateRange(2*node+2, mid+1, end, L, R, delta);
-        tree[node] = tree[2*node+1] + tree[2*node+2];
+        int mid = start + (end - start) / 2;
+        int leftChildIndex = 2 * treeIndex + 1;
+        int rightChildIndex = 2 * treeIndex + 2;
+        
+        updateRange(leftChildIndex, start, mid, updateLeft, updateRight, delta);
+        updateRange(rightChildIndex, mid + 1, end, updateLeft, updateRight, delta);
+        segmentTree[treeIndex] = segmentTree[leftChildIndex] + segmentTree[rightChildIndex];
     }
     
-    int queryRange(int node, int start, int end, int L, int R) {
-        pushLazy(node, start, end);
-        if (start > R || end < L) return 0;
-        if (L <= start && end <= R) return tree[node];
-        int mid = (start + end) / 2;
-        return queryRange(2*node+1, start, mid, L, R) + 
-               queryRange(2*node+2, mid+1, end, L, R);
+    private int queryRange(int treeIndex, int start, int end, int leftRange, int rightRange) {
+        pushLazy(treeIndex, start, end);
+        if (start > rightRange || end < leftRange) return 0;
+        if (leftRange <= start && end <= rightRange) return segmentTree[treeIndex];
+        
+        int mid = start + (end - start) / 2;
+        int leftChildIndex = 2 * treeIndex + 1;
+        int rightChildIndex = 2 * treeIndex + 2;
+        return queryRange(leftChildIndex, start, mid, leftRange, rightRange) + 
+               queryRange(rightChildIndex, mid + 1, end, leftRange, rightRange);
     }
 }
 ```
@@ -160,14 +187,14 @@ class LazySegmentTree {
 
 ### Array Indexing
 ```java
-int[] tree = new int[4 * n];    // Always use 4*n
-int leftChild = 2 * i + 1;
-int rightChild = 2 * i + 2;
+int[] segmentTree = new int[4 * arraySize];    // Always use 4*arraySize
+int leftChildIndex = 2 * treeIndex + 1;
+int rightChildIndex = 2 * treeIndex + 2;
 ```
 
 ### Three Cases in Query
-1. **No overlap**: `if (R < start || L > end) return 0;`
-2. **Complete overlap**: `if (L <= start && end <= R) return tree[node];`
+1. **No overlap**: `if (rightRange < start || leftRange > end) return 0;`
+2. **Complete overlap**: `if (leftRange <= start && end <= rightRange) return segmentTree[treeIndex];`
 3. **Partial overlap**: Query both children and combine
 
 ### Common Interview Questions
