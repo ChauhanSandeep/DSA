@@ -2,6 +2,7 @@ package maths;
 
 import java.util.*;
 
+
 /**
  * Problem: Max Points on a Line
  *
@@ -25,343 +26,201 @@ import java.util.*;
  * 3. How would you extend this to 3D space?
  *    Answer: Use plane equations instead of line equations, requiring 3 points to define a plane.
  *    Related: https://leetcode.com/problems/minimum-lines-to-represent-a-line-chart/
- *
- * @author Sandeep
  */
 public class MaxPointsOnALine {
 
-    /**
-     * Finds maximum points on a line using slope-based grouping with GCD normalization.
-     *
-     * Algorithm:
-     * 1. For each point as base, calculate slopes to all other points
-     * 2. Use rational representation of slopes to avoid floating point issues
-     * 3. Group points by normalized slope and count maximum group size
-     * 4. Handle special cases: vertical lines, duplicate points
-     * 5. Return maximum count across all base points
-     *
-     * Time Complexity: O(n²) where n is number of points
-     * Space Complexity: O(n) for slope map in worst case
-     *
-     * @param points Array of points [x, y]
-     * @return Maximum number of points on same line
-     */
-    public int maxPointsOnLine(int[][] points) {
-        if (points == null || points.length == 0) return 0;
-        if (points.length <= 2) return points.length;
-
-        int maxPoints = 2; // At least 2 points can always form a line
-
-        // Try each point as base point
-        for (int i = 0; i < points.length; i++) {
-            Map<String, Integer> slopeMap = new HashMap<>();
-            int duplicates = 0;
-            int verticalPoints = 0;
-            int currentMax = 0;
-
-            // Compare with all other points
-            for (int j = i + 1; j < points.length; j++) {
-                int dx = points[j][0] - points[i][0];
-                int dy = points[j][1] - points[i][1];
-
-                if (dx == 0 && dy == 0) {
-                    // Duplicate point
-                    duplicates++;
-                } else if (dx == 0) {
-                    // Vertical line
-                    verticalPoints++;
-                    currentMax = Math.max(currentMax, verticalPoints);
-                } else {
-                    // Calculate normalized slope
-                    String slope = getNormalizedSlope(dy, dx);
-                    slopeMap.put(slope, slopeMap.getOrDefault(slope, 0) + 1);
-                    currentMax = Math.max(currentMax, slopeMap.get(slope));
-                }
-            }
-
-            // Add base point and duplicates to the maximum count
-            maxPoints = Math.max(maxPoints, currentMax + duplicates + 1);
-        }
-
-        return maxPoints;
+  /**
+   * Finds maximum number of points on the same line using slope-based HashMap approach.
+   *
+   * Algorithm:
+   * 1. For each point as anchor, calculate slopes to all other points
+   * 2. Use HashMap to count occurrences of each slope from the anchor
+   * 3. Slope is represented as reduced fraction (dy/dx) to avoid floating point errors
+   * 4. Handle vertical lines separately (infinite slope)
+   * 5. Track maximum count across all anchor points
+   *
+   * Key insight: If multiple points share the same slope from an anchor point,
+   * they must be collinear with the anchor. The slope acts as a signature for
+   * the line passing through the anchor.
+   *
+   * Time Complexity: O(N^2) where N is the number of points. For each of N points,
+   * we calculate slopes to all other points, and GCD calculation is O(log M) where M
+   * is the coordinate value, which is effectively constant given the constraints.
+   *
+   * Space Complexity: O(N) for the HashMap storing slopes from each anchor point.
+   * In worst case, all points have unique slopes from a given anchor.
+   *
+   * @param points array of 2D points
+   * @return maximum number of points on the same line
+   */
+  public int maxPoints(int[][] points) {
+    if (points.length <= 2) {
+      return points.length;
     }
 
-    /**
-     * Alternative implementation using double slopes with epsilon comparison.
-     * Less precise but more intuitive.
-     *
-     * Time Complexity: O(n²)
-     * Space Complexity: O(n)
-     */
-    public int maxPointsOnLineDouble(int[][] points) {
-        if (points.length <= 2) return points.length;
+    int maxCount = 0;
 
-        int maxPoints = 2;
-        final double EPS = 1e-9;
+    for (int i = 0; i < points.length; i++) {
+      Map<String, Integer> slopeMap = new HashMap<>(); // <slope, count>
+      int currentMax = 0;
 
-        for (int i = 0; i < points.length; i++) {
-            Map<Double, Integer> slopeCount = new HashMap<>();
-            int duplicates = 0;
-            int verticalCount = 0;
-            int localMax = 0;
+      for (int j = i + 1; j < points.length; j++) {
+        int dx = points[j][0] - points[i][0];
+        int dy = points[j][1] - points[i][1];
 
-            for (int j = i + 1; j < points.length; j++) {
-                int dx = points[j][0] - points[i][0];
-                int dy = points[j][1] - points[i][1];
+        int greatestCommonDivisor = getGreatestCommonDivisor(dx, dy);
+        dy /= greatestCommonDivisor;
+        dx /= greatestCommonDivisor;
 
-                if (dx == 0 && dy == 0) {
-                    duplicates++;
-                } else if (dx == 0) {
-                    verticalCount++;
-                    localMax = Math.max(localMax, verticalCount);
-                } else {
-                    double slope = (double) dy / dx;
-
-                    // Find if similar slope exists
-                    boolean found = false;
-                    for (Double existingSlope : slopeCount.keySet()) {
-                        if (Math.abs(slope - existingSlope) < EPS) {
-                            slopeCount.put(existingSlope, slopeCount.get(existingSlope) + 1);
-                            localMax = Math.max(localMax, slopeCount.get(existingSlope));
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        slopeCount.put(slope, 1);
-                        localMax = Math.max(localMax, 1);
-                    }
-                }
-            }
-
-            maxPoints = Math.max(maxPoints, localMax + duplicates + 1);
-        }
-
-        return maxPoints;
-    }
-
-    /**
-     * Comprehensive solution that also returns the actual lines.
-     * Useful for visualization and debugging.
-     *
-     * @param points Array of points
-     * @return Result containing max count and the lines
-     */
-    public LineAnalysisResult analyzeLines(int[][] points) {
-        if (points.length <= 2) {
-            return new LineAnalysisResult(points.length, points);
-        }
-
-        int maxPoints = 2;
-        List<List<int[]>> maximalLines = new ArrayList<>();
-
-        for (int i = 0; i < points.length; i++) {
-            Map<String, List<int[]>> slopeGroups = new HashMap<>();
-            List<int[]> verticalGroup = new ArrayList<>();
-            verticalGroup.add(points[i]);
-
-            for (int j = i + 1; j < points.length; j++) {
-                int dx = points[j][0] - points[i][0];
-                int dy = points[j][1] - points[i][1];
-
-                if (dx == 0) {
-                    verticalGroup.add(points[j]);
-                } else {
-                    String slope = getNormalizedSlope(dy, dx);
-
-                    if (!slopeGroups.containsKey(slope)) {
-                        slopeGroups.put(slope, new ArrayList<>());
-                        slopeGroups.get(slope).add(points[i]);
-                    }
-                    slopeGroups.get(slope).add(points[j]);
-                }
-            }
-
-            // Check vertical group
-            if (verticalGroup.size() > maxPoints) {
-                maxPoints = verticalGroup.size();
-                maximalLines.clear();
-                maximalLines.add(new ArrayList<>(verticalGroup));
-            } else if (verticalGroup.size() == maxPoints) {
-                maximalLines.add(new ArrayList<>(verticalGroup));
-            }
-
-            // Check slope groups
-            for (List<int[]> group : slopeGroups.values()) {
-                if (group.size() > maxPoints) {
-                    maxPoints = group.size();
-                    maximalLines.clear();
-                    maximalLines.add(new ArrayList<>(group));
-                } else if (group.size() == maxPoints) {
-                    maximalLines.add(new ArrayList<>(group));
-                }
-            }
-        }
-
-        return new LineAnalysisResult(maxPoints, maximalLines);
-    }
-
-    /**
-     * Optimized version with early termination.
-     * Stops early if remaining points can't improve the result.
-     */
-    public int maxPointsOnLineOptimized(int[][] points) {
-        if (points.length <= 2) return points.length;
-
-        int maxPoints = 2;
-
-        for (int i = 0; i < points.length - 1; i++) {
-            // Early termination: if remaining points can't beat current max
-            if (points.length - i <= maxPoints) break;
-
-            Map<String, Integer> slopeMap = new HashMap<>();
-            int duplicates = 0;
-            int verticalCount = 0;
-            int localMax = 0;
-
-            for (int j = i + 1; j < points.length; j++) {
-                int dx = points[j][0] - points[i][0];
-                int dy = points[j][1] - points[i][1];
-
-                if (dx == 0 && dy == 0) {
-                    duplicates++;
-                } else if (dx == 0) {
-                    verticalCount++;
-                    localMax = Math.max(localMax, verticalCount);
-                } else {
-                    String slope = getNormalizedSlope(dy, dx);
-                    slopeMap.put(slope, slopeMap.getOrDefault(slope, 0) + 1);
-                    localMax = Math.max(localMax, slopeMap.get(slope));
-                }
-            }
-
-            maxPoints = Math.max(maxPoints, localMax + duplicates + 1);
-        }
-
-        return maxPoints;
-    }
-
-    // Get normalized slope representation using GCD
-    private String getNormalizedSlope(int dy, int dx) {
-        if (dy == 0) return "0/1"; // Horizontal line
-
-        int gcd = gcd(Math.abs(dy), Math.abs(dx));
-        dy /= gcd;
-        dx /= gcd;
-
-        // Ensure consistent sign representation
         if (dx < 0) {
-            dy = -dy;
-            dx = -dx;
+          // Ensure that the negative sign is always in the numerator
+          dx = -dx;
+          dy = -dy;
+        } else if (dx == 0) {
+          // Ensure vertical lines have consistent representation
+          dy = Math.abs(dy);
         }
 
-        return dy + "/" + dx;
+        String slope = dy + "/" + dx;
+        slopeMap.put(slope, slopeMap.getOrDefault(slope, 0) + 1);
+        currentMax = Math.max(currentMax, slopeMap.get(slope));
+      }
+
+      maxCount = Math.max(maxCount, currentMax + 1);
     }
 
-    // Calculate Greatest Common Divisor
-    private int gcd(int a, int b) {
-        while (b != 0) {
-            int temp = b;
-            b = a % b;
-            a = temp;
-        }
-        return a;
+    return maxCount;
+  }
+
+  /**
+   * Helper method to compute greatest common divisor using Euclidean algorithm.
+   * This is used to reduce slope fractions to their simplest form.
+   * For example if the inputs are (4, 6), the GCD is 2, so the reduced form is (2, 3).
+   *
+   * The idea:
+   * - GCD(a, b) = GCD(b, a % b)
+   * - Continue until b becomes 0.
+   * - The remaining non-zero value of a is the GCD.
+   */
+  private int getGreatestCommonDivisor(int firstNumber, int secondNumber) {
+    // Handle negative inputs — GCD is always positive
+    firstNumber = Math.abs(firstNumber);
+    secondNumber = Math.abs(secondNumber);
+
+    // Euclidean algorithm
+    while (secondNumber != 0) {
+      int remainder = firstNumber % secondNumber;
+      firstNumber = secondNumber;
+      secondNumber = remainder;
     }
 
-    /**
-     * Validates that points are actually collinear.
-     *
-     * @param points Array of points to check
-     * @return true if all points are collinear
-     */
-    public boolean arePointsCollinear(int[][] points) {
-        if (points.length <= 2) return true;
+    return firstNumber;
+  }
 
-        // Use first two points to define the line
-        int x1 = points[0][0], y1 = points[0][1];
-        int x2 = points[1][0], y2 = points[1][1];
-
-        for (int i = 2; i < points.length; i++) {
-            int x3 = points[i][0], y3 = points[i][1];
-
-            // Check if (x3, y3) lies on line through (x1, y1) and (x2, y2)
-            // Using cross product: (y2-y1)*(x3-x1) == (y3-y1)*(x2-x1)
-            if ((y2 - y1) * (x3 - x1) != (y3 - y1) * (x2 - x1)) {
-                return false;
-            }
-        }
-
-        return true;
+  /**
+   * Alternative approach: Finds maximum number of points on the same line using double precision slopes.
+   *
+   * This method uses floating-point arithmetic to calculate slopes, which is simpler but potentially
+   * less precise than the fraction-based approach in the main maxPoints() method.
+   *
+   * Algorithm:
+   * 1. For each point as anchor, calculate slopes to all other points using doubles
+   * 2. Use HashMap to count occurrences of each slope from the anchor
+   * 3. Handle duplicate points separately by counting them
+   * 4. Handle vertical lines using Double.MAX_VALUE as slope representation
+   * 5. Track maximum count across all anchor points
+   *
+   * Key differences from main approach:
+   * - Uses double precision for slopes (potential floating point precision issues)
+   * - Handles duplicate points explicitly by counting them separately
+   * - Simpler slope calculation but less robust for edge cases
+   *
+   * Time Complexity: O(N^2) where N is the number of points. For each of N points,
+   * we calculate slopes to all other points.
+   *
+   * Space Complexity: O(N) for the HashMap storing slopes from each anchor point.
+   *
+   * Note: This approach may have precision issues with very close slopes due to floating point arithmetic.
+   * For production code, prefer the fraction-based approach in maxPoints().
+   *
+   * @param points array of 2D points
+   * @return maximum number of points on the same line
+   */
+  public int maxPointsUsingSlopeCalculation(int[][] points) {
+    int totalPoints = points.length;
+    if (totalPoints < 2) {
+      return totalPoints;
     }
 
-    /**
-     * Finds the equation of line passing through maximum points.
-     * Returns line in form ax + by + c = 0.
-     */
-    public LineEquation findMaximalLineEquation(int[][] points) {
-        LineAnalysisResult analysis = analyzeLines(points);
+    int globalMaxPoints = 1; // At least one point can always form a "line"
 
-        if (analysis.maximalLines.isEmpty()) {
-            return null;
+    // Try each point as an anchor point
+    for (int anchorIndex = 0; anchorIndex < totalPoints; anchorIndex++) {
+      int[] anchorPoint = points[anchorIndex];
+
+      Map<Double, Integer> slopeToCountMap = new HashMap<>();
+      int duplicatePointsCount = 0;
+
+      // Calculate slopes from anchor to all subsequent points
+      for (int currentIndex = anchorIndex + 1; currentIndex < totalPoints; currentIndex++) {
+        int[] currentPoint = points[currentIndex];
+
+        if (arePointsIdentical(anchorPoint, currentPoint)) {
+          duplicatePointsCount++;
+          continue; // Skip duplicate points
         }
+        double slopeValue = calculateSlope(anchorPoint, currentPoint);
+        slopeToCountMap.put(slopeValue, slopeToCountMap.getOrDefault(slopeValue, 0) + 1);
+      }
 
-        // Get first maximal line
-        List<int[]> line = analysis.maximalLines.get(0);
+      // Find the maximum number of points on any single line through this anchor
+      int maxPointsOnLineFromAnchor = 0;
+      for (int pointsOnLine : slopeToCountMap.values()) {
+        maxPointsOnLineFromAnchor = Math.max(maxPointsOnLineFromAnchor, pointsOnLine);
+      }
 
-        if (line.size() < 2) {
-            return null;
-        }
-
-        int x1 = line.get(0)[0], y1 = line.get(0)[1];
-        int x2 = line.get(1)[0], y2 = line.get(1)[1];
-
-        // Line equation: (y2-y1)x - (x2-x1)y + (x2-x1)y1 - (y2-y1)x1 = 0
-        int a = y2 - y1;
-        int b = x1 - x2;
-        int c = (x2 - x1) * y1 - (y2 - y1) * x1;
-
-        return new LineEquation(a, b, c);
+      // Total points on best line = anchor point + duplicate points + max points on any line
+      int totalPointsOnBestLine = 1 + duplicatePointsCount + maxPointsOnLineFromAnchor;
+      globalMaxPoints = Math.max(globalMaxPoints, totalPointsOnBestLine);
     }
 
-    // Result classes for comprehensive analysis
-    static class LineAnalysisResult {
-        int maxCount;
-        List<List<int[]>> maximalLines;
+    return globalMaxPoints;
+  }
 
-        LineAnalysisResult(int maxCount, List<List<int[]>> maximalLines) {
-            this.maxCount = maxCount;
-            this.maximalLines = maximalLines;
-        }
+  /**
+   * Helper method to check if two points are identical (same coordinates).
+   *
+   * @param firstPoint  first point coordinates [x, y]
+   * @param secondPoint second point coordinates [x, y]
+   * @return true if points have identical coordinates, false otherwise
+   */
+  private boolean arePointsIdentical(int[] firstPoint, int[] secondPoint) {
+    return firstPoint[0] == secondPoint[0] && firstPoint[1] == secondPoint[1];
+  }
 
-        LineAnalysisResult(int maxCount, int[][] singleLine) {
-            this.maxCount = maxCount;
-            this.maximalLines = new ArrayList<>();
-            List<int[]> line = new ArrayList<>();
-            for (int[] point : singleLine) {
-                line.add(point);
-            }
-            this.maximalLines.add(line);
-        }
+  /**
+   * Helper method to calculate slope between two points using double precision.
+   *
+   * Special cases:
+   * - Vertical line (same x-coordinate): returns Double.MAX_VALUE
+   * - Horizontal line (same y-coordinate): returns 0.0
+   * - Regular line: returns (y2 - y1) / (x2 - x1)
+   *
+   * @param firstPoint  starting point [x, y]
+   * @param secondPoint ending point [x, y]
+   * @return slope as double value
+   */
+  private double calculateSlope(int[] firstPoint, int[] secondPoint) {
+    int deltaX = secondPoint[0] - firstPoint[0];
+    int deltaY = secondPoint[1] - firstPoint[1];
+
+    if (deltaX == 0) {
+      return Double.MAX_VALUE; // Vertical line (infinite slope)
+    }
+    if (deltaY == 0) {
+      return 0.0; // Horizontal line (zero slope)
     }
 
-    static class LineEquation {
-        int a, b, c; // ax + by + c = 0
-
-        LineEquation(int a, int b, int c) {
-            this.a = a;
-            this.b = b;
-            this.c = c;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%dx + %dy + %d = 0", a, b, c);
-        }
-
-        // Check if point lies on this line
-        public boolean containsPoint(int x, int y) {
-            return a * x + b * y + c == 0;
-        }
-    }
+    return (double) deltaY / (double) deltaX;
+  }
 }

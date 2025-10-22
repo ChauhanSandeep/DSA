@@ -4,27 +4,47 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * LeetCode 929. Unique Email Addresses
+ * Problem: Unique Email Addresses
  *
  * Every valid email consists of a local name and a domain name, separated by the '@' sign.
  * Besides lowercase letters, the email may contain one or more '.' or '+'.
  *
- * For local names:
- * - If you add periods '.' between some characters in the local name, mail will still be forwarded to the same address.
- * - If you add a plus '+' in the local name, everything after the first '+' sign will be ignored.
+ * If you add periods '.' between some characters in the local name part of an email address,
+ * mail sent there will be forwarded to the same address without dots in the local name.
+ * Note that this rule does not apply to domain names.
  *
- * Example 1:
+ * If you add a plus '+' in the local name, everything after the first plus sign will be ignored.
+ * This allows certain emails to be filtered. Note that this rule does not apply to domain names.
+ *
+ * It is possible to use both of these rules at the same time.
+ *
+ * Example:
  * Input: emails = ["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"]
  * Output: 2
  * Explanation: "testemail@leetcode.com" and "testemail@lee.tcode.com" actually receive mails.
+ * The first two emails normalize to the same address "testemail@leetcode.com".
  *
  * LeetCode Link: https://leetcode.com/problems/unique-email-addresses/
  *
- * Follow-up Questions:
- * - How would you handle case-insensitive domains? (Convert domain to lowercase)
- * - Can you optimize for very large email lists? (Use more efficient string processing)
- * - How would you extend to support different email providers with different rules? (Provider-specific processing)
- * - What if we need to return actual unique emails instead of count? (Store normalized emails in set)
+ * 1. What if domain names also have special rules like case-insensitivity?
+ *    Answer: We would normalize the domain name by converting it to lowercase before
+ *    concatenating with the local name. The algorithm structure remains the same.
+ *
+ * 2. How would you handle invalid email formats in the input?
+ *    Answer: Add validation to check for '@' presence, non-empty local and domain parts,
+ *    and proper character sets. Return early or skip invalid emails based on requirements.
+ *
+ * 3. Can you optimize for space if the email list is extremely large?
+ *    Answer: Instead of storing full normalized emails, we could use a hash of the normalized
+ *    email or implement a streaming approach that processes emails in batches.
+ *
+ * 4. How would you extend this to support additional filtering rules?
+ *    Answer: Refactor the normalization logic into a separate method that accepts rule
+ *    configurations. Use strategy pattern to apply different rule sets dynamically.
+ *
+ * 5. What if we need to group emails by their normalized form?
+ *    Answer: Use HashMap<String, List<String>> instead of HashSet, where key is the normalized
+ *    email and value is the list of original emails that map to it.
  */
 public class UniqueEmailAddresses {
 
@@ -101,41 +121,11 @@ public class UniqueEmailAddresses {
     }
 
     /**
-     * Optimized single-pass approach without helper methods.
-     */
-    public int numUniqueEmailsOptimized(String[] emails) {
-        Set<String> uniqueEmails = new HashSet<>();
-
-        for (String email : emails) {
-            StringBuilder normalizedEmail = new StringBuilder();
-            boolean reachedDomain = false;
-            boolean ignoringAfterPlus = false;
-
-            for (char c : email.toCharArray()) {
-                if (c == '@') {
-                    reachedDomain = true;
-                    normalizedEmail.append(c);
-                } else if (reachedDomain) {
-                    // In domain part - keep everything as is
-                    normalizedEmail.append(c);
-                } else {
-                    // In local part - apply rules
-                    if (c == '+') {
-                        ignoringAfterPlus = true;
-                    } else if (!ignoringAfterPlus && c != '.') {
-                        normalizedEmail.append(c);
-                    }
-                }
-            }
-
-            uniqueEmails.add(normalizedEmail.toString());
-        }
-
-        return uniqueEmails.size();
-    }
-
-    /**
      * Alternative approach using string manipulation methods.
+     * For interviews this approach is more concise and easier to implement quickly.
+     *
+     * Time complexity: O(n * m) where n is number of emails, m is average email length
+     * Space complexity: O(n * m) for storing normalized emails in set
      */
     public int numUniqueEmailsStringMethods(String[] emails) {
         Set<String> uniqueEmails = new HashSet<>();
@@ -153,7 +143,7 @@ public class UniqueEmailAddresses {
                 local = local.substring(0, plusIndex);
             }
 
-            local = local.replace(".", "");
+            local = local.replaceAll(".", "");
 
             uniqueEmails.add(local + domain);
         }

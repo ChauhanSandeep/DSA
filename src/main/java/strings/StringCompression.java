@@ -19,150 +19,85 @@ package strings;
  * LeetCode Link: https://leetcode.com/problems/string-compression/
  *
  * Follow-up Questions:
- * - How would you handle very large counts (>9)? (Current solution handles multi-digit counts)
- * - Can you optimize for arrays with no repeating characters? (Early detection and minimal processing)
- * - How would you extend to different compression algorithms? (Modify grouping and encoding logic)
- * - What if we need to decode the compressed string back? (Implement reverse algorithm)
+ *
+ * 1. What if the compressed string is longer than the original string?
+ *    Answer: The algorithm still works correctly. We compress in-place and return the new length.
+ *    Callers can compare the returned length with the original to decide whether to use compression.
+ *
+ * 2. How would you handle counts greater than 9999?
+ *    Answer: The current solution handles any count size by converting it to a string and writing
+ *    each digit separately. For very large counts, we could optimize by using a more efficient
+ *    integer-to-string conversion or buffer management strategy.
+ *
+ * 3. Can you decompress a compressed string back to original?
+ *    Answer: Yes, we'd iterate through the compressed string, read each character, then read
+ *    following digits (if any) to get the count, and expand by writing that character count times.
+ *    This would require O(N) space for the decompressed result.
+ *
+ * 4. How would you optimize for strings with very few repeating characters?
+ *    Answer: We could add an early exit check by scanning once to estimate compression ratio.
+ *    If most characters appear only once, we could skip compression. However, this adds overhead
+ *    and the current solution is already optimal for the general case.
+ *
+ * 5. What if we need to compress using run-length encoding with different rules?
+ *    Answer: The two-pointer technique remains applicable. We'd modify the counting logic and
+ *    how we write the count (e.g., always include count, use special delimiter, etc).
+ *    Related problem: https://leetcode.com/problems/string-compression-ii/
  */
 public class StringCompression {
 
-    /**
-     * Compresses character array in-place using run-length encoding.
-     *
-     * Algorithm:
-     * 1. Use two pointers: read pointer to scan input, write pointer to build result
-     * 2. For each group of consecutive characters, count the length
-     * 3. Write the character to result position
-     * 4. If count > 1, write count digits to subsequent positions
-     * 5. Continue until all characters are processed
-     * 6. Return length of compressed array
-     *
-     * Time Complexity: O(n) where n is length of chars array
-     * Space Complexity: O(1) - compression done in-place
-     *
-     * @param chars Character array to compress in-place
-     * @return Length of compressed array
-     */
-    public int compress(char[] chars) {
-        if (chars == null || chars.length == 0) {
-            return 0;
-        }
+  /**
+   * Compresses character array in-place using two-pointer technique.
+   *
+   * Algorithm:
+   * 1. Use read pointer to traverse and count consecutive identical characters
+   * 2. Use write pointer to write compressed result back to same array
+   * 3. For each group: write character, then write count digits if count > 1
+   * 4. Convert count to string and write each digit separately
+   * 5. Return final write position as new array length
+   *
+   * Key insight: We write the compressed version to the front of the array while
+   * reading from current position. Since compression reduces or maintains size,
+   * we never overwrite unprocessed data.
+   *
+   * Time Complexity: O(N) where N is the length of chars array. We traverse
+   * the array once with the read pointer, and each character is processed once.
+   * Converting count to string is O(log K) where K is the count, but this is
+   * bounded by O(log N) per group.
+   *
+   * Space Complexity: O(1) as we modify the array in-place and use only a
+   * constant amount of extra variables. The count string conversion uses O(log N)
+   * space but this is considered constant relative to input size.
+   *
+   * @param chars array of characters to compress in-place
+   * @return new length of the compressed array
+   */
+  public int compress(char[] chars) {
+    int writePointer = 0;
+    int readPointer = 0;
+    int length = chars.length;
 
-        int writeIndex = 0; // Position to write compressed data
-        int readIndex = 0;  // Position to read input data
+    while (readPointer < length) {
+      char currentChar = chars[readPointer];
+      int count = 0;
 
-        while (readIndex < chars.length) {
-            char currentChar = chars[readIndex];
-            int count = 0;
+      // Count occurrences of currentChar
+      while (readPointer < length && chars[readPointer] == currentChar) {
+        readPointer++;
+        count++;
+      }
 
-            // Count consecutive occurrences of current character
-            while (readIndex < chars.length && chars[readIndex] == currentChar) {
-                count++;
-                readIndex++;
-            }
+      chars[writePointer++] = currentChar;
 
-            // Write character to compressed array
-            chars[writeIndex++] = currentChar;
-
-            // Write count if greater than 1
-            if (count > 1) {
-                String countStr = String.valueOf(count);
-                for (char digit : countStr.toCharArray()) {
-                    chars[writeIndex++] = digit;
-                }
-            }
-        }
-
-        return writeIndex;
-    }
-
-    /**
-     * Alternative approach with explicit count digit handling.
-     */
-    public int compressAlternative(char[] chars) {
-        int writeIndex = 0;
-        int i = 0;
-
-        while (i < chars.length) {
-            char currentChar = chars[i];
-            int count = 1;
-
-            // Count consecutive characters
-            while (i + count < chars.length && chars[i + count] == currentChar) {
-                count++;
-            }
-
-            // Write character
-            chars[writeIndex++] = currentChar;
-
-            // Write count digits if count > 1
-            if (count > 1) {
-                writeIndex = writeCount(chars, writeIndex, count);
-            }
-
-            i += count;
-        }
-
-        return writeIndex;
-    }
-
-    // Helper method to write count digits to array
-    private int writeCount(char[] chars, int startIndex, int count) {
+      // Write count digits only if count > 1
+      if (count > 1) {
         String countStr = String.valueOf(count);
-
-        for (int i = 0; i < countStr.length(); i++) {
-            chars[startIndex + i] = countStr.charAt(i);
+        for (char digit : countStr.toCharArray()) {
+          chars[writePointer++] = digit;
         }
-
-        return startIndex + countStr.length();
+      }
     }
 
-    /**
-     * Approach that handles large counts efficiently without string conversion.
-     */
-    public int compressOptimized(char[] chars) {
-        int writeIndex = 0;
-        int readIndex = 0;
-
-        while (readIndex < chars.length) {
-            char currentChar = chars[readIndex];
-            int count = 0;
-
-            // Count occurrences
-            while (readIndex < chars.length && chars[readIndex] == currentChar) {
-                count++;
-                readIndex++;
-            }
-
-            // Write character
-            chars[writeIndex++] = currentChar;
-
-            // Write count digits for counts > 1
-            if (count > 1) {
-                int start = writeIndex;
-
-                // Extract digits in reverse order
-                while (count > 0) {
-                    chars[writeIndex++] = (char) ('0' + count % 10);
-                    count /= 10;
-                }
-
-                // Reverse the digits to correct order
-                reverse(chars, start, writeIndex - 1);
-            }
-        }
-
-        return writeIndex;
-    }
-
-    // Helper method to reverse portion of array
-    private void reverse(char[] chars, int start, int end) {
-        while (start < end) {
-            char temp = chars[start];
-            chars[start] = chars[end];
-            chars[end] = temp;
-            start++;
-            end--;
-        }
-    }
+    return writePointer;
+  }
 }

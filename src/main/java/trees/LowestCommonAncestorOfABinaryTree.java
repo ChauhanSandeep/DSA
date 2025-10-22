@@ -3,123 +3,144 @@ package trees;
 import java.util.*;
 
 /**
- * Lowest Common Ancestor Of A Binary Tree
+ * Problem: Lowest Common Ancestor of a Binary Tree
  *
- * Problem Statement:
  * Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
- * The LCA is defined as the lowest node that has both p and q as descendants
+ * According to the definition of LCA on Wikipedia: The lowest common ancestor is defined
+ * between two nodes p and q as the lowest node in T that has both p and q as descendants
  * (where we allow a node to be a descendant of itself).
  *
- * Example:
+ * Example 1:
  * Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
  * Output: 3
- * Explanation: The LCA of nodes 5 and 1 is 3
+ * Explanation: The LCA of nodes 5 and 1 is 3. Node 3 is the first common ancestor
+ * when traversing up from both nodes. Node 5 is in the left subtree of 3, and node 1
+ * is in the right subtree of 3.
  *
- * LeetCode Link: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree
+ * LeetCode Problem: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree
  *
  * Follow-up Questions:
- * 1. What if nodes might not exist? - Add existence check before LCA search
- * 2. What about LCA in BST? - Use BST properties for O(h) solution
- * 3. How to find LCA of multiple nodes? - Extend algorithm to handle array of nodes
+ *
+ * 1. What if nodes might not exist in the tree?
+ *    Answer: We would need to verify that both nodes exist before finding the LCA. This can be
+ *    done by performing a pre-traversal to check existence, or by modifying our algorithm to
+ *    return additional information (like a boolean flag or count) indicating whether nodes were found.
+ *
+ * 2. What if we need to find LCA of multiple nodes instead of just two?
+ *    Answer: We can extend the recursive approach by tracking all target nodes in a set. The base
+ *    case would check if the current node is in the target set. We would return a node if it has
+ *    at least two non-null children results or if it's in the target set and has at least one
+ *    non-null child result.
+ *
+ * 3. How would you optimize if we need to answer multiple LCA queries on the same tree?
+ *    Answer: We can use preprocessing techniques like Binary Lifting or Tarjan's offline LCA algorithm.
+ *    Binary Lifting preprocesses the tree in O(N log N) time and answers each query in O(log N).
+ *    For related problem, see: https://leetcode.com/problems/kth-ancestor-of-a-tree-node/
+ *
+ * 4. What if parent pointers are available for each node?
+ *    Answer: We can convert this into a linked list intersection problem. Traverse from both nodes
+ *    to the root, calculate path lengths, align them, and find the intersection point. This would
+ *    take O(h) time and O(1) space where h is the height of the tree.
+ *    Related problem: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree-iii/
+ *
+ * 5. How would this change for a Binary Search Tree?
+ *    Answer: In a BST, we can leverage the ordering property. Starting from root, if both nodes
+ *    are smaller than current node, go left; if both are larger, go right; otherwise, current node
+ *    is the LCA. This is more efficient as we only traverse one path.
+ *    Related problem: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
  */
 public class LowestCommonAncestorOfABinaryTree {
 
     /**
-     * Finds LCA using recursive DFS approach.
+     * Definition for a binary tree node.
+     */
+    public static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int x) {
+            val = x;
+        }
+    }
+
+    /**
+     * Finds the lowest common ancestor of two nodes in a binary tree using recursive approach.
      *
-     * Algorithm: Post-order DFS with early termination
-     * - If current node is null, return null
-     * - If current node is p or q, return current node
-     * - Recursively search in left and right subtrees
-     * - If both subtrees return non-null, current node is LCA
-     * - If only one subtree returns non-null, return that result
+     * Algorithm:
+     * 1. Base Case: If current node is null or matches either p or q, return current node
+     * 2. Recursively search for p and q in left subtree
+     * 3. Recursively search for p and q in right subtree
+     * 4. Decision Logic:
+     *    - If both left and right subtree searches return non-null values, current node is LCA
+     *      (p is in one subtree and q is in the other)
+     *    - If only left subtree returns non-null, return left result (both nodes in left subtree)
+     *    - If only right subtree returns non-null, return right result (both nodes in right subtree)
+     *    - If both return null, neither p nor q found in this subtree
      *
-     * Time Complexity: O(n) - visit each node at most once
-     * Space Complexity: O(h) - recursion stack depth
+     * The algorithm works bottom-up: once we find p or q, we return it up the call stack.
+     * When a node receives non-null values from both subtrees, it knows it's the split point
+     * and therefore the LCA.
      *
-     * @param root root of binary tree
+     * Time Complexity: O(N) where N is the number of nodes in the tree.
+     * Space Complexity: O(H) where H is the height of the tree due to recursion call stack.
+     *
+     * @param root the root node of the binary tree
      * @param p first target node
      * @param q second target node
-     * @return lowest common ancestor of p and q
+     * @return the lowest common ancestor of nodes p and q
      */
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        // Base case: if root is null or root is one of the target nodes
         if (root == null || root == p || root == q) {
             return root;
         }
 
-        // Search in left and right subtrees
         TreeNode leftResult = lowestCommonAncestor(root.left, p, q);
         TreeNode rightResult = lowestCommonAncestor(root.right, p, q);
 
-        // If both subtrees found a target, current node is LCA
         if (leftResult != null && rightResult != null) {
             return root;
         }
 
-        // Return the non-null result (if any)
         return leftResult != null ? leftResult : rightResult;
     }
 
     /**
-     * Alternative approach using parent pointers.
+     * Alternative approach: Finds LCA by storing paths from root to each target node.
+     * This method first finds paths to both nodes, then compares paths to find last common node.
      *
-     * Algorithm: Build parent map and find intersection
-     * - Build map of node -> parent for all nodes
-     * - Traverse ancestors of p and mark them
-     * - Traverse ancestors of q until we find marked node
+     * Algorithm:
+     * 1. Find path from root to node p
+     * 2. Find path from root to node q
+     * 3. Compare both paths from start to find the last common node
      *
-     * Time Complexity: O(n) - to build parent map + O(h) to find LCA
-     * Space Complexity: O(n) - parent map storage
+     * Time Complexity: O(N) where N is the number of nodes. We traverse the tree twice
+     * in worst case to find both paths, then compare paths which is O(H).
+     *
+     * Space Complexity: O(H) for storing paths where H is height of tree.
+     * - Best case (balanced tree): O(log N)
+     * - Worst case (skewed tree): O(N)
+     *
+     * Note: This approach is less efficient than the recursive approach due to multiple
+     * traversals and additional space for storing paths. The recursive approach is preferred
+     * in interviews for its elegance and efficiency.
+     *
+     * @param root the root node of the binary tree
+     * @param p first target node
+     * @param q second target node
+     * @return the lowest common ancestor of nodes p and q
      */
-    public TreeNode lowestCommonAncestorWithParents(TreeNode root, TreeNode p, TreeNode q) {
-        // Build parent map
-        Map<TreeNode, TreeNode> parentMap = new HashMap<>();
-        buildParentMap(root, null, parentMap);
-
-        // Mark all ancestors of p
-        Set<TreeNode> ancestors = new HashSet<>();
-        TreeNode current = p;
-        while (current != null) {
-            ancestors.add(current);
-            current = parentMap.get(current);
+    public TreeNode lowestCommonAncestorPathBased(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) {
+            return null;
         }
 
-        // Find first common ancestor in q's path
-        current = q;
-        while (current != null) {
-            if (ancestors.contains(current)) {
-                return current;
-            }
-            current = parentMap.get(current);
-        }
-
-        return null;
-    }
-
-    // Helper to build parent map
-    private void buildParentMap(TreeNode node, TreeNode parent, Map<TreeNode, TreeNode> parentMap) {
-        if (node == null) {
-            return;
-        }
-
-        parentMap.put(node, parent);
-        buildParentMap(node.left, node, parentMap);
-        buildParentMap(node.right, node, parentMap);
-    }
-
-    /**
-     * Approach using path tracking.
-     *
-     * Find paths from root to both nodes, then find divergence point.
-     * Less efficient but demonstrates alternative thinking.
-     */
-    public TreeNode lowestCommonAncestorWithPaths(TreeNode root, TreeNode p, TreeNode q) {
         List<TreeNode> pathToP = new ArrayList<>();
         List<TreeNode> pathToQ = new ArrayList<>();
 
-        findPath(root, p, pathToP);
-        findPath(root, q, pathToQ);
+        if (!findPath(root, p, pathToP) || !findPath(root, q, pathToQ)) {
+            return null;
+        }
 
         TreeNode lca = null;
         int minLength = Math.min(pathToP.size(), pathToQ.size());
@@ -135,7 +156,7 @@ public class LowestCommonAncestorOfABinaryTree {
         return lca;
     }
 
-    // Helper to find path from root to target
+    // Helper method to find path from root to target node
     private boolean findPath(TreeNode root, TreeNode target, List<TreeNode> path) {
         if (root == null) {
             return false;
@@ -153,47 +174,5 @@ public class LowestCommonAncestorOfABinaryTree {
 
         path.remove(path.size() - 1);
         return false;
-    }
-
-    /**
-     * Optimized approach with existence validation.
-     *
-     * First check if both nodes exist, then find LCA.
-     * Useful when nodes might not be in the tree.
-     */
-    public TreeNode lowestCommonAncestorSafe(TreeNode root, TreeNode p, TreeNode q) {
-        // First verify both nodes exist
-        if (!nodeExists(root, p) || !nodeExists(root, q)) {
-            return null;
-        }
-
-        return lowestCommonAncestor(root, p, q);
-    }
-
-    // Helper to check if node exists in tree
-    private boolean nodeExists(TreeNode root, TreeNode target) {
-        if (root == null) {
-            return false;
-        }
-
-        if (root == target) {
-            return true;
-        }
-
-        return nodeExists(root.left, target) || nodeExists(root.right, target);
-    }
-
-    // Definition for a binary tree node
-    public static class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
-        TreeNode() {}
-        TreeNode(int val) { this.val = val; }
-        TreeNode(int val, TreeNode left, TreeNode right) {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
     }
 }

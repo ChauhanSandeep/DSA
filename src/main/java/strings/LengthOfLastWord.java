@@ -29,7 +29,7 @@ public class LengthOfLastWord {
     public int lengthOfLastWord(String s) {
         int end = s.length() - 1;
 
-        // Skip trailing spaces
+        // Skip trailing spaces to reach last word's end
         while (end >= 0 && s.charAt(end) == ' ') {
             end--;
         }

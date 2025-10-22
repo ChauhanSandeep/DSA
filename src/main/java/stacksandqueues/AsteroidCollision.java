@@ -4,220 +4,151 @@ import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Problem: Asteroid Collision
- * 
- * We are given an array asteroids of integers representing asteroids in a row.
- * For each asteroid, the absolute value represents its size, and the sign represents its direction
- * (positive meaning right, negative meaning left). Each asteroid moves at the same speed.
- * Find out the state of the asteroids after all collisions.
- * 
+ *
+ * Given an array asteroids of integers representing asteroids in a row, where the absolute
+ * value represents size and the sign represents direction (positive = right, negative = left).
+ * Each asteroid moves at the same speed. Find the state of asteroids after all collisions.
+ *
+ * When two asteroids meet, the smaller one explodes. If both are the same size, both explode.
+ * Two asteroids moving in the same direction will never meet.
+ *
  * Example:
- * Input: asteroids = [5,10,-5]
- * Output: [5,10]
- * Explanation: The 10 and -5 collide resulting in 10. The 5 and 10 never collide.
- * 
- * LeetCode: https://leetcode.com/problems/asteroid-collision
- * 
+ * Input: asteroids = [10,2,-5]
+ * Output: [10]
+ * Explanation: The 2 and -5 collide resulting in -5. The 10 and -5 collide resulting in 10.
+ *
+ * LeetCode Problem: https://leetcode.com/problems/asteroid-collision
+ *
  * Follow-up Questions:
- * 1. What if asteroids have different speeds?
- *    Answer: Need to track time and position, becomes much more complex simulation problem.
- * 
- * 2. How would you handle 3D asteroid collisions?
- *    Answer: Extend to 3D vectors, check collision conditions for all three dimensions.
- * 
- * 3. What if we need to track the collision events and their order?
- *    Answer: Return list of collision events with timestamps and participating asteroids.
- *    Related: https://leetcode.com/problems/car-fleet/
- * 
- * @author Sandeep
+ *
+ * 1. What if asteroids move at different speeds?
+ *    Answer: We would need additional information (speed values) and simulate collisions
+ *    based on when asteroids actually meet in time. This would require sorting by position
+ *    and calculating collision times, making it significantly more complex.
+ *
+ * 2. How would you extend this to 2D space where asteroids can move in any direction?
+ *    Answer: Use velocity vectors for each asteroid and calculate if trajectories intersect.
+ *    This becomes a computational geometry problem requiring line intersection algorithms.
+ *
+ * 3. What if we need to track the order of collisions?
+ *    Answer: Store collision events in a list as they occur. Each event would record the
+ *    two colliding asteroids and the result. This adds O(K) space where K is the number
+ *    of collisions.
+ *
+ * 4. Can you solve this without using extra space?
+ *    Answer: Yes, we can use the input array as a stack by maintaining a write pointer.
+ *    Simulate collisions in-place and return the new length. This achieves O(1) extra space.
+ *
+ * 5. How would you handle asteroids that can survive partial collisions?
+ *    Answer: Track remaining mass for each asteroid. On collision, reduce the smaller
+ *    asteroid's mass by the collision impact. Continue until mass reaches zero or no more
+ *    collisions occur.
+ *    Related problem: https://leetcode.com/problems/car-fleet/
  */
 public class AsteroidCollision {
-    
-    /**
-     * Simulates asteroid collisions using stack-based approach.
-     * 
-     * Algorithm:
-     * 1. Use stack to track asteroids moving right (positive values)
-     * 2. For each asteroid moving left (negative), check collisions with right-moving ones
-     * 3. Handle three collision outcomes: left wins, right wins, or both destroyed
-     * 4. Continue until no more collisions possible
-     * 
-     * Time Complexity: O(n) where n is number of asteroids
-     * Space Complexity: O(n) for the stack in worst case
-     * 
-     * @param asteroids Array representing asteroids with size and direction
-     * @return Array representing final state after all collisions
-     */
-    public int[] asteroidCollision(int[] asteroids) {
-        if (asteroids == null || asteroids.length == 0) {
-            return new int[0];
+
+  /**
+   * Simulates asteroid collisions using a stack to track surviving asteroids.
+   *
+   * Algorithm:
+   * 1. Iterate through each asteroid in the array
+   * 2. For right-moving asteroids (positive), push to stack
+   * 3. For left-moving asteroids (negative), check for collisions:
+   *    - While stack is non-empty and top is right-moving (positive):
+   *      - If left-moving asteroid is larger, pop the stack (right one explodes)
+   *      - If equal size, pop the stack and mark left as destroyed (both explode)
+   *      - If left-moving is smaller, mark it as destroyed (it explodes)
+   * 4. If left-moving asteroid survives all collisions, push to stack
+   * 5. Convert stack to array for the result
+   *
+   * Time Complexity: O(N) where N is the number of asteroids
+   * Space Complexity: O(N) for the stack storing surviving asteroids
+   *
+   * @param asteroids array of asteroid sizes and directions
+   * @return array representing final state after all collisions
+   */
+  public int[] asteroidCollision(int[] asteroids) {
+    Stack<Integer> stack = new Stack<>();
+
+    for (int asteroid : asteroids) {
+      boolean alive = true;
+
+      while (!stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
+        int top = stack.peek();
+
+        if (top < -asteroid) {
+          // asteriod on stack explodes
+          stack.pop();
+          continue;
+        } else if (top == -asteroid) {
+          // both asteroids explode
+          stack.pop();
         }
-        
-        Stack<Integer> stack = new Stack<>();
-        
-        for (int asteroid : asteroids) {
-            if (asteroid > 0) {
-                // Right-moving asteroid, no collision possible yet
-                stack.push(asteroid);
-            } else {
-                // Left-moving asteroid, check for collisions
-                boolean destroyed = false;
-                
-                while (!stack.isEmpty() && stack.peek() > 0 && !destroyed) {
-                    int rightMoving = stack.peek();
-                    
-                    if (rightMoving < -asteroid) {
-                        // Left-moving asteroid is larger, destroys right-moving one
-                        stack.pop();
-                    } else if (rightMoving == -asteroid) {
-                        // Same size, both destroyed
-                        stack.pop();
-                        destroyed = true;
-                    } else {
-                        // Right-moving asteroid is larger, left-moving one destroyed
-                        destroyed = true;
-                    }
-                }
-                
-                // If left-moving asteroid survived, add it to result
-                if (!destroyed) {
-                    stack.push(asteroid);
-                }
-            }
-        }
-        
-        // Convert stack to result array
-        int[] result = new int[stack.size()];
-        for (int i = result.length - 1; i >= 0; i--) {
-            result[i] = stack.pop();
-        }
-        
-        return result;
+
+        alive = false;
+        break;
+      }
+
+      if (alive) {
+        stack.push(asteroid);
+      }
     }
-    
-    /**
-     * Alternative implementation using list for clearer logic flow.
-     * 
-     * Time Complexity: O(n)
-     * Space Complexity: O(n)
-     */
-    public int[] asteroidCollisionList(int[] asteroids) {
-        List<Integer> result = new ArrayList<>();
-        
-        for (int asteroid : asteroids) {
-            boolean addAsteroid = true;
-            
-            while (addAsteroid && asteroid < 0 && !result.isEmpty() && 
-                   result.get(result.size() - 1) > 0) {
-                
-                int last = result.get(result.size() - 1);
-                
-                if (last < -asteroid) {
-                    // Current left-moving asteroid destroys the last right-moving one
-                    result.remove(result.size() - 1);
-                } else if (last == -asteroid) {
-                    // Both asteroids destroy each other
-                    result.remove(result.size() - 1);
-                    addAsteroid = false;
-                } else {
-                    // Last right-moving asteroid destroys current left-moving one
-                    addAsteroid = false;
-                }
-            }
-            
-            if (addAsteroid) {
-                result.add(asteroid);
-            }
-        }
-        
-        return result.stream().mapToInt(i -> i).toArray();
+
+    int[] result = new int[stack.size()];
+
+    for (int i = result.length - 1; i >= 0; i--) {
+      result[i] = stack.pop();
     }
-    
-    /**
-     * Simulation approach that processes all asteroids iteratively.
-     * More intuitive but potentially less efficient.
-     */
-    public int[] asteroidCollisionSimulation(int[] asteroids) {
-        List<Integer> current = new ArrayList<>();
-        for (int asteroid : asteroids) {
-            current.add(asteroid);
+
+    return result;
+  }
+
+  /**
+   * Alternative in-place approach using input array as stack to optimize space.
+   *
+   * Algorithm:
+   * 1. Use write pointer to track position in result array
+   * 2. Process each asteroid, using array positions [0, write) as stack
+   * 3. Handle collisions by comparing with asteroids[write - 1]
+   * 4. Only increment write when asteroid survives
+   * 5. Return subarray of first write elements
+   *
+   * Time Complexity: O(N) where N is the number of asteroids.
+   *
+   * Space Complexity: O(1) extra space as we modify input array in-place.
+   * Output array is required by problem definition and doesn't count toward space complexity.
+   *
+   * @param asteroids array of asteroid sizes and directions
+   * @return array representing final state after all collisions
+   */
+  public int[] asteroidCollisionInPlace(int[] asteroids) {
+    int write = 0;
+
+    for (int asteroid : asteroids) {
+      boolean alive = true;
+
+      while (write > 0 && asteroids[write - 1] > 0 && asteroid < 0) {
+        if (asteroids[write - 1] < -asteroid) {
+          write--;
+          continue;
+        } else if (asteroids[write - 1] == -asteroid) {
+          write--;
         }
-        
-        boolean hasCollision = true;
-        
-        while (hasCollision) {
-            hasCollision = false;
-            List<Integer> next = new ArrayList<>();
-            
-            for (int i = 0; i < current.size(); i++) {
-                int asteroid = current.get(i);
-                
-                if (asteroid > 0) {
-                    // Check if this right-moving asteroid collides with next left-moving one
-                    if (i + 1 < current.size() && current.get(i + 1) < 0) {
-                        int nextAsteroid = current.get(i + 1);
-                        hasCollision = true;
-                        
-                        if (asteroid > -nextAsteroid) {
-                            // Right-moving wins
-                            next.add(asteroid);
-                        } else if (asteroid == -nextAsteroid) {
-                            // Both destroyed, skip both
-                        } else {
-                            // Left-moving wins
-                            next.add(nextAsteroid);
-                        }
-                        
-                        i++; // Skip the next asteroid as it's already processed
-                    } else {
-                        next.add(asteroid);
-                    }
-                } else {
-                    next.add(asteroid);
-                }
-            }
-            
-            current = next;
-        }
-        
-        return current.stream().mapToInt(i -> i).toArray();
+
+        alive = false;
+        break;
+      }
+
+      if (alive) {
+        asteroids[write++] = asteroid;
+      }
     }
-    
-    /**
-     * Optimized stack implementation with early termination optimizations.
-     */
-    public int[] asteroidCollisionOptimized(int[] asteroids) {
-        Stack<Integer> stack = new Stack<>();
-        
-        for (int asteroid : asteroids) {
-            boolean survived = true;
-            
-            // Only left-moving asteroids can cause collisions with right-moving ones in stack
-            while (survived && asteroid < 0 && !stack.isEmpty() && stack.peek() > 0) {
-                int top = stack.peek();
-                
-                if (top <= -asteroid) {
-                    stack.pop(); // Right-moving asteroid destroyed
-                    if (top == -asteroid) {
-                        survived = false; // Both destroyed
-                    }
-                } else {
-                    survived = false; // Left-moving asteroid destroyed
-                }
-            }
-            
-            if (survived) {
-                stack.push(asteroid);
-            }
-        }
-        
-        // Convert to array
-        int[] result = new int[stack.size()];
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            result[i] = stack.get(i);
-        }
-        
-        return result;
-    }
+
+    int[] result = new int[write];
+    System.arraycopy(asteroids, 0, result, 0, write);
+    return result;
+  }
 }
