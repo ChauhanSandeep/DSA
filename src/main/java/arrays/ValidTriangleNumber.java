@@ -1,61 +1,100 @@
 package arrays;
 
-import java.util.*;
+import java.util.Arrays;
 
 /**
- * Valid Triangle Number
+ * Problem: Valid Triangle Number
  *
- * Problem: Count number of valid triangles that can be formed using array elements as side lengths.
- * Three sides form valid triangle if sum of any two sides > third side.
+ * Given an integer array nums, return the number of triplets chosen from the array
+ * that can make triangles if we take them as side lengths of a triangle.
  *
- * Example: nums = [2,2,3,4] -> Output: 3
- * Valid triangles: [2,3,4], [2,2,3], [2,2,4] (but not [2,2,4] - violates triangle inequality)
- * Wait, let me recalculate: [2,2,3] (2+2>3 ✓, 2+3>2 ✓, 2+3>2 ✓), [2,3,4] (2+3>4 ✓, 2+4>3 ✓, 3+4>2 ✓), [2,2,4] (2+2=4, not >4 ✗)
- * So valid triangles are: [2,2,3], [2,3,4]. Actually need to be more careful...
+ * For three sides to form a valid triangle, they must satisfy the triangle inequality:
+ * the sum of any two sides must be greater than the third side.
  *
- * LeetCode: https://leetcode.com/problems/valid-triangle-number
+ * Example:
+ * Input: nums = [2,2,3,4]
+ * Output: 3
+ * Explanation: Valid combinations are: (2,3,4) using first 2, (2,3,4) using second 2, and (2,2,3).
+ *
+ * Constraints:
+ * - 1 <= nums.length <= 1000
+ * - 0 <= nums[i] <= 1000
+ *
+ * LeetCode Problem: https://leetcode.com/problems/valid-triangle-number
  *
  * Follow-up Questions:
- * - How to find actual triangle triplets, not just count? (Store triplets instead of counting)
- * - What if sides can be floating point? (Same logic applies)
- * - How to handle case with duplicate side lengths? (Current solution handles correctly)
+ *
+ * 1. What if you need to return the actual triplets instead of just the count?
+ *    Answer: Store each valid triplet (i, j, k) in a list when found. Modify the count
+ *    increment logic to add all triplets between left and right pointers individually.
+ *
+ * 2. How would you handle duplicate triplets if the same values appear at different indices?
+ *    Answer: Use a Set with sorted triplet values as keys, or skip duplicates by checking
+ *    if current value equals previous value and skipping accordingly during iteration.
+ *
+ * 3. Can you solve this for quadrilaterals (4 sides) instead of triangles?
+ *    Answer: For a quadrilateral, the sum of any three sides must be greater than the fourth.
+ *    Fix the largest side and use three nested pointers or extend the current approach with
+ *    an additional dimension. Complexity would become O(n^3).
+ *
+ * 4. What if we need to find the longest valid triangle perimeter?
+ *    Answer: Sort the array and iterate from the end. For each triplet that forms a valid
+ *    triangle, calculate and track the maximum perimeter. Use early exit once found since
+ *    larger values come first.
+ *    Related problem: https://leetcode.com/problems/largest-perimeter-triangle/
+ *
+ * 5. How would you optimize for very large arrays with many zeros?
+ *    Answer: Filter out zeros during preprocessing since they cannot form valid triangles
+ *    with positive sides. This reduces the effective array size before applying the main algorithm.
  */
 public class ValidTriangleNumber {
 
     /**
-     * Counts valid triangles using sorting and two-pointer technique.
+     * Counts valid triangle triplets using two-pointer technique after sorting.
      *
      * Algorithm:
-     * 1. Sort array to enable triangle inequality optimization
-     * 2. For each element as largest side, use two pointers on remaining elements
-     * 3. If nums[left] + nums[right] > nums[largest], all pairs between left and right work
-     * 4. Triangle inequality: if a ≤ b ≤ c, then only need to check a + b > c
+     * 1. Sort the array to enable efficient triangle inequality checking
+     * 2. Fix the largest side at position i (iterate from end to start)
+     * 3. Use two pointers: left at start, right at i-1
+     * 4. If nums[left] + nums[right] > nums[i], all elements between left and right
+     *    form valid triangles with right and i, so add (right - left) to count
+     * 5. Move right pointer left if valid, or left pointer right if not valid
+     * 6. Continue until all combinations are checked
      *
-     * Time Complexity: O(n²) where n is array length
-     * Space Complexity: O(1) if sorting in-place
+     * Key insight: After sorting, [a, b, c, d] : if a + b > c where c is the largest side, then
+     * a + c > b and b + c > a are automatically satisfied due to ordering. We only
+     * need to check one inequality. Additionally, if nums[left] + nums[right] > nums[i],
+     * then all values between left and right also satisfy the condition with right.
      *
-     * @param nums array of side lengths
-     * @return count of valid triangles
+     * Time Complexity: O(N^2) where N is the array length. Sorting takes O(N log N),
+     * then we have outer loop O(N) with inner two-pointer traversal O(N), giving O(N^2).
+     *
+     * Space Complexity: O(1) if we exclude the space used by sorting algorithm.
+     * Java's Arrays.sort() uses O(log N) space for quicksort recursion.
+     *
+     * @param nums array of non-negative integers representing potential triangle sides
+     * @return count of valid triangle triplets
      */
     public int triangleNumber(int[] nums) {
-        if (nums.length < 3) return 0;
+        if (nums == null || nums.length < 3) {
+            return 0;
+        }
 
         Arrays.sort(nums);
         int count = 0;
 
-        // Fix the largest side (rightmost)
-        for (int k = nums.length - 1; k >= 2; k--) {
-            int left = 0, right = k - 1;
+        for (int rightIndex = nums.length - 1; rightIndex >= 2; rightIndex--) {
+            int leftIndex = 0;
+            int middleIndex = rightIndex - 1;
 
-            // Use two pointers for the other two sides
-            while (left < right) {
-                if (nums[left] + nums[right] > nums[k]) {
-                    // All pairs (left, right-1), (left, right-2), ..., (left, left) work
-                    count += right - left;
-                    right--;
+            while (leftIndex < middleIndex) {
+                if (nums[leftIndex] + nums[middleIndex] > nums[rightIndex]) {
+                    // All elements combinations like (leftIndex, leftIndex+1...middleIndex) and rightIndex are valid
+                    // because of sorting
+                    count += middleIndex - leftIndex;
+                    middleIndex--;
                 } else {
-                    // nums[left] + nums[right] <= nums[k], need larger sum
-                    left++;
+                    leftIndex++;
                 }
             }
         }
@@ -64,188 +103,58 @@ public class ValidTriangleNumber {
     }
 
     /**
-     * Brute force approach checking all triplets
-     * Time Complexity: O(n³), Space Complexity: O(1)
-     */
-    public int triangleNumberBruteForce(int[] nums) {
-        int count = 0;
-        int n = nums.length;
-
-        for (int i = 0; i < n - 2; i++) {
-            for (int j = i + 1; j < n - 1; j++) {
-                for (int k = j + 1; k < n; k++) {
-                    if (isValidTriangle(nums[i], nums[j], nums[k])) {
-                        count++;
-                    }
-                }
-            }
-        }
-
-        return count;
-    }
-
-    // Helper method to check triangle validity
-    private boolean isValidTriangle(int a, int b, int c) {
-        return a + b > c && a + c > b && b + c > a;
-    }
-
-    /**
-     * Binary search approach for each pair
-     * Time Complexity: O(n² log n), Space Complexity: O(1)
+     * Alternative approach using binary search for each pair of smaller sides.
+     * Fixes two smaller sides and binary searches for valid largest sides.
+     *
+     * Algorithm:
+     * 1. Sort the array to enable binary search
+     * 2. Fix first two sides at positions i and j
+     * 3. Binary search for the rightmost position k where nums[i] + nums[j] > nums[k]
+     * 4. Count valid triangles as (k - j) for each valid pair
+     *
+     * Time Complexity: O(N^2 log N) where N is array length. Two nested loops O(N^2)
+     * with binary search O(log N) in the innermost operation.
+     *
+     * Space Complexity: O(1) excluding sorting space.
+     *
+     * Note: This approach is less efficient than two-pointers for this problem but
+     * demonstrates an alternative technique that could be useful in modified versions.
+     *
+     * @param nums array of non-negative integers representing potential triangle sides
+     * @return count of valid triangle triplets
      */
     public int triangleNumberBinarySearch(int[] nums) {
+        if (nums == null || nums.length < 3) {
+            return 0;
+        }
+
         Arrays.sort(nums);
         int count = 0;
-        int n = nums.length;
 
-        for (int i = 0; i < n - 2; i++) {
-            for (int j = i + 1; j < n - 1; j++) {
-                int sum = nums[i] + nums[j];
+        for (int leftIndex = 0; leftIndex < nums.length - 2; leftIndex++) {
+            for (int middleIndex = leftIndex + 1; middleIndex < nums.length - 1; middleIndex++) {
 
-                // Find largest k such that nums[k] < sum
-                int k = binarySearchLargest(nums, j + 1, n - 1, sum);
-
-                if (k > j) {
-                    count += k - j;
-                }
+                int sum = nums[leftIndex] + nums[middleIndex];
+                int rightIndex = binarySearch(nums, middleIndex + 1, nums.length - 1, sum);
+                count += rightIndex - middleIndex; // All indices between middleIndex and rightIndex are valid because of sorting
             }
         }
 
         return count;
     }
 
-    // Binary search to find largest index with value < target
-    private int binarySearchLargest(int[] nums, int left, int right, int target) {
-        int result = left - 1;
-
+    // Helper method to find rightmost index where nums[index] < target
+    private int binarySearch(int[] nums, int left, int right, int target) {
         while (left <= right) {
             int mid = left + (right - left) / 2;
 
-            if (nums[mid] < target) {
-                result = mid;
-                left = mid + 1;
-            } else {
+            if (nums[mid] >= target) {
                 right = mid - 1;
+            } else {
+                left = mid + 1;
             }
         }
 
-        return result;
-    }
-
-    /**
-     * Using different approach: fix smallest two sides
-     * Time Complexity: O(n²), Space Complexity: O(1)
-     */
-    public int triangleNumberAlternative(int[] nums) {
-        Arrays.sort(nums);
-        int count = 0;
-        int n = nums.length;
-
-        for (int i = 0; i < n - 2; i++) {
-            for (int j = i + 1; j < n - 1; j++) {
-                int sum = nums[i] + nums[j];
-
-                // Count elements nums[k] where j < k < n and nums[k] < sum
-                int k = j + 1;
-                while (k < n && nums[k] < sum) {
-                    count++;
-                    k++;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    /**
-     * Method that returns actual valid triangles (not just count)
-     * Time Complexity: O(n²), Space Complexity: O(k) where k is number of triangles
-     */
-    public List<int[]> getValidTriangles(int[] nums) {
-        List<int[]> triangles = new ArrayList<>();
-        Arrays.sort(nums);
-
-        for (int k = nums.length - 1; k >= 2; k--) {
-            int left = 0, right = k - 1;
-
-            while (left < right) {
-                if (nums[left] + nums[right] > nums[k]) {
-                    // Add all valid triangles with current right and k
-                    for (int i = left; i < right; i++) {
-                        triangles.add(new int[]{nums[i], nums[right], nums[k]});
-                    }
-                    right--;
-                } else {
-                    left++;
-                }
-            }
-        }
-
-        return triangles;
-    }
-
-    /**
-     * Count triangles with specific constraints (e.g., all sides different)
-     * Time Complexity: O(n²), Space Complexity: O(1)
-     */
-    public int triangleNumberDistinctSides(int[] nums) {
-        Arrays.sort(nums);
-        int count = 0;
-
-        for (int k = nums.length - 1; k >= 2; k--) {
-            int left = 0, right = k - 1;
-
-            while (left < right) {
-                if (nums[left] + nums[right] > nums[k]) {
-                    // Only count if all sides are different
-                    for (int i = left; i < right; i++) {
-                        if (nums[i] != nums[right] && nums[i] != nums[k] && nums[right] != nums[k]) {
-                            count++;
-                        }
-                    }
-                    right--;
-                } else {
-                    left++;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    /**
-     * Method to find maximum triangle perimeter
-     * Time Complexity: O(n²), Space Complexity: O(1)
-     */
-    public int maxTrianglePerimeter(int[] nums) {
-        Arrays.sort(nums);
-        int maxPerimeter = 0;
-
-        for (int k = nums.length - 1; k >= 2; k--) {
-            int left = 0, right = k - 1;
-
-            while (left < right) {
-                if (nums[left] + nums[right] > nums[k]) {
-                    int perimeter = nums[left] + nums[right] + nums[k];
-                    maxPerimeter = Math.max(maxPerimeter, perimeter);
-                    right--;
-                } else {
-                    left++;
-                }
-            }
-        }
-
-        return maxPerimeter;
-    }
-
-    /**
-     * Helper method to demonstrate triangle inequality
-     */
-    public void demonstrateTriangleInequality(int a, int b, int c) {
-        System.out.printf("Triangle with sides %d, %d, %d:\n", a, b, c);
-        System.out.printf("  %d + %d > %d? %b\n", a, b, c, a + b > c);
-        System.out.printf("  %d + %d > %d? %b\n", a, c, b, a + c > b);
-        System.out.printf("  %d + %d > %d? %b\n", b, c, a, b + c > a);
-        System.out.printf("  Valid triangle: %b\n\n", isValidTriangle(a, b, c));
+        return right;
     }
 }

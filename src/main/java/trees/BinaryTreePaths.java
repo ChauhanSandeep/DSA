@@ -2,177 +2,136 @@ package trees;
 
 import java.util.*;
 
+
 /**
- * Binary Tree Paths
+ * Problem: Binary Tree Paths
  *
- * Problem Statement:
  * Given the root of a binary tree, return all root-to-leaf paths in any order.
  * A leaf is a node with no children.
  *
  * Example:
  * Input: root = [1,2,3,null,5]
+ *              1
+ *             / \
+ *            2   3
+ *             \
+ *              5
  * Output: ["1->2->5","1->3"]
- * Explanation: All root-to-leaf paths are: 1->2->5, 1->3
+ * Explanation: All root-to-leaf paths are "1->2->5" and "1->3".
  *
- * LeetCode Link: https://leetcode.com/problems/binary-tree-paths
+ * Constraints:
+ * - The number of nodes in the tree is in the range [1, 100]
+ * - -100 <= Node.val <= 100
+ *
+ * LeetCode Problem: https://leetcode.com/problems/binary-tree-paths
  *
  * Follow-up Questions:
- * 1. What if we need paths with specific sum? - Add sum tracking parameter
- * 2. What about paths between any two nodes? - Use LCA and path finding
- * 3. How to find longest path? - Track and compare path lengths
+ *
+ * 1. How would you modify this to find paths with a specific sum?
+ *    Answer: Add a running sum parameter to the DFS function and check if it equals
+ *    target when reaching leaf nodes. Only add paths that match the target sum.
+ *    Related problem: https://leetcode.com/problems/path-sum-ii/
+ *
+ * 2. What if you need to find the path to a specific node, not just leaf nodes?
+ *    Answer: Modify the base case to check if current node equals the target node instead
+ *    of checking for leaf. Store the path when target is found and return early to avoid
+ *    unnecessary traversal.
+ *
+ * 3. Can you solve this iteratively instead of recursively?
+ *    Answer: Yes, use a stack or queue storing pairs of (node, path_string). Pop each pair,
+ *    append current node, and push children with updated paths. Collect paths at leaf nodes.
+ *
+ * 4. How would you optimize if the tree has millions of nodes but only a few leaf nodes?
+ *    Answer: The current DFS approach is already optimal as it visits each node once. Early
+ *    pruning could help if we have additional constraints (like path sum limits), but for
+ *    all paths, we must visit all nodes.
+ *
+ * 5. What if node values can be multi-digit or contain special characters?
+ *    Answer: The current solution handles this correctly. StringBuilder concatenates values
+ *    as strings, so multi-digit numbers and special characters are preserved in the output.
  */
 public class BinaryTreePaths {
 
-    /**
-     * Finds all root-to-leaf paths using DFS with backtracking.
-     *
-     * Algorithm: Depth-First Search with Path Tracking
-     * - Build path string as we traverse down
-     * - When leaf is reached, add path to result
-     * - Backtrack by removing current node when returning
-     *
-     * Time Complexity: O(n²) - in worst case (skewed tree), we have n paths each of length n
-     * Space Complexity: O(n²) - to store all paths, plus O(h) for recursion stack
-     *
-     * @param root root of binary tree
-     * @return list of all root-to-leaf paths
-     */
-    public List<String> binaryTreePaths(TreeNode root) {
-        List<String> result = new ArrayList<>();
-        if (root == null) {
-            return result;
-        }
-
-        dfsWithString(root, "", result);
-        return result;
+  /**
+   * Finds all root-to-leaf paths using DFS with backtracking.
+   *
+   * Algorithm:
+   * 1. Use DFS to traverse tree from root to leaves
+   * 2. Maintain current path as a list of nodes during traversal
+   * 3. When reaching leaf node, convert path to string format and add to result
+   * 4. Backtrack by removing current node after exploring its subtrees
+   * 5. Recursively explore left and right subtrees
+   *
+   * Key insight: Backtracking allows us to reuse the same path list for different
+   * branches, maintaining correctness while minimizing space usage.
+   *
+   * Time Complexity: O(N)
+   * Space Complexity: O(H) for recursion stack where H is tree height. The path list
+   * also uses O(H) space. Output space is O(N) for storing all paths.
+   *
+   * @param root the root node of the binary tree
+   * @return list of all root-to-leaf paths in "a->b->c" format
+   */
+  public List<String> binaryTreePaths(TreeNode root) {
+    List<String> result = new ArrayList<>();
+    if (root == null) {
+      return result;
     }
 
-    // Helper method using string concatenation
-    private void dfsWithString(TreeNode node, String path, List<String> result) {
-        if (node == null) {
-            return;
-        }
+    List<Integer> path = new ArrayList<>();
+    dfs(root, path, result);
+    return result;
+  }
 
-        // Add current node to path
-        path += node.val;
-
-        // If leaf node, add path to result
-        if (node.left == null && node.right == null) {
-            result.add(path);
-            return;
-        }
-
-        // Continue to children with arrow separator
-        path += "->";
-        dfsWithString(node.left, path, result);
-        dfsWithString(node.right, path, result);
+  // Helper method to perform DFS traversal with backtracking
+  private void dfs(TreeNode node, List<Integer> path, List<String> result) {
+    if (node == null) {
+      return;
     }
 
-    /**
-     * Alternative approach using StringBuilder for better performance.
-     *
-     * Algorithm: DFS with StringBuilder and backtracking
-     * - Use StringBuilder for efficient string building
-     * - Manually handle backtracking by tracking string length
-     * - More memory efficient for deep trees
-     *
-     * Time Complexity: O(n²) - same as above but with better constants
-     * Space Complexity: O(n) for result storage + O(h) for recursion
-     */
-    public List<String> binaryTreePathsOptimized(TreeNode root) {
-        List<String> result = new ArrayList<>();
-        if (root == null) {
-            return result;
-        }
+    path.add(node.val);
 
-        dfsWithStringBuilder(root, new StringBuilder(), result);
-        return result;
+    if (node.left == null && node.right == null) {
+      result.add(buildPath(path));
+    } else {
+      dfs(node.left, path, result);
+      dfs(node.right, path, result);
     }
 
-    // Helper using StringBuilder with manual backtracking
-    private void dfsWithStringBuilder(TreeNode node, StringBuilder path, List<String> result) {
-        if (node == null) {
-            return;
-        }
+    path.remove(path.size() - 1);
+  }
 
-        int originalLength = path.length();
+  // Helper method to build path string from list of node values
+  private String buildPath(List<Integer> path) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < path.size(); i++) {
+      sb.append(path.get(i));
+      if (i < path.size() - 1) {
+        sb.append("->");
+      }
+    }
+    return sb.toString();
+  }
 
-        // Add current node to path
-        if (path.length() > 0) {
-            path.append("->");
-        }
-        path.append(node.val);
+  /**
+   * Definition for a binary tree node.
+   */
+  public static class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
 
-        // If leaf node, add path to result
-        if (node.left == null && node.right == null) {
-            result.add(path.toString());
-        } else {
-            // Continue to children
-            dfsWithStringBuilder(node.left, path, result);
-            dfsWithStringBuilder(node.right, path, result);
-        }
-
-        // Backtrack by restoring original length
-        path.setLength(originalLength);
+    TreeNode() {
     }
 
-    /**
-     * Approach using list for path tracking.
-     *
-     * Most memory efficient approach for building paths.
-     * Uses list to track path and joins at the end.
-     */
-    public List<String> binaryTreePathsList(TreeNode root) {
-        List<String> result = new ArrayList<>();
-        if (root == null) {
-            return result;
-        }
-
-        List<Integer> currentPath = new ArrayList<>();
-        dfsWithList(root, currentPath, result);
-        return result;
+    TreeNode(int val) {
+      this.val = val;
     }
 
-    // Helper using list with backtracking
-    private void dfsWithList(TreeNode node, List<Integer> path, List<String> result) {
-        if (node == null) {
-            return;
-        }
-
-        // Add current node to path
-        path.add(node.val);
-
-        // If leaf node, convert path to string
-        if (node.left == null && node.right == null) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < path.size(); i++) {
-                if (i > 0) {
-                    sb.append("->");
-                }
-                sb.append(path.get(i));
-            }
-            result.add(sb.toString());
-        } else {
-            // Continue to children
-            dfsWithList(node.left, path, result);
-            dfsWithList(node.right, path, result);
-        }
-
-        // Backtrack
-        path.remove(path.size() - 1);
+    TreeNode(int val, TreeNode left, TreeNode right) {
+      this.val = val;
+      this.left = left;
+      this.right = right;
     }
-
-    // Definition for a binary tree node
-    public static class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
-        TreeNode() {}
-        TreeNode(int val) { this.val = val; }
-        TreeNode(int val, TreeNode left, TreeNode right) {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
-    }
+  }
 }

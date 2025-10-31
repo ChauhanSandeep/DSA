@@ -51,6 +51,68 @@ public class BestTimeToBuyAndSellStockIV {
   }
 
   /**
+   * Top-down DP approach with memoization
+   *
+   * Algorithm:
+   * - Base cases: no days left or no transactions left = 0 profit
+   * - If k >= n/2, use unlimited transactions approach
+   * - Initialize memo table with null values
+   *    - memo table dimensions: days x (k+1) x 2 (holding or not)
+   *    - memo[day][transactionsLeft][holding] = profit
+   * - Recursive DFS function:
+   *   - If holding stock: can sell or rest
+   *   - If not holding stock: can buy or rest
+   * - Return maximum profit from all options
+   *
+   * Time Complexity: O(N * K) with memoization.
+   * Space Complexity: O(N * K) for memo table plus O(N) recursion stack.
+   *
+   * @param k maximum number of transactions allowed
+   * @param prices array of stock prices per day
+   * @return maximum profit achievable
+   */
+  public int maxProfitMemo(int k, int[] prices) {
+    int length = prices.length;
+    if (length <= 1 || k == 0) {
+      return 0;
+    }
+
+    if (k >= length / 2) {
+      return maxProfitUnlimitedTransactions(prices);
+    }
+
+    Integer[][][] memo = new Integer[length][k + 1][2]; // memo[day][transactionsLeft][isHolding] = profit
+    return dfs(prices, 0, k, 0, memo);
+  }
+
+  // Helper method for recursive DFS with memoization
+  // holding: 0 = not holding stock, 1 = holding stock
+  private int dfs(int[] prices, int day, int transactionsLeft, int holding, Integer[][][] memo) {
+    if (day == prices.length || transactionsLeft == 0) {
+      return 0;
+    }
+
+    if (memo[day][transactionsLeft][holding] != null) {
+      return memo[day][transactionsLeft][holding];
+    }
+
+    // Option 1: Do nothing (rest)
+    int doNothing = dfs(prices, day + 1, transactionsLeft, holding, memo);
+
+    int doSomething = 0;
+    if (holding == 1) {
+      // Currently holding: can sell
+      doSomething = prices[day] + dfs(prices, day + 1, transactionsLeft - 1, 0, memo);
+    } else {
+      // Not holding: can buy
+      doSomething = -prices[day] + dfs(prices, day + 1, transactionsLeft, 1, memo);
+    }
+
+    memo[day][transactionsLeft][holding] = Math.max(doNothing, doSomething);
+    return memo[day][transactionsLeft][holding];
+  }
+
+  /**
    * Finds maximum profit with at most k transactions using optimized dynamic programming.
    *
    * Algorithm Steps:
@@ -83,7 +145,7 @@ public class BestTimeToBuyAndSellStockIV {
     // dp[i][j] = max profit with at most i transactions by day j
     int[][] dp = new int[maxTransactions + 1][numberOfDays];
 
-    for (int transactionLimit = 1; transactionLimit <= maxTransactions; transactionLimit++) {
+    for (int transactionCount = 1; transactionCount <= maxTransactions; transactionCount++) {
       // Track maximum profit after buying (profit from previous transactions minus buy price)
       int maxProfitAfterBuying = -stockPrices[0];
 
@@ -92,73 +154,20 @@ public class BestTimeToBuyAndSellStockIV {
 
         // Option 1: Don't trade today, keep previous day's profit
         // Option 2: Sell today using best previous buying opportunity
-        dp[transactionLimit][day] = Math.max(
-            dp[transactionLimit][day - 1],           // Don't sell today
+        dp[transactionCount][day] = Math.max(
+            dp[transactionCount][day - 1],           // Don't sell today
             currentPrice + maxProfitAfterBuying      // Sell today
         );
 
         // Update best buying opportunity for next iteration
         maxProfitAfterBuying = Math.max(
             maxProfitAfterBuying,                                        // Keep previous buy
-            dp[transactionLimit - 1][day - 1] - currentPrice           // Buy today
+            dp[transactionCount - 1][day - 1] - currentPrice           // Buy today
         );
       }
     }
 
     return dp[maxTransactions][numberOfDays - 1];
-  }
-
-  /**
-   * Space-optimized version using only 1D arrays.
-   *
-   * Algorithm Steps:
-   * 1. Use two 1D arrays instead of 2D table: previous and current transaction limits
-   * 2. For each transaction limit, update current array based on previous array
-   * 3. Swap arrays after processing each transaction limit
-   *
-   * Time Complexity: O(k * n)
-   * Space Complexity: O(n) - only two arrays needed
-   *
-   * @param maxTransactions maximum number of transactions allowed
-   * @param stockPrices array of daily stock prices
-   * @return maximum profit achievable
-   */
-  public int maxProfitSpaceOptimized(int maxTransactions, int[] stockPrices) {
-    int numberOfDays = stockPrices.length;
-
-    if (numberOfDays <= 1 || maxTransactions <= 0) {
-      return 0;
-    }
-
-    if (maxTransactions >= numberOfDays / 2) {
-      return maxProfitUnlimitedTransactions(stockPrices);
-    }
-
-    int[] previousTransactionProfits = new int[numberOfDays];
-    int[] currentTransactionProfits = new int[numberOfDays];
-
-    for (int transactionCount = 1; transactionCount <= maxTransactions; transactionCount++) {
-      int maxProfitAfterBuying = -stockPrices[0];
-
-      for (int day = 1; day < numberOfDays; day++) {
-        currentTransactionProfits[day] = Math.max(
-            currentTransactionProfits[day - 1],           // Don't sell today
-            stockPrices[day] + maxProfitAfterBuying      // Sell today
-        );
-
-        maxProfitAfterBuying = Math.max(
-            maxProfitAfterBuying,                               // Keep previous buy
-            previousTransactionProfits[day - 1] - stockPrices[day]  // Buy today
-        );
-      }
-
-      // Swap arrays for next transaction limit
-      int[] temp = previousTransactionProfits;
-      previousTransactionProfits = currentTransactionProfits;
-      currentTransactionProfits = temp;
-    }
-
-    return previousTransactionProfits[numberOfDays - 1];
   }
 
   /**

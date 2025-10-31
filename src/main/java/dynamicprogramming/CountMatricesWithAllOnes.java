@@ -24,136 +24,35 @@ import java.util.Stack;
  * LeetCode Problem Link: https://leetcode.com/problems/count-submatrices-with-all-ones/
  *
  * Follow-up Questions:
- * 1. Q: What if we need to count submatrices with at most K zeros?
- *    A: Use sliding window technique with two pointers for each row in height matrix
- * 2. Q: How to handle very large matrices that don't fit in memory?
- *    A: Process matrix row by row using streaming approach, maintaining only current height array
- * 3. Q: Count submatrices with exactly K ones?
- *    A: Use prefix sum with hashmap to track subarray sums (https://leetcode.com/problems/subarray-sum-equals-k/)
- * 4. Q: What about counting square submatrices with all ones?
- *    A: Use DP where dp[i][j] represents side length of largest square ending at (i,j)
- *       (https://leetcode.com/problems/count-square-submatrices-with-all-ones/)
+ *
+ * 1. How would you modify this to count only square submatrices with all ones?
+ *    Answer: Use DP where dp[i][j] represents the side length of the largest square
+ *    ending at (i,j). Sum all dp values to get the count of square submatrices.
+ *    Related problem: https://leetcode.com/problems/count-square-submatrices-with-all-ones/
+ *
+ * 2. What if you need to find the largest submatrix area instead of counting all?
+ *    Answer: Use similar histogram approach but track maximum area instead of counting.
+ *    For each row's histogram, find the largest rectangle area using monotonic stack.
+ *    Related problem: https://leetcode.com/problems/maximal-rectangle/
+ *
+ * 3. How would you handle a 3D matrix instead of 2D?
+ *    Answer: Extend to 3D by treating each 2D slice along one dimension. For each slice,
+ *    build cumulative counts in the third dimension and apply 2D submatrix counting.
+ *
+ * 4. Can you optimize space if the matrix is very large but sparse?
+ *    Answer: Use sparse matrix representation with coordinates and values. Process only
+ *    non-zero regions, skipping areas known to contain zeros.
+ *
+ * 5. What if you need to count submatrices with at least k ones instead of all ones?
+ *    Answer: Use sliding window or prefix sum 2D approach. For each submatrix, calculate
+ *    sum using prefix sums and count those with sum >= k.
  */
 public class CountMatricesWithAllOnes {
 
   public static void main(String[] args) {
     int[][] binaryMatrix = {{0, 1, 1, 0}, {0, 1, 1, 1}, {1, 1, 1, 0}};
     CountMatricesWithAllOnes solver = new CountMatricesWithAllOnes();
-    System.out.println("Total Submatrices with All Ones: " + solver.numSubmat(binaryMatrix));
-  }
-
-  /**
-   * Counts the number of submatrices that contain only ones using histogram approach.
-   *
-   * Algorithm Steps:
-   * 1. Build height matrix where each cell represents consecutive 1s above current position
-   * 2. For each row, treat heights as histogram and count valid rectangles
-   * 3. Use monotonic stack to efficiently compute rectangles for each position
-   *
-   * Time Complexity: O(rows * cols) - each cell processed once for height matrix and once for stack
-   * Space Complexity: O(rows * cols) for height matrix + O(cols) for stack
-   *
-   * @param binaryMatrix Binary matrix containing only 0s and 1s
-   * @return Total count of submatrices containing all ones
-   */
-  public int numSubmat(int[][] binaryMatrix) {
-    if (binaryMatrix == null || binaryMatrix.length == 0 || binaryMatrix[0].length == 0) {
-      return 0;
-    }
-
-    int numRows = binaryMatrix.length;
-    int numCols = binaryMatrix[0].length;
-
-    // Build height matrix representing consecutive 1s in each column
-    int[][] consecutiveOnesHeight = buildHeightMatrix(binaryMatrix, numRows, numCols);
-
-    int totalSubmatricesCount = 0;
-
-    // Process each row as histogram to count valid rectangles
-    for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
-      totalSubmatricesCount += countRectanglesInHistogram(consecutiveOnesHeight[rowIndex]);
-    }
-
-    return totalSubmatricesCount;
-  }
-
-  /**
-   * Builds height matrix where each cell represents number of consecutive 1s above current position.
-   *
-   * Algorithm Steps:
-   * 1. For each column, iterate through rows
-   * 2. If current cell is 0, height is 0
-   * 3. If current cell is 1, height is 1 + height of cell above (or 1 if first row)
-   *
-   * Time Complexity: O(rows * cols)
-   * Space Complexity: O(rows * cols)
-   *
-   * @param binaryMatrix Input binary matrix
-   * @param numRows Number of rows in matrix
-   * @param numCols Number of columns in matrix
-   * @return Height matrix with consecutive 1s count
-   */
-  private int[][] buildHeightMatrix(int[][] binaryMatrix, int numRows, int numCols) {
-    int[][] consecutiveOnesHeight = new int[numRows][numCols];
-
-    for (int colIndex = 0; colIndex < numCols; colIndex++) {
-      for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
-        if (binaryMatrix[rowIndex][colIndex] == 0) {
-          consecutiveOnesHeight[rowIndex][colIndex] = 0;
-        } else {
-          consecutiveOnesHeight[rowIndex][colIndex] =
-              (rowIndex == 0) ? 1 : consecutiveOnesHeight[rowIndex - 1][colIndex] + 1;
-        }
-      }
-    }
-
-    return consecutiveOnesHeight;
-  }
-
-  /**
-   * Counts number of rectangles in histogram using monotonic increasing stack approach.
-   *
-   * Algorithm Steps:
-   * 1. Use monotonic increasing stack to find previous smaller element for each position
-   * 2. For each position, calculate number of rectangles ending at that position
-   * 3. Formula: height[i] * (i - previousSmallerIndex) + count[previousSmallerIndex]
-   * 4. Sum all rectangle counts for the histogram
-   *
-   * Time Complexity: O(n) where n is length of heights array
-   * Space Complexity: O(n) for stack and rectangle count array
-   *
-   * @param histogramHeights Array representing heights in histogram
-   * @return Total count of rectangles in the histogram
-   */
-  private int countRectanglesInHistogram(int[] histogramHeights) {
-    int histogramLength = histogramHeights.length;
-    int[] rectangleCountAtPosition = new int[histogramLength];
-
-    // Stack to maintain indices in increasing order of heights
-    Stack<Integer> monotonicStack = new Stack<>();
-    monotonicStack.push(-1); // Sentinel to handle edge cases
-
-    for (int currentIndex = 0; currentIndex < histogramLength; currentIndex++) {
-      // Pop elements until stack top has smaller height than current
-      while (monotonicStack.peek() != -1 && histogramHeights[monotonicStack.peek()] >= histogramHeights[currentIndex]) {
-        monotonicStack.pop();
-      }
-
-      int previousSmallerIndex = monotonicStack.peek();
-
-      // Calculate rectangles ending at current position
-      int widthFromPreviousSmaller = currentIndex - previousSmallerIndex;
-      rectangleCountAtPosition[currentIndex] = histogramHeights[currentIndex] * widthFromPreviousSmaller;
-
-      // Add rectangles from previous position if it exists
-      if (previousSmallerIndex != -1) {
-        rectangleCountAtPosition[currentIndex] += rectangleCountAtPosition[previousSmallerIndex];
-      }
-
-      monotonicStack.push(currentIndex);
-    }
-
-    return Arrays.stream(rectangleCountAtPosition).sum();
+    System.out.println("Total Submatrices with All Ones: " + solver.numSubmatrix(binaryMatrix));
   }
 
   /**
@@ -168,29 +67,75 @@ public class CountMatricesWithAllOnes {
    * Time Complexity: O(rows * cols)
    * Space Complexity: O(cols) - only single height array needed
    *
-   * @param binaryMatrix Binary matrix containing only 0s and 1s
+   * @param matrix Binary matrix containing only 0s and 1s
    * @return Total count of submatrices containing all ones
    */
-  public int numSubmatOptimized(int[][] binaryMatrix) {
-    if (binaryMatrix == null || binaryMatrix.length == 0 || binaryMatrix[0].length == 0) {
+  public int numSubmatrix(int[][] matrix) {
+    if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
       return 0;
     }
 
-    int numRows = binaryMatrix.length;
-    int numCols = binaryMatrix[0].length;
-    int[] currentRowHeights = new int[numCols];
+    int rows = matrix.length;
+    int cols = matrix[0].length;
+    int[] heights = new int[cols]; // Height of 1s for current row
     int totalSubmatricesCount = 0;
 
-    for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
+    for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
       // Update heights for current row
-      for (int colIndex = 0; colIndex < numCols; colIndex++) {
-        currentRowHeights[colIndex] = (binaryMatrix[rowIndex][colIndex] == 0) ? 0 : currentRowHeights[colIndex] + 1;
+      for (int colIndex = 0; colIndex < cols; colIndex++) {
+        heights[colIndex] = (matrix[rowIndex][colIndex] == 0) ? 0 : heights[colIndex] + 1;
       }
 
       // Count rectangles in current histogram
-      totalSubmatricesCount += countRectanglesInHistogram(currentRowHeights);
+      totalSubmatricesCount += countAllRectanglesInHistogram(heights);
     }
 
     return totalSubmatricesCount;
+  }
+
+  /**
+   * Counts number of rectangles in histogram using monotonic increasing stack approach.
+   *
+   * Algorithm Steps:
+   * 1. Use monotonic increasing stack to find previous smaller element for each position
+   * 2. For each position, calculate number of rectangles ending at that position
+   * 3. Formula: height[i] * (i - previousSmallerIndex) + count[previousSmallerIndex]
+   * 4. Sum all rectangle counts for the histogram
+   *
+   * Time Complexity: O(n) where n is length of heights array
+   * Space Complexity: O(n) for stack and rectangle count array
+   *
+   * @param heights Array representing heights in histogram
+   * @return Total count of rectangles in the histogram
+   */
+  public int countAllRectanglesInHistogram(int[] heights) {
+    Stack<Integer> monotonicStack = new Stack<>();
+    int totalRectangles = 0;
+    int[] rectCountAt = new int[heights.length];
+
+    for (int currentIndex = 0; currentIndex < heights.length; currentIndex++) {
+      while (!monotonicStack.isEmpty() && heights[monotonicStack.peek()] >= heights[currentIndex]) {
+        monotonicStack.pop();
+      }
+
+      /**
+       * At this point, either the stack is empty (no smaller to left)
+       * or the top of the stack is the index of the previous smaller element.
+       * Now we can calculate the width and number of rectangles ending at currentIndex.
+       */
+      int previousSmallerIndex = monotonicStack.isEmpty() ? -1 : monotonicStack.peek();
+      int width = currentIndex - previousSmallerIndex;
+
+      // count rectangles ending at current bar
+      rectCountAt[currentIndex] = heights[currentIndex] * width;
+      if (previousSmallerIndex != -1) {
+        rectCountAt[currentIndex] += rectCountAt[previousSmallerIndex];
+      }
+
+      totalRectangles += rectCountAt[currentIndex];
+      monotonicStack.push(currentIndex);
+    }
+
+    return totalRectangles;
   }
 }

@@ -23,49 +23,66 @@ import java.util.Arrays;
  * LeetCode Link: https://leetcode.com/problems/triangle/
  *
  * Follow-up Questions for FAANG Interviews:
- * 1. Q: Can the solution be optimized for space?
- *    A: Yes, from O(n²) to O(n) using a single 1D DP array (bottom-up in-place update).
+ * 1. How would you find the actual path, not just the minimum sum?
+ *    Answer: Store parent pointers or indices during DP calculation. After computing minimum,
+ *    backtrack from bottom to top using stored indices to reconstruct the path.
  *
- * 2. Q: Can recursion with memoization (top-down) be applied here?
- *    A: Yes, results in O(n²) time and space, easier to reason recursively.
+ * 2. What if you can move to any position in the next row, not just adjacent?
+ *    Answer: For each position, consider all positions in next row instead of just two.
+ *    Time complexity increases to O(n^3) as we check n positions for each of n^2 cells.
  *
- * 3. Q: How about returning the actual path, not just sum?
- *    A: Maintain a parent-pointer array or reconstruct path by retracing DP decisions.
+ * 3. How would you solve if you need maximum path sum instead of minimum?
+ *    Answer: Change min() to max() in the recurrence relation. The algorithm structure
+ *    remains identical, only the comparison operator changes.
+ *    Related problem: https://leetcode.com/problems/maximum-path-sum-in-triangle/
+ *
+ * 4. What if you can move up as well as down (bidirectional)?
+ *    Answer: This becomes a graph problem requiring BFS/Dijkstra since you can revisit
+ *    positions. Need to track visited states and find shortest path from top to any bottom position.
+ *
+ * 5. How would you handle very large triangles that don't fit in memory?
+ *    Answer: Process row by row from bottom to top, keeping only current and next row in memory.
+ *    This is already achieved by the O(n) space solution.
  */
 public class MinimumPathSumTriangle {
 
   public static void main(String[] args) {
     List<List<Integer>> triangle =
         Arrays.asList(Arrays.asList(2), Arrays.asList(3, 4), Arrays.asList(6, 5, 7), Arrays.asList(4, 1, 8, 3));
-    System.out.println("Optimized DP: " + minimumTotalDP(triangle));   // 11
+    System.out.println("Optimized DP: " + minimumTotal(triangle));   // 11
     System.out.println("Memoized Recursion: " + minimumTotalRecursive(triangle)); // 11
   }
 
   /**
-   * Approach 1: Bottom-Up Dynamic Programming with O(n) space optimization.
+   * Finds minimum path sum using bottom-up DP with O(n) space optimization.
    *
-   * Steps:
-   * 1. Initialize a dp array with the values of the bottom row.
-   * 2. Traverse upwards from the second-last row to the top.
-   * 3. For each row and col: dp[col] = triangle[row][col] + min(dp[col], dp[col+1])
-   * 4. dp[0] will contain the minimum path sum at the top.
+   * Algorithm:
+   * 1. Start from second-to-last row and work upward
+   * 2. For each position, add minimum of two adjacent positions below
+   * 3. Use single array that gets updated row by row
+   * 4. Final answer is at dp[0] after processing all rows
    *
-   * Time Complexity: O(n²), where n = number of rows in triangle
-   * Space Complexity: O(n)
+   * Key insight: Each position's minimum path depends only on positions directly below it.
+   * We can reuse the same array since we process bottom-up and only need the previous row.
+   *
+   * Time Complexity: O(N^2) where N is the number of rows. We process each element
+   * once, and total elements = 1 + 2 + ... + N = N*(N+1)/2.
+   *
+   * Space Complexity: O(N) for the DP array storing one row at a time. Can be further
+   * optimized to O(1) by modifying input array in place.
+   *
+   * @param triangle list of lists representing the triangle
+   * @return minimum path sum from top to bottom
    */
-  public static int minimumTotalDP(List<List<Integer>> triangle) {
-    int n = triangle.size();
-    int[] dp = new int[n];
+  public static int minimumTotal(List<List<Integer>> triangle) {
+    int rows = triangle.size();
+    int[] dp = new int[rows + 1];
 
-    // Initialize with the last row
-    for (int i = 0; i < n; i++) {
-      dp[i] = triangle.get(n - 1).get(i);
-    }
-
-    // Bottom-up calculation
-    for (int row = n - 2; row >= 0; row--) {
+    // Process from bottom to top
+    for (int row = rows - 1; row >= 0; row--) {
       for (int col = 0; col <= row; col++) {
-        dp[col] = triangle.get(row).get(col) + Math.min(dp[col], dp[col + 1]);
+        // Current position's min = its value + min of two positions below
+        dp[col] = Math.min(dp[col], dp[col + 1]) + triangle.get(row).get(col);
       }
     }
 
@@ -85,8 +102,8 @@ public class MinimumPathSumTriangle {
    * Space Complexity: O(n²) recursion + memo storage
    */
   public static int minimumTotalRecursive(List<List<Integer>> triangle) {
-    int n = triangle.size();
-    Integer[][] memo = new Integer[n][n];
+    int length = triangle.size();
+    Integer[][] memo = new Integer[length][length];
     return dfs(triangle, 0, 0, memo);
   }
 

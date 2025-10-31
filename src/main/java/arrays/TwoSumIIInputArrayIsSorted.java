@@ -1,26 +1,48 @@
 package arrays;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
-
-
 /**
- * Two Sum II Input Array Is Sorted
+ * Problem: Two Sum II - Input Array Is Sorted
  *
- * Problem: Find two numbers in sorted array that add up to target. Return 1-indexed positions.
+ * Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order,
+ * find two numbers such that they add up to a specific target number. Let these two numbers be
+ * numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
  *
- * Example: numbers = [2,7,11,15], target = 9 -> Output: [1,2]
- * numbers[0] + numbers[1] = 2 + 7 = 9, so return [1,2] (1-indexed).
+ * Return the indices of the two numbers, index1 and index2, added by one as an integer array
+ * [index1, index2] of length 2. The tests are generated such that there is exactly one solution.
+ * You may not use the same element twice. Your solution must use only constant extra space.
  *
- * LeetCode: https://leetcode.com/problems/two-sum-ii-input-array-is-sorted
+ * Example:
+ * Input: numbers = [2,7,11,15], target = 9
+ * Output: [1,2]
+ * Explanation: The sum of 2 and 7 is 9. Since the array is 1-indexed, index1 = 1, index2 = 2.
+ *
+ * LeetCode Problem: https://leetcode.com/problems/two-sum-ii-input-array-is-sorted
  *
  * Follow-up Questions:
- * - What if multiple pairs exist? (Problem guarantees exactly one solution)
- * - How to find all pairs that sum to target? (Continue search after finding each pair)
- * - Can we solve with O(1) space? (Current solution already achieves this)
+ *
+ * 1. What if the array could contain duplicate values and you need all unique pairs?
+ *    Answer: Use the same two-pointer approach but skip duplicate values after finding a valid
+ *    pair. Move both pointers while they point to the same value to avoid counting duplicates.
+ *
+ * 2. How would you modify this for finding three numbers that sum to target (3Sum)?
+ *    Answer: Fix one element and apply two-pointer technique on the remaining sorted array.
+ *    Iterate through each element, treating it as the first number and finding pairs that sum
+ *    to target minus that number.
+ *    Related problem: https://leetcode.com/problems/3sum/
+ *
+ * 3. What if you need to find pairs with sum closest to target instead of exact match?
+ *    Answer: Track the minimum absolute difference while using two pointers. Update the result
+ *    whenever a smaller difference is found. Continue moving pointers to explore all possibilities.
+ *    Related problem: https://leetcode.com/problems/3sum-closest/
+ *
+ * 4. Can you solve this using binary search instead of two pointers?
+ *    Answer: Yes, iterate through each element and binary search for target minus current element
+ *    in the remaining array. Time complexity becomes O(n log n). Two pointers is more optimal at O(n).
+ *
+ * 5. What if the array is not sorted?
+ *    Answer: Use a HashMap to store complements. For each element, check if target minus current
+ *    exists in the map. This gives O(n) time with O(n) space, but violates the constant space requirement.
+ *    Related problem: https://leetcode.com/problems/two-sum/
  */
 public class TwoSumIIInputArrayIsSorted {
 
@@ -28,18 +50,25 @@ public class TwoSumIIInputArrayIsSorted {
      * Finds two numbers that sum to target using two-pointer technique.
      *
      * Algorithm:
-     * 1. Use two pointers: left at start, right at end
-     * 2. If sum equals target, return indices (1-indexed)
-     * 3. If sum < target, move left pointer right (increase sum)
-     * 4. If sum > target, move right pointer left (decrease sum)
-     * 5. Continue until target found
+     * 1. Initialize left pointer at start and right pointer at end of array
+     * 2. Calculate sum of elements at both pointers
+     * 3. If sum equals target, return 1-indexed positions
+     * 4. If sum is less than target, move left pointer right to increase sum
+     * 5. If sum is greater than target, move right pointer left to decrease sum
+     * 6. Repeat until target sum is found
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Key insight: Since the array is sorted, we can efficiently search by moving pointers
+     * based on whether current sum is too small or too large. Moving left pointer increases
+     * sum, moving right pointer decreases sum.
      *
-     * @param numbers sorted array of integers
-     * @param target sum to find
-     * @return 1-indexed positions of two numbers that sum to target
+     * Time Complexity: O(N) where N is the length of the array. Each pointer moves at most
+     * N positions, and they move toward each other, visiting each element at most once.
+     *
+     * Space Complexity: O(1) as only two pointer variables are used regardless of input size.
+     *
+     * @param numbers sorted array of integers (1-indexed in problem, 0-indexed in implementation)
+     * @param target the target sum to find
+     * @return array containing 1-indexed positions of the two numbers
      */
     public int[] twoSum(int[] numbers, int target) {
         int left = 0;
@@ -49,26 +78,43 @@ public class TwoSumIIInputArrayIsSorted {
             int sum = numbers[left] + numbers[right];
 
             if (sum == target) {
-                return new int[]{left + 1, right + 1}; // Convert to 1-indexed
+                return new int[]{left + 1, right + 1};
             } else if (sum < target) {
-                left++;  // Need larger sum
+                left++;
             } else {
-                right--; // Need smaller sum
+                right--;
             }
         }
 
-        // Should never reach here given problem constraints
         return new int[]{-1, -1};
     }
 
     /**
-     * Binary search approach (less efficient but educational)
-     * Time Complexity: O(n log n), Space Complexity: O(1)
+     * Alternative approach using binary search for each element.
+     * For each element, binary search for its complement in remaining array.
+     *
+     * Algorithm:
+     * 1. Iterate through each element at index i
+     * 2. Calculate complement = target - numbers[i]
+     * 3. Binary search for complement in subarray [i+1, n-1]
+     * 4. If found, return 1-indexed positions of both elements
+     *
+     * Time Complexity: O(N log N) where N is array length. For each of N elements,
+     * we perform binary search taking O(log N).
+     *
+     * Space Complexity: O(1) excluding recursion stack for binary search.
+     *
+     * Note: While this approach works, the two-pointer method is more efficient with
+     * O(N) time complexity. Binary search approach is included to demonstrate alternatives.
+     *
+     * @param numbers sorted array of integers
+     * @param target the target sum to find
+     * @return array containing 1-indexed positions of the two numbers
      */
     public int[] twoSumBinarySearch(int[] numbers, int target) {
         for (int i = 0; i < numbers.length - 1; i++) {
             int complement = target - numbers[i];
-            int complementIndex = binarySearch(numbers, complement, i + 1, numbers.length - 1);
+            int complementIndex = binarySearch(numbers, i + 1, numbers.length - 1, complement);
 
             if (complementIndex != -1) {
                 return new int[]{i + 1, complementIndex + 1};
@@ -78,8 +124,8 @@ public class TwoSumIIInputArrayIsSorted {
         return new int[]{-1, -1};
     }
 
-    // Helper method for binary search
-    private int binarySearch(int[] arr, int target, int left, int right) {
+    // Helper method for binary search in a range
+    private int binarySearch(int[] arr, int left, int right, int target) {
         while (left <= right) {
             int mid = left + (right - left) / 2;
 
@@ -93,129 +139,5 @@ public class TwoSumIIInputArrayIsSorted {
         }
 
         return -1;
-    }
-
-    /**
-     * Hash map approach (works for unsorted arrays too)
-     * Time Complexity: O(n), Space Complexity: O(n)
-     */
-    public int[] twoSumHashMap(int[] numbers, int target) {
-        Map<Integer, Integer> numToIndex = new HashMap<>();
-
-        for (int i = 0; i < numbers.length; i++) {
-            int complement = target - numbers[i];
-
-            if (numToIndex.containsKey(complement)) {
-                return new int[]{numToIndex.get(complement) + 1, i + 1};
-            }
-
-            numToIndex.put(numbers[i], i);
-        }
-
-        return new int[]{-1, -1};
-    }
-
-    /**
-     * Brute force approach for comparison
-     * Time Complexity: O(n²), Space Complexity: O(1)
-     */
-    public int[] twoSumBruteForce(int[] numbers, int target) {
-        for (int i = 0; i < numbers.length - 1; i++) {
-            for (int j = i + 1; j < numbers.length; j++) {
-                if (numbers[i] + numbers[j] == target) {
-                    return new int[]{i + 1, j + 1};
-                }
-            }
-        }
-
-        return new int[]{-1, -1};
-    }
-
-    /**
-     * Finding all pairs that sum to target (returns list of pairs)
-     * Time Complexity: O(n), Space Complexity: O(k) where k is number of pairs
-     */
-    public List<int[]> twoSumAllPairs(int[] numbers, int target) {
-        List<int[]> result = new ArrayList<>();
-        int left = 0;
-        int right = numbers.length - 1;
-
-        while (left < right) {
-            int sum = numbers[left] + numbers[right];
-
-            if (sum == target) {
-                result.add(new int[]{left + 1, right + 1});
-
-                // Skip duplicates
-                int leftVal = numbers[left];
-                int rightVal = numbers[right];
-
-                while (left < right && numbers[left] == leftVal) left++;
-                while (left < right && numbers[right] == rightVal) right--;
-            } else if (sum < target) {
-                left++;
-            } else {
-                right--;
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Using streams for functional programming approach
-     * Time Complexity: O(n²), Space Complexity: O(n)
-     */
-    public int[] twoSumStream(int[] numbers, int target) {
-        return IntStream.range(0, numbers.length)
-                .boxed()
-                .flatMap(i -> IntStream.range(i + 1, numbers.length)
-                        .filter(j -> numbers[i] + numbers[j] == target)
-                        .mapToObj(j -> new int[]{i + 1, j + 1}))
-                .findFirst()
-                .orElse(new int[]{-1, -1});
-    }
-
-    /**
-     * Recursive two-pointer approach
-     * Time Complexity: O(n), Space Complexity: O(n) due to recursion
-     */
-    public int[] twoSumRecursive(int[] numbers, int target) {
-        return twoSumHelper(numbers, target, 0, numbers.length - 1);
-    }
-
-    private int[] twoSumHelper(int[] numbers, int target, int left, int right) {
-        if (left >= right) {
-            return new int[]{-1, -1};
-        }
-
-        int sum = numbers[left] + numbers[right];
-
-        if (sum == target) {
-            return new int[]{left + 1, right + 1};
-        } else if (sum < target) {
-            return twoSumHelper(numbers, target, left + 1, right);
-        } else {
-            return twoSumHelper(numbers, target, left, right - 1);
-        }
-    }
-
-    /**
-     * Helper method to validate that solution is correct
-     */
-    public boolean validateSolution(int[] numbers, int target, int[] result) {
-        if (result.length != 2) return false;
-
-        int index1 = result[0] - 1; // Convert to 0-indexed
-        int index2 = result[1] - 1;
-
-        // Check bounds
-        if (index1 < 0 || index1 >= numbers.length ||
-            index2 < 0 || index2 >= numbers.length) {
-            return false;
-        }
-
-        // Check sum
-        return numbers[index1] + numbers[index2] == target;
     }
 }

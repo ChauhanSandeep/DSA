@@ -14,208 +14,151 @@ import java.util.*;
  * Example:
  * Input: nums = [-10,-3,0,5,9]
  * Output: [0,-3,9,-10,null,5] (one possible balanced BST)
- * Explanation: [0,-10,5,null,-3,null,9] would also be accepted
+ * Explanation: This looks like
+ *         0
+ *         / \
+ *       -3   9
+ *       /    /
+ *     -10   5
+ * [0,-10,5,null,-3,null,9] would also be accepted
  *
  * LeetCode Link: https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree
  *
  * Follow-up Questions:
- * 1. What if we want minimum height BST? - Always choose middle element
- * 2. How to handle duplicates? - Define left/right placement strategy
- * 3. What about sorted linked list? - Similar approach with slow/fast pointers
+ *
+ * 1. What if the input is a sorted linked list instead of an array?
+ *    Answer: Convert the linked list to an array first for O(1) access to elements, or use
+ *    a two-pointer approach with slow-fast pointers to find the middle element in O(n) time.
+ *    The latter avoids extra space but increases time complexity per recursive call.
+ *    Related problem: https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/
+ *
+ * 2. How would you ensure the tree is not just balanced but also complete?
+ *    Answer: Use level-order construction instead of recursive midpoint selection. Fill nodes
+ *    level by level from left to right to create a complete binary tree structure.
+ *
+ * 3. What if you need to return all possible balanced BSTs?
+ *    Answer: At each step, instead of choosing only the middle element, try all elements as root
+ *    and recursively generate all possible left and right subtrees. Combine them to get all
+ *    valid BSTs. This increases complexity exponentially (Catalan number).
+ *
+ * 4. Can you construct the BST iteratively without recursion?
+ *    Answer: Yes, use a stack to simulate recursion. Push tuples of (array range, parent node, direction)
+ *    onto the stack and process them iteratively. This converts implicit recursion stack to explicit stack.
+ *
+ * 5. How would you modify this to create an AVL tree with explicit balance factors?
+ *    Answer: During construction, track and store the balance factor (height difference between
+ *    left and right subtrees) in each node. Calculate heights bottom-up during recursion return.
  */
 public class ConvertSortedArrayToBinarySearchTree {
-
     /**
      * Converts sorted array to height-balanced BST using divide and conquer.
      *
-     * Algorithm: Recursive Middle Selection
-     * - Choose middle element as root to ensure balance
-     * - Recursively construct left subtree from left half
-     * - Recursively construct right subtree from right half
-     * - Base case: empty range returns null
+     * Algorithm:
+     * 1. Choose middle element of array as root to ensure balance
+     * 2. Elements to the left form the left subtree (all smaller than root)
+     * 3. Elements to the right form the right subtree (all larger than root)
+     * 4. Recursively apply same process to left and right subarrays
+     * 5. Base case: when subarray is empty, return null
      *
-     * Time Complexity: O(n) - create each node exactly once
-     * Space Complexity: O(log n) - recursion stack for balanced tree
+     * Time Complexity: O(N) where N is the number of elements in the array. Each element
+     * is visited exactly once to create a corresponding tree node.
+     *
+     * Space Complexity: O(log N) for the recursion call stack in a balanced tree. The tree
+     * height is log N, which determines the maximum recursion depth.
      *
      * @param nums sorted array in ascending order
-     * @return root of height-balanced BST
+     * @return root node of the constructed height-balanced BST
      */
     public TreeNode sortedArrayToBST(int[] nums) {
         if (nums == null || nums.length == 0) {
             return null;
         }
-
-        return constructBST(nums, 0, nums.length - 1);
+        return buildBST(nums, 0, nums.length - 1);
     }
 
-    // Helper method to construct BST from array range
-    private TreeNode constructBST(int[] nums, int left, int right) {
-        // Base case: empty range
+    // Helper method to recursively build BST from array range
+    private TreeNode buildBST(int[] nums, int left, int right) {
         if (left > right) {
             return null;
         }
 
-        // Choose middle element as root
         int mid = left + (right - left) / 2;
         TreeNode root = new TreeNode(nums[mid]);
 
-        // Recursively construct subtrees
-        root.left = constructBST(nums, left, mid - 1);
-        root.right = constructBST(nums, mid + 1, right);
+        root.left = buildBST(nums, left, mid - 1);
+        root.right = buildBST(nums, mid + 1, right);
 
         return root;
     }
 
     /**
-     * Alternative approach choosing left-middle for deterministic results.
+     * Iterative approach using explicit stack to simulate recursion.
+     * Uses stack to store array ranges and their corresponding parent nodes.
      *
-     * When array length is even, we can choose either middle element.
-     * This version always chooses left-middle for consistency.
-     */
-    public TreeNode sortedArrayToBSTLeftMiddle(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return null;
-        }
-
-        return constructBSTLeftMiddle(nums, 0, nums.length - 1);
-    }
-
-    // Helper that always chooses left middle
-    private TreeNode constructBSTLeftMiddle(int[] nums, int left, int right) {
-        if (left > right) {
-            return null;
-        }
-
-        // Always choose left middle for even-length ranges
-        int mid = (left + right) / 2;
-        TreeNode root = new TreeNode(nums[mid]);
-
-        root.left = constructBSTLeftMiddle(nums, left, mid - 1);
-        root.right = constructBSTLeftMiddle(nums, mid + 1, right);
-
-        return root;
-    }
-
-    /**
-     * Alternative approach choosing right-middle.
+     * Algorithm:
+     * 1. Create stack storing tuples of (left, right, parent, isLeft)
+     * 2. Process each range by finding middle element as new node
+     * 3. Attach new node to parent based on isLeft flag
+     * 4. Push left and right subranges onto stack for processing
      *
-     * Demonstrates different valid BST construction.
-     * Results in different tree structure but same properties.
-     */
-    public TreeNode sortedArrayToBSTRightMiddle(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return null;
-        }
-
-        return constructBSTRightMiddle(nums, 0, nums.length - 1);
-    }
-
-    // Helper that always chooses right middle
-    private TreeNode constructBSTRightMiddle(int[] nums, int left, int right) {
-        if (left > right) {
-            return null;
-        }
-
-        // Always choose right middle for even-length ranges
-        int mid = (left + right + 1) / 2;
-        TreeNode root = new TreeNode(nums[mid]);
-
-        root.left = constructBSTRightMiddle(nums, left, mid - 1);
-        root.right = constructBSTRightMiddle(nums, mid + 1, right);
-
-        return root;
-    }
-
-    /**
-     * Iterative approach using stack for space optimization.
+     * Time Complexity: O(N) where N is the number of elements.
      *
-     * Algorithm: Iterative Construction with Stack
-     * - Use stack to track ranges to process
-     * - Process ranges in order similar to recursive approach
-     * - Build parent-child relationships explicitly
+     * Space Complexity: O(log N) for the explicit stack in balanced tree.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(n) - stack storage
+     * @param nums sorted array in ascending order
+     * @return root node of the constructed height-balanced BST
      */
     public TreeNode sortedArrayToBSTIterative(int[] nums) {
         if (nums == null || nums.length == 0) {
             return null;
         }
 
-        // Stack to store [left, right, parent, isLeft]
-        Stack<int[]> stack = new Stack<>();
-        TreeNode root = null;
+        TreeNode root = new TreeNode(nums[nums.length / 2]);
+        Stack<Object[]> stack = new Stack<>(); // Each entry: {left, right, parentNode, isLeftChild}
 
-        stack.push(new int[]{0, nums.length - 1, -1, 0}); // -1 indicates root
+        int mid = nums.length / 2;
+        if (mid > 0) {
+            stack.push(new Object[]{0, mid - 1, root, true});
+        }
+        if (mid < nums.length - 1) {
+            stack.push(new Object[]{mid + 1, nums.length - 1, root, false});
+        }
 
         while (!stack.isEmpty()) {
-            int[] current = stack.pop();
-            int left = current[0];
-            int right = current[1];
-            int parentIndex = current[2];
-            int isLeft = current[3];
+            Object[] current = stack.pop();
+            int left = (int) current[0];
+            int right = (int) current[1];
+            TreeNode parent = (TreeNode) current[2];
+            boolean isLeft = (boolean) current[3];
 
-            if (left > right) {
-                continue;
-            }
-
-            int mid = left + (right - left) / 2;
+            mid = left + (right - left) / 2;
             TreeNode node = new TreeNode(nums[mid]);
 
-            if (parentIndex == -1) {
-                root = node;
+            if (isLeft) {
+                parent.left = node;
+            } else {
+                parent.right = node;
             }
-            // Note: In full implementation, would need to track parent nodes
-            // This is a simplified version showing the concept
 
-            // Push right subtree first (processed after left due to stack LIFO)
-            stack.push(new int[]{mid + 1, right, mid, 0});
-            // Push left subtree
-            stack.push(new int[]{left, mid - 1, mid, 1});
+            if (left <= mid - 1) {
+                stack.push(new Object[]{left, mid - 1, node, true});
+            }
+            if (mid + 1 <= right) {
+                stack.push(new Object[]{mid + 1, right, node, false});
+            }
         }
 
         return root;
     }
 
     /**
-     * Approach with random middle selection for variety.
-     *
-     * When range has even length, randomly choose left or right middle.
-     * Creates different valid BSTs on different runs.
+     * Definition for a binary tree node.
      */
-    public TreeNode sortedArrayToBSTRandom(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return null;
-        }
-
-        Random random = new Random();
-        return constructBSTRandom(nums, 0, nums.length - 1, random);
-    }
-
-    // Helper with random middle selection
-    private TreeNode constructBSTRandom(int[] nums, int left, int right, Random random) {
-        if (left > right) {
-            return null;
-        }
-
-        // For even-length ranges, randomly choose left or right middle
-        int mid = (left + right) / 2;
-        if ((right - left + 1) % 2 == 0 && random.nextBoolean()) {
-            mid++;
-        }
-
-        TreeNode root = new TreeNode(nums[mid]);
-        root.left = constructBSTRandom(nums, left, mid - 1, random);
-        root.right = constructBSTRandom(nums, mid + 1, right, random);
-
-        return root;
-    }
-
-    // Definition for a binary tree node
     public static class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
+
         TreeNode() {}
         TreeNode(int val) { this.val = val; }
         TreeNode(int val, TreeNode left, TreeNode right) {

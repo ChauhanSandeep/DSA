@@ -1,4 +1,4 @@
-package amazon;
+package arrays;
 
 import java.util.*;
 
@@ -38,7 +38,7 @@ import java.util.*;
  * 3. What if we also want the users who accessed in that window?
  *    - Maintain user IDs in the sliding window while counting.
  */
-public class CoinbaseRound1 {
+public class MaxResourceAccess {
 
   public static void main(String[] args) {
     String[][] logs1 =
@@ -53,10 +53,15 @@ public class CoinbaseRound1 {
   }
 
   /**
+   * Main intuition for solution:
+   * We need to count accesses per resource within a sliding time window.
+   * For each resource, we gather all access timestamps, sort them, and then use a two-pointer technique to find the maximum number of accesses
+   * that fall within any 5-minute (300 seconds) window.
+   *
    * Steps:
-   * 1. Parse logs and group timestamps by resource
-   * 2. For each resource, find max access count within any given window (e.g., 300 seconds)
-   * 3. Return resource with the maximum count
+   * 1. Parse logs to map each resource to its list of access timestamps.
+   * 2. For each resource, sort its timestamps.
+   * 3. Use two pointers to find the maximum number of accesses within any 300-second window.
    *
    * Algorithm: Sliding Window
    * Time Complexity: O(N log N) due to sorting timestamps per resource
@@ -68,7 +73,7 @@ public class CoinbaseRound1 {
       }
 
     // Map resource -> list of access timestamps
-    Map<String, List<Integer>> resourceToTimestamps = new HashMap<>();
+    Map<String, List<Integer>> resourceToTimestamps = new HashMap<>(); // <resource, List<timestamps>>
     for (String[] log : logs) {
       int timestamp = Integer.parseInt(log[0]);
       String resource = log[2];
@@ -94,19 +99,24 @@ public class CoinbaseRound1 {
   }
 
   /**
-   * Sliding window to compute max accesses within a time window
+   * Sliding window to compute max accesses within a time window.
+   *
+   * - Sort timestamps.
+   * - Use two pointers (left, right) to represent the current window.
+   * - Expand right pointer, and move left pointer to maintain window size.
+   * - Track maximum count of accesses in any valid window.
    */
   private static int getMaxAccessInWindow(List<Integer> timestamps, int windowSize) {
     Collections.sort(timestamps);
     int maxCount = 0;
-    int left = 0;
+    int leftPointer = 0;
 
     // Expand right pointer, shrink left pointer as needed
-    for (int right = 0; right < timestamps.size(); right++) {
-      while (timestamps.get(right) - timestamps.get(left) > windowSize) {
-        left++;
+    for (int rightPointer = 0; rightPointer < timestamps.size(); rightPointer++) {
+      while (timestamps.get(rightPointer) - timestamps.get(leftPointer) > windowSize) {
+        leftPointer++;
       }
-      maxCount = Math.max(maxCount, right - left + 1);
+      maxCount = Math.max(maxCount, rightPointer - leftPointer + 1);
     }
     return maxCount;
   }

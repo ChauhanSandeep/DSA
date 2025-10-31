@@ -42,95 +42,99 @@ public class BestTimeToBuyAndSellStockWithCooldown {
     }
 
     /**
-     * Calculates maximum profit with cooldown using state machine DP approach.
+     * Finds maximum profit using state machine DP with three states.
      *
-     * Algorithm Steps:
-     * 1. Define three states: held (holding stock), sold (just sold stock), rest (cooldown/no stock)
-     * 2. Initialize states for day 0
-     * 3. For each day, compute new states based on previous day's states:
-     *    - held: max(previous held, previous rest - current price)
-     *    - sold: previous held + current price
-     *    - rest: max(previous rest, previous sold)
-     * 4. Return max of sold and rest (not holding stock at end)
+     * Algorithm:
+     * States represent different positions:
+     * - hasStock: Currently holding a stock
+     * - noStock: Not holding stock and can buy tomorrow
+     * - justSold: Just sold stock, must cooldown tomorrow
      *
-     * Time Complexity: O(n) where n is number of days
-     * Space Complexity: O(1) using state variables
+     * State transitions:
+     * 1. hasStock[i] = max(hasStock[i-1], noStock[i-1] - prices[i])
+     *    - Keep holding previous stock, or buy today from noStock state
+     * 2. noStock[i] = max(noStock[i-1], justSold[i-1])
+     *    - Continue not having stock, or complete cooldown from justSold
+     * 3. justSold[i] = hasStock[i-1] + prices[i]
+     *    - Sell the stock we were holding
      *
-     * @param prices array of stock prices for each day
-     * @return maximum profit achievable
+     * Key insight: Must track three states because after selling, we cannot immediately
+     * buy (cooldown). This requires separating "no stock but can buy" from "just sold,
+     * must cooldown".
+     *
+     * Time Complexity: O(N) where N is the number of days. Single pass through prices.
+     * Space Complexity: O(1) using only three variables for current states.
+     *
+     * @param prices array of stock prices per day
+     * @return maximum profit achievable with cooldown constraint
      */
     public int maxProfit(int[] prices) {
         if (prices == null || prices.length <= 1) {
             return 0;
         }
 
-        // State definitions:
-        // heldProfit: maximum profit when holding a stock
-        // soldProfit: maximum profit after selling stock today (must cooldown tomorrow)
-        // restProfit: maximum profit when not holding stock and can buy
-        int heldProfit = -prices[0];  // Buy on first day
-        int soldProfit = 0;           // Cannot sell on first day
-        int restProfit = 0;           // No action on first day
+        int hasStock = -prices[0];  // Bought stock on day 0
+        int noStock = 0;            // Didn't buy anything
+        int justSold = 0;           // Can't sell on day 0 (no stock to sell)
 
-        for (int dayIndex = 1; dayIndex < prices.length; dayIndex++) {
-            int currentPrice = prices[dayIndex];
+        for (int i = 1; i < prices.length; i++) {
+            int prevHasStock = hasStock;
+            int prevNoStock = noStock;
+            int prevJustSold = justSold;
 
-            // Calculate new states based on current day
-            int newHeldProfit = Math.max(heldProfit, restProfit - currentPrice);
-            int newSoldProfit = heldProfit + currentPrice;
-            int newRestProfit = Math.max(restProfit, soldProfit);
+            // Update hasStock: either keep holding or buy today from noStock state
+            hasStock = Math.max(prevHasStock, prevNoStock - prices[i]);
 
-            // Update states for next iteration
-            heldProfit = newHeldProfit;
-            soldProfit = newSoldProfit;
-            restProfit = newRestProfit;
+            // Update noStock: either continue resting or finish cooldown from justSold
+            noStock = Math.max(prevNoStock, prevJustSold);
+
+            // Update justSold: sell stock we were holding
+            justSold = prevHasStock + prices[i];
         }
 
-        // Return max profit when not holding stock (either sold or rest state)
-        return Math.max(soldProfit, restProfit);
+        // Maximum profit when we don't hold any stock at the end
+        return Math.max(noStock, justSold);
     }
 
     /**
-     * Alternative approach using explicit 2D DP table for clarity.
+     * Alternative approach using simplified two-state DP.
      *
-     * Algorithm Steps:
-     * 1. Create 2D DP table where dp[i][state] represents max profit on day i in given state
-     * 2. States: 0 = rest/cooldown, 1 = held, 2 = sold
-     * 3. Fill table based on state transitions
-     * 4. Return dp[n-1][0] or dp[n-1][2] (not holding stock)
+     * Algorithm:
+     * States:
+     * - buy[i]: Max profit after buying or holding stock on day i
+     * - sell[i]: Max profit after selling or not having stock on day i
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(n)
+     * Transitions:
+     * - buy[i] = max(buy[i-1], sell[i-2] - prices[i]) // Must use sell[i-2] to account for cooldown day
+     * - sell[i] = max(sell[i-1], buy[i-1] + prices[i])
      *
-     * @param prices array of stock prices for each day
-     * @return maximum profit achievable
+     * Time Complexity: O(N) where N is the number of days.
+     * Space Complexity: O(N) for buy and sell arrays. Can be optimized to O(1).
+     *
+     * @param prices array of stock prices per day
+     * @return maximum profit achievable with cooldown constraint
      */
-    public int maxProfitDP(int[] prices) {
-        if (prices == null || prices.length <= 1) {
-            return 0;
+    public int maxProfitTwoState(int[] prices) {
+        int length = prices.length;
+        if (length <= 1) return 0;
+
+        int[] buy = new int[length];
+        int[] sell = new int[length];
+
+        buy[0] = -prices[0]; // Bought stock on day 0
+        buy[1] = Math.max(-prices[0], -prices[1]); // Either keep day 0 buy or buy today
+
+        sell[0] = 0; // No stock sold on day 0
+        sell[1] = Math.max(0, prices[1] - prices[0]); // Either no transaction or sell today from day 0 buy
+
+        for (int i = 2; i < length; i++) {
+            // Can buy today only if we were in sell state 2 days ago (after cooldown)
+            buy[i] = Math.max(buy[i - 1], sell[i - 2] - prices[i]);
+
+            // Can sell today if we held stock yesterday
+            sell[i] = Math.max(sell[i - 1], buy[i - 1] + prices[i]);
         }
 
-        int numDays = prices.length;
-        // dp[i][0] = rest, dp[i][1] = held, dp[i][2] = sold
-        int[][] dp = new int[numDays][3];
-
-        // Initialize first day
-        dp[0][0] = 0;           // rest
-        dp[0][1] = -prices[0];  // held (bought today)
-        dp[0][2] = 0;           // sold (impossible on day 0)
-
-        for (int day = 1; day < numDays; day++) {
-            // Rest: either continue resting or cooldown after selling yesterday
-            dp[day][0] = Math.max(dp[day - 1][0], dp[day - 1][2]);
-
-            // Held: either continue holding or buy today (only from rest state)
-            dp[day][1] = Math.max(dp[day - 1][1], dp[day - 1][0] - prices[day]);
-
-            // Sold: sell stock held from previous day
-            dp[day][2] = dp[day - 1][1] + prices[day];
-        }
-
-        // Maximum profit when not holding stock
-        return Math.max(dp[numDays - 1][0], dp[numDays - 1][2]);
+        return sell[length - 1];
     }
 }
