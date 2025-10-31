@@ -4,57 +4,100 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Problem: Find all unique combinations of factors (excluding 1 and n itself)
- * that multiply to give `n`.
+ * Factor Combinations
  *
- * Approach:
- * - Use **backtracking** to explore factor combinations.
- * - Start from 2 and only consider factors that are **≥ previous factor** to avoid duplicate permutations.
- * - Stop recursion when `n == 1` and a valid combination has been found.
+ * Problem:
+ * Numbers can be regarded as product of its factors. Write a function that takes an integer n
+ * and returns all possible combinations of its factors (excluding 1 and n itself).
  *
- * Time Complexity: O(2^logN) (Sub-exponential due to factor tree)
- * Space Complexity: O(logN) (Recursion depth)
+ * Example:
+ * Input: n = 12
+ * Output: [[2,6],[2,2,3],[3,4]]
+ * Explanation: 2*6 = 12, 2*2*3 = 12, 3*4 = 12
  *
- * LeetCode Link: https://leetcode.com/problems/factor-combinations/
+ * Example:
+ * Input: n = 8
+ * Output: [[2,4],[2,2,2]]
+ *
+ * Constraints:
+ * - 1 <= n <= 10^7
+ * - Output should not contain duplicate combinations
+ * - Factors should be in non-decreasing order within each combination
+ *
+ * LeetCode: https://leetcode.com/problems/factor-combinations/
+ *
+ * Follow-up Questions:
+ * Q1: How do you avoid duplicate factor combinations like [2,3] and [3,2]?
+ * A1: Only consider factors >= previous factor (maintain non-decreasing order in recursion).
+ *
+ * Q2: What if we want to include trivial factorization [n] itself?
+ * A2: Remove the condition `currentChain.size() > 1` in the base case.
+ *
+ * Q3: How would you optimize for very large numbers?
+ * A3: Only iterate up to sqrt(n) for factors, then compute complementary factor n/i.
+ *
+ * Q4: What if we want factors in descending order instead?
+ * A4: Change the iteration order and comparison to maintain descending order throughout.
+ *
+ * Q5: How can we find just the number of factorizations without listing them?
+ * A5: Use dynamic programming with memoization counting ways to factorize each number.
  */
 public class FactorsCombination {
     public static void main(String[] args) {
-        List<List<Integer>> factors = getFactorCombinations(12);
-        System.out.println(factors);
+        int number = 12;
+        List<List<Integer>> factors = getFactorCombinations(number);
+        System.out.println("Factor combinations of " + number + ": " + factors);
     }
 
     /**
-     * Finds all unique factor combinations of a given number.
+     * Finds all unique factor combinations of a given number (excluding 1 and n itself).
      *
-     * @param n The target number.
-     * @return A list of factor combinations.
+     * Time Complexity: O(2^log n)
+     * Space Complexity: O(log n)
+     *
+     * @param targetNumber The number to factorize
+     * @return List of all unique factor combinations
      */
-    public static List<List<Integer>> getFactorCombinations(int n) {
+    public static List<List<Integer>> getFactorCombinations(int targetNumber) {
         List<List<Integer>> result = new ArrayList<>();
-        if (n <= 1) return result; // Edge case: No valid factors for 1 or negative numbers
-        backtrack(n, 2, new ArrayList<>(), result);
+        if (targetNumber <= 1) return result;
+        backtrack(targetNumber, 2, new ArrayList<>(), result);
         return result;
     }
 
     /**
-     * Recursive backtracking function to generate factor combinations.
+     * Recursive backtracking function to generate all factor combinations.
      *
-     * @param target       The remaining number to factorize.
-     * @param start   The smallest factor to consider (prevents duplicate permutations).
-     * @param currentChain The temporary list storing the currentChain factor combination.
-     * @param result  The final list containing all valid factor combinations.
+     * Algorithm:
+     * 1. Base case: When remaining number is 1 and we have multiple factors, add to result
+     * 2. Try all factors from minFactor to remaining number
+     * 3. If a number is a factor, add it and recurse with quotient
+     * 4. Backtrack by removing the added factor
+     *
+     * Key Insight: Start from minFactor (not 2 each time) to maintain non-decreasing order
+     * and avoid duplicates like [2,3] and [3,2].
+     *
+     * Time Complexity: O(2^log n) - pruned by factorization tree structure
+     * Space Complexity: O(log n) - recursion depth limited by number of prime factors
+     *
+     * @param remaining The number still to be factorized
+     * @param minFactor Smallest factor to consider (maintains non-decreasing order)
+     * @param currentFactors Current list of factors being built
+     * @param result List storing all valid factor combinations
      */
-    private static void backtrack(int target, int start, List<Integer> currentChain, List<List<Integer>> result) {
-        if (target == 1 && currentChain.size() > 1) { // Valid combination found (excluding trivial cases)
-            result.add(new ArrayList<>(currentChain));
+    private static void backtrack(int remaining, int minFactor, List<Integer> currentFactors, List<List<Integer>> result) {
+        // Base case: fully factorized and has more than one factor (exclude trivial [n])
+        if (remaining == 1 && currentFactors.size() > 1) {
+            result.add(new ArrayList<>(currentFactors));
             return;
         }
 
-        for (int i = start; i <= target; i++) {
-            if (target % i == 0) { // Check if `i` is a factor of `target`
-                currentChain.add(i);
-                backtrack(target / i, i, currentChain, result); // Continue with the reduced value
-                currentChain.remove(currentChain.size() - 1); // Backtrack to try other factors
+        for (int factor = minFactor; factor <= remaining; factor++) {
+            if (remaining % factor == 0) {
+                // Factor found - include it and continue with quotient
+                currentFactors.add(factor);
+                backtrack(remaining / factor, factor, currentFactors, result);
+                currentFactors.remove(currentFactors.size() - 1); // Backtrack
             }
         }
     }
