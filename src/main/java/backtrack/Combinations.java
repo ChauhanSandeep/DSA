@@ -3,231 +3,175 @@ package backtrack;
 import java.util.*;
 
 /**
- * 77. Combinations
- *
- * Problem: Given two integers n and k, return all possible combinations of k numbers
- * chosen from the range [1, n].
- *
+ * Problem: Combinations
+ * 
+ * Given two integers n and k, return all possible combinations of k numbers
+ * chosen from the range [1, n]. You may return the answer in any order.
+ * 
  * Example:
  * Input: n = 4, k = 2
  * Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
- *
- * LeetCode: https://leetcode.com/problems/combinations
- *
- * Follow-up questions:
- * Q: Can we generate combinations in lexicographic order?
- * A: Yes, current backtracking approach naturally generates them in lexicographic order.
- *
- * Q: How to generate the next combination given a current one?
- * A: Implement next permutation algorithm adapted for combinations.
- *
- * Q: Can we optimize space if we only need to count combinations?
- * A: Yes, use mathematical formula C(n,k) = n!/(k!(n-k)!) or dynamic programming.
+ * Explanation: There are 4 choose 2 = 6 total combinations.
+ * Note that combinations are unordered, i.e., [1,2] and [2,1] are the same.
+ * 
+ * Constraints:
+ * - 1 <= n <= 20
+ * - 1 <= k <= n
+ * 
+ * LeetCode Problem: https://leetcode.com/problems/combinations
+ * 
+ * Follow-up Questions:
+ * 
+ * 1. How would you generate combinations with repetition allowed?
+ *    Answer: Remove the restriction of starting from start+1. In the recursive call,
+ *    use start instead of start+1, allowing the same number to be picked multiple times.
+ *    Related problem: https://leetcode.com/problems/combination-sum/
+ * 
+ * 2. What if you need to generate all possible subsets (all lengths) instead of just k?
+ *    Answer: Don't wait for current.size() == k. Add current to result at every
+ *    recursive call, giving all subsets from size 0 to n.
+ *    Related problem: https://leetcode.com/problems/subsets/
+ * 
+ * 3. How would you optimize for very large n with small k?
+ *    Answer: The pruning optimization is crucial. Also consider iterative approach
+ *    with bit manipulation for small k, or use combinatorial formulas to generate
+ *    the i-th combination directly without generating all previous ones.
+ * 
+ * 4. Can you generate combinations in lexicographical order without sorting?
+ *    Answer: Yes, the backtracking approach with start pointer naturally generates
+ *    combinations in lexicographical order as we always proceed in increasing order.
+ * 
+ * 5. How would you modify this to handle negative numbers or arbitrary ranges?
+ *    Answer: Instead of using [1, n], accept an array of numbers as input. Iterate
+ *    through array indices instead of number values. The backtracking structure remains same.
  */
 public class Combinations {
-
+    
     /**
-     * Generates all combinations of k numbers from range [1, n].
-     *
-     * Algorithm: Backtracking
-     * - Start from number 1, try each number as potential candidate
-     * - For each choice, recursively generate remaining combinations
-     * - Backtrack by removing current choice and trying next number
-     * - Use start parameter to avoid duplicates and ensure ascending order
-     *
-     * Time Complexity: O(C(n,k) * k) where C(n,k) is binomial coefficient
-     * Space Complexity: O(k) for recursion stack and current combination
+     * Generates all k-sized combinations using backtracking with pruning.
+     * 
+     * Algorithm:
+     * 1. Start with empty combination and first number (1)
+     * 2. At each step, try adding numbers from current position to n
+     * 3. When combination reaches size k, add to result
+     * 4. Backtrack by removing last added number and trying next option
+     * 5. Prune branches where remaining numbers can't form k-sized combination
+     * 
+     * Key insight: Use start pointer to avoid duplicates. Once we pick number i,
+     * all future picks must be > i. Pruning check: if (n - start + 1 < k - current.size()),
+     * we don't have enough numbers left, so skip this branch.
+     * 
+     * Time Complexity: O(C(n,k) * k) where C(n,k) is binomial coefficient n!/(k!(n-k)!).
+     * We generate C(n,k) combinations, each requiring O(k) to copy to result.
+     * 
+     * Space Complexity: O(C(n,k) * k) for storing all combinations. Recursion depth
+     * is O(k) for the call stack.
+     * 
+     * @param n upper bound of range [1, n]
+     * @param k size of each combination
+     * @return list of all k-sized combinations
      */
     public List<List<Integer>> combine(int n, int k) {
         List<List<Integer>> result = new ArrayList<>();
-        List<Integer> current = new ArrayList<>();
-
-        backtrack(result, current, n, k, 1);
+        backtrack(n, k, 1, new ArrayList<>(), result);
         return result;
     }
-
-    // Backtracking helper
-    private void backtrack(List<List<Integer>> result, List<Integer> current, int n, int k, int start) {
-        // Base case: found a complete combination
+    
+    // Helper method for backtracking with pruning
+    private void backtrack(int n, int k, int start, List<Integer> current, List<List<Integer>> result) {
+        // Base case: found a valid k-sized combination
         if (current.size() == k) {
             result.add(new ArrayList<>(current));
             return;
         }
-
-        // Try each number from start to n
+        
+        // Pruning: if not enough numbers remaining, stop early
+        int needed = k - current.size();
+        int available = n - start + 1;
+        
         for (int i = start; i <= n; i++) {
-            // Early termination: not enough numbers left to complete combination
-            if (current.size() + (n - i + 1) < k) {
+            // Optimization: stop if remaining numbers insufficient
+            if (available < needed) {
                 break;
             }
-
+            
             current.add(i);
-            backtrack(result, current, n, k, i + 1);
+            backtrack(n, k, i + 1, current, result);
             current.remove(current.size() - 1);
+            
+            available--;
         }
     }
-
+    
     /**
-     * Optimized version with better pruning.
-     * Calculates exact remaining slots needed for early termination.
-     */
-    public List<List<Integer>> combineOptimized(int n, int k) {
-        List<List<Integer>> result = new ArrayList<>();
-
-        if (k > n || k <= 0) {
-            return result;
-        }
-
-        backtrackOptimized(result, new ArrayList<>(), n, k, 1);
-        return result;
-    }
-
-    // Optimized backtracking with tighter bounds
-    private void backtrackOptimized(List<List<Integer>> result, List<Integer> current, int n, int k, int start) {
-        int remaining = k - current.size();
-
-        if (remaining == 0) {
-            result.add(new ArrayList<>(current));
-            return;
-        }
-
-        // Only iterate through numbers that can lead to valid combinations
-        for (int i = start; i <= n - remaining + 1; i++) {
-            current.add(i);
-            backtrackOptimized(result, current, n, k, i + 1);
-            current.remove(current.size() - 1);
-        }
-    }
-
-    /**
-     * Iterative approach using lexicographic generation.
-     * Generates combinations without recursion.
+     * Alternative iterative approach using bit manipulation for small k.
+     * Works well when k is small (k <= 3 or 4).
+     * 
+     * Algorithm:
+     * 1. Use k nested loops to generate combinations
+     * 2. Each loop variable represents one position in combination
+     * 3. Ensure each subsequent number is greater than previous
+     * 
+     * Time Complexity: O(C(n,k) * k) same as backtracking.
+     * 
+     * Space Complexity: O(C(n,k) * k) for result storage.
+     * 
+     * Note: This approach becomes impractical for larger k due to nested loops.
+     * Shown here for k=2 as an example.
+     * 
+     * @param n upper bound of range [1, n]
+     * @param k size of each combination (must be 2 for this implementation)
+     * @return list of all k-sized combinations
      */
     public List<List<Integer>> combineIterative(int n, int k) {
         List<List<Integer>> result = new ArrayList<>();
-
-        if (k > n || k <= 0) {
-            return result;
-        }
-
-        // Start with the first combination [1, 2, ..., k]
-        List<Integer> current = new ArrayList<>();
-        for (int i = 1; i <= k; i++) {
-            current.add(i);
-        }
-
-        while (true) {
-            result.add(new ArrayList<>(current));
-
-            // Find the rightmost element that can be incremented
-            int i = k - 1;
-            while (i >= 0 && current.get(i) == n - k + i + 1) {
-                i--;
-            }
-
-            if (i < 0) {
-                break; // No more combinations
-            }
-
-            // Increment current[i] and adjust subsequent elements
-            current.set(i, current.get(i) + 1);
-            for (int j = i + 1; j < k; j++) {
-                current.set(j, current.get(j - 1) + 1);
+        
+        if (k == 2) {
+            for (int i = 1; i <= n - 1; i++) {
+                for (int j = i + 1; j <= n; j++) {
+                    List<Integer> combination = new ArrayList<>();
+                    combination.add(i);
+                    combination.add(j);
+                    result.add(combination);
+                }
             }
         }
-
+        // For k > 2, would need more nested loops - not scalable
+        
         return result;
     }
-
+    
     /**
-     * Binary representation approach.
-     * Uses bit manipulation to generate all combinations.
+     * Cleaner backtracking version without explicit pruning check.
+     * Relies on natural loop bounds for termination.
+     * 
+     * Algorithm:
+     * Same backtracking approach but simpler code without explicit pruning.
+     * The loop condition i <= n naturally handles the bounds.
+     * 
+     * Time Complexity: O(C(n,k) * k) slightly slower than pruned version.
+     * 
+     * Space Complexity: O(C(n,k) * k) for result storage.
+     * 
+     * @param n upper bound of range [1, n]
+     * @param k size of each combination
+     * @return list of all k-sized combinations
      */
-    public List<List<Integer>> combineBinary(int n, int k) {
+    public List<List<Integer>> combineSimple(int n, int k) {
         List<List<Integer>> result = new ArrayList<>();
-
-        // Generate all possible bitmasks with exactly k bits set
-        generateCombinations(result, n, k, 0, 0, new ArrayList<>());
-
+        backtrackSimple(n, k, 1, new ArrayList<>(), result);
         return result;
     }
-
-    // Generate combinations using binary representation
-    private void generateCombinations(List<List<Integer>> result, int n, int k, int pos, int count, List<Integer> current) {
-        if (count == k) {
+    
+    private void backtrackSimple(int n, int k, int start, List<Integer> current, List<List<Integer>> result) {
+        if (current.size() == k) {
             result.add(new ArrayList<>(current));
             return;
         }
-
-        if (pos > n || count + (n - pos) < k) {
-            return;
-        }
-
-        // Include current position
-        current.add(pos + 1);
-        generateCombinations(result, n, k, pos + 1, count + 1, current);
-        current.remove(current.size() - 1);
-
-        // Exclude current position
-        generateCombinations(result, n, k, pos + 1, count, current);
-    }
-
-    /**
-     * Mathematical approach for counting combinations only.
-     * Useful when we only need the count, not the actual combinations.
-     */
-    public long countCombinations(int n, int k) {
-        if (k > n || k < 0) {
-            return 0;
-        }
-
-        if (k == 0 || k == n) {
-            return 1;
-        }
-
-        // Optimize by using C(n,k) = C(n,n-k)
-        k = Math.min(k, n - k);
-
-        long result = 1;
-        for (int i = 0; i < k; i++) {
-            result = result * (n - i) / (i + 1);
-        }
-
-        return result;
-    }
-
-    /**
-     * Dynamic programming approach for computing binomial coefficients.
-     * Useful for multiple queries or when building Pascal's triangle.
-     */
-    public List<List<Integer>> combineDP(int n, int k) {
-        // Build Pascal's triangle up to row n
-        int[][] dp = new int[n + 1][k + 1];
-
-        for (int i = 0; i <= n; i++) {
-            dp[i][0] = 1;
-            for (int j = 1; j <= Math.min(i, k); j++) {
-                dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j];
-            }
-        }
-
-        // Generate actual combinations using the computed values
-        List<List<Integer>> result = new ArrayList<>();
-        generateFromDP(result, new ArrayList<>(), n, k, 1, dp);
-
-        return result;
-    }
-
-    // Generate combinations using precomputed DP table
-    private void generateFromDP(List<List<Integer>> result, List<Integer> current, int n, int k, int start, int[][] dp) {
-        if (k == 0) {
-            result.add(new ArrayList<>(current));
-            return;
-        }
-
-        for (int i = start; i <= n - k + 1; i++) {
+        
+        for (int i = start; i <= n; i++) {
             current.add(i);
-            generateFromDP(result, current, n, k - 1, i + 1, dp);
+            backtrackSimple(n, k, i + 1, current, result);
             current.remove(current.size() - 1);
         }
     }

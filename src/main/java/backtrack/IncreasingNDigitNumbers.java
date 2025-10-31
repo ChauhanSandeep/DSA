@@ -3,6 +3,43 @@ package backtrack;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ✅ Problem: Increasing N-Digit Numbers (Strictly Increasing Digits)
+ *
+ * Generate all N-digit integers whose digits are strictly increasing from left to right.
+ * Digits are chosen from 1..9 (no leading zeros), and each subsequent digit must be greater than the previous.
+ * Return the list in ascending numerical order.
+ *
+ * Leetcode: https://leetcode.com/problems/sequential-digits/ (LC 1291, related), 
+ * https://leetcode.com/problems/combinations/ (LC 77, pattern)
+ *
+ * Example:
+ * Input: N = 1
+ * Output: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+ *
+ * Input: N = 2
+ * Output: [12, 13, 14, 15, 16, 17, 18, 19, 23, 24, 25, 26, 27, 28, 29, 34, 35, 36, 37, 38, 39, 45, 46, 47, 48, 49, 56, 57, 58, 59, 67, 68, 69, 78, 79, 89]
+ *
+ * Input: N = 3
+ * Output: [123, 124, 125, 126, 127, 128, 129, 134, 135, 136, 137, 138, 139, 145, 146, 147, 148, 149, 156, 157, 158, 159, 167, 168, 169, 178, 179, 189, 234, 235, ..., 789]
+ *
+ * 🔍 Intuition:
+ * Use backtracking (DFS) to build numbers digit by digit. From the last chosen digit d, the next digit can be any value in [d+1..9],
+ * until the length reaches N. This is equivalent to generating combinations of size N from digits {1..9} and mapping each combination to a number.
+ *
+ * Constraints:
+ * - 1 ≤ N ≤ 9
+ * - Digits strictly increasing; no repeats; no leading zeros
+ * - Digits drawn from 1..9
+ * - Output should be in ascending numerical order
+ *
+ * Follow-up Questions:
+ * 1) What if we allow non-strictly increasing sequences (i.e., non-decreasing digits with equality allowed)?
+ * 2) How to generate N-digit numbers with strictly decreasing digits?
+ * 3) Can you generate the k-th number in lexicographic order without generating all (combinatorial indexing)?
+ * 4) How to extend this to arbitrary digit ranges (e.g., allow 0..9, or a custom subset/alphabet)?
+ * 5) What if we want numbers with at most N digits instead of exactly N digits?
+ */
 public class IncreasingNDigitNumbers {
 
     /**

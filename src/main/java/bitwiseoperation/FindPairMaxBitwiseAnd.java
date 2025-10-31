@@ -35,7 +35,6 @@ package bitwiseoperation;
  *    Answer: Use hash map to group elements by their MSB positions. Only check
  *    pairs within groups that share same high-order bits.
  */
- */
 public class FindPairMaxBitwiseAnd {
 
     public static void main(String[] args) {

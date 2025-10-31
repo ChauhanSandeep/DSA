@@ -69,7 +69,11 @@ public class EqualSumSubsetPartition {
 
     // sort in descending order.
     // This helps in pruning branches early. However, the worst case time complexity is still O(2^N)
-    nums = Arrays.stream(nums).boxed().sorted(Comparator.reverseOrder()).mapToInt(Integer::intValue).toArray();
+    nums = Arrays.stream(nums)
+        .boxed()
+        .sorted(Comparator.reverseOrder())
+        .mapToInt(Integer::intValue)
+        .toArray();
     boolean[] used = new boolean[nums.length]; // used[i] = true if nums[i] is used
     return backtrack(nums, used, 0, 0, k, target);
   }

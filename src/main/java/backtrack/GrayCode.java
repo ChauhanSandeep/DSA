@@ -5,10 +5,8 @@ import java.util.List;
 
 
 /**
- * Problem: Gray Code
  * LeetCode: https://leetcode.com/problems/gray-code/
  *
- * Statement:
  * The Gray Code is a binary numeral system in which two successive values differ in only one bit.
  * Given a non-negative integer n representing the total number of bits in the code,
  * return the sequence of Gray Code, starting from 0.
@@ -48,12 +46,13 @@ public class GrayCode {
    * Time Complexity: O(2^num) — Each sequence has length 2^num.
    * Space Complexity: O(2^num) — To store all Gray codes.
    *
-   * @param num Number of bits.
+   * @param bitsCount Number of bits.
    * @return List of integers representing the Gray Code sequence.
    */
-  public static List<Integer> generateGrayCode(int num) {
+  public static List<Integer> generateGrayCode(int bitsCount) {
       // binaryGrayCode = ["0", "1", "11", "10"]
-    List<String> binaryGrayCode = generateGrayCodeRecursive(num);
+    List<String> binaryGrayCode = generateGrayCodeRecursive(bitsCount);
+        
     // grayCodeNumbers = [0, 1, 3, 2]
     List<Integer> grayCodeNumbers = new ArrayList<>(binaryGrayCode.size());
 
@@ -70,26 +69,27 @@ public class GrayCode {
    * Steps:
    * 1. Base case for n=0: ["0"], for n=1: ["0","1"].
    * 2. Recursively generate Gray Code for (n-1) bits.
-   * 3. First half: prefix '0' to each code.
-   * 4. Second half: reverse the previous sequence and prefix '1'.
+   * 3. From the Gray code of (n-1) bits:
+   *    1. First half: prefix '0' to each code.
+   *    2. Second half: reverse the previous sequence and prefix '1'.
    *
-   * @param n Number of bits.
+   * @param bitsCount Number of bits.
    * @return List of binary strings representing the Gray Code sequence.
    */
-  private static List<String> generateGrayCodeRecursive(int n) {
-    if (n == 0) {
+  private static List<String> generateGrayCodeRecursive(int bitsCount) {
+    if (bitsCount == 0) {
       List<String> baseCase = new ArrayList<>();
       baseCase.add("0");
       return baseCase;
     }
-    if (n == 1) {
+    if (bitsCount == 1) {
       List<String> baseCase = new ArrayList<>();
       baseCase.add("0");
       baseCase.add("1");
       return baseCase;
     }
 
-    List<String> previousGrayCode = generateGrayCodeRecursive(n - 1);
+    List<String> previousGrayCode = generateGrayCodeRecursive(bitsCount - 1);
     List<String> currentGrayCode = new ArrayList<>(previousGrayCode.size() * 2);
 
     // Prefix '0' to first half
