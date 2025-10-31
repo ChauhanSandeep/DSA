@@ -17,13 +17,13 @@ package trees;
 public class TreeNode {
 
     // Value stored in the node.
-    int val;
+    public int val;
 
     // Reference to the left child node.
-    TreeNode left;
+    public TreeNode left;
 
     // Reference to the right child node.
-    TreeNode right;
+    public TreeNode right;
 
     // Default constructor: Creates a node with no value or children.
     public TreeNode() {}
