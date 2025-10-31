@@ -89,10 +89,6 @@ public class MedianFinder {
         if (minHeap.size() > maxHeap.size()) {
             maxHeap.offer(minHeap.poll());
         }
-
-        // Invariants maintained:
-        // 1. maxHeap.size() - minHeap.size() ∈ {0, 1}
-        // 2. maxHeap.peek() ≤ minHeap.peek() (when both non-empty)
     }
 
     /**

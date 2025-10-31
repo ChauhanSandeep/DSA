@@ -64,14 +64,11 @@ public class NonDecreasingArray {
                 // More than one violation - impossible
                 if (violations > 1) return false;
 
-                // Try to fix the violation
-                // Option 1: Modify nums[i] to be <= nums[i+1]
-                // Check if this doesn't violate constraint with nums[i-1]
+                // Option 1: Decrease nums[i] to become nums[i+1], if nums[i-1] <= nums[i+1]
                 if (i == 0 || nums[i - 1] <= nums[i + 1]) {
                     nums[i] = nums[i + 1]; // Modify nums[i]
                 } else {
-                    // Option 2: Modify nums[i+1] to be >= nums[i]
-                    // Check if this doesn't violate constraint with nums[i+2]
+                    // Option 2: Increase nums[i+1] to become nums[i+2], if nums[i] <= nums[i + 2]
                     if (i + 2 >= size || nums[i] <= nums[i + 2]) {
                         nums[i + 1] = nums[i]; // Modify nums[i+1]
                     } else {
@@ -114,10 +111,12 @@ public class NonDecreasingArray {
         // Check if we can fix the single violation
         int i = violationIndex;
 
-        // Can we modify nums[i] to fix violation? If yes, we can make it the same as nums[i+1]
+        // Decrease nums[i] to make same as nums[i+1]. If nums[i-1] <= nums[i+1]
+        // Example 1 (i-1), 4(i), 3(i+1) => 1, 3, 3
         boolean canModifyLeft = (i == 0) || (nums[i - 1] <= nums[i + 1]);
 
-        // Can we modify nums[i+1] to fix violation? If yes, we can make nums[i+1] the same as nums[i]
+        // Increase nums[i+1] to make same as nums[i]. If nums[i] <= nums[i+2]
+        // 1(i-1), 3(i), 1(i+1), 4(i+2) => 1, 3, 3, 4
         boolean canModifyRight = (i + 2 >= size) || (nums[i] <= nums[i + 2]);
 
         return canModifyLeft || canModifyRight;

@@ -4,8 +4,8 @@ import java.util.*;
 
 
 /**
- * 🔹 Problem: Insert Delete GetRandom O(1)
- * 🔗 LeetCode: https://leetcode.com/problems/insert-delete-getrandom-o1/
+ * Problem: Insert Delete GetRandom O(1)
+ * LeetCode: https://leetcode.com/problems/insert-delete-getrandom-o1/
  *
  * Design a set data structure that supports:
  * - insert(val): Inserts an item val to the set if not already present. If present, return false.
@@ -47,10 +47,9 @@ public class InsertDeleteGetRandom {
  * RandomizedSet supports O(1) insertion, deletion, and random access.
  */
 class RandomizedSet {
-  private final List<Integer> elements;     // Stores values for random access
+  private final List<Integer> elements;         // Stores values for random access
   private final Map<Integer, Integer> indexMap; // Maps value -> index in elements
-
-  private final Random random;              // Random number generator
+  private final Random random;                  // Random number generator
 
   /** Constructor to initialize data structures. */
   public RandomizedSet() {

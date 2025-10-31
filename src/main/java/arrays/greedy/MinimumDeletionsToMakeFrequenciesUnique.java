@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 
 /**
- * 🔗 LeetCode: https://leetcode.com/problems/minimum-deletions-to-make-character-frequencies-unique/
+ * LeetCode: https://leetcode.com/problems/minimum-deletions-to-make-character-frequencies-unique/
  *
  * Problem:
  * Given a string, return the minimum number of characters to delete so that no two characters
@@ -14,15 +14,6 @@ import java.util.Arrays;
  * Input: "aabbcc"
  * Output: 2
  * Explanation: Delete one 'a' and one 'b' to make frequencies [2,1,1]
- *
- * ✅ Greedy Strategy:
- * - Count character frequencies
- * - Sort frequencies in descending order
- * - From highest to lowest, ensure each frequency is less than the previous
- * - If not, reduce frequency (simulate deletions)
- *
- * Time Complexity: O(N log N) due to sorting
- * Space Complexity: O(1) since array size is fixed at 26
  *
  * Follow-up Questions:
  * - Q: Can we do better than sorting?

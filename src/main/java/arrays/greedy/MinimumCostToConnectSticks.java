@@ -3,7 +3,7 @@ package arrays.greedy;
 import java.util.PriorityQueue;
 
 /**
- * ✅ Problem: Minimum Cost to Connect Sticks
+ * Problem: Minimum Cost to Connect Sticks
  *
  * You are given an array of integers representing the lengths of sticks.
  * You can connect any two sticks into one. The cost is equal to the sum of their lengths.
@@ -20,7 +20,7 @@ import java.util.PriorityQueue;
  *  - Combine 8 + 9 = 17 → cost = 17
  *  - Total = 4 + 9 + 17 = 30
  *
- * 🔍 Follow-up:
+ * Follow-up:
  * 1. Why does greedy (always combine smallest two) work?
  *    ➤ Huffman coding principle — combining smaller parts early reduces cost growth.
  * 2. Can you avoid using a heap?
