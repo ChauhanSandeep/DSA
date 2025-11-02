@@ -25,64 +25,73 @@ package arrays.indexhash;
 public class FirstMissingPositive {
 
     public static void main(String[] args) {
-        int[] arr = {1, 2, 0};
+        int[] arr = {3, 4, -1, 0, 1, 10};
         int result = new FirstMissingPositive().firstMissingPositive(arr);
         System.out.println("First missing positive number in array is " + result);
     }
 
+    private static final int INVALID_NUMBER = Integer.MAX_VALUE;
+
     /**
-     * Using marking (negating values) to track presence.
+     * Finds first missing positive using marking by negating array values.
      *
-     * Step-by-step explanation:
-     * 1. Replace all non-positive numbers with n+1 (out of range).
-     * 2. For each number in [1, n], use it as index and negate the value there to mark presence.
-     *    - Use absolute value to handle already negated indices.
-     * 3. Scan for the first non-negative value; its index +1 is missing.
-     * 4. If all marked, return n+1. Handle case where 1 is missing separately if needed.
+     * Algorithm:
+     * - Replace all invalid numbers (non-positive or > n) with INVALID_NUMBER
+     *   - Ensures we only care about numbers in [1, n]
+     *   - Invalid numbers won't interfere with marking phase
+     * - For each number in [1, n], negate value at corresponding index to mark presence
+     *   - For number x, mark index (x-1) by negating its value
+     *   - Use absolute value to handle already negated indices
+     *   - If number x exists, nums[x-1] will be negative
+     * - Scan for first positive value; its index +1 is the answer
+     *   - If nums[i] > 0, then number (i+1) is missing
+     *   - First positive value found is the answer
+     * Step 4: If all marked, return n+1
+     *         - All numbers [1, n] are present
+     *         - Answer must be n+1
      *
-     * Algorithm: Index Marking
-     * Time Complexity: O(n) - Two passes over the array.
-     * Space Complexity: O(1) - In-place modification.
+     * Key insight: Array becomes hash table where index represents number and
+     * sign represents presence. Positive = missing, Negative = present.
      *
-     * @param nums the input array of integers
-     * @return the smallest missing positive integer
+     * Time Complexity: O(N) where N is array length. Three passes: normalize, mark, scan.
+     * Space Complexity: O(1) using only constant extra space. Array modified in-place.
+     *
+     * @param nums array of integers (will be modified)
+     * @return smallest missing positive integer
      */
-    public int firstMissingPositive(int[] nums) { // [3,4,-1,1]
+    public int firstMissingPositive(int[] nums) {
         int length = nums.length;
-        boolean containsOne = false;
 
-        // Step 1: Replace non-positive and out-of-range with 1 (temporarily), and check if 1 is present
+        // Phase 1: Normalize array - replace all invalid numbers
         for (int i = 0; i < length; i++) {
-            if (nums[i] == 1) {
-                containsOne = true;
-            }
             if (nums[i] <= 0 || nums[i] > length) {
-                nums[i] = 1;
+                nums[i] = INVALID_NUMBER;
             }
         }
-        // [3,4,1,1]
 
-        // If 1 is not present, it's the answer (edge case)
-        if (!containsOne) {
-            return 1;
-        }
-
-        // Step 2: Mark presence by negating at index abs(num) - 1
+        // Phase 2: Mark presence of numbers by negating values at corresponding indices
         for (int i = 0; i < length; i++) {
-            int index = Math.abs(nums[i]) - 1;
-            if (nums[index] > 0) {
-                nums[index] = -nums[index];
+            int number = Math.abs(nums[i]);
+
+            // Only mark if number is in valid range [1, n]
+            if (number >= 1 && number <= length) {
+                int indexToMark = number - 1;  // Convert to 0-indexed position
+
+                // Negate to mark presence (only if not already negative)
+                if (nums[indexToMark] > 0) {
+                    nums[indexToMark] = -nums[indexToMark];
+                }
             }
         }
 
-        // Step 3: Find the first positive (unmarked) index
+        // Phase 3: Find first positive value; its index +1 is the answer
         for (int i = 0; i < length; i++) {
             if (nums[i] > 0) {
-                return i + 1;
+                return i + 1;  // Index +1 is the missing number
             }
         }
 
-        // All marked, missing is n + 1
+        // Phase 4: All indices marked, so all numbers [1,n] are present
         return length + 1;
     }
 }

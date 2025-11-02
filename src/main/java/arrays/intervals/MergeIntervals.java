@@ -6,18 +6,18 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 🔹 Problem: Merge Intervals
- * 🔗 Leetcode: https://leetcode.com/problems/merge-intervals/
+ * Problem: Merge Intervals
+ * Leetcode: https://leetcode.com/problems/merge-intervals/
  *
  * Given an array of intervals where intervals[i] = [start_i, end_i], merge all
  * overlapping intervals, and return an array of the non-overlapping intervals
  * that cover all the intervals in the input.
  *
- * 📌 Example:
+ * Example:
  * Input: [[1,3],[2,6],[8,10],[15,18]]
  * Output: [[1,6],[8,10],[15,18]]
  *
- * ✅ Follow-up Questions:
+ * Follow-up Questions:
  * 1. What if the input is already sorted?
  *    → You can skip sorting and start merging directly in O(N) time.
  * 2. Can you do this in-place?
@@ -34,58 +34,62 @@ public class MergeIntervals {
             {8, 10},
             {15, 18}
         };
-        int[][] merged = mergeOverlappingIntervals(intervals);
+        int[][] merged = merge(intervals);
         System.out.println("Merged Intervals: " + Arrays.deepToString(merged));
     }
 
     /**
-     * Merges all overlapping intervals from the given list.
+     * Merges overlapping intervals using sorting and linear scan.
      *
-     * 🔹 Steps:
-     * 1. Sort intervals by their starting point.
-     * 2. Initialize `currentStart` and `currentEnd` with the first interval.
-     * 3. Iterate over remaining intervals:
-     *    - If overlapping (interval's start ≤ current end), update current end.
-     *    - Else, store the previous merged interval and update start/end.
-     * 4. Don't forget to add the last interval at the end.
+     * Algorithm:
+     * 1. Sort intervals by start time to ensure ordered processing
+     * 2. Initialize result with first interval
+     * 3. For each subsequent interval:
+     *    - If it overlaps with last merged interval, extend the end time
+     *    - Otherwise, add as new separate interval
+     * 4. Return merged intervals
      *
-     * 🔹 Time Complexity: O(N log N)
-     *      - Sorting takes O(N log N), merging is O(N)
-     * 🔹 Space Complexity: O(N)
-     *      - For output list of merged intervals
+     * Key insight: After sorting by start time, we only need to compare each interval
+     * with the previously merged interval. If current interval's start <= previous end,
+     * they overlap. We take the maximum of both ends to handle containment cases.
      *
-     * @param intervals 2D array where each element is [start, end] interval
-     * @return merged non-overlapping intervals
+     * Time Complexity: O(N log N) where N is number of intervals. Sorting dominates
+     * with O(N log N), followed by O(N) linear scan for merging.
+     *
+     * Space Complexity: O(log N) for sorting algorithm's stack space (Timsort/Quicksort).
+     * Output array not counted as it's required space, not auxiliary space.
+     *
+     * @param intervals array of intervals where each interval is [start, end]
+     * @return array of merged non-overlapping intervals
      */
-    public static int[][] mergeOverlappingIntervals(int[][] intervals) {
-        if (intervals == null || intervals.length <= 1) return intervals;
+    public static int[][] merge(int[][] intervals) {
+        if (intervals == null || intervals.length <= 1) {
+            return intervals;
+        }
 
-        // Sort intervals based on their start time
-        Arrays.sort(intervals, Comparator.comparingInt(a -> a[0]));
+        // Sort by start time
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
 
         List<int[]> merged = new ArrayList<>();
-        int currentStart = intervals[0][0];
-        int currentEnd = intervals[0][1];
+        int[] currentInterval = intervals[0];
+        merged.add(currentInterval);
 
         for (int i = 1; i < intervals.length; i++) {
+            int currentEnd = currentInterval[1];
             int nextStart = intervals[i][0];
             int nextEnd = intervals[i][1];
 
+            // Check if intervals overlap
             if (nextStart <= currentEnd) {
-                // Overlapping: Extend the current interval
-                currentEnd = Math.max(currentEnd, nextEnd);
+                // Merge: extend end time to maximum of both
+                currentInterval[1] = Math.max(currentEnd, nextEnd);
             } else {
-                // No overlap: Add the previous interval and start a new one
-                merged.add(new int[]{currentStart, currentEnd});
-                currentStart = nextStart;
-                currentEnd = nextEnd;
+                // No overlap: add as new interval
+                currentInterval = intervals[i];
+                merged.add(currentInterval);
             }
         }
 
-        // Add the final interval
-        merged.add(new int[]{currentStart, currentEnd});
-
-        // Convert the list back to an array
-        return merged.toArray(new int[0][]);
+        return merged.toArray(new int[merged.size()][]);
     }
 }

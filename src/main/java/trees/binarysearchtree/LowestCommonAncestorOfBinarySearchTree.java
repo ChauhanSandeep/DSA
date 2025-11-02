@@ -1,7 +1,5 @@
 package trees.binarysearchtree;
 
-import trees.Node;
-
 /**
  * Given a Binary Search Tree (BST) and two node values, this program finds the Lowest Common Ancestor (LCA) of the two nodes.
  *
@@ -18,7 +16,7 @@ import trees.Node;
  * LeetCode Problem Link: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
  */
 
-public class LowestCommonAncestor {
+public class LowestCommonAncestorOfBinarySearchTree {
 
     // Node class to represent each node in the binary search tree
     static class Node {

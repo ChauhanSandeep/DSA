@@ -73,21 +73,21 @@ public class MaximumSumIncreasingTriplet {
     int maxSum = 0;
 
     // Step 3: Traverse list to consider each element as middle Aj
-    for (int j = 0; j < length - 1; j++) {
-      int current = list.get(j);
-      int rightMax = maxRight[j + 1];
+    for (int i = 0; i < length - 1; i++) {
+      int currentElement = list.get(i);
+      int rightMax = maxRight[i + 1];
 
       // Valid increasing triplet condition: Ai < Aj < Ak
-      if (rightMax > current) {
-        Integer leftMax = sortedPrefixSet.lower(current); // max from left side but less than current
+      if (rightMax > currentElement) {
+        Integer leftMax = sortedPrefixSet.lower(currentElement); // max from left side but less than current
         if (leftMax != null) {
-          int tripletSum = leftMax + current + rightMax;
+          int tripletSum = leftMax + currentElement + rightMax;
           maxSum = Math.max(maxSum, tripletSum);
         }
       }
 
       // Add current element to TreeSet for future prefix lookups
-      sortedPrefixSet.add(current);
+      sortedPrefixSet.add(currentElement);
     }
 
     return maxSum;

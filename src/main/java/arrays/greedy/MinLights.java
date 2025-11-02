@@ -5,11 +5,46 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Given a list of integer signifying light bulbs and range.
- * Bulbs marked 1 are functional and bulbs marked 0 are non-functional.
- * Find the min number of functional bulbs which can be used to light the complete corridor.
+ * Problem: Minimum Lights to Activate
  *
- * https://www.interviewbit.com/problems/minimum-lights-to-activate/
+ * Given a list of integers representing light bulbs in a corridor where 1 indicates
+ * a functional bulb and 0 indicates a non-functional bulb, find the minimum number
+ * of functional bulbs needed to light the entire corridor. Each bulb at index i
+ * can light up positions in the range [i - (range-1), i + (range-1)].
+ *
+ * Example:
+ * Input: bulbs = [0,0,0,1,0], range = 3
+ * Output: 1
+ * Explanation: The bulb at index 3 can light positions [1, 5], covering the entire corridor.
+ *
+ * Constraints:
+ * - 1 <= bulbs.length <= 10^5
+ * - 0 <= bulbs[i] <= 1
+ * - 1 <= range <= bulbs.length
+ *
+ * InterviewBit Problem: https://www.interviewbit.com/problems/minimum-lights-to-activate/
+ *
+ * Follow-up Questions:
+ *
+ * 1. What if some bulbs have different ranges based on their type?
+ *    Answer: Store range with each bulb. When calculating coverage, use the specific
+ *    bulb's range instead of the universal range parameter.
+ *
+ * 2. How would you handle if bulbs can be turned ON or OFF (not fixed)?
+ *    Answer: Use dynamic programming where state is (position, bulbsLeft). For each
+ *    position, try turning on different bulbs and track minimum needed.
+ *
+ * 3. What if you need to minimize power consumption (different bulbs use different power)?
+ *    Answer: Modify greedy approach to select bulb with minimum power among those
+ *    covering current position, instead of rightmost. This requires sorting by power.
+ *
+ * 4. Can you extend this to 2D grid where each bulb covers a square area?
+ *    Answer: Similar greedy approach but process row by row. For each row, find minimum
+ *    bulbs to cover it, considering coverage from bulbs above/below within range.
+ *
+ * 5. What if there's a cost to activate each bulb?
+ *    Answer: Use greedy with modified selection criteria. Choose bulb that covers
+ *    current position with minimum cost-per-coverage ratio among valid bulbs.
  */
 public class MinLights {
 
@@ -81,16 +116,16 @@ public class MinLights {
      *
      * **Approach:**
      * - We start from the leftmost uncovered position (`position = 0`).
-     * - At each step, we find the **rightmost bulb** that can cover this position.
-     * - If no such bulb exists, return `-1` (lighting the corridor is impossible).
+     * - At each step, we find the rightmost bulb that can cover this position.
+     * - If no such bulb exists, return -1 (lighting the corridor is impossible).
      * - Otherwise, use that bulb, update the covered position, and continue.
      *
-     * **Steps:**
-     * 1. Initialize `position = 0` (tracks the leftmost uncovered section).
-     * 2. While `position < bulbs.size()`:
-     *    - Find the **rightmost bulb** in the range `[position - (range-1), position + (range-1)]`.
-     *    - If found, update `position` to the next uncovered section.
-     *    - If not found, return `-1`.
+     * Steps:
+     * 1. Initialize position = 0 (tracks the leftmost uncovered section).
+     * 2. While position < bulbs.size():
+     *    - Find the rightmost bulb in the range [position - (range-1), position + (range-1)].
+     *    - If found, update position to the next uncovered section.
+     *    - If not found, return -1.
      * 3. Repeat until the entire corridor is lit.
      *
      * **Time Complexity:** `O(n)`

@@ -6,16 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Given the root of a binary tree and an integer targetSum, this program returns the number of paths where the sum of the values along the path equals targetSum.
- * The path must go downwards (i.e., traveling only from parent nodes to child nodes), and it does not need to start or end at the root or a leaf.
- *
- * Algorithm:
- * - We use a depth-first search (DFS) approach to traverse the tree.
- * - As we traverse, we maintain the cumulative sum (`currSum`) and use a hashmap to track the number of times a particular sum has occurred.
- * - If at any point the difference between the current sum and the target sum (`currSum - targetSum`) exists in the hashmap, it means we've found a path that sums up to the target.
- *
- * Time Complexity: O(N), where N is the number of nodes in the tree.
- * Space Complexity: O(H), where H is the height of the tree (due to recursion stack and hashmap storage).
+ * Given the root of a binary tree and an integer targetSum, count the number of paths where
+ * the sum of the values along the path equals targetSum.
+ * The path must go downwards (i.e., traveling only from parent nodes to child nodes),
+ * and it does not need to start or end at the root or a leaf.
  *
  * LeetCode Problem Link: https://leetcode.com/problems/path-sum-iii/
  */
@@ -24,27 +18,17 @@ public class PathSum3 {
     // Variable to store the result (number of paths with sum equal to targetSum)
     private int result;
 
-    public static void main(String[] args) {
-        // Constructing a test tree
-        TreeNode root = new TreeNode(10);
-        root.left = new TreeNode(5);
-        root.left.left = new TreeNode(3);
-        root.left.left.left = new TreeNode(3);
-        root.left.left.right = new TreeNode(-2);
-        root.left.right = new TreeNode(2);
-        root.left.right.right = new TreeNode(1);
-        root.right = new TreeNode(-3);
-        root.right.right = new TreeNode(11);
-
-        // Create an instance of the PathSum3 class and call the pathSum method
-        int result = new PathSum3().pathSum(root, 8);
-
-        // Print the result
-        System.out.println("Number of paths with sum equal to target: " + result);
-    }
-
     /**
      * This method starts the path sum calculation and initiates the DFS traversal.
+     *
+     * Algorithm:
+     * - We use a depth-first search (DFS) approach to traverse the tree.
+     * - As we traverse, we maintain the cumulative sum (`currSum`) and use a hashmap to track the number of times a particular sum has occurred.
+     * - If at any point the difference between the current sum and the target sum (`currSum - targetSum`) exists in the hashmap,
+     * it means we've found a path that sums up to the target.
+     *
+     * Time Complexity: O(N), where N is the number of nodes in the tree.
+     * Space Complexity: O(H), where H is the height of the tree (due to recursion stack and hashmap storage).
      *
      * @param root The root node of the binary tree.
      * @param sum The target sum to find paths for.
@@ -52,7 +36,7 @@ public class PathSum3 {
      */
     public int pathSum(TreeNode root, int sum) {
         // Initialize the result and hashmap to store cumulative sums
-        Map<Integer, Integer> map = new HashMap<>();
+        Map<Integer, Integer> map = new HashMap<>(); // <sum, frequency>
 
         // Start DFS traversal from the root node
         pathSum(root, 0, sum, map);

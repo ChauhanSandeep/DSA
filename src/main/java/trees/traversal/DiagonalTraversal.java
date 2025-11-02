@@ -95,25 +95,25 @@ public class DiagonalTraversal {
      * Recursively traverses the tree and populates the diagonals list with nodes at each diagonal level.
      *
      * @param node       The current node being visited.
-     * @param diagonal  The current diagonal index.
+     * @param diagonalNumber  The current diagonal index.
      * @param diagonals The list storing nodes for each diagonal.
      */
-    private void traverse(TreeNode node, int diagonal, List<List<Integer>> diagonals) {
+    private void traverse(TreeNode node, int diagonalNumber, List<List<Integer>> diagonals) {
         // Base case: return if the node is null
         if (node == null) return;
 
         // Ensure the diagonal list exists for the current diagonal
-        while (diagonals.size() <= diagonal) {
+        while (diagonals.size() <= diagonalNumber) {
             diagonals.add(new ArrayList<>());
         }
 
         // Add the current node's value to the appropriate diagonal list
-        diagonals.get(diagonal).add(node.val);
+        diagonals.get(diagonalNumber).add(node.val);
 
         // Recursively traverse the left child (move to the next diagonal level)
-        traverse(node.left, diagonal + 1, diagonals);
+        traverse(node.left, diagonalNumber + 1, diagonals);
 
         // Recursively traverse the right child (stay on the same diagonal)
-        traverse(node.right, diagonal, diagonals);
+        traverse(node.right, diagonalNumber, diagonals);
     }
 }

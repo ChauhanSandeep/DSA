@@ -22,8 +22,6 @@ import java.util.ArrayList;
  */
 public class KDistance {
 
-    private ArrayList<Integer> result;
-
     public static void main(String[] args) {
         // Constructing the example tree:
         //        0
@@ -64,8 +62,8 @@ public class KDistance {
      * @return A list of node values that are at distance `K` from the target node.
      */
     public ArrayList<Integer> distanceK(TreeNode root, int target, int distance) {
-        this.result = new ArrayList<>();
-        findNodes(root, target, distance);
+        ArrayList<Integer> result = new ArrayList<>();
+        findNodes(root, target, distance, result);
         return result;
     }
 
@@ -76,19 +74,20 @@ public class KDistance {
      * @param node The current node being explored in the binary tree.
      * @param target The value of the target node.
      * @param distance The distance `K` from the target node.
+     * @param result The list to store nodes at distance K from the target.
      * @return The distance of the target node from the current node. Returns -1 if the target is not found.
      */
-    private int findNodes(TreeNode node, int target, int distance) {
+    private int findNodes(TreeNode node, int target, int distance, ArrayList<Integer> result) {
         if (node == null) return -1; // If current node is null, return -1.
 
         // If the current node is the target node, start marking children at distance K
         if (node.val == target) {
-            markChild(node, distance, 0); // Start marking from the target node.
+            markChild(node, distance, 0, result); // Start marking from the target node.
             return 1; // Return 1 to signify that we've found the target node.
         }
 
         // Search in the left subtree
-        int left = findNodes(node.left, target, distance);
+        int left = findNodes(node.left, target, distance, result);
 
         // If the target is found in the left subtree and is within the distance
         if (left > 0 && left <= distance) {
@@ -97,12 +96,12 @@ public class KDistance {
                 return left + 1; // Return the distance from the current node to its parent
             }
             // Otherwise, continue searching in the right subtree
-            markChild(node.right, distance, left + 1);
+            markChild(node.right, distance, left + 1, result);
             return left + 1;
         }
 
         // Search in the right subtree
-        int right = findNodes(node.right, target, distance);
+        int right = findNodes(node.right, target, distance, result);
 
         // If the target is found in the right subtree and is within the distance
         if (right > 0 && right <= distance) {
@@ -111,7 +110,7 @@ public class KDistance {
                 return right + 1;
             }
             // Otherwise, continue searching in the left subtree
-            markChild(node.left, distance, right + 1);
+            markChild(node.left, distance, right + 1, result);
             return right + 1;
         }
 
@@ -124,18 +123,17 @@ public class KDistance {
      * @param node The current node being explored.
      * @param distance The distance `K` from the target node.
      * @param curr The current distance from the target node.
+     * @param result The list to store nodes at distance K from the target.
      */
-    public void markChild(TreeNode node, int distance, int curr) {
+    public void markChild(TreeNode node, int distance, int curr, ArrayList<Integer> result) {
         if (node == null || curr > distance) return; // Stop if we reach a null node or exceed the distance.
 
         // If the current distance matches the target distance, add the node value to the result
         if (curr == distance) result.add(node.val);
 
         // Recur for both left and right children
-        markChild(node.left, distance, curr + 1);
-        markChild(node.right, distance, curr + 1);
+        markChild(node.left, distance, curr + 1, result);
+        markChild(node.right, distance, curr + 1, result);
     }
 
 }
-
-

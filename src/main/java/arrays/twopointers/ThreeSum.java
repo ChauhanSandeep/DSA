@@ -38,246 +38,122 @@ import java.util.*;
 public class ThreeSum {
 
     /**
-     * Finds all unique triplets in the array that sum to zero.
+     * Finds all unique triplets by fixing the last element.
+     *
+     * Steps:
+     * 1. Return empty list if input is null or has <3 elements.
+     * 2. Sort array.
+     * 3. For each last element (iterate backwards):
+     *    a. Skip duplicates.
+     *    b. Use two pointers (start, end before last) to find pairs summing to -lastNum:
+     *       - If sum matches, add triplet and skip duplicates.
+     *       - Move pointers inward.
+     * 4. Return unique triplets.
+     *
+     * Time Complexity: O(n²) - sorting O(n log n) + nested iteration O(n²)
+     * Space Complexity: O(1) or O(n) depending on sorting algorithm (excluding result storage)
      *
      * @param nums The input array of integers
      * @return A list of all unique triplets that sum to zero
      */
-    public List<List<Integer>> threeSum(int[] nums) {
-        List<List<Integer>> result = new ArrayList<>();
+    public List<List<Integer>> threeSumFixedLast(int[] nums) {
+        List<List<Integer>> triplets = new ArrayList<>();
         if (nums == null || nums.length < 3) {
-            return result;
+            return triplets;
         }
 
         // Sort the array to handle duplicates and use two pointers
         Arrays.sort(nums);
 
-        for (int i = 0; i < nums.length - 2; i++) {
-            // Skip duplicate elements
-            if (i > 0 && nums[i] == nums[i - 1]) {
+        // Iterate from right to left, fixing the last element
+        for (int targetIndex = nums.length - 1; targetIndex >= 2; targetIndex--) {
+            // Skip duplicate elements for the last position
+            if (targetIndex < nums.length - 1 && nums[targetIndex] == nums[targetIndex + 1]) {
                 continue;
             }
 
-            int left = i + 1;
-            int right = nums.length - 1;
-            int target = -nums[i];
+            int leftPointer = 0;
+            int rightPointer = targetIndex - 1;
+            int remainingTarget = -nums[targetIndex];
 
-            while (left < right) {
-                int sum = nums[left] + nums[right];
+            while (leftPointer < rightPointer) {
+                int twoSum = nums[leftPointer] + nums[rightPointer];
 
-                if (sum == target) {
-                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                if (twoSum == remainingTarget) {
+                    triplets.add(Arrays.asList(nums[leftPointer], nums[rightPointer], nums[targetIndex]));
 
-                    // Skip duplicate elements
-                    while (left < right && nums[left] == nums[left + 1]) left++;
-                    while (left < right && nums[right] == nums[right - 1]) right--;
+                    // Skip duplicate elements for left and right pointers
+                    while (leftPointer < rightPointer && nums[leftPointer] == nums[leftPointer + 1]) leftPointer++;
+                    while (leftPointer < rightPointer && nums[rightPointer] == nums[rightPointer - 1]) rightPointer--;
 
-                    left++;
-                    right--;
-                } else if (sum < target) {
-                    left++;
+                    leftPointer++;
+                    rightPointer--;
+                } else if (twoSum < remainingTarget) {
+                    leftPointer++;
                 } else {
-                    right--;
+                    rightPointer--;
                 }
             }
         }
 
-        return result;
+        return triplets;
     }
 
     /**
      * General solution to find all unique triplets that sum to a target value.
      *
+     * Steps:
+     * 1. Return empty list if input is null or has fewer than 3 elements.
+     * 2. Sort the array.
+     * 3. For each unique first element:
+     *    a. Use two pointers to find pairs that sum to (targetSum - firstNum).
+     *    b. Add triplets and skip duplicates.
+     * 4. Return all unique triplets.
+     *
+     * Time Complexity: O(n²)
+     * Space Complexity: O(1) or O(n) depending on sorting algorithm
+     *
      * @param nums The input array of integers
-     * @param target The target sum
+     * @param targetSum The target sum
      * @return A list of all unique triplets that sum to the target
      */
-    public List<List<Integer>> threeSumGeneral(int[] nums, int target) {
-        List<List<Integer>> result = new ArrayList<>();
+    public List<List<Integer>> threeSumGeneral(int[] nums, int targetSum) {
+        List<List<Integer>> triplets = new ArrayList<>();
         if (nums == null || nums.length < 3) {
-            return result;
+            return triplets;
         }
 
         Arrays.sort(nums);
 
-        for (int i = 0; i < nums.length - 2; i++) {
-            if (i > 0 && nums[i] == nums[i - 1]) {
+        for (int firstIndex = 0; firstIndex < nums.length - 2; firstIndex++) {
+            if (firstIndex > 0 && nums[firstIndex] == nums[firstIndex - 1]) {
                 continue;
             }
 
-            int left = i + 1;
-            int right = nums.length - 1;
-            int currentTarget = target - nums[i];
+            int leftPointer = firstIndex + 1;
+            int rightPointer = nums.length - 1;
+            int remainingSum = targetSum - nums[firstIndex];
 
-            while (left < right) {
-                int sum = nums[left] + nums[right];
+            while (leftPointer < rightPointer) {
+                int pairSum = nums[leftPointer] + nums[rightPointer];
 
-                if (sum == currentTarget) {
-                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                if (pairSum == remainingSum) {
+                    triplets.add(Arrays.asList(nums[firstIndex], nums[leftPointer], nums[rightPointer]));
 
-                    while (left < right && nums[left] == nums[left + 1]) left++;
-                    while (left < right && nums[right] == nums[right - 1]) right--;
+                    while (leftPointer < rightPointer && nums[leftPointer] == nums[leftPointer + 1]) leftPointer++;
+                    while (leftPointer < rightPointer && nums[rightPointer] == nums[rightPointer - 1]) rightPointer--;
 
-                    left++;
-                    right--;
-                } else if (sum < currentTarget) {
-                    left++;
+                    leftPointer++;
+                    rightPointer--;
+                } else if (pairSum < remainingSum) {
+                    leftPointer++;
                 } else {
-                    right--;
+                    rightPointer--;
                 }
             }
         }
 
-        return result;
-    }
-
-    /**
-     * Solution for "3Sum Closest" (LeetCode #16).
-     * Finds three integers in nums such that the sum is closest to target.
-     */
-    public int threeSumClosest(int[] nums, int target) {
-        if (nums == null || nums.length < 3) {
-            throw new IllegalArgumentException("Input array must have at least 3 elements");
-        }
-
-        Arrays.sort(nums);
-        int closestSum = nums[0] + nums[1] + nums[2];
-
-        for (int i = 0; i < nums.length - 2; i++) {
-            if (i > 0 && nums[i] == nums[i - 1]) {
-                continue;
-            }
-
-            int left = i + 1;
-            int right = nums.length - 1;
-
-            while (left < right) {
-                int currentSum = nums[i] + nums[left] + nums[right];
-
-                if (currentSum == target) {
-                    return currentSum;
-                }
-
-                // Update the closest sum if the current sum is closer to the target
-                if (Math.abs(currentSum - target) < Math.abs(closestSum - target)) {
-                    closestSum = currentSum;
-                }
-
-                if (currentSum < target) {
-                    left++;
-                    // Skip duplicate elements
-                    while (left < right && nums[left] == nums[left - 1]) left++;
-                } else {
-                    right--;
-                    // Skip duplicate elements
-                    while (left < right && nums[right] == nums[right + 1]) right--;
-                }
-            }
-        }
-
-        return closestSum;
-    }
-
-    /**
-     * Solution for "4Sum" (LeetCode #18).
-     * Finds all unique quadruplets in the array that sum to target.
-     */
-    public List<List<Integer>> fourSum(int[] nums, int target) {
-        List<List<Integer>> result = new ArrayList<>();
-        if (nums == null || nums.length < 4) {
-            return result;
-        }
-
-        Arrays.sort(nums);
-
-        for (int i = 0; i < nums.length - 3; i++) {
-            // Skip duplicate elements for the first number
-            if (i > 0 && nums[i] == nums[i - 1]) {
-                continue;
-            }
-
-            for (int j = i + 1; j < nums.length - 2; j++) {
-                // Skip duplicate elements for the second number
-                if (j > i + 1 && nums[j] == nums[j - 1]) {
-                    continue;
-                }
-
-                int left = j + 1;
-                int right = nums.length - 1;
-                long currentTarget = (long)target - nums[i] - nums[j];
-
-                while (left < right) {
-                    long sum = (long)nums[left] + nums[right];
-
-                    if (sum == currentTarget) {
-                        result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
-
-                        // Skip duplicate elements
-                        while (left < right && nums[left] == nums[left + 1]) left++;
-                        while (left < right && nums[right] == nums[right - 1]) right--;
-
-                        left++;
-                        right--;
-                    } else if (sum < currentTarget) {
-                        left++;
-                    } else {
-                        right--;
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Solution for "Two Sum" (LeetCode #1).
-     * Finds two numbers in the array that add up to the target.
-     */
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> numMap = new HashMap<>();
-
-        for (int i = 0; i < nums.length; i++) {
-            int complement = target - nums[i];
-
-            if (numMap.containsKey(complement)) {
-                return new int[] { numMap.get(complement), i };
-            }
-
-            numMap.put(nums[i], i);
-        }
-
-        throw new IllegalArgumentException("No two sum solution");
-    }
-
-    /**
-     * Finds all unique pairs in the array that sum to the target.
-     * This is a helper method that can be used for the 3Sum problem.
-     */
-    private List<List<Integer>> twoSumHelper(int[] nums, int start, int target) {
-        List<List<Integer>> result = new ArrayList<>();
-        int left = start;
-        int right = nums.length - 1;
-
-        while (left < right) {
-            int sum = nums[left] + nums[right];
-
-            if (sum == target) {
-                result.add(Arrays.asList(nums[left], nums[right]));
-
-                // Skip duplicate elements
-                while (left < right && nums[left] == nums[left + 1]) left++;
-                while (left < right && nums[right] == nums[right - 1]) right--;
-
-                left++;
-                right--;
-            } else if (sum < target) {
-                left++;
-            } else {
-                right--;
-            }
-        }
-
-        return result;
+        return triplets;
     }
 }
+

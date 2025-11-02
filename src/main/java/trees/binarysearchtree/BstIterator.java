@@ -6,24 +6,22 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 /**
- * **BST Iterator (Inorder Traversal)**
+ * 173. Binary Search Tree Iterator
  *
- * This class implements an iterator over a Binary Search Tree (BST).
- * It returns the elements in **ascending order** (inorder traversal).
+ * Problem: Implement an iterator over a binary search tree (BST) that will iterate
+ * over the BST in in-order traversal (smallest to largest).
  *
- * **Approach:**
- * - Uses a **stack-based iterative inorder traversal**.
- * - At initialization, pushes all left subtree nodes onto the stack.
- * - `next()` retrieves the smallest element, processes the right subtree if present.
- * - `hasNext()` checks if there are remaining elements.
+ * LeetCode: https://leetcode.com/problems/binary-search-tree-iterator
  *
- * **Time Complexity:**
- * - `hasNext()`: **O(1)** (constant-time check).
- * - `next()`: **O(1)** amortized (each node is pushed & popped once).
+ * Follow-up questions:
+ * Q: Can you implement with O(1) time for both operations?
+ * A: No, amortized O(1) is the best we can do due to tree traversal nature.
  *
- * **Space Complexity:** **O(H)** (height of tree, worst case O(N) for a skewed tree).
+ * Q: How to implement previous() method?
+ * A: Need to maintain parent pointers or use two stacks (forward/backward).
  *
- * **LeetCode/InterviewBit Link:** https://www.interviewbit.com/problems/bst-iterator/
+ * Q: What if we need to support arbitrary position jumping?
+ * A: Pre-compute all nodes in array or use augmented BST with size information.
  */
 public class BstIterator {
     private final Deque<TreeNode> stack;
@@ -38,14 +36,25 @@ public class BstIterator {
     }
 
     /**
-     * @return `true` if there is a next smallest number, otherwise `false`.
+     * Steps:
+     * 1. Check if the stack is not empty.
+     * 2. If not empty, there are more elements to iterate over.
+     *
+     * Time Complexity: O(1)
+     * Space Complexity: O(1)
      */
     public boolean hasNext() {
         return !stack.isEmpty();
     }
 
     /**
-     * @return The next smallest number in BST.
+     * Steps:
+     * 1. Pop the top node from the stack (this is the next smallest element).
+     * 2. If the popped node has a right child, push all its left descendants onto the stack.
+     * 3. Return the value of the popped node.
+     *
+     * Time Complexity: O(1) amortized, because each node is pushed and popped exactly once.
+     * Space Complexity: O(H) where H is the height of the tree
      */
     public int next() {
         if (!hasNext()) {

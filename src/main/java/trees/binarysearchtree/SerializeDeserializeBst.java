@@ -70,6 +70,17 @@ public class SerializeDeserializeBst {
      * @return A string representing the serialized binary tree.
      */
     public String serialize(TreeNode root) {
+        /**
+         *            1
+         *          /   \
+         *         2     3
+         *        / \   / \
+         *      null 4  5  6
+         *             / \
+         *            7   8
+         *
+         *  Serialized : [1, 2, 3, null, 4, 5, 6, null, null, 7, 8, null, null]
+         */
         if (root == null) return "null"; // Return "null" for an empty tree
 
         StringBuilder builder = new StringBuilder();
@@ -97,14 +108,25 @@ public class SerializeDeserializeBst {
      * Deserializes a string into a binary tree.
      * Approach:
      * - Split the serialized string into an array of node values.
-     * - Use a queue to reconstruct the tree level by level.
-     * * - For each node, create a new TreeNode and assign its left and right children
-     *  based on the next values in the array.
+     * - Use a queue to reconstruct the tree in level-order.
+     * - For each node, create its left and right children based on the array values.
+     * - Return the root of the reconstructed tree.
      *
      * @param data A string representing the serialized binary tree.
      * @return The root node of the deserialized binary tree.
      */
     public TreeNode deserialize(String data) {
+        /**
+         * Serialized : [1, 2, 3, null, 4, 5, 6, null, null, 7, 8, null, null]
+         *
+         *            1
+         *          /   \
+         *         2     3
+         *        / \   / \
+         *      null 4  5  6
+         *             / \
+         *            7   8
+         */
         if (data == null || data.trim().length() == 0 || data.equals("null")) return null;
 
         // Split the data into an array of values

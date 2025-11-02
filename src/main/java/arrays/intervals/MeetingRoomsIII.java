@@ -47,7 +47,7 @@ public class MeetingRoomsIII {
    */
   public int mostBooked(int rooms, int[][] meetings) {
     // Sort meetings by start time
-    Arrays.sort(meetings, (a, b) -> a[0] - b[0]);
+    Arrays.sort(meetings, (a, b) -> Integer.compare(a[0], b[0]));
     // Min-heap for available room numbers
     PriorityQueue<Integer> availableRooms = new PriorityQueue<>();
     for (int i = 0; i < rooms; i++) {

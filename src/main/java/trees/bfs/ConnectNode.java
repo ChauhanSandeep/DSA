@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * **Connect Nodes at the Same Level in a Binary Tree**
+ * Connect Nodes at the Same Level in a Binary Tree
  *
  * The problem requires connecting all nodes at the same level in a binary tree.
  * Specifically, each node should point to its next right node at the same level.
@@ -36,7 +36,6 @@ public class ConnectNode {
         root.left.left = new Node(3);
 
         connect(root);  // Connect nodes at the same level.
-        printNextRightNodes(root);  // Print connected nodes for verification.
     }
 
     /**
@@ -69,32 +68,6 @@ public class ConnectNode {
                 if (currentNode.right != null) {
                     queue.offer(currentNode.right);
                 }
-            }
-        }
-    }
-
-    /**
-     * Helper method to print nextRight pointers of nodes.
-     * For verification, it prints the value of the node and the nextRight pointer value.
-     *
-     * @param root The root node of the binary tree.
-     */
-    public static void printNextRightNodes(Node root) {
-        if (root == null) return;
-
-        Queue<Node> queue = new LinkedList<>();
-        queue.offer(root);
-
-        while (!queue.isEmpty()) {
-            Node currentNode = queue.poll();
-            System.out.println("Node " + currentNode.data + " -> NextRight: " +
-                (currentNode.nextRight != null ? currentNode.nextRight.data : "null"));
-
-            if (currentNode.left != null) {
-                queue.offer(currentNode.left);
-            }
-            if (currentNode.right != null) {
-                queue.offer(currentNode.right);
             }
         }
     }

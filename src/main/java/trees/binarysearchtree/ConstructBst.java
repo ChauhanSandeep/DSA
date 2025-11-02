@@ -9,31 +9,14 @@ import trees.TreeNode;
  * Inorder is where the left subtree is visited first, followed by the root node and then the right subtree.
  *
  * Example:
- * Input: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
- * Output: [3,9,20,null,null,15,7]
- *          3
+ * Input:   preorder = [1,2,4,5,3,6],
+ *          inorder =  [4,2,5,1,3,6]
+ * Output: [1,2,3,4,5,6]
+ *          1
  *         / \
- *        9  20
- *          /  \
- *         15   7
- * Intuition:
- * - In preorder traversal, the first element is the root of the tree.
- * - In inorder traversal, the elements to the left of the root represent the left subtree,
- *   and the elements to the right represent the right subtree.
- * - The goal is to recursively build the tree using this information.
- *
- * Algorithm:
- * 1. Start with the root node (first element in preorder).
- * 2. Find the index of the root in inorder.
- * 3. Recursively build the left and right subtrees by using the corresponding segments
- *    of the preorder and inorder arrays.
- * 4. Continue until the tree is fully constructed.
- *
- * Time Complexity:
- * - The time complexity is O(n) where n is the number of nodes in the tree because each node is processed once.
- *
- * Space Complexity:
- * - The space complexity is O(n) due to the recursive call stack and the space required to store the tree.
+ *        2   3
+ *       / \   \
+ *      4   5   6
  *
  * LeetCode Link:
  * https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
@@ -44,8 +27,8 @@ public class ConstructBst {
      * Main method to test the tree construction.
      */
     public static void main(String[] args) {
-        int[] preorder = {3, 9, 20, 15, 7};
-        int[] inorder = {9, 3, 15, 20, 7};
+        int[] preorder = {1,2,4,5,3,6};
+        int[] inorder = {4,2,5,1,3,6};
 
         // Build the binary tree using the given preorder and inorder traversals
         ConstructBst treeBuilder = new ConstructBst();
@@ -57,6 +40,27 @@ public class ConstructBst {
 
     /**
      * This method constructs the binary tree using preorder and inorder traversals.
+     *
+     * Intuition:
+     * - In preorder traversal, the first element is the root of the tree.
+     * - In inorder traversal, the elements to the left of the root represent the left subtree,
+     *   and the elements to the right represent the right subtree.
+     * - The goal is to recursively build the tree using this information.
+     *
+     * Algorithm:
+     * 1. Identify the root node of the current subtree from the first element of the preorder array segment.
+     * 2. Locate the root node's index in the inorder array segment to determine the boundaries of the left and right subtrees.
+     * 3. Recursively construct the left subtree using the elements to the left of the root in the inorder array and
+     *    the corresponding elements in the preorder array.
+     * 4. Recursively construct the right subtree using the elements to the right of the root in the inorder array
+     *    and the corresponding elements in the preorder array.
+     * 5. Attach the constructed left and right subtrees to the root node and repeat the process until all nodes are placed.
+     *
+     * Time Complexity:
+     * - The time complexity is O(n) where n is the number of nodes in the tree because each node is processed once.
+     * Space Complexity:
+     * - The space complexity is O(n) due to the recursive call stack and the space required to store the tree.
+     *
      *
      * @param preorder  The preorder traversal array.
      * @param inorder   The inorder traversal array.

@@ -57,7 +57,7 @@ public class CountPairs {
     for (int index = 0; index < arr.length; index++) {
       int transformedValue = arr[index] - index;
 
-      // All previous elements with same transformed value form valid pairs with current index
+      // All previous elements with same transformed value form valid pairs with current index.
       int existingCount = valueToFrequency.getOrDefault(transformedValue, 0);
       totalValidPairs += existingCount;
 

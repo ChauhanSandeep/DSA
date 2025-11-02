@@ -32,12 +32,12 @@ public class TreeTraversal {
         // Sample binary tree structure
         /*
                 5
-               /    \
-             4       6
-            / \       \
-           3  14       7
-                      / \
-                     9   8
+               /  \
+             4     6
+            / \     \
+           3  14     7
+                    / \
+                   9   8
         */
         TreeNode root = new TreeNode(5);
         root.left = new TreeNode(4);
@@ -107,9 +107,29 @@ public class TreeTraversal {
     }
 
     /**
+     * ITERATIVE APPROACHES
+     * https://claude.ai/public/artifacts/0b255d6a-e7dc-45bb-be58-b6f56d50e032
+     */
+
+    /**
      * Iterative Inorder Traversal using a stack.
-     * In Inorder, the left subtree is visited first, followed by the root, and then the right subtree.
-     * This iterative version avoids recursion by using an explicit stack.
+     *
+     *                 5
+     *                /  \
+     *              4     6
+     *             / \     \
+     *            3  14     7
+     *                     / \
+     *                    9   8
+     * Output : 3->4->14->5->6->9->7->8->
+     *
+     * Steps:
+     * 1. Initialize an empty stack and set the current node to the root.
+     * 2. While the current node is not null or the stack is not empty:
+     *   a. Traverse to the leftmost node, pushing each node onto the stack.
+     *   b. Pop a node from the stack, visit it, and set the current node to its right child.
+     * 3. Repeat until all nodes are visited.
+     *
      *
      * @param root The root of the tree.
      */
@@ -134,7 +154,23 @@ public class TreeTraversal {
     /**
      * Iterative Preorder Traversal using a stack.
      * In Preorder, the root is visited first, followed by the left subtree, and then the right subtree.
-     * This iterative version avoids recursion by using an explicit stack.
+     *
+     *                 5
+     *                /  \
+     *              4     6
+     *             / \     \
+     *            3  14     7
+     *                     / \
+     *                    9   8
+     * Output : 5->4->3->14->6->7->9->8->
+     *
+     * Steps:
+     * 1. Initialize an empty stack and push the root node onto it.
+     * 2. While the stack is not empty:
+     *  a. Pop the top node from the stack and visit it.
+     *  b. Push the right child of the popped node onto the stack (if it exists).
+     *  c. Push the left child of the popped node onto the stack (if it exists).
+     * 3. Repeat until all nodes are visited.
      *
      * @param root The root of the tree.
      */
@@ -156,32 +192,50 @@ public class TreeTraversal {
 
     /**
      * Iterative Postorder Traversal using two stacks.
-     * In Postorder, the left subtree is visited first, followed by the right subtree, and then the root.
-     * This iterative version avoids recursion by using two stacks.
+     *                 5
+     *                /  \
+     *              4     6
+     *             / \     \
+     *            3  14     7
+     *                     / \
+     *                    9   8
+     * Output :
+     * Steps: 3->14->4->9->8->7->6->5->
+     * 1. Initialize two stacks: one for processing nodes and another for storing the output
+     * 2. Push the root node onto the processing stack.
+     * 3. While the processing stack is not empty:
+     *  a. Pop a node from the processing stack and push its value onto the output
+     *  b. Push the left child of the popped node onto the processing stack (if it exists).
+     *  c. Push the right child of the popped node onto the processing stack (if it exists).
+     * 4. Once all nodes are processed, pop values from the output stack to get the postorder traversal.
+     *
+     * This is very similar to Preorder but the difference is that
+     * - In Postorder, the left subtree is visited first, followed by the right subtree, and then the root.
+     * - The output is stored in reverse order using a second stack.
      *
      * @param root The root of the tree.
      */
     public static void postorderIterative(TreeNode root) {
         if (root == null) return;
 
-        Stack<TreeNode> stack = new Stack<>();
-        Stack<Integer> out = new Stack<>();
+        Stack<TreeNode> processingStack = new Stack<>();
+        Stack<Integer> outputStack = new Stack<>();
 
-        stack.push(root);
+        processingStack.push(root);
 
         // Process nodes in the same way as Postorder
-        while (!stack.isEmpty()) {
-            TreeNode curr = stack.pop();
-            out.push(curr.val); // Push data into the output stack
+        while (!processingStack.isEmpty()) {
+            TreeNode curr = processingStack.pop();
+            outputStack.push(curr.val); // Push data into the output stack
 
-            // Push left and right children into the stack
-            if (curr.left != null) stack.push(curr.left);
-            if (curr.right != null) stack.push(curr.right);
+            // Push left and right children into the processing stack
+            if (curr.left != null) processingStack.push(curr.left);
+            if (curr.right != null) processingStack.push(curr.right);
         }
 
         // Print the postorder traversal by popping from the output stack
-        while (!out.isEmpty()) {
-            System.out.print(out.pop() + " ");
+        while (!outputStack.isEmpty()) {
+            System.out.print(outputStack.pop() + "->");
         }
     }
 }

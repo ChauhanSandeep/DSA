@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.Arrays;
 
 /**
- * Leetcode-like Problem (commonly asked):
  * Find all triplets in an array such that the sum of two elements equals the third element.
  *
  * ### Problem Statement:
@@ -21,8 +20,10 @@ import java.util.Arrays;
  * https://www.geeksforgeeks.org/find-the-number-of-triplets-in-array-whose-sum-is-equal-to-a-given-number/
  *
  * ### Follow-up Questions:
- * - Can you avoid using extra space? Yes, using sorting + two pointers.
- * - What if we want to return all triplets, not just the count? Use a `Set<List<Integer>>` to store triplets.
+ * - Can you avoid using extra space?
+ *    Yes, using sorting + two pointers.
+ * - What if we want to return all triplets, not just the count?
+ *    Use a `Set<List<Integer>>` to store triplets.
  */
 public class CountTriplet {
 
@@ -36,8 +37,9 @@ public class CountTriplet {
    * Counts the number of triplets using HashSet lookup method.
    *
    * Steps:
-   * - Store all elements in a set for O(1) lookup.
-   * - Iterate all pairs and check if their sum exists in the set.
+   * - Store all elements in a HashSet for O(1) lookups
+   * - Iterate all pairs (i, j) and check if (arr[i] +
+   * arr[j]) exists in the set
    *
    * Time Complexity: O(n^2)
    * Space Complexity: O(n)
@@ -70,8 +72,10 @@ public class CountTriplet {
    *
    * Steps:
    * - Sort the array
-   * - Fix the third element (from end to start)
-   * - Use two pointers to find two elements whose sum == current element
+   * - Fix the third element and use two pointers to find pairs that sum to it
+   * - When sum is less than target, move left pointer right
+   * - When sum is greater than target, move right pointer left
+   * - When sum equals target, increment count and move both pointers
    *
    * Time Complexity: O(n^2)
    * Space Complexity: O(1)
@@ -82,23 +86,22 @@ public class CountTriplet {
     int count = 0;
 
     // Fix the third element from end
-    for (int k = length - 1; k >= 2; k--) {
-      int i = 0, j = k - 1;
+    for (int targetIndex = length - 1; targetIndex >= 2; targetIndex--) {
+      int leftIndex = 0, rightIndex = targetIndex - 1;
 
-      while (i < j) {
-        int sum = arr[i] + arr[j];
-        if (sum == arr[k]) {
+      while (leftIndex < rightIndex) {
+        int sum = arr[leftIndex] + arr[rightIndex];
+        if (sum == arr[targetIndex]) {
           count++;
-          i++;
-          j--;
-        } else if (sum < arr[k]) {
-          i++;
+          leftIndex++;
+          rightIndex--;
+        } else if (sum < arr[targetIndex]) {
+          leftIndex++;
         } else {
-          j--;
+          rightIndex--;
         }
       }
     }
-
     return count;
   }
 }

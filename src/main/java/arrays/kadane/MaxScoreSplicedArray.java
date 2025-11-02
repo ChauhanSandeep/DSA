@@ -1,8 +1,8 @@
 package arrays.kadane;
 
 /**
- * 🔹 Problem: Maximum Score of Spliced Array
- * 🔗 Leetcode: https://leetcode.com/problems/maximum-score-of-spliced-array/
+ * Problem: Maximum Score of Spliced Array
+ * Leetcode: https://leetcode.com/problems/maximum-score-of-spliced-array/
  *
  * You are given two integer arrays nums1 and nums2 of equal length.
  * You may choose a subarray from either of the arrays and splice it into the other
@@ -56,8 +56,8 @@ public class MaxScoreSplicedArray {
    *   - sum1 + maxGain1 (splicing nums2 into nums1)
    *   - sum2 + maxGain2 (splicing nums1 into nums2)
    *
-   * 🔹 Time Complexity: O(N)
-   * 🔹 Space Complexity: O(1)
+   * Time Complexity: O(N)
+   * Space Complexity: O(1)
    *
    * @param nums1 First input array
    * @param nums2 Second input array

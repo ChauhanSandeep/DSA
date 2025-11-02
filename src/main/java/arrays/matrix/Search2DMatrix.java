@@ -1,55 +1,94 @@
 package arrays.matrix;
 
 /**
- * Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
- * - Integers in each row are sorted from left to right.
- * - The first integer of each row is greater than the last integer of the previous row.
+ * Problem: Search a 2D Matrix
  *
- * Example 1:
+ * You are given an m x n integer matrix with the following two properties:
+ * - Each row is sorted in non-decreasing order
+ * - The first integer of each row is greater than the last integer of the previous row
+ *
+ * Given an integer target, return true if target is in matrix or false otherwise.
+ * You must write a solution in O(log(m * n)) time complexity.
+ *
+ * Example:
  * Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
  * Output: true
+ * Explanation: 3 exists in the first row of the matrix.
  *
- * Example 2:
- * Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13
- * Output: false
+ * Constraints:
+ * - m == matrix.length
+ * - n == matrix[i].length
+ * - 1 <= m, n <= 100
+ * - -10^4 <= matrix[i][j], target <= 10^4
  *
- * LeetCode: https://leetcode.com/problems/search-a-2d-matrix/
+ * LeetCode Problem: https://leetcode.com/problems/search-a-2d-matrix
  *
  * Follow-up Questions:
- * 1. How would you handle very large matrices that don't fit in memory?
- *    - We could use binary search on the virtual 1D array without materializing it.
- * 2. What if the matrix is sorted row-wise and column-wise but doesn't have the second property?
- *    - We'd need a different approach, like starting from the top-right corner.
- * 3. How would you find all occurrences of the target value?
- *    - We could find the range of rows and columns where the target appears.
  *
- * Related Problems:
- * - Search a 2D Matrix II (https://leetcode.com/problems/search-a-2d-matrix-ii/)
- * - Kth Smallest Element in a Sorted Matrix (https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+ * 1. What if rows are sorted but first element of a row is NOT guaranteed greater than last of previous?
+ *    Answer: Use different approach - start from top-right or bottom-left corner. Move left if
+ *    target is smaller, down if larger. This gives O(m+n) time.
+ *    Related problem: https://leetcode.com/problems/search-a-2d-matrix-ii/
+ *
+ * 2. How would you modify this to find all occurrences if duplicates exist?
+ *    Answer: After finding target with binary search, expand left and right to find all
+ *    occurrences in that row, then check adjacent rows. Or collect all matching positions
+ *    during a modified binary search.
+ *
+ * 3. What if matrix is extremely large and stored on disk, not in memory?
+ *    Answer: Use external memory algorithms. Binary search still works as it only needs
+ *    to access O(log n) positions. Fetch required rows/elements from disk on demand.
+ *
+ * 4. Can you find the kth smallest element in this matrix efficiently?
+ *    Answer: Use binary search on value range, not on indices. For each mid value, count
+ *    elements ≤ mid using the sorted property. Adjust range until finding kth smallest.
+ *    Related problem: https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
+ *
+ * 5. How would you handle if matrix dimensions are not known in advance?
+ *    Answer: Exponential search to find bounds first. Start with small range, double until
+ *    finding element out of bounds, then apply binary search on discovered range.
  */
 public class Search2DMatrix {
+
     /**
-     * Searches for a target value in the matrix using binary search.
+     * Searches for target using single binary search by treating 2D matrix as 1D sorted array.
      *
-     * @param matrix The m x n matrix with sorted rows and columns
-     * @param target The value to search for
-     * @return true if the target is found, false otherwise
+     * Algorithm:
+     * 1. Treat m×n matrix as sorted array of length m*n
+     * 2. Map 1D index to 2D coordinates: row = index/n, col = index%n
+     * 3. Apply standard binary search on this virtual 1D array
+     * 4. Return true if target found, false otherwise
+     *
+     * Key insight: Since rows are sorted AND first element of each row > last element
+     * of previous row, entire matrix can be viewed as one sorted sequence. Binary search
+     * works directly with index arithmetic to map between 1D and 2D.
+     *
+     * Time Complexity: O(log(M*N)) where M is rows and N is columns. Standard binary
+     * search over M*N elements.
+     *
+     * Space Complexity: O(1) using only constant extra variables.
+     *
+     * @param matrix 2D sorted matrix
+     * @param target value to search for
+     * @return true if target exists in matrix
      */
     public boolean searchMatrix(int[][] matrix, int target) {
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
             return false;
         }
 
-        int m = matrix.length;
-        int n = matrix[0].length;
-
-        // Binary search on the virtual 1D array
+        int rows = matrix.length;
+        int cols = matrix[0].length;
         int left = 0;
-        int right = m * n - 1;
+        int right = rows * cols - 1;
 
         while (left <= right) {
             int mid = left + (right - left) / 2;
-            int midValue = matrix[mid / n][mid % n];
+
+            // Convert 1D index to 2D coordinates
+            int row = mid / cols;
+            int col = mid % cols;
+            int midValue = matrix[row][col];
 
             if (midValue == target) {
                 return true;
@@ -64,49 +103,73 @@ public class Search2DMatrix {
     }
 
     /**
-     * Alternative approach using two binary searches:
-     * 1. First find the correct row using binary search
-     * 2. Then search within that row using binary search
+     * Alternative two-step binary search approach for clearer logic.
+     *
+     * Algorithm:
+     * 1. First binary search: find the correct row where target could exist
+     * 2. Second binary search: search within that row for target
+     *
+     * Time Complexity: O(log M + log N) = O(log(M*N)) where M is rows and N is columns.
+     * Two binary searches but still logarithmic overall.
+     *
+     * Space Complexity: O(1) using only constant extra space.
+     *
+     * @param matrix 2D sorted matrix
+     * @param target value to search for
+     * @return true if target exists in matrix
      */
-    public boolean searchMatrixTwoBinarySearches(int[][] matrix, int target) {
+    public boolean searchMatrixTwoStep(int[][] matrix, int target) {
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
             return false;
         }
 
-        int m = matrix.length;
-        int n = matrix[0].length;
+        int rows = matrix.length;
+        int cols = matrix[0].length;
 
-        // Binary search to find the correct row
+        // Step 1: Binary search to find the row
+        int targetRow = findRow(matrix, target);
+
+        if (targetRow == -1) {
+            return false;
+        }
+
+        // Step 2: Binary search within the row
+        return binarySearch(matrix[targetRow], target);
+    }
+
+    // Find the row where target could exist
+    private int findRow(int[][] matrix, int target) {
         int top = 0;
-        int bottom = m - 1;
-        int targetRow = -1;
+        int bottom = matrix.length - 1;
+        int cols = matrix[0].length;
 
         while (top <= bottom) {
             int mid = top + (bottom - top) / 2;
-            if (matrix[mid][0] <= target && target <= matrix[mid][n - 1]) {
-                targetRow = mid;
-                break;
-            } else if (matrix[mid][0] > target) {
+
+            // Check if target falls in this row's range
+            if (matrix[mid][0] <= target && target <= matrix[mid][cols - 1]) {
+                return mid;
+            } else if (target < matrix[mid][0]) {
                 bottom = mid - 1;
             } else {
                 top = mid + 1;
             }
         }
 
-        if (targetRow == -1) {
-            return false; // Target is not in any row
-        }
+        return -1;
+    }
 
-        // Binary search within the target row
+    // Standard binary search in 1D array
+    private boolean binarySearch(int[] arr, int target) {
         int left = 0;
-        int right = n - 1;
-        int[] row = matrix[targetRow];
+        int right = arr.length - 1;
 
         while (left <= right) {
             int mid = left + (right - left) / 2;
-            if (row[mid] == target) {
+
+            if (arr[mid] == target) {
                 return true;
-            } else if (row[mid] < target) {
+            } else if (arr[mid] < target) {
                 left = mid + 1;
             } else {
                 right = mid - 1;
@@ -114,85 +177,5 @@ public class Search2DMatrix {
         }
 
         return false;
-    }
-
-    /**
-     * Solution for when the matrix is sorted row-wise and column-wise but doesn't have
-     * the second property (first element of row > last element of previous row).
-     * This is LeetCode #240: Search a 2D Matrix II
-     */
-    public boolean searchMatrixII(int[][] matrix, int target) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-            return false;
-        }
-
-        int m = matrix.length;
-        int n = matrix[0].length;
-
-        // Start from the top-right corner
-        int row = 0;
-        int col = n - 1;
-
-        while (row < m && col >= 0) {
-            if (matrix[row][col] == target) {
-                return true;
-            } else if (matrix[row][col] < target) {
-                // Move down if current element is smaller than target
-                row++;
-            } else {
-                // Move left if current element is larger than target
-                col--;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Finds the first occurrence of the target in the matrix.
-     * Returns the coordinates as an array [row, col], or [-1, -1] if not found.
-     */
-    public int[] searchMatrixFindFirst(int[][] matrix, int target) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-            return new int[]{-1, -1};
-        }
-
-        int m = matrix.length;
-        int n = matrix[0].length;
-
-        int left = 0;
-        int right = m * n - 1;
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            int midValue = matrix[mid / n][mid % n];
-
-            if (midValue == target) {
-                // Found a match, now find the first occurrence
-                int row = mid / n;
-                int col = mid % n;
-
-                // Find the first occurrence in the row
-                int firstInRow = col;
-                while (firstInRow > 0 && matrix[row][firstInRow - 1] == target) {
-                    firstInRow--;
-                }
-
-                // Find the first row with this target
-                int firstRow = row;
-                while (firstRow > 0 && matrix[firstRow - 1][firstInRow] == target) {
-                    firstRow--;
-                }
-
-                return new int[]{firstRow, firstInRow};
-
-            } else if (midValue < target) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
-        }
-
-        return new int[]{-1, -1};
     }
 }

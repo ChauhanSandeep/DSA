@@ -3,11 +3,11 @@ package arrays.intervals;
 import java.util.*;
 
 /**
- * ✅ Problem:
+ * Problem:
  * You are given a list of existing meeting schedules and a new meeting request.
  * Write a function to determine if the new meeting can be accommodated without overlapping.
  *
- * ✅ Example:
+ * Example:
  * Existing: [10:00–11:00], [14:00–16:00], [23:00–23:30]
  * Incoming: [11:00–14:00] → Can be added ✔
  * Incoming: [10:30–11:30] → Overlaps ❌

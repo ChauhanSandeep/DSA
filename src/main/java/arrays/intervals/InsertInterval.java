@@ -31,50 +31,58 @@ import java.util.List;
 public class InsertInterval {
 
     /**
-     * Inserts a new interval into the sorted list of non-overlapping intervals and merges if necessary.
+     * Inserts new interval into sorted non-overlapping intervals and merges if necessary.
      *
      * Algorithm:
-     * - Add all intervals that end before the new interval starts.
-     * - Merge overlapping intervals with the new interval.
-     * - Add all intervals that start after the new interval ends.
+     * 1. Add all intervals that end before new interval starts (no overlap)
+     * 2. Merge all intervals that overlap with new interval
+     * 3. Add all intervals that start after merged interval ends (no overlap)
      *
-     * Time Complexity: O(n), where n = number of intervals
-     * Space Complexity: O(n), for storing the result
+     * Key insight: Partition intervals into three groups based on their relationship
+     * with the new interval: those before, those overlapping, and those after. Process
+     * each group sequentially without needing to sort.
      *
-     * @param intervals Array of existing intervals, sorted and non-overlapping
-     * @param newInterval Interval to be inserted
-     * @return Updated list of merged intervals
+     * Time Complexity: O(N) where N is number of intervals. Single pass through intervals.
+     *
+     * Space Complexity: O(N) for result list (excluding output array).
+     *
+     * @param intervals array of non-overlapping sorted intervals
+     * @param newInterval interval to insert [start, end]
+     * @return array of intervals after insertion with merges applied
      */
     public int[][] insert(int[][] intervals, int[] newInterval) {
         List<int[]> result = new ArrayList<>();
-        int i = 0;
+
+        int newStart = newInterval[0];
+        int newEnd = newInterval[1];
+
+        int currentIndex = 0;
         int length = intervals.length;
 
-        // Add intervals before newInterval starts
-        while (i < length && intervals[i][1] < newInterval[0]) {
-            result.add(intervals[i]);
-            i++;
+        // Phase 1: Add all intervals that end before new interval starts
+        while (currentIndex < length && intervals[currentIndex][1] < newStart) {
+            result.add(intervals[currentIndex]);
+            currentIndex++;
         }
 
-        // Merge all overlapping intervals with newInterval
-        while (i < length && intervals[i][0] <= newInterval[1]) {
-            // Update the newInterval to include current interval
-            newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
-            newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
-            i++;
+        // Phase 2: Merge all overlapping intervals into new interval
+        while (currentIndex < length && intervals[currentIndex][0] <= newEnd) {
+            // Extend new interval to encompass current interval
+            newStart = Math.min(newStart, intervals[currentIndex][0]);
+            newEnd = Math.max(newEnd, intervals[currentIndex][1]);
+            currentIndex++;
         }
 
-        // Add the merged newInterval
-        result.add(newInterval);
+        // Add the merged interval
+        result.add(new int[]{newStart, newEnd});
 
-        // Add remaining intervals after newInterval
-        while (i < length) {
-            result.add(intervals[i]);
-            i++;
+        // Phase 3: Add all remaining intervals that start after merged interval ends
+        while (currentIndex < length) {
+            result.add(intervals[currentIndex]);
+            currentIndex++;
         }
 
-        // Convert list to array
-        return result.toArray(new int[0][]); // 0 indicates dynamic size
+        return result.toArray(new int[result.size()][]);
     }
 
     /**
