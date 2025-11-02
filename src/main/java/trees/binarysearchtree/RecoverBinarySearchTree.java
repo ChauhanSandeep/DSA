@@ -1,6 +1,6 @@
 package trees.binarysearchtree;
 
-import utils.TreeNode;
+import trees.TreeNode;
 
 import java.util.Stack;
 
@@ -48,9 +48,9 @@ public class RecoverBinarySearchTree {
 
         // Swap the values of the two misplaced nodes
         if (first != null && second != null) {
-            int temp = first.value;
-            first.value = second.value;
-            second.value = temp;
+            int temp = first.val;
+            first.val = second.val;
+            second.val = temp;
         }
     }
 
@@ -70,14 +70,14 @@ public class RecoverBinarySearchTree {
             // Go to the leftmost node
             while (current != null) {
                 stack.push(current);
-                current = current.leftChild;
+                current = current.left;
             }
 
             // Process the current node
             current = stack.pop();
 
             // Check if current node is out of order
-            if (prev != null && current.value < prev.value) {
+            if (prev != null && current.val < prev.val) {
                 // If this is the first violation, record both nodes
                 if (first == null) {
                     first = prev;
@@ -90,7 +90,7 @@ public class RecoverBinarySearchTree {
             }
 
             prev = current;
-            current = current.rightChild; // Move to rightChild subtree
+            current = current.right; // Move to rightChild subtree
         }
     }
 
@@ -105,48 +105,48 @@ public class RecoverBinarySearchTree {
         TreeNode secondNode = null;
 
         while (current != null) {
-            if (current.leftChild == null) {
+            if (current.left == null) {
                 // Process current node
-                if (prevNode != null && prevNode.value > current.value) {
+                if (prevNode != null && prevNode.val > current.val) {
                     if (firstNode == null) {
                         firstNode = prevNode;
                     }
                     secondNode = current;
                 }
                 prevNode = current;
-                current = current.rightChild;
+                current = current.right;
             } else {
                 // Find the inorder predecessor
-                TreeNode predecessor = current.leftChild;
-                while (predecessor.rightChild != null && predecessor.rightChild != current) {
-                    predecessor = predecessor.rightChild;
+                TreeNode predecessor = current.left;
+                while (predecessor.right != null && predecessor.right != current) {
+                    predecessor = predecessor.right;
                 }
 
-                if (predecessor.rightChild == null) {
+                if (predecessor.right == null) {
                     // Create a temporary link to current node
-                    predecessor.rightChild = current;
-                    current = current.leftChild;
+                    predecessor.right = current;
+                    current = current.left;
                 } else {
                     // Remove the temporary link and process current node
-                    predecessor.rightChild = null;
+                    predecessor.right = null;
 
-                    if (prevNode != null && prevNode.value > current.value) {
+                    if (prevNode != null && prevNode.val > current.val) {
                         if (firstNode == null) {
                             firstNode = prevNode;
                         }
                         secondNode = current;
                     }
                     prevNode = current;
-                    current = current.rightChild;
+                    current = current.right;
                 }
             }
         }
 
         // Swap the values of the two misplaced nodes
         if (firstNode != null && secondNode != null) {
-            int temp = firstNode.value;
-            firstNode.value = secondNode.value;
-            secondNode.value = temp;
+            int temp = firstNode.val;
+            firstNode.val = secondNode.val;
+            secondNode.val = temp;
         }
     }
 
@@ -164,9 +164,9 @@ public class RecoverBinarySearchTree {
 
         // Swap the values of the two misplaced nodes
         if (first != null && second != null) {
-            int temp = first.value;
-            first.value = second.value;
-            second.value = temp;
+            int temp = first.val;
+            first.val = second.val;
+            second.val = temp;
         }
     }
 
@@ -178,17 +178,17 @@ public class RecoverBinarySearchTree {
             return;
         }
 
-        inOrderTraversal(node.leftChild);
+        inOrderTraversal(node.left);
 
         // Check if current node is out of order
-        if (first == null && prev.value > node.value) {
+        if (first == null && prev.val > node.val) {
             first = prev; // First violation
         }
-        if (first != null && prev.value > node.value) {
+        if (first != null && prev.val > node.val) {
             second = node; // Second violation or adjacent nodes
         }
 
         prev = node;
-        inOrderTraversal(node.rightChild);
+        inOrderTraversal(node.right);
     }
 }

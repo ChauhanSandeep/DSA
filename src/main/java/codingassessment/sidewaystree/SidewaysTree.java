@@ -1,6 +1,6 @@
 package codingassessment.sidewaystree;
 
-import utils.TreeNode;
+import trees.TreeNode;
 
 /**
  * ✅ Problem: Binary Tree Upside Down
@@ -65,23 +65,23 @@ public class SidewaysTree {
      * @return New root after the transformation
      */
     public static TreeNode flipUpsideDown(TreeNode root) {
-        if (root == null || root.leftChild == null) {
+        if (root == null || root.left == null) {
             return root; // Base case: empty tree or no left child
         }
 
         // Recurse down to leftmost child
-        TreeNode newRoot = flipUpsideDown(root.leftChild);
+        TreeNode newRoot = flipUpsideDown(root.left);
 
         // Rearrange current node and its children
-        TreeNode left = root.leftChild;
-        TreeNode right = root.rightChild;
+        TreeNode left = root.left;
+        TreeNode right = root.right;
 
-        left.leftChild = right; // Right child becomes new left
-        left.rightChild = root; // Current root becomes right child
+        left.left = right; // Right child becomes new left
+        left.right = root; // Current root becomes right child
 
         // Cut old links
-        root.leftChild = null;
-        root.rightChild = null;
+        root.left = null;
+        root.right = null;
 
         return newRoot;
     }
@@ -96,19 +96,19 @@ public class SidewaysTree {
             System.out.print("null ");
             return;
         }
-        System.out.print(node.value + " ");
-        printPreOrder(node.leftChild);
-        printPreOrder(node.rightChild);
+        System.out.print(node.val + " ");
+        printPreOrder(node.left);
+        printPreOrder(node.right);
     }
 
     public static void main(String[] args) {
         System.out.println("✅ Test Case: Problem Example");
         TreeNode root = new TreeNode(1);
-        root.leftChild = new TreeNode(2);
-        root.rightChild = new TreeNode(3);
-        root.leftChild.leftChild = new TreeNode(4);
-        root.leftChild.leftChild.leftChild = new TreeNode(5);
-        root.leftChild.leftChild.rightChild = new TreeNode(6);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
+        root.left.left = new TreeNode(4);
+        root.left.left.left = new TreeNode(5);
+        root.left.left.right = new TreeNode(6);
 
         System.out.println("🔹 Original Tree (Preorder):");
         printPreOrder(root);
