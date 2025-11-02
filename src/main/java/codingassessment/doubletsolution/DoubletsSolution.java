@@ -91,9 +91,9 @@ class DoubletsSolution {
         // Build dictionary set for O(1) lookup
         Set<String> dictionarySet = new HashSet<>(wordList);
         
-        // Early exit if endWord not in dictionary
+        // Early exit if endWord not in dictionary - impossible to reach
         if (!dictionarySet.contains(endWord)) {
-            return 0;
+            return -1;
         }
 
         // BFS initialization

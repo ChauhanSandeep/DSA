@@ -83,7 +83,12 @@ public class Testing {
 
     /**
      * Legacy method maintained for backward compatibility.
-     * @deprecated Use {@link #insertCharacterAt(String, int, char)} instead
+     * 
+     * @deprecated Use {@link #insertCharacterAt(String, int, char)} instead.
+     *             This method will be removed in a future version.
+     * @param numberString The input string
+     * @param index Position where parenthesis should be inserted
+     * @return Modified string with parenthesis inserted
      */
     @Deprecated
     public static String formatDecimalWithParentheses(String numberString, int index) {
