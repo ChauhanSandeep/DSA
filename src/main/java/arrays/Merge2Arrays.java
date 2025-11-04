@@ -3,14 +3,14 @@ package arrays;
 import java.util.Arrays;
 
 /**
- * 🔹 Problem: Merge Two Sorted Arrays Without Extra Space
- * 🔗 GeeksForGeeks: https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
+ * Problem: Merge Two Sorted Arrays Without Extra Space
+ * GeeksForGeeks: https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
  *
  * Given two sorted arrays `arr1[]` and `arr2[]`, merge them such that:
  * - The final arrays remain sorted.
  * - No extra space is used (for in-place variant).
  *
- * 📌 Example:
+ * Example:
  * Input:
  *   arr1 = [1, 3, 5, 7]
  *   arr2 = [0, 2, 6, 8, 9]
@@ -66,39 +66,42 @@ public class Merge2Arrays {
   }
 
   /**
-   * 🔹 In-place merge of two sorted arrays using a two-pointer technique.
+   * Merges two sorted arrays in-place using swap-and-sort approach.
    *
-   * Intuition:
-   * The idea is that we can swap elements in `arr1` that are larger than elements in `arr2` because at the end of the process,
-   * `arr1` should contain all the smaller elements and `arr2` should contain larger elements.
-   * After the swap is done, we sort both arrays to maintain order.
+   * Algorithm:
+   * 1. Compare largest element of arr1 with smallest element of arr2
+   * 2. If arr1's element is greater, swap them
+   * 3. Move pointers inward and repeat until arrays are partitioned
+   * 4. Sort both arrays to restore sorted order within each array
    *
-   * Note: This is variation of the insertion sort technique where we insert elements from `arr2` into `arr1` in sorted order.
+   * Key insight: After swapping, arr1 will contain all smaller elements and arr2
+   * will contain all larger elements. Then we sort each array independently.
    *
-   * Steps:
-   * 1. Compare the largest element of `arr1` with the smallest element of `arr2`.
-   * 2. If `arr1`'s element is greater, swap them.
-   * 3. Repeat until all elements are in correct order.
+   * Time Complexity: O((N + M) log(N + M)) where N and M are array lengths.
+   * Swapping phase is O(min(N, M)), sorting is O(N log N + M log M).
    *
-   * Time Complexity: O(N + M) for the merge +  O(N log N + M log M) for sorting. Overall O((N + M) log(N + M)).
-   * Space Complexity: O(1) (in-place modification)
+   * Space Complexity: O(1) for swapping. O(log N) if counting sorting's stack space.
+   *
+   * @param arr1 first sorted array (will contain smaller elements after merge)
+   * @param arr2 second sorted array (will contain larger elements after merge)
    */
-  static void mergeArrays(int[] arr1, int[] arr2) {
-    int pointer1 = arr1.length - 1, pointer2 = 0;
+  public void mergeArraysSwapAndSort(int[] arr1, int[] arr2) {
+    int pointer1 = arr1.length - 1;  // Start from end of arr1
+    int pointer2 = 0;                // Start from beginning of arr2
 
-    // Step 1: Swap larger elements of arr1 with smaller elements of arr2
+    // Swap larger elements of arr1 with smaller elements of arr2
     while (pointer1 >= 0 && pointer2 < arr2.length) {
       if (arr1[pointer1] > arr2[pointer2]) {
-        int temp = arr2[pointer2];
-        arr2[pointer2] = arr1[pointer1];
-        arr1[pointer1] = temp;
+        // Swap elements
+        int temp = arr1[pointer1];
+        arr1[pointer1] = arr2[pointer2];
+        arr2[pointer2] = temp;
       }
       pointer1--;
       pointer2++;
     }
 
-    // Step 2: Now arr1 contains all the smaller elements, and arr2 contains larger elements.
-    // Sort both arrays to maintain order
+    // Sort both arrays to maintain sorted order
     Arrays.sort(arr1);
     Arrays.sort(arr2);
   }

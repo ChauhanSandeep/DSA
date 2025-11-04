@@ -1,4 +1,4 @@
-package backtrack;
+package trie;
 
 import java.util.*;
 

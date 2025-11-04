@@ -88,33 +88,42 @@ public class MaxScoreSplicedArray {
   /**
    * Computes the maximum gain by replacing a subarray from source into target.
    * The gain at index i is (source[i] - target[i]).
-   * Uses Kadane’s algorithm to find the max subarray sum of the gain array.
+   *
+   * Steps:
+   * 1. Create a difference array where diff[i] = source[i] - target[i].
+   * 2. Use Kadane's algorithm to find the maximum sum subarray in the difference array.
+   *    This signifies the maximum gain obtainable by splicing.
+   * 3. Track the start and end indices of the maximum gain subarray.
    *
    * Time Complexity: O(N)
-   * Space Complexity: O(1)
+   * Space Complexity: O(N) for the difference array
    *
-   * @param source The array being spliced in
-   * @param target The array being spliced into
+   * @param source The array from where subarray is picked
+   * @param target The array into which subarray is placed
    * @return Maximum gain obtainable
    */
   private SpliceResult maxSubarrayGainWithIndices(int[] source, int[] target) {
+    int length = source.length;
+
+    // Create difference array
+    int[] diff = new int[length];
+    for (int i = 0; i < length; i++) {
+      diff[i] = source[i] - target[i];
+    }
+
+    // Kadane's algorithm to find max subarray sum with indices
     int maxGainSoFar = 0;
     int maxGainEndingHere = 0;
-
     int start = 0;
     int tempStart = 0;
     int end = -1;
 
-    for (int i = 0; i < source.length; i++) {
-      int gain = source[i] - target[i];
-      maxGainEndingHere += gain;
-
+    for (int i = 0; i < length; i++) {
+      maxGainEndingHere += diff[i];
       if (maxGainEndingHere < 0) {
-        // Reset if the current gain is negative
         maxGainEndingHere = 0;
         tempStart = i + 1;
       } else if (maxGainEndingHere > maxGainSoFar) {
-        // Update max gain and indices if we found a new maximum
         maxGainSoFar = maxGainEndingHere;
         start = tempStart;
         end = i;
@@ -132,7 +141,7 @@ public class MaxScoreSplicedArray {
     return sum;
   }
 
-  private class SpliceResult {
+  private static class SpliceResult {
     public int gain;  // Maximum gain from splicing
     public int start; // Start index of the subarray spliced in
     public int end;   // End index of the subarray spliced in

@@ -1,4 +1,4 @@
-package arrays;
+package trie;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,14 +6,14 @@ import java.util.List;
 
 
 /**
- * 🔹 Problem: Search Suggestions System
- * 🔗 Leetcode: https://leetcode.com/problems/search-suggestions-system/
+ * Problem: Search Suggestions System
+ * Leetcode: https://leetcode.com/problems/search-suggestions-system/
  *
  * Given a list of product strings and a search word, suggest at most 3 product names
  * after each character of the search word is typed. The suggested products must start
  * with the typed prefix and be in lexicographically increasing order.
  *
- * 📌 Example:
+ * Example:
  * Input:
  *    products = ["mobile","mouse","moneypot","monitor","mousepad"]
  *    searchWord = "mouse"
@@ -26,9 +26,11 @@ import java.util.List;
  *      ["mouse","mousepad"]
  *    ]
  *
- * ✅ Follow-up:
- * - How would you scale to millions of products? → Use Trie with indexing.
- * - What if prefix search must be case-insensitive? → Normalize input to lowercase.
+ * Follow-up:
+ * - How would you scale to millions of products?
+ *  → Use Trie with indexing.
+ * - What if prefix search must be case-insensitive?
+ *  → Normalize input to lowercase.
  */
 public class SuggestedProducts {
 

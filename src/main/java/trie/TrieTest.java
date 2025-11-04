@@ -1,4 +1,4 @@
-package arrays;
+package trie;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +9,9 @@ import java.util.Map;
  * A Trie (prefix tree) is a tree data structure used to efficiently store and retrieve keys
  * in a dataset of strings. This implementation supports insert, search, and prefix matching operations.
  *
- * 🔗 LeetCode: https://leetcode.com/problems/implement-trie-prefix-tree/
+ * LeetCode: https://leetcode.com/problems/implement-trie-prefix-tree/
  *
- * 📝 Example:
+ * Example:
  * Input:
  *   trie.insert("apple");
  *   trie.search("apple");   → true
@@ -20,12 +20,12 @@ import java.util.Map;
  *   trie.insert("app");
  *   trie.search("app");     → true
  *
- * 🎯 Constraints:
+ * Constraints:
  * - 1 <= word.length, prefix.length <= 2000
  * - word and prefix consist only of lowercase English letters
  * - At most 3 * 10^4 calls in total to insert, search, and startsWith
  *
- * 💡 Follow-up Questions with Answers:
+ * Follow-up Questions with Answers:
  * 1. Q: How would you optimize memory usage for a Trie with many words sharing common prefixes?
  *    A: Use an array of size 26 instead of HashMap for children (for lowercase letters only),
  *       or implement compressed trie (radix tree/Patricia trie) that merges single-child paths.
