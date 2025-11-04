@@ -27,7 +27,7 @@ package codingassessment;
  *       multiple solutions, or as future integration point for test framework.
  *
  * 2. Q: How would you organize this for actual interview take-home assessment?
- *    A: Add README.md with instructions, separate test cases, create driver methods for
+ *    A: Add DataStructures.md with instructions, separate test cases, create driver methods for
  *       each problem, add timing/benchmarking utilities.
  *
  * 3. Q: Should this class include test data or test runner functionality?

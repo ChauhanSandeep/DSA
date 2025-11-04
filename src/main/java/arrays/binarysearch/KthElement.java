@@ -1,8 +1,7 @@
 package arrays.binarysearch;
 
 /**
- * 🔗 Leetcode: https://leetcode.com/problems/kth-smallest-element-in-sorted-matrix/
- * Alternate (more accurate): https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0
+ * GeeksForGeeks link: https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0
  *
  * Problem:
  * Given two sorted arrays `arr1` and `arr2`, return the Kth element in the merged sorted array without merging them.
@@ -17,11 +16,75 @@ package arrays.binarysearch;
  * k = 5
  * Output: 6 (5th smallest in merged array)
  *
- * Follow-up:
- * - What if arrays are very large and live on disk? Use external merge pattern.
- * - What if `k` is very small? Consider min-heap solution (not optimal for large k).
+ * Follow-up Questions:
+ *
+ * 1. What if you need to find the median instead of k-th element?
+ *    Answer: Use k = (n+m+1)/2 for lower median, k = (n+m+2)/2 for upper median.
+ *    For even total length, median is average of two middle elements.
+ *
+ * 2. How would you handle if one array is much larger than the other?
+ *    Answer: Binary search approach scales well. Two-pointer approach would waste time
+ *    iterating through smaller array. Complexity remains O(log(min(n,m))).
+ *
+ * 3. Can you find k-th element in k queries efficiently?
+ *    Answer: Precompute using binary search once for each k. Total O(q * log(min(n,m)))
+ *    where q is number of queries. Or use two pointers for all k values together.
+ *
+ * 4. What if arrays have duplicates and you need the k-th unique element?
+ *    Answer: Modify comparison to skip duplicates. When advancing pointers, skip over
+ *    equal elements. Count only unique elements toward k.
+ *
+ * 5. How would you handle three or more sorted arrays?
+ *    Answer: Use min-heap with (value, array_index, element_index). Extract min k times.
+ *    Time: O(k log m) where m is number of arrays.
  */
 public class KthElement {
+
+  /**
+   * Finds k-th element using two-pointer approach.
+   * Most intuitive and efficient for this specific problem.
+   *
+   * Algorithm:
+   * 1. Initialize two pointers at start of both arrays
+   * 2. Iterate k-1 times, always moving the pointer pointing to smaller element
+   * 3. This ensures we process elements in sorted order
+   * 4. After k-1 iterations, return the minimum of current elements
+   *
+   * Key insight: By maintaining two pointers and always advancing the smaller one,
+   * we traverse the merged array in sorted order without actually merging.
+   *
+   * Time Complexity: O(k) where k is the position we're looking for.
+   *
+   * Space Complexity: O(1) using only constant extra variables.
+   *
+   * @param arr1 first sorted array
+   * @param arr2 second sorted array
+   * @param k position (1-indexed) to find
+   * @return k-th element in merged sorted arrays
+   */
+  public int findKthElementUsingTwoPointers(int[] arr1, int[] arr2, int k) {
+    int pointer1 = 0;
+    int pointer2 = 0;
+    int count = 0;
+
+    // Iterate until we reach (k-1)th element
+    while (count < k - 1) {
+      // Move pointer pointing to smaller element
+      if (pointer1 < arr1.length && (pointer2 >= arr2.length || arr1[pointer1] <= arr2[pointer2])) {
+        pointer1++;
+      } else {
+        pointer2++;
+      }
+      count++;
+    }
+
+    // Return k-th element (minimum of current elements)
+    if (pointer1 < arr1.length && (pointer2 >= arr2.length || arr1[pointer1] <= arr2[pointer2])) {
+      return arr1[pointer1];
+    } else {
+      return arr2[pointer2];
+    }
+  }
 
   /**
    * Finds the Kth element in the union of two sorted arrays using binary search.
@@ -37,7 +100,8 @@ public class KthElement {
    *   - The largest element in the left partition of `arr2` is less than or equal to the smallest element in the right partition of `arr1`.
    * 5. If valid, return the maximum of the largest elements in the left partitions.
    * If not valid, adjust the binary search bounds:
-   *   - If the largest element in the left partition of `arr1` is greater than the smallest element in the right partition of `arr2`, move the high pointer left.
+   *   - If the largest element in the left partition of `arr1` is greater
+   *     than the smallest element in the right partition of `arr2`, move the high pointer left.
    *   - Otherwise, move the low pointer right.
    *
    * Time complexity: O(log(min(n, m))) where n and m are the lengths of the two arrays.

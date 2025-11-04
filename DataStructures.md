@@ -796,7 +796,9 @@ Math.round(x);      // Round to nearest integer
 *Generate random values - O(1)*
 
 ``` java
-int rand = (int)(Math.random() * n);  // Random int in [0, n)
+// Random int in [0, n)
+Random random = new Random();
+int rand = random.nextInt(n);
 ```
 
 ### GCD & LCM

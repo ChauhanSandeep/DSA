@@ -4,12 +4,12 @@ import java.util.*;
 
 
 /**
- * ✅ Problem: Merge K Sorted Arrays.
+ * Problem: Merge K Sorted Arrays.
  * Given K sorted arrays of integers, merge them into a single sorted array.
  *
- * 🔗 Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/ (conceptually similar)
+ * Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/ (conceptually similar)
  *
- * 📌 Example:
+ * Example:
  * Input:
  *   arr1 = [1, 3, 5, 7]
  *   arr2 = [2, 4, 6, 8]
@@ -17,7 +17,7 @@ import java.util.*;
  * Output:
  *   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
  *
- * 🔄 Follow-up Questions:
+ * Follow-up Questions:
  * 1. Can you do it without a heap? → Yes, by using divide and conquer (merge 2 arrays at a time)
  *    🔗 https://leetcode.com/problems/merge-k-sorted-lists/discuss/10527/A-java-solution-based-on-divide-and-conquer
  * 2. Can you merge arrays in-place? → Only possible if you control the original arrays.

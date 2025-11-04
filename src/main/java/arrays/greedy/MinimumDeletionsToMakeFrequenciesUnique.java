@@ -1,6 +1,11 @@
 package arrays.greedy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -28,46 +33,108 @@ public class MinimumDeletionsToMakeFrequenciesUnique {
   }
 
   /**
-   * Returns the minimum number of deletions required to make all character frequencies unique.
+   * Finds minimum deletions using greedy approach with frequency sorting.
    *
-   * Steps:
-   * 1. Count character frequencies (26 lowercase letters only).
-   * 2. Sort the frequency array in descending order.
-   * 3. For each frequency:
-   *    - If it's greater than the maximum allowed frequency, delete extra characters.
-   *    - Update the maximum allowed frequency for the next character.
+   * Algorithm:
+   * 1. Count frequency of each character in string
+   * 2. Sort frequencies in descending order (process highest first)
+   * 3. Track previously assigned frequency to ensure uniqueness
+   * 4. For each frequency:
+   *    - If >= previous, reduce to (previous - 1)
+   *    - Count deletions = original - reduced
+   *    - Update previous for next iteration
+   * 5. Handle edge case: frequency can't go below 0
    *
-   * @param str Input string consisting of lowercase letters
-   * @return Minimum number of deletions needed
+   * Key insight: Process from highest to lowest frequency. If current frequency
+   * equals or exceeds previous, reduce it to (previous - 1) to maintain uniqueness.
+   * This greedy choice minimizes deletions because we preserve higher frequencies.
+   *
+   * Time Complexity: O(N + K log K) where N is string length and K is unique characters.
+   * Counting is O(N), sorting frequencies is O(K log K) where K ≤ 26.
+   *
+   * Space Complexity: O(K) for frequency array, where K ≤ 26 for lowercase letters.
+   *
+   * @param input input string of lowercase letters
+   * @return minimum number of deletions to make all frequencies unique
    */
-  public static int minDeletions(String str) {
-    // example str = "aabbcc"
-    int[] freq = new int[26];
-
-    // Step 1: Count frequency of each character
-    for (char ch : str.toCharArray()) {
-      freq[ch - 'a']++;
+  public static int minDeletions(String input) {
+    // Here input = "aaabbcc"
+    // Count frequency of each character
+    int[] frequency = new int[26];
+    for (char ch : input.toCharArray()) {
+      frequency[ch - 'a']++;
     }
-    // freq here : // [2, 2, 2, 0, 0, ..., 0] for "aabbcc" (only 'a', 'b', 'c' have non-zero frequencies)
+    // Here frequency = [3, 2, 2, 0, 0, ..., 0] for "aaabbcc"
 
-    // Step 2: Sort frequencies in ascending order (we'll iterate from end)
-    Arrays.sort(freq);
-    // freq after sorting: [
-    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2] for "aabbcc"
+    // Collect non-zero frequencies and sort descending
+    List<Integer> frequencies = new ArrayList<>();
+    for (int freq : frequency) {
+      if (freq > 0) {
+        frequencies.add(freq);
+      }
+    }
+    Collections.sort(frequencies, Collections.reverseOrder());
+    // frequencies = [3, 2, 2] for "aaabbcc"
 
     int deletions = 0;
-    int maxAllowedFreq = str.length(); // Highest allowed frequency initially
+    int maxAllowedFreq = Integer.MAX_VALUE;
 
-    // Step 3: Iterate from highest to lowest frequency
-    for (int i = 25; i >= 0 && freq[i] > 0; i--) {
-      if (freq[i] > maxAllowedFreq) {
-        // Need to reduce frequency to avoid collision
-        deletions += freq[i] - maxAllowedFreq;
-        freq[i] = maxAllowedFreq;
+    for (int currentFrequency : frequencies) {
+      // If current frequency conflicts with previous, reduce it
+      if (currentFrequency >= maxAllowedFreq) {
+        int newFrequency = Math.max(0, maxAllowedFreq - 1);
+        deletions += currentFrequency - newFrequency;
+        maxAllowedFreq = newFrequency;
+      } else {
+        maxAllowedFreq = currentFrequency;
+      }
+    }
+
+    return deletions;
+  }
+
+  /**
+   * Alternative approach using HashSet to track used frequencies.
+   * More intuitive but slightly less efficient.
+   *
+   * Algorithm:
+   * 1. Count frequencies
+   * 2. For each frequency, if already used:
+   *    - Decrement until finding unused frequency or reaching 0
+   *    - Count each decrement as a deletion
+   * 3. Mark frequency as used
+   *
+   * Time Complexity: O(N + K * M) where M is maximum frequency.
+   * Worst case: O(N + K^2) when all frequencies equal.
+   *
+   * Space Complexity: O(K) for frequency map and used set.
+   *
+   * @param s input string of lowercase letters
+   * @return minimum number of deletions to make all frequencies unique
+   */
+  public int minDeletionsWithSet(String s) {
+    // Count frequency of each character
+    int[] frequency = new int[26];
+    for (char ch : s.toCharArray()) {
+      frequency[ch - 'a']++;
+    }
+
+    Set<Integer> usedFrequencies = new HashSet<>();
+    int deletions = 0;
+
+    for (int freq : frequency) {
+      if (freq == 0) continue;
+
+      // Keep decrementing until we find unused frequency
+      while (freq > 0 && usedFrequencies.contains(freq)) {
+        freq--;
+        deletions++;
       }
 
-      // Update maxAllowedFreq for the next lower frequency
-      maxAllowedFreq = Math.max(0, freq[i] - 1);
+      // Mark this frequency as used (if > 0)
+      if (freq > 0) {
+        usedFrequencies.add(freq);
+      }
     }
 
     return deletions;

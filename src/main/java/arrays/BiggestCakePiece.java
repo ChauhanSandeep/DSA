@@ -53,6 +53,7 @@ public class BiggestCakePiece {
      * Computes the maximum area of a piece of cake after performing the given cuts.
      *
      * Algorithm:
+     * 0. Add boundary cuts (0 and height/width) implicitly
      * 1. Sort horizontal and vertical cuts to process them in order
      * 2. Find maximum gap between consecutive horizontal cuts
      * 3. Find maximum gap between consecutive vertical cuts

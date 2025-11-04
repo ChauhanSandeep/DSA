@@ -4,7 +4,10 @@ import java.util.*;
 
 /**
  * Problem Statement:
- * In a string composed of 'L', 'R', and 'X' characters, like "RXXLRXRXL", a move consists of either replacing one occurrence of "XL" with "LX", or replacing one occurrence of "RX" with "XR". Given the starting string start and the ending string end, return True if and only if there exists a sequence of moves to transform start to end.
+ * In a string composed of 'L', 'R', and 'X' characters, like "RXXLRXRXL", a move consists of either
+ * replacing one occurrence of "XL" with "LX", or replacing one occurrence of "RX" with "XR".
+ * Given the starting string start and the ending string end,
+ * return True if and only if there exists a sequence of moves to transform start to end.
  *
  * Example:
  * Input: start = "RXXLRXRXL", end = "XRLXXRRLX"
@@ -30,8 +33,8 @@ public class SwapAdjacentInLRString {
    * 1. First, remove all 'X' from both strings and check if the resulting sequences of 'L' and 'R' are identical. If not, transformation is impossible.
    * 2. Use two pointers to traverse both strings, skipping 'X' characters.
    * 3. For each non-'X' character:
-   *    - If it's 'L', ensure its position in start is >= position in end (can only move left).
    *    - If it's 'R', ensure its position in start is <= position in end (can only move right).
+   *    - If it's 'L', ensure its position in start is >= position in end (can only move left).
    * 4. If all matching characters satisfy the conditions and both pointers reach the end, return true.
    *
    * Logic Summary:
@@ -126,7 +129,6 @@ public class SwapAdjacentInLRString {
 
   /**
    * Alternative approach: Collect positions of 'L' and 'R' in both strings and compare them.
-   * This is another optimal way, suitable for FAANG, with same complexities.
    *
    * Step-by-step Explanation:
    * 1. Collect lists of positions for 'L' and 'R' in start and end, ignoring 'X'.
@@ -160,6 +162,7 @@ public class SwapAdjacentInLRString {
 
       if (startChar == 'L') startL.add(i);
       else if (startChar == 'R') startR.add(i);
+
       if (endChar == 'L') endL.add(i);
       else if (endChar == 'R') endR.add(i);
     }
@@ -169,17 +172,17 @@ public class SwapAdjacentInLRString {
       return false;
     }
 
-    // Check 'L' positions: start >= end
-    for (int index = 0; index < startL.size(); index++) {
-      if (startL.get(index) < endL.get(index)) {
-        return false; // 'L' cannot move right so start position must be >= end position
+    // Check 'R' positions: start <= end
+    for (int i = 0; i < startR.size(); i++) {
+      if (startR.get(i) > endR.get(i)) {
+        return false; // 'R' cannot move left so start position must be <= end position
       }
     }
 
-    // Check 'R' positions: start <= end
-    for (int index = 0; index < startR.size(); index++) {
-      if (startR.get(index) > endR.get(index)) {
-        return false; // 'R' cannot move left so start position must be <= end position
+    // Check 'L' positions: start >= end
+    for (int i = 0; i < startL.size(); i++) {
+      if (startL.get(i) < endL.get(i)) {
+        return false; // 'L' cannot move right so start position must be >= end position
       }
     }
 

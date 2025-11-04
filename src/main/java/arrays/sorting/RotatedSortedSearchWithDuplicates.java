@@ -30,6 +30,9 @@ public class RotatedSortedSearchWithDuplicates {
     /**
      * Searches for the target in a rotated sorted array that may contain duplicates.
      *
+     * Key insight: Duplicates at boundaries make it impossible to determine which half
+     * is sorted. When nums[left] == nums[mid] == nums[right], we must shrink boundaries.
+     *
      * Steps:
      * 1. Initialize `left` and `right` pointers.
      * 2. Perform binary search.
@@ -38,7 +41,6 @@ public class RotatedSortedSearchWithDuplicates {
      *    b. If duplicates exist (nums[left] == nums[mid]) → shrink left by one.
      *    c. Determine which half is sorted, then check if target lies in that half.
      *
-     * Algorithm: Modified Binary Search with Duplicate Handling
      * Time Complexity: O(log n) average, O(n) worst-case (when many duplicates)
      * Space Complexity: O(1)
      *
@@ -71,6 +73,7 @@ public class RotatedSortedSearchWithDuplicates {
                 left++;
                 right--;
             }
+
             // Left half is sorted
             else if (nums[left] <= nums[mid]) {
                 if (target >= nums[left] && target < nums[mid]) {

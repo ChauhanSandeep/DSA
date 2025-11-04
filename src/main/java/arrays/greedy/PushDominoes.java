@@ -1,5 +1,8 @@
 package arrays.greedy;
 
+import java.util.Arrays;
+
+
 /**
  * Push Dominoes - LeetCode Problem 838
  *
@@ -37,7 +40,7 @@ public class PushDominoes {
 
     public static void main(String[] args) {
         String dominoes = ".L.R...LR..L..";
-        System.out.println("Optimized Output: " + pushDominoes(dominoes));
+        System.out.println("Optimized Output: " + pushDominoesForceBased(dominoes));
     }
 
     /**
@@ -132,6 +135,7 @@ public class PushDominoes {
             }
             forces[i] += force;
         }
+        System.out.println("After rightward pass: " + Arrays.toString(forces));
 
         // 👉 Pass 2: Compute leftward forces from 'L'
         force = 0;
@@ -145,6 +149,7 @@ public class PushDominoes {
             }
             forces[i] -= force; // subtract because leftward is negative
         }
+        System.out.println("After leftward pass: " + Arrays.toString(forces));
 
         // Pass 3: Build the final result based on net forces
         StringBuilder result = new StringBuilder(len);
