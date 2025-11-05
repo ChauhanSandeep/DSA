@@ -4,22 +4,191 @@
 
 ---
 
-## 📚 Table of Contents
-1. [Collections & Maps](#-collections--maps)
-2. [String Operations](#-string-operations)
-3. [Arrays & Primitives](#-arrays--primitives)
-4. [Comparators & Sorting](#-comparators--sorting)
-5. [Streams & Lambdas](#-streams--lambdas)
-6. [Data Structures](#-data-structures)
-7. [Bit Manipulation](#-bit-manipulation)
-8. [Math Utilities](#-math-utilities)
-9. [Common Patterns](#-common-patterns)
-10. [Interview Pitfalls](#-interview-pitfalls)
-11. [Time Complexity Reference](#-time-complexity-quick-reference)
+## 🧮 Arrays & Primitives
+
+### Array Basics
+
+#### Declaration & Initialization
+*Create arrays with different syntaxes - O(n)*
+
+``` java
+int[] arr = new int[n];            // Array of size n, initialized to 0
+int[] arr = {1, 2, 3, 4, 5};       // Array literal
+int[] arr = new int[]{1, 2, 3};    // Array initialization
+int[][] matrix = new int[m][n];    // 2D array
+```
+
+#### Copying Arrays
+*Create copies of arrays efficiently*
+
+``` java
+int[] copy = arr.clone();          // Shallow copy - O(n)
+int[] copy = Arrays.copyOf(arr, length);  // Copy with new length - O(n)
+int[] copy = Arrays.copyOfRange(arr, from, to);  // Copy range [from, to) - O(n)
+System.arraycopy(src, srcPos, dest, destPos, length);  // Native copy - O(n)
+```
+
+#### Filling Arrays
+*Set array values - O(n)*
+
+``` java
+Arrays.fill(arr, value);           // Fill entire array
+Arrays.fill(arr, fromIndex, toIndex, value);  // Fill range
+```
+
+#### Sorting & Searching
+*Sort in arrays*
+
+``` java
+Arrays.sort(arr);                  // Sort entire array - O(n log n)
+Arrays.sort(arr, (a, b) -> Integer.compare(a, b));  // Custom comparator
+Arrays.sort(arr, fromIndex, toIndex);  // Sort range - O(n log n)
+```
+
+*Search in arrays*
+```java
+int index = Arrays.binarySearch(arr, key);  // Binary search (sorted array) - O(log n)
+```
+
+#### Array-List Conversions
+*Convert between arrays and lists*
+
+``` java
+List<Integer> list = Arrays.stream(arr).boxed().collect(Collectors.toList());  // Array to List - O(n)
+List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));  // Array literal to List - O(n)
+int[] arr = list.stream().mapToInt(i -> i).toArray();  // List to array - O(n)
+```
+
+#### 2D Array to List
+*Convert 2D arrays to lists*
+
+``` java
+int[][] arr = {{1,2}, {3,4}};
+List<int[]> list = Arrays.asList(arr);  // Fixed-size list - O(1)
+List<int[]> list = new ArrayList<>(Arrays.asList(arr));  // Mutable list - O(n)
+
+List<List<Integer>> list = Arrays.stream(matrix)
+            .map(row -> Arrays.stream(row)          // stream each row
+                              .boxed()             // convert int -> Integer
+                              .collect(Collectors.toList()))
+            .collect(Collectors.toList());
+
+```
+
+### Array Utilities
+
+#### Stream Operations
+*Process arrays using streams - all O(n)*
+
+``` java
+Arrays.stream(arr).sum();          // Sum all elements
+Arrays.stream(arr).max().getAsInt();  // Find maximum
+Arrays.stream(arr).min().getAsInt();  // Find minimum
+Arrays.stream(arr).average().getAsDouble();  // Calculate average
+Arrays.stream(arr).count();        // Count elements
+```
+
+#### Array Comparison
+*Compare arrays for equality*
+
+``` java
+Arrays.equals(arr1, arr2);         // Compare 1D arrays - O(n)
+Arrays.deepEquals(arr1, arr2);     // Compare multi-dimensional - O(n)
+```
+
+#### String Representation
+*Convert arrays to readable strings*
+
+``` java
+Arrays.toString(arr);              // 1D: [1, 2, 3] - O(n)
+Arrays.deepToString(arr);          // Multi-dimensional - O(n)
+```
+
+### Primitive Type Conversions
+
+#### String to Number
+*Parse strings to numeric types - O(n)*
+
+``` java
+int x = Integer.parseInt(str);     // String to int
+long x = Long.parseLong(str);      // String to long
+double x = Double.parseDouble(str); // String to double
+```
+
+#### Number to String
+*Convert numbers to strings - O(1) to O(log n)*
+
+``` java
+String s = String.valueOf(num);    // Any number to String
+String s = Integer.toString(num);  // Int to String
+```
+
+#### Character-Number Conversions
+*Convert between chars and digits - O(1)*
+
+``` java
+int digit = ch - '0';              // '5' -> 5 (char to int)
+char ch = (char)('0' + digit);     // 5 -> '5' (int to char)
+char ch = (char)(num + 'a');       // 0 -> 'a' (int to letter)
+```
 
 ---
 
-## 📚 Collections & Maps
+### List Operations
+
+#### Creation
+*Create lists with different characteristics*
+
+``` java
+List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));  // Mutable list
+List<String> list = List.of("a", "b", "c");  // Immutable (Java 9+)
+```
+
+#### Sorting
+*Sort lists in various orders - O(n log n)*
+
+``` java
+list.sort(Comparator.naturalOrder());  // Sort in ascending order
+list.sort(Comparator.reverseOrder());  // Sort in descending order
+
+Collections.sort(list);  // Sort using natural ordering
+Collections.reverse(list);  // Reverse list order - O(n)
+
+Collections.sort(list, (a, b) -> Integer.compare(a, b));  // Custom comparator
+```
+
+#### Utilities
+*Common list utility operations*
+
+``` java
+Collections.frequency(list, element);  // Count occurrences - O(n)
+Collections.swap(list, i, j);  // Swap two elements - O(1)
+Collections.fill(list, value);  // Fill with value - O(n)
+list.subList(fromIndex, toIndex);  // Get view (not copy) - O(1)
+```
+
+---
+
+### Set Operations
+
+#### Creation
+*Create sets with different ordering guarantees*
+
+``` java
+Set<Integer> set = new HashSet<>(list);  // Unordered, O(1) operations
+Set<Integer> set = new LinkedHashSet<>();  // Maintains insertion order
+Set<Integer> set = new TreeSet<>();  // Sorted, O(log n) operations
+```
+
+#### Set Operations
+*Perform mathematical set operations - O(n)*
+
+``` java
+set1.addAll(set2);      // Union: combine both sets
+set1.retainAll(set2);   // Intersection: keep common elements
+set1.removeAll(set2);   // Difference: remove elements in set2
+```
+
 
 ### Map Operations
 
@@ -48,56 +217,35 @@ for (Map.Entry<K, V> entry : map.entrySet()) { }  // Traditional iteration
 ``` java
 map.containsKey(key);  // Check if key exists
 map.containsValue(value);  // Check if value exists - O(n)
-```
+````
 
-### List Operations
+### TreeSet / TreeMap (Sorted)
 
-#### Creation
-*Create lists with different characteristics*
-
-``` java
-List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));  // Mutable list
-List<String> list = List.of("a", "b", "c");  // Immutable (Java 9+)
-```
-
-#### Sorting
-*Sort lists in various orders - O(n log n)*
+#### TreeSet Operations
+*Sorted set with navigational methods - O(log n) for all operations*
 
 ``` java
-list.sort(Comparator.naturalOrder());  // Sort in ascending order
-list.sort(Comparator.reverseOrder());  // Sort in descending order
-Collections.sort(list);  // Sort using natural ordering
-Collections.reverse(list);  // Reverse list order - O(n)
+TreeSet<Integer> set = new TreeSet<>();
+set.add(x);         // Add element
+set.first();        // Get minimum element
+set.last();         // Get maximum element
+set.lower(x);       // Largest element < x
+set.higher(x);      // Smallest element > x
+set.floor(x);       // Largest element <= x
+set.ceiling(x);     // Smallest element >= x
 ```
 
-#### Utilities
-*Common list utility operations*
+#### TreeMap Operations
+*Sorted map with navigational methods - O(log n) for all operations*
 
 ``` java
-Collections.frequency(list, element);  // Count occurrences - O(n)
-Collections.swap(list, i, j);  // Swap two elements - O(1)
-Collections.fill(list, value);  // Fill with value - O(n)
-list.subList(fromIndex, toIndex);  // Get view (not copy) - O(1)
-```
-
-### Set Operations
-
-#### Creation
-*Create sets with different ordering guarantees*
-
-``` java
-Set<Integer> set = new HashSet<>(list);  // Unordered, O(1) operations
-Set<Integer> set = new LinkedHashSet<>();  // Maintains insertion order
-Set<Integer> set = new TreeSet<>();  // Sorted, O(log n) operations
-```
-
-#### Set Operations
-*Perform mathematical set operations - O(n)*
-
-``` java
-set1.addAll(set2);      // Union: combine both sets
-set1.retainAll(set2);   // Intersection: keep common elements
-set1.removeAll(set2);   // Difference: remove elements in set2
+TreeMap<Integer, String> map = new TreeMap<>();
+map.firstKey();     // Get minimum key
+map.lastKey();      // Get maximum key
+map.lowerKey(x);    // Largest key < x
+map.higherKey(x);   // Smallest key > x
+map.floorKey(x);    // Largest key <= x
+map.ceilingKey(x);  // Smallest key >= x
 ```
 
 ### Queue & Deque
@@ -123,6 +271,65 @@ deque.pollFirst();      // Remove from front
 deque.pollLast();       // Remove from back
 deque.peekFirst();      // View front
 deque.peekLast();       // View back
+```
+### Stack
+
+#### Legacy Stack (Avoid)
+*Old Stack class - synchronized overhead*
+
+``` java
+Stack<Integer> stack = new Stack<>();
+stack.push(x);      // Push element - O(1)
+stack.pop();        // Pop element - O(1)
+stack.peek();       // View top - O(1)
+stack.isEmpty();    // Check if empty - O(1)
+stack.size();       // Get size - O(1)
+```
+
+#### Modern Stack (Recommended)
+*Use Deque for better performance - all operations O(1)*
+
+``` java
+Deque<Integer> stack = new ArrayDeque<>();
+stack.push(x);      // Push element (or addFirst)
+stack.pop();        // Pop element (or removeFirst)
+stack.peek();       // View top (or peekFirst)
+```
+
+### PriorityQueue (Heap)
+
+#### Min-Heap Creation
+*Default priority queue orders elements naturally*
+
+``` java
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();  // Smallest element at top
+```
+
+#### Max-Heap Creation
+*Reverse ordering for maximum element at top*
+
+``` java
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());  // Safe
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));  // Safe
+```
+
+#### Basic Operations
+*All operations except remove specific element*
+
+``` java
+pq.offer(x);        // Add element - O(log n)
+pq.poll();          // Remove and return min/max - O(log n)
+pq.peek();          // View min/max without removing - O(1)
+pq.remove(x);       // Remove specific element - O(n)
+```
+
+#### Custom Comparators
+*Priority queue for complex objects - O(log n) per operation*
+
+``` java
+PriorityQueue<int[]> pq = new PriorityQueue<>(
+    Comparator.comparingInt(a -> a[0])  // Compare by first element
+);
 ```
 
 ---
@@ -219,123 +426,6 @@ boolean isAnagram = Arrays.equals(a1, a2);  // Compare sorted arrays
 
 ---
 
-## 🧮 Arrays & Primitives
-
-### Array Basics
-
-#### Declaration & Initialization
-*Create arrays with different syntaxes - O(n)*
-
-``` java
-int[] arr = new int[n];            // Array of size n, initialized to 0
-int[] arr = {1, 2, 3, 4, 5};       // Array literal
-int[] arr = new int[]{1, 2, 3};    // Array initialization
-int[][] matrix = new int[m][n];    // 2D array
-```
-
-#### Copying Arrays
-*Create copies of arrays efficiently*
-
-``` java
-int[] copy = arr.clone();          // Shallow copy - O(n)
-int[] copy = Arrays.copyOf(arr, length);  // Copy with new length - O(n)
-int[] copy = Arrays.copyOfRange(arr, from, to);  // Copy range [from, to) - O(n)
-System.arraycopy(src, srcPos, dest, destPos, length);  // Native copy - O(n)
-```
-
-#### Filling Arrays
-*Set array values - O(n)*
-
-``` java
-Arrays.fill(arr, value);           // Fill entire array
-Arrays.fill(arr, fromIndex, toIndex, value);  // Fill range
-```
-
-#### Sorting & Searching
-*Sort and search in arrays*
-
-``` java
-Arrays.sort(arr);                  // Sort entire array - O(n log n)
-Arrays.sort(arr, fromIndex, toIndex);  // Sort range - O(n log n)
-int index = Arrays.binarySearch(arr, key);  // Binary search (sorted array) - O(log n)
-```
-
-#### Array-List Conversions
-*Convert between arrays and lists*
-
-``` java
-List<Integer> list = Arrays.stream(arr).boxed().collect(Collectors.toList());  // Array to List - O(n)
-int[] arr = list.stream().mapToInt(i -> i).toArray();  // List to array - O(n)
-```
-
-#### 2D Array to List
-*Convert 2D arrays to lists*
-
-``` java
-int[][] arr = {{1,2}, {3,4}};
-List<int[]> list = Arrays.asList(arr);  // Fixed-size list - O(1)
-List<int[]> list = new ArrayList<>(Arrays.asList(arr));  // Mutable list - O(n)
-```
-
-### Array Utilities
-
-#### Stream Operations
-*Process arrays using streams - all O(n)*
-
-``` java
-Arrays.stream(arr).sum();          // Sum all elements
-Arrays.stream(arr).max().getAsInt();  // Find maximum
-Arrays.stream(arr).min().getAsInt();  // Find minimum
-Arrays.stream(arr).average().getAsDouble();  // Calculate average
-Arrays.stream(arr).count();        // Count elements
-```
-
-#### Array Comparison
-*Compare arrays for equality*
-
-``` java
-Arrays.equals(arr1, arr2);         // Compare 1D arrays - O(n)
-Arrays.deepEquals(arr1, arr2);     // Compare multi-dimensional - O(n)
-```
-
-#### String Representation
-*Convert arrays to readable strings*
-
-``` java
-Arrays.toString(arr);              // 1D: [1, 2, 3] - O(n)
-Arrays.deepToString(arr);          // Multi-dimensional - O(n)
-```
-
-### Primitive Type Conversions
-
-#### String to Number
-*Parse strings to numeric types - O(n)*
-
-``` java
-int x = Integer.parseInt(str);     // String to int
-long x = Long.parseLong(str);      // String to long
-double x = Double.parseDouble(str); // String to double
-```
-
-#### Number to String
-*Convert numbers to strings - O(1) to O(log n)*
-
-``` java
-String s = String.valueOf(num);    // Any number to String
-String s = Integer.toString(num);  // Int to String
-```
-
-#### Character-Number Conversions
-*Convert between chars and digits - O(1)*
-
-``` java
-int digit = ch - '0';              // '5' -> 5 (char to int)
-char ch = (char)('0' + digit);     // 5 -> '5' (int to char)
-char ch = (char)(num + 'a');       // 0 -> 'a' (int to letter)
-```
-
----
-
 ## ⚖️ Comparators & Sorting
 
 ### Safe Comparators
@@ -367,6 +457,10 @@ Arrays.sort(arr, (a, b) -> {
 *Sort using natural/reverse order - O(n log n)*
 
 ``` java
+Collections.sort(list, Comparator.naturalOrder());   // Ascending order
+Collections.sort(list, Comparator.reverseOrder());   // Descending order
+Collections.sort(list, (a, b) -> a.compareTo(b));  // Ascending order
+
 list.sort(Comparator.naturalOrder());   // Ascending order
 list.sort(Comparator.reverseOrder());   // Descending order
 ```
@@ -563,99 +657,6 @@ Map<Integer, String> map = list.stream()
 String result = list.stream()
     .map(String::valueOf)
     .collect(Collectors.joining(", ", "[", "]"));  // Format: [1, 2, 3]
-```
-
----
-
-## 🏗️ Data Structures
-
-### Stack
-
-#### Legacy Stack (Avoid)
-*Old Stack class - synchronized overhead*
-
-``` java
-Stack<Integer> stack = new Stack<>();
-stack.push(x);      // Push element - O(1)
-stack.pop();        // Pop element - O(1)
-stack.peek();       // View top - O(1)
-stack.isEmpty();    // Check if empty - O(1)
-stack.size();       // Get size - O(1)
-```
-
-#### Modern Stack (Recommended)
-*Use Deque for better performance - all operations O(1)*
-
-``` java
-Deque<Integer> stack = new ArrayDeque<>();
-stack.push(x);      // Push element (or addFirst)
-stack.pop();        // Pop element (or removeFirst)
-stack.peek();       // View top (or peekFirst)
-```
-
-### PriorityQueue (Heap)
-
-#### Min-Heap Creation
-*Default priority queue orders elements naturally*
-
-``` java
-PriorityQueue<Integer> minHeap = new PriorityQueue<>();  // Smallest element at top
-```
-
-#### Max-Heap Creation
-*Reverse ordering for maximum element at top*
-
-``` java
-PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());  // Safe
-PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));  // Safe
-```
-
-#### Basic Operations
-*All operations except remove specific element*
-
-``` java
-pq.offer(x);        // Add element - O(log n)
-pq.poll();          // Remove and return min/max - O(log n)
-pq.peek();          // View min/max without removing - O(1)
-pq.remove(x);       // Remove specific element - O(n)
-```
-
-#### Custom Comparators
-*Priority queue for complex objects - O(log n) per operation*
-
-``` java
-PriorityQueue<int[]> pq = new PriorityQueue<>(
-    Comparator.comparingInt(a -> a[0])  // Compare by first element
-);
-```
-
-### TreeSet / TreeMap (Sorted)
-
-#### TreeSet Operations
-*Sorted set with navigational methods - O(log n) for all operations*
-
-``` java
-TreeSet<Integer> set = new TreeSet<>();
-set.add(x);         // Add element
-set.first();        // Get minimum element
-set.last();         // Get maximum element
-set.lower(x);       // Largest element < x
-set.higher(x);      // Smallest element > x
-set.floor(x);       // Largest element <= x
-set.ceiling(x);     // Smallest element >= x
-```
-
-#### TreeMap Operations
-*Sorted map with navigational methods - O(log n) for all operations*
-
-``` java
-TreeMap<Integer, String> map = new TreeMap<>();
-map.firstKey();     // Get minimum key
-map.lastKey();      // Get maximum key
-map.lowerKey(x);    // Largest key < x
-map.higherKey(x);   // Smallest key > x
-map.floorKey(x);    // Largest key <= x
-map.ceilingKey(x);  // Smallest key >= x
 ```
 
 ---
