@@ -7,7 +7,6 @@ import java.util.List;
 /**
  * Combination Sum
  *
- * Problem:
  * Given an array of distinct integers candidates and a target integer, return all unique combinations
  * of candidates where the chosen numbers sum to target. The same number may be chosen unlimited times.
  *
@@ -91,5 +90,6 @@ public class CombinationSum {
 
     // Choice 2: Skip current candidate and move to next
     backtrack(candidates, startIndex + 1, remainingTarget, currentCombination, result);
+    // No need to remove here since we didn't add anything in this branch
   }
 }

@@ -90,7 +90,7 @@ public class CombinationSum2 {
         backtrack(candidates, currentIndex + 1, remainingTarget - candidates[currentIndex], currentCombination, result);
         currentCombination.remove(currentCombination.size() - 1); // Backtrack
 
-        // Choice 2: Skip current number and all its duplicates
+        // Choice 2: Skip current number and all its duplicates, because this number would already be considered in the pick branch
         int nextUniqueIndex = currentIndex + 1;
         while (nextUniqueIndex < candidates.length && candidates[nextUniqueIndex] == candidates[currentIndex]) {
             nextUniqueIndex++;

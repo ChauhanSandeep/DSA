@@ -88,7 +88,7 @@ public class AdjacencyListGraph {
     }
 }
 ```
-
+---
 ## Breadth-First Search (BFS)
 
 BFS is an algorithm for traversing or searching a graph. It starts at a source node and explores all its neighbors level by level before moving to the next level. It’s ideal for finding the shortest path in an unweighted graph and is implemented using a queue.
@@ -189,6 +189,7 @@ public class BFS {
 3. [LeetCode #127: Word Ladder](https://leetcode.com/problems/word-ladder/)
 4. [LeetCode #1091: Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)
 
+---
 ## Depth-First Search (DFS)
 
 DFS is another graph traversal algorithm where you explore as deep as possible along a branch before backtracking. It is implemented using either recursion or a stack. DFS is useful for topological sorting, pathfinding, and checking graph connectivity.
@@ -321,6 +322,8 @@ public class DFS {
 2. [LeetCode #547: Number of Provinces](https://leetcode.com/problems/number-of-provinces/)
 3. [LeetCode #207: Course Schedule](https://leetcode.com/problems/course-schedule/)
 4. [LeetCode #841: Keys and Rooms](https://leetcode.com/problems/keys-and-rooms/)
+
+---
 
 ## Topological Sort
 
@@ -562,6 +565,7 @@ public class TopologicalSortKahn {
 3. [LeetCode #329: Longest Increasing Path in a Matrix](https://leetcode.com/problems/longest-increasing-path-in-a-matrix/)
 4. [LeetCode #802: Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
 
+---
 ## Shortest Path Algorithms
 These algorithms are used to find the shortest path between nodes in a graph. Depending on the graph structure (weighted/unweighted, directed/undirected), various algorithms can be used, such as Dijkstra’s, Bellman-Ford, or Floyd-Warshall.
 
@@ -676,6 +680,7 @@ private void dijkstraShortestPaths(int numberOfVertices, ArrayList<Edge>[] graph
 - **Time Complexity**: O((V + E) log V) using a binary heap priority queue
 - **Space Complexity**: O(V) for the distance array and the priority queue
 
+---
 ## Bellman-Ford Algorithm
 Bellman-Ford is a single-source shortest path algorithm that works even with negative edge weights. It relaxes all edges up to n-1 times (where n is the number of nodes) and can detect negative weight cycles, unlike Dijkstra’s algorithm.
 
@@ -780,7 +785,7 @@ public class BellmanFord {
 #### Time and Space Complexity
 - **Time Complexity**: O(V × E)
 - **Space Complexity**: O(V) for the distance array
-
+---
 ### Floyd-Warshall Algorithm
 Imagine you want to know the shortest distance between every pair of cities in the world. But instead of checking each route directly, you ask:
 “What if I go through city X as a pit stop — is that cheaper?”  You do this for every possible city X as a middle stop, for every pair of cities.
@@ -871,7 +876,7 @@ public class FloydWarshallAlgorithm {
 3. [LeetCode #1334: Find the City With the Smallest Number of Neighbors at a Threshold Distance](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)
 4. [LeetCode #399: Evaluate Division](https://leetcode.com/problems/evaluate-division/)
 
-
+---
 
 ## Disjoint Sets (Union-Find)
 A Disjoint Set (also called Union-Find) is a data structure that keeps track of non-overlapping (disjoint) groups of elements.
@@ -1011,7 +1016,7 @@ public class CycleDetectionUsingDisjointSet {
 3. [LeetCode #1319: Number of Operations to Make Network Connected](https://leetcode.com/problems/number-of-operations-to-make-network-connected/)
 4. [LeetCode #990: Satisfiability of Equality Equations](https://leetcode.com/problems/satisfiability-of-equality-equations/)
 
-
+---
 ## Minimum Spanning Tree
 An MST of a weighted undirected graph is a tree that spans all the vertices and has the minimum possible total edge weight. It ensures all nodes are connected with the least amount of weight, useful in network design, clustering, etc.
 
@@ -1110,6 +1115,8 @@ public class PrimMST {
 ### Time and Space Complexity
 - **Time Complexity**: O(E log V) using a binary heap
 - **Space Complexity**: O(V) for the key and parent arrays and the priority queue
+
+---
 
 ## Kruskal's Algorithm
 Instead of starting from a node and growing like Prim’s, Kruskal’s starts with all nodes as isolated components, and adds the shortest edge available that does not create a cycle — until all nodes are connected. It heavily relies on a Disjoint Set Union (DSU) or Union-Find data structure to efficiently check whether adding an edge would form a cycle.
@@ -1416,6 +1423,7 @@ public class ArticulationPointsAndBridges {
 1. [LeetCode #1192: Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
 2. [LeetCode #1568: Minimum Number of Days to Disconnect Island](https://leetcode.com/problems/minimum-number-of-days-to-disconnect-island/)
 
+---
 ## Kosaraju's Algorithm
 
 Kosaraju's algorithm finds all strongly connected components (SCCs) in a directed graph.

@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * Factor Combinations
  *
- * Problem:
  * Numbers can be regarded as product of its factors. Write a function that takes an integer n
  * and returns all possible combinations of its factors (excluding 1 and n itself).
  *
@@ -80,23 +79,23 @@ public class FactorsCombination {
      * Time Complexity: O(2^log n) - pruned by factorization tree structure
      * Space Complexity: O(log n) - recursion depth limited by number of prime factors
      *
-     * @param remaining The number still to be factorized
+     * @param remainingTarget The number still to be factorized
      * @param minFactor Smallest factor to consider (maintains non-decreasing order)
      * @param currentFactors Current list of factors being built
      * @param result List storing all valid factor combinations
      */
-    private static void backtrack(int remaining, int minFactor, List<Integer> currentFactors, List<List<Integer>> result) {
+    private static void backtrack(int remainingTarget, int minFactor, List<Integer> currentFactors, List<List<Integer>> result) {
         // Base case: fully factorized and has more than one factor (exclude trivial [n])
-        if (remaining == 1 && currentFactors.size() > 1) {
+        if (remainingTarget == 1 && currentFactors.size() > 1) {
             result.add(new ArrayList<>(currentFactors));
             return;
         }
 
-        for (int factor = minFactor; factor <= remaining; factor++) {
-            if (remaining % factor == 0) {
+        for (int factor = minFactor; factor <= remainingTarget; factor++) {
+            if (remainingTarget % factor == 0) {
                 // Factor found - include it and continue with quotient
                 currentFactors.add(factor);
-                backtrack(remaining / factor, factor, currentFactors, result);
+                backtrack(remainingTarget / factor, factor, currentFactors, result);
                 currentFactors.remove(currentFactors.size() - 1); // Backtrack
             }
         }

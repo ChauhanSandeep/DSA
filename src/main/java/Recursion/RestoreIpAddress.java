@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * Leetcode Problem: https://leetcode.com/problems/restore-ip-addresses/
  *
- * Problem Statement:
  * Given a string containing only digits, return all possible valid IP address combinations.
  * A valid IP address consists of exactly four integers (each between 0 and 255) separated by dots.
  * Each integer must not have leading zeros unless it is "0".

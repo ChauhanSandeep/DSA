@@ -72,7 +72,10 @@ public class LongestConsecutiveSequence {
     public int findLongestConsecutiveSequence(int[] nums) {
         if (nums == null || nums.length == 0) return 0;
 
-        Set<Integer> numberSet = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+        Set<Integer> numberSet = Arrays.stream(nums)
+            .boxed()
+            .collect(Collectors.toSet());
+
         int maxSequenceLength = 0;
 
         for (int num : numberSet) {

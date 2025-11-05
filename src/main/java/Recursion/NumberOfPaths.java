@@ -70,7 +70,7 @@ public class NumberOfPaths {
      * @return Total number of unique paths from (0,0) to (m-1,n-1)
      */
     public static long numberOfPathsIterative(int m, int n) {
-        long[][] dp = new long[m][n];
+        long[][] dp = new long[m][n]; // dp[i][j] = number of paths to reach cell (i,j) from (0,0)
 
         // Base cases: First row and first column = 1 path
         for (int i = 0; i < m; i++) dp[i][0] = 1; // can travel only in one direction
