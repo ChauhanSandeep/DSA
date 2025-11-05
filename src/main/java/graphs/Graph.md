@@ -344,10 +344,10 @@ Topological sort is the process of ordering the vertices of a directed graph suc
 - **Dependency resolution**: In package managers, topological sort can be used to determine the order in which packages should be installed based on their dependencies.
 
 ### Approaches
-1. **DFS-based (Recursive)**: Uses a temporary stack to store vertices in topological order
+1. **DFS based (Recursive)**: Uses a temporary stack to store vertices in topological order
 2. **Kahn's Algorithm (Iterative)**: Uses in-degree of vertices and a queue
 
-### DFS-based Topological Sort Implementation
+### 1. DFS-based Topological Sort
 In this approach, topological sorting is performed using DFS. As DFS visits each node, it places the node on a stack once all its descendants are processed. The stack’s order gives a valid topological sort of the DAG.
 
 #### Steps:
@@ -424,7 +424,7 @@ public class TopologicalSortDFS {
 }
 ```
 
-### Kahn's Algorithm based approach
+### 2. Kahn's Algorithm Based Topological Sort
 Kahn’s algorithm is a method of topological sorting for DAGs using in-degree tracking. Nodes with zero in-degree (no dependencies) are processed first, and their removal decreases the in-degree of their neighbors. This process continues until all nodes are sorted or a cycle is detected.
 
 #### Steps:
@@ -586,9 +586,8 @@ These algorithms are used to find the shortest path between nodes in a graph. Th
 
 3. **Floyd-Warshall Algorithm**: Computes shortest paths between **all pairs of vertices**. Uses dynamic programming to consider all intermediate vertices. Time: O(V³).
 
----
 
-### Dijkstra's Algorithm
+### 1. Dijkstra's Algorithm
 Dijkstra’s algorithm is a greedy method for finding the shortest path in a graph with non-negative weights. It works by iteratively selecting the node with the smallest tentative distance, updating its neighbors, and continuing until the destination is reached or all nodes are processed.
 
 ### Example Leetcode Problems
@@ -705,7 +704,7 @@ public class DijkstraShortestPath {
 - **Time Complexity**: O((V + E) log V) using a binary heap priority queue
 - **Space Complexity**: O(V) for the distance array and the priority queue
 
-### Bellman-Ford Algorithm
+### 2. Bellman-Ford Algorithm
 Bellman-Ford is a single-source shortest path algorithm that works even with negative edge weights. It relaxes all edges up to n-1 times (where n is the number of nodes) and can detect negative weight cycles, unlike Dijkstra’s algorithm.
 
 ### Use Cases
@@ -796,7 +795,7 @@ public class BellmanFord {
 - **Time Complexity**: O(V × E)
 - **Space Complexity**: O(V) for the distance array
 ---
-### Floyd-Warshall Algorithm
+### 3. Floyd-Warshall Algorithm
 Imagine you want to know the shortest distance between every pair of cities in the world. But instead of checking each route directly, you ask:
 “What if I go through city X as a pit stop — is that cheaper?”  You do this for every possible city X as a middle stop, for every pair of cities.
 
@@ -1040,7 +1039,7 @@ An MST of a weighted undirected graph is a tree that spans all the vertices and 
 
 ---
 
-### Prim's Algorithm
+### 1. Prim's Algorithm
 Prim’s algorithm is a greedy algorithm to find the MST of a graph. Starting from any node, it repeatedly adds the nearest vertex not in the MST, until all vertices are included. It uses a priority queue to track the edge with the smallest weight at each step.
 
 ### Use Cases
@@ -1139,7 +1138,7 @@ public class PrimMST {
 - **Time Complexity**: O(E log V) using a binary heap
 - **Space Complexity**: O(V) for the key and parent arrays and the priority queue
 
-### Kruskal's Algorithm
+### 2. Kruskal's Algorithm
 Instead of starting from a node and growing like Prim’s, Kruskal’s starts with all nodes as isolated components, and adds the shortest edge available that does not create a cycle — until all nodes are connected. It heavily relies on a Disjoint Set Union (DSU) or Union-Find data structure to efficiently check whether adding an edge would form a cycle.
 
 Imagine the graph as a bunch of islands (nodes) and edges as bridges between them.
@@ -1454,7 +1453,6 @@ public class ArticulationPointsAndBridges {
 1. [LeetCode #1192: Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
 2. [LeetCode #1568: Minimum Number of Days to Disconnect Island](https://leetcode.com/problems/minimum-number-of-days-to-disconnect-island/)
 
----
 ---
 
 ## Kosaraju's Algorithm
