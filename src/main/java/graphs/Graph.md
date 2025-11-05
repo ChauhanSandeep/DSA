@@ -684,7 +684,7 @@ public class DijkstraShortestPath {
 - **Time Complexity**: O((V + E) log V) using a binary heap priority queue
 - **Space Complexity**: O(V) for the distance array and the priority queue
 
-## Bellman-Ford Algorithm
+### Bellman-Ford Algorithm
 Bellman-Ford is a single-source shortest path algorithm that works even with negative edge weights. It relaxes all edges up to n-1 times (where n is the number of nodes) and can detect negative weight cycles, unlike Dijkstra’s algorithm.
 
 ### Use Cases
@@ -1111,7 +1111,7 @@ public class PrimMST {
 - **Time Complexity**: O(E log V) using a binary heap
 - **Space Complexity**: O(V) for the key and parent arrays and the priority queue
 
-## Kruskal's Algorithm
+### Kruskal's Algorithm
 Instead of starting from a node and growing like Prim’s, Kruskal’s starts with all nodes as isolated components, and adds the shortest edge available that does not create a cycle — until all nodes are connected. It heavily relies on a Disjoint Set Union (DSU) or Union-Find data structure to efficiently check whether adding an edge would form a cycle.
 
 Imagine the graph as a bunch of islands (nodes) and edges as bridges between them.
