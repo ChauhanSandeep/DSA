@@ -331,6 +331,13 @@ public class DFS {
 
 Topological sort is the process of ordering the vertices of a directed graph such that for every directed edge u → v, vertex u comes before v in the ordering. This is primarily used in directed acyclic graphs (DAGs) and is helpful in scheduling tasks.
 
+**Algorithms Covered:**
+1. **DFS-based Topological Sort**: Uses depth-first search with a stack to store vertices in reverse finishing order. After DFS completes, vertices are popped from the stack to get topological order. Time: O(V + E).
+
+2. **Kahn's Algorithm (Preferred)**: Uses BFS with in-degree tracking. Repeatedly removes vertices with zero in-degree and reduces in-degree of neighbors. Easier to understand and can detect cycles. Time: O(V + E).
+
+---
+
 ### Use Cases
 - **Ordering tasks or events** with dependencies: Topological sort is used in project scheduling, task dependency resolution, and course prerequisite ordering where tasks must occur in a specific order.
 - **DAGs (Directed Acyclic Graphs)**: This algorithm is specifically designed for directed acyclic graphs where cycles do not exist.
@@ -569,7 +576,17 @@ public class TopologicalSortKahn {
 
 ---
 ## Shortest Path Algorithms
-These algorithms are used to find the shortest path between nodes in a graph. Depending on the graph structure (weighted/unweighted, directed/undirected), various algorithms can be used, such as Dijkstra’s, Bellman-Ford, or Floyd-Warshall.
+
+These algorithms are used to find the shortest path between nodes in a graph. The choice of algorithm depends on the graph structure and constraints:
+
+**Algorithms Covered:**
+1. **Dijkstra's Algorithm**: Finds shortest paths from a single source to all other vertices in graphs with **non-negative edge weights**. Uses a greedy approach with a priority queue. Time: O((V + E) log V).
+
+2. **Bellman-Ford Algorithm**: Handles graphs with **negative edge weights** and can detect negative cycles. Works by relaxing all edges V-1 times. Time: O(V × E).
+
+3. **Floyd-Warshall Algorithm**: Computes shortest paths between **all pairs of vertices**. Uses dynamic programming to consider all intermediate vertices. Time: O(V³).
+
+---
 
 ### Dijkstra's Algorithm
 Dijkstra’s algorithm is a greedy method for finding the shortest path in a graph with non-negative weights. It works by iteratively selecting the node with the smallest tentative distance, updating its neighbors, and continuing until the destination is reached or all nodes are processed.
@@ -775,7 +792,7 @@ public class BellmanFord {
 }
 ```
 
-#### Time and Space Complexity
+### Time and Space Complexity
 - **Time Complexity**: O(V × E)
 - **Space Complexity**: O(V) for the distance array
 ---
@@ -787,13 +804,13 @@ That’s the Floyd-Warshall algorithm: try improving every path by passing throu
 
 <b><u>This is not important for interviews</u></b>
 
-#### Use Cases
+### Use Cases
 - **All-pairs shortest path**: If you need the shortest path between every pair of nodes in a graph, especially when the graph is relatively small.
 - **Graph with dense edges**: Floyd-Warshall is particularly effective when the graph is dense, as it computes all distances in one go.
 - **Handling negative distances**: Like Bellman-Ford, it can handle graphs with negative distances, but it handles all pairs simultaneously.
 
 
-#### Steps
+### Steps
 1. Initialize a distance matrix where distance[i][j] = distance of direct edge i → j, or ∞ if no direct edge.
 2.	Loop over every node k as an intermediate node.
       - For every pair (i, j), check:
@@ -801,7 +818,7 @@ That’s the Floyd-Warshall algorithm: try improving every path by passing throu
       - If yes, update distance[i][j] = distance[i][k] + distance[k][j]
 3.	After all updates, if distance to itself (any diagonal distance[i][i] < 0 ), a negative weight cycle exists.
 
-#### Java Implementation
+### Java Implementation
 
 ```java
 import java.util.*;
@@ -861,11 +878,11 @@ public class FloydWarshall {
 }
 ```
 
-#### Time and Space Complexity
+### Time and Space Complexity
 - **Time Complexity**: O(V³) - Triple nested loop
 - **Space Complexity**: O(V²) for the distance matrix
 
-#### Example LeetCode Problems for Shortest Path Algorithms
+### Example LeetCode Problems for Shortest Path Algorithms
 1. [LeetCode #743: Network Delay Time](https://leetcode.com/problems/network-delay-time/)
 2. [LeetCode #787: Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
 3. [LeetCode #1334: Find the City With the Smallest Number of Neighbors at a Threshold Distance](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)
@@ -1013,18 +1030,26 @@ public class CycleDetectionUsingDisjointSet {
 
 ---
 ## Minimum Spanning Tree
+
 An MST of a weighted undirected graph is a tree that spans all the vertices and has the minimum possible total edge weight. It ensures all nodes are connected with the least amount of weight, useful in network design, clustering, etc.
+
+**Algorithms Covered:**
+1. **Prim's Algorithm**: Grows the MST by adding the minimum weight edge connecting a vertex in the MST to a vertex outside. Uses a priority queue to efficiently select edges. Best for dense graphs. Time: O(E log V).
+
+2. **Kruskal's Algorithm**: Sorts all edges by weight and adds them one by one, skipping edges that create cycles (using Union-Find). Best for sparse graphs. Time: O(E log E).
+
+---
 
 ### Prim's Algorithm
 Prim’s algorithm is a greedy algorithm to find the MST of a graph. Starting from any node, it repeatedly adds the nearest vertex not in the MST, until all vertices are included. It uses a priority queue to track the edge with the smallest weight at each step.
 
-#### Use Cases
+### Use Cases
 - **Dense graphs**: If the graph has a large number of edges, Prim’s is preferred over Kruskal’s since it avoids sorting edges.
 - **Incrementally constructing a minimum spanning tree (MST)**: You start from a node and grow the MST one edge at a time.
 - **When edge weights are available** and you need to connect all nodes with the minimum possible total weight.
 
 
-#### Steps
+### Steps
 Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **Initialize**: Create a `min-heap` (priority queue) to store `(toNode, distance)`, and a `visited[]` array. Start with an arbitrary node (usually 0), and add `(0, 0)` to the heap. Initialize `totalMstDistance = 0`.
 - **SELECT**: Extract the edge with the minimum distance from the heap.
@@ -1246,6 +1271,8 @@ public class KruskalMST {
 2. [LeetCode #1135: Connecting Cities With Minimum Cost](https://leetcode.com/problems/connecting-cities-with-minimum-cost/)
 3. [LeetCode #1489: Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree](https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/)
 
+---
+
 ## Articulation Points and Bridges
 
 Articulation points (or cut vertices) are vertices in an undirected graph whose removal increases the number of connected components. Bridges are edges whose removal increases the number of connected components. These are critical for understanding the vulnerability of a network.
@@ -1428,6 +1455,8 @@ public class ArticulationPointsAndBridges {
 2. [LeetCode #1568: Minimum Number of Days to Disconnect Island](https://leetcode.com/problems/minimum-number-of-days-to-disconnect-island/)
 
 ---
+---
+
 ## Kosaraju's Algorithm
 
 Kosaraju's algorithm finds all strongly connected components (SCCs) in a directed graph.
@@ -1541,7 +1570,10 @@ public class KosarajuSCC {
 1. [LeetCode #1192: Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
 2. [LeetCode #802: Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)
 
+---
+
 ## Eulerian Path, Circuit & Graph
+
 ### What it is
 - An Euler Path is a trail that visits every edge exactly once, but does not necessarily end where it started.
 - An Euler Circuit (Cycle) is a path that visits every edge exactly once and starts and ends at the same vertex.
