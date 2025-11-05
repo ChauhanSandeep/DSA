@@ -836,9 +836,8 @@ public class FloydWarshall {
                     }
                     
                     // Relaxation: update if path through k is shorter
-                    long newDistance = (long) distance[i][k] + distance[k][j];
-                    if (newDistance < distance[i][j]) {
-                        distance[i][j] = (int) newDistance;
+                    if (distance[i][k] + distance[k][j] < distance[i][j]) {
+                        distance[i][j] = distance[i][k] + distance[k][j];
                     }
                 }
             }
