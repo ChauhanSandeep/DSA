@@ -5,16 +5,16 @@
 - [Breadth-First Search (BFS)](#breadth-first-search-bfs) `(SELECT → MARK(*) → WORK → ADD(*))` [In Queue]
 - [Depth-First Search (DFS)](#depth-first-search-dfs) `(SELECT → MARK(*) → WORK → ADD(*))` [In Stack]
 - [Topological Sort](#topological-sort)
-    - [Topological Sort using DFS](#dfs-based-topological-sort-implementation)
-    - [Kahn's Algorithm (PREFERRED)](#kahns-algorithm-based-approach) `(SELECT → MARK(*) → WORK → ADD(*))` [In Queue with 0 In-Degree]
+    - [1. DFS-based Topological Sort](#1-dfs-based-topological-sort)
+    - [2. Kahn's Algorithm (PREFERRED)](#2-kahns-algorithm-based-topological-sort) `(SELECT → MARK(*) → WORK → ADD(*))` [In Queue with 0 In-Degree]
 - [Shortest Path Algorithms](#shortest-path-algorithms)
-    - [Dijkstra's Algorithm](#dijkstras-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with total path distance]
-    - [Bellman-Ford Algorithm](#bellman-ford-algorithm)
-    - [Floyd-Warshall Algorithm](#floyd-warshall-algorithm)
+    - [1. Dijkstra's Algorithm](#1-dijkstras-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with total path distance]
+    - [2. Bellman-Ford Algorithm](#2-bellman-ford-algorithm)
+    - [3. Floyd-Warshall Algorithm](#3-floyd-warshall-algorithm)
 - [Disjoint Sets (Union-Find)](#disjoint-sets-union-find)
 - [Minimum Spanning Tree](#minimum-spanning-tree)
-    - [Prim's Algorithm](#prims-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with individual Nodes]
-    - [Kruskal's Algorithm](#kruskals-algorithm)
+    - [1. Prim's Algorithm](#1-prims-algorithm) `(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with individual Nodes]
+    - [2. Kruskal's Algorithm](#2-kruskals-algorithm)
 - [Articulation Points and Bridges](#articulation-points-and-bridges)
 - [Kosaraju's Algorithm](#kosarajus-algorithm)
 
