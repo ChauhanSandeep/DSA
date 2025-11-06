@@ -111,7 +111,7 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
   mark them as visited and add them to the queue.
 - **Repeat**: Continue until the queue is empty.
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -212,7 +212,7 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
   mark them as visited and push them onto the stack.
 - **Repeat**: Continue until the stack is empty (or all nodes are visited in recursion).
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -356,7 +356,7 @@ In this approach, topological sorting is performed using DFS. As DFS visits each
 3. Push nodes to a stack after visiting all their neighbors
 4. Pop elements from the stack to get the topological order
 
-#### Java Implementation
+#### Code Implementation
 ```java
 import java.util.*;
 
@@ -436,7 +436,7 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **ADD(*)**: For each neighbor of the current node, reduce its in-degree by 1. If in-degree becomes 0, enqueue the neighbor.
 - **Repeat**: Continue until the queue is empty. If the result list size is less than the total nodes, then there is a cycle in the graph.
 
-#### Java Implementation
+#### Code Implementation
 ```java
 import java.util.*;
 
@@ -609,7 +609,7 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **ADD(*)**: For all unvisited neighbors of the current node, if a shorter path is found via the current node, update their distance and add them to the min-heap.
 - **Repeat**: Continue until the min-heap is empty.
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -723,7 +723,7 @@ Bellman-Ford is a single-source shortest path algorithm that works even with neg
    - “Relaxing an edge” means: Can I reach `to` from `from` more cheaply than I thought before?
 3. After n - 1 rounds, if any edge can still be relaxed, it means you’ve found a cycle that can keep reducing cost forever — a trap!
 
-### Java Implementation
+### Code Implementation
 ```java
 import java.util.*;
 
@@ -817,7 +817,7 @@ That’s the Floyd-Warshall algorithm: try improving every path by passing throu
       - If yes, update distance[i][j] = distance[i][k] + distance[k][j]
 3.	After all updates, if distance to itself (any diagonal distance[i][i] < 0 ), a negative weight cycle exists.
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -911,7 +911,7 @@ You can think of it as managing social circles — where each person belongs to 
     - This is optimized with union by rank, which ensures that the smaller tree is always added under the root of the larger tree, keeping the structure balanced.
 3. **Connected(x, y)**: Checks if x and y are in the same set by comparing their roots.
 
-### Java Implementation
+### Code Implementation
 
 ```java
 public class DisjointSet {
@@ -973,7 +973,7 @@ public class DisjointSet {
 }
 ```
 
-### Cycle Detection in Undirected Graph
+#### Use case : Cycle Detection in Undirected Graph
 A common use of Union-Find is detecting cycles in undirected graphs. If while adding an edge, the two nodes already belong to the same set, a cycle is formed.
 
 ```java
@@ -998,7 +998,8 @@ public class CycleDetectionUsingDisjointSet {
       int rootFrom = dsu.find(edge.from);
       int rootTo = dsu.find(edge.to);
 
-      // If both nodes are already in the same set, cycle exists
+      // If both nodes are already in the same set, means that these nodes were joined earlier from some other path
+      // And cycle exists so we reached here again
       if (rootFrom == rootTo) {
         return true;
       }
@@ -1037,7 +1038,6 @@ An MST of a weighted undirected graph is a tree that spans all the vertices and 
 
 2. **Kruskal's Algorithm**: Sorts all edges by weight and adds them one by one, skipping edges that create cycles (using Union-Find). Best for sparse graphs. Time: O(E log E).
 
----
 
 ### 1. Prim's Algorithm
 Prim’s algorithm is a greedy algorithm to find the MST of a graph. Starting from any node, it repeatedly adds the nearest vertex not in the MST, until all vertices are included. It uses a priority queue to track the edge with the smallest weight at each step.
@@ -1057,80 +1057,78 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **ADD(*)**: For all unvisited neighbors of the current node, add them to the heap along with their edge distance.
 - **Repeat**: Continue until all nodes are added to the MST (heap is empty or all nodes are visited).
 
-**Note:** In Dijkstra's (to find shortest distance between a source to destinations), the heap stores (shortestDistanceFromSource, node) while in Prim's (to find MST), it stores (currentNode, distance).
+**Note:** In Dijkstra's (to find shortest distance between a source to destinations), the heap stores (shortestDistanceFromSource, node) while in Prim's (to find MST), it stores (toNode, distance).
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
 
 public class PrimMST {
-    
-    // Represents an edge in the graph
-    static class Edge {
-        int from;
-        int to;
-        int weight;
-        
-        public Edge(int from, int to, int weight) {
-            this.from = from;
-            this.to = to;
-            this.weight = weight;
-        }
+
+  // Represents an edge in the graph
+  static class Edge {
+    int from;
+    int to;
+    int weight;
+
+    public Edge(int from, int to, int weight) {
+      this.from = from;
+      this.to = to;
+      this.weight = weight;
     }
-    
-    /**
-     * Computes the total weight of the Minimum Spanning Tree (MST)
-     * using Prim's Algorithm with a min-heap.
-     *
-     * Time Complexity: O(E * log V), where E = edges, V = vertices
-     * Space Complexity: O(V + E)
-     *
-     * @param numVertices Number of vertices in the graph
-     * @param graph       Adjacency list where graph[i] contains edges from vertex i
-     * @return Total weight of the MST
-     */
-    public static int computeMST(int numVertices, List<List<Edge>> graph) {
-        // Min-heap: prioritize edges with minimum weight
-        PriorityQueue<Edge> minHeap = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
-        
-        boolean[] inMST = new boolean[numVertices]; // Track vertices included in MST
-        int totalMSTWeight = 0;
-        int edgesAdded = 0;
-        
-        // Start from vertex 0 (arbitrary choice)
-        // Use -1 as 'from' for the starting vertex
-        minHeap.offer(new Edge(-1, 0, 0));
-        
-        while (!minHeap.isEmpty() && edgesAdded < numVertices) {
-            // SELECT: Extract edge with minimum weight
-            Edge current = minHeap.poll();
-            int vertex = current.to;
-            
-            // MARK(*): Skip if vertex already in MST
-            if (inMST[vertex]) continue;
-            inMST[vertex] = true;
-            
-            // WORK: Add edge weight to MST total
-            totalMSTWeight += current.weight;
-            edgesAdded++;
-            
-            // Optional: Print selected edge
-            if (current.from != -1) {
-                System.out.printf("Edge added: %d -> %d (weight = %d)%n",
-                    current.from, vertex, current.weight);
-            }
-            
-            // ADD(*): Add all edges from current vertex to unvisited neighbors
-            for (Edge edge : graph.get(vertex)) {
-                if (!inMST[edge.to]) {
-                    minHeap.offer(edge);
-                }
-            }
+  }
+
+  /**
+   * Computes the total weight of the Minimum Spanning Tree (MST)
+   * using Prim's Algorithm with a min-heap.
+   *
+   * Time Complexity: O(E * log V), where E = edges, V = vertices
+   * Space Complexity: O(V + E)
+   *
+   * @param numVertices Number of vertices in the graph
+   * @param graph       Adjacency list where graph[i] contains edges from vertex i
+   * @return Total weight of the MST
+   */
+  public static int computeMST(int numVertices, List<List<Edge>> graph) {
+    // Min-heap: prioritize edges with minimum weight
+    PriorityQueue<Edge> minHeap = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+
+    boolean[] inMST = new boolean[numVertices]; // Track vertices included in MST
+    int totalMSTWeight = 0;
+    int edgesAdded = 0;
+
+    // Start from vertex 0 (arbitrary choice)
+    minHeap.offer(new Edge(-1, 0, 0));
+
+    while (!minHeap.isEmpty() && edgesAdded < numVertices) {
+      // SELECT: Extract edge with minimum weight
+      Edge edge = minHeap.poll();
+      int toVertex = edge.to;
+
+      // MARK: Skip if already in MST
+      if (inMST[toVertex]) continue;
+      inMST[toVertex] = true;
+
+      // WORK: Add edge weight to total
+      totalMSTWeight += edge.weight;
+      edgesAdded++;
+
+      // Optional: Print selected edge
+      if (edge.from != -1) {
+        System.out.printf("Edge added: %d -> %d (weight = %d)%n", edge.from, edge.to, edge.weight);
+      }
+
+      // ADD: Add all edges from this vertex to unvisited neighbors
+      for (Edge neighborEdge : graph.get(toVertex)) {
+        if (!inMST[neighborEdge.to]) {
+          minHeap.offer(neighborEdge);
         }
-        
-        return totalMSTWeight;
+      }
     }
+
+    return totalMSTWeight;
+  }
 }
 ```
 
@@ -1161,7 +1159,7 @@ Imagine the graph as a bunch of islands (nodes) and edges as bridges between the
    - it connects nodes in the same component, skip it (would form a cycle)
 4.	Stop when MST has exactly V - 1 edges
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -1289,7 +1287,7 @@ Articulation points (or cut vertices) are vertices in an undirected graph whose 
     - It is the root of the DFS tree and has at least two children
     - It is not the root and has a child whose lowest reachable vertex is not an ancestor of the vertex
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -1470,7 +1468,7 @@ Kosaraju's algorithm finds all strongly connected components (SCCs) in a directe
 3. Pop vertices from the stack one by one and do a DFS on the transposed graph
 4. Each DFS traversal gives one SCC
 
-### Java Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -1601,7 +1599,7 @@ To find an Eulerian Circuit (or Path), we use Hierholzer’s Algorithm:
 4.	Reverse the result at the end to get the Eulerian Path/Circuit.
 
 
-### Java Implementation
+### Code Implementation
 
 Assumes the graph is connected and either Eulerian or Semi-Eulerian.
 
