@@ -151,17 +151,17 @@ public class MinCostCutStick {
     int[][] dp = new int[numberOfCuts + 2][numberOfCuts + 2]; // dp[i][j] = min cost to cut between curPositions[i] and curPositions[j]
 
     // Fill DP for increasing interval lengths
-    for (int len = 2; len < numberOfCuts + 2; len++) {
-      for (int i = 0; i + len < numberOfCuts + 2; i++) {
-        int j = i + len;
-        dp[i][j] = Integer.MAX_VALUE;
+    for (int gap = 2; gap < numberOfCuts + 2; gap++) {
+      for (int left = 0; left + gap < numberOfCuts + 2; left++) {
+        int right = left + gap;
+        dp[left][right] = Integer.MAX_VALUE;
         // Try each possible k
-        for (int intermediateCut = i + 1; intermediateCut < j; intermediateCut++) {
-          // Cost if cut at intermediateCut first
-          int currStickLength = curPositions[j] - curPositions[i];
-          int cost = dp[i][intermediateCut] + dp[intermediateCut][j] + currStickLength;
+        for (int split = left + 1; split < right; split++) {
+          // Cost if cut at split first
+          int currStickLength = curPositions[right] - curPositions[left];
+          int cost = dp[left][split] + dp[split][right] + currStickLength;
           // Update min
-          dp[i][j] = Math.min(dp[i][j], cost);
+          dp[left][right] = Math.min(dp[left][right], cost);
         }
       }
     }
