@@ -30,17 +30,17 @@ public class FrogJump {
 
     /**
      * Approach:
-     * - We use an **iterative DFS (Depth-First Search) with a stack**.
-     * - A **set `stoneSet` stores valid stone positions** for O(1) lookups.
-     * - A **set `visited` tracks (position, jumpSize) pairs** to avoid redundant checks.
+     * - We use iterative DFS (Depth-First Search) with a stack.
+     * - A set `stoneSet` stores valid stone positions for O(1) lookups.
+     * - A set `visited` tracks (position, jumpSize) pairs to avoid redundant checks.
      * - If at any step, the frog reaches the last stone, we return `true`.
      * - If all possibilities are exhausted, return `false`.
      *
      * Optimized Check:
-     * - If a stone is **too far away (more than double of the previous stone)**, return `false` early.
+     * - If a stone istoo far away (more than double of the previous stone), return `false` early.
      *
-     * Time Complexity: **O(N²)** in worst case (each stone has ~3 jump options).
-     * Space Complexity: **O(N²)** due to `visited` set storing position-jump pairs.
+     * Time Complexity:O(N²) in worst case (each stone has ~3 jump options).
+     * Space Complexity:O(N²) due to `visited` set storing position-jump pairs.
      *
      * @param stones Array of stone positions in ascending order.
      * @return `true` if the frog can reach the last stone, `false` otherwise.
