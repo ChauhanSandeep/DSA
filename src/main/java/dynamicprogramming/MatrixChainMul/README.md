@@ -2,6 +2,10 @@
 
 ## Matrix Chain Multiplication (MCM)
 
+Matrix Chain Multiplication is an optimization problem where you need to find the most efficient way to multiply a
+sequence of matrices together. The goal isn't to actually perform the multiplication, but to determine the best order (
+parenthesization) to minimize the total number of scalar multiplications required
+
 ### How to know that a problem is related to MCM?
 Not every problem is exactly MCM, but many are variations or analogs (e.g., the "Minimum Cost to Cut a Stick" problem you referenced earlier is a direct analog). You can identify MCM-like problems by these characteristics:
 

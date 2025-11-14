@@ -23,7 +23,8 @@ import java.util.Arrays;
  *
  * Follow-up Questions:
  * 1. How would the solution change if we wanted to minimize the coins instead?
- *      - We could modify the DP to take min instead of max, but the problem is about max; minimization might not make sense in this context as coins are positive.
+ *      - We could modify the DP to take min instead of max, but the problem is about max;
+ *      minimization might not make sense in this context as coins are positive.
  * 2. What if balloons could be burst in groups?
  *      - That would require a different DP state, perhaps segmenting into groups, but here it's individual bursts.
  * 3. How to handle if some balloons give negative coins?
@@ -63,7 +64,7 @@ public class BurstBalloon {
      */
     public int maxCoinsRecursiveApproach(int[] nums) {
         int length = nums.length;
-        int[][] memo = new int[length][length];
+        int[][] memo = new int[length][length]; // memo[i][j] stores max coins for range i to j
 
         // Fill memo with -1 to indicate uncomputed states
         for (int[] row : memo) {
@@ -137,8 +138,9 @@ public class BurstBalloon {
         int[][] dp = new int[length][length];
 
         // Fill DP table for subarrays of different lengths
-        for (int subarrayLength = 0; subarrayLength < length; subarrayLength++) {
-            for (int startIndex = 0, endIndex = subarrayLength; endIndex < length; startIndex++, endIndex++) {
+        for (int gap = 0; gap < length; gap++) {
+            for (int startIndex = 0; startIndex + gap < length; startIndex++) {
+                int endIndex = startIndex + gap;
                 int maxCoinsInRange = Integer.MIN_VALUE;
 
                 // Try bursting each balloon in the range [startIndex, endIndex]

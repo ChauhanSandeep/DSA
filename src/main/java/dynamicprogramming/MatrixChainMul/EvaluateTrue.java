@@ -6,7 +6,7 @@ import java.util.Arrays;
  * LeetCode Problem: Boolean Parenthesization (Similar to https://leetcode.com/problems/parsing-a-boolean-expression/)
  *
  * Given a boolean expression containing 'T' (true), 'F' (false), and operators '&' (AND), '|' (OR), and '^' (XOR),
- * this program calculates the number of ways to parenthesize the expression so that it evaluates to true.
+ * calculates the number of ways to parenthesize the expression so that it evaluates to true.
  * For example:
  * - Input: "T|F&T^F"
  * - Output: 4
