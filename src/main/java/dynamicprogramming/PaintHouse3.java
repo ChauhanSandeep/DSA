@@ -4,31 +4,39 @@ import java.util.Arrays;
 
 
 /**
- * Paint House III
  *
- * Problem Statement:
- * There is a row of m houses in a small city, each house must be painted with one of n colors.
- * The cost of painting each house with a certain color is different. You have to paint all the houses
- * such that no two adjacent houses have the same color. Some houses are already painted (houses[i] != 0).
- * A neighborhood is a maximal group of continuous houses that are painted with the same color.
- * Return the minimum cost of painting all the remaining houses so that there are exactly target neighborhoods.
- * If it is not possible, return -1.
+ * There is a row of m houses in a small city. Each house must be painted with one of n colors (labeled from 1 to n).
+ * Some houses are already painted (cannot be repainted). You need to paint all remaining houses.
  *
- * Example:
- * Input: houses = [0,0,0,0,0],
- * cost = [
- * [1,10],
- * [10,1],
- * [10,1],
- * [1,10],
- * [5,1]
- * ], m = 5, n = 2, target = 3
+ * A neighborhood is a maximal group of continuous houses painted with the same color.
+ * For example: houses = [1,2,2,3,3,2,1,1] contains 5 neighborhoods [{1}, {2,2}, {3,3}, {2}, {1,1}].
+ *
+ * Given:
+ * - houses: array where houses[i] is the color of house i (0 means unpainted)
+ * - cost: 2D array where cost[i][j] is the cost to paint house i with color j+1
+ * - m: number of houses
+ * - n: number of colors
+ * - target: desired number of neighborhoods
+ *
+ * Return the minimum cost to paint all houses such that there are exactly target neighborhoods.
+ * If impossible, return -1.
+ *
+ * Input: houses = [0,0,0,0,0], cost = [[1,10],[10,1],[10,1],[1,10],[5,1]], 
+ *  m = 5, 
+ *  n = 2, 
+ * target = 3
+ *
  * Output: 9
- * Explanation: Paint houses with colors [1,2,2,1,1] to get 3 neighborhoods [1],[2,2],[1,1] with cost 1+1+1+1+5=9.
+ * Explanation:
+ * Paint houses: [1,2,2,1,1]
+ * Neighborhoods: [{1}, {2,2}, {1,1}] = 3 neighborhoods
+ * Cost: 1 + 10 + 1 + 1 + 5 = 18... wait, optimal is actually 9
+ * Actual optimal: [1,1,2,1,1] with cost 1+1+1+1+5=9 gives [{1,1},{2},{1,1}] = 3 neighborhoods
+ *
  *
  * LeetCode: https://leetcode.com/problems/paint-house-iii/
  *
- * Follow-up Questions for FAANG Interviews:
+ * Follow-up Questions:
  * 1. Q: What if we want to minimize neighborhoods instead of achieving exact target?
  *    A: Remove target constraint and track minimum neighborhoods formed. Use similar DP structure.
  *
@@ -63,14 +71,27 @@ public class PaintHouse3 {
   /**
    * Top-down DP solution to find minimum cost for painting houses
    *
-   * Steps:
-   * 1. Use memoization with state (houseIndex, neighborhoodCount, previousColor)
-   * 2. For each house, either it's pre-painted or we try all possible colors
-   * 3. Track neighborhoods by checking if current color differs from previous
-   * 4. Return minimum cost among all valid color assignments
-   * 5. Use pruning when neighborhoods exceed target (impossible to achieve exact target)
+   * Main method: Finds minimum cost using 3D Dynamic Programming with Memoization.
+   * Step-by-step:
+   *  1. Define DP state: dp[currentHouseIndex][currentNeighborhoods][previousHouseColor] 
+   *     - currentHouseIndex: current house being processed (0 to m)
+   *     - previousHouseColor: color of previous house (0 to n, where 0 means no previous house)
+   *     - currentNeighborhoods: number of neighborhoods formed so far (0 to target)
+   *  2. Base case: When all houses processed (currentHouseIndex == m):
+   *     - Return 0 if currentNeighborhoods == target, otherwise IMPOSSIBLE
+   *  3. For each house:
+   *     a. If already painted: only one choice (existing color)
+   *     b. If unpainted: try all n colors
+   *  4. For each color choice:
+   *     - Calculate new neighborhood count (increment if different from prevColor)
+   *     - Add painting cost (if house was unpainted)
+   *     - Recursively solve for remaining houses
+   *  5. Return minimum cost among all valid solutions.
+   * 
+   * Key Insight:
+   * A new neighborhood is formed when current house color differs from previous house color.
+   * We track neighborhoods incrementally as we paint houses from left to right.
    *
-   * Algorithm: Top-Down Dynamic Programming with Memoization
    * Time Complexity: O(m * target * n * n) = O(m * target * n²)
    * Space Complexity: O(m * target * n) for memoization + O(m) recursion stack
    *
@@ -97,26 +118,26 @@ public class PaintHouse3 {
   }
 
   private int findMinimumCostRecursive(int[] houses, int[][] paintingCosts, int currentHouseIndex,
-      int currentNeighborhoods, int previousHouseColor, int targetNeighborhoods, int numColors) {
+      int currentneighborhoodCount, int previousHouseColor, int targetNeighborhoods, int numColors) {
     // Base case: processed all houses
     if (currentHouseIndex == houses.length) {
-      return (currentNeighborhoods == targetNeighborhoods) ? 0 : IMPOSSIBLE_COST;
+      return (currentneighborhoodCount == targetNeighborhoods) ? 0 : IMPOSSIBLE_COST;
     }
 
     // Pruning: too many neighborhoods already formed
-    if (currentNeighborhoods > targetNeighborhoods) {
+    if (currentneighborhoodCount > targetNeighborhoods) {
       return IMPOSSIBLE_COST;
     }
 
     // Pruning: impossible to reach target with remaining houses
     int remainingHouses = houses.length - currentHouseIndex;
-    if (currentNeighborhoods + remainingHouses < targetNeighborhoods) {
+    if (currentneighborhoodCount + remainingHouses < targetNeighborhoods) {
       return IMPOSSIBLE_COST;
     }
 
     // Check memoization cache
-    if (dp[currentHouseIndex][currentNeighborhoods][previousHouseColor] != null) {
-      return dp[currentHouseIndex][currentNeighborhoods][previousHouseColor];
+    if (dp[currentHouseIndex][currentneighborhoodCount][previousHouseColor] != null) {
+      return dp[currentHouseIndex][currentneighborhoodCount][previousHouseColor];
     }
 
     int minimumCostFromCurrentState = IMPOSSIBLE_COST;
@@ -124,7 +145,7 @@ public class PaintHouse3 {
     if (houses[currentHouseIndex] != 0) {
       // House is already painted
       int currentHouseColor = houses[currentHouseIndex];
-      int newNeighborhoodCount = currentNeighborhoods + ((currentHouseColor != previousHouseColor) ? 1 : 0);
+      int newNeighborhoodCount = currentneighborhoodCount + ((currentHouseColor != previousHouseColor) ? 1 : 0);
 
       minimumCostFromCurrentState =
           findMinimumCostRecursive(houses, paintingCosts, currentHouseIndex + 1, newNeighborhoodCount,
@@ -132,7 +153,7 @@ public class PaintHouse3 {
     } else {
       // House needs to be painted - try all available colors
       for (int colorChoice = 1; colorChoice <= numColors; colorChoice++) {
-        int newNeighborhoodCount = currentNeighborhoods + ((colorChoice != previousHouseColor) ? 1 : 0);
+        int newNeighborhoodCount = currentneighborhoodCount + ((colorChoice != previousHouseColor) ? 1 : 0);
 
         int costForThisColor = paintingCosts[currentHouseIndex][colorChoice - 1]
             + findMinimumCostRecursive(houses, paintingCosts, currentHouseIndex + 1,
@@ -143,7 +164,7 @@ public class PaintHouse3 {
     }
 
     // Cache and return result
-    dp[currentHouseIndex][currentNeighborhoods][previousHouseColor] = minimumCostFromCurrentState;
+    dp[currentHouseIndex][currentneighborhoodCount][previousHouseColor] = minimumCostFromCurrentState;
     return minimumCostFromCurrentState;
   }
 

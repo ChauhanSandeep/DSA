@@ -1,4 +1,4 @@
-package com.leetcode.tree;
+package trees.dfs;
 
 /**
  * Problem: Binary Tree Maximum Path Sum
@@ -94,107 +94,29 @@ public class BinaryTreeMaximumPathSum {
         int[] leftResult = calculateMaxPath(node.left);
         int[] rightResult = calculateMaxPath(node.right);
 
-        int leftMaxPath = leftResult[0];      // Best path in left subtree
-        int leftMaxBranch = leftResult[1];    // Best branch from left child
+        int bestPathInLeftSubtree = leftResult[0];      // Best complete path in left subtree
+        int leftGainToParent = leftResult[1];           // Gain from left child if we continue upward
 
-        int rightMaxPath = rightResult[0];    // Best path in right subtree
-        int rightMaxBranch = rightResult[1];  // Best branch from right child
+        int bestPathInRightSubtree = rightResult[0];    // Best complete path in right subtree
+        int rightGainToParent = rightResult[1];         // Gain from right child if we continue upward
 
         // Calculate best single branch going through current node
         // Can go left, right, or neither (just node itself)
-        int leftBranch = Math.max(0, leftMaxBranch);
-        int rightBranch = Math.max(0, rightMaxBranch);
-        int maxBranchToParent = node.val + Math.max(leftBranch, rightBranch);
+        int leftContribution = Math.max(0, leftGainToParent);
+        int rightContribution = Math.max(0, rightGainToParent);
+        int maxSinglePathToParent = node.val + Math.max(leftContribution, rightContribution);
 
         // Calculate best path going through current node (can use both branches)
-        int pathThroughNode = node.val + leftBranch + rightBranch;
+        int pathThroughCurrentNode = node.val + leftContribution + rightContribution;
 
         // Global maximum is best of:
         // 1. Path through current node (using both branches)
         // 2. Best path in left subtree
         // 3. Best path in right subtree
-        int maxPathInSubtree = Math.max(pathThroughNode,
-            Math.max(leftMaxPath, rightMaxPath));
+        int bestPathInCurrentSubtree = Math.max(pathThroughCurrentNode,
+            Math.max(bestPathInLeftSubtree, bestPathInRightSubtree));
 
-        return new int[]{maxPathInSubtree, maxBranchToParent};
-    }
-
-    /**
-     * Alternative approach using array to pass maximum value by reference.
-     * Avoids instance variable for cleaner encapsulation.
-     *
-     * Algorithm:
-     * Same as above but uses array to track maximum across recursive calls.
-     *
-     * Time Complexity: O(N) where N is number of nodes.
-     *
-     * Space Complexity: O(H) for recursion stack where H is tree height.
-     *
-     * @param root root of the binary tree
-     * @return maximum path sum in the tree
-     */
-    public int maxPathSumArray(TreeNode root) {
-        int[] max = new int[]{Integer.MIN_VALUE};
-        calculateMaxPathWithArray(root, max);
-        return max[0];
-    }
-
-    private int calculateMaxPathWithArray(TreeNode node, int[] max) {
-        if (node == null) {
-            return 0;
-        }
-
-        int leftMax = Math.max(0, calculateMaxPathWithArray(node.left, max));
-        int rightMax = Math.max(0, calculateMaxPathWithArray(node.right, max));
-
-        max[0] = Math.max(max[0], leftMax + node.val + rightMax);
-
-        return node.val + Math.max(leftMax, rightMax);
-    }
-
-    /**
-     * Verbose version with detailed comments for educational purposes.
-     *
-     * Algorithm:
-     * Same logic but with extensive inline documentation explaining each step.
-     *
-     * Time Complexity: O(N) where N is number of nodes.
-     *
-     * Space Complexity: O(H) for recursion stack where H is tree height.
-     *
-     * @param root root of the binary tree
-     * @return maximum path sum in the tree
-     */
-    public int maxPathSumVerbose(TreeNode root) {
-        int[] globalMax = new int[]{Integer.MIN_VALUE};
-        dfsMaxPath(root, globalMax);
-        return globalMax[0];
-    }
-
-    private int dfsMaxPath(TreeNode node, int[] globalMax) {
-        // Base case: null node contributes 0 to any path
-        if (node == null) {
-            return 0;
-        }
-
-        // Get maximum gain from left subtree
-        // Math.max(0, ...) means we ignore negative paths
-        int leftGain = Math.max(0, dfsMaxPath(node.left, globalMax));
-
-        // Get maximum gain from right subtree
-        int rightGain = Math.max(0, dfsMaxPath(node.right, globalMax));
-
-        // Calculate path sum going through current node
-        // This creates a path: left subtree -> current node -> right subtree
-        int currentPathSum = leftGain + node.val + rightGain;
-
-        // Update global maximum if current path is better
-        globalMax[0] = Math.max(globalMax[0], currentPathSum);
-
-        // Return maximum gain if parent uses this node in its path
-        // Can only choose one branch (left or right), not both
-        // Adding node.val because parent needs this node's contribution
-        return node.val + Math.max(leftGain, rightGain);
+        return new int[]{bestPathInCurrentSubtree, maxSinglePathToParent};
     }
 
     /**

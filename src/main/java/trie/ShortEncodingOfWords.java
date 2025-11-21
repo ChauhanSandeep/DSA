@@ -72,9 +72,9 @@ public class ShortEncodingOfWords {
      * By processing longer words first and removing their suffixes, we ensure
      * only necessary words remain for encoding.
      *
-     * Time Complexity: O(N * L^2) where N is number of words and L is average word length.
-     * Sorting takes O(N log N), and for each word we generate up to L suffixes with
-     * substring operations taking O(L) each.
+     * Time Complexity: O(N log N + N*L²) where N is number of words and L is average word length.
+     * - O(N log N) for sorting words by length
+     * - O(N * L²) for suffix removal (each word of length L has up to L suffixes, each requiring O(L) substring operations)
      *
      * Space Complexity: O(N * L) for storing all words in the Set.
      *
@@ -84,18 +84,24 @@ public class ShortEncodingOfWords {
     public int minimumLengthEncoding(String[] words) {
         Set<String> wordSet = new HashSet<>(Arrays.asList(words));
 
+        // Sort words by length in descending order
+        Arrays.sort(words, (a, b) -> Integer.compare(b.length(), a.length()));
+
+        // Remove words from the set which will be encoded by their longer words
         for (String word : words) {
+            // Remove all suffixes of the current word
             for (int i = 1; i < word.length(); i++) {
-                wordSet.remove(word.substring(i));
+                String suffix = word.substring(i);
+                wordSet.remove(suffix);
             }
         }
 
-        int length = 0;
+        // Calculate total length of remaining words + '#' for each
+        int totalLength = 0;
         for (String word : wordSet) {
-            length += word.length() + 1;
+            totalLength += word.length() + 1; // +1 for '#'
         }
-
-        return length;
+        return totalLength;
     }
 
     /**

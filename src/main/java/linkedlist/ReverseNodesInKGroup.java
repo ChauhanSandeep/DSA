@@ -3,7 +3,7 @@ package linkedlist;
 import java.util.*;
 
 /**
- * 25. Reverse Nodes in k-Group
+ * Reverse Nodes in k-Group
  *
  * Problem: Given a linked list, reverse the nodes in groups of k and return the modified list.
  * If the number of nodes is not a multiple of k, the remaining nodes should stay as is.

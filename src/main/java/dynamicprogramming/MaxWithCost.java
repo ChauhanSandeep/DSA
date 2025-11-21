@@ -1,7 +1,7 @@
 package dynamicprogramming;
 
 /**
- * 🔗 LeetCode: https://leetcode.com/problems/maximum-number-of-points-with-cost/
+ * LeetCode: https://leetcode.com/problems/maximum-number-of-points-with-cost/
  *
  * Problem Statement:
  * You are given a 2D integer matrix `points` of size `m x n`.
@@ -9,7 +9,7 @@ package dynamicprogramming;
  * and move down row by row. From a cell `(i, j)`, you can move to any cell `(i+1, k)`
  * in the next row but you incur a cost of `abs(j - k)`.
  *
- * Your goal is to return the **maximum total points** you can collect.
+ * Your goal is to return the maximum total points you can collect.
  *
  * Example:
  * Input: points = [
@@ -21,7 +21,7 @@ package dynamicprogramming;
  * Explanation: Start from points[0][2] = 3 → points[1][1] = 5 → points[2][0] = 3
  * Total = 3 + 5 + 3 - (2) (minus cost) = 9
  *
- * 🔁 Follow-up Questions:
+ * Follow-up Questions:
  * Q: Can this be done in-place with O(1) extra space?
  * A: Not without altering input or compromising performance. Right now O(n) is optimal.
  *

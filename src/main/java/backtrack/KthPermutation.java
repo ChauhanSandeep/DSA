@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Permutation Sequence - LeetCode Problem 60
+ * PermutationSequence.java
  *
- * Problem Statement:
  * The set [1, 2, 3, ..., n] contains a total of n! unique permutations.
- * By listing and labeling all of the permutations in order, return the kth permutation sequence.
- * Permutations are ordered lexicographically and k is 1-indexed.
+ * By listing and labeling all of the permutations in order, we get the following sequence for n = 3:
+ * "123", "132", "213", "231", "312", "321"
+ * Given n and k, return the kth permutation sequence.
  *
- * Example : n = 4, k = 17
- * Output: "3214"
- * Explanation: The 17-th permutation of [1, 2, 3, 4] is "3214".
+ * Example 1:
+ * Input: n = 3, k = 3
+ * Output: "213"
+ * Explanation:
+ * The permutations in order are: "123", "132", "213", "231", "312", "321"
+ * The 3rd permutation is "213"
  *
  * LeetCode Link: https://leetcode.com/problems/permutation-sequence/
  *
@@ -51,14 +54,14 @@ public class KthPermutation {
      *
      * Step-by-step trace for n = 4, k = 17 (zero-based k = 16):
      *
-     * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
-     * | Step | Available Numbers | Factorial | k   | Index = k / factorial  | Picked Digit  | New k = k % factorial  |
-     * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
-     * | 1    | [1, 2, 3, 4]      |(4-1)! = 6 | 16  | 2                      | 3             | 4                      |
-     * | 2    | [1, 2, 4]         |(3-1)! = 2 | 4   | 2                      | 4             | 0                      |
-     * | 3    | [1, 2]            |(2-1)! = 1 | 0   | 0                      | 1             | 0                      |
-     * | 4    | [2]               |(1-1)! = 1 | 0   | 0                      | 2             | -                      |
-     * |------|-------------------|-----------|-----|------------------------|---------------|------------------------|
+     * |------|-------------------|-----------|-----|------------------------------|---------------|------------------------|
+     * | Step | Available Numbers | Factorial | k   | PickedIndex = k / factorial  | Picked Digit  | New k = k % factorial  |
+     * |------|-------------------|-----------|-----|------------------------------|---------------|------------------------|
+     * | 1    | [1, 2, 3, 4]      |(4-1)! = 6 | 16  | 2                            | 3             | 16 % 6 = 4             |
+     * | 2    | [1, 2, 4]         |(3-1)! = 2 | 4   | 2                            | 4             | 4 % 2 = 0              |
+     * | 3    | [1, 2]            |(2-1)! = 1 | 0   | 0                            | 1             | 0                      |
+     * | 4    | [2]               |(1-1)! = 1 | 0   | 0                            | 2             | 0                      |
+     * |------|-------------------|-----------|-----|------------------------------|---------------|------------------------|
      * Final Permutation: "3412"
      *
      * Time Complexity:  O(n) → We iterate through `n` elements and perform constant-time operations.

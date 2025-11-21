@@ -41,114 +41,58 @@ import java.util.*;
  */
 public class DominoAndTrominoTiling {
 
-    private static final int MOD = 1000000007;
+  private static final int MODULO = 1_000_000_007;
 
-    /**
-     * Space-optimized version using rolling variables.
-     *
-     * Algorithm: Space-Optimized DP with Rolling Variables
-     * Step 1: Observe that we only need last 3 values to compute current value
-     * Step 2: Use three variables instead of full array
-     * Step 3: Update variables in rolling fashion
-     * Step 4: Maintain same recurrence relation logic
-     *
-     * Time Complexity: O(n)
-     * Space Complexity: O(1) - constant space usage
-     *
-     * @param n the width of the board
-     * @return number of ways with optimized space usage
-     */
-    public int numTilingsOptimized(int n) {
-      if (n == 1) {
-        return 1;
-      }
-      if (n == 2) {
-        return 2;
-      }
-      if (n == 3) {
-        return 5;
-      }
+  /**
+   * Using full state DP with explicit tracking of partial tilings.
+   * Step-by-step:
+   *  1. Define two states:
+   *     - fullyTiled[i]: ways to fully tile 2 x i board
+   *     - partiallyTiled[i]: ways to tile with one cell in column i+1 already covered
+   *  2. Base cases: fullyTiled[0] = 1, partiallyTiled[0] = 0
+   *  3. Transitions:
+   *     - fullyTiled[i] = fullyTiled[i-1] + fullyTiled[i-2] + 2 * partiallyTiled[i-1]
+   *     - partiallyTiled[i] = fullyTiled[i-1] + partiallyTiled[i-1]
+   *  4. This approach makes the state transitions more explicit and easier to understand.
+   *
+   * Algorithm: Dynamic Programming with explicit state tracking.
+   * Time Complexity: O(n).
+   * Space Complexity: O(n) for both arrays.
+   */
+  public int numTilingsExplicitStates(int boardWidth) {
+    // Base cases
+    if (boardWidth == 1) return 1; // Only one vertical domino possible
+    if (boardWidth == 2) return 2; // Two ways: 2 vertical dominoes or 2 horizontal dominoes
 
-        // Step 1-2: Use rolling variables for last three values
-        long thirdPrev = 1;  // f(i-3)
-        long secondPrev = 2; // f(i-2)
-        long firstPrev = 5;  // f(i-1)
+    // fullyTiled[i] → number of ways to fully cover a 2×i board
+    // partiallyTiled[i]  → number of ways to cover a 2×i board with one cell missing at the top or bottom corner
+    long[] fullyTiled = new long[boardWidth + 1];
+    long[] partiallyTiled = new long[boardWidth + 1];
 
-        // Step 3-4: Compute using rolling updates
-        for (int i = 4; i <= n; i++) {
-          /**
-           * - From firstPrev (f(i-1)), add a vertical domino
-           * - From secondPrev (f(i-2)), add two horizontal dominoes
-           * - From thirdPrev (f(i-3)), add two L-trominoes in two orientations. Vertical/Horizontal are not included
-           *   as they are already covered in firstPrev and secondPrev
-           */
-            long current = (firstPrev + secondPrev + 2 * thirdPrev) % MOD;
+    // Base initialization
+    fullyTiled[0] = 1; // An empty board (2×0) has one valid configuration — do nothing
+    fullyTiled[1] = 1; // A 2×1 board can only have one vertical domino
+    partiallyTiled[0] = 0;  // You can’t have a half-covered empty board
+    partiallyTiled[1] = 0;  // A 2×1 board can’t be half-covered by a valid tromino
 
-            // Roll the variables forward
-            thirdPrev = secondPrev;
-            secondPrev = firstPrev;
-            firstPrev = current;
-        }
+    // Fill the DP arrays using recurrence relations
+    for (int width = 2; width <= boardWidth; width++) {
+      /**
+       * fullyTiled[width]:
+       *  1. Add a vertical domino to fullyTiled[width - 1]
+       *  2. Add two horizontal dominoes to fullyTiled[width - 2]
+       *  3. Add two mirrored L-shaped trominoes to partiallyTiled[width - 1]
+       */
+      fullyTiled[width] = (fullyTiled[width - 1] + fullyTiled[width - 2] + 2 * partiallyTiled[width - 1]) % MODULO;
 
-        return (int) firstPrev;
+      /**
+       * partiallyTiled[width]:
+       *  1. Extend a fully covered board of width-2 by adding one tromino
+       *  2. Extend a half-covered board of width-1 by adding one vertical domino
+       */
+      partiallyTiled[width] = (fullyTiled[width - 2] + partiallyTiled[width - 1]) % MODULO;
     }
 
-    /**
-     * Recursive approach with memoization for better understanding.
-     *
-     * Algorithm: Top-Down DP with Memoization
-     * Step 1: Define recursive function that computes tiling ways for width n
-     * Step 2: Use memoization to avoid recomputing same subproblems
-     * Step 3: Handle base cases and recursive calls
-     * Step 4: Apply modular arithmetic to prevent overflow
-     *
-     * Time Complexity: O(n) due to memoization
-     * Space Complexity: O(n) for recursion stack and memoization table
-     *
-     * @param n the width of the board
-     * @return number of ways using recursive memoization
-     */
-    public int numTilingsRecursive(int n) {
-        Map<Integer, Long> memo = new HashMap<>(); // Key is n, Value is number of ways
-        return (int) numTilingRecHelper(n, memo);
-    }
-
-    // Helper method for recursive memoized solution
-    private long numTilingRecHelper(int n, Map<Integer, Long> memo) {
-      if (n == 0) return 1;
-      if (n == 1) return 1;
-      if (n == 2) return 2;
-      if (n == 3) return 5;
-
-        // Check memoization
-        if (memo.containsKey(n)) {
-            return memo.get(n);
-        }
-
-        // Recursive call with memoization
-        long result = (numTilingRecHelper(n-1, memo) + numTilingRecHelper(n-2, memo) + 2 * numTilingRecHelper(n-3, memo)) % MOD;
-
-        memo.put(n, result);
-        return result;
-    }
+    return (int) fullyTiled[boardWidth];
+  }
 }
-
-/**
- * Usage Example:
- * DominoAndTrominoTiling solution = new DominoAndTrominoTiling();
- *
- * int result1 = solution.numTilings(3);              // returns 5 - optimal DP approach
- * int result2 = solution.numTilingsSimplified(3);   // returns 5 - simplified recurrence
- * int result3 = solution.numTilingsOptimized(3);    // returns 5 - space optimized O(1)
- * int result4 = solution.numTilingsRecursive(3);    // returns 5 - recursive with memoization
- *
- * // For larger inputs (matrix exponentiation)
- * int result5 = solution.numTilingsMatrix(100);     // efficient for very large n
- *
- * // Verification with brute force (only for small n)
- * int result6 = solution.numTilingsBruteForce(3);   // returns 5 - brute force verification
- *
- * System.out.println("Ways to tile 2x3 board: " + result1); // Output: 5
- * System.out.println("Ways to tile 2x1 board: " + solution.numTilings(1)); // Output: 1
- * System.out.println("Ways to tile 2x4 board: " + solution.numTilings(4)); // Output: 11
- */

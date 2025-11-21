@@ -50,7 +50,7 @@ public class SwapPairs {
 
   /**
    * Intuition:
-   * Think of swapping in *chunks of size 2*.
+   * Think of swapping in chunks of size 2.
    * Every iteration we focus on two nodes at a time:
    *     [first] -> [second] -> [next]
    * becomes
@@ -59,9 +59,9 @@ public class SwapPairs {
    * Approach:
    *  1. Use a dummy node to simplify swapping at the head of the list.
    *  2. Initialize two pointers:
-   *     - `previous`: Points to the end of the processed part.
-   *     - `head`: Points to the current pair’s first node.
-   *  3. Loop while both `head` and `head.next` exist:
+   *     - previous: Points to the end of the processed part.
+   *     - head: Points to the current pair’s first node.
+   *  3. Loop while both head and head.next exist:
    *     - Identify the two nodes to swap.
    *     - Adjust pointers to swap them.
    *     - Reconnect the previous group to the new start of the current group.

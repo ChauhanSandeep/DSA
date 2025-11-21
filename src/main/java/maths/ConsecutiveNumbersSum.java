@@ -59,40 +59,34 @@ public class ConsecutiveNumbersSum {
         return count;
     }
 
-    /**
-     * Counts ways to express n as sum of consecutive positive integers using mathematical approach.
-     * # Consecutive Numbers Sum - Concise Solution
-     *
-     * Observation
-     * - For any length k, there's exactly one consecutive sequence that sums to N (if it exists).
-     *
-     * Equation
-     * - k consecutive numbers starting from x:
-     *     => x + (x+1) + (x+2) + ... + (x+k-1) = N
-     *     => kx + k(k-1)/2 = N
-     *     => x = (N - k(k-1)/2) / k
-     *
-     *
-     * Conditions:
-     * 1. Loop bound: k * (k-1) / 2 < N (so that numerator > 0)
-     * 2. Check validity:
-     *    - numerator = N - k(k-1)/2 > 0 (positive starting point)
-     *    - numerator % k == 0 (integer starting point)
-     * 3. Count: Each valid k contributes 1 to the answer
-     *
-     * Algorithm:
-     * 1. For k consecutive numbers starting from a: n = k*a + k*(k-1)/2
-     * 2. Rearranging: numerator = (n - k*(k-1)/2) / k
-     * 3. For valid sequence, 'numerator' must be positive integer
-     * 4. Iterate through possible values of k and count valid sequences
-     * 5. Stop when k*(k-1)/2 >= n (no valid positive 'numerator' possible)
-     *
-     * Time Complexity: O(√n) where n is the input number
-     * Space Complexity: O(1) - only using constant extra space
-     *
-     * @param num Input positive integer
-     * @return Number of ways to write n as sum of consecutive positive integers
-     */
+   /**
+    * Counts ways to represent n as sum of consecutive integers using mathematical approach.
+    * Step-by-step:
+    *  1. Mathematical derivation:
+    *     - Let the consecutive integers be: x, x+1, x+2, ..., x+(k-1)
+    *     - Sum formula: k*x + k*(k-1)/2 = n
+    *     - Rearranging: k*x = n - k*(k-1)/2
+    *     - For valid representation: x must be a positive integer
+    *  2. For each possible length k (starting from 1):
+    *     a. Calculate: numerator = n - k*(k-1)/2
+    *     b. Check if numerator > 0 and divisible by k
+    *     c. If yes, we found a valid way to represent n
+    *  3. Loop continues while k*(k-1)/2 < n (ensures numerator stays positive)
+    *  4. Count all valid representations.
+    *
+    * Key Insight:
+    * For k consecutive integers starting at x:
+    * Sum = k*x + (0 + 1 + 2 + ... + (k-1)) = k*x + k*(k-1)/2 = n
+    * So: x = (n - k*(k-1)/2) / k
+    * For x to be a positive integer: n - k*(k-1)/2 must be divisible by k and > 0.
+    *
+    * Algorithm: Mathematical iteration.
+    * Time Complexity: O(sqrt(n)), loop runs until k*(k+1)/2 > n, which gives k ≈ sqrt(2n).
+    * Space Complexity: O(1), only constant extra space.
+    *
+    * @param n Input positive integer
+    * @return Number of ways to write n as sum of consecutive positive integers
+    */
     public int consecutiveNumbersSum(int num) {
         if (num <= 0) return 0;
 
@@ -108,6 +102,7 @@ public class ConsecutiveNumbersSum {
             // Check if 'a' is a positive integer
             if (numerator > 0 && numerator % k == 0) {
                 count++;
+                // The sequence starts from (numerator/k)
             }
         }
 

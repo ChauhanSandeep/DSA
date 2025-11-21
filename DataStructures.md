@@ -140,7 +140,14 @@ char ch = (char)(num + 'a');       // 0 -> 'a' (int to letter)
 *Create lists with different characteristics*
 
 ``` java
-List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));  // Mutable list
+// Mutable list created from a fixed set of integers
+List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));
+
+ 
+List<Integer> list = Arrays.stream(nums1)
+                           .boxed()             // Converts each primitive int to Integer
+                           .collect(Collectors.toList());   // Collects into a mutable List<Integer>
+
 List<String> list = List.of("a", "b", "c");  // Immutable (Java 9+)
 ```
 
@@ -150,6 +157,7 @@ List<String> list = List.of("a", "b", "c");  // Immutable (Java 9+)
 ``` java
 list.sort(Comparator.naturalOrder());  // Sort in ascending order
 list.sort(Comparator.reverseOrder());  // Sort in descending order
+list.sort((a, b) -> a.getAge() - b.getAge()); // Sort in ascending age
 
 Collections.sort(list);  // Sort using natural ordering
 Collections.reverse(list);  // Reverse list order - O(n)
@@ -618,8 +626,14 @@ Map<Type, List<Item>> grouped = list.stream()
 *Group and count elements - O(n)*
 
 ``` java
+// Count per group
 Map<Type, Long> counts = list.stream()
-    .collect(Collectors.groupingBy(Item::getType, Collectors.counting()));  // Count per group
+    .collect(Collectors.groupingBy(Item::getType, Collectors.counting()));
+
+// Count frequency of each number
+Map<Integer, Integer> frequency = Arrays.stream(nums)
+    .boxed()
+    .collect(Collectors.groupingBy(Function.identity(), Collectors.summingInt(e -> 1)));
 ```
 
 #### Partition
