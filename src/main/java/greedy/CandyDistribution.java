@@ -25,25 +25,28 @@ public class CandyDistribution {
     }
 
     /**
-     * Calculates the minimum candies needed to satisfy the problem constraints.
+     * Main method: Two-pass greedy algorithm (Optimal for clarity).
+     * Step-by-step:
+     *  1. Initialize candy array with 1 for each child (minimum requirement)
+     *  2. Left-to-right pass:
+     *     - If current child's rating > left neighbor's rating
+     *     - Give current child: leftNeighborCandies + 1
+     *     - This ensures children with higher ratings than left neighbor get more
+     *  3. Right-to-left pass:
+     *     - If current child's rating > right neighbor's rating
+     *     - Update current child: max(current, rightNeighborCandies + 1)
+     *     - This ensures children with higher ratings than right neighbor get more
+     *     - Use max() to satisfy BOTH left and right constraints
+     *  4. Sum all candies and return
      *
-     * Approach:
-     * - **Left-to-Right Pass**: Ensure children with higher ratings than the previous child get more candies.
-     * - **Right-to-Left Pass**: Ensure children with higher ratings than the next child get more candies.
-     * - Use a **candies array** initialized to 1 for all children.
-     * - **Sum up the candy counts** after adjusting in both passes.
+     * Key Insight:
+     * We can't determine candy count in one pass because a child must satisfy
+     * both left AND right neighbor constraints. Two passes ensure we capture
+     * dependencies from both directions. Taking max() ensures both constraints met.
      *
-     * This guarantees solution because:
-     * - Every child has at least 1 candy from the start.
-     * - Every local peak in ratings gets more candies than both neighbors.
-     * - Every increasing or decreasing sequence is respected by at least one pass.
-     * - By using Math.max(...) in the second pass, we never violate the result of the first pass.
-     *
-     * Time Complexity: O(N) - We traverse the ratings array twice.
-     * Space Complexity: O(N) - We use an extra array for candy distribution.
-     *
-     * @param ratings An array representing student ratings.
-     * @return The minimum number of candies required.
+     * Algorithm: Two-pass Greedy with max aggregation.
+     * Time Complexity: O(n), two linear passes through array.
+     * Space Complexity: O(n) for candy array.
      */
     public int minimumCandyRequired(int[] ratings) {
         if (ratings == null || ratings.length == 0) return 0;
@@ -61,6 +64,7 @@ public class CandyDistribution {
 
         // Right to Left Pass: Ensure decreasing ratings get more candies
         int totalCandies = candies[size - 1]; // Initialize with last child's candy
+
         for (int i = size - 2; i >= 0; i--) {
             if (ratings[i] > ratings[i + 1]) {
                 candies[i] = Math.max(candies[i], candies[i + 1] + 1);
@@ -68,6 +72,69 @@ public class CandyDistribution {
             totalCandies += candies[i]; // Accumulate total candies
         }
 
+        return totalCandies;
+    }
+
+    /**
+     * Alternative method: Single-pass with slope counting (Space optimized O(1)).
+     * Step-by-step:
+     *  1. Track ascending and descending slopes (runs of increasing/decreasing ratings)
+     *  2. For ascending slope: candies = 1 + 2 + 3 + ... + upCount
+     *  3. For descending slope: candies = 1 + 2 + 3 + ... + downCount
+     *  4. At peak (top of ascending slope before descending):
+     *     - Ensure peak gets max(upCount, downCount) + 1 candies
+     *     - This ensures peak satisfies both up and down neighbors
+     *  5. Handle equal ratings by resetting to baseline
+     *
+     * Key Insight:
+     * Ascending/descending runs have predictable candy patterns (1,2,3...).
+     * We can count candies arithmetically without storing array. Peak handling
+     * is critical: must give enough to satisfy both slopes.
+     *
+     * Algorithm: Single-pass with slope arithmetic.
+     * Time Complexity: O(n), single pass through array.
+     * Space Complexity: O(1), only counters used.
+     */
+    public int candyOptimized(int[] ratings) {
+        int length = ratings.length;
+        if (length == 0) return 0;
+        
+        int totalCandies = 1;  // First child gets 1 candy
+        int upSlope = 0;       // Length of current ascending slope
+        int downSlope = 0;     // Length of current descending slope
+        int peak = 0;          // Height of last peak
+        
+        for (int i = 1; i < length; i++) {
+            if (ratings[i] > ratings[i - 1]) {
+                // Ascending: rating increasing
+                upSlope++;
+                downSlope = 0;
+                peak = upSlope;
+                totalCandies += upSlope + 1;
+                
+            } else if (ratings[i] < ratings[i - 1]) {
+                // Descending: rating decreasing
+                upSlope = 0;
+                downSlope++;
+                
+                // Add candies for descending slope
+                totalCandies += downSlope;
+                
+                // If down slope exceeds peak, add 1 to compensate
+                // Peak must be higher than both up and down slopes
+                if (downSlope > peak) {
+                    totalCandies++;
+                }
+                
+            } else {
+                // Equal ratings: reset slopes
+                upSlope = 0;
+                downSlope = 0;
+                peak = 0;
+                totalCandies++;  // New child gets baseline 1 candy
+            }
+        }
+        
         return totalCandies;
     }
 }

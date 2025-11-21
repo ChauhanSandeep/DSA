@@ -145,15 +145,16 @@ public class SlidingPuzzle {
         return new String(charArray);
     }
 
-    // Check if puzzle is solvable using inversion count
+    // For 2x3 board, puzzle is solvable if number of inversions is even
+    // Inversion: a pair (a,b) such that a appears before b but a > b
     private boolean isSolvable(String state) {
         int inversions = 0;
-        String withoutZero = state.replace("0", "");
+        String updatedState = state.replace("0", "");
 
         // Puzzle is solvable if number of inversions is even
-        for (int i = 0; i < withoutZero.length(); i++) {
-            for (int j = i + 1; j < withoutZero.length(); j++) {
-                if (withoutZero.charAt(i) > withoutZero.charAt(j)) {
+        for (int i = 0; i < updatedState.length(); i++) {
+            for (int j = i + 1; j < updatedState.length(); j++) {
+                if (updatedState.charAt(i) > updatedState.charAt(j)) {
                     inversions++;
                 }
             }

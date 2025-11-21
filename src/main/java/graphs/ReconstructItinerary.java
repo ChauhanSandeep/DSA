@@ -2,40 +2,40 @@ package graphs;
 
 import java.util.*;
 
+
 /**
- * **Reconstruct Itinerary - Leetcode 332**
- * Leetcode Link: https://leetcode.com/problems/reconstruct-itinerary/
+ * Problem Statement:
+ * You are given a list of airline tickets where tickets[i] = [from_i, to_i] represent the departure 
+ * and arrival airports of one flight. Reconstruct the itinerary in order and return it.
  *
- * --- Problem Statement ---
- * You are given a list of airline tickets represented as pairs of departure and arrival airports [from, to].
- * Reconstruct the itinerary in such a way that:
- * - The itinerary must begin with "JFK".
- * - If multiple valid itineraries exist, return the one with the smallest lexicographical order.
- * - All tickets must be used exactly once.
+ * All of the tickets belong to a man who departs from "JFK", thus, the itinerary must begin with "JFK".
+ * If there are multiple valid itineraries, you should return the itinerary that has the smallest 
+ * lexical order when read as a single string.
  *
- * --- Example ---
- * Input: [["JFK","SFO"]3,["JFK","ATL"]1,["SFO","ATL"]4,["ATL","JFK"]2,["ATL","SFO"]5]
- * Output: ["JFK","ATL","JFK","SFO","ATL","SFO"]
+ * For example, the itinerary ["JFK", "LGA"] has a smaller lexical order than ["JFK", "LGB"].
+ * You may assume all tickets form at least one valid itinerary. You must use all the tickets once and only once.
  *
- * --- Explanation ---
- * Among all valid itineraries, the one with the lexicographically smallest order is selected.
- * This requires using a priority queue at each node to always pick the next destination in sorted order.
+ * Example 1:
+ * Input: tickets = [
+ *    ["MUC","LHR"],
+ *    ["JFK","MUC"],
+ *    ["SFO","SJC"],
+ *    ["LHR","SFO"]]
+ * Output: ["JFK","MUC","LHR","SFO","SJC"]
+ * Explanation:
+ * Start at JFK → MUC → LHR → SFO → SJC (uses all 4 tickets)
  *
- * --- Approach ---
- * - Model the tickets as a directed graph with adjacency list using a PriorityQueue at each node.
- * - Use **Hierholzer's algorithm** (post-order DFS) to build the Eulerian path.
- * - Since we insert airports into the result after all their edges are visited, the itinerary is built in reverse.
+ * LeetCode link: https://leetcode.com/problems/reconstruct-itinerary/
  *
- * --- Time Complexity ---
- * - O(E log E) for sorting edges in the priority queue, where E is number of tickets.
- * --- Space Complexity ---
- * - O(V + E), where V is number of airports and E is number of tickets.
- *
- * --- Follow-up Questions ---
- * 1. What if the itinerary must be the longest instead of lexicographically smallest?
- *    - Use backtracking instead of PriorityQueue to explore all paths.
- * 2. What if tickets are reused?
- *    - Mark visited tickets to avoid revisiting.
+ * Follow-up Questions FAANG Interviews Might Ask:
+ *  - What if there's no valid itinerary (tickets don't form a connected path)?
+ *    → Problem guarantees valid itinerary exists, but could add validation to check connectivity.
+ *  - How would you handle returning all possible valid itineraries?
+ *    → Use backtracking to generate all paths, then sort and return all valid ones.
+ *  - What if we don't start from "JFK" but from any arbitrary airport?
+ *    → Modify algorithm to accept starting airport as parameter; Hierholzer's algorithm still works.
+ *  - Can you determine if an Eulerian path exists before attempting to find it?
+ *    → Yes, check if at most 2 vertices have odd degree (for undirected) or specific in/out-degree conditions (for directed).
  */
 public class ReconstructItinerary {
 
@@ -49,71 +49,124 @@ public class ReconstructItinerary {
     );
 
     ReconstructItinerary itineraryBuilder = new ReconstructItinerary();
-    List<String> itinerary = itineraryBuilder.findLexicographicalItinerary(tickets);
+    List<String> itinerary = itineraryBuilder.findItinerary(tickets);
     System.out.println(itinerary);
   }
 
   /**
-   * Reconstructs the itinerary using Hierholzer's algorithm.
-   *
-   * Steps:
-   * 1. Build a graph from the tickets with lexicographical ordering using PriorityQueue.
-   * 2. Run DFS starting from "JFK", always choosing the smallest destination.
-   * 3. Post-order insert airports into the result list to ensure correct itinerary order.
-   *
-   * Algorithm: Hierholzer’s algorithm for Eulerian path (DFS with post-order insertion).
-   *
-   * Time Complexity: O(E log E), due to PriorityQueue operations per edge.
-   * Space Complexity: O(V + E), for storing the graph and the result.
-   *
-   * @param tickets List of [from, to] ticket pairs.
-   * @return List of airport codes representing the itinerary.
-   */
-  public List<String> findLexicographicalItinerary(List<List<String>> tickets) {
-    Map<String, PriorityQueue<String>> flightGraph = constructGraph(tickets);
+     * Main method: Reconstructs itinerary using Hierholzer's Algorithm (Optimal).
+     * Step-by-step:
+     *  1. Build adjacency list graph where each airport maps to sorted list of destinations
+     *  2. Use PriorityQueue (min-heap) for each airport to ensure lexicographically smallest choice
+     *  3. Perform DFS starting from "JFK":
+     *     a. Visit airports greedily (always pick smallest lexical destination)
+     *     b. Remove used tickets as we traverse (mark edges as visited)
+     *     c. Use post-order traversal: add airport to result after visiting all its destinations
+     *  4. Reverse the result since we build it backwards (post-order)
+     *  5. Return the itinerary
+     *
+     * Key Insight:
+     * This is an Eulerian path problem - find a path that visits every edge exactly once.
+     * Hierholzer's algorithm efficiently finds such paths. By using post-order DFS:
+     * - Dead-end airports (no outgoing flights) are added first
+     * - Airports leading to dead-ends are added next
+     * - Starting airport is added last
+     * Reversing gives us the correct forward path.
+     *
+     * Algorithm: Hierholzer's Algorithm with DFS and Priority Queue.
+     * Time Complexity: O(E log E), where E is number of tickets/edges.
+     *                  - Building graph with sorting: O(E log E)
+     *                  - DFS traversal: O(E), each edge visited once
+     * Space Complexity: O(E) for adjacency list and result array.
+     */
+    public List<String> findItinerary(List<List<String>> tickets) {
+        // Build adjacency list with priority queues for lexical ordering
+        Map<String, PriorityQueue<String>> graph = new HashMap<>();
+        
+        for (List<String> ticket : tickets) {
+            String from = ticket.get(0);
+            String to = ticket.get(1);
+            
+            graph.putIfAbsent(from, new PriorityQueue<>());
+            graph.get(from).offer(to);
+        }
+        
+        List<String> itinerary = new ArrayList<>();
+        
+        // Start DFS from JFK
+        dfs("JFK", graph, itinerary);
 
-    LinkedList<String> itinerary = new LinkedList<>();
-    performDFS("JFK", flightGraph, itinerary);
-
-    return itinerary;
-  }
-
-  /**
-   * Builds a graph from the ticket list using a PriorityQueue to maintain lexicographical order.
-   *
-   * @param tickets List of [from, to] airport pairs.
-   * @return Map representing adjacency list with min-heaps for destinations.
-   */
-  private Map<String, PriorityQueue<String>> constructGraph(List<List<String>> tickets) {
-    Map<String, PriorityQueue<String>> graph = new HashMap<>();
-
-    for (List<String> ticket : tickets) {
-      String fromAirport = ticket.get(0);
-      String toAirport = ticket.get(1);
-
-      graph.computeIfAbsent(fromAirport, k -> new PriorityQueue<>())
-          .add(toAirport);
+        // Validation, if it's not guaranteed that all tickets form a valid itinerary
+        if (itinerary.size() != tickets.size() + 1) {
+            return new ArrayList<>(); // Invalid: couldn't use all tickets
+        }
+        
+        // Reverse since we built path in post-order
+        Collections.reverse(itinerary);
+        
+        return itinerary;
     }
 
-    return graph;
-  }
-
-  /**
-   * Performs DFS traversal while removing used tickets (edges).
-   * Airports are inserted into the result list in post-order to build the path in reverse.
-   *
-   * @param currentAirport Current airport node.
-   * @param flightGraph Directed graph with destination airports.
-   * @param itinerary Output list collecting the reconstructed path.
-   */
-  private void performDFS(String currentAirport, Map<String, PriorityQueue<String>> flightGraph, LinkedList<String> itinerary) {
-    PriorityQueue<String> nextDestinations = flightGraph.get(currentAirport);
-
-    while (nextDestinations != null && !nextDestinations.isEmpty()) {
-      String nextAirport = nextDestinations.poll(); // ensure to poll so that we don't revisit this edge
-      performDFS(nextAirport, flightGraph, itinerary);
+    /**
+     * Helper: Performs DFS using Hierholzer's algorithm to find Eulerian path.
+     */
+    private void dfs(String currentAirport, Map<String, PriorityQueue<String>> graph, List<String> itinerary) {
+        PriorityQueue<String> destinations = graph.get(currentAirport);
+        
+        // Visit all destinations from current airport
+        while (destinations != null && !destinations.isEmpty()) {
+            // Poll (remove) the smallest lexical destination
+            String nextAirport = destinations.poll();
+            // Recursively visit next airport
+            dfs(nextAirport, graph, itinerary);
+        }
+        
+        // Add current airport after visiting all its destinations (post-order)
+        itinerary.add(currentAirport);
     }
 
-    itinerary.addFirst(currentAirport);
-  }
+    /**
+     * Alternative method: Using stack-based iterative approach (avoids recursion).
+     * Step-by-step:
+     *  1. Build graph with priority queues as above
+     *  2. Use explicit stack instead of recursion call stack
+     *  3. Process airports iteratively, simulating DFS behavior
+     *  4. Build result in post-order and reverse at end
+     *
+     * Algorithm: Iterative Hierholzer's Algorithm with explicit stack.
+     * Time Complexity: O(E log E).
+     * Space Complexity: O(E) for graph, stack, and result.
+     */
+    public List<String> findItineraryIterative(List<List<String>> tickets) {
+        // Build graph
+        Map<String, PriorityQueue<String>> graph = new HashMap<>();
+        
+        for (List<String> ticket : tickets) {
+            String from = ticket.get(0);
+            String to = ticket.get(1);
+            graph.putIfAbsent(from, new PriorityQueue<>());
+            graph.get(from).offer(to);
+        }
+        
+        List<String> itinerary = new ArrayList<>();
+        Stack<String> stack = new Stack<>();
+        stack.push("JFK");
+        
+        while (!stack.isEmpty()) {
+            String currentAirport = stack.peek();
+            
+            if (graph.containsKey(currentAirport) && !graph.get(currentAirport).isEmpty()) {
+                // Has unvisited destinations, go deeper
+                stack.push(graph.get(currentAirport).poll());
+            } else {
+                // No more destinations, add to result (post-order)
+                itinerary.add(stack.pop());
+            }
+        }
+        
+        // Reverse to get correct order
+        Collections.reverse(itinerary);
+        
+        return itinerary;
+    }
 }

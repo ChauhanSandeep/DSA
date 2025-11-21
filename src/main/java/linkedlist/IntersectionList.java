@@ -9,7 +9,7 @@ package linkedlist;
  *
  * Example:
  * List A: 1 -> 2 -> 3 \
- *                     -> 8 -> 9
+ *                       -> 8 -> 9
  * List B:       4 -> 5 /
  * Output: Node with value 8
  *

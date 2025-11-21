@@ -7,7 +7,8 @@ import java.util.*;
  *
  * A matrix diagonal is a diagonal line of cells starting from some cell in either
  * the topmost row or leftmost column and going in the bottom-right direction until
- * reaching the matrix's end. Given an m x n matrix mat of integers, sort each
+ * reaching the matrix's end. 
+ * Given an m x n matrix mat of integers, sort each
  * matrix diagonal in ascending order and return the resulting matrix.
  *
  * Example: mat = [
@@ -64,13 +65,13 @@ public class SortTheMatrixDiagonally {
         int rows = mat.length;
         int cols = mat[0].length;
 
-        Map<Integer, PriorityQueue<Integer>> diagonals = new HashMap<>();
+        Map<Integer, PriorityQueue<Integer>> diagonalElementsMap = new HashMap<>();
 
         // Collect elements in min heaps
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 int diagonal = i - j;
-                diagonals.computeIfAbsent(diagonal, k -> new PriorityQueue<>()).offer(mat[i][j]);
+                diagonalElementsMap.computeIfAbsent(diagonal, k -> new PriorityQueue<>()).offer(mat[i][j]);
             }
         }
 
@@ -78,7 +79,7 @@ public class SortTheMatrixDiagonally {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 int diagonal = i - j;
-                mat[i][j] = diagonals.get(diagonal).poll();
+                mat[i][j] = diagonalElementsMap.get(diagonal).poll();
             }
         }
 
@@ -89,11 +90,11 @@ public class SortTheMatrixDiagonally {
  * In-place sorting of each diagonal using selection sort.
  *
  * Intuitive Steps:
- * 1\. For each diagonal starting from the first row and first column:
- *    a\. Collect all positions (row, col) that belong to the diagonal.
- *    b\. For each position in the diagonal, find the minimum element among the remaining positions.
- *    c\. Swap the current element with the minimum found, sorting the diagonal in ascending order.
- * 2\. Repeat for all diagonals, ensuring each is sorted independently.
+ * 1. For each diagonal starting from the first row and first column:
+ *    a. Collect all positions (row, col) that belong to the diagonal.
+ *    b. For each position in the diagonal, find the minimum element among the remaining positions.
+ *    c. Swap the current element with the minimum found, sorting the diagonal in ascending order.
+ * 2. Repeat for all diagonals, ensuring each is sorted independently.
  *
  * Time Complexity: O(m*n*min(m, n)), where m and n are matrix dimensions.
  * Space Complexity: O(1), as sorting is done in-place.

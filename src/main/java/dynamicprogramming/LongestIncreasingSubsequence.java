@@ -5,24 +5,36 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * LeetCode #300: Longest Increasing Subsequence
- * https://leetcode.com/problems/longest-increasing-subsequence/
  *
- * Problem:
- * Given an integer array `nums`, return the length of the longest strictly increasing subsequence.
+ * Given an integer array nums, return the length of the longest strictly increasing subsequence.
+ * A subsequence is a sequence that can be derived from an array by deleting some or no elements 
+ * without changing the order of the remaining elements.
  *
- * Example:
- * Input: nums = [10, 9, 2, 5, 3, 7, 101, 18]
+ * Example 1:
+ * Input: nums = [10,9,2,5,3,7,101,18]
  * Output: 4
- * Explanation: The longest increasing subsequence is [2, 3, 7, 101], so the length is 4.
+ * Explanation:
+ * The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+ * Other valid subsequences: [2,5,7,101], [2,3,7,18], etc.
  *
- * Approaches:
- * 1. DP (O(N²)) — Bottom-up LIS using previous comparisons
- * 2. Greedy + Binary Search (O(N log N)) — Optimal with clever sub structure
  *
- * Time Complexity:
- * - O(N²) for basic DP
- * - O(N log N) for Binary Search approach
+ * LeetCode link: https://leetcode.com/problems/longest-increasing-subsequence/
+ *
+ * Follow-up Questions FAANG Interviews Might Ask:
+ *  - Can you return the actual longest increasing subsequence, not just its length?
+ *    → Yes, modify DP to store parent pointers and backtrack from the maximum position.
+ *  - How would you handle the longest non-decreasing subsequence (allowing equals)?
+ *    → Change comparison from nums[j] < nums[i] to nums[j] <= nums[i].
+ *  - What if you need to find all possible LIS of maximum length?
+ *    → Use backtracking with DP to enumerate all paths leading to maximum length.
+ *  - Can you solve this for 2D LIS (longest increasing path in a matrix)?
+ *    → Use DFS with memoization from each cell, checking all four directions.
+ *
+ * Relevant Follow-up Problems:
+ *  - LeetCode 354 (Russian Doll Envelopes): https://leetcode.com/problems/russian-doll-envelopes/
+ *  - LeetCode 673 (Number of Longest Increasing Subsequence): https://leetcode.com/problems/number-of-longest-increasing-subsequence/
+ *  - LeetCode 1048 (Longest String Chain): https://leetcode.com/problems/longest-string-chain/
+ *  - LeetCode 646 (Maximum Length of Pair Chain): https://leetcode.com/problems/maximum-length-of-pair-chain/
  */
 public class LongestIncreasingSubsequence {
     public static void main(String[] args) {
@@ -68,74 +80,55 @@ public class LongestIncreasingSubsequence {
     }
 
     /**
-     * Approach 2: Binary Search + Greedy (O(N log N))
-     * - We track the smallest possible tail for all increasing subsequences of different lengths.
-     * - This is done via a greedy approach using a list `lisTracker`.
-     *   → `lisTracker[i]` will represent the **smallest possible last element** of an LIS of length `i + 1`.
+     * Optimized method: Finds LIS length using Binary Search with Patience Sorting (Optimal).
+     * Step-by-step:
+     *  1. Maintain an array 'tails' where tails[i] = smallest tail element of all 
+     *     increasing subsequences of length i+1.
+     *  2. For each element in nums:
+     *     a. If element is larger than all tails: append to tails (extend longest subsequence)
+     *     b. Otherwise: find the smallest tail >= element using binary search and replace it
+     *  3. The length of tails array at the end is the LIS length.
      *
-     * Algorithm:
-     * 1. Initialize an empty list `lisTracker`.
-     * 2. For each number `num` in the input:
-     *    - If `num` > last element in `lisTracker`, we can extend the existing LIS. So, add `num`.
-     *    - Else, use binary search to find the **first element ≥ num** in `lisTracker` and replace it.
-     *      → This ensures `lisTracker` maintains the smallest possible values, increasing chances of future extensions.
-     * 3. The size of `lisTracker` at the end is the length of the LIS.
+     * Key Insight:
+     * By keeping the smallest possible tail for each length, we maximize chances of 
+     * extending subsequences. Binary search finds the correct position to maintain this property.
+     * This is related to Patience Sorting algorithm where we minimize number of piles.
      *
-     * Why this works:
-     * - By greedily keeping the smallest tails, we leave room to build longer sequences.
-     * - The list does **not** represent an actual LIS, but its **length is guaranteed** to be correct.
-     * - Binary search gives us `O(log N)` efficiency per update, leading to `O(N log N)` overall.
-     *
-     * Time Complexity: O(N log N)
-     * - For each of the N elements, binary search takes log N time
-     *
-     * Space Complexity: O(N)
-     * - In the worst case, `lisTracker` stores all elements
+     * Algorithm: Binary Search with Greedy Approach (Patience Sorting variant).
+     * Time Complexity: O(n log n), where n is array length. Binary search O(log n) for each element.
+     * Space Complexity: O(n) for tails array in worst case (all elements increasing).
      */
-    public static int findLisUsingBinarySearch(int[] nums) {
-        if (nums == null || nums.length == 0) return 0;
-
-        /**
-         * lisTracker represents list of list in a single dimension.
-         * Each element in lisTracker represents the last element of a list of increasing subsequence of length i + 1.
-         * For example, if lisTracker = [2, 3, 7], it means:
-         * - There is an increasing subsequence of length 1 ending with 2
-         * * - There is an increasing subsequence of length 2 ending with 3
-         * * - There is an increasing subsequence of length 3 ending with 7
-         * But it does not mean that the actual subsequences is [2, 3, 7].
-         */
-        List<Integer> lisTracker = new ArrayList<>();
-        lisTracker.add(nums[0]); // First element is always included
-
+    public int lengthOfLIS(int[] nums) {
+        int length = nums.length;
+        if (length == 0) return 0;
+        
+        // tails[i] = smallest tail of all increasing subsequences of length i+1
+        int[] tails = new int[length];
+        int size = 0; // Current length of tails array
+        
         for (int num : nums) {
-            if (num > lisTracker.get(lisTracker.size() - 1)) {
-                // Case 1: num is greater than last element —> extend LIS
-                lisTracker.add(num);
-            } else {
-                // Case 2: num could replace an element to keep lisTracker optimal
-                int idx = lowerBound(lisTracker, num);
-                lisTracker.set(idx, num);
+            // Find the first index where tails[mid] >= num
+            int left = 0;
+            int right = size;
+            
+            while (left < right) {
+                int mid = left + (right - left) / 2;
+                if (tails[mid] < num) {
+                    left = mid + 1;
+                } else {
+                    right = mid;
+                }
+            }
+            
+            // Place num at the found position
+            tails[left] = num;
+            
+            // If num extends the longest subsequence, increment size
+            if (left == size) {
+                size++;
             }
         }
-
-        return lisTracker.size(); // The length of lisTracker is the LIS length
-    }
-
-    /**
-     * find the first index where value is greater than `num`.
-     */
-    private static int lowerBound(List<Integer> lisTracker, int num) {
-        int left = 0, right = lisTracker.size() - 1;
-
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-            if (lisTracker.get(mid) >= num) {
-                right = mid;
-            } else {
-                left = mid + 1;
-            }
-        }
-
-        return left;
+        
+        return size;
     }
 }

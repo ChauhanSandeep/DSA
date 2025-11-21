@@ -99,121 +99,110 @@ public class MaxStack {
     }
 
     /**
-     * Optimized implementation using TreeMap and custom Node structure.
-     *
-     * Algorithm:
-     * 1. Use a doubly linked list to maintain stack order.
-     * 2. Use a TreeMap to map values to lists of nodes for O(log n) max retrieval.
-     * 3. Each push adds a new node to the linked list and updates the TreeMap.
-     * 4. Each pop removes the tail node from the linked list and updates the TreeMap.
-     * 5. peekMax retrieves the last key in the TreeMap.
-     * 6. popMax retrieves and removes the last node from the list in the TreeMap, and removes it from the linked list.
-     *
-     * Time Complexities:
-     * - push, pop, peek, peekMax: O(log n)
-     * - popMax: O(log n)
-     *
-     * Space Complexity: O(n) for storing nodes and mappings.
-     *
-     * This implementation is more complex but optimizes popMax to O(log n).
-     * It uses a combination of a doubly linked list for stack operations
-     * and a TreeMap for efficient max value tracking.
-     *
-     *
-     * Provides O(log n) for all operations including popMax.
-     */
-    static class MaxStackOptimized implements MaxStackInterface {
+    * Approach 2: Optimal Solution using Doubly Linked List + TreeMap.
+    * This achieves O(log n) time complexity for all operations.
+    * 
+    * Data structures:
+    *  - Doubly linked list: maintains stack order
+    *  - TreeMap<Integer, List<Node>>: maps values to their nodes for quick max lookup
+    * 
+    * Operations:
+    *  - push(x): O(log n) - add to list and TreeMap
+    *  - pop(): O(log n) - remove from list and TreeMap
+    *  - top(): O(1) - access list tail
+    *  - peekMax(): O(log n) - access TreeMap lastKey
+    *  - popMax(): O(log n) - find max in TreeMap and remove node
+    * 
+    * Time Complexity: O(log n) for all operations
+    * Space Complexity: O(n) for doubly linked list and TreeMap
+    */
+    static class MaxStackOptimal implements MaxStackInterface {
+        // Node class for doubly linked list
+        private static class Node {
+            int value;
+            Node previous;
+            Node next;
+        
+            Node(int value) {
+                this.value = value;
+            }
+        }
+    
+        // Doubly linked list to maintain stack order
         private Node head;
         private Node tail;
-        private int nodeId;
+    
+        // TreeMap to efficiently find maximum element
+        // Key: element value, Value: list of nodes with that value
         private TreeMap<Integer, List<Node>> valueToNodes;
-        private TreeMap<Integer, Node> idToNode;
-
-        class Node {
-            int val;
-            int id;
-            Node prev;
-            Node next;
-
-            Node(int val, int id) {
-                this.val = val;
-                this.id = id;
-            }
-        }
-
-        public MaxStackOptimized() {
-            head = new Node(0, 0);
-            tail = new Node(0, 0);
+    
+        public MaxStackOptimal() {
+            head = new Node(0);  // Sentinel head
+            tail = new Node(0);  // Sentinel tail
             head.next = tail;
-            tail.prev = head;
-            nodeId = 0;
+            tail.previous = head;
             valueToNodes = new TreeMap<>();
-            idToNode = new TreeMap<>();
         }
 
-        public void push(int val) {
-            Node node = new Node(val, ++nodeId);
-
-            // Add to doubly linked list
-            addToTail(node);
-
-            // Add to maps
-            valueToNodes.computeIfAbsent(val, k -> new ArrayList<>()).add(node);
-            idToNode.put(nodeId, node);
+        // Push element onto stack
+        public void push(int x) {
+            Node newNode = new Node(x);
+        
+            // Add to end of doubly linked list (top of stack)
+            newNode.previous = tail.previous;
+            newNode.next = tail;
+            tail.previous.next = newNode;
+            tail.previous = newNode;
+        
+            // Add to TreeMap
+            valueToNodes.computeIfAbsent(x, k -> new ArrayList<>()).add(newNode);
         }
 
+        // Remove and return the top element
         public int pop() {
-            Node node = tail.prev;
-            removeNode(node);
-
-            // Clean up maps
-            List<Node> nodes = valueToNodes.get(node.val);
-            nodes.remove(node);
+            Node topNode = tail.previous;
+            removeNode(topNode);
+        
+               // Remove from TreeMap
+            List<Node> nodes = valueToNodes.get(topNode.value);
+            nodes.remove(nodes.size() - 1);  // Remove last occurrence
             if (nodes.isEmpty()) {
-                valueToNodes.remove(node.val);
+                valueToNodes.remove(topNode.value);
             }
-            idToNode.remove(node.id);
-
-            return node.val;
+        
+               return topNode.value;
         }
 
-        public int peek() {
-            return tail.prev.val;
+        // Get the element on top of the stack
+        public int top() {
+            return tail.previous.value;
         }
 
+        // Retrieve the maximum element in the stack
         public int peekMax() {
             return valueToNodes.lastKey();
         }
 
+        // Remove and return the maximum element
         public int popMax() {
-            int maxVal = peekMax();
-            List<Node> nodes = valueToNodes.get(maxVal);
-            Node nodeToRemove = nodes.get(nodes.size() - 1);
-
+            int maxValue = peekMax();
+            List<Node> nodes = valueToNodes.get(maxValue);
+        
+            // Remove the last node with max value (closest to top)
+            Node nodeToRemove = nodes.remove(nodes.size() - 1);
             removeNode(nodeToRemove);
-
-            nodes.remove(nodes.size() - 1);
-            if (nodes.isEmpty()) {
-                valueToNodes.remove(maxVal);
+        
+               if (nodes.isEmpty()) {
+                valueToNodes.remove(maxValue);
             }
-            idToNode.remove(nodeToRemove.id);
-
-            return maxVal;
+        
+               return maxValue;
         }
 
-        // Helper method to add node to tail of doubly linked list
-        private void addToTail(Node node) {
-            Node prevNode = tail.prev;
-            prevNode.next = node;
-            node.prev = prevNode;
-            node.next = tail;
-            tail.prev = node;
-        }
-
-        // Helper method to remove node from doubly linked list
+        // Helper: Remove a node from doubly linked list
         private void removeNode(Node node) {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
+            node.previous.next = node.next;
+            node.next.previous = node.previous;
         }
     }
 

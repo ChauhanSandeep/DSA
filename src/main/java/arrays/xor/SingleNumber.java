@@ -1,6 +1,7 @@
 package arrays.xor;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -81,14 +82,8 @@ public class SingleNumber {
      * Space Complexity: O(n) for set
      */
     public int singleNumberMath(int[] nums) {
-        Set<Integer> uniqueElements = new HashSet<>();
-        int arraySum = 0;
-
-        for (int num : nums) {
-            uniqueElements.add(num);
-            arraySum += num;
-        }
-
+        Set<Integer> uniqueElements = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+        int arraySum = Arrays.stream(nums).sum();
         int uniqueSum = uniqueElements.stream().mapToInt(Integer::intValue).sum();
 
         // If each unique element appeared twice, sum would be 2*uniqueSum
@@ -107,20 +102,15 @@ public class SingleNumber {
      * Space Complexity: O(n)
      */
     public int singleNumberHashMap(int[] nums) {
-        Map<Integer, Integer> frequency = new HashMap<>();
-
-        // Count frequencies
-        for (int num : nums) {
-            frequency.put(num, frequency.getOrDefault(num, 0) + 1);
-        }
+        Map<Integer, Integer> frequency = Arrays.stream(nums)
+                .boxed()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.summingInt(e -> 1)));
 
         // Find element with frequency 1
-        for (Map.Entry<Integer, Integer> entry : frequency.entrySet()) {
-            if (entry.getValue() == 1) {
-                return entry.getKey();
-            }
-        }
-
-        return -1; // Should never reach here given problem constraints
+        return frequency.entrySet().stream()
+            .filter(entry -> entry.getValue() == 1)
+            .findFirst()
+            .map(Entry::getKey)
+            .orElse(-1);
     }
 }

@@ -17,7 +17,7 @@ import java.util.Set;
  * Output: 2
  * Explanation: There are two valid ways to place queens on a 4x4 board.
  *
- * Follow-up Questions for FAANG Interviews:
+ * Follow-up Questions:
  * 1. Can you return all configurations?
  *    - Yes, store column placements and convert them to board strings at base case.
  *    - Related Problem: https://leetcode.com/problems/n-queens/
@@ -28,17 +28,10 @@ import java.util.Set;
  */
 public class NQueen2 {
 
-    public static void main(String[] args) {
-        int n = 4;
-        NQueen2 solver = new NQueen2();
-        int solutions = solver.totalNQueens(n);
-        System.out.println("Total solutions for " + n + "-Queens: " + solutions);
-    }
-
   private int boardSize;
 
-  public int totalNQueens(int n) {
-    this.boardSize = n;
+  public int totalNQueens(int boardSize) {
+    this.boardSize = boardSize;
     return backtrack(
         0,
         new HashSet<>(), // occupiedMainDiagonals

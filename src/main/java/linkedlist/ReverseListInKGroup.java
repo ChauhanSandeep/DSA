@@ -8,14 +8,6 @@ package linkedlist;
  * If the number of nodes is not a multiple of `k`, then the remaining nodes at the end should remain unchanged.
  * For given the list   1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 and k = 2,
  * the output should be 3 -> 2 -> 1 -> 6 -> 5 -> 4 -> 9 -> 8 -> 7 -> 12 -> 11 -> 10 -> 13
- *
- * **Approach:**
- * Count the total number of nodes.
- * Reverse every group of `k` nodes while keeping track of links.
- * Link the reversed segments correctly and preserve the remaining nodes.
- *
- * **Time Complexity:** O(N) - Each node is processed twice.
- * **Space Complexity:** O(1) - Constant extra space is used.
  */
 public class ReverseListInKGroup {
 
@@ -30,44 +22,6 @@ public class ReverseListInKGroup {
     int k = 2;
     ListNode result = new ReverseListInKGroup().reverseInGroupsOfK(head, k);
     System.out.println("Reversed in groups of " + k + ": " + result);
-  }
-
-  /**
-   *
-   * Algorithm:
-   * 1. Traverse the list and reverse the first 'k' nodes.
-   * 2. Recursively call the function for the next part of the list.
-   *
-   * Time Complexity: O(N) - Each node is visited once.
-   * Space Complexity: O(N) - Due to recursive calls.
-   *
-   * @param head Head of the linked list.
-   * @param k Group size for reversal.
-   * @return New head after group-wise reversal.
-   */
-  public static ListNode reverseInGroupsRecursive(ListNode head, int k) {
-    if (head == null || k <= 1) {
-      return head; // No change needed
-    }
-
-    ListNode prev = null, current = head, nextNode;
-    int count = 0;
-
-    // Reverse first 'k' nodes
-    while (current != null && count < k) {
-      nextNode = current.getNext();
-      current.setNext(prev);
-      prev = current;
-      current = nextNode;
-      count++;
-    }
-
-    // Recursively reverse the next part and attach it
-    if (current != null) {
-      head.setNext(reverseInGroupsRecursive(current, k));
-    }
-
-    return prev; // New head of the reversed section
   }
 
   /**
@@ -126,11 +80,6 @@ public class ReverseListInKGroup {
       // Step 4: Move pointers for next iteration
       previousGroupEnd = currentGroupStart;
       currentGroupStart = nextGroupStart;
-
-      // Example Dry Run: k = 3, input = 1->2->3->4->5->6->7
-      // 1st iteration: reverse 1,2,3 -> becomes 3->2->1, nextGroupStart = 4
-      // 2nd iteration: reverse 4,5,6 -> becomes 6->5->4, nextGroupStart = 7
-      // 7 remains as is.
     }
 
     return dummyHead.next;
@@ -138,9 +87,6 @@ public class ReverseListInKGroup {
 
   /**
    * Reverses the linked list from start to end (inclusive).
-   *
-   * @param groupStart Start node of the group to be reversed.
-   * @param groupEnd   End node of the group to be reversed.
    */
   private void reverseGroup(ListNode groupStart, ListNode groupEnd) {
     ListNode previousNode = null;
@@ -158,10 +104,6 @@ public class ReverseListInKGroup {
 
   /**
    * Checks if there are at least k nodes left from the current node.
-   *
-   * @param startNode Starting node to check from.
-   * @param k         Number of nodes to check.
-   * @return true if at least k nodes exist, false otherwise.
    */
   private boolean hasKNodes(ListNode startNode, int k) {
     int count = 0;

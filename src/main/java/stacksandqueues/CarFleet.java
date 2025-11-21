@@ -1,6 +1,5 @@
 package stacksandqueues;
 
-import java.util.Stack;
 import java.util.Arrays;
 
 /**
@@ -15,7 +14,9 @@ import java.util.Arrays;
  * Return the number of car fleets that will arrive at the destination.
  *
  * Example:
- * Input: target = 12, position = [10,8,0,5,3], speed = [2,4,1,1,3]
+ * Input: target = 12, 
+ * position = [10,8, 0, 5, 3], 
+ * speed =    [2, 4, 1, 1, 3]
  * Output: 3
  * Explanation: Cars starting at 10 and 8 become a fleet, meeting at 12. Car at 0 forms fleet 1.
  * Cars at 5 and 3 become a fleet, meeting before 12. So there are 3 fleets.

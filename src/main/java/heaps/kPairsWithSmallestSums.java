@@ -22,6 +22,7 @@ import java.util.Set;
  * Example:
  * Input: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
  * Output: [[1,2],[1,4],[1,6]]
+ * Explanation: The first 3 pairs with the smallest sums are: [1,2], [1,4], and [1,6].
  *
  * Follow-up Questions:
  * 1. How would your solution change if arrays are not sorted?

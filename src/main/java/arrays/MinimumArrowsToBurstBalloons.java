@@ -17,7 +17,8 @@ import java.util.List;
  * Example:
  * Input: points = [[10,16],[2,8],[1,6],[7,12]]
  * Output: 2
- * Explanation: Shoot one arrow at x=6 to burst [1,6], [2,8], and [7,12]; another at x=16 to burst [10,16].
+ * Explanation: Shoot one arrow at x=6 to burst [1,6], [2,8]. 
+ * another arrow at x = 11, bursting the balloons [10,16] and [7,12].
  *
  * Leetcode URL:
  * https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons

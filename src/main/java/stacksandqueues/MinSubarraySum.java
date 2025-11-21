@@ -6,7 +6,6 @@ import java.util.Deque;
 
 /**
  * Problem: Sum of Subarray Minimums
- * -----------------------------------------
  * Given an array of integers, return the sum of the minimum value of all possible contiguous subarrays.
  *
  * Example:
@@ -19,13 +18,13 @@ import java.util.Deque;
  *
  * LeetCode Link: https://leetcode.com/problems/sum-of-subarray-minimums/
  *
- * 🔍 Follow-up Questions:
- * 1. **Can we find the sum of maximums in subarrays using similar approach?**
+ * Follow-up Questions:
+ * 1. Can we find the sum of maximums in subarrays using similar approach?
  *    - Yes, just reverse the comparison logic (use monotonic decreasing stack).
  *    - Related: https://leetcode.com/problems/sum-of-subarray-ranges/
- * 2. **Can we do it without stack?**
+ * 2. Can we do it without stack?
  *    - Naively yes, but that takes O(N²) time. Stack is optimal O(N).
- * 3. **Can we find how many subarrays each element is the minimum for?**
+ * 3. Can we find how many subarrays each element is the minimum for?
  *    - Yes. That's the core of this approach using left and right spans.
  */
 public class MinSubarraySum {
@@ -69,9 +68,10 @@ public class MinSubarraySum {
     for (int i = 0; i < length; i++) {
       // Maintain a monotonic increasing stack
       while (stack.peek() != -1 && nums[stack.peek()] > nums[i]) {
-        int mid = stack.pop();                // Current minimum
+        int mid = stack.pop();                // Current local maxima index
         int left = stack.peek();              // Previous smaller element's index
         int right = i;                        // Next smaller element's index
+                
         totalSum = (totalSum + computeContribution(nums[mid], left, mid, right)) % MODULO;
       }
       stack.push(i);

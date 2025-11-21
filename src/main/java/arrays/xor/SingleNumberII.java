@@ -1,7 +1,5 @@
 package arrays.xor;
 
-import java.util.*;
-
 /**
  * 137. Single Number II
  *

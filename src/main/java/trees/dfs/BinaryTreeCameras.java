@@ -1,6 +1,4 @@
 package trees.dfs;
-import trees.TreeNode;
-import trees.Node;
 
 /**
  * Binary Tree Cameras
@@ -85,51 +83,6 @@ public class BinaryTreeCameras {
         // Both children are covered but don't have cameras
         // Current node needs camera (will be handled by parent)
         return NEEDS_CAMERA;
-    }
-
-    /**
-     * Alternative approach using DP with explicit state tracking
-     *
-     * Each node returns array [with_camera, without_camera_covered, without_camera_not_covered]
-     * This approach is more explicit but has same time/space complexity
-     */
-    public int minCameraCoverDP(TreeNode root) {
-        int[] result = dpHelper(root);
-        int withCamera = result[0];
-        int coveredNoCamera = result[1];
-        // Min of: root has camera OR root covered by children
-        return Math.min(withCamera, coveredNoCamera);
-    }
-
-    // Returns [with_camera_cost, covered_without_camera_cost, not_covered_cost]
-    private int[] dpHelper(TreeNode node) {
-        if (node == null) {
-            return new int[]{Integer.MAX_VALUE / 2, 0, 0};
-        }
-
-        int[] left = dpHelper(node.left);
-        int leftWithCamera = left[0];
-        int leftCoveredNoCamera = left[1];
-        int leftNotCovered = left[2];
-
-        int[] right = dpHelper(node.right);
-        int rightWithCamera = right[0];
-        int rightCoveredNoCamera = right[1];
-        int rightNotCovered = right[2];
-
-        // If current node has a camera, then add 1 + min of all states of children
-        int withCamera = 1 + Math.min(Math.min(leftWithCamera, leftCoveredNoCamera), leftNotCovered) +
-                        Math.min(Math.min(rightWithCamera, rightCoveredNoCamera), rightNotCovered);
-
-        // If current node covered but no camera, at least one child must have camera
-        int coveredWithoutCamera = Math.min(leftWithCamera + rightWithCamera,
-                                    Math.min(leftWithCamera + rightCoveredNoCamera,
-                                        leftCoveredNoCamera + rightWithCamera));
-
-        // Cost if current node not covered (both children covered without camera)
-        int notCovered = leftCoveredNoCamera + rightCoveredNoCamera;
-
-        return new int[]{withCamera, coveredWithoutCamera, notCovered};
     }
 
     // Definition for a binary tree node

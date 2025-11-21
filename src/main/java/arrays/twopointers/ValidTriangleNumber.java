@@ -63,7 +63,8 @@ public class ValidTriangleNumber {
      *
      * Key insight: After sorting, [a, b, c, d] : if a + b > c where c is the largest side, then
      * a + c > b and b + c > a are automatically satisfied due to ordering. We only
-     * need to check one inequality. Additionally, if nums[left] + nums[right] > nums[i],
+     * need to check one inequality. 
+     * Additionally, if nums[left] + nums[right] > nums[i],
      * then all values between left and right also satisfy the condition with right.
      *
      * Time Complexity: O(N^2) where N is the array length. Sorting takes O(N log N),
@@ -89,8 +90,8 @@ public class ValidTriangleNumber {
 
             while (leftIndex < middleIndex) {
                 if (nums[leftIndex] + nums[middleIndex] > nums[rightIndex]) {
-                    // All elements combinations like (leftIndex, leftIndex+1...middleIndex) and rightIndex are valid
-                    // because of sorting
+                    // All elements combinations like (leftIndex, middleIndex), (leftIndex, middleIndex+1), ... (middleIndex-1, middleIndex)
+                    // are greater than nums[rightIndex] and hence form valid triangles with nums[rightIndex] because of sorting
                     count += middleIndex - leftIndex;
                     middleIndex--;
                 } else {

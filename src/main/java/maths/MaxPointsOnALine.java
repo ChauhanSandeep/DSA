@@ -60,13 +60,13 @@ public class MaxPointsOnALine {
 
     int maxCount = 0;
 
-    for (int i = 0; i < points.length; i++) {
+    for (int anchorIndex = 0; anchorIndex < points.length; anchorIndex++) {
       Map<String, Integer> slopeMap = new HashMap<>(); // <slope, count>
       int currentMax = 0;
 
-      for (int j = i + 1; j < points.length; j++) {
-        int dx = points[j][0] - points[i][0];
-        int dy = points[j][1] - points[i][1];
+      for (int otherIndex = anchorIndex + 1; otherIndex < points.length; otherIndex++) {
+        int dx = points[otherIndex][0] - points[anchorIndex][0];
+        int dy = points[otherIndex][1] - points[anchorIndex][1];
 
         int greatestCommonDivisor = getGreatestCommonDivisor(dx, dy);
         dy /= greatestCommonDivisor;

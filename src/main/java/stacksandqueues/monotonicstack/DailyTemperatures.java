@@ -1,7 +1,6 @@
 package stacksandqueues.monotonicstack;
 
 import java.util.Stack;
-import java.util.Arrays;
 
 /**
  * Problem: Daily Temperatures
@@ -101,30 +100,6 @@ public class DailyTemperatures {
             if (j < size) {
                 result[i] = j - i;
             }
-        }
-
-        return result;
-    }
-
-    /**
-     * Brute force approach for comparison (O(n²) time complexity).
-     * Useful for understanding the problem and small inputs.
-     *
-     * Time Complexity: O(n²)
-     * Space Complexity: O(1) excluding result
-     */
-    public int[] dailyTemperaturesBruteForce(int[] temperatures) {
-        int n = temperatures.length;
-        int[] result = new int[n];
-
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if (temperatures[j] > temperatures[i]) {
-                    result[i] = j - i;
-                    break;
-                }
-            }
-            // If no warmer temperature found, result[i] remains 0
         }
 
         return result;

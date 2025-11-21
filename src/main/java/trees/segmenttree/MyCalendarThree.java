@@ -39,7 +39,7 @@ import java.util.*;
  */
 public class MyCalendarThree {
 
-    private final TreeMap<Integer, Integer> timeline;
+    private final TreeMap<Integer, Integer> timeline; // <Time, NumOfBookings>
 
     /**
      * Initializes the MyCalendarThree object using TreeMap approach.
@@ -66,39 +66,32 @@ public class MyCalendarThree {
      * Step 4: Track maximum prefix sum encountered (maximum overlapping events)
      * Step 5: Return the maximum k-booking value
      *
-     * Time Complexity: O(n log n) where n is number of unique time points
+     * Time Complexity: O(n + log n) where n is number of unique time points
      * - O(log n) for TreeMap insertions
      * - O(n) for iterating through all time points to find maximum
      * Space Complexity: O(n) for storing unique time points in TreeMap
-     *
-     * @param start the start time of the event (inclusive)
-     * @param end the end time of the event (exclusive)
-     * @return the maximum k-booking after adding this event
      */
-    public int book(int start, int end) {
-        // Step 1: Event starts at 'start' time - increment count
-        timeline.merge(start, 1, Integer::sum);
-
-        // Step 2: Event ends at 'end' time - decrement count
-        timeline.merge(end, -1, Integer::sum);
-
-        // Step 3: Line sweep through timeline computing prefix sums
-        int currentOverlap = 0;
-        int maxOverlap = 0;
-
-        // Step 4: Process events in chronological order
+    public int book(int startTime, int endTime) {
+        // Update timeline with event start (+1) and end (-1)
+        timeline.put(startTime, timeline.getOrDefault(startTime, 0) + 1);
+        timeline.put(endTime, timeline.getOrDefault(endTime, 0) - 1);
+        
+        // Sweep through timeline to find maximum overlap
+        int activeEvents = 0;
+        int maxBooking = 0;
+        
         for (int delta : timeline.values()) {
-            currentOverlap += delta;
-            // Step 5: Track maximum number of simultaneous events
-            maxOverlap = Math.max(maxOverlap, currentOverlap);
+            activeEvents += delta;
+            maxBooking = Math.max(maxBooking, activeEvents);
         }
-
-        return maxOverlap;
+        
+        return maxBooking;
     }
 
     /**
      * Alternative implementation using Segment Tree with Lazy Propagation.
      * Provides better performance for large coordinate ranges through coordinate compression.
+     * However this might not be required in interview for implementation
      */
     public static class MyCalendarThreeSegmentTree {
 
@@ -336,15 +329,3 @@ public class MyCalendarThree {
     }
 }
 
-/**
- * Usage Example:
- * MyCalendarThree myCalendarThree = new MyCalendarThree();
- * int result1 = myCalendarThree.book(10, 20); // returns 1
- * int result2 = myCalendarThree.book(50, 60); // returns 1
- * int result3 = myCalendarThree.book(10, 40); // returns 2
- * int result4 = myCalendarThree.book(5, 15);  // returns 3
- *
- * Alternative usage:
- * MyCalendarThree.MyCalendarThreeSegmentTree segTree = new MyCalendarThree.MyCalendarThreeSegmentTree();
- * int result = segTree.book(10, 20);
- */
