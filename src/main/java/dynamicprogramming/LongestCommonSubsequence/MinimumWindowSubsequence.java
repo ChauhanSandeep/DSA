@@ -167,14 +167,14 @@ public class MinimumWindowSubsequence {
     }
 
     // Fill DP table
-    for (int i = 1; i <= sourceLen; i++) {
-      for (int j = 1; j <= targetLen; j++) {
-        if (source.charAt(i - 1) == target.charAt(j - 1)) {
+    for (int sourcePointer = 1; sourcePointer <= sourceLen; sourcePointer++) {
+      for (int targetPointer = 1; targetPointer <= targetLen; targetPointer++) {
+        if (source.charAt(sourcePointer - 1) == target.charAt(targetPointer - 1)) {
           // Characters match: extend window from where j-1 characters were matched
-          dp[i][j] = dp[i - 1][j - 1];
+          dp[sourcePointer][targetPointer] = dp[sourcePointer - 1][targetPointer - 1];
         } else {
           // No match: carry forward previous window
-          dp[i][j] = dp[i - 1][j];
+          dp[sourcePointer][targetPointer] = dp[sourcePointer - 1][targetPointer];
         }
       }
     }
@@ -184,7 +184,7 @@ public class MinimumWindowSubsequence {
 
     for (int endPos = 1; endPos <= sourceLen; endPos++) {
       if (dp[endPos][targetLen] != -1) {
-        int startPos = dp[endPos][targetLen];
+        int startPos = dp[endPos][targetLen]; // Start index of window
         int currentLen = endPos - startPos;
 
         if (currentLen < minWindowLen) {

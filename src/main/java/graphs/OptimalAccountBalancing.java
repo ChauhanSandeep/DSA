@@ -57,10 +57,10 @@ public class OptimalAccountBalancing {
         memo.clear();
 
         // Step 1: Compute net balance of each person
-        Map<Integer, Integer> netBalanceMap = calculateNetBalances(transactions);
+        Map<Integer, Integer> personBalanceMap = calculateNetBalances(transactions);
 
         // Step 2: Store only non-zero balances
-        List<Integer> nonZeroBalances = netBalanceMap.values().stream()
+        List<Integer> nonZeroBalances = personBalanceMap.values().stream()
             .filter(value -> value != 0)
             .collect(Collectors.toList());
 

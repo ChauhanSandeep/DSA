@@ -14,7 +14,7 @@ import java.util.Arrays;
  * Input:  [1, 2, 3, 4, 5, 6]
  * Output: [6, 1, 5, 2, 4, 3]
  *
- * GFG Link: https://www.geeksforgeeks.org/dsa/rearrange-array-maximum-minimum-form/?utm_source=chatgpt.com
+ * GFG Link: https://www.geeksforgeeks.org/dsa/rearrange-array-maximum-minimum-form
  */
 public class AlternateArray {
 

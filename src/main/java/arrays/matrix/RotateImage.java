@@ -1,7 +1,5 @@
 package arrays.matrix;
 
-import java.util.*;
-
 /**
  * Problem: Rotate Image
  *

@@ -22,7 +22,7 @@ public class LongestPalindrome {
         String input = "kjqlrfzzfmlvyoshiktodnsjjp";
 
         System.out.println("Longest Palindromic Substring (DP Approach): " + longestPalindromeDP(input));
-        System.out.println("Longest Palindromic Substring (Expand Around Center Approach): " + longestPalindromeExpand(input));
+        System.out.println("Longest Palindromic Substring (Expand Around Center Approach): " + new LongestPalindrome().longestPalindrome(input));
     }
 
     /**

@@ -16,7 +16,7 @@ import java.util.*;
  *
  * Related Link: [YouTube Explanation](https://www.youtube.com/watch?v=Om47LiGTy8o)
  *
- * 🔍 Follow-up Questions:
+ * Follow-up Questions:
  * 1. **Can we find smallest multiple with only digits 1 and 2, or any other custom digits?**
  *    - Yes, we can generalize this approach by changing the digits used in BFS transitions.
  * 2. **Can we solve this without backtracking using parent maps?**

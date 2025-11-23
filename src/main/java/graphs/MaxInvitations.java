@@ -74,46 +74,46 @@ public class MaxInvitations {
    * Time Complexity: O(N)
    * Space Complexity: O(N)
    *
-   * @param favorites Array where favorites[i] is the preferred neighbor of employee i
+   * @param favoriteArr Array where favorites[i] is the preferred neighbor of employee i
    * @return Maximum number of employees that can be invited
    */
-  public int maximumInvitations(int[] favorites) {
-    int totalEmployees = favorites.length;
-    boolean[] isProcessed = new boolean[totalEmployees]; // Node is considered processed when removed in topological sort
+  public int maximumInvitations(int[] favoriteArr) {
+    int length = favoriteArr.length;
+    boolean[] visited = new boolean[length]; // Node is considered processed when removed in topological sort
 
     // Step 1: Calculate in-degrees for topological sorting
-    int[] inDegree = new int[totalEmployees];
-    for (int favorite : favorites) {
+    int[] inDegree = new int[length];
+    for (int favorite : favoriteArr) {
       inDegree[favorite]++;
     }
 
     // Step 2: Remove nodes with no incoming edges (start of chains)
     Queue<Integer> queue = new LinkedList<>();
-    for (int employee = 0; employee < totalEmployees; employee++) {
+    for (int employee = 0; employee < length; employee++) {
       if (inDegree[employee] == 0) {
-        isProcessed[employee] = true;
+        visited[employee] = true;
         queue.offer(employee);
       }
     }
 
     // Step 3: Calculate the longest chain leading to each node
     // maxChainLen[i] = length of longest chain leading to employee i
-    int[] maxChainLen = getMaxChainLength(favorites, totalEmployees, queue, inDegree, isProcessed);
+    int[] maxChainLen = getMaxChainLength(favoriteArr, length, queue, inDegree, visited);
 
     // Step 4: Process remaining cycles
     int largestCycleSize = 0;
     int totalTwoCycleContribution = 0;
 
-    for (int employee = 0; employee < totalEmployees; employee++) {
-      if (!isProcessed[employee]) {
+    for (int employee = 0; employee < length; employee++) {
+      if (!visited[employee]) {
         // Found start of a cycle - traverse to find cycle length
         // Start of cycle is not processed in previous steps because it has incoming edges
         int cycleLength = 0;
         int currentNode = employee;
 
-        while (!isProcessed[currentNode]) {
-          isProcessed[currentNode] = true;
-          currentNode = favorites[currentNode];
+        while (!visited[currentNode]) {
+          visited[currentNode] = true;
+          currentNode = favoriteArr[currentNode];
           cycleLength++;
         }
 
@@ -135,7 +135,7 @@ public class MaxInvitations {
           // So, we compute the contribution of this 2-cycle as:
           // 2 (for A and B) + longest incoming chain to A + longest incoming chain to B
           int mutualFav1 = employee;
-          int mutualFav2 = favorites[employee];
+          int mutualFav2 = favoriteArr[employee];
           totalTwoCycleContribution += 2 + maxChainLen[mutualFav1] + maxChainLen[mutualFav2];
         } else {
           // Regular Cycle of size > 2 (like A → B → C → A)
@@ -155,13 +155,14 @@ public class MaxInvitations {
     return Math.max(largestCycleSize, totalTwoCycleContribution);
   }
 
-  private static int[] getMaxChainLength(int[] favorites, int totalEmployees, Queue<Integer> queue, int[] inDegree,
-      boolean[] isProcessed) {
-    int[] maxChainLen = new int[totalEmployees]; // maxChainLen[i] = length of longest chain leading to employee i
+  // Helper to calculate longest chains leading to each employee
+  private static int[] getMaxChainLength(int[] favoriteArr, int length, Queue<Integer> queue, int[] inDegree,
+      boolean[] visited) {
+    int[] maxChainLen = new int[length]; // maxChainLen[i] = length of longest chain leading to employee i
 
     while (!queue.isEmpty()) {
       int currentEmployee = queue.poll();
-      int favoriteEmployee = favorites[currentEmployee];
+      int favoriteEmployee = favoriteArr[currentEmployee];
 
       // Update the longest chain to the favorite employee
       maxChainLen[favoriteEmployee] = Math.max(maxChainLen[favoriteEmployee], maxChainLen[currentEmployee] + 1);
@@ -169,7 +170,7 @@ public class MaxInvitations {
       // Remove this edge and check if favorites becomes a leaf
       inDegree[favoriteEmployee]--;
       if (inDegree[favoriteEmployee] == 0) {
-        isProcessed[favoriteEmployee] = true;
+        visited[favoriteEmployee] = true;
         queue.offer(favoriteEmployee);
       }
     }

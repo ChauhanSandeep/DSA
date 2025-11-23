@@ -51,138 +51,141 @@ public class MinimumCostMergeStones {
     System.out.println("Min cost (k=2): " + solver.mergeStones(stones, 2)); // Expected: 20
   }
 
-  /**
-   * Finds minimum cost to merge all stone piles into one using 3D dynamic programming.
-   *
-   * Algorithm: Interval Dynamic Programming with 3D State
-   * State: dp[i][j][m] = minimum cost to merge stones[i-1] to stones[j-1] into exactly m piles
-   *
-   * Key insights:
-   * 1. Impossibility check: (n-1) % (k-1) must equal 0 for merging to be possible
-   * 2. Each merge reduces pile count by (k-1), so we need (n-1)/(k-1) total merges
-   * 3. To merge range [i,j] into 1 pile: first merge into k piles, then final merge
-   * 4. Split points must align with k-merge constraints (increment by k-1)
-   *
-   * Recurrence Relations:
-   * - dp[i][j][m] = min(dp[i][split][1] + dp[split+1][j][m-1]) for valid splits
-   * - dp[i][j][1] = dp[i][j][k] + sum(stones[i-1] to stones[j-1])
-   *
-   * Time Complexity: O(n^3 * k) - three nested loops for range, one for pile count
-   * Space Complexity: O(n^2 * k) - 3D DP array plus prefix sum array
-   *
-   * @param stones array representing stone counts in each pile
-   * @param k number of consecutive piles that must be merged together
-   * @return minimum cost to merge all piles into one, or -1 if impossible
-   */
-  public int mergeStones(int[] stones, int k) {
-    int size = stones.length;
-
-    // Check impossibility: each merge reduces count by (k-1)
-    // To go from n piles to 1 pile, we need (n-1)/(k-1) merges
-    if ((size - 1) % (k - 1) != 0) {
-      return -1;
-    }
-
-    // Build prefix sum array for O(1) range sum queries
-    int[] prefixSum = buildPrefixSumArray(stones);
-
-    // Initialize DP table with impossible states as infinity
-    int[][][] dp = initializeDpTable(size, k);
-
-    // Fill DP table using interval DP approach
-    fillDpTable(dp, prefixSum, size, k);
-
-    return dp[1][size][1];
-  }
-
-  /**
-   * Builds prefix sum array for efficient range sum calculation.
-   * prefixSum[i] = sum of stones[0] to stones[i-1]
-   *
-   * @param stones original stone array
-   * @return prefix sum array with 1-indexed structure
-   */
-  private int[] buildPrefixSumArray(int[] stones) {
-    int numPiles = stones.length;
-    int[] prefixSum = new int[numPiles + 1];
-
-    for (int i = 1; i <= numPiles; i++) {
-      prefixSum[i] = prefixSum[i - 1] + stones[i - 1];
-    }
-
-    return prefixSum;
-  }
-
-  /**
-   * Initializes 3D DP table with base cases and impossible state markers.
-   *
-   * @param numPiles number of stone piles
-   * @param k merge constraint parameter
-   * @return initialized DP table
-   */
-  private int[][][] initializeDpTable(int numPiles, int k) {
-    int[][][] dp = new int[numPiles + 1][numPiles + 1][k + 1];
-    final int INFINITY = Integer.MAX_VALUE / 2; // Avoid overflow in additions
-
-    // Initialize all states as impossible (infinity)
-    for (int i = 0; i <= numPiles; i++) {
-      for (int j = 0; j <= numPiles; j++) {
-        Arrays.fill(dp[i][j], INFINITY);
-      }
-    }
-
-    // Base case: single pile is already 1 pile with zero cost
-    for (int i = 1; i <= numPiles; i++) {
-      dp[i][i][1] = 0;
-    }
-
-    return dp;
-  }
-
-  /**
-   * Fills DP table using interval dynamic programming approach.
-   *
-   * Algorithm:
-   * 1. Process intervals of increasing length (bottom-up)
-   * 2. For each interval [start, end], try forming different pile counts
-   * 3. For m piles: try splitting into (1 pile) + (m-1 piles) at valid positions
-   * 4. For 1 pile: first form k piles, then merge with final cost
-   *
-   * @param dp 3D DP table to fill
-   * @param prefixSum prefix sum array for range sum queries
-   * @param numPiles total number of stone piles
-   * @param k merge constraint parameter
-   */
-  private void fillDpTable(int[][][] dp, int[] prefixSum, int numPiles, int k) {
-    // Process intervals of increasing length
-    for (int intervalLength = 2; intervalLength <= numPiles; intervalLength++) {
-      // Try all possible starting positions for current interval length
-      for (int start = 1; start + intervalLength - 1 <= numPiles; start++) {
-        int end = start + intervalLength - 1;
-
-        // Try forming different numbers of piles (2 to k)
-        for (int targetPiles = 2; targetPiles <= k; targetPiles++) {
-          // Try all valid split positions (must align with k-merge constraint)
-          for (int split = start; split < end; split += k - 1) {
-            // Merge [start, split] into 1 pile, [split+1, end] into (targetPiles-1) piles
-            if (dp[start][split][1] != Integer.MAX_VALUE / 2 &&
-                dp[split + 1][end][targetPiles - 1] != Integer.MAX_VALUE / 2) {
-
-              dp[start][end][targetPiles] = Math.min(
-                  dp[start][end][targetPiles],
-                  dp[start][split][1] + dp[split + 1][end][targetPiles - 1]
-              );
+    /**
+     * Main method: 2D Dynamic Programming with interval optimization.
+     * Step-by-step:
+     *  1. Check feasibility: To merge n piles into 1, we need (n-1) to be divisible by (k-1)
+     *     - Each merge reduces piles by (k-1), so after m merges: n - m*(k-1) = 1
+     *     - This gives: (n-1) % (k-1) == 0
+     *  2. Define DP state: dp[i][j] = minimum cost to merge stones[i..j] into minimum possible piles
+     *     - Minimum piles = ((j-i) % (k-1)) + 1
+     *  3. For each interval [i,j]:
+     *     a. Try all split points: split at i, i+k-1, i+2*(k-1), ... (increment by k-1)
+     *     b. Each split divides into two parts that are optimally merged
+     *     c. If (j-i) is divisible by (k-1), we can merge into 1 pile (add sum cost)
+     *  4. Use prefix sum for O(1) range sum queries
+     *
+     * Key Insight:
+     * Each merge reduces piles by exactly (k-1). To merge interval into 1 pile, we first
+     * merge into k piles, then do final merge. Split points must be at k-1 intervals to
+     * ensure both sides can be optimally merged. The (n-1) % (k-1) == 0 condition ensures
+     * we can eventually reach 1 pile.
+     *
+     * Algorithm: Interval Dynamic Programming.
+     * Time Complexity: O(n³/k), outer loops O(n²), inner loop O(n/k) split points.
+     * Space Complexity: O(n²) for DP table.
+     */
+    public int mergeStones(int[] stones, int k) {
+        int length = stones.length;
+        
+        // Check if merging to 1 pile is possible
+        if ((length - 1) % (k - 1) != 0) {
+            return -1;
+        }
+        
+        // Compute prefix sums for O(1) range sum
+        int[] prefixSum = new int[length + 1];
+        for (int i = 0; i < length; i++) {
+            prefixSum[i + 1] = prefixSum[i] + stones[i];
+        }
+        
+        // dp[i][j] = min cost to merge stones[i..j] into minimum piles
+        int[][] dp = new int[length][length];
+        
+        // Fill DP table for increasing interval lengths
+        for (int gap = k; gap <= length; gap++) {
+            for (int start = 0; start + gap <= length; start++) {
+                int end = start + gap - 1;
+                dp[start][end] = Integer.MAX_VALUE;
+                
+                // Try all valid split points (increment by k-1)
+                for (int mid = start; mid < end; mid += k - 1) {
+                    dp[start][end] = Math.min(dp[start][end], 
+                                       dp[start][mid] + dp[mid + 1][end]);
+                }
+                
+                // If this interval can be merged into 1 pile, add merge cost
+                if ((end - start) % (k - 1) == 0) {
+                    dp[start][end] += prefixSum[end + 1] - prefixSum[start];
+                }
             }
-          }
         }
-
-        // Merge k piles into 1 pile (final merge step)
-        if (dp[start][end][k] != Integer.MAX_VALUE / 2) {
-          // Cost = cost to form k piles + cost of final merge (sum of all stones)
-          int finalMergeCost = prefixSum[end] - prefixSum[start - 1];
-          dp[start][end][1] = dp[start][end][k] + finalMergeCost;
-        }
-      }
+        
+        return dp[0][length - 1];
     }
-  }
+
+    /**
+     * Alternative method: Top-Down DP with Memoization (easier to understand).
+     * Step-by-step:
+     *  1. Use recursion with memoization to compute minimum cost
+     *  2. Base case: if i >= j, cost is 0 (single pile or invalid)
+     *  3. Try all split points at k-1 intervals
+     *  4. Recursively compute cost for left and right parts
+     *  5. If interval length allows merging to 1 pile, add merge cost
+     *
+     * Key Insight:
+     * Same logic as bottom-up but uses recursion with memo for clarity.
+     * Easier to understand the subproblem decomposition.
+     *
+     * Algorithm: Top-Down DP with Memoization.
+     * Time Complexity: O(n³/k).
+     * Space Complexity: O(n²) for memoization + O(n) recursion stack.
+     */
+    public int mergeStonesTopDown(int[] stones, int k) {
+        int length = stones.length;
+        
+        // Check feasibility
+        if ((length - 1) % (k - 1) != 0) {
+            return -1;
+        }
+        
+        // Prefix sum
+        int[] prefixSum = new int[length + 1];
+        for (int i = 0; i < length; i++) {
+            prefixSum[i + 1] = prefixSum[i] + stones[i];
+        }
+        
+        // Memoization table (-1 means not computed)
+        int[][] memo = new int[length][length];
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
+                memo[i][j] = -1;
+            }
+        }
+        
+        return helper(stones, k, 0, length - 1, prefixSum, memo);
+    }
+
+    /**
+     * Helper: Recursively computes minimum cost to merge stones[i..j].
+     */
+    private int helper(int[] stones, int k, int i, int j, 
+                      int[] prefixSum, int[][] memo) {
+        // Base case: single pile or invalid
+        if (i >= j) {
+            return 0;
+        }
+        
+        // Check memo
+        if (memo[i][j] != -1) {
+            return memo[i][j];
+        }
+        
+        int minCost = Integer.MAX_VALUE;
+        
+        // Try all valid split points (increment by k-1)
+        for (int mid = i; mid < j; mid += k - 1) {
+            int cost = helper(stones, k, i, mid, prefixSum, memo) + 
+                       helper(stones, k, mid + 1, j, prefixSum, memo);
+            minCost = Math.min(minCost, cost);
+        }
+        
+        // If this interval can be merged into 1 pile, add merge cost
+        if ((j - i) % (k - 1) == 0) {
+            minCost += prefixSum[j + 1] - prefixSum[i];
+        }
+        
+        memo[i][j] = minCost;
+        return minCost;
+    }
 }

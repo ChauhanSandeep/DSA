@@ -39,7 +39,7 @@ import java.util.List;
 public class KthPermutation {
     public static void main(String[] args) {
         int n = 4, k = 17;
-        String result = getKthPermutation(n, k);
+        String result = getKthPermutationRecursiveApproach(n, k);
         System.out.println("The " + k + "-th permutation of sequence 1 to " + n + " is: " + result);
     }
 
@@ -117,42 +117,43 @@ public class KthPermutation {
      *
      * Space Complexity: O(n) for recursion stack + current permutation
      */
-    public String getPermutationRecursiveApproach(int n, int k) {
-        boolean[] used = new boolean[n + 1];
+    public static String getKthPermutationRecursiveApproach(int num, int k) {
+        boolean[] used = new boolean[num + 1];
         StringBuilder currentPermutation = new StringBuilder();
         int[] counter = {0}; // Use array to make it mutable in recursion
 
-        String result = generatePermutationRec(n, k, currentPermutation, used, counter);
+        String result = generatePermutationRec(num, k, currentPermutation, used, counter);
         return result != null ? result : "";
     }
 
     // Helper method for early stopping approach
-    private String generatePermutationRec(int n, int k, StringBuilder current, boolean[] used, int[] counter) {
+    private static String generatePermutationRec(int num, int k, StringBuilder currentPermutation, boolean[] used, int[] counter) {
         // Base case: complete permutation found
-        if (current.length() == n) {
+        if (currentPermutation.length() == num) {
+            System.out.println("Generated permutation: " + currentPermutation.toString());
             counter[0]++;
             if (counter[0] == k) {
-                return current.toString(); // Found kth permutation!
+                return currentPermutation.toString(); // Found kth permutation!
             }
             return null; // Continue searching
         }
 
         // Try each unused number
         // Start from 1 to n to maintain lexicographical order
-        for (int i = 1; i <= n; i++) {
+        for (int i = 1; i <= num; i++) {
             if (!used[i]) {
                 // Choose
                 used[i] = true;
-                current.append(i);
+                currentPermutation.append(i);
 
                 // Recurse
-                String result = generatePermutationRec(n, k, current, used, counter);
+                String result = generatePermutationRec(num, k, currentPermutation, used, counter);
                 if (result != null) {
                     return result; // Found it, propagate up
                 }
 
                 // Backtrack
-                current.deleteCharAt(current.length() - 1);
+                currentPermutation.deleteCharAt(currentPermutation.length() - 1);
                 used[i] = false;
             }
         }

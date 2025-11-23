@@ -1,7 +1,6 @@
 package dynamicprogramming;
 
-import java.util.Arrays;
-import java.util.Stack;
+import java.util.*;
 
 
 /**
@@ -109,13 +108,13 @@ public class CountMatricesWithAllOnes {
    * @return Total count of rectangles in the histogram
    */
   public int countAllRectanglesInHistogram(int[] heights) {
-    Stack<Integer> monotonicStack = new Stack<>();
+    Deque<Integer> monotonicIncreasingStack = new ArrayDeque<>();
     int totalRectangles = 0;
     int[] rectCountAt = new int[heights.length];
 
     for (int currentIndex = 0; currentIndex < heights.length; currentIndex++) {
-      while (!monotonicStack.isEmpty() && heights[monotonicStack.peek()] >= heights[currentIndex]) {
-        monotonicStack.pop();
+      while (!monotonicIncreasingStack.isEmpty() && heights[monotonicIncreasingStack.peek()] >= heights[currentIndex]) {
+        monotonicIncreasingStack.pop();
       }
 
       /**
@@ -123,7 +122,7 @@ public class CountMatricesWithAllOnes {
        * or the top of the stack is the index of the previous smaller element.
        * Now we can calculate the width and number of rectangles ending at currentIndex.
        */
-      int previousSmallerIndex = monotonicStack.isEmpty() ? -1 : monotonicStack.peek();
+      int previousSmallerIndex = monotonicIncreasingStack.isEmpty() ? -1 : monotonicIncreasingStack.peek();
       int width = currentIndex - previousSmallerIndex;
 
       // count rectangles ending at current bar
@@ -133,7 +132,7 @@ public class CountMatricesWithAllOnes {
       }
 
       totalRectangles += rectCountAt[currentIndex];
-      monotonicStack.push(currentIndex);
+      monotonicIncreasingStack.push(currentIndex);
     }
 
     return totalRectangles;

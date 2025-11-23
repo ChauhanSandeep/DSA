@@ -159,12 +159,12 @@ class LFUCache {
    * Space Complexity: O(1)
    */
   private void evictLeastFrequentKey() {
-    LinkedHashSet<Integer> keysAtMinFreq = frequencyToKeysMap.get(minFrequency);
-    int keyToRemove = keysAtMinFreq.iterator().next();
+    LinkedHashSet<Integer> keysWithMinFreq = frequencyToKeysMap.get(minFrequency);
+    int keyToRemove = keysWithMinFreq.stream().findFirst().get(); // Get the least recently used key
 
     // Remove the key from all maps
-    keysAtMinFreq.remove(keyToRemove);
-    if (keysAtMinFreq.isEmpty()) {
+    keysWithMinFreq.remove(keyToRemove);
+    if (keysWithMinFreq.isEmpty()) {
       frequencyToKeysMap.remove(minFrequency);
     }
 

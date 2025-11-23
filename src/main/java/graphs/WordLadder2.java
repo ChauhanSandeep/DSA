@@ -32,11 +32,6 @@ import java.util.*;
  *    Answer: Replace BFS with Dijkstra's algorithm using priority queue for weighted shortest paths.
  * 4. What if words can have different lengths with insertion/deletion operations?
  *    Answer: Extend to edit distance problem using dynamic programming with 3D state space.
- *
- * Related Problems:
- * - LeetCode 127: Word Ladder (Single shortest path length)
- * - LeetCode 433: Minimum Genetic Mutation (Similar transformation concept)
- * - LeetCode 752: Open the Lock (BFS with state transformations)
  */
 public class WordLadder2 {
 
@@ -83,17 +78,17 @@ public class WordLadder2 {
     Set<String> frontSet = new HashSet<>(Collections.singleton(beginWord));
     Set<String> backSet = new HashSet<>(Collections.singleton(endWord));
 
-    boolean pathFound = false; // Track if a path has been found between the two frontiers
-    boolean reverse = false; // Track direction to expand in bidirectional BFS. True -> backSet, False -> frontSet
+    boolean isPathFound = false; // Track if a path has been found between the two frontiers
+    boolean isReverseTraversal = false; // Track direction to expand in bidirectional BFS. True -> backSet, False -> frontSet
 
-    while (!frontSet.isEmpty() && !backSet.isEmpty() && !pathFound) {
+    while (!frontSet.isEmpty() && !backSet.isEmpty() && !isPathFound) {
       // Expand smaller frontier for efficiency. We do expansion of frontSet always so keep it smaller
       if (frontSet.size() > backSet.size()) {
         // Swap frontSet and backSet
         Set<String> temp = frontSet;
         frontSet = backSet;
         backSet = temp;
-        reverse = !reverse;
+        isReverseTraversal = !isReverseTraversal;
       }
 
       dictionary.removeAll(frontSet); // Remove already-visited words from the dictionary (prevents revisiting).
@@ -109,12 +104,12 @@ public class WordLadder2 {
 
           // reverse check is done because we are doing bidirectional BFS and we are expanding the smaller frontier
           // so the word that we are expanding is the one that is in the opposite frontier
-          String from = reverse ? transformedWord : currentWord; // from contains currentWord
-          String to = reverse ? currentWord : transformedWord;  // to contains transformedWord
+          String from = isReverseTraversal ? transformedWord : currentWord; // from contains currentWord
+          String to = isReverseTraversal ? currentWord : transformedWord;  // to contains transformedWord
           adjacencyMap.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
 
           if (backSet.contains(transformedWord)) {
-            pathFound = true; // Path found
+            isPathFound = true; // Path found
           } else {
             neighborSet.add(transformedWord); // Add word to be expanded in next level
           }
@@ -124,7 +119,8 @@ public class WordLadder2 {
 
       frontSet = neighborSet;
     }
-    return pathFound;
+
+    return isPathFound;
   }
 
   /**

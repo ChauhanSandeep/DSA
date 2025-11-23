@@ -151,45 +151,6 @@ public class ReverseNodesInKGroup {
         return prev; // New head of reversed group
     }
 
-    /**
-     * Iterative approach - constant space complexity.
-     * More efficient for very long lists.
-     */
-    public ListNode reverseKGroupIterative(ListNode head, int k) {
-        if (head == null || k == 1) return head;
-
-        // Count total nodes
-        int length = getLength(head);
-        int numGroups = length / k;
-
-        ListNode dummy = new ListNode(0);
-        dummy.next = head;
-        ListNode groupPrev = dummy;
-
-        for (int group = 0; group < numGroups; group++) {
-            ListNode groupNext = groupPrev;
-
-            // Find end of current group
-            for (int i = 0; i < k; i++) {
-                groupNext = groupNext.next;
-            }
-
-            ListNode nextGroupStart = groupNext.next;
-
-            // Reverse current group
-            ListNode[] reversed = reverseGroup(groupPrev.next, groupNext);
-
-            // Connect with previous group
-            groupPrev.next = reversed[0]; // New head
-            reversed[1].next = nextGroupStart; // Connect tail
-
-            // Move to next group
-            groupPrev = reversed[1];
-        }
-
-        return dummy.next;
-    }
-
     // Helper: get length of linked list
     private int getLength(ListNode head) {
         int length = 0;
@@ -198,22 +159,6 @@ public class ReverseNodesInKGroup {
             head = head.next;
         }
         return length;
-    }
-
-    // Helper: reverse group and return [newHead, newTail]
-    private ListNode[] reverseGroup(ListNode start, ListNode end) {
-        ListNode prev = end.next;
-        ListNode current = start;
-
-        while (current != end) {
-            ListNode next = current.next;
-            current.next = prev;
-            prev = current;
-            current = next;
-        }
-
-        current.next = prev;
-        return new ListNode[]{end, start}; // [newHead, newTail]
     }
 
     /**

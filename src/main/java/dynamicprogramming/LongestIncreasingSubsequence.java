@@ -41,7 +41,7 @@ public class LongestIncreasingSubsequence {
         int[] arr = {10, 22, 9, 33, 21, 50, 41, 60, 60};
 
         System.out.println("LIS Length (O(N²) DP): " + findLisUsingDp(arr));
-        System.out.println("LIS Length (O(N log N) Binary Search): " + findLisUsingBinarySearch(arr));
+        System.out.println("LIS Length (O(N log N) Binary Search): " + new LongestIncreasingSubsequence().lengthOfLIS(arr));
     }
 
     /**

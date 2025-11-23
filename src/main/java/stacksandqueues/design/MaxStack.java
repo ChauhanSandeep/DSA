@@ -178,6 +178,11 @@ public class MaxStack {
             return tail.previous.value;
         }
 
+        // Get the element on top of the stack (alias for top)
+        public int peek() {
+            return top();
+        }
+
         // Retrieve the maximum element in the stack
         public int peekMax() {
             return valueToNodes.lastKey();
