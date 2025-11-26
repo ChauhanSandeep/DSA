@@ -30,18 +30,6 @@ import java.util.*;
 public class UsefulExtraEdges {
 
     /**
-     * Helper class to represent edges in adjacency list.
-     */
-    static class Edge {
-        int target, weight;
-
-        Edge(int target, int weight) {
-            this.target = target;
-            this.weight = weight;
-        }
-    }
-
-    /**
      * Finds the shortest path between source and destination considering extra bidirectional edges.
      *
      * Optimized Approach: Avoids re-running Dijkstra for each extra edge.
@@ -148,6 +136,17 @@ public class UsefulExtraEdges {
             }
         }
         return distances;
+    }
+    /**
+     * Helper class to represent edges in adjacency list.
+     */
+    static class Edge {
+        int target, weight;
+
+        Edge(int target, int weight) {
+            this.target = target;
+            this.weight = weight;
+        }
     }
 
     /**

@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * **Leetcode 542: 01 Matrix**
  * LeetCode: https://leetcode.com/problems/01-matrix/
  *
  * --- Problem Description ---

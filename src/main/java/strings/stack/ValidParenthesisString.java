@@ -55,41 +55,41 @@ public class ValidParenthesisString {
      * Time Complexity: O(n) where n is length of string
      * Space Complexity: O(1) - only uses constant extra space
      *
-     * @param s String containing '(', ')', and '*' characters
+     * @param input String containing '(', ')', and '*' characters
      * @return true if string can be made valid, false otherwise
      */
-    public boolean checkValidString(String s) {
-        if (s == null) {
+    public boolean checkValidString(String input) {
+        if (input == null) {
             return true;
         }
 
         // Min and max possible open parentheses
-        int minOpen = 0; // Minimum possible open parentheses
-        int maxOpen = 0; // Maximum possible open parentheses
+        int minOpenParCount = 0; // Minimum possible open parentheses
+        int maxOpenParCount = 0; // Maximum possible open parentheses
 
-        for (char c : s.toCharArray()) {
+        for (char c : input.toCharArray()) {
             if (c == '(') {
                 // Must treat as open parenthesis
-                minOpen++;
-                maxOpen++;
+                minOpenParCount++;
+                maxOpenParCount++;
             } else if (c == ')') {
                 // Must treat as close parenthesis
-                minOpen = Math.max(0, minOpen - 1);
-                maxOpen--;
+                minOpenParCount = Math.max(0, minOpenParCount - 1);
+                maxOpenParCount--;
             } else { // c == '*'
                 // Can treat as ')', '(', or empty
-                minOpen = Math.max(0, minOpen - 1); // Treat as ')'. If goes negative, reset to 0 (taking * as empty string)
-                maxOpen++; // Treat as '('
+                minOpenParCount = Math.max(0, minOpenParCount - 1); // Treat as ')'. If goes negative, reset to 0 (taking * as empty string)
+                maxOpenParCount++; // Treat as '('
             }
 
             // If maximum possible opens becomes negative anywhere in traversal, its impossible to balance
-            if (maxOpen < 0) {
+            if (maxOpenParCount < 0) {
                 return false;
             }
         }
 
         // Valid if 0 is within the range of possible open parentheses
-        return minOpen <= 0 && maxOpen >= 0;
+        return minOpenParCount <= 0 && maxOpenParCount >= 0;
     }
 
     /**
@@ -99,14 +99,22 @@ public class ValidParenthesisString {
      * 1. First pass: left to right, check if we can balance all ')'. Here we treat '*' as '('
      * 2. Second pass: right to left, check if we can balance all '('. Here we treat '*' as ')'
      * 3. If both passes are valid, return true
+     * 
+     * Why this works:
+     * - First pass ensures that at no point do we have more closing parentheses ) than we can 
+     *  possibly match. It's done by treating every * optimistically as an opening parenthesis (
+     * - Second pass ensures that at no point do we have more opening parentheses ( than we can
+     * possibly match. Here we treat every * as a closing parenthesis )
+     * - If both conditions are satisfied, it means there exists a way to assign * such that
+     * all parentheses are balanced.
      *
      * Time Complexity: O(n) where n is length of string
      * Space Complexity: O(1) - only uses constant extra space
      */
-    public boolean checkValidStringTwoPass(String s) {
+    public boolean checkValidStringTwoPass(String input) {
         // First pass: left to right, check if we can balance all ')'. Here we treat '*' as '('
         int balance = 0;
-        for (char c : s.toCharArray()) {
+        for (char c : input.toCharArray()) {
             if (c == '(' || c == '*') {
                 balance++;
             } else { // c == ')'
@@ -120,8 +128,8 @@ public class ValidParenthesisString {
 
         // Second pass: right to left, check if we can balance all '('. Here we treat '*' as ')'
         balance = 0;
-        for (int i = s.length() - 1; i >= 0; i--) {
-            char c = s.charAt(i);
+        for (int i = input.length() - 1; i >= 0; i--) {
+            char c = input.charAt(i);
             if (c == ')' || c == '*') {
                 balance++;
             } else { // c == '('

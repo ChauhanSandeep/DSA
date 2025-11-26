@@ -1,5 +1,14 @@
 package dynamicprogramming;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Problem: Shortest Common Superstring
  *
@@ -21,117 +30,282 @@ package dynamicprogramming;
  */
 public class ShortestCommonSuperstring {
 
-  public static void main(String[] args) {
-    String[] words = {"abcd", "cdef", "fgh", "de"};
-    ShortestCommonSuperstring solver = new ShortestCommonSuperstring();
-    int length = solver.findShortestSuperstringLength(words);
-    System.out.println("Shortest Common Superstring Length: " + length);
-  }
+    /**
+     * Finds the shortest superstring using Dynamic Programming with bitmask.
+     * This approach models the problem similar to the Traveling Salesman Problem (TSP).
+     *
+     * Algorithm:
+     * 1. Precompute overlap matrix: For each pair of words (i, j), calculate how many
+     *    characters from the end of word[i] match the beginning of word[j].
+     *    Example: overlap("abc", "bcd") = 2 because "bc" matches
+     * 2. Use DP with bitmask: dp[mask][lastWord] represents the maximum total overlap achievable
+     *    when we've used the words indicated by the mask and the last word used is lastWord.
+     *    The mask is a bit representation where bit i is 1 if word i has been used.
+     * 3. Track parent pointers to reconstruct the optimal path showing which word came before.
+     * 4. Build the result by following the optimal path and merging words with their overlaps.
+     *
+     * Key Insight: By maximizing overlap, we minimize the total length of the superstring.
+     * The bitmask DP ensures we try all possible orderings efficiently without n! complexity.
+     *
+     * Time Complexity: O(n^2 * 2^n + n^2 * m) where n is the number of words and m is max word length.
+     * - O(n^2 * m) for computing overlaps between all pairs of words
+     * - O(n^2 * 2^n) for DP computation (for each of 2^n masks, we check n possible last words
+     *   and n possible previous words)
+     *
+     * Space Complexity: O(n^2 + 2^n * n) for overlap matrix and DP tables.
+     *
+     * @param words array of strings to find superstring for
+     * @return the shortest superstring containing all words
+     */
+    public String shortestSuperstring(String[] words) {
+        int numWords = words.length;
+        
+        // Step 1: Precompute overlap between every pair of words
+        // overlap[i][j] = how many characters we save if word[i] is followed by word[j]
+        int[][] overlap = computeOverlapMatrix(words);
+        
+        // Step 2: Initialize DP table and parent tracking
+        // dp[mask][lastWord] = maximum overlap when using words in mask, ending with lastWord
+        int[][] maxOverlapDP = new int[1 << numWords][numWords];
+        
+        // parent[mask][lastWord] = which word came before lastWord in the optimal path
+        int[][] parentWord = new int[1 << numWords][numWords];
+        
+        // Initialize parent array with -1 (no parent)
+        for (int mask = 0; mask < (1 << numWords); mask++) {
+            Arrays.fill(parentWord[mask], -1);
+        }
+        
+        // Step 3: Fill DP table by trying all possible masks and last words
+        for (int currentMask = 0; currentMask < (1 << numWords); currentMask++) {
+            for (int lastWord = 0; lastWord < numWords; lastWord++) {
+                // Skip if lastWord is not in the current mask
+                if ((currentMask & (1 << lastWord)) == 0) {
+                    continue;
+                }
+                
+                // Previous mask before adding lastWord
+                int previousMask = currentMask ^ (1 << lastWord);
+                
+                // If previousMask is empty, this is the first word (base case)
+                if (previousMask == 0) {
+                    continue;
+                }
+                
+                // Try all possible words that could have come before lastWord
+                for (int previousWord = 0; previousWord < numWords; previousWord++) {
+                    // Skip if previousWord is not in the previous mask
+                    if ((previousMask & (1 << previousWord)) == 0) {
+                        continue;
+                    }
+                    
+                    // Calculate total overlap if we go from previousWord to lastWord
+                    int totalOverlap = maxOverlapDP[previousMask][previousWord] + overlap[previousWord][lastWord];
+                    
+                    // Update DP table if this path gives better overlap
+                    if (totalOverlap > maxOverlapDP[currentMask][lastWord]) {
+                        maxOverlapDP[currentMask][lastWord] = totalOverlap;
+                        parentWord[currentMask][lastWord] = previousWord;
+                    }
+                }
+            }
+        }
+        
+        // Step 4: Find the best ending word when all words are used
+        int bestLastWord = 0;
+        int fullMask = (1 << numWords) - 1; // All bits set (all words used)
+        
+        for (int word = 0; word < numWords; word++) {
+            if (maxOverlapDP[fullMask][word] > maxOverlapDP[fullMask][bestLastWord]) {
+                bestLastWord = word;
+            }
+        }
+        
+        // Step 5: Reconstruct the optimal path from parent pointers
+        List<Integer> optimalPath = reconstructPath(parentWord, bestLastWord, numWords);
+        
+        // Step 6: Build the final superstring using the optimal path
+        return buildSuperstring(words, overlap, optimalPath);
+    }
 
-  /**
-   * Finds the length of the shortest superstring that contains all strings in the array
-   * as subsequences while preserving order.
-   *
-   * Steps:
-   * 1. Repeatedly identify the pair of strings with maximum suffix-prefix overlap.
-   * 2. Merge them and reduce the list by 1.
-   * 3. Continue until only one string remains.
-   *
-   * Time Complexity: O(n^3 * k), where n = number of words, k = average word length.
-   * Space Complexity: O(n * k), for intermediate merged strings.
-   *
-   * @param words Input array of strings.
-   * @return Length of the shortest superstring.
-   */
-  public int findShortestSuperstringLength(String[] words) {
-      if (words.length == 0) {
-          return 0;
-      }
-      if (words.length == 1) {
-          return words[0].length();
-      }
+    /**
+     * Computes overlap matrix for all pairs of words.
+     * overlap[i][j] represents how many characters from end of words[i] match beginning of words[j].
+     */
+    private int[][] computeOverlapMatrix(String[] words) {
+        int numWords = words.length;
+        int[][] overlap = new int[numWords][numWords];
+        
+        for (int i = 0; i < numWords; i++) {
+            for (int j = 0; j < numWords; j++) {
+                if (i != j) {
+                    overlap[i][j] = calculateOverlap(words[i], words[j]);
+                }
+            }
+        }
+        
+        return overlap;
+    }
 
-    // Repeat until all strings are merged into one
-    while (words.length > 1) {
-      int toBeMergedWordIdx1 = -1;
-      int toBeMergedWordIdx2 = -1;
-      int maxOverlap = -1;    // Track maximum overlap found
-      String mergedWord = ""; // Track the best merged string
+    /**
+     * Calculates maximum overlap between end of first string and beginning of second string.
+     * Example: calculateOverlap("abc", "bcd") returns 2 because "bc" overlaps.
+     */
+    private int calculateOverlap(String firstWord, String secondWord) {
+        int maxPossibleOverlap = Math.min(firstWord.length(), secondWord.length());
+        
+        // Try all possible overlap lengths from largest to smallest
+        for (int overlapLen = maxPossibleOverlap; overlapLen > 0; overlapLen--) {
+            // Check if last overlapLen characters of firstWord match first overlapLen of secondWord
+            if (firstWord.substring(firstWord.length() - overlapLen).equals(secondWord.substring(0, overlapLen))) {
+                return overlapLen;
+            }
+        }
+        
+        return 0; // No overlap found
+    }
 
-      // Step1 : Find the 2 best words to merge based on maximum overlap
-      for (int i = 0; i < words.length; i++) {
-        for (int j = 0; j < words.length; j++) {
-            if (i == j) {
+    /**
+     * Reconstructs the optimal path by backtracking through parent pointers.
+     * Returns a list of word indices in the order they should appear in the superstring.
+     */
+    private List<Integer> reconstructPath(int[][] parentWord, int lastWord, int numWords) {
+        List<Integer> path = new ArrayList<>();
+        int currentMask = (1 << numWords) - 1; // Start with all words used
+        int currentWord = lastWord;
+        
+        // Backtrack through parent pointers to build path in reverse
+        while (currentWord != -1) {
+            path.add(currentWord);
+            int previousWord = parentWord[currentMask][currentWord];
+            currentMask ^= (1 << currentWord); // Remove current word from mask
+            currentWord = previousWord;
+        }
+        
+        // Reverse to get correct order
+        Collections.reverse(path);
+        
+        // Handle edge case: if some words were never added (shouldn't happen with correct DP)
+        // This ensures all words appear in the path
+        Set<Integer> usedWords = new HashSet<>(path);
+        for (int word = 0; word < numWords; word++) {
+            if (!usedWords.contains(word)) {
+                path.add(word);
+            }
+        }
+        
+        return path;
+    }
+
+    /**
+     * Builds the superstring by merging words according to the optimal path.
+     * Uses overlap information to avoid duplicating overlapping characters.
+     */
+    private String buildSuperstring(String[] words, int[][] overlap, List<Integer> path) {
+        StringBuilder superstring = new StringBuilder(words[path.get(0)]);
+        
+        // For each subsequent word, append only the non-overlapping part
+        for (int i = 1; i < path.size(); i++) {
+            int previousWordIndex = path.get(i - 1);
+            int currentWordIndex = path.get(i);
+            int overlapLength = overlap[previousWordIndex][currentWordIndex];
+            
+            // Append only the part of current word that doesn't overlap with previous
+            // Example: if previous = "abc", current = "bcd", overlap = 2
+            // We append "d" only (substring from index 2)
+            superstring.append(words[currentWordIndex].substring(overlapLength));
+        }
+        
+        return superstring.toString();
+    }
+
+    /**
+     * Alternative approach using DFS with memoization.
+     * This approach explores different orderings of words recursively.
+     *
+     * Algorithm:
+     * 1. Try all possible orderings using DFS with bitmask to track used words
+     * 2. For each state (current mask, last word), memoize the best superstring suffix
+     * 3. Build the complete superstring by choosing the first word and appending the best suffix
+     * 4. Return the shortest superstring found among all possibilities
+     *
+     * Key Insight: Unlike the bottom-up DP approach, this top-down approach builds the
+     * actual strings during recursion, which is more intuitive but uses more space.
+     *
+     * Time Complexity: O(n * 2^n * m) where n is number of words and m is average word length.
+     * We have 2^n * n states (mask, last word combinations), and for each we try n next words.
+     * String operations add O(m) factor.
+     *
+     * Space Complexity: O(2^n * n * m) for memoization table storing strings.
+     * This is higher than the first approach because we store actual strings.
+     *
+     * @param words array of strings to find superstring for
+     * @return the shortest superstring containing all words
+     */
+    public String shortestSuperstringDFS(String[] words) {
+        int numWords = words.length;
+        int[][] overlap = computeOverlapMatrix(words);
+        
+        // Memoization: key = "mask_lastWord", value = best superstring suffix for remaining words
+        Map<String, String> memo = new HashMap<>();
+        
+        return dfs(words, overlap, 0, -1, memo);
+    }
+
+    /**
+     * Recursive DFS that explores all possible word orderings.
+     * Returns the shortest superstring for the remaining words not in the mask.
+     */
+    private String dfs(String[] words, int[][] overlap, int usedWordsMask, int lastWordIndex, 
+                      Map<String, String> memo) {
+        int numWords = words.length;
+        int allWordsUsedMask = (1 << numWords) - 1;
+        
+        // Base case: all words have been used, return empty string
+        if (usedWordsMask == allWordsUsedMask) {
+            return "";
+        }
+        
+        // Check memoization
+        String memoKey = usedWordsMask + "_" + lastWordIndex;
+        if (memo.containsKey(memoKey)) {
+            return memo.get(memoKey);
+        }
+        
+        String shortestSuffix = null;
+        
+        // Try adding each unused word next
+        for (int nextWord = 0; nextWord < numWords; nextWord++) {
+            // Skip if word is already used
+            if ((usedWordsMask & (1 << nextWord)) != 0) {
                 continue;
             }
-          int overlapLength = calculateOverlap(words[i], words[j]);
-          int mergedLength = words[i].length() + words[j].length() - overlapLength;
-
-          // If this overlap is better than the previous best, update indices and best merged string
-          if (overlapLength > maxOverlap || (overlapLength == maxOverlap && mergedLength < mergedWord.length())) {
-            maxOverlap = overlapLength;
-            toBeMergedWordIdx1 = i;
-            toBeMergedWordIdx2 = j;
-            mergedWord = mergeWithOverlap(words[i], words[j], overlapLength);
-          }
+            
+            // Add nextWord to the mask
+            int newMask = usedWordsMask | (1 << nextWord);
+            
+            // Recursively find best suffix after adding nextWord
+            String suffixAfterNextWord = dfs(words, overlap, newMask, nextWord, memo);
+            
+            // Build the complete string with nextWord
+            String currentCandidate;
+            if (lastWordIndex == -1) {
+                // This is the first word, use it completely
+                currentCandidate = words[nextWord] + suffixAfterNextWord;
+            } else {
+                // Merge with overlap
+                int overlapLength = overlap[lastWordIndex][nextWord];
+                currentCandidate = words[nextWord].substring(overlapLength) + suffixAfterNextWord;
+            }
+            
+            // Update shortest if this candidate is better
+            if (shortestSuffix == null || currentCandidate.length() < shortestSuffix.length()) {
+                shortestSuffix = currentCandidate;
+            }
         }
-      }
-
-      // Step2 : If no overlap is found, that means that all words are unique and cannot be merged further. Sum up all
-      if (maxOverlap == -1) {
-        int total = 0;
-        for (String word : words) {
-          total += word.length();
-        }
-        return total;
-      }
-
-      // Step3: Create a new array with the merged string and remove the two merged words
-      String[] updatedWords = new String[words.length - 1];
-      int index = 0;
-      for (int i = 0; i < words.length; i++) {
-        if (i != toBeMergedWordIdx1 && i != toBeMergedWordIdx2) {
-          updatedWords[index++] = words[i];
-        }
-      }
-      updatedWords[index] = mergedWord;
-
-      words = updatedWords; // Update for next iteration
+        
+        // Memoize and return
+        memo.put(memoKey, shortestSuffix);
+        return shortestSuffix;
     }
-
-    return words[0].length();
-  }
-
-  /**
-   * Calculates the maximum suffix-prefix overlap between two strings.
-   *
-   * For example, overlap("abcde", "cdefg") = 3 ("cde" overlaps)
-   *
-   * @param first First string
-   * @param second Second string
-   * @return Length of the overlap
-   */
-  private int calculateOverlap(String first, String second) {
-    for (int i = 0; i < first.length(); i++) {
-      if (second.startsWith(first.substring(i))) {
-        return first.length() - i;
-      }
-    }
-    return 0;
-  }
-
-  /**
-   * Merges two strings based on given overlap.
-   *
-   * Example:
-   * str1 = "abcde", str2 = "cdefg", overlap = 3 → "abcdefg"
-   *
-   * @param str1 First string
-   * @param str2 Second string
-   * @param overlap Number of overlapping characters
-   * @return Merged string
-   */
-  private String mergeWithOverlap(String str1, String str2, int overlap) {
-    return str1 + str2.substring(overlap);
-  }
 }

@@ -50,26 +50,26 @@ public class NumberOfMatchingSubsequences {
      * @return
      */
     public int numMatchingSubseqHashMap(String targetString, String[] words) {
-        Map<Character, Deque<WordIterator>> buckets = new HashMap<>();
+        Map<Character, Deque<WordIndexTracker>> subsequenceBuckets = new HashMap<>();
         
         // Initialize buckets for all words
         for (String word : words) {
             char firstChar = word.charAt(0);
-            buckets.computeIfAbsent(firstChar, k -> new ArrayDeque<>()).offer(new WordIterator(word, 0));
+            subsequenceBuckets.computeIfAbsent(firstChar, k -> new ArrayDeque<>()).offer(new WordIndexTracker(word, 0));
         }
         
         int matchCount = 0;
         
         // Process each character in targetString
         for (char currentChar : targetString.toCharArray()) {
-            if (!buckets.containsKey(currentChar)) continue;
+            if (!subsequenceBuckets.containsKey(currentChar)) continue;
             
             // Process all words waiting for currentChar
-            Deque<WordIterator> currentBucket = buckets.get(currentChar);
+            Deque<WordIndexTracker> currentBucket = subsequenceBuckets.get(currentChar);
             int bucketSize = currentBucket.size();
             
             for (int i = 0; i < bucketSize; i++) {
-                WordIterator iterator = currentBucket.poll();
+                WordIndexTracker iterator = currentBucket.poll();
                 // Move to next character in the word
                 iterator.index++;
                 
@@ -77,8 +77,8 @@ public class NumberOfMatchingSubsequences {
                     matchCount++;
                 } else {
                     char nextChar = iterator.word.charAt(iterator.index);
-                    buckets.putIfAbsent(nextChar, new ArrayDeque<>());
-                    buckets.get(nextChar).offer(iterator);
+                    subsequenceBuckets.putIfAbsent(nextChar, new ArrayDeque<>());
+                    subsequenceBuckets.get(nextChar).offer(iterator);
                 }
             }
         }
@@ -87,11 +87,11 @@ public class NumberOfMatchingSubsequences {
     }
 
     // Helper class to track current position in a word
-    private static class WordIterator {
+    private static class WordIndexTracker {
         String word;
         int index;
 
-        WordIterator(String word, int index) {
+        WordIndexTracker(String word, int index) {
             this.word = word;
             this.index = index;
         }

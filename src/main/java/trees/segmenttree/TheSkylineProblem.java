@@ -60,7 +60,19 @@ public class TheSkylineProblem {
         }
 
         List<Event> events = createEvents(buildings);
-        Collections.sort(events);
+        Collections.sort(events, (e1, e2) -> {
+            if (e1.x != e2.x) {
+                return Integer.compare(e1.x, e2.x);
+            }
+            // For same x, process start events before end events
+            if (e1.isStart && e2.isStart) {
+                return Integer.compare(e2.height, e1.height); // Higher height first
+            }
+            if (!e1.isStart && !e2.isStart) {
+                return Integer.compare(e1.height, e2.height); // Lower height first
+            }
+            return e1.isStart ? -1 : 1; // Start event before end event
+        });
 
         PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
         maxHeap.offer(0);
@@ -193,24 +205,6 @@ public class TheSkylineProblem {
             this.x = x;
             this.height = height;
             this.isStart = isStart;
-        }
-
-        @Override
-        public int compareTo(Event other) {
-            if (this.x != other.x) {
-                return Integer.compare(this.x, other.x);
-            }
-
-            if (this.isStart && other.isStart) {
-                // if both are start events, higher height first
-                return Integer.compare(other.height, this.height);
-            } else if (!this.isStart && !other.isStart) {
-                // if both are end events, lower height first
-                return Integer.compare(this.height, other.height);
-            } else {
-                // if one is start and other is end, start event first
-                return this.isStart ? -1 : 1;
-            }
         }
     }
 

@@ -31,7 +31,7 @@ public class BinaryTreeCameras {
     private int cameras = 0;
 
     // Node states: 0 = needs camera, 1 = has camera, 2 = covered
-    private static final int NEEDS_CAMERA = 0;
+    private static final int NOT_COVERED = 0;
     private static final int HAS_CAMERA = 1;
     private static final int COVERED = 2;
 
@@ -53,7 +53,7 @@ public class BinaryTreeCameras {
         cameras = 0;
 
         // If root is not covered, we need a camera at root
-        if (dfs(root) == NEEDS_CAMERA) {
+        if (dfs(root) == NOT_COVERED) {
             cameras++;
         }
 
@@ -70,7 +70,7 @@ public class BinaryTreeCameras {
         int rightState = dfs(node.right);
 
         // If any child needs camera, current node must have camera
-        if (leftState == NEEDS_CAMERA || rightState == NEEDS_CAMERA) {
+        if (leftState == NOT_COVERED || rightState == NOT_COVERED) {
             cameras++;
             return HAS_CAMERA;
         }
@@ -82,7 +82,7 @@ public class BinaryTreeCameras {
 
         // Both children are covered but don't have cameras
         // Current node needs camera (will be handled by parent)
-        return NEEDS_CAMERA;
+        return NOT_COVERED;
     }
 
     // Definition for a binary tree node

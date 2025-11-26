@@ -11,8 +11,8 @@ import java.util.PriorityQueue;
  * - `startFuel`, the initial amount of fuel in your tank.
  * - A list of `stations`, where stations[i] = [position_i, fuel_i] means a station at position_i offers fuel_i liters.
  *
- * Return the **minimum number of refueling stops** to reach the target.
- * If you cannot reach the target, return **-1**.
+ * Return the minimum number of refueling stops to reach the target.
+ * If you cannot reach the target, return -1.
  *
  * Example:
  * Input:
@@ -74,7 +74,7 @@ public class MinRefuel {
     int totalStations = stations.length;
 
     // Max-heap to store fuel capacities of reachable stations
-    PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+    PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
 
     // While the current fuel can't take us to the target
     while (currentFuel < target) {

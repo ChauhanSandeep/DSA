@@ -1,8 +1,5 @@
 package arrays.greedy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * LeetCode Problem 1326: Minimum Number of Taps to Open to Water a Garden

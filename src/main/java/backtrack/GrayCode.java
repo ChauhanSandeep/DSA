@@ -121,7 +121,8 @@ public class GrayCode {
    * | 5           | 101        | 010             | 111        | 111                |
    * | 6           | 110        | 011             | 101        | 101                |
    * | 7           | 111        | 011             | 100        | 100                |
-   *
+   * | ----------- | ---------- | --------------- | ---------- | ------------------ |
+   * 
    * Time Complexity: O(2^num)
    * Space Complexity: O(1) extra space (excluding output list).
    *

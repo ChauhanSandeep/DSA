@@ -9,8 +9,8 @@ import java.util.PriorityQueue;
  *
  * You are given a list of tasks where each task is represented by an array [enqueueTime, processingTime].
  * The CPU can process only one task at a time, and tasks are processed in the following order:
- *   1. The task with the **shortest processing time** is selected.
- *   2. If multiple tasks have the same processing time, choose the task with the **smallest index**.
+ *   1. The task with the shortest processing time is selected.
+ *   2. If multiple tasks have the same processing time, choose the task with the smallest index.
  * The CPU is initially idle. If no tasks are available at the current time, it fast-forwards to the next task’s enqueue time.
  *
  * Return the order in which the CPU will process the tasks.
@@ -62,7 +62,7 @@ public class SingleThreadCPU {
         // Step 2: Sort tasks by enqueue time
         Arrays.sort(allTasks, (a, b) -> Integer.compare(a.enqueueTime, b.enqueueTime));
 
-        // Step 3: Min-heap for processing tasks by shortest time, then index
+        // Step 3: Min-heap for processing tasks by shortest processing time, then index
         PriorityQueue<Task> availableTasks = new PriorityQueue<>(
             (a, b) -> a.processingTime == b.processingTime
                 ? Integer.compare(a.index, b.index)

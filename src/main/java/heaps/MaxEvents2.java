@@ -107,6 +107,91 @@ public class MaxEvents2 {
     return memoTable[index][allowedEvents] = Math.max(maxIfSkipped, maxIfAttended);
   }
 
+    /**
+     * Alternative bottom-up DP approach sorted by end time.
+     * More intuitive for understanding the weighted interval scheduling pattern.
+     *
+     * Algorithm:
+     * 1. Sort events by end day (ascending)
+     * 2. dp[i][j] = max value using first i events with at most j events attended
+     * 3. For each event i and limit j:
+     *    - Option 1: Don't take event i → dp[i][j] = dp[i-1][j]
+     *    - Option 2: Take event i → dp[i][j] = value[i] + dp[lastNonOverlapping][j-1]
+     *    - Take maximum of both options
+     * 4. Find last non-overlapping event using binary search
+     *
+     * Time Complexity: O(n * log(n) + n * k * log(n))
+     * Space Complexity: O(n * k)
+     *
+     * @param events array of events
+     * @param k maximum events to attend
+     * @return maximum value achievable
+     */
+    public int maxValueBottomUp(int[][] events, int k) {
+        if (events == null || events.length == 0 || k == 0) {
+            return 0;
+        }
+        
+        // Step 1: Sort events by end day (for bottom-up processing)
+        Arrays.sort(events, (eventA, eventB) -> Integer.compare(eventA[1], eventB[1]));
+        
+        int numEvents = events.length;
+        
+        // Step 2: Initialize DP table
+        // dp[i][j] = max value considering first i events with at most j events attended
+        int[][] dp = new int[numEvents + 1][k + 1];
+        
+        // Step 3: Fill DP table
+        for (int eventIdx = 1; eventIdx <= numEvents; eventIdx++) {
+            // Current event is at index (eventIdx - 1) in 0-indexed events array
+            int startDay = events[eventIdx - 1][0];
+            int endDay = events[eventIdx - 1][1];
+            int value = events[eventIdx - 1][2];
+            
+            for (int eventsCount = 1; eventsCount <= k; eventsCount++) {
+                // Option 1: Skip current event
+                int skipValue = dp[eventIdx - 1][eventsCount];
+                
+                // Option 2: Take current event
+                // Find last event that doesn't overlap (ends before current starts)
+                int lastNonOverlapping = findLastNonOverlappingEvent(events, eventIdx - 1, startDay);
+                int takeValue = value + dp[lastNonOverlapping][eventsCount - 1];
+                
+                // Take maximum of skip and take
+                dp[eventIdx][eventsCount] = Math.max(skipValue, takeValue);
+            }
+        }
+        
+        // Answer is maximum value using all events with at most k events attended
+        return dp[numEvents][k];
+    }
+
+    /**
+     * Binary search to find the last event that ends before the given start day.
+     * Used in bottom-up approach where events are sorted by end time.
+     */
+    private int findLastNonOverlappingEvent(int[][] events, int currentIdx, int startDay) {
+        int left = 0;
+        int right = currentIdx;
+        int result = 0; // 0 means no previous non-overlapping event (use dp[0][j] = 0)
+        
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            
+            // If this event ends before startDay, it doesn't overlap
+            // We want the latest such event, so search right half
+            if (events[mid][1] < startDay) {
+                result = mid + 1; // +1 because dp array is 1-indexed
+                left = mid + 1;
+            } else {
+                // This event overlaps, search left half
+                right = mid;
+            }
+        }
+        
+        return result;
+    }
+
   /**
    * Finds index of the next event that starts after given day using binary search.
    *

@@ -72,19 +72,19 @@ public class FindPairMaxBitwiseAnd {
         }
 
         int result = 0;
-        int candidateCount = nums.length;
 
         // Process each bit from MSB (31) to LSB (0)
         for (int bit = 31; bit >= 0; bit--) {
             int pattern = result | (1 << bit); // Candidate pattern with current bit set
+            // result | (1 << bit);  will set the current bit in the result pattern
 
             // Count how many elements match the current pattern
             int matchCount = 0;
-          for (int num : nums) {
-            if ((num & pattern) == pattern) { // Check if num has all bits of pattern set
-              matchCount++;
+            for (int num : nums) {
+                if ((num & pattern) == pattern) { // Check if num has all bits of pattern set
+                matchCount++;
+                }
             }
-          }
 
             // If at least 2 elements have this bit set, include it in result
             if (matchCount >= 2) {

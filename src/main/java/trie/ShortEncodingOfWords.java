@@ -105,61 +105,69 @@ public class ShortEncodingOfWords {
     }
 
     /**
-     * Finds minimum encoding length using Trie data structure with reversed words.
+     * Finds minimum encoding length using Trie with reversed words.
+     * 
+     * Key Insight: If word A is suffix of word B, we only need B in encoding.
+     * Reverse words so suffixes become prefixes, then find non-prefix words.
      *
      * Algorithm:
-     * 1. Build a Trie by inserting all words in reverse order.
-     *    In reverse order because suffixes so that prefixes which are easier to manage in a Trie.
-     * 2. Words that are suffixes become prefixes in reversed form
-     * 3. Perform DFS to find all leaf nodes in the Trie
-     * 4. Only leaf nodes represent words needing separate encoding
-     * 5. Sum depths of all leaf nodes (each +1 for '#' delimiter)
+     * 1. Build Trie with reversed words (suffixes become prefixes)
+     * 2. DFS to find leaf nodes (words not suffix of any other)
+     * 3. Sum: length of each leaf word + 1 (for '#')
      *
-     * Key insight: Reversing words transforms suffix relationship into prefix relationship.
-     * Leaf nodes in the reversed Trie represent words that aren't suffixes of any other word.
+     * Example: ["time", "me", "bell"]
+     * - Reversed: ["emit", "em", "lleb"]
+     * - Trie: root → e → m → i → t (leaf, length 4)
+     *         root → l → l → e → b (leaf, length 4)
+     * - "em" is prefix of "emit" (not leaf), so "me" is suffix of "time"
+     * - Result: (4+1) + (4+1) = 10
      *
-     * Time Complexity: O(N * L) where N is number of words and L is average word length.
-     * Each word is inserted once (O(L) per word), and DFS visits each node once.
-     *
-     * Space Complexity: O(N * L) for Trie structure storing all unique prefixes.
-     *
-     * @param words array of words to encode
-     * @return minimum length of encoded reference string
+     * Time: O(n * L) where n = number of words, L = average word length
+     * Space: O(n * L) for Trie
      */
-    public int minimumLengthEncodingTrie(String[] words) {
+    public int minimumLengthEncodingUsingTrie(String[] words) {
         TrieNode root = new TrieNode();
-
+        
+        // Build Trie with reversed words
         for (String word : words) {
-            TrieNode node = root;
-            for (int i = word.length() - 1; i >= 0; i--) {
-                char c = word.charAt(i);
-                if (node.children[c - 'a'] == null) {
-                    node.children[c - 'a'] = new TrieNode();
-                }
-                node = node.children[c - 'a'];
-            }
+            insertReversed(root, word);
         }
-
+        
+        // DFS to find total encoding length (only leaf nodes count)
         return dfs(root, 0);
     }
 
-    // Helper method to calculate total encoding length via DFS
-    private int dfs(TrieNode node, int depth) {
-        if (node == null) {
-            return 0;
+    // Insert word into Trie in reversed order
+    private void insertReversed(TrieNode root, String word) {
+        TrieNode current = root;
+        // Insert word in reverse (so suffixes become prefixes)
+        for (int i = word.length() - 1; i >= 0; i--) {
+            char ch = word.charAt(i);
+            if (current.children[ch - 'a'] == null) {
+                current.children[ch - 'a'] = new TrieNode();
+            }
+            current = current.children[ch - 'a'];
         }
+    }
 
-        boolean isLeaf = true;
-        int length = 0;
-
+    // DFS to calculate total length from leaf nodes
+    private int dfs(TrieNode node, int depth) {
+        int totalLength = 0;
+        
+        // Recursively sum lengths from all children
         for (TrieNode child : node.children) {
             if (child != null) {
-                isLeaf = false;
-                length += dfs(child, depth + 1);
+                totalLength += dfs(child, depth + 1);
             }
         }
-
-        return isLeaf ? depth + 1 : length;
+        
+        // If this is a leaf node (no children) and not root, count it
+        // Leaf means this word isn't a suffix of any other word
+        if (totalLength == 0 && depth > 0) {
+            return depth + 1; // word length + '#' delimiter
+        }
+        
+        return totalLength;
     }
 
     // Trie node with children array for lowercase letters

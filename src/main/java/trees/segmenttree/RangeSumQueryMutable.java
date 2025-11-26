@@ -27,7 +27,7 @@ package trees.segmenttree;
  * 4. What's the space-time tradeoff between BIT and Segment Tree?
  *    Answer: BIT uses less space (n vs 4n) but segment tree supports more operations like range min/max.
  */
-public class SegmentTreeRangeSumQueryMutable {
+public class RangeSumQueryMutable {
 
   /**
    * Segment Tree based implementation using Segment Tree.
@@ -71,6 +71,10 @@ public class SegmentTreeRangeSumQueryMutable {
 
     /**
      * Recursively builds the segment tree.
+     * - If leaf node, store the array value.
+     * - Find midpoint, build left and right children, then set current node sum.
+     * - Handles segments defined by [start, end].
+     * 
      * @param treeIndex current index in segment tree array
      * @param start start index of the segment in original array
      * @param end end index of the segment in original array

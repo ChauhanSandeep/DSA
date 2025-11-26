@@ -6,7 +6,7 @@ import java.util.*;
  * LeetCode: https://leetcode.com/problems/remove-invalid-parentheses/
  *
  * Problem:
- * Given a string containing parentheses and characters, remove the **minimum number**
+ * Given a string containing parentheses and characters, remove the minimum number
  * of invalid parentheses to make the expression valid. Return all possible results.
  *
  * Example
@@ -32,6 +32,11 @@ public class RemoveParenthesis {
 
     /**
      * Finds all valid expressions by removing the fewest invalid parentheses.
+     * Steps:
+     * 1. Use BFS to explore all possible states by removing one parenthesis at a time.
+     * 2. Use a queue to manage the current level of expressions.
+     * 3. Use a set to avoid processing duplicate expressions.
+     * 4. Stop as soon as a valid expression is found at the current level.
      *
      * @param str The input string containing parentheses.
      * @return A list of all possible valid expressions.

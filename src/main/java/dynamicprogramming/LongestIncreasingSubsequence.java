@@ -114,14 +114,16 @@ public class LongestIncreasingSubsequence {
             while (left < right) {
                 int mid = left + (right - left) / 2;
                 if (tails[mid] < num) {
+                    // Move right if current tail is less than num
                     left = mid + 1;
                 } else {
+                    // Move left if current tail is greater than or equal to num
                     right = mid;
                 }
             }
             
             // Place num at the found position
-            tails[left] = num;
+            tails[left] = num; // tails[left] is the smallest tail for subsequence of length left+1
             
             // If num extends the longest subsequence, increment size
             if (left == size) {

@@ -3,205 +3,221 @@ package maths;
 /**
  * Problem: Divide Two Integers
  *
- * Given two integers dividend and divisor, divide two integers without using
- * multiplication, division, and mod operator.
- *
- * The integer division should truncate toward zero, which means losing its fractional part.
- * For example, 8.345 would be truncated to 8, and -2.7335 would be truncated to -2.
+ * Given two integers dividend and divisor, divide two integers without using multiplication,
+ * division, and mod operator. The integer division should truncate toward zero, which means
+ * losing its fractional part. For example, 8.345 would be truncated to 8, and -2.7335 would
+ * be truncated to -2.
  *
  * Return the quotient after dividing dividend by divisor.
  *
- * Note: Assume we are dealing with an environment that could only store integers
- * within the 32-bit signed integer range: [−2^31, 2^31 − 1]. For this problem,
- * if the quotient is strictly greater than 2^31 - 1, then return 2^31 - 1,
- * and if the quotient is strictly smaller than -2^31, then return -2^31.
+ * Note: Assume we are dealing with an environment that could only store integers within the
+ * 32-bit signed integer range: [−2^31, 2^31 − 1]. For this problem, if the quotient is strictly
+ * greater than 2^31 - 1, then return 2^31 - 1, and if the quotient is strictly less than -2^31,
+ * then return -2^31.
  *
  * Example 1:
  * Input: dividend = 10, divisor = 3
  * Output: 3
- * Explanation: 10/3 = 3.33333.. which is truncated to 3.
+ * Explanation: 10/3 = 3.33333.. which truncates to 3.
+ * Step-by-step using bit manipulation:
+ * - 3 * 2^0 = 3 ≤ 10, subtract: 10 - 3 = 7, quotient += 1
+ * - 3 * 2^1 = 6 ≤ 7, subtract: 7 - 6 = 1, quotient += 2
+ * - 3 * 2^0 = 3 > 1, cannot subtract
+ * - Final quotient: 1 + 2 = 3
  *
- * Example 2:
- * Input: dividend = 7, divisor = -3
- * Output: -2
- * Explanation: 7/-3 = -2.33333.. which is truncated to -2.
+ * LeetCode Problem: https://leetcode.com/problems/divide-two-integers/
  *
- * LeetCode: https://leetcode.com/problems/divide-two-integers/
+ * Follow-up Questions:
  *
- * Follow-up Questions (FAANG-style):
- * 1. How would you handle division with floating point precision?
- *    - Use binary search on the result with epsilon-based precision checks.
- * 2. What if we need to handle arbitrarily large numbers?
- *    - Implement using string-based arithmetic or BigInteger approach.
- * 3. How would you optimize for multiple divisions with same divisor?
- *    - Precompute powers of divisor and reuse across multiple operations.
- * 4. What if the divisor can be zero?
- *    - Handle division by zero case explicitly and throw appropriate exception.
- * 5. How to implement modulus operation without using % operator?
- *    - Use: a % b = a - (a/b) * b, implementing multiplication via repeated addition.
- * 6. What if you need to support negative number representations in different systems?
- *    - Handle two's complement, sign-magnitude, and one's complement representations.
- *    - Related: https://leetcode.com/problems/multiply-strings/
+ * 1. What if we need to return the remainder as well?
+ *    Answer: Track the remaining dividend after all subtractions. The final value of
+ *    dividend after the algorithm completes is the remainder. Return both quotient and
+ *    remainder as a pair or array.
+ *
+ * 2. How would you handle division with decimal precision (not just truncation)?
+ *    Answer: After finding the integer quotient, continue the division algorithm with
+ *    the remainder scaled by 10 repeatedly to get decimal places. Use long to avoid
+ *    overflow during scaling. Track desired precision level.
+ *
+ * 3. Can we optimize for specific divisor values (powers of 2)?
+ *    Answer: Yes! If divisor is a power of 2, division can be done with a single right
+ *    shift operation. For example, dividing by 4 (2^2) is equivalent to right shift by 2.
+ *    Check if divisor is power of 2: (divisor & (divisor - 1)) == 0
+ *
+ * 4. What if we're allowed to use multiplication but not division/mod?
+ *    Answer: Use binary search approach. Search for quotient q such that q * divisor <= dividend
+ *    but (q+1) * divisor > dividend. Time complexity would be O(log(dividend) * log(quotient)).
+ *    Related: https://leetcode.com/problems/divide-chocolate/
+ *
+ * 5. How would you handle very large numbers beyond 64-bit integers?
+ *    Answer: Implement division using strings or BigInteger-like structures. Process digit
+ *    by digit similar to long division taught in elementary school. This becomes a string
+ *    manipulation problem with carry handling.
  */
 public class IntegerDivisionWithoutOperators {
 
-    private static final int INTEGER_MAX = Integer.MAX_VALUE;
-    private static final int INTEGER_MIN = Integer.MIN_VALUE;
-
-    public static void main(String[] args) {
-        IntegerDivisionWithoutOperators calculator = new IntegerDivisionWithoutOperators();
-
-        // Test basic cases
-        System.out.println("10 / 3 = " + calculator.divide(10, 3));         // Expected: 3
-        System.out.println("7 / -3 = " + calculator.divide(7, -3));        // Expected: -2
-        System.out.println("-7 / 3 = " + calculator.divide(-7, 3));        // Expected: -2
-        System.out.println("-7 / -3 = " + calculator.divide(-7, -3));      // Expected: 2
-
-        // Test edge cases
-        System.out.println("MIN_VALUE / -1 = " + calculator.divide(INTEGER_MIN, -1)); // Expected: MAX_VALUE
-        System.out.println("MAX_VALUE / 1 = " + calculator.divide(INTEGER_MAX, 1));   // Expected: MAX_VALUE
-        System.out.println("1 / 2 = " + calculator.divide(1, 2));          // Expected: 0
-        System.out.println("0 / 5 = " + calculator.divide(0, 5));          // Expected: 0
-        System.out.println("12 / 12 = " + calculator.divide(12, 12));      // Expected: 1
-    }
-
     /**
-     * Performs integer division without using multiplication, division, or modulus operators.
+     * Simple version using only subtraction (very slow but easiest to understand).
+     * Counts how many times we can subtract divisor from dividend.
      *
-     * Algorithm: Bit Manipulation with Power-of-2 Optimization
-     * Steps:
-     * 1. Handle edge case where dividend equals divisor (result is 1)
-     * 2. Determine result sign using XOR logic on sign bits
-     * 3. Convert to unsigned values to avoid overflow during operations
-     * 4. Use bit shifting to find largest power of 2 multiples
-     * 5. Accumulate quotient and reduce dividend iteratively
-     * 6. Handle overflow case and apply final sign
+     * Algorithm:
+     * 1. Keep subtracting divisor from dividend
+     * 2. Count each subtraction
+     * 3. The count is the quotient
      *
-     * Mathematical Insight:
-     * - Division finds how many times divisor fits into dividend
-     * - Optimization: find largest 2^k such that divisor * 2^k <= dividend
-     * - Subtract (divisor * 2^k) and repeat with remainder
-     * - Use bit shifting for efficient power-of-2 multiplication
+     * Time Complexity: O(dividend/divisor) - can be very slow
+     * Space Complexity: O(1)
      *
-     * Time Complexity: O(log^2 n) where n is the quotient
-     * Space Complexity: O(1) - constant extra space
+     * WARNING: This is too slow for large inputs but shows the basic concept
+     * without any optimization or bit manipulation.
      *
      * @param dividend the number to be divided
      * @param divisor the number to divide by
-     * @return quotient of dividend/divisor, clamped to 32-bit integer range
+     * @return the quotient after division
      */
-    public int divide(int dividend, int divisor) {
-        // Quick check: if dividend equals divisor, result is always 1
-        if (dividend == divisor) {
-            return 1;
+    public int divideSimple(int dividend, int divisor) {
+        // Edge case: Overflow
+        if (dividend == Integer.MIN_VALUE && divisor == -1) {
+            return Integer.MAX_VALUE;
         }
-
-        // Determine if result should be positive or negative
-        // XOR of sign bits: same signs -> positive, different signs -> negative
-        boolean isResultPositive = (dividend > 0) ^ (divisor > 0);
-
-        // Convert to unsigned long to handle absolute values safely
-        // This prevents overflow when dealing with Integer.MIN_VALUE
-        long numerator = Math.abs((long) dividend);
-        long denominator = Math.abs((long) divisor);
-
-        long quotient = 0;
-
-        // Continue division while dividend is larger than or equal to divisor
-        while (numerator >= denominator) {
-            // Find the largest power of 2 such that divisor * 2^powerOfTwo <= dividend
-            int powerOfTwo = findLargestPowerOfTwo(numerator, denominator);
-
-            // Add the power of 2 to our quotient
-          quotient = quotient + (1L << powerOfTwo);
-
-            // Reduce dividend by divisor * 2^powerOfTwo
-            numerator -= (denominator << powerOfTwo);
-        }
-
-        // Handle overflow case: if result exceeds Integer.MAX_VALUE and should be positive
-        if (quotient == (1L << 31) && isResultPositive) {
-            return INTEGER_MAX;
-        }
-
-        // Apply sign to final result
-        return isResultPositive ? (int) quotient : -(int) quotient;
-    }
-
-    /**
-     * Finds the largest power of 2 such that divisor * 2^power <= dividend.
-     *
-     * Algorithm: Binary Search for Optimal Power
-     * Steps:
-     * 1. Start with power = 0
-     * 2. Keep incrementing power while divisor * 2^(power+1) <= dividend
-     * 3. Use bit shifting to efficiently check: divisor << (power+1) <= dividend
-     * 4. Return the largest valid power found
-     *
-     * This optimization reduces repeated subtraction by finding the largest
-     * chunk we can subtract in each iteration.
-     *
-     * Time Complexity: O(log n) where n is dividend/divisor ratio
-     * Space Complexity: O(1)
-     *
-     * @param dividend current remaining dividend
-     * @param divisor the divisor value
-     * @return largest power of 2 for optimal subtraction
-     */
-    private int findLargestPowerOfTwo(long dividend, long divisor) {
-        int power = 0;
-
-        // Keep doubling the divisor while it fits within the dividend
-        // Use (power + 1) to check the next power level
-        while (dividend >= (divisor << (power + 1))) {
-            power++;
-        }
-
-        return power;
-    }
-
-    /**
-     * Alternative approach using iterative bit manipulation for educational purposes.
-     *
-     * Algorithm: Direct Bit-by-Bit Division
-     * Steps:
-     * 1. Process quotient from most significant bit to least significant bit
-     * 2. For each bit position, check if divisor fits into current remainder
-     * 3. Set quotient bit if divisor fits, subtract divisor from remainder
-     * 4. Continue until all bits are processed
-     *
-     * Time Complexity: O(log n)
-     * Space Complexity: O(1)
-     *
-     * @param dividend the number to be divided
-     * @param divisor the number to divide by
-     * @return quotient using bit-by-bit approach
-     */
-    public int divideUsingBitManipulation(int dividend, int divisor) {
-        if (dividend == divisor) {
-            return 1;
-        }
-
-        boolean isResultPositive = (dividend < 0) == (divisor < 0);
+        
+        // Determine sign
+        boolean isNegative = (dividend < 0) != (divisor < 0);
+        
+        // Convert to positive
         long absDividend = Math.abs((long) dividend);
         long absDivisor = Math.abs((long) divisor);
-
+        
         long quotient = 0;
-
-        // Process each bit position from most significant to least significant
-        for (int bitPosition = 31; bitPosition >= 0; bitPosition--) {
-            // Check if divisor shifted by bitPosition fits into remaining dividend
-            if ((absDivisor << bitPosition) <= absDividend) {
-                absDividend -= (absDivisor << bitPosition);
-                quotient |= (1L << bitPosition); // Set the bit at current position
-            }
+        
+        // Simple repeated subtraction - count how many times we can subtract
+        while (absDividend >= absDivisor) {
+            absDividend = absDividend - absDivisor; // Subtract divisor
+            quotient = quotient + 1;                 // Increment count
         }
-
-        // Handle overflow and apply sign
-        if (quotient == (1L << 31) && isResultPositive) {
-            return INTEGER_MAX;
-        }
-
-        return isResultPositive ? (int) quotient : -(int) quotient;
+        
+        // Apply sign
+        return isNegative ? (int) -quotient : (int) quotient;
     }
+
+     /**
+     *
+     * Optimized division using addition to double the divisor.
+     * 
+     * Algorithm:
+     * - Use addition to double the divisor repeatedly until it exceeds the dividend.
+     * - Keep track of how many times we've added the divisor (this forms the quotient).
+     * - When we can no longer add the doubled divisor, reset to the original divisor and
+     *  continue the process until the dividend is less than the divisor.
+     *
+     * Time Complexity: O(log²(dividend))
+     * Space Complexity: O(1) - no lists needed
+     *
+     * @param dividend the number to be divided
+     * @param divisor the number to divide by
+     * @return the quotient after division
+     */
+    public int divideOptimized(int dividend, int divisor) {
+        // Edge case: Overflow
+        if (dividend == Integer.MIN_VALUE && divisor == -1) {
+            return Integer.MAX_VALUE;
+        }
+        
+        // Determine sign
+        boolean isNegative = (dividend < 0) != (divisor < 0);
+        
+        // Convert to positive
+        long absDividend = Math.abs((long) dividend);
+        long absDivisor = Math.abs((long) divisor);
+        
+        long quotient = 0;
+        
+        while (absDividend >= absDivisor) {
+            // Find the largest multiple of divisor that fits in current dividend
+            long tempDivisor = absDivisor;
+            long tempQuotient = 1;
+            
+            // Keep doubling using addition until next double would exceed dividend
+            // Build: divisor, 2*divisor, 4*divisor, 8*divisor, ...
+            // Using only addition: divisor+divisor, then result+result, etc.
+            while (tempDivisor <= absDividend) {
+                // Check if we can safely double
+                // Need to check: tempDivisor + tempDivisor <= absDividend
+                long nextDivisor = tempDivisor + tempDivisor;
+                
+                // If next double would exceed dividend, stop
+                if (nextDivisor > absDividend) {
+                    break;
+                }
+                
+                // Double both values using addition
+                tempDivisor = nextDivisor;
+                tempQuotient = tempQuotient + tempQuotient;
+            }
+            
+            // Subtract the largest multiple we found
+            absDividend = absDividend - tempDivisor;
+            
+            // Add corresponding quotient contribution
+            quotient = quotient + tempQuotient;
+        }
+        
+        // Apply sign
+        return isNegative ? (int) -quotient : (int) quotient;
+    }
+
+    /**
+     * Division using bit manipulation (shifts).
+     *
+     * Algorithm:
+     * - Use bit manipulation to double the divisor until it exceeds the dividend.
+     * - Keep track of how many times we've doubled (this forms the quotient).
+     * - When we can no longer double, subtract the largest found multiple from the dividend
+     * and continue the process until the dividend is less than the divisor.
+     * 
+     *
+     * Time Complexity: O(log(dividend)) - each iteration reduces dividend by at least half
+     * Space Complexity: O(1)
+     *
+     * @param dividend the number to be divided
+     * @param divisor the number to divide by
+     * @return the quotient after division
+     */
+    public int divideUsingBitManipulation(int dividend, int divisor) {
+        // Handle overflow case
+        if (dividend == Integer.MIN_VALUE && divisor == -1) {
+            return Integer.MAX_VALUE;
+        }
+        
+        // Determine sign
+        boolean isNegative = (dividend < 0) ^ (divisor < 0);
+        
+        // Work with absolute values using long
+        long numerator = Math.abs((long) dividend);
+        long denominator = Math.abs((long) divisor);
+        
+        long quotient = 0;
+        
+        // Exponential search approach
+        while (numerator >= denominator) {
+            // Start with base divisor
+            long currentDenominator = denominator;
+            long currentQuotient = 1;
+            
+            // Keep doubling until we exceed the dividend
+            // Build up: divisor, 2*divisor, 4*divisor, 8*divisor, ...
+            while (numerator >= (currentDenominator << 1)) {
+                currentDenominator <<= 1;  // Double the divisor
+                currentQuotient <<= 1; // Double the quotient contribution
+            }
+            
+            // Subtract the largest multiple we found
+            numerator -= currentDenominator;
+            quotient += currentQuotient;
+        }
+        
+        // Apply sign
+        return isNegative ? (int) -quotient : (int) quotient;
+    }
+
 }

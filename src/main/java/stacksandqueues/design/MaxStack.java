@@ -60,23 +60,58 @@ public class MaxStack {
             stack = new Stack<>();
         }
 
+        /**
+         * Pushes element x onto the stack.
+         * Time Complexity: O(1)
+         * Space Complexity: O(1)
+         * 
+         * @param x element to push
+         */
         public void push(int x) {
             int currentMax = stack.isEmpty() ? x : Math.max(x, stack.peek()[1]);
             stack.push(new int[]{x, currentMax});
         }
 
+        /**
+         * Removes the element on top of the stack and returns it.
+         * Time Complexity: O(1)
+         * Space Complexity: O(1)
+         * 
+         * @return the element on top of the stack
+         */
         public int pop() {
             return stack.pop()[0];
         }
 
+        /**
+         * Gets the element on the top of the stack without removing it.
+         * Time Complexity: O(1)
+         * Space Complexity: O(1)
+         * 
+         * @return the element on top of the stack
+         */
         public int peek() {
             return stack.peek()[0];
         }
 
+        /**
+         * Retrieves the maximum element in the stack without removing it.
+         * Time Complexity: O(1)
+         * Space Complexity: O(1)
+         * 
+         * @return the maximum element in the stack
+         */
         public int peekMax() {
             return stack.peek()[1];
         }
 
+        /**
+         * Retrieves and removes the maximum element in the stack.
+         * Time Complexity: O(n) in worst case
+         * Space Complexity: O(n)
+         * 
+         * @return the maximum element removed from the stack
+         */
         public int popMax() {
             Stack<int[]> temp = new Stack<>();
             int maxVal = peekMax();

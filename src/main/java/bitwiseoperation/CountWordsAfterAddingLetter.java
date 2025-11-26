@@ -24,12 +24,12 @@ import java.util.*;
  * - Is it necessary to group words by length?
  *   👉 Not with bitmasking; length grouping is only helpful when comparing sorted strings.
  */
-public class CountWords {
+public class CountWordsAfterAddingLetter {
 
   public static void main(String[] args) {
     String[] startWords = {"ant", "act", "tack"};
     String[] targetWords = {"tack", "act", "acti"};
-    int result = new CountWords().wordCount(startWords, targetWords);
+    int result = new CountWordsAfterAddingLetter().wordCount(startWords, targetWords);
     System.out.println(result); // Output: 2
   }
 

@@ -90,8 +90,9 @@ public class ValidTriangleNumber {
 
             while (leftIndex < middleIndex) {
                 if (nums[leftIndex] + nums[middleIndex] > nums[rightIndex]) {
-                    // All elements combinations like (leftIndex, middleIndex), (leftIndex, middleIndex+1), ... (middleIndex-1, middleIndex)
-                    // are greater than nums[rightIndex] and hence form valid triangles with nums[rightIndex] because of sorting
+                    // All elements combinations like (leftIndex, middleIndex), (leftIndex+1, middleIndex), ..., (middleIndex-1, middleIndex)
+                    // form valid triangles with nums[rightIndex] because nums[left] + nums[middleIndex] > nums[rightIndex]
+                    // and due to sorting, all values between leftIndex and middleIndex also satisfy this condition
                     count += middleIndex - leftIndex;
                     middleIndex--;
                 } else {

@@ -61,24 +61,24 @@ public class CarFleet {
         int size = position.length;
         if (size <= 1) return size;
 
-        // Create array of [position, time] pairs
-        double[][] carsPositionAndTime = new double[size][2];
+        // Create array of Car objects
+        Car[] cars = new Car[size];
         for (int i = 0; i < size; i++) {
-            carsPositionAndTime[i][0] = position[i];
-            carsPositionAndTime[i][1] = (double) (target - position[i]) / speed[i];
+            double timeToTarget = (double) (target - position[i]) / speed[i];
+            cars[i] = new Car(position[i], timeToTarget);
         }
 
         // Sort by position (descending)
-        Arrays.sort(carsPositionAndTime, (a, b) -> Double.compare(b[0], a[0]));
+        Arrays.sort(cars, (a, b) -> Double.compare(b.position, a.position));
 
         int fleets = 0;
         double currentFleetTime = 0;
 
-        for (double[] car : carsPositionAndTime) {
+        for (Car car : cars) {
             // If this car takes longer than current fleet, it starts a new fleet
-            if (car[1] > currentFleetTime) {
+            if (car.timeToTarget > currentFleetTime) {
                 fleets++;
-                currentFleetTime = car[1];
+                currentFleetTime = car.timeToTarget;
             }
         }
 
@@ -130,5 +130,17 @@ public class CarFleet {
         }
 
         return fleets;
+    }
+    /**
+     * Inner class to represent a car with its position and time to reach target.
+     */
+    private static class Car {
+        double position;
+        double timeToTarget;
+
+        Car(double position, double timeToTarget) {
+            this.position = position;
+            this.timeToTarget = timeToTarget;
+        }
     }
 }

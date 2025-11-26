@@ -69,7 +69,9 @@ public class ConsecutiveNumbersSum {
     *     - For valid representation: x must be a positive integer
     *  2. For each possible length k (starting from 1):
     *     a. Calculate: numerator = n - k*(k-1)/2
-    *     b. Check if numerator > 0 and divisible by k
+    *     b. Validate that 
+    *       - numerator > 0 
+    *       - numerator is divisible by k
     *     c. If yes, we found a valid way to represent n
     *  3. Loop continues while k*(k-1)/2 < n (ensures numerator stays positive)
     *  4. Count all valid representations.

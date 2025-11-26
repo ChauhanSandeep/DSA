@@ -14,7 +14,7 @@ import java.util.ArrayDeque;
  *               /  \     \
  *              25  35    100
  *
- * <p>LeetCode Link: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/
+ * LeetCode Link: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/
  */
 public class ValidBstFromPreorder {
     public static void main(String[] args) {

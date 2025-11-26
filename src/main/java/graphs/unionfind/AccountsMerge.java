@@ -62,15 +62,15 @@ public class AccountsMerge {
         // Build adjacency list (same as DFS approach)
         for (List<String> account : accounts) {
             String name = account.get(0);
-            String firstEmail = account.get(1);
+            String primaryEmail = account.get(1);
             
-            for (int emailIndex = 1; emailIndex < account.size(); emailIndex++) {
-                String email = account.get(emailIndex);
+            for (int i = 1; i < account.size(); i++) {
+                String email = account.get(i);
                 emailToName.put(email, name);
                 
                 // Undirected graph connections
-                emailGraph.putIfAbsent(firstEmail, new HashSet<>()).add(email);
-                emailGraph.putIfAbsent(email, new HashSet<>()).add(firstEmail);
+                emailGraph.putIfAbsent(primaryEmail, new HashSet<>()).add(email);
+                emailGraph.putIfAbsent(email, new HashSet<>()).add(primaryEmail);
             }
         }
         

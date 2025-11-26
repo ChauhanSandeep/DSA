@@ -1,6 +1,9 @@
 package dynamicprogramming;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
  * Problem: Smallest Prime Sequence
@@ -34,6 +37,47 @@ public class SmallestPrimeSequence {
     }
 
     /**
+     * Solves using Min-Heap to always pick the smallest candidate.
+     * 
+     * Steps:
+     * 1. Start with 1 in the heap and a set to track visited numbers (avoid duplicates)
+     * 2. Poll the smallest number from heap, add it to result
+     * 3. Generate new candidates by multiplying with each prime factor
+     * 4. Add new candidates to heap if not already visited
+     * 5. Repeat until we have k numbers
+     * 
+     * Time Complexity: O(k log k) - k insertions/deletions from heap
+     * Space Complexity: O(k) - heap and visited set
+     */
+    public int[] findSmallestSequenceUsingHeap(int first, int second, int third, int k) {
+        if (k <= 0) return new int[0];
+        
+        int[] result = new int[k];
+        PriorityQueue<Long> minHeap = new PriorityQueue<>();
+        Set<Long> visited = new HashSet<>();
+        
+        minHeap.offer(1L);
+        visited.add(1L);
+        
+        for (int i = 0; i < k; i++) {
+            long current = minHeap.poll();
+            result[i] = (int) current;
+            
+            // Generate new candidates by multiplying with each prime
+            long[] candidates = {current * first, current * second, current * third};
+            
+            for (long candidate : candidates) {
+                if (!visited.contains(candidate)) {
+                    minHeap.offer(candidate);
+                    visited.add(candidate);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    /**
      * Finds the first `k` smallest numbers that only have `first`, `second`, and `third` as prime factors.
      *
      * Steps of Solution:
@@ -52,12 +96,6 @@ public class SmallestPrimeSequence {
      *
      * Time Complexity: O(k) to generate k numbers
      * Space Complexity: O(k) to store k results
-     *
-     * @param first  First prime factor
-     * @param second Second prime factor
-     * @param third  Third prime factor
-     * @param k      Number of elements to generate
-     * @return Array of first `k` elements in the sequence
      */
     public int[] findSmallestSequence(int first, int second, int third, int k) {
         if (k <= 0) return new int[0];

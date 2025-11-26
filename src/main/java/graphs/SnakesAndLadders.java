@@ -115,18 +115,18 @@ public class SnakesAndLadders {
         int length = board.length;
         int[] flatBoard = new int[length * length + 1];
 
-        for (int i = 0; i < length; i++) {
-            for (int j = 0; j < length; j++) {
+        for (int row = 0; row < length; row++) {
+            for (int col = 0; col < length; col++) {
                 // Calculate position based on Boustrophedon pattern
                 int position;
-                if (i % 2 == 0) {
+                if (row % 2 == 0) {
                     // Even rows: left to right
-                    position = ((length - 1 - i) * length) + (j + 1);
+                    position = ((length - 1 - row) * length) + (col + 1);
                 } else {
                     // Odd rows: right to left
-                    position = ((length - 1 - i) * length) + ((length - 1 - j) + 1);
+                    position = ((length - 1 - row) * length) + ((length - 1 - col) + 1);
                 }
-                flatBoard[position] = board[i][j];
+                flatBoard[position] = board[row][col];
             }
         }
 

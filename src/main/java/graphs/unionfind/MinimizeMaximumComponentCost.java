@@ -7,78 +7,134 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Problem: Minimize Maximum Component Cost
- * Leetcode: https://leetcode.com/problems/minimize-maximum-component-cost
+ * You are given an undirected connected graph with n nodes labeled from 0 to n - 1 and a 2D
+ * integer array edges where edges[i] = [ui, vi, wi] denotes an undirected edge between node ui
+ * and node vi with weight wi, and an integer k.
  *
- * Problem Statement:
- * Given a weighted undirected graph with `n` nodes and a list of edges [u, v, weight],
- * partition the graph into `k` connected components such that the maximum cost
- * of any component is minimized. Cost is defined as the largest edge weight in that component.
- *f
- * Example:
- * Input: n = 5, edges = [[0,1,1],[1,2,3],[2,3,4],[3,4,2]], k = 2
- * Output: 3
+ * You are allowed to remove any number of edges from the graph such that the resulting graph
+ * has at most k connected components.
  *
+ * The cost of a component is defined as the maximum edge weight in that component. If a component
+ * has no edges, its cost is 0.
+ *
+ * Return the minimum possible value of the maximum cost among all components after such removals.
+ *
+ * Example 1:
+ * Input: n = 5, edges = [[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k = 2
+ * Output: 4
  * Explanation:
- * - The MST of the graph has edges [0-1 (1), 3-4 (2), 1-2 (3), 2-3 (4)]
- * - To split into 2 components, we remove 1 edge from MST.
- * - Remove the largest weight edge (4), then the max weight in remaining MST is 3.
+ * We need to split the graph into at most 2 components. The key insight is to remove the
+ * heaviest edge (weight 6) between nodes 3 and 4.
+ * After removal:
+ * - Component 1: nodes {0,1,2,3} with edges [0,1,4], [1,2,3], [1,3,2]. Maximum edge weight = 4
+ * - Component 2: node {4} with no edges. Maximum edge weight = 0
+ * The maximum cost among all components is max(4, 0) = 4.
+ * This is optimal because if we keep the edge with weight 6, the maximum cost would be 6.
+ *
+ * LeetCode Problem: https://leetcode.com/problems/minimize-maximum-component-cost/
  *
  * Follow-up Questions:
- * - Can you do this for directed graphs? → Not directly with MST, need SCC algorithms.
- * - Can you maximize the *minimum* cost instead? (Binary search + DSU variant)
- * - Leetcode Follow-up: None explicitly, but similar pattern in:
- *     - https://leetcode.com/problems/optimize-water-distribution-in-a-village/
+ *
+ * 1. What if we want to know which exact edges to remove?
+ *    Answer: Modify the solution to track which edges are included when forming components.
+ *    During binary search, when we find the optimal threshold weight, record all edges with
+ *    weight greater than this threshold - those are the edges to remove.
+ *
+ * 2. How would you handle the case where edge weights can be negative?
+ *    Answer: The problem becomes more complex. We'd need to adjust the binary search range
+ *    to include negative values. The concept remains the same, but the lower bound would be
+ *    the minimum edge weight instead of 0.
+ *
+ * 3. What if instead of removing edges, we can add edges with cost?
+ *    Answer: This becomes a different problem - Minimum Spanning Tree variants. We'd use
+ *    Kruskal's or Prim's algorithm but stop when we have exactly k components, adding edges
+ *    in increasing order of weight.
+ *    Related: https://leetcode.com/problems/min-cost-to-connect-all-points/
+ *
+ * 4. Can we solve this if k can be larger than n?
+ *    Answer: If k >= n, we can split the graph into n separate components (all isolated nodes)
+ *    by removing all edges. The maximum cost would be 0 since no component has edges.
+ *
+ * 5. What if we want to minimize the sum of all component costs instead of maximum?
+ *    Answer: This requires a different approach. We'd use dynamic programming or greedy
+ *    algorithm to partition the graph. We'd still use Union-Find but optimize for sum
+ *    rather than maximum, which changes the decision-making process significantly.
  */
 public class MinimizeMaximumComponentCost {
 
   /**
-   * Uses Kruskal's algorithm to build MST and removes (k - 1) heaviest edges
-   * to partition the graph into k components with minimized max edge cost.
+   * Uses Kruskal's MST algorithm with strategic edge removal to partition the graph.
+   *
+   * Intuition:
+   * To minimize the maximum edge weight in any component, we should:
+   * 1. Keep only the lightest edges that connect nodes (MST gives us this)
+   * 2. Break the graph by removing the heaviest edges from the MST
+   * 
+   * Key Insight: 
+   * An MST of n nodes has exactly (n-1) edges. To create k components, we need to 
+   * remove (k-1) edges. By removing the (k-1) heaviest edges from the MST, we create 
+   * k components where each component's maximum edge weight is minimized.
    *
    * Approach:
-   * 1. Build a Minimum Spanning Tree (MST) using Kruskal’s Algorithm. This ensures that we
-   * have the minimum possible edge weights connecting all nodes. These will be definitely removed.
-   * 2. From the MST, remove (k - 1) largest edges to split it into k components.
-   * 3. The result is the max weight among the remaining edges.
+   * Step 1: Build MST using Kruskal's algorithm (Union-Find with sorted edges)
+   *         - Sort all edges by weight in ascending order
+   *         - Add edges to MST if they connect different components
+   *         - Track all MST edge weights in a list
+   * 
+   * Step 2: Partition the MST into k components
+   *         - Sort MST edges by weight (already sorted from Kruskal's)
+   *         - Remove the (k-1) largest edges from MST
+   *         - This splits the tree into exactly k components
+   * 
+   * Step 3: Find the answer
+   *         - After removing (k-1) edges, we have (n-k) edges remaining
+   *         - The maximum weight among remaining edges is our answer
    *
-   * Time Complexity: O(E * logE + E) ~ O(E logE), where E is number of edges.
-   * Space Complexity: O(N + E)
+   * Example Walkthrough (n=5, edges=[[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k=2):
+   * - MST edges after Kruskal's: [2, 3, 4, 6] (weights only)
+   * - To create k=2 components, remove (k-1)=1 heaviest edge: remove 6
+   * - Remaining MST edges: [2, 3, 4]
+   * - Maximum weight among remaining edges: 4 ✓
+   *
+   * Time Complexity: O(E log E) - dominated by edge sorting in Kruskal's algorithm
+   * Space Complexity: O(N + E) - Union-Find structure (N) + MST edge list (E)
    *
    * @param numNodes Number of nodes in the graph
    * @param edges List of edges where each edge is [u, v, weight]
-   * @param numComponents Number of connected components desired
+   * @param numComponents Number of connected components desired (k)
    * @return Minimum possible maximum cost among all components
    */
   public int minimizeMaximumComponentCost(int numNodes, int[][] edges, int numComponents) {
-    // Step 1: Sort all edges by weight in ascending order (Kruskal’s)
-    Arrays.sort(edges, Comparator.comparingInt(edge -> edge[2]));
-
-    DSU disjointSet = new DSU(numNodes);
-    List<Integer> mstWeightList = new ArrayList<>();
-
-    // Step 2: Build MST and record selected edge weights
-    for (int[] edge : edges) {
-      int nodeA = edge[0];
-      int nodeB = edge[1];
-      int weight = edge[2];
-      if (disjointSet.union(nodeA, nodeB)) {
-        // if these nodes were in different components, add this edge to MST
-        mstWeightList.add(weight);
-      }
-    }
-
-    // Edge Case: If components required are >= number of nodes, all nodes can be isolated
+    // Edge Case: If k >= n, isolate all nodes (remove all edges)
     if (numComponents >= numNodes) {
       return 0;
     }
 
-    // Step 3: Remove (k - 1) largest weights to form k components
-    Collections.sort(mstWeightList); // Already sorted during Kruskal; but re-confirm here
-    int remainingEdges = mstWeightList.size() - (numComponents - 1);
+    // Step 1: Build MST using Kruskal's Algorithm
+    // Sort edges by weight (ascending order)
+    Arrays.sort(edges, Comparator.comparingInt(edge -> edge[2]));
 
-    // Step 4: The answer is the maximum edge in the remaining MST
-    return mstWeightList.get(remainingEdges - 1);
+    DSU disjointSet = new DSU(numNodes);
+    List<Integer> mstEdgeWeights = new ArrayList<>();
+
+    // Add edges to MST if they connect different components
+    for (int[] edge : edges) {
+      int nodeA = edge[0];
+      int nodeB = edge[1];
+      int weight = edge[2];
+      
+      if (disjointSet.union(nodeA, nodeB)) {
+        mstEdgeWeights.add(weight);
+      }
+    }
+
+    // Step 2: Remove (k-1) heaviest edges to create k components
+    // MST has (n-1) edges, removing (k-1) leaves us with (n-k) edges
+    int edgesAfterRemoval = mstEdgeWeights.size() - (numComponents - 1);
+
+    // Step 3: The maximum weight among remaining edges is the answer
+    // Since mstEdgeWeights is sorted, the last remaining edge has max weight
+    return mstEdgeWeights.get(edgesAfterRemoval - 1);
   }
 
   /**

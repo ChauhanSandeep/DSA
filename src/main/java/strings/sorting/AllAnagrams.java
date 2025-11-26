@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ✅ Problem: Find All Anagrams in a String
+ * Problem: Find All Anagrams in a String
  *
- * Given two strings `text` and `pattern`, return **all start indices** of `pattern`'s anagrams in `text`.
+ * Given two strings `text` and `pattern`, return all start indices of `pattern`'s anagrams in `text`.
  *
  * Better Example:
  * Input: text = "xyzabcabaxy", pattern = "ab"
@@ -14,11 +14,7 @@ import java.util.List;
  * Explanation:
  * - "ab" → anagram at index 3
  * - "ba" → anagram at index 6
-
- * Explanation:
- * - "ab" → anagram at index 0
- * - "ba" → anagram at index 1
- * - "ab" → anagram at index 2
+ * - "ab" → anagram at index 7
  *
  * 🔗 Leetcode: https://leetcode.com/problems/find-all-anagrams-in-a-string/
  *

@@ -117,6 +117,9 @@ public class PaintHouse3 {
     return (minimumCost >= IMPOSSIBLE_COST) ? -1 : minimumCost;
   }
 
+  /** 
+   * Recursive helper for top-down DP 
+   */
   private int findMinimumCostRecursive(int[] houses, int[][] paintingCosts, int currentHouseIndex,
       int currentneighborhoodCount, int previousHouseColor, int targetNeighborhoods, int numColors) {
     // Base case: processed all houses

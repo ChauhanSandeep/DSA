@@ -1,5 +1,8 @@
 package arrays.xor;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * 137. Single Number II
  *
@@ -36,6 +39,44 @@ package arrays.xor;
  * - 645. Set Mismatch: https://leetcode.com/problems/set-mismatch/
  */
 public class SingleNumberII {
+
+    /**
+     * Find single number using maths.
+     * 
+     * Formula
+     * -----------
+     * 3 * (x + y + z + ...) + singleNumber = sumOfAllElements
+     * 
+     * x + y + z + ... + singleNumber = sumOfUniqueElements
+     * 3 * (x + y + z + ...) + 3 * singleNumber = 3 * sumOfUniqueElements
+     * 
+     * Subtracting the two equations:
+     * -----------
+     * 2 * singleNumber = 3 * sumOfUniqueElements - sumOfAllElements
+     * -----------
+     * Rearranging gives:
+     * singleNumber = (3 * sumOfUniqueElements - sumOfAllElements) / 2
+     * 
+     * Algorithm:
+     * 1. Sum all unique elements and multiply by 3
+     * 2. Subtract sum of all elements from this value
+     * 3. The difference divided by 2 gives the single number
+     * 
+     * Time Complexity: O(n) where n is array length
+     * Space Complexity: O(n) for storing unique elements
+     * @param nums
+     * @return
+     */
+    public int singleNumberMaths(int[] nums) {
+        Set<Integer> uniqueElements = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+        int sumOfUniqueElements = uniqueElements.stream().mapToInt(Integer::intValue).sum();
+
+        // Calculate sum of all elements
+        int sumOfAllElements = Arrays.stream(nums).sum();
+
+        // Using the formula: (3 * sumOfUniqueElements - sumOfAllElements) / 2
+        return (3 * sumOfUniqueElements - sumOfAllElements) / 2;
+    }
 
     /**
      * Finds single number using bit manipulation with modular arithmetic.
