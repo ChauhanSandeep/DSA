@@ -9,6 +9,12 @@ import java.util.Stack;
  *
  * LeetCode Problem Link: https://leetcode.com/problems/largest-rectangle-in-histogram/
  *
+ * Example 1:
+ * Input: heights = [2,1,5,6,2,3]
+ * Output: 10
+ * Explanation: The largest rectangle has height 5 and width 2 (bars at index 2 and 3 
+ * with heights 5 and 6). The limiting height is 5, giving area = 5 * 2 = 10.
+ * 
  * Intuition:
  * - For each bar, the largest rectangle it can form is bounded by the nearest smaller bars on the left and right.
  * - The width of the rectangle is determined by the distance between these bounds.
@@ -29,8 +35,8 @@ public class LargestHistogram {
      *
      * Intuition:
      * - For every bar, we want to know how far we can extend to the left and right without hitting a smaller bar.
-     * - NSL tells us the previous bar that is smaller → left boundary
-     * - NSR tells us the next bar that is smaller → right boundary
+     * - NextSmallerElement tells us the previous bar that is smaller than current bar → left boundary
+     * - PreviousSmallerElement tells us the next bar that is smaller than current bar → right boundary
      * - Width = (NSR - NSL - 1), Area = height * width
      *
      * Approach:
@@ -51,32 +57,49 @@ public class LargestHistogram {
     public static int largestRectangleArea(int[] heights) {
         int length = heights.length;
 
-        int[] leftSmaller = new int[length];  // NSL indices
-        int[] rightSmaller = new int[length]; // NSR indices
+        int[] previousSmaller = new int[length];  // PSE (Previous Smaller Element) indices
+        int[] nextSmaller = new int[length]; // NSE (Next Smaller Element) indices
+
+        // Initialize with boundary values
+        for (int i = 0; i < length; i++) {
+            previousSmaller[i] = -1;      // Default: no smaller element to the left
+            nextSmaller[i] = length;  // Default: no smaller element to the right
+        }
 
         Stack<Integer> stack = new Stack<>();
 
-        // Find Nearest Smaller to Right (NSR)
-        for (int i = 0; i < length; i++) {
-            // If current element is smaller than stack top, it's NSR for those
-            while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
-                int idx = stack.pop();
-                rightSmaller[idx] = i;
+        System.out.println("Performing Next Smaller Element (NSE) computation...");
+        // Find Next Smaller Element (NSE) using monotonic increasing stack
+        for (int i = length - 1; i >= 0; i--) {
+            // Pop elements >= current (maintain increasing stack)
+            while (!stack.isEmpty() && heights[stack.peek()] >= heights[i]) {
+                stack.pop();
             }
-
+            
+            // Top of stack is the next smaller element
+            if (!stack.isEmpty()) {
+                nextSmaller[i] = stack.peek();
+            }
+            
             stack.push(i);
         }
+        
         // Clear stack to reuse
         stack.clear();
 
-        // Find Nearest Smaller to Left (NSL)
-        for (int i = length - 1; i >= 0; i--) {
-            // While stack has elements that are >= current → they're not useful
-            while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
-                int idx = stack.pop();
-                leftSmaller[idx] = i; // Current index is nearest smaller to left for popped index
+        System.out.println("Performing Previous Smaller Element (PSE) computation...");
+        // Find Previous Smaller Element (PSE) using monotonic increasing stack
+        for (int i = 0; i < length; i++) {
+            // Pop elements >= current (maintain increasing stack)
+            while (!stack.isEmpty() && heights[stack.peek()] >= heights[i]) {
+                stack.pop();
             }
-
+            
+            // Top of stack is the previous smaller element
+            if (!stack.isEmpty()) {
+                previousSmaller[i] = stack.peek();
+            }
+            
             stack.push(i);
         }
 
@@ -84,7 +107,7 @@ public class LargestHistogram {
         int maxArea = 0;
         for (int i = 0; i < length; i++) {
             int height = heights[i];
-            int width = rightSmaller[i] - leftSmaller[i] - 1;
+            int width = nextSmaller[i] - previousSmaller[i] - 1;
             int area = height * width;
             maxArea = Math.max(maxArea, area);
         }

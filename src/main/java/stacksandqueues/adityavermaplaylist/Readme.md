@@ -60,6 +60,23 @@ String: "{[()]"
 
 ---
 
+### Monotonic Stack Cheatsheet
+
+| Problem Type | Stack Type | Traversal Direction | Stack Stores | Pattern |
+|-------------|------------|-------------------|--------------|---------|
+| **Next Greater Element (NGE)** | Decreasing | Right to Left (← ) | Elements in decreasing order | If current > stack.top(), pop and assign current as NGE |
+| **Next Smaller Element (NSE)** | Increasing | Right to Left (← ) | Elements in increasing order | If current < stack.top(), pop and assign current as NSE |
+| **Previous Greater Element (PGE)** | Decreasing | Left to Right (→ ) | Elements in decreasing order | If current > stack.top(), pop; stack.top() is PGE |
+| **Previous Smaller Element (PSE)** | Increasing | Left to Right (→ ) | Elements in increasing order | If current < stack.top(), pop; stack.top() is PSE |
+
+**Key Insights:**
+- **Next** problems: Traverse **right to left** (reverse iteration)
+- **Previous** problems: Traverse **left to right** (forward iteration)
+- **Greater** problems: Use **decreasing stack** (maintain elements in descending order)
+- **Smaller** problems: Use **increasing stack** (maintain elements in ascending order)
+- Pop elements that violate the monotonic property
+- Answer for popped elements is the current element
+
 ## 2. Next Greater Element
 
 **Problem Description:**

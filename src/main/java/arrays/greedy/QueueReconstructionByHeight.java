@@ -5,8 +5,12 @@ import java.util.*;
 
 /**
  * Problem Statement:
- * You are given an array of people, where people[i] = [h_i, k_i] represents the ith person of height h_i with exactly k_i other people in front who have a height greater than or equal to h_i.
- * Reconstruct and return the queue that is represented by the input array people. The returned queue should be formatted as an array queue, where queue[j] = [h_j, k_j] is the attributes of the jth person in the reconstructed queue (queue[0] is the person at the front of the queue).
+ * You are given an array of people, people, which are the attributes of some people in a queue (not necessarily in order). 
+ * Each people[i] = [hi, ki] represents the ith person of height hi with exactly ki other people in front (on left side of array) 
+ * who have a height greater than or equal to hi
+ * 
+ * Reconstruct and return the queue that is represented by the input array people. The returned queue should be formatted as an array queue, 
+ * where queue[j] = [hj, kj] is the attributes of the jth person in the queue (queue[0] is the person at the front of the queue).
  *
  * Example:
  * Input: people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
@@ -34,7 +38,11 @@ public class QueueReconstructionByHeight {
   /**
    * Reconstructs the queue by sorting people by height descending and k ascending, then inserting at k index.
    * This is the optimal greedy approach.
-   *
+   * 
+   * Intuition:
+   * If you process the people from tallest to shortest, you can ensure that when you place a person P, 
+   * all the people already in the queue are guaranteed to be taller than or equal to P. 
+   * 
    * Step-by-step explanation:
    * 1. Sort the people array: first by height in descending order, then by k in ascending order for ties.
    * 2. Initialize an empty list for the result.
@@ -68,7 +76,8 @@ public class QueueReconstructionByHeight {
     List<int[]> queue = new LinkedList<>();
 
     for (int[] person : people) {
-      queue.add(person[1], person); // Insert person at index k
+      int indexToInsert = person[1];
+      queue.add(indexToInsert, person); // Insert person at index k
     }
     // Here the queue would be [{5, 0}, {7, 0}, {5, 2}, {6, 1}, {4, 4}, {7, 1}]
 

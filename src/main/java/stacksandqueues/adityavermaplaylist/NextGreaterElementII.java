@@ -78,19 +78,19 @@ public class NextGreaterElementII {
 
         // Double traversal with index-based stack
         for (int i = 2 * size - 1; i >= 0; i--) {
-            int currentIndex = i % size;
+            int adjustedIndex = i % size;
 
             // Pop indices whose values are ≤ current element
-            while (!stack.isEmpty() && nums[stack.peek()] <= nums[currentIndex]) {
+            while (!stack.isEmpty() && nums[stack.peek()] <= nums[adjustedIndex]) {
                 stack.pop();
             }
 
             // Update result with value at top index
             if (!stack.isEmpty() && i < size) {
-                result[currentIndex] = nums[stack.peek()];
+                result[adjustedIndex] = nums[stack.peek()];
             }
 
-            stack.push(currentIndex);
+            stack.push(adjustedIndex);
         }
 
         return result;

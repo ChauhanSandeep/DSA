@@ -5,7 +5,6 @@ import java.util.Queue;
 
 
 /**
- * Problem: Is Graph Bipartite?
  * LeetCode Link: https://leetcode.com/problems/is-graph-bipartite/
  *
  * Problem Statement:

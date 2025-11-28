@@ -179,7 +179,12 @@ public class MaxStack {
             valueToNodes = new TreeMap<>();
         }
 
-        // Push element onto stack
+        /**
+         * Push element onto stack
+         * Time Complexity: O(log n) : For TreeMap insertion
+         * Space Complexity: O(1)
+         */
+        @Override
         public void push(int x) {
             Node newNode = new Node(x);
         
@@ -193,7 +198,12 @@ public class MaxStack {
             valueToNodes.computeIfAbsent(x, k -> new ArrayList<>()).add(newNode);
         }
 
-        // Remove and return the top element
+        /**
+         * Removes the element on top of the stack and returns it
+         * Time Complexity: O(log n) : For TreeMap removal
+         * Space Complexity: O(1)
+         */        
+        @Override
         public int pop() {
             Node topNode = tail.previous;
             removeNode(topNode);
@@ -208,22 +218,32 @@ public class MaxStack {
                return topNode.value;
         }
 
-        // Get the element on top of the stack
-        public int top() {
+        /**
+         * Get the element on top of the stack without removing it
+         * Time Complexity: O(1)
+         * Space Complexity: O(1)
+         */
+        @Override
+        public int peek() {
             return tail.previous.value;
         }
 
-        // Get the element on top of the stack (alias for top)
-        public int peek() {
-            return top();
-        }
-
-        // Retrieve the maximum element in the stack
+        /**
+         * Retrieve the maximum element in the stack without removing it
+         * Time Complexity: O(log n)
+         * Space Complexity: O(1)
+         */
+        @Override
         public int peekMax() {
             return valueToNodes.lastKey();
         }
 
-        // Remove and return the maximum element
+        /**
+         * Remove and return the maximum element
+         * Time Complexity: O(log n)
+         * Space Complexity: O(1)
+         */
+        @Override
         public int popMax() {
             int maxValue = peekMax();
             List<Node> nodes = valueToNodes.get(maxValue);

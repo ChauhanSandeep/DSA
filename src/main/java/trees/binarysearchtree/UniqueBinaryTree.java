@@ -13,8 +13,12 @@ public class UniqueBinaryTree {
 
     public static void main(String[] args) {
         // Example usage: Find the number of unique BSTs that can be formed with 3 nodes
-        int result = new UniqueBinaryTree().numTreesRecursive(3);
-        System.out.println(result); // Expected output: 5
+        UniqueBinaryTree solution = new UniqueBinaryTree();
+        
+        int n = 3;
+        System.out.println("Recursive DP: " + solution.numTreesRecursive(n)); // Expected output: 5
+        System.out.println("Iterative DP: " + solution.numTreesIterative(n)); // Expected output: 5
+        System.out.println("Catalan Number: " + solution.numTreesCatalan(n)); // Expected output: 5
     }
 
     /**
@@ -82,7 +86,13 @@ public class UniqueBinaryTree {
 
     /**
      * Iterative Dynamic Programming solution for Unique Binary Search Trees
-     *
+     * Steps
+     * 1. Create a dp array where dp[i] represents the number of unique BSTs that can be formed with i nodes.
+     * 2. Initialize base cases: dp[0] = 1 (empty tree) and dp[1] = 1 (single node tree).
+     * 3. For each number of nodes from 2 to numNodes, calculate dp[i]:
+     *    - For each node as the root, multiply the number of unique BSTs possible in the left subtree
+     *      and the right subtree, and sum these products to get dp[i].
+     * 
      * Time Complexity: O(numNodes^2)
      * Space Complexity: O(numNodes)
      */
@@ -98,5 +108,50 @@ public class UniqueBinaryTree {
             }
         }
         return dp[numNodes];
+    }
+
+    /**
+     * Catalan Number solution for Unique Binary Search Trees
+     *
+     * Intuition:
+     * - The number of unique BSTs with n nodes is the nth Catalan number.
+     * - Catalan numbers have the formula: C(n) = (2n)! / ((n+1)! * n!)
+     * - This can be simplified to: C(n) = C(2n, n) / (n+1)
+     *   where C(2n, n) is the binomial coefficient "2n choose n"
+     *
+     * Mathematical Formula:
+     * - C(n) = (2n choose n) / (n+1)
+     * - C(n) = (2n)! / ((n+1)! * n!)
+     * - Alternatively: C(n) = Product from i=2 to n of (n+i)/i
+     *
+     * Why Catalan Numbers?
+     * - Each way to arrange n nodes in a BST corresponds to a Catalan structure
+     * - This is because we're counting the number of ways to parenthesize expressions,
+     *   which is equivalent to counting binary tree structures
+     *
+     * Algorithm:
+     * - We use the iterative formula: C(n) = C(n) * (4*i - 2) / (i + 1)
+     * - Starting with C(0) = 1, we compute each subsequent Catalan number
+     * - This approach avoids factorial overflow and is more efficient
+     *
+     * Time Complexity: O(n) - Single pass through n iterations
+     * Space Complexity: O(1) - Only using a constant amount of extra space
+     *
+     * @param numNodes The number of nodes
+     * @return The number of unique BSTs (nth Catalan number)
+     */
+    public int numTreesCatalan(int numNodes) {
+        // Use long to avoid integer overflow during calculation
+        long catalan = 1;
+
+        // Calculate nth Catalan number using the formula:
+        // C(n) = C(n-1) * (4*n - 2) / (n + 1)
+        // This is derived from: C(n) = (2n)! / ((n+1)! * n!)
+        for (int i = 1; i <= numNodes; i++) {
+            // Multiply first to maintain precision, then divide
+            catalan = catalan * (4L * i - 2) / (i + 1);
+        }
+
+        return (int) catalan;
     }
 }

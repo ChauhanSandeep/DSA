@@ -77,6 +77,35 @@ public class DuplicateNumber {
    *
    * Treat the array as a linked list where each index points to nums[i],
    * and find the start of the cycle, which is the duplicate number.
+   * 
+   * Steps:
+   * 1. Initialize two pointers, slow and fast, both starting at the first element
+   * 2. Move slow by one step and fast by two steps until they meet (detect cycle)
+   * 3. Reset one pointer to the start and move both one step at a time until they meet again
+   * 4. The meeting point is the duplicate number
+   * 
+   * Why it works with formula:
+   * Let:
+   * - x = distance from start to cycle entrance
+   * - y = distance from cycle entrance to meeting point
+   * - z = distance from meeting point back to cycle entrance
+   * At meeting point:
+   * - Slow has traveled: x + y
+   * - Fast has traveled: x + y + n*(y + z) for some n ≥ 1
+   * Since fast moves twice as fast:
+   * 2 * (x + y) = x + y + n*(y + z)
+   * => x + y = n*(y + z)
+   * => x = (n - 1)*(y + z) + z
+   * This means if we start one pointer at the beginning and one at the meeting point,
+   * and move both one step at a time, they will meet at the cycle entrance (duplicate number).
+   * 
+   * Dry run:
+   *       [1, 3, 4, 2, 2]
+   * Index: 0  1  2  3  4
+   * Value: 1->3->2->4->2 (cycle starts at index 2)
+   * One each iteration:
+   * Iteration 1: slow=3, fast=2
+   * Iteration 2: slow=2, fast=2 (intersection point)
    *
    * Time Complexity: O(n)
    * Space Complexity: O(1)
