@@ -31,16 +31,16 @@ public class LongestCommonSubstring {
      * @return The longest common substring
      */
     public static String findLongestCommonSubstring(String str1, String str2) {
-        int m = str1.length();
-        int n = str2.length();
-        int[][] dp = new int[m + 1][n + 1]; // DP table to store substring lengths
+        int len1 = str1.length();
+        int len2 = str2.length();
+        int[][] dp = new int[len1 + 1][len2 + 1]; // DP table to store substring lengths
 
         int maxLength = 0; // Stores length of the longest common substring
         int endIndex = 0;  // Stores the ending index of longest common substring in str1
 
         // Build the DP table
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
+        for (int i = 1; i <= len1; i++) {
+            for (int j = 1; j <= len2; j++) {
                 if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
                     dp[i][j] = dp[i - 1][j - 1] + 1;
 

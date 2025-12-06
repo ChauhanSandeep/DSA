@@ -30,71 +30,46 @@ package arrays.binarysearch;
  */
 public class FindMinimumInRotatedSortedArray {
     /**
-     * Finds the minimum element in a rotated sorted array using binary search.
-     *
-     * @param nums The rotated sorted array
-     * @return The minimum element in the array
+     * Binary Search - Compare with Right Boundary
+     * 
+     * Algorithm:
+     * 1. Use binary search with left and right pointers
+     * 2. Compare mid element with right element to determine which half is sorted
+     * 3. If nums[mid] > nums[right], minimum is in right half (unsorted part)
+     * 4. Otherwise, minimum is in left half (including mid)
+     * 5. Converge until left == right
+     * 
+     * Key Insight:
+     * In a rotated sorted array, one half is always sorted. The minimum element
+     * lies at the rotation point where the sorted order breaks. By comparing mid
+     * with the right boundary, we can determine which half contains the break point.
+     * 
+     * Why Compare with Right Instead of Left:
+     * Comparing with right allows us to identify the unsorted portion reliably.
+     * If nums[mid] > nums[right], we know rotation happened in [mid+1, right].
+     * If nums[mid] <= nums[right], the right portion is sorted, so min is in [left, mid].
+     * 
+     * Time Complexity: O(log n) - binary search halves the search space each iteration
+     * Space Complexity: O(1) - only uses constant extra space
      */
     public int findMin(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            throw new IllegalArgumentException("Input array is empty");
-        }
-
         int left = 0;
         int right = nums.length - 1;
-
-        // If the array is not rotated or has only one element
-        if (nums[left] <= nums[right]) {
-            return nums[left];
-        }
-
+        
         while (left < right) {
             int mid = left + (right - left) / 2;
-
-            // Check if mid+1 is the minimum element
-            if (mid < nums.length - 1 && nums[mid] > nums[mid + 1]) {
-                return nums[mid + 1];
-            }
-
-            // Check if mid is the minimum element
-            if (mid > 0 && nums[mid - 1] > nums[mid]) {
-                return nums[mid];
-            }
-
-            // Determine which half to search
-            if (nums[mid] > nums[right]) {
-                // The minimum is in the right half
-                left = mid + 1;
-            } else {
-                // The minimum is in the left half (including mid)
-                right = mid - 1;
-            }
-        }
-
-        return nums[left];
-    }
-
-    /**
-     * Alternative approach with cleaner code but same time complexity.
-     */
-    public int findMinAlternative(int[] nums) {
-        int left = 0;
-        int right = nums.length - 1;
-
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-
-            // If the middle element is greater than the rightmost element,
-            // the minimum must be in the right half
+            
+            // Right half is unsorted, minimum must be in [mid+1, right]
             if (nums[mid] > nums[right]) {
                 left = mid + 1;
-            }
-            // Otherwise, the minimum is in the left half (including mid)
+            } 
+            // Left half including mid is sorted, minimum is in [left, mid]
             else {
                 right = mid;
             }
         }
-
+        
+        // left == right, pointing to minimum element
         return nums[left];
     }
 
@@ -130,83 +105,43 @@ public class FindMinimumInRotatedSortedArray {
     }
 
     /**
-     * Finds the number of rotations performed on the original sorted array.
-     * This is equivalent to finding the index of the minimum element.
-     */
-    public int findRotationCount(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return -1;
-        }
-
-        int left = 0;
-        int right = nums.length - 1;
-
-        // If the array is not rotated
-        if (nums[left] <= nums[right]) {
-            return 0;
-        }
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-
-            // Check if mid+1 is the minimum element
-            if (mid < nums.length - 1 && nums[mid] > nums[mid + 1]) {
-                return mid + 1;
-            }
-
-            // Check if mid is the minimum element
-            if (mid > 0 && nums[mid - 1] > nums[mid]) {
-                return mid;
-            }
-
-            // Determine which half to search
-            if (nums[mid] > nums[right]) {
-                // The minimum is in the right half
-                left = mid + 1;
-            } else {
-                // The minimum is in the left half (including mid)
-                right = mid - 1;
-            }
-        }
-
-        return 0; // This line is theoretically unreachable for valid inputs
-    }
-
-    /**
-     * Finds the maximum element in the rotated sorted array.
-     * This is similar to finding the minimum but looks for the pivot point.
+     * Finds the maximum element in a rotated sorted array.
+     * 
+     * Key Insight:
+     * The maximum element is always at the rotation point - 1, or at the end if not rotated.
+     * We use binary search similar to finding minimum, but adjust the logic to find the
+     * point where the array drops from a larger value to a smaller value.
+     * 
+     * Time Complexity: O(log n)
+     * Space Complexity: O(1)
      */
     public int findMax(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            throw new IllegalArgumentException("Input array is empty");
-        }
-
         int left = 0;
         int right = nums.length - 1;
-
-        // If the array is not rotated or has only one element
+        
+        // If array is not rotated, last element is maximum
         if (nums[left] <= nums[right]) {
             return nums[right];
         }
-
+        
         while (left < right) {
             int mid = left + (right - left) / 2;
-
-            // Check if mid is the maximum element
+            
+            // If mid element is greater than next element, mid is the maximum
             if (mid < nums.length - 1 && nums[mid] > nums[mid + 1]) {
                 return nums[mid];
             }
-
-            // Determine which half to search
-            if (nums[mid] > nums[right]) {
-                // The maximum is in the right half (including mid)
-                left = mid;
-            } else {
-                // The maximum is in the left half
-                right = mid - 1;
+            
+            // Left half is sorted and contains larger values
+            if (nums[mid] >= nums[left]) {
+                left = mid + 1;
+            } 
+            // Right half is sorted, maximum is in left half
+            else {
+                right = mid;
             }
         }
-
+        
         return nums[left];
     }
 }

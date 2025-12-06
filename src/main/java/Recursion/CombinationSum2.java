@@ -40,62 +40,46 @@ import java.util.*;
  */
 public class CombinationSum2 {
 
-    public static void main(String[] args) {
-        int[] candidates = {10, 1, 2, 7, 6, 1, 5};
-        int target = 8;
-
+    /**
+     * Finds all unique combinations that sum to target using backtracking.
+     * 
+     * Algorithm:
+     * 1. Sort candidates to group duplicates and enable early termination
+     * 2. Use backtracking to explore combinations
+     * 3. Skip duplicates at same recursion level to avoid duplicate combinations
+     * 4. Each element used at most once (pass i+1 in recursive call)
+     * 
+     * Time Complexity: O(2^n) - explore all subsets with pruning
+     * Space Complexity: O(k) - recursion depth where k = target/min(candidates)
+     */
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
         List<List<Integer>> result = new ArrayList<>();
-        Arrays.sort(candidates); // Essential: brings duplicates together for proper skipping
-        backtrack(candidates, 0, target, new ArrayList<>(), result);
-
-        System.out.println("Unique combinations that sum to " + target + ": " + result);
+        if (candidates == null || candidates.length == 0) return result;
+        
+        Arrays.sort(candidates);
+        backtrack(candidates, target, 0, new ArrayList<>(), result);
+        return result;
     }
 
-    /**
-     * Recursively explores combinations using explicit branching to avoid duplicates.
-     *
-     * Algorithm:
-     * 1. Base case: If target is 0, we found a valid combination
-     * 2. Base case: If index out of bounds or target negative, terminate
-     * 3. Two choices at each step:
-     *    a. PICK current number (move to next index, each number used at most once)
-     *    b. SKIP current number AND all its duplicates to avoid duplicate combinations
-     * 4. Backtrack after exploring each branch
-     *
-     * Key Insight: Sorting brings duplicates together. When skipping, skip all duplicate values
-     * to ensure we don't generate duplicate combinations.
-     *
-     * Time Complexity: O(2^N) - exponential due to exploring all combinations
-     * Space Complexity: O(N) - recursion stack depth
-     *
-     * @param candidates Sorted array of candidate numbers
-     * @param currentIndex Current position in candidates array
-     * @param remainingTarget Remaining sum needed to reach target
-     * @param currentCombination Current combination being built
-     * @param result List storing all valid unique combinations
-     */
-    private static void backtrack(int[] candidates, int currentIndex, int remainingTarget,
-        List<Integer> currentCombination, List<List<Integer>> result) {
-        // Base case: found valid combination
-        if (remainingTarget == 0) {
-            result.add(new ArrayList<>(currentCombination));
+    // Explores all combinations using backtracking with duplicate skipping
+    private void backtrack(int[] candidates, int target, int index, 
+                          List<Integer> curr, List<List<Integer>> result) {
+        if (target == 0) {
+            result.add(new ArrayList<>(curr));
             return;
         }
-
-        // Base case: bounds check and early termination
-        if (currentIndex >= candidates.length || remainingTarget < 0) return;
-
-        // Choice 1: Pick current number (use once, move to next index)
-        currentCombination.add(candidates[currentIndex]);
-        backtrack(candidates, currentIndex + 1, remainingTarget - candidates[currentIndex], currentCombination, result);
-        currentCombination.remove(currentCombination.size() - 1); // Backtrack
-
-        // Choice 2: Skip current number and all its duplicates, because this number would already be considered in the pick branch
-        int nextUniqueIndex = currentIndex + 1;
-        while (nextUniqueIndex < candidates.length && candidates[nextUniqueIndex] == candidates[currentIndex]) {
-            nextUniqueIndex++;
+        if (target < 0 || index >= candidates.length) return;
+        
+        for (int i = index; i < candidates.length; i++) {
+            // Early termination: sorted array, all subsequent values will be too large
+            if (candidates[i] > target) break;
+            
+            // Skip duplicates at same recursion level to avoid duplicate combinations
+            if (i > index && candidates[i] == candidates[i - 1]) continue;
+            
+            curr.add(candidates[i]);
+            backtrack(candidates, target - candidates[i], i + 1, curr, result);
+            curr.remove(curr.size() - 1);
         }
-
-        backtrack(candidates, nextUniqueIndex, remainingTarget, currentCombination, result);
     }
 }
