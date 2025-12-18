@@ -206,6 +206,21 @@ public class TheSkylineProblem {
             this.height = height;
             this.isStart = isStart;
         }
+
+        @Override
+        public int compareTo(Event other) {
+            if (this.x != other.x) {
+                return Integer.compare(this.x, other.x);
+            }
+            // If at same x-coordinate, process starts before ends
+            if (this.isStart != other.isStart) {
+                return this.isStart ? -1 : 1;
+            }
+            // For starts, taller buildings first; for ends, shorter buildings first
+            return this.isStart ? 
+                Integer.compare(other.height, this.height) : 
+                Integer.compare(this.height, other.height);
+        }
     }
 
     /**

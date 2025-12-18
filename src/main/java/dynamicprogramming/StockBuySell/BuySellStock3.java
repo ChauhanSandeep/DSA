@@ -42,13 +42,88 @@ public class BuySellStock3 {
   }
 
   /**
+   * Main method: Left-Right DP approach (Most intuitive for interviews).
+   * Step-by-step:
+   *  1. Split problem: max profit = best of (first transaction in [0,i] + second in [i+1,n-1])
+   *  2. First pass (left to right):
+   *     - leftProfit[i] = max profit achievable using prices[0..i] with one transaction
+   *     - Track minimum price seen so far for optimal buying point
+   *  3. Second pass (right to left):
+   *     - rightProfit[i] = max profit achievable using prices[i..n-1] with one transaction
+   *     - Track maximum price seen so far for optimal selling point
+   *  4. Third pass: combine results
+   *     - For each split point i: profit = leftProfit[i] + rightProfit[i+1]
+   *     - Return maximum across all split points
+   *
+   * Key Insight:
+   * Two transactions don't overlap, so we can split the timeline and compute
+   * best single transaction for left and right parts independently. The split
+   * point represents the gap between two transactions.
+   *
+   * Algorithm: Two-pass Dynamic Programming with arrays.
+   * Time Complexity: O(n), three linear passes through array.
+   * Space Complexity: O(n) for leftProfit and rightProfit arrays.
+   */
+  public int maxProfit(int[] prices) {
+      if (prices == null || prices.length < 2) {
+          return 0;
+      }
+
+      int length = prices.length;
+      int[] leftProfit = new int[length];
+      int[] rightProfit = new int[length];
+      
+      // Left pass: compute max profit for first transaction ending at or before i
+      int minPrice = prices[0];
+      leftProfit[0] = 0;
+      
+      for (int i = 1; i < length; i++) {
+          leftProfit[i] = Math.max(leftProfit[i - 1], prices[i] - minPrice);
+          minPrice = Math.min(minPrice, prices[i]);
+      }
+
+      // Right pass: compute max profit for second transaction starting at or after i
+      int maxPrice = prices[length - 1];
+      rightProfit[length - 1] = 0;
+      
+      for (int i = length - 2; i >= 0; i--) {
+          rightProfit[i] = Math.max(rightProfit[i + 1], maxPrice - prices[i]);
+          maxPrice = Math.max(maxPrice, prices[i]);
+      }
+
+      // Combine: find best split point between two transactions
+      int maxProfit = 0;
+      for (int i = 0; i < length; i++) {
+          int right = (i + 1 < length) ? rightProfit[i + 1] : 0;
+          maxProfit = Math.max(maxProfit, leftProfit[i] + right);
+      }
+      
+      return maxProfit;
+  }
+
+  /**
    * Finds maximum profit using state machine dynamic programming approach
    *
+   * Key Insight:
+   * Think of it as a state machine with 4 states. Each state transition represents
+   * a trading action. We track maximum profit achievable at each state as we
+   * process prices. The transitions naturally handle "at most 2" constraint.
+   *
+   * 
    * Algorithm: State Machine Dynamic Programming
    * Steps:
-   * 1. Track 4 states: first buy, first sell, second buy, second sell
-   * 2. For each day, update all states based on optimal decisions
-   * 3. Each state represents maximum profit achievable in that state
+   * *  1. Track 4 states representing profit at each stage:
+   *     - profitAfterFirstBuy: max profit after first buy (negative, spent money)
+   *     - profitAfterFirstSell: max profit after first sell
+   *     - profitAfterSecondBuy: max profit after second buy
+   *     - profitAfterSecondSell: max profit after second sell (final answer)
+   *  2. For each price, update states in order:
+   *     a. profitAfterFirstBuy =  either keep previous profitAfterFirstBuy or buy today
+   *     b. profitAfterFirstSell = either keep previous profitAfterFirstSell or sell today
+   *     c. profitAfterSecondBuy = either keep previous profitAfterSecondBuy or buy again
+   *     d. profitAfterSecondSell = either keep previous profitAfterSecondSell or sell again
+   *  3. Return profitAfterSecondSell (maximum profit after at most 2 transactions)
+   *
    *
    * Time Complexity: O(n)
    * Space Complexity: O(1) - only using constant extra space

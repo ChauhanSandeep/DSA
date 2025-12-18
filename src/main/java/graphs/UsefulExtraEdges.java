@@ -90,12 +90,16 @@ public class UsefulExtraEdges {
 
         // Step 4: Try using each extra edge
         for (List<Integer> edge : extraEdges) {
-            int node1 = edge.get(0), node2 = edge.get(1), weight = edge.get(2);
+            int node1 = edge.get(0);
+            int node2 = edge.get(1);
+            int weight = edge.get(2);
 
+            // Distance from source to node1 + weight + from node2 to destination
             if (distFromSource[node1] != Integer.MAX_VALUE && distToDestination[node2] != Integer.MAX_VALUE) {
                 shortestPath = Math.min(shortestPath, distFromSource[node1] + weight + distToDestination[node2]);
             }
 
+            // Distance from source to node2 + weight + from node1 to destination
             if (distFromSource[node2] != Integer.MAX_VALUE && distToDestination[node1] != Integer.MAX_VALUE) {
                 shortestPath = Math.min(shortestPath, distFromSource[node2] + weight + distToDestination[node1]);
             }
@@ -141,7 +145,8 @@ public class UsefulExtraEdges {
      * Helper class to represent edges in adjacency list.
      */
     static class Edge {
-        int target, weight;
+        int target;
+        int weight;
 
         Edge(int target, int weight) {
             this.target = target;

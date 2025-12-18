@@ -16,8 +16,7 @@ import java.util.Set;
  * Output: [1, 2, 4, 5, 8]
  * Explanation: The sequence starts from 1, then multiplies by prime factors to generate next smallest numbers.
  *
- * Related LeetCode Problem:
- * - Super Ugly Number: https://leetcode.com/problems/super-ugly-number/
+ * Interviewbit: https://www.interviewbit.com/problems/smallest-sequence-with-given-primes/
  *
  * Follow-up Questions (FAANG-style):
  * 1. How would you generalize this for N primes instead of 3?
