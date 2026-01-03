@@ -67,22 +67,22 @@ public class BestTimeToBuyAndSellStockIV {
    * Time Complexity: O(N * K) with memoization.
    * Space Complexity: O(N * K) for memo table plus O(N) recursion stack.
    *
-   * @param k maximum number of transactions allowed
+   * @param maxTransactions maximum number of transactions allowed
    * @param prices array of stock prices per day
    * @return maximum profit achievable
    */
-  public int maxProfitMemo(int k, int[] prices) {
+  public int maxProfitMemo(int maxTransactions, int[] prices) {
     int length = prices.length;
-    if (length <= 1 || k == 0) {
+    if (length <= 1 || maxTransactions == 0) {
       return 0;
     }
 
-    if (k >= length / 2) {
-      return maxProfitUnlimitedTransactions(prices);
+    if (maxTransactions >= length / 2) {
+      return maxProfitUnlimited(prices);
     }
 
-    Integer[][][] memo = new Integer[length][k + 1][2]; // memo[day][transactionsLeft][isHolding] = profit
-    return dfs(prices, 0, k, 0, memo);
+    Integer[][][] memo = new Integer[length][maxTransactions + 1][2]; // memo[day][transactionsLeft][isHolding] = profit
+    return dfs(prices, 0, maxTransactions, 0, memo);
   }
 
   // Helper method for recursive DFS with memoization
@@ -113,61 +113,70 @@ public class BestTimeToBuyAndSellStockIV {
   }
 
   /**
-   * Finds maximum profit with at most k transactions using optimized dynamic programming.
+   * State Machine approach: Track buy and sell states for each transaction.
+   * Step-by-step:
+   *  1. Create arrays to track states:
+   *     - buy[i] = max profit after buying for ith transaction
+   *     - sell[i] = max profit after selling for ith transaction
+   *  2. Initialize buy states to -prices[0] (cost of first buy)
+   *  3. For each price:
+   *     - Update buy[i]: either keep previous state or buy using sell[i-1] profit
+   *     - Update sell[i]: either keep previous state or sell using buy[i]
+   *  4. Process transactions in order (1 to k) for each price
+   *  5. Return sell[k] (profit after k complete transactions)
    *
-   * Algorithm Steps:
-   * 1. Handle edge cases and check if k >= n/2 for unlimited transactions optimization
-   * 2. Use 2D DP where dp[i][j] = max profit with at most i transactions by day j
-   * 3. For each transaction limit and day, consider:
-   *    - Don't trade today (carry forward previous profit)
-   *    - Sell today (use best previous buying opportunity)
-   * 4. Track maxProfitAfterBuying to optimize inner loop calculations
+   * State Transitions:
+   *   Initial → buy[1] → sell[1] → buy[2] → sell[2] → ... → buy[k] → sell[k]
    *
-   * Time Complexity: O(k * n) where k = max transactions, n = number of days
-   * Space Complexity: O(k * n) for the DP table
+   * Key Insight:
+   * Each transaction has two states: bought and sold. We track maximum profit
+   * at each state. buy[i] uses profit from sell[i-1], ensuring transactions
+   * are sequential and non-overlapping.
    *
-   * @param maxTransactions maximum number of transactions allowed
-   * @param stockPrices array of daily stock prices
-   * @return maximum profit achievable with at most k transactions
+   * Time Complexity: O(n*k), iterate through n prices with k transactions.
+   * Space Complexity: O(k), two arrays of size k.
    */
-  public int maxProfit(int maxTransactions, int[] stockPrices) {
-    int numberOfDays = stockPrices.length;
-
-    if (numberOfDays <= 1 || maxTransactions <= 0) {
-      return 0;
-    }
-
-    // Optimization: if k >= n/2, we can make unlimited transactions
-    if (maxTransactions >= numberOfDays / 2) {
-      return maxProfitUnlimitedTransactions(stockPrices);
-    }
-
-    // dp[i][j] = max profit with at most i transactions by day j
-    int[][] dp = new int[maxTransactions + 1][numberOfDays];
-
-    for (int transactionCount = 1; transactionCount <= maxTransactions; transactionCount++) {
-      // Track maximum profit after buying (profit from previous transactions minus buy price)
-      int maxProfitAfterBuying = -stockPrices[0];
-
-      for (int day = 1; day < numberOfDays; day++) {
-        int currentPrice = stockPrices[day];
-
-        // Option 1: Don't trade today, keep previous day's profit
-        // Option 2: Sell today using best previous buying opportunity
-        dp[transactionCount][day] = Math.max(
-            dp[transactionCount][day - 1],           // Don't sell today
-            currentPrice + maxProfitAfterBuying      // Sell today
-        );
-
-        // Update best buying opportunity for next iteration
-        maxProfitAfterBuying = Math.max(
-            maxProfitAfterBuying,                                        // Keep previous buy
-            dp[transactionCount - 1][day - 1] - currentPrice           // Buy today
-        );
+  public int maxProfit(int maxTransactions, int[] prices) {
+      if (prices == null || prices.length < 2 || maxTransactions == 0) {
+          return 0;
       }
-    }
 
-    return dp[maxTransactions][numberOfDays - 1];
+      int length = prices.length;
+      
+      // Optimization: if k >= length/2, becomes unlimited transactions
+      if (maxTransactions >= length / 2) {
+          return maxProfitUnlimited(prices);
+      }
+
+      // State arrays
+      int[] buy = new int[maxTransactions + 1];   // buy[i] = max profit after buying for ith transaction
+      int[] sell = new int[maxTransactions + 1];  // sell[i] = max profit after selling for ith transaction
+      
+      // Initialize: buying requires spending money
+      for (int i = 1; i <= maxTransactions; i++) {
+          buy[i] = -prices[0];  // Cost of buying on day 0
+          sell[i] = 0;          // Can't sell without buying
+      }
+
+      // Process each price (day)
+      for (int day = 1; day < length; day++) {          
+          // Update states for each transaction (process in order)
+          for (int transactionCount = 1; transactionCount <= maxTransactions; transactionCount++) {
+              // Buy state: either keep previous buy or buy today using previous sell profit
+              buy[transactionCount] = Math.max(
+                buy[transactionCount], 
+                sell[transactionCount - 1] - prices[day]
+              );
+              
+              // Sell state: either keep previous sell or sell today using current buy
+              sell[transactionCount] = Math.max(
+                sell[transactionCount], 
+                buy[transactionCount] + prices[day]
+              );
+          }
+      }
+
+      return sell[maxTransactions];
   }
 
   /**
@@ -184,7 +193,7 @@ public class BestTimeToBuyAndSellStockIV {
    * @param stockPrices array of daily stock prices
    * @return maximum profit with unlimited transactions
    */
-  private int maxProfitUnlimitedTransactions(int[] stockPrices) {
+  private int maxProfitUnlimited(int[] stockPrices) {
     int totalMaxProfit = 0;
 
     for (int day = 1; day < stockPrices.length; day++) {

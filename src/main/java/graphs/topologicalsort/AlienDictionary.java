@@ -6,7 +6,6 @@ import java.util.*;
  * Problem: Alien Dictionary
  * LeetCode: https://leetcode.com/problems/alien-dictionary/
  *
- * Statement:
  * You are given a list of words sorted lexicographically in an alien language.
  * Derive the order of characters in this language.
  * If the dictionary order is invalid, return an empty string.

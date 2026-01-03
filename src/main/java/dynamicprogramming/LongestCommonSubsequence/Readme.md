@@ -1,16 +1,29 @@
-**Parent Problem: Longest Common Subsequence (LCS)**
+## Parent Problem: Longest Common Subsequence (LCS)
 
-*   **Problem Name:** Longest Common Subsequence (LCS)
-
-*   **Problem Statement:** Given two sequences (strings or arrays), find the length of the longest subsequence that is common to both sequences. A subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
-* **Intuition : ** 
+**Problem Statement:** Given two sequences (strings or arrays), find the length of the longest subsequence that is common to both sequences. A subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
+* Intuition :
     1.  If the last characters of both sequences match, then the length of the LCS is 1 plus the length of the LCS of the remaining sequences.
     2.  If the last characters do not match, then the length of the LCS is the maximum of the lengths of the LCS obtained by either excluding the last character of one sequence or excluding the last character of the other sequence. 
 
-*   **Memoized Recursive Code (Java):**
+### **Memoized Recursive Code (Java):**
 
 ```java
 public class LCSRelatedProblems {
+
+    public static int longestCommonSubsequence(String text1, String text2) {
+        int length1 = text1.length();
+        int length2 = text2.length();
+        int[][] dp = new int[length1 + 1][length2 + 1];
+
+        // Initialize the dp array with -1 to indicate uncomputed states
+        for (int i = 0; i <= length1; i++) {
+            for (int j = 0; j <= length2; j++) {
+                dp[i][j] = -1;
+            }
+        }
+
+        return longestCommonSubsequenceMemoized(text1, text2, 0, 0, dp);
+    }
 
     public static int longestCommonSubsequenceMemoized(String text1, String text2, int index1, int index2, int[][] dp) {
         // Base cases:
@@ -40,7 +53,7 @@ public class LCSRelatedProblems {
         return dp[index1][index2];
     }
 ```
-*   **Tabulation Code (Java):**
+### **Tabulation Code (Java):**
 
 ```java
     public static int longestCommonSubsequenceTabulation(String text1, String text2, int length1, int length2) {
@@ -69,15 +82,15 @@ public class LCSRelatedProblems {
 }
 ```
 
-*   **Time and Space Complexity:**
-    *   **Memoized Recursive:**
-        *   Time Complexity: O(length1 * length2) - Due to memoization.
-        *   Space Complexity: O(length1 * length2) + O(length1 + length2) - For the `dp` table and the recursion call stack.
-    *   **Tabulation:**
-        *   Time Complexity: O(length1 * length2)
-        *   Space Complexity: O(length1 * length2)
+#### **Time and Space Complexity:**
+**Memoized Recursive:**
+- Time Complexity: O(length1 * length2) - Due to memoization.
+- Space Complexity: O(length1 * length2) + O(length1 + length2) - For the `dp` table and the recursion call stack.
+**Tabulation:**
+- Time Complexity: O(length1 * length2)
+- Space Complexity: O(length1 * length2)
 
-**Child Problems (in a sensible study order):**
+### **Child Problems (in a sensible study order):**
 
 1.  **Longest Common Substring**
 
@@ -88,6 +101,8 @@ public class LCSRelatedProblems {
     *   **High-Level Approach:**  Use a DP table `dp[i][j]` to store the length of the longest common *suffix* of `text1[0...i-1]` and `text2[0...j-1]`. The core difference from LCS is that if the characters at `i-1` and `j-1` *don't* match, `dp[i][j]` is reset to 0. We keep track of the maximum value in the DP table, which represents the length of the longest common substring.
 
     *   **Connection to Parent Problem (LCS):**  While both involve finding common sequences, the key difference lies in *contiguity*. LCS allows gaps (subsequence), while Longest Common Substring requires the common sequence to be a consecutive sequence of characters. The DP solution for Longest Common Substring is a modified version of the LCS approach where non-matching characters reset the length of the common suffix, ensuring contiguity.
+
+    *  **Dynamic Programming Pattern:** dp[i][j] = (text1[i-1] == text2[j-1]) ? 1 + dp[i-1][j-1] : 0 
 
 2.  **Shortest Common Supersequence**
 

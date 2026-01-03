@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.toList;
  * Problem: Minimum Cost to Connect All Islands
  *
  * Statement:
- * There are `vertices` islands and M possible bridges between them.
+ * There are N islands and M possible bridges between them.
  * Each bridge has a cost. We need to find the minimum total cost to
  * connect all islands so that they form a single connected component.
  * It is guaranteed that at least one spanning structure exists.

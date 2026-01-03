@@ -35,7 +35,7 @@ public class LongestCommonSubstring {
         int len2 = str2.length();
         int[][] dp = new int[len1 + 1][len2 + 1]; // DP table to store substring lengths
 
-        int maxLength = 0; // Stores length of the longest common substring
+    int maxLength = 0; // Stores length of the longest common substring
         int endIndex = 0;  // Stores the ending index of longest common substring in str1
 
         // Build the DP table

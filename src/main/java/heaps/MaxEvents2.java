@@ -5,14 +5,14 @@ import java.util.Arrays;
 
 /**
  * -------------------------------------------------------------
- * 💡 Problem: Maximum Number of Events That Can Be Attended II
+ * Problem: Maximum Number of Events That Can Be Attended II
  * -------------------------------------------------------------
  * You are given an array `events`, where each event is represented as [startDay, endDay, value].
  * You can attend at most `k` events, and attending an event requires you to be available for all the days
  * from its start to end. Your task is to select events (up to k) such that the total value is maximized,
  * and no two attended events overlap.
  *
- * 🔹 Example:
+ * Example:
  * Input: events = [
  *  [1,2,4],
  *  [3,4,3],
@@ -21,10 +21,10 @@ import java.util.Arrays;
  * Output: 7
  * Explanation: Attend event [1,2,4] and [3,4,3] for a total value of 7.
  *
- * 🔗 Leetcode Link: https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/
+ * Leetcode Link: https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/
  *
  * -------------------------------------------------------------
- * 🔄 Follow-up Questions:
+ * Follow-up Questions:
  * -------------------------------------------------------------
  * 1. Can we do this in bottom-up DP (tabulation) instead of recursion + memoization?
  *    → Yes. It's more iterative, usually easier to debug, and better stack-wise.
@@ -60,9 +60,9 @@ public class MaxEvents2 {
    * Space Complexity: O(N * K) for the memoization table.
    */
   public int getMaxEventValue(int[][] events, int k) {
-      if (events == null || events.length == 0 || k == 0) {
-          return 0;
-      }
+    if (events == null || events.length == 0 || k == 0) {
+        return 0;
+    }
 
     // Sort events based on start day; for stability, if same start, sort by end.
     Arrays.sort(events, (a, b) -> (a[0] != b[0]) ? Integer.compare(a[0], b[0]) : Integer.compare(a[1], b[1]));

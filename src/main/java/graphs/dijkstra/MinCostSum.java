@@ -7,14 +7,18 @@ import java.util.*;
  *
  * Problem:
  * You're given a grid of size `rows x cols`, where each cell contains a direction: 'R', 'L', 'U', or 'D'.
- * You can move from a cell to an adjacent cell **only** if it's in the direction specified — otherwise, you must
+ * You can move from a cell to an adjacent cell only if it's in the direction specified — otherwise, you must
  * pay a cost of `1` to change the direction. Find the **minimum total cost** to go from the top-left (0,0) to
  * the bottom-right (rows-1, cols-1).
  *
  * Example:
  * Input:
  * rows = 3, cols = 3
- * matrix = ["RRR", "DDD", "UUU"]
+ * matrix = [
+ *              "RRR", 
+ *              "DDD", 
+ *              "UUU"
+ *          ]
  * Output: 2
  *
  * Explanation:
@@ -67,7 +71,9 @@ public class MinCostSum {
      */
     public int minCostPath(int rows, int cols, String[] matrix) {
         int[][] dist = new int[rows][cols];
-        for (int[] row : dist) Arrays.fill(row, Integer.MAX_VALUE);
+        for (int[] row : dist) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        } 
 
         // Min-heap based on accumulated cost
         PriorityQueue<Point> queue = new PriorityQueue<>(Comparator.comparingInt(p -> p.costSoFar));

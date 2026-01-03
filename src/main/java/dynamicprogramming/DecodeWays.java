@@ -65,11 +65,11 @@ public class DecodeWays {
 
         if (memo.containsKey(idx)) return memo.get(idx);
 
-        int ways = numDecodeRecHelper(idx + 1, str, memo); // One-digit
+        int ways = numDecodeRecHelper(idx + 1, str, memo); // One digit taken
         if (idx + 1 < length) {
             int num = Integer.parseInt(str.substring(idx, idx + 2));
             if (num >= 10 && num <= 26) {
-                ways += numDecodeRecHelper(idx + 2, str, memo); // Two-digit
+                ways += numDecodeRecHelper(idx + 2, str, memo); // Two digits taken
             }
         }
 

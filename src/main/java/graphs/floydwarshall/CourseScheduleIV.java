@@ -113,14 +113,14 @@ public class CourseScheduleIV {
       adjacencyList.get(pair[0]).add(pair[1]);
     }
 
-    boolean[][] reachable = new boolean[courseCount][courseCount];
+    boolean[][] dp = new boolean[courseCount][courseCount];
     for (int course = 0; course < courseCount; course++) {
-      dfs(course, course, adjacencyList, reachable);
+      dfs(course, course, adjacencyList, dp);
     }
 
     List<Boolean> result = new ArrayList<>();
     for (int[] query : queries) {
-      result.add(reachable[query[0]][query[1]]);
+      result.add(dp[query[0]][query[1]]);
     }
 
     return result;
@@ -129,11 +129,11 @@ public class CourseScheduleIV {
   /**
    * Helper DFS to compute reachability from a source course.
    */
-  private void dfs(int source, int current, List<List<Integer>> adjacencyList, boolean[][] reachable) {
-    for (int nextCourse : adjacencyList.get(current)) {
-      if (!reachable[source][nextCourse]) {
-        reachable[source][nextCourse] = true;
-        dfs(source, nextCourse, adjacencyList, reachable);
+  private void dfs(int startCourse, int currentCourse, List<List<Integer>> adjacencyList, boolean[][] dp) {
+    for (int nextCourse : adjacencyList.get(currentCourse)) {
+      if (!dp[startCourse][nextCourse]) {
+        dp[startCourse][nextCourse] = true;
+        dfs(startCourse, nextCourse, adjacencyList, dp);
       }
     }
   }
