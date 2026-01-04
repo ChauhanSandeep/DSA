@@ -81,9 +81,9 @@ public class MinimumDeletionsToMakeFrequenciesUnique {
     for (int currentFrequency : frequencies) {
       // If current frequency conflicts with previous, reduce it
       if (currentFrequency >= maxAllowedFreq) {
-        int newFrequency = Math.max(0, maxAllowedFreq - 1);
-        deletions += currentFrequency - newFrequency;
-        maxAllowedFreq = newFrequency;
+        int newMaxAllowedFreq = Math.max(0, maxAllowedFreq - 1);
+        deletions += currentFrequency - newMaxAllowedFreq;
+        maxAllowedFreq = newMaxAllowedFreq;
       } else {
         maxAllowedFreq = currentFrequency;
       }
@@ -103,7 +103,10 @@ public class MinimumDeletionsToMakeFrequenciesUnique {
    *    - Count each decrement as a deletion
    * 3. Mark frequency as used
    *
-   * Time Complexity: O(N + K * M) where M is maximum frequency.
+   * Time Complexity: O(N + K * M) where M is maximum frequency and K is number of unique characters.
+   * Because:
+   * - Counting frequencies: O(N)
+   * - For each of K unique characters, in worst case we may decrement M times.
    * Worst case: O(N + K^2) when all frequencies equal.
    *
    * Space Complexity: O(K) for frequency map and used set.

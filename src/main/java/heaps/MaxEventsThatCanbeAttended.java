@@ -20,7 +20,7 @@ import java.util.PriorityQueue;
  * Explanation: You can attend events 1, 2, 3, and 5 on days 1, 2, 3, and 4 respectively.
  *
  */
-public class MaxEvents {
+public class MaxEventsThatCanbeAttended {
     public static void main(String[] args) {
         int[][] events = {
                 {1, 4},
@@ -29,7 +29,7 @@ public class MaxEvents {
                 {3, 4},
                 {1, 1}
         };
-        System.out.println("Max events attended: " + new MaxEvents().maxEvents(events));
+        System.out.println("Max events attended: " + new MaxEventsThatCanbeAttended().maxEvents(events));
     }
 
     /**

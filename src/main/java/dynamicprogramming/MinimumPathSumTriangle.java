@@ -54,40 +54,33 @@ public class MinimumPathSumTriangle {
   }
 
   /**
-   * Finds minimum path sum using bottom-up DP with O(n) space optimization.
+   * Approach 1: Bottom-Up Dynamic Programming (In-Place Modification)
    *
-   * Algorithm:
-   * 1. Start from second-to-last row and work upward
-   * 2. For each position, add minimum of two adjacent positions below
-   * 3. Use single array that gets updated row by row
-   * 4. Final answer is at dp[0] after processing all rows
-   *
-   * Key insight: Each position's minimum path depends only on positions directly below it.
-   * We can reuse the same array since we process bottom-up and only need the previous row.
-   *
-   * Time Complexity: O(N^2) where N is the number of rows. We process each element
-   * once, and total elements = 1 + 2 + ... + N = N*(N+1)/2.
-   *
-   * Space Complexity: O(N) for the DP array storing one row at a time. Can be further
-   * optimized to O(1) by modifying input array in place.
-   *
+   * Steps:
+   * 1. Start from the second-to-last row and move upwards to the top.
+   * 2. For each element, add the minimum of the two adjacent elements from the row below.
+   * 3. By the time we reach the top, the top element contains the minimum path sum.
+   * 
+   * Time Complexity: O(N^2) where N is the number of rows. Each element is processed once.
+   * Space Complexity: O(1) additional space since we modify the triangle in place.
+   * 
    * @param triangle list of lists representing the triangle
    * @return minimum path sum from top to bottom
    */
   public static int minimumTotal(List<List<Integer>> triangle) {
-    int rows = triangle.size();
-    int[] dp = new int[rows + 1];
-
-    // Process from bottom to top
-    for (int row = rows - 1; row >= 0; row--) {
-      for (int col = 0; col <= row; col++) {
-        // Current position's min = its value + min of two positions below
-        dp[col] = Math.min(dp[col], dp[col + 1]) + triangle.get(row).get(col);
-      }
+        for (int row = triangle.size() - 2; row >= 0; row--) {
+            for (int col = 0; col <= row; col++) {
+                int bestBelow = Math.min(
+                    triangle.get(row + 1).get(col),
+                    triangle.get(row + 1).get(col + 1)
+                );
+                triangle
+                    .get(row)
+                    .set(col, bestBelow + triangle.get(row).get(col));
+            }
+        }
+        return triangle.get(0).get(0);
     }
-
-    return dp[0];
-  }
 
   /**
    * Approach 2: Recursive Top-Down with Memoization.

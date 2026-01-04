@@ -46,7 +46,7 @@ public class PushDominoes {
     /**
      * Simulates the final state of dominoes after being pushed using an efficient two-pointer approach.
      *
-     * 💡 **Approach:**
+     * Approach:
      * 1. Convert the string to a character array for in-place modification.
      * 2. Traverse the array using a single loop and track the most recent 'L' and 'R' positions.
      * 3. Handle 3 cases:
@@ -103,7 +103,7 @@ public class PushDominoes {
     /**
      * Simulates the final state of dominoes using a force-based approach.
      *
-     * 💡 Approach:
+     * Approach:
      * 1. Use an array to simulate the net force on each domino.
      *    - Force from 'R' is positive.
      *    - Force from 'L' is negative.

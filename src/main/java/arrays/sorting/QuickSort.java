@@ -68,14 +68,14 @@ public class QuickSort {
      * 4. Base case: when low >= high, subarray has 0 or 1 element (already sorted)
      *
      * @param array The array to sort
-     * @param low Starting index of the subarray to sort
-     * @param high Ending index of the subarray to sort
+     * @param left Starting index of the subarray to sort
+     * @param right Ending index of the subarray to sort
      */
-    public static void quickSort(int[] array, int low, int high) {
-        if (low < high) {
-            int partitionIndex = partition(array, low, high);
-            quickSort(array, low, partitionIndex - 1);
-            quickSort(array, partitionIndex + 1, high);
+    public static void quickSort(int[] array, int left, int right) {
+        if (left < right) {
+            int partitionIndex = partition(array, left, right);
+            quickSort(array, left, partitionIndex - 1);
+            quickSort(array, partitionIndex + 1, right);
         }
     }
 

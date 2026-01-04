@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
- * Problem: Course Schedule III (LeetCode #630)
+ * Problem: Course Schedule III (LeetCode 630)
  *
  * Problem Statement:
  * There are n different online courses numbered from 1 to n. You are given an array 'courses' where
@@ -90,7 +90,8 @@ public class CourseScheduleIII {
             currentTime += duration;
             durationsMaxHeap.offer(duration);
 
-            // If we've exceeded the deadline, remove the longest course
+            // If we've exceeded the deadline, remove the longest course to make room for the current one
+            // This means that we are replacing a longer course with a shorter one to meet the deadline
             if (currentTime > lastDay) {
                 currentTime -= durationsMaxHeap.poll();
             }

@@ -55,7 +55,9 @@ public class GuessingGame2 {
      * Algorithm:
      *  - Top-down DP (recursion + memoization), following a minimax strategy.
      *
-     * Time Complexity: O(n²) due to memoization.
+     * Time Complexity: O(n³) 
+     *  - memo table: (n+1) x (n+1) → O(n²)
+     *  - for each entry, we try up to n pivots → O(n)
      * Space Complexity: O(n²) for the memo table.
      *
      * @param start Starting point of the range.

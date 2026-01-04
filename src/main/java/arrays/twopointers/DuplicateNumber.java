@@ -32,6 +32,32 @@ public class DuplicateNumber {
   }
 
   /**
+   * Using mathematical formula to find duplicate
+   * 
+   * Algorithm:
+   * 1. Calculate the expected sum of numbers from 1 to n using the formula n*(n+1)/2
+   * 2. Calculate the actual sum of the elements in the array
+   * 3. The difference between the actual sum and expected sum gives the duplicate number
+   * 
+   * Note : This approach works only if there is exactly one duplicate and no missing numbers.
+   * Time Complexity: O(n)
+   * Space Complexity: O(1)
+   * @param nums
+   * @return
+   */
+  public int findDuplicateUsingSumFormula(int[] nums) {
+    int maxNum = nums.length - 1; // Since nums contains n + 1 elements
+    int expectedSum = maxNum * (maxNum + 1) / 2;
+    int actualSum = 0;
+
+    for (int num : nums) {
+      actualSum += num;
+    }
+
+    return actualSum - expectedSum;
+  }
+
+  /**
    * Alternative Solution (Negation - MODIFIES ARRAY)
    *
    * Negation Approach - VIOLATES the "do not modify array" constraint.

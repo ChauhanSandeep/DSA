@@ -48,7 +48,7 @@ import utils.TreeNode;
  * - Original parent becomes new right child
  *
  */
-public class SidewaysTree {
+public class BinaryTreeUpsideDown {
 
     /**
      * ✅ Recursively flips the binary tree upside down
@@ -61,27 +61,27 @@ public class SidewaysTree {
      * - Tree has only one node
      * - Tree violates assumption (has nodes with only right child): invalid input
      *
-     * @param root Root node of the binary tree
+     * @param node Root node of the binary tree
      * @return New root after the transformation
      */
-    public static TreeNode flipUpsideDown(TreeNode root) {
-        if (root == null || root.leftChild == null) {
-            return root; // Base case: empty tree or no left child
+    public static TreeNode flipUpsideDown(TreeNode node) {
+        if (node == null || node.leftChild == null) {
+            return node; // Base case: empty tree or no left child
         }
 
         // Recurse down to leftmost child
-        TreeNode newRoot = flipUpsideDown(root.leftChild);
+        TreeNode newRoot = flipUpsideDown(node.leftChild);
 
         // Rearrange current node and its children
-        TreeNode left = root.leftChild;
-        TreeNode right = root.rightChild;
+        TreeNode left = node.leftChild;
+        TreeNode right = node.rightChild;
 
         left.leftChild = right; // Right child becomes new left
-        left.rightChild = root; // Current root becomes right child
+        left.rightChild = node; // Current root becomes right child
 
         // Cut old links
-        root.leftChild = null;
-        root.rightChild = null;
+        node.leftChild = null;
+        node.rightChild = null;
 
         return newRoot;
     }

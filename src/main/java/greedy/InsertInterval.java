@@ -51,7 +51,7 @@ public class InsertInterval {
             i++;
         }
 
-        // Phase 2: Merge overlapping intervals - until end of new interval is greater than start of next interval
+        // Phase 2: Merge overlapping intervals - while end of newInterval overlaps with start of current interval
         while(i<length && newInterval[1] >= intervals[i][0]) {
             // start of merged interval is min of starts of overlapping intervals
             newInterval[0] = Math.min(newInterval[0], intervals[i][0]);

@@ -1,6 +1,6 @@
 package stacksandqueues.monotonicstack;
 
-import java.util.LinkedList;
+import java.util.*;
 
 
 /**
@@ -93,7 +93,7 @@ public class NiceSubarray {
    * @return Number of valid subarrays with exactly k odd numbers
    */
   public static int countNiceSubarraysPrefixSum(int[] nums, int k) {
-    java.util.Map<Integer, Integer> prefixCountMap = new java.util.HashMap<>();
+    Map<Integer, Integer> prefixCountMap = new HashMap<>();
     prefixCountMap.put(0, 1); // Prefix sum 0 has occurred once
 
     int oddCount = 0;

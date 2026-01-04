@@ -7,13 +7,13 @@ import java.util.Set;
 /**
  * Problem: Generate all unique permutations of a given string.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/permutations-ii/
+ * Leetcode: https://leetcode.com/problems/permutations-ii/
  *
- * 🔍 Example:
+ * Example:
  * Input: "ABC"
  * Output: ["ABC", "ACB", "BAC", "BCA", "CAB", "CBA"]
  *
- * 🧠 Intuition:
+ * Intuition:
  * - We can fix each character at one position and recursively permute the rest.
  * - For uniqueness, we use a Set to avoid duplicates.
  *
@@ -32,7 +32,7 @@ import java.util.Set;
  * 3. Can you sort permutations lexicographically without using a Set?
  *    - Yes. Sort the string initially and skip duplicates during backtracking.
  */
-public class PermutationGenerator {
+public class PermutationII {
 
   public static void main(String[] args) {
     String input = "ABC";

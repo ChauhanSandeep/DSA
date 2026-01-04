@@ -80,8 +80,8 @@ public class NextGreaterElementII {
         for (int i = 2 * size - 1; i >= 0; i--) {
             int adjustedIndex = i % size;
 
-            // Pop indices whose values are ≤ current element
-            while (!stack.isEmpty() && nums[stack.peek()] <= nums[adjustedIndex]) {
+            // Pop indices whose values are less than or equal to current element
+            while (!stack.isEmpty() &&  nums[stack.peek()] <= nums[adjustedIndex]) {
                 stack.pop();
             }
 
