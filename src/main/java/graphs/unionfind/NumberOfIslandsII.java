@@ -107,7 +107,7 @@ public class NumberOfIslandsII {
                     int neighborCellId = newRow * cols + newCol;
                     
                     // If neighbor is in different component, merge
-                    if (unionFind.find(cellId) != unionFind.find(neighborCellId)) {
+                    if (unionFind.findRoot(cellId) != unionFind.findRoot(neighborCellId)) {
                         unionFind.union(cellId, neighborCellId);
                         islandCount--;  // Merged two islands into one
                     }
@@ -138,17 +138,17 @@ public class NumberOfIslandsII {
         }
         
         // Find with path compression
-        public int find(int x) {
+        public int findRoot(int x) {
             if (parent[x] != x) {
-                parent[x] = find(parent[x]);  // Path compression
+                parent[x] = findRoot(parent[x]);  // Path compression
             }
             return parent[x];
         }
         
         // Union by rank
         public void union(int x, int y) {
-            int rootX = find(x);
-            int rootY = find(y);
+            int rootX = findRoot(x);
+            int rootY = findRoot(y);
             
             if (rootX == rootY) return;
             
@@ -160,118 +160,6 @@ public class NumberOfIslandsII {
             } else {
                 parent[rootY] = rootX;
                 rank[rootX]++;
-            }
-        }
-    }
-
-    /**
-     * Alternative method: Union-Find with HashMap (Space optimized for sparse grids).
-     * Step-by-step:
-     *  1. Use HashMap instead of arrays to track only occupied cells
-     *  2. More memory efficient when positions.length << m*n
-     *  3. Same union-find logic but with HashMap-based parent tracking
-     *
-     * Key Insight:
-     * When grid is very large but only few cells are land, HashMap saves space.
-     * Only store parent/rank for cells that are actually land. Trade-off: slightly
-     * slower due to HashMap overhead, but much better space complexity.
-     *
-     * Algorithm: Union-Find with HashMap.
-     * Time Complexity: O(k * α(k)), where k is positions length.
-     * Space Complexity: O(k), only store data for k land cells.
-     */
-    public List<Integer> numIslands2Optimized(int m, int n, int[][] positions) {
-        List<Integer> result = new ArrayList<>();
-        if (positions == null || positions.length == 0) {
-            return result;
-        }
-
-        UnionFindMap uf = new UnionFindMap();
-        int islandCount = 0;
-        
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        
-        for (int[] pos : positions) {
-            int row = pos[0];
-            int col = pos[1];
-            int cellId = row * n + col;
-            
-            // Skip if already land
-            if (uf.contains(cellId)) {
-                result.add(islandCount);
-                continue;
-            }
-            
-            // Add new land
-            uf.add(cellId);
-            islandCount++;
-            
-            // Check neighbors
-            for (int[] dir : directions) {
-                int newRow = row + dir[0];
-                int newCol = col + dir[1];
-                
-                if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n) {
-                    int neighborId = newRow * n + newCol;
-                    
-                    if (uf.contains(neighborId) && 
-                        uf.find(cellId) != uf.find(neighborId)) {
-                        uf.union(cellId, neighborId);
-                        islandCount--;
-                    }
-                }
-            }
-            
-            result.add(islandCount);
-        }
-        
-        return result;
-    }
-
-    /**
-     * HashMap-based Union-Find for sparse grids.
-     */
-    static class UnionFindMap {
-        private Map<Integer, Integer> parent;
-        private Map<Integer, Integer> rank;
-        
-        public UnionFindMap() {
-            parent = new HashMap<>();
-            rank = new HashMap<>();
-        }
-        
-        public boolean contains(int x) {
-            return parent.containsKey(x);
-        }
-        
-        public void add(int x) {
-            parent.put(x, x);
-            rank.put(x, 1);
-        }
-        
-        public int find(int x) {
-            if (parent.get(x) != x) {
-                parent.put(x, find(parent.get(x)));
-            }
-            return parent.get(x);
-        }
-        
-        public void union(int x, int y) {
-            int rootX = find(x);
-            int rootY = find(y);
-            
-            if (rootX == rootY) return;
-            
-            int rankX = rank.get(rootX);
-            int rankY = rank.get(rootY);
-            
-            if (rankX < rankY) {
-                parent.put(rootX, rootY);
-            } else if (rankX > rankY) {
-                parent.put(rootY, rootX);
-            } else {
-                parent.put(rootY, rootX);
-                rank.put(rootX, rankX + 1);
             }
         }
     }

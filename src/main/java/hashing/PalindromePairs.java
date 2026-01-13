@@ -38,9 +38,9 @@ public class PalindromePairs {
      *    - Palindromic suffix with a corresponding reversed prefix.
      *
      * Complexity:
-     * - Constructing the HashMap: O(N)
-     * - Checking each word for palindrome properties: O(N * M^2) (M = max length of words)
-     * - Overall: **O(N * M^2)**
+     * - Time complexity : O(n * k^2) where n is number of words and k is average length of words.
+     *      - because for each word we may check all prefixes and suffixes (k) and palindrome check (k).
+     * - Space complexity: O(n) for storing words in the HashMap.
      */
     public List<List<Integer>> findPalindromePairs(String[] words) {
         Map<String, Integer> wordIndexMap = new HashMap<>(); // mapping between word and its index

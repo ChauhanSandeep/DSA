@@ -56,28 +56,48 @@ public class SingleElementInASortedArray {
         while (left < right) {
             int mid = left + (right - left) / 2;
 
-            // Check if mid is the single element
-            if ((mid == 0 || nums[mid] != nums[mid - 1]) &&
-                (mid == nums.length - 1 || nums[mid] != nums[mid + 1])) {
+            // If mid itself is the single element, return it
+            if (isSingleElement(nums, mid)) {
                 return nums[mid];
             }
 
-            // Determine which side has the single element
-            int leftSize = mid;
-            if (mid > 0 && nums[mid] == nums[mid - 1]) { // Left side has a pair
-                leftSize = mid - 1; // Don't count the pair
+            /*
+            * Determine how many elements remain on the LEFT side
+            * after excluding the pair that mid belongs to.
+            *
+            * If nums[mid] == nums[mid - 1], then (mid - 1, mid) is a pair
+            * and the remaining left side ends at index (mid - 2).
+            *
+            * Otherwise, mid pairs with mid + 1 and the left side ends at (mid - 1).
+            */
+            boolean isMidMatchingLeft = false;
+
+            if (mid > 0 && nums[mid] == nums[mid - 1]) {
+                // Pair is on the left side, exclude both elements
+                isMidMatchingLeft = true;
             }
 
-            if (leftSize % 2 == 1) {
-                // Left side has odd number of elements, single element is on left
+            /*
+            * Key idea:
+            * - The side with an odd number of elements contains the single element
+            */
+            if (isMidMatchingLeft) {
+                // One element of left is paired with mid 
+                // remaining left side is odd -> single element is on the left
                 right = mid - 1;
             } else {
-                // Left side has even number of elements, single element is on right
+                // One element of mid is paired with right
+                // remaining right side is odd -> single element is on the right
                 left = mid + 1;
             }
         }
 
         return nums[left];
+    }
+
+    private boolean isSingleElement(int[] nums, int mid) {
+        return (mid == 0 || nums[mid] != nums[mid - 1]) &&
+            (mid == nums.length - 1 || nums[mid] != nums[mid + 1]);
     }
 
     /**

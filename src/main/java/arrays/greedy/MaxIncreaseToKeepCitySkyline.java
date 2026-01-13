@@ -1,8 +1,5 @@
 package arrays.greedy;
 
-import java.util.Arrays;
-
-
 /**
  * LeetCode Problem 807: Max Increase to Keep City Skyline
  *

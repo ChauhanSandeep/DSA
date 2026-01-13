@@ -1,108 +1,181 @@
 package dynamicprogramming;
 
-import java.util.Deque;
-import java.util.ArrayDeque;
+import java.util.*;
 
 
 /**
- * Problem: Find the length of the longest valid (well-formed) parentheses substring.
+ * LongestValidParentheses.java
  *
- * Approaches:
- * 1. **Stack-based O(N) Approach**
- *    - Push indices of unmatched '(' onto the stack.
- *    - If a matching ')' is found, pop '(' and compute the valid substring length.
+ * Problem Statement:
+ * Given a string containing just the characters '(' and ')', return the length of the longest 
+ * valid (well-formed) parentheses substring.
  *
- * 2. **O(N) Optimized Two-Pass Approach (No Stack)**
- *    - Use two counters: left & right parentheses count.
- *    - Scan left-to-right and right-to-left to track balanced sequences.
+ * Example:
+ * Input: s = "(()"
+ * Output: 2
+ * Explanation: The longest valid parentheses substring is "()".
  *
- * Time Complexity: **O(N)**
- * Space Complexity:
- * - **Stack Approach:** O(N) (worst case)
- * - **Two-Pass Approach:** O(1) (constant space)
+ * Input: s = ")()())"
+ * Output: 4
+ * Explanation: The longest valid parentheses substring is "()()".
+ *
+ * LeetCode link: https://leetcode.com/problems/longest-valid-parentheses/
+ *
+ * Follow-up Questions FAANG Interviews Might Ask:
+ *  - Can you solve it in one pass instead of two?
+ *    → Yes, use stack-based approach for single pass O(n) solution.
+ *  - What if you need to return the actual substring, not just length?
+ *    → Track start index when updating maxLength in any approach.
+ *  - Can you handle multiple types of brackets ([], {}, ())?
+ *    → Extend stack approach to validate matching pairs.
+ *  - What if string is extremely long (billions of characters)?
+ *    → Use streaming approach with constant space (two-pass counter method).
+ *
+ * Relevant Follow-up Problems:
+ *  - LeetCode 20 (Valid Parentheses): https://leetcode.com/problems/valid-parentheses/
+ *  - LeetCode 22 (Generate Parentheses): https://leetcode.com/problems/generate-parentheses/
+ *  - LeetCode 301 (Remove Invalid Parentheses): https://leetcode.com/problems/remove-invalid-parentheses/
  */
 public class LongestValidParentheses {
   public static void main(String[] args) {
     LongestValidParentheses lvp = new LongestValidParentheses();
-    System.out.println(lvp.longestValidParenthesesStack("(()"));        // Output: 2
-    System.out.println(lvp.longestValidParenthesesStack("(())"));       // Output: 4
+    System.out.println(lvp.longestValidParenthesesStack("(()"));          // Output: 2
+    System.out.println(lvp.longestValidParenthesesStack("(())"));         // Output: 4
     System.out.println(lvp.longestValidParenthesesStack("))()()(()()()"));// Output: 6
 
-    System.out.println(lvp.longestValidParenthesesOptimized("(()"));        // Output: 2
-    System.out.println(lvp.longestValidParenthesesOptimized("(())"));       // Output: 4
-    System.out.println(lvp.longestValidParenthesesOptimized("))()()(()()()"));// Output: 6
+    System.out.println(lvp.longestValidParentheses("(()"));           // Output: 2
+    System.out.println(lvp.longestValidParentheses("(())"));          // Output: 4
+    System.out.println(lvp.longestValidParentheses("))()()(()()()")); // Output: 6
   }
 
   /**
-   * Approach 1: O(N) using Stack
-   * - Use a stack to store indices of unmatched '('
-   * - When a matching ')' is found, pop '(' and compute max valid length
-   */
-  public int longestValidParenthesesStack(String str) {
-    int maxLength = 0;
-    Deque<Integer> stack = new ArrayDeque<>();
-    stack.push(-1); // Base case for valid length computation
-
-    for (int i = 0; i < str.length(); i++) {
-      char c = str.charAt(i);
-      if (c == '(') {
-        stack.push(i);
-      } else { // c == ')'
-        stack.pop();
-        if (stack.isEmpty()) {
-          stack.push(i); // Store last invalid index
-        } else {
-          maxLength = Math.max(maxLength, i - stack.peek());
-        }
-      }
-    }
-    return maxLength;
-  }
-
-  /**
-   * Approach 2: O(N) Optimized Two-Pass Traversal (No Stack)
-   * - Scan left to right, count '(' and ')' occurrences.
-   * - If '(' == ')', update max valid length.
-   * - If ')' > '(', reset count.
-   * - Repeat in reverse direction to handle edge cases.
-   */
-  public int longestValidParenthesesOptimized(String str) {
-    int maxLength = 0, left = 0, right = 0;
-
-    // Left to Right Scan
-    for (char c : str.toCharArray()) {
-        if (c == '(') {
-            left++;
-        } else {
-            right++;
+     * Main method: Two-pass counter approach (Optimal for space).
+     * Step-by-step:
+     *  1. First pass (left to right):
+     *     - Count open and closed parentheses
+     *     - When open == closed: valid substring, update maxLength
+     *     - When closed > open: reset counters (invalid, can't recover)
+     *  2. Second pass (right to left):
+     *     - Same logic but swap conditions
+     *     - When open == closed: valid substring, update maxLength
+     *     - When open > closed: reset counters
+     *  3. Return maxLength
+     *
+     * Why two passes?
+     * - Left-to-right catches cases like "()()"
+     * - Right-to-left catches cases like "(()"
+     * - Example: "(()" - left pass misses it, right pass finds "()"
+     *
+     * Key Insight:
+     * Left-to-right scan handles excess closing parentheses by resetting.
+     * Right-to-left scan handles excess opening parentheses by resetting.
+     * Together they cover all cases without needing extra space.
+     *
+     * Algorithm: Two-pass counter with reset.
+     * Time Complexity: O(n), two linear passes.
+     * Space Complexity: O(1), only counters used.
+     */
+    public int longestValidParentheses(String input) {
+        if (input == null || input.length() < 2) {
+            return 0;
         }
 
-      if (left == right) {
-        maxLength = Math.max(maxLength, 2 * right);
-      } else if (right > left) {
-        left = right = 0; // Reset when unbalanced
-      }
+        int maxLength = 0;
+        int open = 0;
+        int closed = 0;
+        
+        // Left to right pass
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '(') {
+                open++;
+            } else {
+                closed++;
+            }
+            
+            // Valid substring when balanced
+            if (open == closed) {
+                maxLength = Math.max(maxLength, 2 * open);
+            } else if (closed > open) {
+                // Too many closing brackets, reset
+                open = 0;
+                closed = 0;
+            }
+        }
+        
+        // Reset counters for right to left pass
+        open = 0;
+        closed = 0;
+        
+        // Right to left pass
+        for (int i = input.length() - 1; i >= 0; i--) {
+            if (input.charAt(i) == '(') {
+                open++;
+            } else {
+                closed++;
+            }
+            
+            // Valid substring when balanced
+            if (open == closed) {
+                maxLength = Math.max(maxLength, 2 * open);
+            } else if (open > closed) {
+                // Too many opening brackets, reset
+                open = 0;
+                closed = 0;
+            }
+        }
+        
+        return maxLength;
     }
 
-    left = right = 0;
-
-    // Right to Left Scan
-    // scanning in reverse to catch cases like "(()"
-    for (int i = str.length() - 1; i >= 0; i--) {
-      char c = str.charAt(i);
-        if (c == ')') {
-            right++;
-        } else {
-            left++;
+    /**
+     * Alternative method 1: Stack-based approach (Single pass, more intuitive).
+     * Step-by-step:
+     *  1. Use stack to track indices of unmatched parentheses
+     *  2. Initialize stack with -1 (base for length calculation)
+     *  3. For each character:
+     *     - If '(': push index to stack
+     *     - If ')': pop from stack
+     *       - If stack empty after pop: push current index (new base)
+     *       - If stack not empty: calculate length from top of stack
+     *  4. Return maxLength
+     *
+     * Key Insight:
+     * Stack maintains indices of unmatched parentheses. When we find a match,
+     * the distance from current index to top of stack gives valid length.
+     * Stack top always points to last unmatched index or base.
+     *
+     * Algorithm: Stack-based index tracking.
+     * Time Complexity: O(n), single pass.
+     * Space Complexity: O(n) for stack in worst case.
+     */
+    public int longestValidParenthesesStack(String input) {
+        if (input == null || input.length() < 2) {
+            return 0;
         }
 
-      if (left == right) {
-        maxLength = Math.max(maxLength, 2 * left);
-      } else if (left > right) {
-        left = right = 0; // Reset when unbalanced
-      }
+        Stack<Integer> stack = new Stack<>();
+        stack.push(-1);  // Base for length calculation
+        int maxLength = 0;
+        
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '(') {
+                // Push index of opening bracket
+                stack.push(i);
+            } else {
+                // Pop for closing bracket
+                stack.pop();
+                
+                if (stack.isEmpty()) {
+                    // No matching opening bracket, push current as new base
+                    stack.push(i);
+                } else {
+                    // Calculate length from last unmatched position
+                    int length = i - stack.peek();
+                    maxLength = Math.max(maxLength, length);
+                }
+            }
+        }
+        
+        return maxLength;
     }
-
-    return maxLength;
-  }
 }

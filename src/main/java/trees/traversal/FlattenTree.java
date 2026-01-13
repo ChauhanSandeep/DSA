@@ -5,6 +5,8 @@ import trees.Node;
 /**
  * This class converts a binary tree to a flattened linked list in-place.
  * The flattened list should follow the preorder traversal order of the binary tree.
+ * 
+ * Leetcode link : https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
  *
  * Intuition:
  * - We recursively flatten the left subtree and then attach it to the right side of the current node.

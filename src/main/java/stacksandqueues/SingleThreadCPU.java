@@ -51,7 +51,7 @@ public class SingleThreadCPU {
      */
     public int[] getOrder(int[][] tasks) {
         int taskCount = tasks.length;
-        int[] executionOrder = new int[taskCount];
+        int[] result = new int[taskCount];
 
         // Step 1: Wrap input tasks into Task objects with index info
         Task[] allTasks = new Task[taskCount];
@@ -88,10 +88,10 @@ public class SingleThreadCPU {
             // Step 6: Process the task from the heap
             Task nextTask = availableTasks.poll();
             currentTime += nextTask.processingTime;
-            executionOrder[resultIndex++] = nextTask.index;
+            result[resultIndex++] = nextTask.index;
         }
 
-        return executionOrder;
+        return result;
     }
 
     /**

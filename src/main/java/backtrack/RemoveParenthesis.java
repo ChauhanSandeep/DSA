@@ -13,14 +13,6 @@ import java.util.*;
  *
  * Input: s = "()())()"
  * Output: ["(())()","()()()"]
- *
- * Approach:
- * - We use **BFS (Breadth-First Search)** to explore all possible valid expressions.
- * - At each step, we remove **one** parenthesis and check if the result is valid.
- * - The first valid expression found will be of **minimum edits** (shortest distance).
- *
- * Time Complexity: **O(2^N)** → Worst case, we generate all subsets of parentheses.
- * Space Complexity: **O(2^N)** → Storing results & visited states.
  */
 public class RemoveParenthesis {
 
@@ -33,11 +25,16 @@ public class RemoveParenthesis {
     /**
      * Finds all valid expressions by removing the fewest invalid parentheses.
      * Steps:
-     * 1. Use BFS to explore all possible states by removing one parenthesis at a time.
-     * 2. Use a queue to manage the current level of expressions.
-     * 3. Use a set to avoid processing duplicate expressions.
-     * 4. Stop as soon as a valid expression is found at the current level.
-     *
+     * 1. Use BFS to explore all possible strings by removing one parenthesis at a time.
+     * 2. Check if the current string is valid (balanced parentheses).
+     * 3. If valid, add to results and mark that we found a valid expression
+     * 4. If valid expression found at current level, do not explore further levels.
+     * 5. Use a set to avoid processing the same string multiple times.
+     * 
+     * Time complexity: O(2^N) in the worst case.
+     *      Because for each character, we have two choices: include it or exclude it.
+     * Space complexity: O(2^N) for storing results and visited states.
+     * 
      * @param str The input string containing parentheses.
      * @return A list of all possible valid expressions.
      */

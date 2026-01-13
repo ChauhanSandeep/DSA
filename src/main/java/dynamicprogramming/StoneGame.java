@@ -26,18 +26,18 @@ public class StoneGame {
      * - Uses a depth-first search (DFS) approach to explore all possible moves.
      * - Memoization is used to store results of subproblems to avoid redundant calculations.
      *
-     * Time Complexity: O(N²),
+     * Time Complexity: O(N²), because for each pair (start, end), we compute the result once.
      * Space Complexity: O(N²) for memoization table
      *
      * @param piles Array of stone piles
      * @return true if Alex can win, false otherwise
      */
     public boolean stoneGameRecursive(int[] piles) {
-        int n = piles.length;
-        Integer[][] memo = new Integer[n][n];
+        int length = piles.length;
+        Integer[][] memo = new Integer[length][length];
 
         // Alex wins if he can get strictly more than opponent
-        return dfs(0, n - 1, piles, memo) > 0;
+        return maxDiffRec(0, length - 1, piles, memo) > 0;
     }
 
     /**
@@ -47,16 +47,16 @@ public class StoneGame {
      * @param memo Memoization table
      * @return Maximum score difference the current player can guarantee
      */
-    private int dfs(int start, int end, int[] piles, Integer[][] memo) {
+    private int maxDiffRec(int start, int end, int[] piles, Integer[][] memo) {
         if (start == end) return piles[start]; // Only one pile to take
 
         if (memo[start][end] != null) return memo[start][end];
 
         // Pick start: take piles[start], opponent plays optimally on [start+1, end]
-        int pickLeft = piles[start] - dfs(start + 1, end, piles, memo);
+        int pickLeft = piles[start] - maxDiffRec(start + 1, end, piles, memo);
 
         // Pick end: take piles[end], opponent plays optimally on [start, end-1]
-        int pickRight = piles[end] - dfs(start, end - 1, piles, memo);
+        int pickRight = piles[end] - maxDiffRec(start, end - 1, piles, memo);
 
         memo[start][end] = Math.max(pickLeft, pickRight);
         return memo[start][end];

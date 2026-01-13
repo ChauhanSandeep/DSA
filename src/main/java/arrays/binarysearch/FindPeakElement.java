@@ -27,8 +27,6 @@ package arrays.binarysearch;
  * 3. What about finding peaks in a 2D matrix?
  *    Answer: Use divide and conquer, find peak in middle column, then recurse on side with larger neighbor.
  *    Related: https://leetcode.com/problems/find-a-peak-element-ii/
- *
- * @author Sandeep
  */
 public class FindPeakElement {
 

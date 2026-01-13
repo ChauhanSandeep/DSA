@@ -1,8 +1,5 @@
 package dynamicprogramming;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Distinct Subsequences
  *
@@ -69,15 +66,22 @@ public class DistinctSubsequence {
             return 1;
         }
 
-        Map<String, Integer> memoizationCache = new HashMap<>(); // <sourceIndex,targetIndex, waysCount>
-        return findDistinctSubsequencesRecursive(sourceString, targetString, 0, 0, memoizationCache);
+        // Initialize memoization table with -1 (uncomputed state)
+        int[][] dp = new int[sourceString.length()][targetString.length()];
+        for (int i = 0; i < sourceString.length(); i++) {
+            for (int j = 0; j < targetString.length(); j++) {
+                dp[i][j] = -1;
+            }
+        }
+        
+        return recHelper(sourceString, targetString, 0, 0, dp);
     }
 
     /**
      * Recursive helper method to count distinct subsequences with memoization
      */
-    private int findDistinctSubsequencesRecursive(String sourceString, String targetString, int sourceIndex, int targetIndex,
-        Map<String, Integer> memoizationCache) {
+    private int recHelper(String sourceString, String targetString, int sourceIndex, int targetIndex,
+        int[][] dp) {
         // Base case: target string fully matched
         if (targetIndex == targetString.length()) {
             return 1;
@@ -88,30 +92,25 @@ public class DistinctSubsequence {
             return 0;
         }
 
-        // Create unique key for memoization
-        String memoizationKey = sourceIndex + "," + targetIndex;
-        if (memoizationCache.containsKey(memoizationKey)) {
-            return memoizationCache.get(memoizationKey);
+        // Check if result already computed
+        if (dp[sourceIndex][targetIndex] != -1) {
+            return dp[sourceIndex][targetIndex];
         }
 
-        int totalWaysCount = 0;
+        int count = 0;
 
         // If current characters match, we have choice to use this match or skip it
         if (sourceString.charAt(sourceIndex) == targetString.charAt(targetIndex)) {
             // Option 1: Use this character match and advance both pointers
-            totalWaysCount += findDistinctSubsequencesRecursive(sourceString, targetString,
-                sourceIndex + 1, targetIndex + 1,
-                memoizationCache);
+            count += recHelper(sourceString, targetString, sourceIndex + 1, targetIndex + 1, dp);
         }
 
         // Option 2: Skip current character in source string (always available)
-        totalWaysCount += findDistinctSubsequencesRecursive(sourceString, targetString,
-            sourceIndex + 1, targetIndex,
-            memoizationCache);
+        count += recHelper(sourceString, targetString, sourceIndex + 1, targetIndex, dp);
 
         // Cache the result for future use
-        memoizationCache.put(memoizationKey, totalWaysCount);
-        return totalWaysCount;
+        dp[sourceIndex][targetIndex] = count;
+        return count;
     }
 
     /**
@@ -144,12 +143,12 @@ public class DistinctSubsequence {
         }
 
         // dp[i][j] represents number of ways to form target[0..i-1] using source[0..j-1]
-        int[][] distinctWaysTable = new int[targetLength + 1][sourceLength + 1];
+        int[][] dp = new int[targetLength + 1][sourceLength + 1];
 
         // Base case: empty target string can be formed in exactly 1 way
         // by deleting all characters from any prefix of source
         for (int sourceIndex = 0; sourceIndex <= sourceLength; sourceIndex++) {
-            distinctWaysTable[0][sourceIndex] = 1;
+            dp[0][sourceIndex] = 1;
         }
 
         // Fill the DP table using bottom-up approach
@@ -160,18 +159,16 @@ public class DistinctSubsequence {
 
                 if (targetChar == sourceChar) {
                     // Characters match: we can either use this match or skip source character
-                    distinctWaysTable[targetIndex][sourceIndex] =
-                        distinctWaysTable[targetIndex - 1][sourceIndex - 1] + // use the match
-                            distinctWaysTable[targetIndex][sourceIndex - 1];     // skip source char
+                    dp[targetIndex][sourceIndex] = dp[targetIndex - 1][sourceIndex - 1] + // use the match
+                                                   dp[targetIndex][sourceIndex - 1];     // skip source char
                 } else {
                     // Characters don't match: only option is to skip source character
-                    distinctWaysTable[targetIndex][sourceIndex] =
-                        distinctWaysTable[targetIndex][sourceIndex - 1];
+                    dp[targetIndex][sourceIndex] = dp[targetIndex][sourceIndex - 1];
                 }
             }
         }
 
-        return distinctWaysTable[targetLength][sourceLength];
+        return dp[targetLength][sourceLength];
     }
 
     /**

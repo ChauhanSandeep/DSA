@@ -1,21 +1,31 @@
 package strings.twopointers;
 
 /**
- * Problem: Find the longest palindromic substring in a given string.
+ * Given a string s, return the longest palindromic substring in s.
+ * A palindrome is a string that reads the same forward and backward.
  *
- * Approaches:
- * 1. **Dynamic Programming (O(n²) time, O(n²) space)**
- *    - Maintain a DP table where dp[i][j] = true if substring(i, j) is a palindrome.
- *    - Build the table iteratively and track the longest palindromic substring.
+ * Example:
+ * Input: s = "babad"
+ * Output: "bab" or "aba"
+ * Explanation:
+ * Both "bab" and "aba" are valid answers as they are the longest palindromes.
  *
- * 2. **Expand Around Center (O(n²) time, O(1) space) [Optimal for interviews]**
- *    - Expand from every character (odd-length palindromes) and every pair (even-length palindromes).
- *    - Track the longest palindrome found.
+ * LeetCode link: https://leetcode.com/problems/longest-palindromic-substring/
  *
- * Time Complexity: **O(n²)** for both approaches.
- * Space Complexity: **O(n²) for DP, O(1) for Expand Around Center** (preferred for interviews).
+ * Follow-up Questions FAANG Interviews Might Ask:
+ *  - Can you achieve O(n) time complexity?
+ *    → Yes, Manacher's algorithm achieves O(n) but is complex to implement.
+ *  - What if you need to return all longest palindromic substrings?
+ *    → Track all substrings with maximum length during expansion.
+ *  - How would you handle very long strings (millions of characters)?
+ *    → Manacher's algorithm is best, or consider approximate/streaming solutions.
+ *  - Can you detect if entire string is a palindrome in O(1) after preprocessing?
+ *    → Use rolling hash or Manacher's preprocessing, then O(1) query.
  *
- * LeetCode Problem: https://leetcode.com/problems/longest-palindromic-substring/
+ * Relevant Follow-up Problems:
+ *  - LeetCode 647 (Palindromic Substrings): https://leetcode.com/problems/palindromic-substrings/
+ *  - LeetCode 516 (Longest Palindromic Subsequence): https://leetcode.com/problems/longest-palindromic-subsequence/
+ *  - LeetCode 214 (Shortest Palindrome): https://leetcode.com/problems/shortest-palindrome/
  */
 public class LongestPalindrome {
     public static void main(String[] args) {

@@ -32,10 +32,12 @@ public class ValidBstFromPreorder {
     /**
      * This method checks if the given preorder sequence can form a valid BST.
      * It uses a recursive approach to verify the properties of BST.
-     * This is suboptimal than using stack approach because it uses O(N) space for recursion.
+     * This is suboptimal than using stack approach because it has worse time complexity.
      *
-     * Time Complexity: O(N) where N is the number of nodes in the sequence.
-     * Space Complexity: O(N) for the recursion stack.
+     * Time Complexity: O(N²) in worst case - for each node, we iterate through remaining elements
+     *                  to find and validate the right subtree. In a skewed tree, this becomes
+     *                  N + (N-1) + (N-2) + ... + 1 = O(N²).
+     * Space Complexity: O(N) for the recursion stack in worst case (skewed tree).
      */
     public boolean isValidPreorderBstSuboptimal(int[] preorderSequence) {
         return verify(preorderSequence, 0, preorderSequence.length - 1);
@@ -71,9 +73,8 @@ public class ValidBstFromPreorder {
 
     /**
      * Thinking intuition process (How we came up with this approach?)
-     * -
      *
-     *  <p>Logic:
+     *  Logic:
      * - Use a monotonic stack to track ancestors.
      * - Maintain a `lowerBound` to track the valid range for the next node.
      * - If we encounter a node smaller than `lowerBound`, it's invalid.
@@ -97,8 +98,8 @@ public class ValidBstFromPreorder {
      *   - 35: pop 25 (valid), pop 30 (valid), update `lowerBound` to 30, push 35
      *   - 80: pop all smaller values, update `lowerBound` to 40, push 80
      *
-     * <p>Time Complexity: O(N), where N is the number of nodes in the sequence.
-     * <p>Space Complexity: O(N) for the stack in the worst case.
+     * Time Complexity: O(N), where N is the number of nodes in the sequence.
+     * Space Complexity: O(N) for the stack in the worst case.
      *
      * @param preorderSequence The preorder traversal array.
      * @return true if a valid BST can be formed, otherwise false.

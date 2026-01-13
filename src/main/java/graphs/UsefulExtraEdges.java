@@ -75,9 +75,11 @@ public class UsefulExtraEdges {
         }
 
         for (List<Integer> edge : edges) {
-            int u = edge.get(0), v = edge.get(1), w = edge.get(2);
-            graph.get(u).add(new Edge(v, w));
-            reverseGraph.get(v).add(new Edge(u, w)); // for reverse graph
+            int edge1 = edge.get(0);
+            int edge2 = edge.get(1);
+            int weight = edge.get(2);
+            graph.get(edge1).add(new Edge(edge2, weight));
+            reverseGraph.get(edge2).add(new Edge(edge1, weight)); // for reverse graph
         }
 
         // Step 2: Run Dijkstra from source to find shortest path to all nodes
@@ -121,21 +123,21 @@ public class UsefulExtraEdges {
         Arrays.fill(distances, Integer.MAX_VALUE);
         distances[source] = 0;
 
-        PriorityQueue<Edge> pq = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
-        pq.add(new Edge(source, 0));
+        PriorityQueue<Edge> queue = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+        queue.add(new Edge(source, 0));
 
-        while (!pq.isEmpty()) {
-            Edge current = pq.poll();
-            int node = current.target;
-            int currDist = current.weight;
+        while (!queue.isEmpty()) {
+            Edge currNode = queue.poll();
+            int nodeVal = currNode.target;
+            int nodeWeight = currNode.weight;
 
-            if (currDist > distances[node]) continue; // skip outdated entries
+            if (nodeWeight > distances[nodeVal]) continue; // skip outdated entries
 
-            for (Edge neighbor : graph.get(node)) {
-                int newDist = distances[node] + neighbor.weight;
+            for (Edge neighbor : graph.get(nodeVal)) {
+                int newDist = distances[nodeVal] + neighbor.weight;
                 if (newDist < distances[neighbor.target]) {
                     distances[neighbor.target] = newDist;
-                    pq.add(new Edge(neighbor.target, newDist));
+                    queue.add(new Edge(neighbor.target, newDist));
                 }
             }
         }

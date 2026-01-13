@@ -113,19 +113,19 @@ public class TaskScheduler {
    * @return Minimum time units required to finish all tasks
    */
   public int leastIntervalUsingMath(char[] tasks, int cooldown) {
-    int[] taskCounts = new int[26];
+    int[] taskFreqArr = new int[26];
 
     // Step 1: Count each task
     for (char task : tasks) {
-      taskCounts[task - 'A']++;
+      taskFreqArr[task - 'A']++;
     }
 
     // Step 2: Find the max frequency
-    int maxFreq = Arrays.stream(taskCounts).max().orElse(0);
+    int maxFreq = Arrays.stream(taskFreqArr).max().orElse(0);
 
     // Step 3: Count how many tasks have that max frequency
     int maxFreqCount = 0;
-    for (int freq : taskCounts) {
+    for (int freq : taskFreqArr) {
       if (freq == maxFreq) {
         maxFreqCount++;
       }

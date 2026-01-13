@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Problem: Nested List Weight Sum
  *
- * You are given a nested list of integers nestedList. Each element is either an integer or a list
+ * You are given a nested list of integers `nestedList`. Each element is either an integer or a list
  * whose elements may also be integers or other lists.
  * The depth of an integer is the number of lists that it is inside of. For example, the nested list
  * [1,[4,[6]]] has each integer's value multiplied by its depth: 1*1 + 4*2 + 6*3 = 17.

@@ -62,17 +62,17 @@ public class IsomorphicStrings {
      * Space Complexity: O(k) - HashMap and HashSet storage
      *
      */
-    public boolean isIsomorphicSingleMap(String s, String t) {
-        if (s == null || t == null || s.length() != t.length()) {
-            return s == t;
+    public boolean isIsomorphicSingleMap(String source, String target) {
+        if (source == null || target == null || source.length() != target.length()) {
+            return source == target;
         }
 
         Map<Character, Character> mapping = new HashMap<>();
         Set<Character> usedChars = new HashSet<>();
 
-        for (int i = 0; i < s.length(); i++) {
-            char charS = s.charAt(i);
-            char charT = t.charAt(i);
+        for (int i = 0; i < source.length(); i++) {
+            char charS = source.charAt(i);
+            char charT = target.charAt(i);
 
             if (mapping.containsKey(charS)) {
                 // Check if existing mapping is consistent

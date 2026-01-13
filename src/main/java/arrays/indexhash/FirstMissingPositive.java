@@ -30,8 +30,6 @@ public class FirstMissingPositive {
         System.out.println("First missing positive number in array is " + result);
     }
 
-    private static final int INVALID_NUMBER = Integer.MAX_VALUE;
-
     /**
      * Finds first missing positive using marking by negating array values.
      *
@@ -60,38 +58,45 @@ public class FirstMissingPositive {
      * @return smallest missing positive integer
      */
     public int firstMissingPositive(int[] nums) {
-        int length = nums.length;
+        int len = nums.length;
 
-        // Phase 1: Normalize array - replace all invalid numbers
-        for (int i = 0; i < length; i++) {
-            if (nums[i] <= 0 || nums[i] > length) {
-                nums[i] = INVALID_NUMBER;
+        // Replace negative numbers, zeros,
+        // and numbers larger than n with 1s.
+        // After this nums contains only positive numbers.
+        for (int i = 0; i < len; i++) {
+            // Check whether 1 is in the original array
+            if (nums[i] == 1) {
+                return 1;
+            }
+            if (nums[i] <= 0 || nums[i] > len) {
+                nums[i] = 1;
             }
         }
 
-        // Phase 2: Mark presence of numbers by negating values at corresponding indices
-        for (int i = 0; i < length; i++) {
-            int number = Math.abs(nums[i]);
-
-            // Only mark if number is in valid range [1, n]
-            if (number >= 1 && number <= length) {
-                int indexToMark = number - 1;  // Convert to 0-indexed position
-
-                // Negate to mark presence (only if not already negative)
-                if (nums[indexToMark] > 0) {
-                    nums[indexToMark] = -nums[indexToMark];
-                }
+        // Mark whether integers 1 to n are in nums
+        // Use index as a hash key and negative sign as a presence detector.
+        for (int i = 0; i < len; i++) {
+            int value = Math.abs(nums[i]);
+            if (value == len) {
+                // Means that number of value n (i.e., len) is present
+                nums[0] = -Math.abs(nums[0]);
+            } else {
+                nums[value] = -Math.abs(nums[value]);
             }
         }
 
-        // Phase 3: Find first positive value; its index +1 is the answer
-        for (int i = 0; i < length; i++) {
-            if (nums[i] > 0) {
-                return i + 1;  // Index +1 is the missing number
-            }
+        // First positive in nums is smallest missing positive integer
+        for (int i = 1; i < len; i++) {
+            if (nums[i] > 0) return i;
         }
 
-        // Phase 4: All indices marked, so all numbers [1,n] are present
-        return length + 1;
+        // nums[0] stores whether n (i.e., len) is in nums
+        if (nums[0] > 0) {
+            return len;
+        }
+
+        // If nums contains all elements 1 to n
+        // the smallest missing positive number is n + 1
+        return len + 1;
     }
 }

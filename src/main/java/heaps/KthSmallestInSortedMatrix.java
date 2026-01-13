@@ -4,15 +4,13 @@ import java.util.PriorityQueue;
 
 
 /**
- * Problem: Kth Smallest Element in a Sorted Matrix
- *
  * Given an n x n matrix where each row and each column is sorted in ascending order,
  * return the k-th smallest element in the matrix.
  *
  * Example:
  * Input:
  * matrix = [
- *     [1, 5, 9],
+ *     [1,  5,  9],
  *     [10, 11, 13],
  *     [12, 13, 15]
  * ]
@@ -42,64 +40,12 @@ public class KthSmallestInSortedMatrix {
     int[][] matrix = {{1, 5, 9}, {10, 11, 13}, {12, 13, 15}};
     int k = 8;
 
-    System.out.println("Kth Smallest (Min-Heap): " + findKthSmallestUsingMinHeap(matrix, k)); // Expected: 13
     System.out.println("Kth Smallest (Binary Search): " + findKthSmallestUsingBinarySearch(matrix, k)); // Expected: 13
     System.out.println("Kth Smallest (Optimized Heap): " + findKthSmallestOptimizedHeap(matrix, k)); // Expected: 13
   }
 
   /**
-   * Finds the k-th smallest element in a sorted matrix using a Min-Heap approach.
-   *
-   * Algorithm: Priority Queue (Min-Heap)
-   * Steps:
-   * 1. Initialize min-heap with first element of each row
-   * 2. Extract minimum element k times from heap
-   * 3. For each extracted element, add next element from same row (if exists)
-   * 4. Return the k-th extracted element
-   *
-   * Time Complexity: O(k * log(min(n, k)))
-   * Space Complexity: O(min(n, k)) for the heap
-   *
-   * @param matrix sorted n x n matrix
-   * @param k the position of smallest element to find
-   * @return k-th smallest element
-   */
-  public static int findKthSmallestUsingMinHeap(int[][] matrix, int k) {
-    if (matrix == null || matrix.length == 0 || k <= 0) {
-      throw new IllegalArgumentException("Invalid input parameters");
-    }
-
-    int numRows = matrix.length;
-    int numCols = matrix[0].length;
-
-    // Min-heap to store matrix elements with their coordinates
-    PriorityQueue<MatrixElement> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.value, b.value));
-
-    // Initialize heap with first element of each row
-    for (int row = 0; row < numRows; row++) {
-      minHeap.offer(new MatrixElement(row, 0, matrix[row][0]));
-    }
-
-    int kthSmallestElement = -1;
-
-    // Extract k elements from heap
-    for (int extractionCount = 0; extractionCount < k; extractionCount++) {
-      MatrixElement currentElement = minHeap.poll();
-      kthSmallestElement = currentElement.value;
-
-      // Add next element from same row if it exists
-      if (currentElement.columnIndex + 1 < numCols) {
-        int nextColumn = currentElement.columnIndex + 1;
-        int nextValue = matrix[currentElement.rowIndex][nextColumn];
-        minHeap.offer(new MatrixElement(currentElement.rowIndex, nextColumn, nextValue));
-      }
-    }
-
-    return kthSmallestElement;
-  }
-
-  /**
-   * Optimized heap approach that maintains heap size proportional to min(k, n).
+   * Heap approach that maintains heap size proportional to min(k, n).
    *
    * Algorithm: Space-Optimized Min-Heap
    * Steps:

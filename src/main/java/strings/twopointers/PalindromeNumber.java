@@ -1,8 +1,6 @@
 package strings.twopointers;
 
 /**
- * LeetCode 9. Palindrome Number
- *
  * Given an integer x, return true if x is a palindrome, and false otherwise.
  * An integer is a palindrome when it reads the same backward as forward.
  *

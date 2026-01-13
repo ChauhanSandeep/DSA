@@ -95,7 +95,7 @@ public class MinCutPalindrome {
     public int minCutDP(String str) {
         int length = str.length();
         boolean[][] isPalindrome = new boolean[length][length]; // isPalindrome[i][j] = true if str[i:j] is a palindrome
-        int[] minCutsRequired = new int[length]; // minCutsRequired[i] = min cuts needed for str[0..i]
+        
 
         // Precompute palindrome substrings
         for (int end = 0; end < length; end++) {
@@ -106,6 +106,7 @@ public class MinCutPalindrome {
             }
         }
 
+        int[] minCutsRequired = new int[length]; // minCutsRequired[i] = min cuts needed for str[0..i]
         // Fill DP table
         for (int right = 0; right < length; right++) {
             if (isPalindrome[0][right]) {

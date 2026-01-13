@@ -56,7 +56,7 @@ public class FindPeakElementII {
    * @param mat the input 2D matrix
    * @return array containing [row, column] coordinates of any peak element
    */
-  public int[] findPeakGrid(int[][] mat) {
+  public int[] locatePeakElement(int[][] mat) {
     int left = 0;
     int right = mat[0].length - 1;
 

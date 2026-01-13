@@ -39,14 +39,14 @@ public class SortTransformedArray {
      * @return sorted array of transformed values
      */
     public int[] sortTransformedArray(int[] nums, int a, int b, int c) {
-        int n = nums.length;
-        int[] result = new int[n];
-        int left = 0, right = n - 1;
+        int length = nums.length;
+        int[] result = new int[length];
+        int left = 0, right = length - 1;
 
         if (a >= 0) {
             // Parabola opens upward or is linear with positive slope
             // Fill result from right to left (largest to smallest)
-            int index = n - 1;
+            int index = length - 1;
             while (left <= right) {
                 int leftVal = transform(nums[left], a, b, c);
                 int rightVal = transform(nums[right], a, b, c);

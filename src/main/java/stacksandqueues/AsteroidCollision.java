@@ -1,13 +1,9 @@
 package stacksandqueues;
 
 import java.util.Stack;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
- * Problem: Asteroid Collision
- *
  * Given an array asteroids of integers representing asteroids in a row, where the absolute
  * value represents size and the sign represents direction (positive = right, negative = left).
  * Each asteroid moves at the same speed. Find the state of asteroids after all collisions.
@@ -74,13 +70,11 @@ public class AsteroidCollision {
     Stack<Integer> stack = new Stack<>();
 
     for (int asteroid : asteroids) {
-      boolean alive = true;
-
       while (!stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
         int top = stack.peek();
 
         if (top < -asteroid) {
-          // asteriod on stack explodes
+          // asteroid on stack explodes
           stack.pop();
           continue;
         } else if (top == -asteroid) {
@@ -88,13 +82,12 @@ public class AsteroidCollision {
           stack.pop();
         }
 
-        alive = false;
-        break;
+        // current asteroid is destroyed
+        continue;
       }
 
-      if (alive) {
-        stack.push(asteroid);
-      }
+      // current asteroid survived, push to stack
+      stack.push(asteroid);
     }
 
     int[] result = new int[stack.size()];
@@ -128,8 +121,6 @@ public class AsteroidCollision {
     int write = 0;
 
     for (int asteroid : asteroids) {
-      boolean alive = true;
-
       while (write > 0 && asteroids[write - 1] > 0 && asteroid < 0) {
         if (asteroids[write - 1] < -asteroid) {
           write--;
@@ -138,13 +129,11 @@ public class AsteroidCollision {
           write--;
         }
 
-        alive = false;
-        break;
+        // current asteroid is destroyed
+        continue;
       }
 
-      if (alive) {
-        asteroids[write++] = asteroid;
-      }
+      asteroids[write++] = asteroid;
     }
 
     int[] result = new int[write];

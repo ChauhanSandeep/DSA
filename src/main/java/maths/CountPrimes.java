@@ -61,7 +61,7 @@ public class CountPrimes {
                 // Start from i² (optimization: smaller multiples already marked)
                 // Eg for i = 3, mark 9, 12, 15, ...
                 // For i = 5, mark 25, 30, 35, ...
-                for (int j = i * i; j < upperLimit; j += i) {
+                for (int j = i * 2; j < upperLimit; j += i) {
                     isPrime[j] = false;
                 }
             }

@@ -15,10 +15,13 @@ import java.util.*;
  * You can move up, down, left, or right (4 directions).
  *
  * Example:
- * Input: heights = [[1,2,2],[3,8,2],[5,3,5]]
+ * Input: heights = [
+ *      [1,2,2],
+ *      [3,8,2],
+ *      [5,3,5]]
  * Output: 2
  * Explanation: The route [1,2,2,5] has effort 2, which is minimum.
- * Path: (0,0)→(0,1)→(0,2)→(2,2)
+ * Path: (0,0)→(0,1)→(0,2)→(1,2),(2,2)
  * Efforts: |1-2|=1, |2-2|=0, |2-5|=3 → max effort = 3 (not optimal)
  * Better path: (0,0)→(1,0)→(2,0)→(2,1)→(2,2) with max effort 2
  *

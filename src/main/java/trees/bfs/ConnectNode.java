@@ -6,6 +6,8 @@ import java.util.Queue;
 
 /**
  * Connect Nodes at the Same Level in a Binary Tree
+ * 
+ * LeetCode: https://leetcode.com/problems/populating-next-right-pointers-in-each-node/
  *
  * The problem requires connecting all nodes at the same level in a binary tree.
  * Specifically, each node should point to its next right node at the same level.

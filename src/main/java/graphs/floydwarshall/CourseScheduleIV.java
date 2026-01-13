@@ -1,7 +1,6 @@
 package graphs.floydwarshall;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -59,9 +58,9 @@ public class CourseScheduleIV {
 
     // Step 1: Populate direct prerequisites
     for (int[] pair : prerequisites) {
-      int prerequisiteCourse = pair[0];
+      int sourceCourse = pair[0];
       int targetCourse = pair[1];
-      reachable[prerequisiteCourse][targetCourse] = true;
+      reachable[sourceCourse][targetCourse] = true;
     }
 
     // Step 2: Floyd-Warshall for transitive closure
@@ -78,63 +77,145 @@ public class CourseScheduleIV {
     // Step 3: Answer queries
     List<Boolean> result = new ArrayList<>();
     for (int[] query : queries) {
-      int prerequisiteCourse = query[0];
+      int fromCourse = query[0];
       int targetCourse = query[1];
-      result.add(reachable[prerequisiteCourse][targetCourse]);
+      result.add(reachable[fromCourse][targetCourse]);
     }
 
     return result;
   }
 
   /**
-   * Optimized approach using Topological Sort + DFS.
-   *
-   * Steps:
-   * 1. Build adjacency list of prerequisites.
-   * 2. Perform DFS from each course to collect all reachable courses.
-   * 3. For each query, check if target is in prerequisite's reachable set.
-   *
-   * Algorithm: DFS with memoization
-   * Time Complexity: O(courseCount^2 + edgeCount + queryCount), where edgeCount = number of edges
-   * The time complexity `O(courseCount^2 + edgeCount + queryCount)` is calculated as follows:
-   * - O(courseCount^2): Each course runs DFS, and in the worst case, each course can reach every other course, filling the `reachable` matrix.
-   * - O(edgeCount): Each edge is traversed once during DFS across all courses.
-   * - O(queryCount): Each query is answered in constant time by looking up the `reachable` matrix.
-   *
-   * All steps are summed because they happen sequentially, not nested.
-   * Space Complexity: O(courseCount^2) for reachability set
-   */
-  public List<Boolean> checkIfPrerequisiteOptimized(int courseCount, int[][] prerequisites, int[][] queries) {
-    List<List<Integer>> adjacencyList = new ArrayList<>();
-    for (int i = 0; i < courseCount; i++) {
-      adjacencyList.add(new ArrayList<>());
-    }
-    for (int[] pair : prerequisites) {
-      adjacencyList.get(pair[0]).add(pair[1]);
+     * Approach 2: BFS/DFS with Preprocessing (Alternative).
+     * Step-by-step:
+     *  1. Build adjacency list from prerequisites
+     *  2. For each course i from 0 to n-1:
+     *     - Run BFS/DFS from course i
+     *     - Mark all reachable courses as prerequisites of i
+     *  3. Answer queries by looking up preprocessed results
+     *
+     * Key Insight:
+     * Instead of Floyd-Warshall's all-pairs approach, explicitly find all descendants
+     * of each course using BFS/DFS. Same result, different implementation.
+     *
+     * Algorithm: BFS from each node.
+     * Time Complexity: O(n * (V + E)) = O(n²) best case, O(n³) worst case
+     * Space Complexity: O(n²) for storing all prerequisites.
+     * 
+     * Best when: Sparse graphs (fewer edges), similar query count.
+     */
+    public List<Boolean> checkIfPrerequisite_BFS(int numCourses, int[][] prerequisites, int[][] queries) {
+        // Build adjacency list
+        List<List<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new ArrayList<>());
+        }
+        for (int[] prereq : prerequisites) {
+            graph.get(prereq[0]).add(prereq[1]);
+        }
+        
+        // For each course, find all courses it's a prerequisite for
+        boolean[][] isReachable = new boolean[numCourses][numCourses];
+        
+        for (int start = 0; start < numCourses; start++) {
+            // BFS from start to find all reachable courses
+            Queue<Integer> queue = new LinkedList<>();
+            boolean[] visited = new boolean[numCourses];
+            queue.offer(start);
+            visited[start] = true;
+            
+            while (!queue.isEmpty()) {
+                int course = queue.poll();
+                
+                for (int nextCourse : graph.get(course)) {
+                    if (!visited[nextCourse]) {
+                        visited[nextCourse] = true;
+                        isReachable[start][nextCourse] = true;  // start is prerequisite of nextCourse
+                        queue.offer(nextCourse);
+                    }
+                }
+            }
+        }
+        
+        // Answer queries
+        List<Boolean> result = new ArrayList<>();
+        for (int[] query : queries) {
+            result.add(isReachable[query[0]][query[1]]);
+        }
+        
+        return result;
     }
 
-    boolean[][] dp = new boolean[courseCount][courseCount];
-    for (int course = 0; course < courseCount; course++) {
-      dfs(course, course, adjacencyList, dp);
+    /**
+     * Approach 3: Topological Sort (Kahn's Algorithm) - Most Efficient.
+     * Step-by-step:
+     *  1. Build graph and calculate in-degrees
+     *  2. Process nodes in topological order using Kahn's algorithm
+     *  3. For each node, maintain a set of all its prerequisites
+     *  4. When processing edge u → v, propagate all prerequisites of u to v
+     *  5. Answer queries by checking prerequisite sets
+     *
+     * Key Insight:
+     * Process courses in dependency order. When we process a course, we already know
+     * all prerequisites of its dependencies, so we can aggregate them efficiently.
+     *
+     * Algorithm: Topological Sort with prerequisite propagation.
+     * Time Complexity: O(V + E + V * max_prereqs) ≈ O(V²) in practice
+     * Space Complexity: O(V²) for prerequisite sets.
+     * 
+     * Best when: DAG structure, clear dependency ordering.
+     */
+    public List<Boolean> checkIfPrerequisite_TopologicalSort(int numCourses, int[][] prerequisites, 
+                                                               int[][] queries) {
+        // Build graph and in-degree array
+        List<List<Integer>> graph = new ArrayList<>();
+        int[] inDegree = new int[numCourses];
+        
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new ArrayList<>());
+        }
+        
+        for (int[] prereq : prerequisites) {
+            graph.get(prereq[0]).add(prereq[1]);
+            inDegree[prereq[1]]++;
+        }
+        
+        // Map to store all prerequisites for each course
+        Map<Integer, Set<Integer>> allPrereqs = new HashMap<>();
+        
+        // Kahn's algorithm for topological sort
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (inDegree[i] == 0) {
+                queue.offer(i);
+            }
+            allPrereqs.put(i, new HashSet<>());
+        }
+        
+        while (!queue.isEmpty()) {
+            int course = queue.poll();
+            
+            for (int nextCourse : graph.get(course)) {
+                // Add direct prerequisite
+                allPrereqs.get(nextCourse).add(course);
+                
+                // Add all indirect prerequisites (from course's prerequisites)
+                allPrereqs.get(nextCourse).addAll(allPrereqs.get(course));
+                
+                // Decrease in-degree and add to queue if ready
+                inDegree[nextCourse]--;
+                if (inDegree[nextCourse] == 0) {
+                    queue.offer(nextCourse);
+                }
+            }
+        }
+        
+        // Answer queries
+        List<Boolean> result = new ArrayList<>();
+        for (int[] query : queries) {
+            result.add(allPrereqs.get(query[1]).contains(query[0]));
+        }
+        
+        return result;
     }
-
-    List<Boolean> result = new ArrayList<>();
-    for (int[] query : queries) {
-      result.add(dp[query[0]][query[1]]);
-    }
-
-    return result;
-  }
-
-  /**
-   * Helper DFS to compute reachability from a source course.
-   */
-  private void dfs(int startCourse, int currentCourse, List<List<Integer>> adjacencyList, boolean[][] dp) {
-    for (int nextCourse : adjacencyList.get(currentCourse)) {
-      if (!dp[startCourse][nextCourse]) {
-        dp[startCourse][nextCourse] = true;
-        dfs(startCourse, nextCourse, adjacencyList, dp);
-      }
-    }
-  }
 }

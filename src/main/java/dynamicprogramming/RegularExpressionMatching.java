@@ -81,51 +81,51 @@ public class RegularExpressionMatching {
    *
    * Space Complexity: O(M * N) for the DP table.
    *
-   * @param s input string to match
-   * @param p pattern with '.' and '*' support
+   * @param str input string to match
+   * @param pattern pattern with '.' and '*' support
    * @return true if entire string matches pattern
    */
-  public boolean isMatch(String s, String p) {
-    int m = s.length();
-    int n = p.length();
-    boolean[][] dp = new boolean[m + 1][n + 1];
+  public boolean isMatch(String str, String pattern) {
+    int stringLength = str.length();
+    int patternLength = pattern.length();
+    boolean[][] dp = new boolean[stringLength + 1][patternLength + 1];
 
     // Empty string matches empty pattern
     dp[0][0] = true;
 
     // Handle patterns like a*, a*b*, etc. that can match empty string
-    for (int j = 2; j <= n; j++) {
-      if (p.charAt(j - 1) == '*') {
+    for (int j = 2; j <= patternLength; j++) {
+      if (pattern.charAt(j - 1) == '*') {
         dp[0][j] = dp[0][j - 2];
       }
     }
 
-    for (int i = 1; i <= m; i++) {
-      for (int j = 1; j <= n; j++) {
-        char sChar = s.charAt(i - 1);
-        char pChar = p.charAt(j - 1);
+    for (int strIndex = 1; strIndex <= stringLength; strIndex++) {
+      for (int patternIndex = 1; patternIndex <= patternLength; patternIndex++) {
+        char sChar = str.charAt(strIndex - 1);
+        char pChar = pattern.charAt(patternIndex - 1);
 
         if (pChar == '*') {
           // '*' matches zero or more of preceding element
-          char prevPatternChar = p.charAt(j - 2);  // Get the character BEFORE '*'
+          char prevPatternChar = pattern.charAt(patternIndex - 2);  // Get the character BEFORE '*'
 
           // Option 1: Match ZERO occurrences - ignore both the character and '*'
-          dp[i][j] = dp[i][j - 2];
+          dp[strIndex][patternIndex] = dp[strIndex][patternIndex - 2];
 
           // Option 2: Match ONE OR MORE occurrences
           if (charMatches(sChar, prevPatternChar)) {
-            dp[i][j] = dp[i][j] || dp[i - 1][j];
+            dp[strIndex][patternIndex] = dp[strIndex][patternIndex] || dp[strIndex - 1][patternIndex];
           }
         } else {
           // Current pattern char is letter or '.'
           if (charMatches(sChar, pChar)) {
-            dp[i][j] = dp[i - 1][j - 1];
+            dp[strIndex][patternIndex] = dp[strIndex - 1][patternIndex - 1];
           }
         }
       }
     }
 
-    return dp[m][n];
+    return dp[stringLength][patternLength];
   }
 
   // Helper method to check if character matches pattern character

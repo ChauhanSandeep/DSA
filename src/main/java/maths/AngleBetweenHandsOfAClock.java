@@ -23,10 +23,13 @@ package maths;
  * 3. How would you animate the clock hands smoothly?
  *    Answer: Use continuous time calculations instead of discrete hour/minute values.
  *    Related: https://leetcode.com/problems/minimum-time-difference/
- *
- * @author Sandeep
  */
 public class AngleBetweenHandsOfAClock {
+
+    public static void main(String[] args) {
+        AngleBetweenHandsOfAClock angleBetweenHandsOfAClock = new AngleBetweenHandsOfAClock();
+        System.out.println("The angle between hands is: " + angleBetweenHandsOfAClock.angleClock(3, 15)); // 165.0
+    }
 
     /**
      * Calculates the smaller angle between hour and minute hands.

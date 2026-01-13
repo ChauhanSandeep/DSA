@@ -20,6 +20,14 @@ import java.util.List;
  *
  * Example 1:
  * Input: n = 5, edges = [[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k = 2
+ * 
+ *         0
+ *         |4
+ *         1
+ *        2| \3
+ *         3  2
+ *         |6
+ *         4
  * Output: 4
  * Explanation:
  * We need to split the graph into at most 2 components. The key insight is to remove the

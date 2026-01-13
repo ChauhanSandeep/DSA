@@ -100,7 +100,7 @@ public class SnapshotArray {
         
         TreeMap<Integer, Integer> snapshots = snapshotValues.get(index);
         
-        // Find largest snap_id <= requested snap_id
+        // Find largest snap_id which is less than or equal to requested snap_id
         // floorEntry returns entry with largest key ≤ given key
         Map.Entry<Integer, Integer> entry = snapshots.floorEntry(snap_id);
         

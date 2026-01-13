@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Problem: Decode Ways
- *
  * Given a string of digits representing an encoded message, determine the number of ways it can be decoded
  * using the mapping: 'A' -> 1, 'B' -> 2, ..., 'Z' -> 26. Leading zeroes are invalid.
  *

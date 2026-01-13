@@ -15,8 +15,16 @@ package arrays.prefixsum;
  * corresponding position in the original matrix.
  *
  * Example 1:
- * Input: mat = [[1,2,3],[4,5,6],[7,8,9]], k = 1
- * Output: [[12,21,16],[27,45,33],[24,39,28]]
+ * Input: mat = [
+ *      [1,2,3],
+ *      [4,5,6],
+ *      [7,8,9]], 
+ * k = 1
+ * Output: [
+ *      [12,21,16],
+ *      [27,45,33],
+ *      [24,39,28]
+ * ]
  * Explanation: For position (0,0), the block includes elements from rows [0,1] and columns
  * [0,1], which are 1,2,4,5, summing to 12. For position (1,1), the block includes all 9
  * elements (since k=1 allows reaching all positions from center), summing to 45.

@@ -63,7 +63,7 @@ public class DungeonGame {
   }
 
   /**
-   * DFS to calculate minimum HP deficit from current cell to bottom-right
+   * Recursive helper: Returns minimum health needed to enter cell (i, j) and reach princess.
    */
   private int minHealthRecHelper(int[][] dungeon, int row, int col, Integer[][] memo) {
     int rows = dungeon.length;

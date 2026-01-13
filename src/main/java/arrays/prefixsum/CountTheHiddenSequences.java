@@ -41,59 +41,51 @@ import java.util.*;
 public class CountTheHiddenSequences {
 
     /**
-     * Counts possible hidden sequences using prefix sum and range analysis.
+     * Counts how many valid original arrays can produce the given differences array
+     * while keeping every element within [lower, upper].
      *
-     * Algorithm:
-     * 1. Calculate prefix sums to determine relative positions
-     * 2. Find minimum and maximum values in the constructed sequence
-     * 3. Determine valid range for the starting value
-     * 4. Count integers in the valid range
-     *
-     * Time Complexity: O(n) where n is length of differences array
-     * Space Complexity: O(1) - only using constant extra space
-     *
-     * @param differences Array of adjacent differences
-     * @param lower Lower bound of allowed values
-     * @param upper Upper bound of allowed values
-     * @return Number of possible hidden sequences
+     * Idea:
+     * 1. Build relative offsets using prefix sums of differences.
+     * 2. Track the smallest and largest offset we ever reach.
+     * 3. Let firstElement be the unknown starting value.
+     *    - Every element = firstElement + someOffset.
+     * 4. Constrain firstElement so that all elements stay within [lower, upper].
+     * 5. Count how many integer values of firstElement satisfy all constraints.
      */
     public int numberOfArrays(int[] differences, int lower, int upper) {
         if (differences == null || differences.length == 0) {
-            // Single element sequence, check if it can be in range
+            // Only one element in the array; it just needs to be within [lower, upper].
             return upper >= lower ? 1 : 0;
         }
 
-        // Calculate prefix sums to find relative positions
-        long prefixSum = 0;
-        long minPrefix = 0;
-        long maxPrefix = 0;
+        // currentOffset: value difference from the first element as we walk forward.
+        // minOffset / maxOffset: smallest and largest offset seen so far.
+        long currentOffset = 0;
+        long minOffset = 0;
+        long maxOffset = 0;
 
-        for (int diff : differences) {
-            prefixSum += diff;
-            minPrefix = Math.min(minPrefix, prefixSum);
-            maxPrefix = Math.max(maxPrefix, prefixSum);
+        for (int delta : differences) {
+            currentOffset += delta;
+            minOffset = Math.min(minOffset, currentOffset);
+            maxOffset = Math.max(maxOffset, currentOffset);
         }
 
-        // For a starting value x, the sequence values will be:
-        // x, x + prefix[0], x + prefix[1], ..., x + prefix[n-1]
-        // where prefix[i] is the sum of differences[0..i]
+        // If firstElement = x, then all elements lie in:
+        // [x + minOffset, x + maxOffset].
+        //
+        // To keep the whole array within [lower, upper], we need:
+        //   x + minOffset >= lower   ->  x >= lower - minOffset
+        //   x + maxOffset <= upper  ->  x <= upper - maxOffset
+        long minFirstElement = lower - minOffset;
+        long maxFirstElement = upper - maxOffset;
 
-        // The minimum value in sequence will be x + minPrefix
-        // The maximum value in sequence will be x + maxPrefix
-
-        // For sequence to be valid:
-        // lower <= x + minPrefix  =>  x >= lower - minPrefix
-        // x + maxPrefix <= upper  =>  x <= upper - maxPrefix
-
-        long minStartValue = lower - minPrefix;
-        long maxStartValue = upper - maxPrefix;
-
-        if (minStartValue > maxStartValue) {
-            return 0; // No valid starting values
+        if (minFirstElement > maxFirstElement) {
+            // No starting value x satisfies both inequalities.
+            return 0;
         }
 
-        // Count integers in range [minStartValue, maxStartValue]
-        return (int)(maxStartValue - minStartValue + 1);
+        // Number of integer x in [minFirstElement, maxFirstElement].
+        return (int) (maxFirstElement - minFirstElement + 1);
     }
 
     /**

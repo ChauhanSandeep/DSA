@@ -20,7 +20,9 @@ package arrays.greedy;
  * We can rotate the second and fourth dominoes to make all top values equal to 2.
  * After:  tops=[2,2,2,2,2,2], bottoms=[5,1,6,4,3,2]
  *
- * Input: tops = [3,5,1,2,3], bottoms = [3,6,3,3,4]
+ * Input: 
+ * tops =    [3, 5, 1, 2, 3], 
+ * bottoms = [3, 6, 3, 3, 4]
  * Output: -1
  * Explanation: No single value can fill an entire row after rotations.
  *

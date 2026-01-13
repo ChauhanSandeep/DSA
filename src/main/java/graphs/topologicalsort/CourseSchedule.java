@@ -127,23 +127,23 @@ public class CourseSchedule {
     }
 
     // Queue initialization for all courses with zero in-degree
-    Queue<Integer> readyCourses = new LinkedList<>();
+    Queue<Integer> queue = new LinkedList<>();
     for (int course = 0; course < numCourses; course++) {
       if (inDegree[course] == 0) {
-        readyCourses.offer(course);
+        queue.offer(course);
       }
     }
 
     int completedCourses = 0;
 
-    while (!readyCourses.isEmpty()) {
-      int current = readyCourses.poll();
+    while (!queue.isEmpty()) {
+      int current = queue.poll();
       completedCourses++;
 
       for (int neighbor : prerequisiteGraph.getOrDefault(current, Collections.emptyList())) {
         inDegree[neighbor]--;
         if (inDegree[neighbor] == 0) {
-          readyCourses.offer(neighbor);
+          queue.offer(neighbor);
         }
       }
     }

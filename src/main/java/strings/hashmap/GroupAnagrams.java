@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Problem: Group Anagrams
  *
- * Given an array of strings strs, group the anagrams together. You can return the answer in any order.
+ * Given an array of strings `strs`, group the anagrams together. You can return the answer in any order.
  * An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase,
  * typically using all the original letters exactly once.
  *
@@ -100,7 +100,7 @@ public class GroupAnagrams {
             return new ArrayList<>();
         }
 
-        Map<String, List<String>> anagramGroups = new HashMap<>();
+        Map<String, List<String>> anagramGroups = new HashMap<>(); // Key: frequency key, Value: list of anagrams
 
         for (String currentString : strs) {
             // Create frequency-based key
