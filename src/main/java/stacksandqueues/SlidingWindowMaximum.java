@@ -53,15 +53,15 @@ public class SlidingWindowMaximum {
             return new int[0];
         }
 
-        int n = nums.length;
-        int[] result = new int[n - k + 1];
-        int ri = 0;
+        int length = nums.length;
+        int[] result = new int[length - k + 1];
+        int resultIndex = 0;
 
         // Deque to store indices of elements in the current window
         // The deque maintains elements in decreasing order of their values
-        Deque<Integer> deque = new ArrayDeque<>();
+        Deque<Integer> deque = new ArrayDeque<>(); // monotonic decreasing deque
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < length; i++) {
             // Remove indices that are out of the current window from the front
             while (!deque.isEmpty() && deque.peek() < i - k + 1) {
                 deque.poll();
@@ -77,7 +77,7 @@ public class SlidingWindowMaximum {
 
             // The front of the deque is the maximum element for the current window
             if (i >= k - 1) {
-                result[ri++] = nums[deque.peek()];
+                result[resultIndex++] = nums[deque.peek()];
             }
         }
 

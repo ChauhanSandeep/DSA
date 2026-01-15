@@ -62,12 +62,13 @@ String: "{[()]"
 
 ### Monotonic Stack Cheatsheet
 
-| Problem Type | Stack Type | Traversal Direction | Stack Stores | Pattern |
-|-------------|------------|-------------------|--------------|---------|
-| **Next Greater Element (NGE)** | Decreasing | Right to Left (← ) | Elements in decreasing order | If current > stack.top(), pop and assign current as NGE |
-| **Next Smaller Element (NSE)** | Increasing | Right to Left (← ) | Elements in increasing order | If current < stack.top(), pop and assign current as NSE |
-| **Previous Greater Element (PGE)** | Decreasing | Left to Right (→ ) | Elements in decreasing order | If current > stack.top(), pop; stack.top() is PGE |
-| **Previous Smaller Element (PSE)** | Increasing | Left to Right (→ ) | Elements in increasing order | If current < stack.top(), pop; stack.top() is PSE |
+| To Find       | Traversal Direction | Pop Condition       | Stack Property              |
+|---------------|--------------------|---------------------|-------------------------------|
+| Next Greater  | n-1 → 0            | peek ≤ current      | Monotonic Decreasing          |
+| Next Smaller  | n-1 → 0            | peek ≥ current      | Monotonic Increasing          |
+| Prev Greater  | 0 → n-1            | peek ≤ current      | Monotonic Decreasing          |
+| Prev Smaller  | 0 → n-1            | peek ≥ current      | Monotonic Increasing          |
+
 
 **Key Insights:**
 - **Next** problems: Traverse **right to left** (reverse iteration)
@@ -78,14 +79,6 @@ String: "{[()]"
 - Answer for popped elements is the current element
 
 ## 2. Next Greater Element
-
-**Problem Description:**
-
-Given an array `arr`, for each element, find the next greater element (NGE). The next greater element for an element `x` is the first element to the right of `x` in the array that is greater than `x`. If no such element exists, the NGE is -1.
-
-**Intuition:**
-
-The stack helps us keep track of potential candidates for the NGE of elements we've seen so far. The key is that the stack will store elements in *decreasing* order.  When we encounter a larger element, we know that it's the NGE for all the smaller elements on the stack.
 
 **Approach (Step-by-Step):**
 
@@ -113,34 +106,28 @@ Result: `[3, 4, 4, -1]`
 **Code Snippet (illustrative):**
 
 ```java
-//Not Complete Code
+// 1. DIRECTION: Right to Left (looking at the "future")
 for (int i = n - 1; i >= 0; i--) {
-  while (!stack.isEmpty() && arr[i] >= stack.peek()) {
-    stack.pop();
-  }
-  nge[i] = stack.isEmpty() ? -1 : stack.peek();
-  stack.push(arr[i]);
+    
+    // 2. POP: Remove elements smaller than current (they can't be NGE for anyone else)
+    while (!stack.isEmpty() && stack.peek() <= arr[i]) {
+        stack.pop();
+    }
+
+    // 3. ANSWER: Top of stack is the first greater element to the right
+    if (stack.isEmpty()) {
+        nge[i] = -1; // No greater element found
+    } else {
+        nge[i] = stack.peek();
+    }
+
+    // 4. PUSH: Add current element to stack for elements to the left to consider
+    stack.push(arr[i]);
 }
 ```
-
-**Common Mistakes:**
-
-*   **Iterating in the Wrong Direction:** Iterating from left to right won't work.  You need to iterate from right to left to find the *next* greater element.
-*   **Incorrect Comparison:** Using `>` instead of `>=` in the `while` loop can lead to incorrect results when there are duplicate elements in the array.
-*   **Pushing Indices vs. Values:** Make sure you're pushing the actual values from the array onto the stack and not their indices (unless the problem specifically requires indices).
-*   **Not handling Empty Stack Correctly:** When the stack is empty after the popping operations, correctly assign -1 to `nge[i]`.
-
 ---
 
 ## 3. Next Smaller Element
-
-**Problem Description:**
-
-Given an array `arr`, for each element, find the next smaller element (NSE). The next smaller element for an element `x` is the first element to the right of `x` in the array that is smaller than `x`. If no such element exists, the NSE is -1.
-
-**Intuition:**
-
-The logic is very similar to the Next Greater Element, but with a slight modification in the comparison. Instead of finding the next *greater* element, we want to find the next *smaller* element.  Therefore, the stack will now store elements in *increasing* order.
 
 **Approach (Step-by-Step):**
 
@@ -165,24 +152,24 @@ Array: `[4, 5, 2, 10, 8]`
 5.  `4`: Push 4. `nse[0] = 2`
     Output: `[2, 2, -1, 8, -1]`
 
-**Common Mistakes:**
-
-Same as Next Greater Element, but with the comparison reversed.
-
-*   **Incorrect Comparison:** Use `<` instead of `<=` in the `while` loop.
-*   **Confusing with Next Greater Element:** Make sure you understand the difference in comparison (greater vs. smaller) and that you're popping the *larger* elements when looking for the NSE.
-
+```java
+// DIRECTION: Right to Left (n-1 down to 0)
+for (int i = n - 1; i >= 0; i--) {
+    // POP: While top of stack is GREATER than or equal to current
+    // (This keeps the stack "Monotonic Increasing" from the bottom)
+    while (!stack.isEmpty() && stack.peek() >= arr[i]) {
+        stack.pop();
+    }
+    
+    // ANSWER: Top of stack is the first smaller element to the right
+    nse[i] = stack.isEmpty() ? -1 : stack.peek();
+    
+    stack.push(arr[i]);
+}
+```
 ---
 
 ## 4. Previous Greater Element
-
-**Problem Description:**
-
-Given an array `arr`, for each element, find the previous greater element (PGE). The previous greater element for an element `x` is the first element to the left of `x` in the array that is greater than `x`. If no such element exists, the PGE is -1.
-
-**Intuition:**
-
-Since we're looking for elements to the *left*, we iterate from left to right. The stack will store elements in decreasing order (similar to NGE).  Whenever we encounter an element bigger than something on the stack, we pop until we find the previous greater.
 
 **Approach (Step-by-Step):**
 
@@ -207,23 +194,24 @@ Array: `[1, 3, 2, 4]`
 
 Result: `[-1, -1, 3, -1]`
 
-**Common Mistakes:**
-
-*   **Iterating in the Wrong Direction:** Iterating from right to left is wrong. Iterate from left to right.
-*   **Incorrect Comparison:** Using `>` instead of `>=`.
-*   **Pushing Indices vs. Values:** Push the values of the array.
-
+```java
+// DIRECTION: Left to Right (0 up to n-1)
+for (int i = 0; i < n; i++) {
+    // POP: While top of stack is SMALLER than or equal to current
+    // (This keeps the stack "Monotonic Decreasing" from the bottom)
+    while (!stack.isEmpty() && stack.peek() <= arr[i]) {
+        stack.pop();
+    }
+    
+    // ANSWER: Top of stack is the first greater element to the left
+    pge[i] = stack.isEmpty() ? -1 : stack.peek();
+    
+    stack.push(arr[i]);
+}
+```
 ---
 
 ## 5. Previous Smaller Element
-
-**Problem Description:**
-
-Given an array `arr`, for each element, find the previous smaller element (PSE). The previous smaller element for an element `x` is the first element to the left of `x` in the array that is smaller than `x`. If no such element exists, the PSE is -1.
-
-**Intuition:**
-
-The stack will store elements in increasing order (like NSE). We iterate from left to right.
 
 **Approach (Step-by-Step):**
 
@@ -249,11 +237,21 @@ Array: `[4, 5, 2, 10, 8]`
 
 Result: `[-1, 4, -1, 2, 2]`
 
-**Common Mistakes:**
-
-*   **Iterating in the Wrong Direction:** Iterate from left to right.
-*   **Incorrect Comparison:**  Use `<` instead of `<=`.
-
+```java
+// DIRECTION: Left to Right (0 up to n-1)
+for (int i = 0; i < n; i++) {
+    // POP: While top of stack is GREATER than or equal to current
+    // (This keeps the stack "Monotonic Increasing" from the bottom)
+    while (!stack.isEmpty() && stack.peek() >= arr[i]) {
+        stack.pop();
+    }
+    
+    // ANSWER: Top of stack is the first smaller element to the left
+    pse[i] = stack.isEmpty() ? -1 : stack.peek();
+    
+    stack.push(arr[i]);
+}
+```
 ---
 
 ## 6. Stock Span Problem

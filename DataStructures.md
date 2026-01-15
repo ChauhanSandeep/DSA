@@ -14,7 +14,6 @@
 ``` java
 int[] arr = new int[n];            // Array of size n, initialized to 0
 int[] arr = {1, 2, 3, 4, 5};       // Array literal
-int[] arr = new int[]{1, 2, 3};    // Array initialization
 int[][] matrix = new int[m][n];    // 2D array
 ```
 

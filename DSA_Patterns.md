@@ -16,16 +16,31 @@ This document summarizes common Data Structures and Algorithms (DSA) patterns us
 
 **Code snippet:**
 ```java
-int left = 0;
-for (int right = 0; right < nums.length; right++) {
-    // Expand window by adding right element
-    while (!indexDeque.isEmpty() && indexDeque.peekFirst() < right - (k - 1)) {
-        indexDeque.pollFirst();  // Remove elements outside window
+// Find maximum sum of subarray of size K
+// ADD -> SHRINK -> PROCESS
+public int findMaxSum(int[] arr, int k) {
+    int left = 0;
+    int currentSum = 0;
+    int maxSum = 0;
+
+    for (int right = 0; right < arr.length; right++) {
+        // 1. ADD: Expand the window by including the current element
+        currentSum += arr[right];
+
+        // 2. SHRINK: Ensure window does not exceed size K
+        // Using 'while' keeps the logic generic for variable sizes
+        while (right - left + 1 > k) {
+            currentSum -= arr[left]; // Remove the element going out of view
+            left++;
+        }
+
+        // 3. PROCESS: If we hit the target size, check for max
+        if (right - left + 1 == k) {
+            maxSum = Math.max(maxSum, currentSum);
+        }
     }
-    // Process current window
-    if (right >= k - 1) {
-        result[right - (k - 1)] = nums[indexDeque.peekFirst()];
-    }
+    
+    return maxSum;
 }
 ```
 
@@ -45,22 +60,26 @@ for (int right = 0; right < nums.length; right++) {
 
 **Code snippet:**
 ```java
-int left = 0;
-int right = heights.length - 1;
-int maxWater = 0;
+// Find max area of water container
+public int maxArea(int[] heights) {
+    int left = 0;
+    int right = heights.length - 1;
+    int maxWater = 0;
 
-while (left < right) {
-    int minHeight = Math.min(heights[left], heights[right]);
-    int width = right - left;
-    int currentArea = minHeight * width;
-    maxWater = Math.max(maxWater, currentArea);
-    
-    // Move pointer with smaller height
-    if (heights[left] < heights[right]) {
-        left++;
-    } else {
-        right--;
+    while (left < right) {
+        int minHeight = Math.min(heights[left], heights[right]);
+        int width = right - left;
+        int currentArea = minHeight * width;
+        maxWater = Math.max(maxWater, currentArea);
+        
+        // Move pointer with smaller height
+        if (heights[left] < heights[right]) {
+            left++;
+        } else {
+            right--;
+        }
     }
+    return maxWater;
 }
 ```
 
@@ -80,6 +99,34 @@ while (left < right) {
 
 **Code snippet:**
 ```java
+// Standard binary search of target in sorted array
+public int binarySearch(int[] arr, int target) {
+    int left = 0;
+    int right = arr.length - 1;
+
+    // Use <= so the case where left == right is checked
+    while (left <= right) { 
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] == target) {
+            return mid;
+        }
+
+        if (arr[mid] > target) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return -1; // Target not found
+}
+```
+
+When we have to find the boundary condition instead of fixed target, like minimum in rotated sorted array or peak element,
+ then we use condition `left < right` to avoid infinite loop.
+```java
+// Find minimum in rotated sorted array
 int left = 0, right = nums.length - 1;
 
 while (left < right) {
@@ -95,216 +142,6 @@ return nums[left];
 ```
 
 **Complexity:** Time - O(log n), Space - O(1)
-
----
-
-## 4. Binary Search on Answer
-
-**When to use:** When you need to find an optimal value (minimum or maximum) that satisfies certain conditions. The search space is the range of possible answers, not array indices.
-
-**Example problems:**
-- Capacity To Ship Packages Within D Days
-- Split Array Largest Sum
-- Koko Eating Bananas
-- Minimum Limit of Balls in a Bag
-
-**Code snippet:**
-```java
-int left = maxWeight, right = totalWeight;
-
-// Binary search on capacity
-while (left < right) {
-    int mid = left + (right - left) / 2;
-    
-    if (canShipWithCapacity(weights, D, mid)) {
-        right = mid;  // Try smaller capacity
-    } else {
-        left = mid + 1;  // Need larger capacity
-    }
-}
-
-private boolean canShipWithCapacity(int[] weights, int D, int capacity) {
-    int daysNeeded = 1;
-    int currentLoad = 0;
-    for (int weight : weights) {
-        if (currentLoad + weight > capacity) {
-            daysNeeded++;
-            currentLoad = weight;
-            if (daysNeeded > D) return false;
-        } else {
-            currentLoad += weight;
-        }
-    }
-    return true;
-}
-```
-
-**Complexity:** Time - O(n log(sum)), Space - O(1)
-
----
-
-## 5. Backtracking
-
-**When to use:** When you need to explore all possible solutions by making choices, then undoing them if they don't lead to a valid solution. Common in permutations, combinations, and constraint satisfaction problems.
-
-**Example problems:**
-- N-Queens
-- Permutations
-- Combinations
-- Subset Generation
-- Word Search
-
-**Code snippet:**
-```java
-private void backtrack(int row, int n, char[][] board, 
-                      Set<Integer> columns, Set<Integer> diagonals, 
-                      Set<Integer> antiDiagonals, List<List<String>> solutions) {
-    // Base case: All queens placed
-    if (row == n) {
-        solutions.add(convertBoardToList(board));
-        return;
-    }
-    
-    for (int col = 0; col < n; col++) {
-        int diagonal = row - col;
-        int antiDiagonal = row + col;
-        
-        if (columns.contains(col) || diagonals.contains(diagonal) 
-            || antiDiagonals.contains(antiDiagonal)) continue;
-        
-        // Make choice
-        board[row][col] = 'Q';
-        columns.add(col);
-        diagonals.add(diagonal);
-        antiDiagonals.add(antiDiagonal);
-        
-        // Recurse
-        backtrack(row + 1, n, board, columns, diagonals, antiDiagonals, solutions);
-        
-        // Undo choice (backtrack)
-        board[row][col] = '.';
-        columns.remove(col);
-        diagonals.remove(diagonal);
-        antiDiagonals.remove(antiDiagonal);
-    }
-}
-```
-
-**Complexity:** Time - O(N!) for N-Queens, varies by problem; Space - O(N) for recursion stack
-
----
-
-## 6. Dynamic Programming - Tabulation
-
-**When to use:** When a problem has overlapping subproblems and optimal substructure. Build solutions bottom-up using a table to store intermediate results.
-
-**Example problems:**
-- Climbing Stairs
-- Coin Change
-- Longest Common Subsequence
-- 0/1 Knapsack
-- House Robber
-
-**Code snippet:**
-```java
-// Climbing Stairs example with space optimization
-public int climbStairs(int totalSteps) {
-    if (totalSteps <= 1) return 1;
-    
-    int waysToPreviousStep = 2;  // ways to reach step 2
-    int waysToTwoStepsBack = 1;  // ways to reach step 1
-    
-    for (int currentStep = 3; currentStep <= totalSteps; currentStep++) {
-        int currentWays = waysToPreviousStep + waysToTwoStepsBack;
-        waysToTwoStepsBack = waysToPreviousStep;
-        waysToPreviousStep = currentWays;
-    }
-    
-    return waysToPreviousStep;
-}
-```
-
-**Complexity:** Time - O(n), Space - O(1) with space optimization, O(n) with DP array
-
----
-
-## 7. Dynamic Programming - Memoization
-
-**When to use:** Top-down approach to DP where you recursively solve subproblems and cache results to avoid recomputation.
-
-**Example problems:**
-- Fibonacci Numbers
-- Decode Ways
-- Burst Balloons
-- Regular Expression Matching
-
-**Code snippet:**
-```java
-public int climbStairsMemoization(int totalSteps) {
-    int[] memo = new int[totalSteps + 1];
-    return climbStairsHelper(totalSteps, memo);
-}
-
-private int climbStairsHelper(int remainingSteps, int[] memo) {
-    // Base cases
-    if (remainingSteps <= 1) return 1;
-    
-    // Return cached result if available
-    if (memo[remainingSteps] > 0) {
-        return memo[remainingSteps];
-    }
-    
-    // Compute and cache
-    memo[remainingSteps] = climbStairsHelper(remainingSteps - 1, memo) +
-                          climbStairsHelper(remainingSteps - 2, memo);
-    
-    return memo[remainingSteps];
-}
-```
-
-**Complexity:** Time - O(n), Space - O(n) for memoization table + recursion stack
-
----
-
-## 8. Greedy Algorithm
-
-**When to use:** When making locally optimal choices leads to a globally optimal solution. Often involves sorting and making the best choice at each step.
-
-**Example problems:**
-- Candy Distribution
-- Jump Game
-- Meeting Rooms
-- Activity Selection
-
-**Code snippet:**
-```java
-// Candy distribution - Two-pass greedy approach
-public int candy(int[] ratings) {
-    int n = ratings.length;
-    if (n <= 1) return n;
-    
-    int[] candies = new int[n];
-    Arrays.fill(candies, 1);
-    
-    // Left to right pass
-    for (int i = 1; i < n; i++) {
-        if (ratings[i] > ratings[i - 1]) {
-            candies[i] = candies[i - 1] + 1;
-        }
-    }
-    
-    // Right to left pass
-    for (int i = n - 2; i >= 0; i--) {
-        if (ratings[i] > ratings[i + 1]) {
-            candies[i] = Math.max(candies[i], candies[i + 1] + 1);
-        }
-    }
-    
-    return Arrays.stream(candies).sum();
-}
-```
-
-**Complexity:** Time - O(n), Space - O(n)
 
 ---
 
@@ -351,28 +188,37 @@ public int findKthLargestUsingMinHeap(int[] inputArray, int k) {
 
 **Code snippet:**
 ```java
-public List<List<Integer>> levelOrder(TreeNode root) {
-    List<List<Integer>> result = new ArrayList<>();
-    if (root == null) return result;
+// BFS to find shortest path from source to all other vertices
+public static int[] shortestPath(List<List<Integer>> graph, int startNode) {
+    int size = graph.size();
+    boolean[] visited = new boolean[size];
+    int[] distance = new int[size];
+    Arrays.fill(distance, -1);
     
-    Queue<TreeNode> queue = new LinkedList<>();
-    queue.offer(root);
+    Queue<Pair> queue = new LinkedList<>();
+    
+    // Initial Add
+    queue.offer(new Pair(startNode, 0));
     
     while (!queue.isEmpty()) {
-        int levelSize = queue.size();
-        List<Integer> currentLevel = new ArrayList<>();
+        // 1. SELECT
+        Pair node = queue.poll();
         
-        for (int i = 0; i < levelSize; i++) {
-            TreeNode node = queue.poll();
-            currentLevel.add(node.val);
-            
-            if (node.left != null) queue.offer(node.left);
-            if (node.right != null) queue.offer(node.right);
+        // 2. MARK(*)
+        if (visited[node.v]) continue;
+        visited[node.v] = true;
+        // 3. WORK
+        distance[node.v] = node.d; // Update the final distance array
+        
+        // 4. ADD(*)
+        for (int neighbor : graph.get(node.v)) {
+            if (!visited[neighbor]) {
+                // Add the neighbor with distance + 1
+                queue.offer(new Pair(neighbor, node.d + 1));
+            }
         }
-        result.add(currentLevel);
     }
-    
-    return result;
+    return distance;
 }
 ```
 
@@ -392,7 +238,7 @@ public List<List<Integer>> levelOrder(TreeNode root) {
 
 **Code snippet:**
 ```java
-// Recursive DFS
+// Recursive DFS for graph traversal
 public void dfs(int node, boolean[] visited, List<List<Integer>> graph) {
     visited[node] = true;
     
@@ -402,21 +248,37 @@ public void dfs(int node, boolean[] visited, List<List<Integer>> graph) {
         }
     }
 }
+```
 
-// Iterative DFS using stack
-public void dfsIterative(int start, List<List<Integer>> graph) {
-    boolean[] visited = new boolean[graph.size()];
-    Stack<Integer> stack = new Stack<>();
-    stack.push(start);
+DFS approach using stack and formula SELECT -> MARK(*) > WORK -> ADD(*):
+```java
+public static void iterativeDFS(List<List<Integer>> graph, int startNode) {
+    int size = graph.size();
+    boolean[] visited = new boolean[size];
+    
+    // Use a Stack instead of a Queue
+    Stack<Pair> stack = new Stack<>();
+    
+    // Initial Add
+    stack.push(new Pair(startNode, 0));
     
     while (!stack.isEmpty()) {
-        int node = stack.pop();
-        if (!visited[node]) {
-            visited[node] = true;
-            for (int neighbor : graph.get(node)) {
-                if (!visited[neighbor]) {
-                    stack.push(neighbor);
-                }
+        // 1. SELECT (Pop instead of Poll)
+        Pair node = stack.pop();
+        
+        // 2. MARK(*)
+        // This is crucial in Iterative DFS because a node 
+        // might be pushed onto the stack multiple times.
+        if (visited[node.v]) continue;
+        visited[node.v] = true;
+
+        // 3. WORK
+        System.out.println("Visited: " + node.v + " at depth " + node.d);
+        
+        // 4. ADD(*)
+        for (int neighbor : graph.get(node.v)) {
+            if (!visited[neighbor]) {
+                stack.push(new Pair(neighbor, node.d + 1));
             }
         }
     }
@@ -439,6 +301,7 @@ public void dfsIterative(int start, List<List<Integer>> graph) {
 
 **Code snippet:**
 ```java
+// Union-Find with path compression and union by rank
 public class DisjointSet {
     private int[] parent;
     private int[] rank;
@@ -494,6 +357,7 @@ public class DisjointSet {
 
 **Code snippet:**
 ```java
+// Find next warmer day for daily temperatures
 public int[] dailyTemperatures(int[] temperatures) {
     int n = temperatures.length;
     int[] result = new int[n];
@@ -516,6 +380,63 @@ public int[] dailyTemperatures(int[] temperatures) {
 
 ---
 
+### Finding Both Next Smaller and Previous Smaller in Single Iteration
+
+**When to use:** When you need to find both the next smaller element AND the previous smaller element for each element simultaneously. Common in area calculation problems like histograms, where you need boundaries on both sides.
+
+**Key Idea:** Use a monotonic increasing stack. When you pop elements (because current element is smaller), the popped element has found its **next smaller** (current element), and the element now at stack top becomes the **previous smaller** for the current element.
+
+**Example problems:**
+- [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+- [85. Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)
+- [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/) (uses similar concept)
+
+**Code snippet:**
+```java
+// Find largest rectangle in histogram
+public int largestRectangleArea(int[] heights) {
+    int n = heights.length;
+    int maxArea = 0;
+    Stack<Integer> stack = new Stack<>();  // Monotonic increasing stack (stores indices)
+    
+    for (int i = 0; i < n; i++) {
+        // While current bar is shorter than stack top, calculate area for popped bars
+        while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
+            int heightIndex = stack.pop();
+            int height = heights[heightIndex];
+            
+            // Previous smaller: element at current stack top (or -1 if stack empty)
+            // Next smaller: current element at index i
+            int prevSmaller = stack.isEmpty() ? -1 : stack.peek();
+            int nextSmaller = i;
+            
+            int width = nextSmaller - prevSmaller - 1;
+            int area = height * width;
+            maxArea = Math.max(maxArea, area);
+        }
+        stack.push(i);
+    }
+    
+    // Process remaining bars in stack (no next smaller exists, use n as boundary)
+    while (!stack.isEmpty()) {
+        int heightIndex = stack.pop();
+        int height = heights[heightIndex];
+        int prevSmaller = stack.isEmpty() ? -1 : stack.peek();
+        int nextSmaller = n;  // No next smaller, so width extends to end
+        
+        int width = nextSmaller - prevSmaller - 1;
+        int area = height * width;
+        maxArea = Math.max(maxArea, area);
+    }
+    
+    return maxArea;
+}
+```
+
+**Complexity:** Time - O(n), Space - O(n)
+
+---
+
 ## 14. Fast & Slow Pointers (Floyd's Cycle Detection)
 
 **When to use:** When you need to detect cycles in linked lists or find the middle element. Also known as the "tortoise and hare" algorithm.
@@ -528,6 +449,7 @@ public int[] dailyTemperatures(int[] temperatures) {
 
 **Code snippet:**
 ```java
+// Detect cycle and find cycle start in linked list
 public ListNode detectCycle(ListNode head) {
     if (head == null || head.next == null) return null;
     
@@ -570,6 +492,7 @@ public ListNode detectCycle(ListNode head) {
 
 **Code snippet:**
 ```java
+// Find maximum XOR of two numbers in an array
 public int findMaximumXor(int[] arr) {
     int maxXor = 0;
     int mask = 0;
@@ -614,6 +537,7 @@ public int findMaximumXor(int[] arr) {
 
 **Code snippet:**
 ```java
+// Segment Tree for range sum queries
 class SegmentTree {
     private int[] tree;
     private int n;
@@ -665,48 +589,78 @@ class SegmentTree {
 
 **Code snippet:**
 ```java
-public int networkDelayTime(int[][] times, int n, int k) {
-    // Build adjacency list
-    Map<Integer, List<int[]>> graph = new HashMap<>();
-    for (int[] time : times) {
-        graph.computeIfAbsent(time[0], x -> new ArrayList<>())
-             .add(new int[]{time[1], time[2]});
-    }
+// Find shortest time to reach all nodes from source k
+public class DijkstraShortestPath {
     
-    // Priority queue: [distance, node]
-    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[0] - b[0]);
-    pq.offer(new int[]{0, k});
-    
-    int[] dist = new int[n + 1];
-    Arrays.fill(dist, Integer.MAX_VALUE);
-    dist[k] = 0;
-    
-    while (!pq.isEmpty()) {
-        int[] curr = pq.poll();
-        int d = curr[0], node = curr[1];
+    // Class representing an edge in the graph
+    static class Edge {
+        int destination;
+        int weight;
         
-        if (d > dist[node]) continue;
-        
-        if (graph.containsKey(node)) {
-            for (int[] next : graph.get(node)) {
-                int neighbor = next[0], weight = next[1];
-                int newDist = d + weight;
-                
-                if (newDist < dist[neighbor]) {
-                    dist[neighbor] = newDist;
-                    pq.offer(new int[]{newDist, neighbor});
-                }
-            }
+        public Edge(int destination, int weight) {
+            this.destination = destination;
+            this.weight = weight;
         }
     }
     
-    int maxDist = 0;
-    for (int i = 1; i <= n; i++) {
-        if (dist[i] == Integer.MAX_VALUE) return -1;
-        maxDist = Math.max(maxDist, dist[i]);
+    // Helper class for priority queue entries
+    static class Node {
+        int id;
+        int distance;
+        
+        public Node(int id, int distance) {
+            this.id = id;
+            this.distance = distance;
+        }
     }
     
-    return maxDist;
+    /**
+     * Finds shortest paths from source to all vertices using Dijkstra's algorithm.
+     * 
+     * @param graph Adjacency list where graph[i] contains list of edges from vertex i
+     * @param source The starting vertex
+     * @return Array of shortest distances from source to each vertex
+     */
+    public static int[] dijkstra(List<List<Edge>> graph, int source) {
+        int numVertices = graph.size();
+        int[] distance = new int[numVertices];
+        boolean[] visited = new boolean[numVertices];
+        
+        // Initialize all distances as infinity
+        Arrays.fill(distance, Integer.MAX_VALUE);
+        distance[source] = 0;
+        
+        // Min-heap: prioritize nodes with smallest distance
+        PriorityQueue<Node> minHeap = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
+        minHeap.offer(new Node(source, 0));
+        
+        while (!minHeap.isEmpty()) {
+            // SELECT: Extract node with minimum distance
+            Node current = minHeap.poll();
+            int currentNode = current.id;
+            
+            // MARK(*): Skip if already processed
+            if (visited[currentNode]) continue;
+            visited[currentNode] = true;
+            
+            // WORK: Current node's shortest path is finalized
+            // (Optional: can track parent for path reconstruction)
+            
+            // ADD(*): Explore all neighbors and update distances
+            for (Edge edge : graph.get(currentNode)) {
+                int neighbor = edge.destination;
+                int newDistance = distance[currentNode] + edge.weight;
+                
+                // Relaxation: update if we found a shorter path
+                if (!visited[neighbor] && newDistance < distance[neighbor]) {
+                    distance[neighbor] = newDistance;
+                    minHeap.offer(new Node(neighbor, newDistance));
+                }
+            }
+        }
+        
+        return distance;
+    }
 }
 ```
 
@@ -726,6 +680,7 @@ public int networkDelayTime(int[][] times, int n, int k) {
 
 **Code snippet:**
 ```java
+// Find order of courses to finish all prerequisites
 public int[] findOrder(int numCourses, int[][] prerequisites) {
     // Build graph and calculate in-degrees
     List<List<Integer>> graph = new ArrayList<>();
