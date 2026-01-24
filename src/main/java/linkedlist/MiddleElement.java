@@ -25,7 +25,8 @@ import java.util.Optional;
  *    - Requires cycle detection and length calculation before finding mid.
  * 3. How would you modify this for a doubly linked list?
  *    - Same logic applies, though reverse traversal becomes easier.
- */
+ * LeetCode Contest Rating: 1232
+ **/
 public class MiddleElement {
 
   public static void main(String[] args) {

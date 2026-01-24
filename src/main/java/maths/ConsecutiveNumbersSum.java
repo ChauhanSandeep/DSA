@@ -28,7 +28,8 @@ import java.util.List;
  *    Related: https://leetcode.com/problems/sum-of-consecutive-numbers/
  *
  * @author Sandeep
- */
+ * LeetCode Contest Rating: 1694
+ **/
 public class ConsecutiveNumbersSum {
 
     /**

@@ -27,7 +27,8 @@ import java.util.Set;
  * 2. Can this problem be solved using DP + Bitmask for optimal result?
  *    - Yes, use DP[i][mask] = shortest string ending with i and mask indicating included words.
  *    - Leetcode link for optimal DP + Bitmask approach: https://leetcode.com/problems/find-the-shortest-superstring/
- */
+ * LeetCode Contest Rating: 2186
+ **/
 public class ShortestCommonSuperstring {
 
     /**

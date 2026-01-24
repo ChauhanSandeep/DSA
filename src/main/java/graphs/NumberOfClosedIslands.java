@@ -39,7 +39,8 @@ import java.util.*;
  * Related Problems:
  * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
  * - Surrounded Regions (https://leetcode.com/problems/surrounded-regions/)
- */
+ * LeetCode Contest Rating: 1659
+ **/
 public class NumberOfClosedIslands {
     // Directions for moving in 4 directions
     private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};

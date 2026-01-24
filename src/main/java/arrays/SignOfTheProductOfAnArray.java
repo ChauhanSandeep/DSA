@@ -28,7 +28,8 @@ import java.util.Arrays;
  * - 238. Product of Array Except Self: https://leetcode.com/problems/product-of-array-except-self/
  * - 152. Maximum Product Subarray: https://leetcode.com/problems/maximum-product-subarray/
  * - 1464. Maximum Product of Two Elements in an Array: https://leetcode.com/problems/maximum-product-of-two-elements-in-an-array/
- */
+ * LeetCode Contest Rating: 1210
+ **/
 public class SignOfTheProductOfAnArray {
 
     /**

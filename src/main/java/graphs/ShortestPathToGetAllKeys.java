@@ -28,7 +28,8 @@ import java.util.*;
  *
  * Time Complexity: O(m * n * 2^k) where m is number of rows, n is number of columns, and k is number of keys
  * Space Complexity: O(m * n * 2^k) for the visited set
- */
+ * LeetCode Contest Rating: 2259
+ **/
 public class ShortestPathToGetAllKeys {
     private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 

@@ -38,7 +38,8 @@ package arrays.twopointers;
  * - 768. Max Chunks To Make Sorted II: https://leetcode.com/problems/max-chunks-to-make-sorted-ii/
  * - 1043. Partition Array for Maximum Sum: https://leetcode.com/problems/partition-array-for-maximum-sum/
  * - 132. Palindrome Partitioning II: https://leetcode.com/problems/palindrome-partitioning-ii/
- */
+ * LeetCode Contest Rating: 1501
+ **/
 public class PartitionArrayIntoDisjointIntervals {
 
     /**

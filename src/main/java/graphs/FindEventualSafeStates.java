@@ -25,7 +25,8 @@ import java.util.*;
  *
  * Q: How to handle dynamic updates to the graph?
  * A: Maintain incremental data structures or recompute affected components.
- */
+ * LeetCode Contest Rating: 1962
+ **/
 public class FindEventualSafeStates {
 
     /**

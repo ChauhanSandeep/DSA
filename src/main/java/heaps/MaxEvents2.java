@@ -32,7 +32,8 @@ import java.util.Arrays;
  *    → Similar approach but maximize becomes minimize, and base case logic needs tweaks.
  * 3. Can this be solved with Segment Trees?
  *    → Yes, in O(N log N) using event processing + range max queries. See: LC hard variants.
- */
+ * LeetCode Contest Rating: 2041
+ **/
 public class MaxEvents2 {
 
   public static void main(String[] args) {

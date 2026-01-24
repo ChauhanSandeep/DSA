@@ -24,7 +24,8 @@ import java.util.*;
  * - shortestPath: O(1) per query
  *
  * Space Complexity: O(n^2)
- */
+ * LeetCode Contest Rating: 1811
+ **/
 public class Graph {
 
     private static final int INF = (int) 1e9;

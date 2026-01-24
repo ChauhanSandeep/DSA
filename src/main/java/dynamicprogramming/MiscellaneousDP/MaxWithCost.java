@@ -27,7 +27,8 @@ package dynamicprogramming.MiscellaneousDP;
  *
  * Q: Can this be done using segment tree?
  * A: Yes, but would be overkill as current approach is already linear per row.
- */
+ * LeetCode Contest Rating: 2106
+ **/
 public class MaxWithCost {
 
   /**

@@ -51,7 +51,8 @@ import java.util.Arrays;
  *    Answer: We would need to adjust the approach to handle negative indices or normalize them.
  *
  * LeetCode: https://leetcode.com/problems/video-stitching/
- */
+ * LeetCode Contest Rating: 1746
+ **/
 public class VideoStitching {
 
     /**

@@ -30,7 +30,8 @@ import java.util.Map;
  *    Related: https://leetcode.com/problems/find-eventual-safe-states/
  *
  * @author Sandeep
- */
+ * LeetCode Contest Rating: 1287
+ **/
 public class FindCenterOfStarGraph {
 
     /**

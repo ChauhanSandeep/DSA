@@ -39,7 +39,8 @@ import java.util.List;
  * 3) Can you generate the k-th number in lexicographic order without generating all (combinatorial indexing)?
  * 4) How to extend this to arbitrary digit ranges (e.g., allow 0..9, or a custom subset/alphabet)?
  * 5) What if we want numbers with at most N digits instead of exactly N digits?
- */
+ * LeetCode Contest Rating: 1374
+ **/
 public class IncreasingNDigitNumbers {
 
     /**

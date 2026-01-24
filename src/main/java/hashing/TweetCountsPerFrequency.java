@@ -33,7 +33,8 @@ import java.util.*;
  * - recordTweet: O(1) average time per operation
  * - getTweetCountsPerFrequency: O(n log n) where n is the number of tweets in the given time range
  * Space Complexity: O(n) where n is the total number of tweets recorded
- */
+ * LeetCode Contest Rating: 2037
+ **/
 public class TweetCountsPerFrequency {
     private Map<String, TreeMap<Integer, Integer>> tweetMap;
     private Map<String, Integer> freqMap;

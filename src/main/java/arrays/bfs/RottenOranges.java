@@ -23,7 +23,8 @@ import java.util.Queue;
  * 🧠 Follow-up:
  * - What if the input grid is extremely large (e.g., 10^6 x 10^6)?
  *   → You must optimize memory. Use streaming techniques or mark changes in-place.
- */
+ * LeetCode Contest Rating: 1433
+ **/
 public class RottenOranges {
 
   private static final int EMPTY = 0;

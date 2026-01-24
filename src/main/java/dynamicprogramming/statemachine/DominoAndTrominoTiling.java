@@ -36,7 +36,8 @@ package dynamicprogramming.statemachine;
  *    Answer: Modify DP to store actual configurations instead of just counts.
  * 4. How to optimize space for very large n?
  *    Answer: Since we only need last 3 values, use rolling variables instead of array.
- */
+ * LeetCode Contest Rating: 1830
+ **/
 public class DominoAndTrominoTiling {
 
   private static final int MODULO = 1_000_000_007;

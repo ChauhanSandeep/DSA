@@ -28,7 +28,8 @@ import java.util.Set;
  * - Can you solve without converting numbers to strings? (Use modular arithmetic)
  * - How would you extend to different rotation rules? (Modify rotation mapping)
  * - What if we need to count numbers that remain the same after rotation? (Change validity condition)
- */
+ * LeetCode Contest Rating: 1397
+ **/
 public class RotatedDigits {
 
     private final Set<Integer> INVALID_DIGITS = new HashSet<>(Arrays.asList(3, 4, 7));

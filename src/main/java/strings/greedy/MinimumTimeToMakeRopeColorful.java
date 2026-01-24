@@ -31,7 +31,8 @@ package strings.greedy;
  * - LeetCode 1047: Remove All Adjacent Duplicates In String
  * - LeetCode 1209: Remove All Adjacent Duplicates in String II
  * - LeetCode 1578: Minimum Deletion Cost to Avoid Repeating Letters (same problem)
- */
+ * LeetCode Contest Rating: 1574
+ **/
 public class MinimumTimeToMakeRopeColorful {
 
     /**

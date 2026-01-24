@@ -32,7 +32,8 @@ import java.util.*;
  * Question: How would you optimize the solution for real-time updates?
  * Answer: We could maintain a sliding window of recent visits and update the pattern counts incrementally.
  *
- */
+ * LeetCode Contest Rating: 1851
+ **/
 public class WebsiteVisit {
 
     public static void main(String[] args) {

@@ -38,7 +38,8 @@ import java.util.*;
  *  - LeetCode 207 (Course Schedule): https://leetcode.com/problems/course-schedule/
  *  - LeetCode 210 (Course Schedule II): https://leetcode.com/problems/course-schedule-ii/
  *  - LeetCode 1136 (Parallel Courses): https://leetcode.com/problems/parallel-courses/
- */
+ * LeetCode Contest Rating: 1679
+ **/
 public class FindAllPossibleRecipes {
 
     /**

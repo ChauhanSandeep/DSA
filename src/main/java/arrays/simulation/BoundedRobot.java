@@ -14,7 +14,8 @@ package arrays.simulation;
  * - Space complexity is **O(1)** as only a few variables are used.
  *
  * LeetCode Problem: https://leetcode.com/problems/robot-bounded-in-circle/
- */
+ * LeetCode Contest Rating: 1521
+ **/
 public class BoundedRobot {
     public static void main(String[] args) {
         String instructions = "GGLLGG";

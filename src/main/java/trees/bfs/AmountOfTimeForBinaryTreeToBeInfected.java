@@ -54,7 +54,8 @@ import java.util.*;
  * 5. What if infection spreads with different speeds (some edges take longer)?
  *    Answer: Use Dijkstra's algorithm instead of BFS. Assign weights to edges based
  *    on infection speed. Find longest shortest path from start node to any other node.
- */
+ * LeetCode Contest Rating: 1711
+ **/
 public class AmountOfTimeForBinaryTreeToBeInfected {
 
     /**

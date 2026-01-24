@@ -28,7 +28,8 @@ package graphs;
  * Related Problems:
  * - Redundant Connection (https://leetcode.com/problems/redundant-connection/)
  * - Graph Valid Tree (https://leetcode.com/problems/graph-valid-tree/)
- */
+ * LeetCode Contest Rating: 2132
+ **/
 public class RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable {
     /**
      * Calculates the maximum number of edges that can be removed while keeping the graph fully traversable.

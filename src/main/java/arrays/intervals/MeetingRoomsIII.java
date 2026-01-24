@@ -22,7 +22,8 @@ import java.util.PriorityQueue;
  * 1. What if the meeting durations can be changed slightly (flexible start/end)? -> Use greedy + priority queue
  * 2. Can you optimize for minimal wait time instead of maximizing usage? -> Use heap and additional state tracking
  * 3. What if each room has different setup time or cost per meeting? -> Use cost-based priority queue
- */
+ * LeetCode Contest Rating: 2093
+ **/
 
 public class MeetingRoomsIII {
 

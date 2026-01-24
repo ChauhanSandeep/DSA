@@ -29,7 +29,8 @@ package linkedlist;
  *    Answer: Create new nodes instead of modifying existing ones.
  *
  * @author Sandeep
- */
+ * LeetCode Contest Rating: 1333
+ **/
 public class MergeNodesInBetweenZeros {
 
     // Definition for singly-linked list

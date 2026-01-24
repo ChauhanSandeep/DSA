@@ -26,7 +26,8 @@ import java.util.*;
  *    - Use adjacency matrix instead of adjacency list for O(1) edge existence checks.
  * 3. Can this problem be extended to weighted edges?
  *    - Yes, instead of counting degrees, sum up weights of connected roads.
- */
+ * LeetCode Contest Rating: 1522
+ **/
 public class MaximalNetworkRank {
 
   public static void main(String[] args) {

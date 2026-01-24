@@ -13,7 +13,8 @@ package dynamicprogramming.gametheory;
  * Explanation: Alex can pick 5, then Lee picks 3, Alex picks 5, and Lee picks 4.
  *
  * LeetCode Problem: https://leetcode.com/problems/stone-game/
- */
+ * LeetCode Contest Rating: 1590
+ **/
 public class StoneGame {
 
     public static void main(String[] args) {

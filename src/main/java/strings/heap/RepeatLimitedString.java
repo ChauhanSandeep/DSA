@@ -23,7 +23,8 @@ import java.util.PriorityQueue;
  *    - Yes, by simulating character access using a frequency array from 'z' to 'a' and maintaining indices.
  * 3. How to solve for streaming data (continuous characters arriving)?
  *    - Requires window-based frequency handling and deferred write strategies.
- */
+ * LeetCode Contest Rating: 1680
+ **/
 
 public class RepeatLimitedString {
 

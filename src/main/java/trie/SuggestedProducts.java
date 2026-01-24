@@ -31,7 +31,8 @@ import java.util.List;
  *  → Use Trie with indexing.
  * - What if prefix search must be case-insensitive?
  *  → Normalize input to lowercase.
- */
+ * LeetCode Contest Rating: 1573
+ **/
 public class SuggestedProducts {
 
   public static void main(String[] args) {

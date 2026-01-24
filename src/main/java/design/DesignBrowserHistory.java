@@ -25,7 +25,8 @@ import java.util.*;
  * 
  * Q: How to support branching history (tree structure)?
  * A: Use tree structure instead of linear array/list.
- */
+ * LeetCode Contest Rating: 1454
+ **/
 public class DesignBrowserHistory {
     
     /**

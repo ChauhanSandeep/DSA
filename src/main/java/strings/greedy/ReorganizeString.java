@@ -27,7 +27,8 @@ import java.util.PriorityQueue;
  * Related Problems:
  * - Task Scheduler (https://leetcode.com/problems/task-scheduler/)
  * - Rearrange String k Distance Apart (https://leetcode.com/problems/rearrange-string-k-distance-apart/)
- */
+ * LeetCode Contest Rating: 1681
+ **/
 public class ReorganizeString {
     /**
      * Reorganizes the string so that no two adjacent characters are the same.

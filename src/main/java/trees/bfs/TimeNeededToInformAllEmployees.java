@@ -26,7 +26,8 @@ import java.util.*;
  *
  * Time Complexity: O(n) where n is the number of employees
  * Space Complexity: O(n) for the tree structure
- */
+ * LeetCode Contest Rating: 1561
+ **/
 public class TimeNeededToInformAllEmployees {
     public int numOfMinutes(int n, int headID, int[] manager, int[] informTime) {
         // Build the tree using adjacency list

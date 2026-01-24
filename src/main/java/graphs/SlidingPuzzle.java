@@ -37,7 +37,8 @@ import java.util.*;
  *    Related: https://leetcode.com/problems/shortest-path-to-get-all-keys/
  *
  * @author Sandeep
- */
+ * LeetCode Contest Rating: 1815
+ **/
 public class SlidingPuzzle {
 
     private static final String TARGET = "123450";

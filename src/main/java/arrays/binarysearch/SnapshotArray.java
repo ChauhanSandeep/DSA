@@ -35,7 +35,8 @@ import java.util.TreeMap;
  *    → Extend to store range data structures like segment trees per snapshot.
  *  - What if snapshots need to be persisted to disk?
  *    → Serialize TreeMaps to disk, use lazy loading for get operations.
- */
+ * LeetCode Contest Rating: 1771
+ **/
 public class SnapshotArray {
     /**
      * Main solution: HashMap + TreeMap for efficient snapshot storage.

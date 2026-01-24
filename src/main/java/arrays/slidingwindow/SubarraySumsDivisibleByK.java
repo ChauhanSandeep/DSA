@@ -20,7 +20,8 @@ import java.util.Map;
  *
  * Time Complexity: O(n) where n is the length of nums
  * Space Complexity: O(k) for the frequency map
- */
+ * LeetCode Contest Rating: 1676
+ **/
 public class SubarraySumsDivisibleByK {
     public int subarraysDivByK(int[] nums, int k) {
         // Map to store frequency of remainders

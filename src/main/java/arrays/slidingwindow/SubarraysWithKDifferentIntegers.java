@@ -21,7 +21,8 @@ import java.util.Map;
  *
  * Time Complexity: O(n) where n is the length of nums
  * Space Complexity: O(k) for the frequency map
- */
+ * LeetCode Contest Rating: 2210
+ **/
 public class SubarraysWithKDifferentIntegers {
     public int subarraysWithKDistinct(int[] nums, int k) {
         // The problem can be transformed to find the difference between

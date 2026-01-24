@@ -40,7 +40,8 @@ import java.util.*;
  * Related Problems:
  * - Network Delay Time (https://leetcode.com/problems/network-delay-time/)
  * - Cheapest Flights Within K Stops (https://leetcode.com/problems/cheapest-flights-within-k-stops/)
- */
+ * LeetCode Contest Rating: 2328
+ **/
 public class ReachableNodesInSubdividedGraph {
     /**
      * Calculates the number of nodes reachable in at most M moves.

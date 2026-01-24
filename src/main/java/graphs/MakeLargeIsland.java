@@ -25,7 +25,8 @@ import java.util.*;
  *
  * Time Complexity: O(N^2) (for DFS labeling + checking all zeros)
  * Space Complexity: O(N^2) (for map and marking)
- */
+ * LeetCode Contest Rating: 1934
+ **/
 public class MakeLargeIsland {
 
   /**

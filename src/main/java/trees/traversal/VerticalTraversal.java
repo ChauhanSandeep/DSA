@@ -33,7 +33,8 @@ import java.util.TreeMap;
  * Space Complexity: O(n) - Storing nodes in the map.
  *
  * LeetCode Problem Link: https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/
- */
+ * LeetCode Contest Rating: 1676
+ **/
 public class VerticalTraversal {
 
     public static void main(String[] args) {

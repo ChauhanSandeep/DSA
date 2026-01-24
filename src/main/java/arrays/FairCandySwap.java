@@ -17,7 +17,8 @@ import java.util.*;
  * - What if multiple valid swaps exist? (Return any one, current solution returns first found)
  * - How to find all possible fair swaps? (Modify to collect all valid pairs)
  * - What if no fair swap exists? (Problem guarantees solution exists)
- */
+ * LeetCode Contest Rating: 1334
+ **/
 public class FairCandySwap {
 
     /**

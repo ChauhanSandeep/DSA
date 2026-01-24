@@ -45,7 +45,8 @@ package arrays.greedy;
  * - Best Meeting Point: https://leetcode.com/problems/best-meeting-point/
  * - Minimum Moves to Equal Array Elements II: https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/
  * - Flip String to Monotone Increasing: https://leetcode.com/problems/flip-string-to-monotone-increasing/
- */
+ * LeetCode Contest Rating: 1541
+ **/
 public class MinimumDominoRotationsForEqualRow {
 
     /**

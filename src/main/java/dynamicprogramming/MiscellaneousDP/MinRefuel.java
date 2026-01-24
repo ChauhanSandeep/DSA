@@ -37,7 +37,8 @@ import java.util.PriorityQueue;
  *    ➤ Yes. DP[i] = max distance reachable with i refuels.
  * 2. What if all fuel stations are sorted in reverse?
  *    ➤ Doesn't matter; algorithm still works since it greedily adds reachable stations.
- */
+ * LeetCode Contest Rating: 2074
+ **/
 public class MinRefuel {
 
   public static void main(String[] args) {

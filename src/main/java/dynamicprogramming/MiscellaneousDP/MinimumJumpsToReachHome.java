@@ -36,7 +36,8 @@ import java.util.*;
  * Related Problems:
  * - Jump Game II (https://leetcode.com/problems/jump-game-ii/)
  * - Jump Game III (https://leetcode.com/problems/jump-game-iii/)
- */
+ * LeetCode Contest Rating: 2124
+ **/
 public class MinimumJumpsToReachHome {
     /**
      * Calculates the minimum number of jumps needed to reach home.

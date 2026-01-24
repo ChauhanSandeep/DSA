@@ -14,7 +14,8 @@ import java.util.List;
  *
  * LeetCode Problem: https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/
  *
- */
+ * LeetCode Contest Rating: 1657
+ **/
 public class MinimumRemoveToMakeValidParentheses {
 
   public static void main(String[] args) {

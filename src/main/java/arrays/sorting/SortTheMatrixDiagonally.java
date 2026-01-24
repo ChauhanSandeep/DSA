@@ -39,7 +39,8 @@ import java.util.*;
  * - 498. Diagonal Traverse: https://leetcode.com/problems/diagonal-traverse/
  * - 1572. Matrix Diagonal Sum: https://leetcode.com/problems/matrix-diagonal-sum/
  * - 766. Toeplitz Matrix: https://leetcode.com/problems/toeplitz-matrix/
- */
+ * LeetCode Contest Rating: 1548
+ **/
 public class SortTheMatrixDiagonally {
 
     /**

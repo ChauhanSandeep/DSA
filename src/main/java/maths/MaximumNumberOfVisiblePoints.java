@@ -25,7 +25,8 @@ import java.util.*;
  *
  * Q: Can we optimize for very large number of points?
  * A: Use spatial data structures or approximation algorithms for massive datasets.
- */
+ * LeetCode Contest Rating: 2147
+ **/
 public class MaximumNumberOfVisiblePoints {
 
     private static final double EPS = 1e-9;

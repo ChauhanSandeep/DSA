@@ -32,7 +32,8 @@ import static java.util.stream.Collectors.toList;
  *    - Yes, Kruskal sorts all edges and uses Union-Find to connect components.
  * 3. What is the time complexity difference between Prim’s and Kruskal’s?
  *    - Prim’s: O(E log V), Kruskal’s: O(E log E). Choice depends on graph density.
- */
+ * LeetCode Contest Rating: 1858
+ **/
 public class CommutableIslands {
 
     public static void main(String[] args) {

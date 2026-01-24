@@ -53,7 +53,8 @@ import java.util.stream.IntStream;
  *    Answer: Store candy indices or values during sorting. Track which candies are
  *    paid vs free based on position (every 3rd is free). Return two lists: bought
  *    and free candies.
- */
+ * LeetCode Contest Rating: 1261
+ **/
 public class MinimumCostOfBuyingCandiesWithDiscount {
 
     /**

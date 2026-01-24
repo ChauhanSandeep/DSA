@@ -51,7 +51,8 @@ import java.util.Arrays;
  *
  * 5. Q: How would you optimize space complexity?
  *    A: Use rolling array technique since we only need previous house's state. (LeetCode 256, 265)
- */
+ * LeetCode Contest Rating: 2056
+ **/
 public class PaintHouse3 {
   private Integer[][][] dp;
   private static final int IMPOSSIBLE_COST = Integer.MAX_VALUE / 2;

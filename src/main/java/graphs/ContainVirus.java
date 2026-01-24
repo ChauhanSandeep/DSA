@@ -24,7 +24,8 @@ import java.util.*;
  *
  * Q: What if we only need to minimize total walls without step-by-step?
  * A: Solve as minimum cut problem on graph.
- */
+ * LeetCode Contest Rating: 2277
+ **/
 public class ContainVirus {
 
     private static final int[][] DIRS = {{-1,0},{1,0},{0,-1},{0,1}};

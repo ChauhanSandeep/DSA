@@ -16,7 +16,8 @@ import java.util.*;
  * - How to find the actual elements instead of count? (Store elements in result list)
  * - What if we want elements with at least k smaller/greater? (Modify counting condition)
  * - Can we solve without finding min/max? (Use sorting approach)
- */
+ * LeetCode Contest Rating: 1202
+ **/
 public class CountElementsWithStrictlySmallerAndGreaterElements {
 
     /**

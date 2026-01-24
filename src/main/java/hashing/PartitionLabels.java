@@ -36,7 +36,8 @@ import java.util.List;
  *  - LeetCode 56 (Merge Intervals): https://leetcode.com/problems/merge-intervals/
  *  - LeetCode 435 (Non-overlapping Intervals): https://leetcode.com/problems/non-overlapping-intervals/
  *  - LeetCode 1024 (Video Stitching): https://leetcode.com/problems/video-stitching/
- */
+* LeetCode Contest Rating: 1443
+**/
 public class PartitionLabels {
 
    /**

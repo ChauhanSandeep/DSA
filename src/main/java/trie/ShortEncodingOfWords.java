@@ -56,7 +56,8 @@ import java.util.Set;
  *    Answer: We would use a standard Trie without reversing words. Words that are prefixes
  *    of others would be eliminated instead of suffixes.
  *    Related problem: https://leetcode.com/problems/replace-words/
- */
+ * LeetCode Contest Rating: 1632
+ **/
 public class ShortEncodingOfWords {
 
     /**

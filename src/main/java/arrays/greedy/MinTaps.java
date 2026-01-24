@@ -31,7 +31,8 @@ package arrays.greedy;
  * Related Problems:
  * - Jump Game II (LeetCode 45): https://leetcode.com/problems/jump-game-ii/
  * - Minimum Number of Arrows to Burst Balloons (LeetCode 452): https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
- */
+ * LeetCode Contest Rating: 1885
+ **/
 public class MinTaps {
 
   public static void main(String[] args) {

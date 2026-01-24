@@ -26,7 +26,8 @@ package strings.greedy;
  * - Can you optimize for very long numbers? (Early termination when max digit 9 is found)
  * - How would you construct actual deci-binary numbers instead of just count? (Build numbers digit by digit)
  * - What if we need to minimize sum of deci-binary numbers instead of count? (Different optimization problem)
- */
+ * LeetCode Contest Rating: 1355
+ **/
 public class PartitioningIntoMinimumNumberOfDeciBinaryNumbers {
 
     /**

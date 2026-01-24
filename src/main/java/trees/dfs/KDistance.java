@@ -19,7 +19,8 @@ import java.util.ArrayList;
  *        / \
  *       7   4
  *       If the target node is 5 and K is 2, the output will be [7, 4, 1].
- */
+ * LeetCode Contest Rating: 1663
+ **/
 public class KDistance {
 
     public static void main(String[] args) {

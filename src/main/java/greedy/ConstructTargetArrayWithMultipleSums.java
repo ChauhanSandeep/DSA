@@ -38,7 +38,8 @@ import java.util.PriorityQueue;
  *    Related: https://leetcode.com/problems/reach-a-number/
  *
  * @author Sandeep
- */
+ * LeetCode Contest Rating: 2015
+ **/
 public class ConstructTargetArrayWithMultipleSums {
 
     /**

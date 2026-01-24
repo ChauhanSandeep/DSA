@@ -33,7 +33,8 @@ import java.util.Arrays;
  *   Brute-force is not feasible, need constraint propagation or SAT solvers.
  * - Can we avoid using strings and work directly with bits?
  *   Yes, you can optimize memory and speed using bitwise operations on integers.
- */
+ * LeetCode Contest Rating: 1980
+ **/
 public class MaxGoodPeople {
 
   public static void main(String[] args) {

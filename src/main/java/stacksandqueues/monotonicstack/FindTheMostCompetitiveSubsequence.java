@@ -25,7 +25,8 @@ import java.util.*;
  *
  * Q: Can we solve this problem in parallel?
  * A: Difficult due to sequential dependencies; stack operations are inherently sequential.
- */
+ * LeetCode Contest Rating: 1802
+ **/
 public class FindTheMostCompetitiveSubsequence {
 
     /**

@@ -32,7 +32,8 @@ import java.util.*;
  *    Related: https://leetcode.com/problems/minimum-jumps-to-reach-home/
  *
  * @author Sandeep
- */
+ * LeetCode Contest Rating: 2020
+ **/
 public class SnakesAndLadders {
 
     /**

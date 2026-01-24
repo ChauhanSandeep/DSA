@@ -17,7 +17,8 @@ package dynamicprogramming.MiscellaneousDP;
  *
  * Time Complexity: **O(glassRow²)** (Only need to fill up to `glassRow`)
  * Space Complexity: **O(glassRow²)** (DP table of size `glassRow × glassRow`)
- */
+ * LeetCode Contest Rating: 1856
+ **/
 public class ChampagneTower {
 
     public static void main(String[] args) {

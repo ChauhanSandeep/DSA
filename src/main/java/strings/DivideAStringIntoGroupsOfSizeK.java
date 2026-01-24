@@ -40,7 +40,8 @@ import java.util.*;
  * Related Problems:
  * - String Compression: https://leetcode.com/problems/string-compression/
  * - Split Array into Consecutive Subsequences: https://leetcode.com/problems/split-array-into-consecutive-subsequences/
- */
+ * LeetCode Contest Rating: 1273
+ **/
 public class DivideAStringIntoGroupsOfSizeK {
 
     /**
