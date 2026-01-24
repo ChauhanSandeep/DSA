@@ -1,4 +1,4 @@
-package dynamicprogramming.LongestCommonSubsequence;
+package dynamicprogramming.longestcommonsubsequence;
 
 /**
  * Problem: Minimum Window Subsequence

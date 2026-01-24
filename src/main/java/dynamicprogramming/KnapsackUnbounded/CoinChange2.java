@@ -1,4 +1,4 @@
-package dynamicprogramming.KnapsackUnbounded;
+package dynamicprogramming.knapsackunbounded;
 
 /**
  * Coin Change II - Number of Ways to Make Change

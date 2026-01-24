@@ -1,4 +1,4 @@
-package dynamicprogramming.StockBuySell;
+package dynamicprogramming.stockbuysell;
 
 /**
  * Problem: Best Time to Buy and Sell Stock IV
