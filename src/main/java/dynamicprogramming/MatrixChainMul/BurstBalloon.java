@@ -64,100 +64,116 @@ public class BurstBalloon {
      */
     public int maxCoinsRecursiveApproach(int[] nums) {
         int length = nums.length;
-        int[][] memo = new int[length][length]; // memo[i][j] stores max coins for range i to j
-
-        // Fill memo with -1 to indicate uncomputed states
+        
+        // Create arr with virtual balloons: [1, nums[0], nums[1], ..., nums[n-1], 1]
+        int[] arr = new int[length + 2];
+        arr[0] = 1;                    // Virtual left balloon
+        arr[length + 1] = 1;           // Virtual right balloon
+        for (int i = 0; i < length; i++) {
+            arr[i + 1] = nums[i];      // Original balloons shifted right by 1
+        }
+        
+        // Memo for intervals in extended array (1 to length)
+        int[][] memo = new int[length + 2][length + 2];
         for (int[] row : memo) {
             Arrays.fill(row, -1);
         }
-
-        return burstRecHelper(nums, 0, length - 1, memo);
+        
+        // Solve for interval (0, length+1) - burst all original balloons
+        return burstRecHelper(arr, 0, length + 1, memo);
     }
 
     /**
-     * Recursive helper to calculate max coins between left and right indices (inclusive).
-     *
-     * @param nums the original balloon values
-     * @param left start index
-     * @param right end index
-     * @param memo memoization table
-     * @return max coins collected
+     * Recursive helper: max coins bursting balloons in OPEN interval (left, right)
+     * arr[left] and arr[right] are NOT burst - they become neighbors!
      */
-    private int burstRecHelper(int[] nums, int left, int right, int[][] memo) {
-        // Base case: no balloons to burst
-        if (left > right) {
+    private int burstRecHelper(int[] arr, int left, int right, int[][] memo) {
+        // Base case: no balloons between left and right
+        if (right - left <= 1) {
             return 0;
         }
-
+        
         // Return memoized result
         if (memo[left][right] != -1) {
             return memo[left][right];
         }
+        
+        int maxCoins = 0;
+        
+        // Try each balloon burstIndex in (left, right) as LAST to burst
+        for (int burstIndex = left + 1; burstIndex < right; burstIndex++) {
 
-        int maxCoinsInRange = 0;
+            // + coins from left subproblem (left, burstIndex)
+            // + coins from right subproblem (burstIndex, right)
+            int leftCoins = burstRecHelper(arr, left, burstIndex, memo);
+            int rightCoins = burstRecHelper(arr, burstIndex, right, memo);
 
-        // Try bursting each balloon between left and right as the last one
-        for (int i = left; i <= right; i++) {
-            // Coins from bursting balloon i is calculated as:
-            // nums[left - 1] * nums[i] * nums[right + 1]
-            int coinsFromCurrent = getValue(nums, left - 1) * nums[i] * getValue(nums, right + 1);
-
-            // Coins from remaining left and right partitions
-            int coinsFromLeft = burstRecHelper(nums, left, i - 1, memo);
-            int coinsFromRight = burstRecHelper(nums, i + 1, right, memo);
-
-            int currentTotalCoins = coinsFromCurrent + coinsFromLeft + coinsFromRight;
-
-            maxCoinsInRange = Math.max(maxCoinsInRange, currentTotalCoins);
+            // When burstIndex is burst LAST:
+            // - All other balloons from left+1 to right-1 are GONE
+            // - Neighbors are arr[left] and arr[right] (virtual balloons stay!)
+            int coins = arr[left] * arr[burstIndex] * arr[right];
+            
+            maxCoins = Math.max(maxCoins, coins + leftCoins + rightCoins);
         }
-
-        // Memoize and return
-        memo[left][right] = maxCoinsInRange;
-        return maxCoinsInRange;
+        
+        memo[left][right] = maxCoins;
+        return maxCoins;
     }
 
     /**
-     * Computes the maximum coins collectible by bursting balloons optimally.
-     * Steps:
-     * 1. Create a DP table to store results for subproblems.
-     * 2. Iterate over all possible subarrays of balloons.
-     * 3. For each subarray, try bursting each balloon and calculate the maximum coins.
-     * 4. Store results in the DP table.
-     * 5. Return the result for the entire array.
-     *
-     * Time Complexity: O(n^3)
-     * - For each (left, right) pair (~n^2 pairs), we try all balloons in between (~n choices).
-     * Space Complexity: O(n^2)
-     * - For DP table storing results for all [left, right] ranges.
-     *
-     * @param nums Original array representing balloon values.
-     * @return Maximum coins that can be collected.
+     * Iterative Solution
+     * 
+     * Algorithm Breakdown:
+     * 1. Create arr[] with virtual balloons: [1, nums[0], nums[1], ..., nums[n-1], 1]
+     * 2. dp[left][right] = max coins from bursting balloons in open interval (left, right)
+     * 3. Iterate by increasing interval length (len = 2 to n+1)
+     * 4. For each interval [left, right], try bursting each balloon burstIndex LAST
+     * 5. When burstIndex is burst last, its neighbors are arr[left] and arr[right]
+     * 6. Coins = arr[left] * arr[burstIndex] * arr[right] + dp[left][burstIndex] + dp[burstIndex][right]
+     * 
+     * Time Complexity: O(n^3) because of three nested loops
+     * Space Complexity: O(n^2) for the DP table
      */
     public int maxCoinsIterative(int[] nums) {
         int length = nums.length;
-        int[][] dp = new int[length][length];
 
-        // Fill DP table for subarrays of different lengths
-        for (int gap = 0; gap < length; gap++) {
-            for (int startIndex = 0; startIndex + gap < length; startIndex++) {
-                int endIndex = startIndex + gap;
-                int maxCoinsInRange = Integer.MIN_VALUE;
+        // Create new array with virtual balloons at both ends
+        // Why? Eliminates boundary checks: arr[-1]=1 and arr[n]=1
+        int[] arr = new int[length + 2];
+        arr[0] = 1;
+        arr[length + 1] = 1;
+        for (int i = 0; i < length; i++) {
+            arr[i + 1] = nums[i];
+        }
 
-                // Try bursting each balloon in the range [startIndex, endIndex]
-                for (int burstIndex = startIndex; burstIndex <= endIndex; burstIndex++) {
-                    int coinsFromLeft = (burstIndex == startIndex) ? 0 : dp[startIndex][burstIndex - 1]; // Left subproblem
-                    int coinsFromRight = (burstIndex == endIndex) ? 0 : dp[burstIndex + 1][endIndex]; // Right subproblem
-                    int coinsFromCurrent = getValue(nums, startIndex - 1) * nums[burstIndex] * getValue(nums, endIndex + 1);
+        // dp[i][j] = max coins from bursting balloons from (i+1) to (j-1)
+        int[][] dp = new int[length + 2][length + 2];
+        
+        // Build DP table by increasing interval length
+        // gap represents the distance between left and right boundaries
+        for (int gap = 2; gap < length + 2; gap++) {
+            // Try all possible intervals of this length
+            for (int leftIndex = 0; leftIndex + gap < length + 2; leftIndex++) {
+                int rightIndex = leftIndex + gap;
+                
+                // Try bursting each balloon in (left, right) as the LAST one
+                for (int burstIndex = leftIndex + 1; burstIndex < rightIndex; burstIndex++) {
+                    int leftCoins = dp[leftIndex][burstIndex]; // burst balloons in [left+1 to burstIndex-1]
+                    int rightCoins = dp[burstIndex][rightIndex]; // burst balloons in [burstIndex+1 to right-1]
+                    int coins = leftCoins + rightCoins;
 
-                    int currentTotalCoins = coinsFromLeft + coinsFromRight + coinsFromCurrent;
-                    maxCoinsInRange = Math.max(maxCoinsInRange, currentTotalCoins);
+                    // When burstIndex is burst LAST in interval (left, right):
+                    // - Its neighbors remaining are arr[left] and arr[right]
+                    // - Subproblems [left+1 to burstIndex-1] and [burstIndex+1 to right-1] are already solved
+                    coins = arr[leftIndex] * arr[burstIndex] * arr[rightIndex];
+                    
+                    dp[leftIndex][rightIndex] = Math.max(dp[leftIndex][rightIndex], coins);
                 }
-
-                dp[startIndex][endIndex] = maxCoinsInRange;
             }
         }
 
-        return dp[0][length - 1];
+        // Answer: max coins from bursting all balloons in interval (0, length+1)
+        return dp[0][length + 1];
     }
 
     /**

@@ -1,4 +1,4 @@
-package dynamicprogramming;
+package dynamicprogramming.linearpartition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,68 +52,68 @@ public class DecodeWays {
      */
     public static int numDecodeRecursive(String str) {
         if (str == null || str.isEmpty()) return 0;
-        Map<Integer, Integer> memo = new HashMap<>();
-        return numDecodeRecHelper(0, str, memo);
+        Map<Integer, Integer> dp = new HashMap<>();
+        return numDecodeRecHelper(0, str, dp);
     }
 
-    private static int numDecodeRecHelper(int idx, String str, Map<Integer, Integer> memo) {
+    private static int numDecodeRecHelper(int index, String str, Map<Integer, Integer> dp) {
         int length = str.length();
-        if (idx == length) return 1;
-        if (str.charAt(idx) == '0') return 0;
+        if (index == length) return 1;
+        if (str.charAt(index) == '0') return 0;
 
-        if (memo.containsKey(idx)) return memo.get(idx);
+        if (dp.containsKey(index)) return dp.get(index);
 
-        int ways = numDecodeRecHelper(idx + 1, str, memo); // One digit taken
-        if (idx + 1 < length) {
-            int num = Integer.parseInt(str.substring(idx, idx + 2));
-            if (num >= 10 && num <= 26) {
-                ways += numDecodeRecHelper(idx + 2, str, memo); // Two digits taken
+        int ways = numDecodeRecHelper(index + 1, str, dp); // One digit taken
+        if (index + 1 < length) {
+            int twoDigits = Integer.parseInt(str.substring(index, index + 2));
+            if (twoDigits >= 10 && twoDigits <= 26) {
+                ways += numDecodeRecHelper(index + 2, str, dp); // Two digits taken
             }
         }
 
-        memo.put(idx, ways);
+        dp.put(index, ways);
         return ways;
     }
 
     /**
-     * Bottom-up Dynamic Programming Solution (Preferred for Interviews)
-     *
-     * Steps:
-     * - dp[i] = number of ways to decode from index i to end
-     * - dp[n] = 1 (empty string base case)
-     * - For each i from n-1 down to 0:
-     *      - If s[i] == '0', dp[i] = 0 (invalid)
-     *      - Else, dp[i] = dp[i+1] (decode one digit)
-     *      - If s[i:i+2] is between "10" and "26", add dp[i+2] (decode two digits)
-     *
-     * Time Complexity: O(N)
-     * Space Complexity: O(N)
-     *
-     * @param str Encoded string
-     * @return Number of decoding ways
+     * Decodes a string of numbers into letters (1='A', 2='B', ..., 26='Z').
+     * * STEPS TO SOLVE:
+     * 1. Define State: dp[i] is the number of ways to decode the prefix of length 'i'.
+     * 2. Base Case: An empty string (length 0) has 1 way to be decoded (doing nothing).
+     * 3. Linear Transition:
+     * - Check the last 1 digit: If it's valid (1-9), add dp[i-1] to dp[i].
+     * - Check the last 2 digits: If they form a valid number (10-26), add dp[i-2] to dp[i].
+     * 4. The "Last Piece" Logic: At each step 'i', we only look back at the most recent 
+     * possible valid segments (of length 1 and 2).
      */
-    public static int numDecodingIterative(String str) {
-        if (str == null || str.isEmpty() || str.charAt(0) == '0') return 0;
+    public static int numDecodingIterative(String input) {
+        if (input == null || input.length() == 0 || input.charAt(0) == '0') {
+            return 0;
+        }
 
-        int length = str.length();
+        int length = input.length();
+        // dp[i] = number of ways to decode prefix input[0...i-1]
         int[] dp = new int[length + 1];
-        dp[length] = 1;
 
-        for (int i = length - 1; i >= 0; i--) {
-            char ch = str.charAt(i);
-            if (ch == '0') {
-                dp[i] = 0;
-            } else {
-                dp[i] = dp[i + 1];
-                if (i + 1 < length) {
-                    int num = Integer.parseInt(str.substring(i, i + 2));
-                    if (num >= 10 && num <= 26) {
-                        dp[i] += dp[i + 2];
-                    }
-                }
+        // Base case: empty string
+        dp[0] = 1;
+        // Base case: first character (already checked for '0' above)
+        dp[1] = 1;
+
+        for (int i = 2; i <= length; i++) {
+            // Option 1: The last piece is a single digit (input[i-1])
+            int oneDigit = Integer.parseInt(input.substring(i - 1, i));
+            if (oneDigit >= 1 && oneDigit <= 9) {
+                dp[i] += dp[i - 1];
+            }
+
+            // Option 2: The last piece is two digits (input[i-2...i-1])
+            int twoDigits = Integer.parseInt(input.substring(i - 2, i));
+            if (twoDigits >= 10 && twoDigits <= 26) {
+                dp[i] += dp[i - 2];
             }
         }
 
-        return dp[0];
+        return dp[length];
     }
 }

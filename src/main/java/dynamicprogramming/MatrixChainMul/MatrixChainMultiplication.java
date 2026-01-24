@@ -1,12 +1,17 @@
 package dynamicprogramming.MatrixChainMul;
 
+import java.util.Arrays;
+
 /**
  * MatrixChainMultiplication.java
  *
  * Problem Statement:
- * Given a sequence of matrices, the goal is to find the most efficient way to multiply these matrices together.
- * The problem is represented by an array arr[] where the dimension of the i-th matrix is arr[i-1] x arr[i].
- * The objective is to determine the minimum number of scalar multiplications needed to compute the matrix chain product.
+ * Given a sequence of matrices, the goal is to find the most efficient way to
+ * multiply these matrices together.
+ * The problem is represented by an array arr[] where the dimension of the i-th
+ * matrix is arr[i-1] x arr[i].
+ * The objective is to determine the minimum number of scalar multiplications
+ * needed to compute the matrix chain product.
  *
  * Example 1:
  * Input: arr = [2, 1, 3, 4]
@@ -26,88 +31,109 @@ package dynamicprogramming.MatrixChainMul;
  * Optimal parenthesization: ((M1M2)M3)M4
  * Multiplications: (1*2*3) + (1*3*4) + (1*4*3) = 6 + 12 + 12 = 30
  *
- * GeeksForGeeks link: https://www.geeksforgeeks.org/problems/matrix-chain-multiplication0303/1
+ * GeeksForGeeks link:
+ * https://www.geeksforgeeks.org/problems/matrix-chain-multiplication0303/1
  *
  * Follow-up Questions FAANG Interviews Might Ask:
- *  - Can you reconstruct the optimal parenthesization sequence, not just the minimum cost?
- *    → Yes, maintain an additional table to store split points and backtrack through it to build the parenthesization string.
- *  - How would you handle the case where matrices have incompatible dimensions?
- *    → Add validation to check if arr[i] matches dimensions correctly; return error for invalid input.
- *  - What if you need to parallelize matrix chain multiplication?
- *    → Divide-and-conquer with parallel execution on independent subproblems, though DP dependencies limit parallelization.
- *  - Can you extend this to handle matrix addition or other operations with different costs?
- *    → Modify the cost function in DP recurrence to account for different operation costs.
+ * - Can you reconstruct the optimal parenthesization sequence, not just the
+ * minimum cost?
+ * → Yes, maintain an additional table to store split points and backtrack
+ * through it to build the parenthesization string.
+ * - How would you handle the case where matrices have incompatible dimensions?
+ * → Add validation to check if arr[i] matches dimensions correctly; return
+ * error for invalid input.
+ * - What if you need to parallelize matrix chain multiplication?
+ * → Divide-and-conquer with parallel execution on independent subproblems,
+ * though DP dependencies limit parallelization.
+ * - Can you extend this to handle matrix addition or other operations with
+ * different costs?
+ * → Modify the cost function in DP recurrence to account for different
+ * operation costs.
  *
  * Relevant Follow-up Problems:
- *  - LeetCode 312 (Burst Balloons): https://leetcode.com/problems/burst-balloons/
- *  - LeetCode 1039 (Minimum Score Triangulation of Polygon): https://leetcode.com/problems/minimum-score-triangulation-of-polygon/
+ * - LeetCode 312 (Burst Balloons):
+ * https://leetcode.com/problems/burst-balloons/
+ * - LeetCode 1039 (Minimum Score Triangulation of Polygon):
+ * https://leetcode.com/problems/minimum-score-triangulation-of-polygon/
  */
 public class MatrixChainMultiplication {
 
   /**
-   * Main method: Calculates minimum scalar multiplications using Top-Down DP (Memoization).
+   * Main method: Calculates minimum scalar multiplications using Top-Down DP
+   * (Memoization).
    * Step-by-step:
-   *  1. Initialize a memoization table dp where dp[i][j] stores the minimum cost for multiplying matrices from i to j.
-   *  2. Use recursive function to explore all possible split points k between i and j.
-   *  3. For each split, calculate cost as: dp[i][k] + dp[k+1][j] + arr[i-1] * arr[k] * arr[j]
-   *  4. Memoize results to avoid recomputation.
-   *  5. Base case: Single matrix (i == j) has zero cost.
+   * 1. Initialize a memoization table dp where dp[i][j] stores the minimum cost
+   * for multiplying matrices from i to j.
+   * 2. Use recursive function to explore all possible split points k between i
+   * and j.
+   * 3. For each split, calculate cost as: dp[i][k] + dp[k+1][j] + arr[i-1] *
+   * arr[k] * arr[j]
+   * 4. Memoize results to avoid recomputation.
+   * 5. Base case: Single matrix (i == j) has zero cost.
    *
    * Algorithm: Dynamic Programming with Memoization (Interval DP).
-   * Time Complexity: O(n^3), where n is the number of matrices (n = arr.length - 1).
-   * Space Complexity: O(n^2), for the memoization table plus O(n) recursion stack.
+   * Time Complexity: O(n^3), where n is the number of matrices (n = arr.length -
+   * 1).
+   * Space Complexity: O(n^2), for the memoization table plus O(n) recursion
+   * stack.
    */
   public int matrixMultiplication(int[] arr) {
-    int n = arr.length;
-    if (n <= 2) return 0; // Single matrix or empty chain
+    int length = arr.length;
+    if (length <= 2)
+      return 0; // Single matrix or empty chain
 
-    int[][] dp = new int[n][n];
-    // Initialize memoization table with -1
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        dp[i][j] = -1;
-      }
+    int[][] dp = new int[length][length];
+    for (int[] row : dp) {
+      Arrays.fill(row, Integer.MAX_VALUE / 2); // Avoid overflow
     }
 
-    return solve(arr, 1, n - 1, dp);
+    return matrixMultiplicationHelper(arr, 1, length - 1, dp);
   }
 
-  // Helper: Recursively computes minimum multiplications for matrix chain from index i to j.
-  private int solve(int[] arr, int i, int j, int[][] dp) {
+  // Helper: Recursively computes minimum multiplications for matrix chain from
+  // index i to j.
+  private int matrixMultiplicationHelper(int[] arr, int leftIndex, int rightIndex, int[][] dp) {
     // Base case: Single matrix, no multiplication needed
-    if (i == j) return 0;
+    if (leftIndex == rightIndex)
+      return 0;
 
     // Return memoized result if already computed
-    if (dp[i][j] != -1) return dp[i][j];
+    if (dp[leftIndex][rightIndex] != Integer.MAX_VALUE / 2)
+      return dp[leftIndex][rightIndex];
 
     int minCost = Integer.MAX_VALUE;
 
     // Try every possible split point k between i and j
-    for (int k = i; k < j; k++) {
+    for (int breakPoint = leftIndex; breakPoint < rightIndex; breakPoint++) {
       // Cost to multiply left partition (i to k)
-      int leftCost = solve(arr, i, k, dp);
+      int leftCost = matrixMultiplicationHelper(arr, leftIndex, breakPoint, dp);
       // Cost to multiply right partition (k+1 to j)
-      int rightCost = solve(arr, k + 1, j, dp);
+      int rightCost = matrixMultiplicationHelper(arr, breakPoint + 1, rightIndex, dp);
       // Cost to multiply the two resulting matrices
-      int mergeCost = arr[i - 1] * arr[k] * arr[j];
+      // here matrix dimensions are arr[leftIndex - 1] x arr[breakPoint] x
+      // arr[rightIndex]
+      int mergeCost = arr[leftIndex - 1] * arr[breakPoint] * arr[rightIndex];
 
       int totalCost = leftCost + rightCost + mergeCost;
       minCost = Math.min(minCost, totalCost);
     }
 
     // Memoize and return the result
-    dp[i][j] = minCost;
+    dp[leftIndex][rightIndex] = minCost;
     return minCost;
   }
 
   /**
-   * Alternative method: Bottom-Up DP (Tabulation). Avoids recursion overhead and stack space.
+   * Alternative method: Bottom-Up DP (Tabulation). Avoids recursion overhead and
+   * stack space.
    * Step-by-step:
-   *  1. Create dp table where dp[i][j] represents minimum cost to multiply matrices from i to j.
-   *  2. Fill table diagonally: start with chains of length 2, then 3, and so on.
-   *  3. For each chain length, iterate through all possible starting positions.
-   *  4. For each subchain, try all split points and update dp[i][j] with minimum cost.
-   *  5. Result is in dp[1][n-1].
+   * 1. Create dp table where dp[i][j] represents minimum cost to multiply
+   * matrices from i to j.
+   * 2. Fill table diagonally: start with chains of length 2, then 3, and so on.
+   * 3. For each chain length, iterate through all possible starting positions.
+   * 4. For each subchain, try all split points and update dp[i][j] with minimum
+   * cost.
+   * 5. Result is in dp[1][n-1].
    *
    * Algorithm: Dynamic Programming with Tabulation (Interval DP).
    * Time Complexity: O(n^3), where n is the number of matrices.
@@ -115,7 +141,8 @@ public class MatrixChainMultiplication {
    */
   public int matrixMultiplicationTabulation(int[] arr) {
     int length = arr.length;
-    if (length <= 2) return 0;
+    if (length <= 2)
+      return 0;
 
     int[][] dp = new int[length][length]; // dp[i][j] = min cost to multiply matrices from i to j
 

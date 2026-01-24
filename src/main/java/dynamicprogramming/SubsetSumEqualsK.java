@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * **LeetCode Problem:** https://leetcode.com/problems/subarray-sum-equals-k/
  */
-public class SubsetSum {
+public class SubsetSumEqualsK {
     public static void main(String[] args) {
         int[] nums = {1, 1, 1};
         int targetSum = 2;

@@ -1,4 +1,4 @@
-package dynamicprogramming.MatrixChainMul;
+package dynamicprogramming.linearpartition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,13 +73,13 @@ public class PalindromePartitioning {
             return;
         }
 
-        for (int endIndex = startIndex; endIndex < input.length(); endIndex++) {
+        for (int breakIndex = startIndex; breakIndex < input.length(); breakIndex++) {
             // Check if substring input[startIndex ... endIndex] is palindrome
-            if (isPalindrome(input, startIndex, endIndex)) {
+            if (isPalindrome(input, startIndex, breakIndex)) {
                 // Select
-                currentPartition.add(input.substring(startIndex, endIndex + 1));
+                currentPartition.add(input.substring(startIndex, breakIndex + 1));
                 // Explore
-                backtrack(endIndex + 1, input, currentPartition, result);
+                backtrack(breakIndex + 1, input, currentPartition, result);
                 // Unselect (Backtrack)
                 currentPartition.remove(currentPartition.size() - 1);
             }
@@ -126,11 +126,11 @@ public class PalindromePartitioning {
         }
         
         // Check for palindromes of length 2 and more
-        for (int len = 2; len <= length; len++) {
-            for (int i = 0; i <= length - len; i++) {
-                int j = i + len - 1;
-                if (input.charAt(i) == input.charAt(j)) {
-                    isPalindrome[i][j] = (len == 2) || isPalindrome[i + 1][j - 1];
+        for (int gap = 2; gap <= length; gap++) {
+            for (int left = 0; left <= length - gap; left++) {
+                int right = left + gap - 1;
+                if (input.charAt(left) == input.charAt(right)) {
+                    isPalindrome[left][right] = (gap == 2) || isPalindrome[left + 1][right - 1];
                 }
             }
         }
@@ -144,17 +144,17 @@ public class PalindromePartitioning {
         partitionedPalindromes.get(0).add(new ArrayList<>());
         
         // Build partitions for each position
-        for (int i = 1; i <= length; i++) {
+        for (int right = 1; right <= length; right++) {
             List<List<String>> currentPartitions = new ArrayList<>();
             
-            // Try all possible last palindromic substrings ending at position i-1
-            for (int j = 0; j < i; j++) {
-                // If substring [j...i-1] is a palindrome
-                if (isPalindrome[j][i - 1]) {
-                    String palindrome = input.substring(j, i);
+            // Try all possible last palindromic substrings ending at position right-1
+            for (int left = 0; left < right; left++) {
+                // If substring [left...right-1] is a palindrome
+                if (isPalindrome[left][right - 1]) {
+                    String palindrome = input.substring(left, right);
                     
-                    // Get all partitions up to position j
-                    List<List<String>> previousPartitions = partitionedPalindromes.get(j);
+                    // Get all partitions up to position left
+                    List<List<String>> previousPartitions = partitionedPalindromes.get(left);
                     
                     // Add current palindrome to each previous partition
                     for (List<String> prevPartition : previousPartitions) {

@@ -3,6 +3,7 @@ package arrays.slidingwindow;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 
 /**
@@ -79,6 +80,60 @@ public class MaxSlidingWindow {
       }
     }
 
+    return result;
+  }
+
+
+  /**
+   * Returns an array representing the maximum value of every contiguous subarray of size `k`
+   * using a TreeMap-based approach.
+   *
+   * Steps:
+   * 1. Use a TreeMap to store elements and their frequencies in the current window.
+   * 2. For each position, add the new element to the window.
+   * 3. Once the window reaches size k, record the maximum (last key in TreeMap).
+   * 4. Remove the leftmost element from the window and update its frequency.
+   * 5. If frequency becomes 0, remove the element from the TreeMap.
+   *
+   * Time Complexity: O(n log k) — TreeMap operations (put, remove, lastKey) are O(log k).
+   * Space Complexity: O(k) — TreeMap holds at most `k` unique elements.
+   *
+   * @param nums Input integer array
+   * @param k    Size of the sliding window
+   * @return Array of maximums for each sliding window
+   */
+  public int[] maxSlidingWindowUsingTreeMap(int[] nums, int k) {
+    if (nums == null || nums.length == 0 || k <= 0) {
+      return new int[0];
+    }
+
+    // TreeMap maintains elements in sorted order: key = element value, value = frequency
+    TreeMap<Integer, Integer> numFreqMap = new TreeMap<>();
+    int[] result = new int[nums.length - k + 1];
+    int resultIndex = 0;
+
+    // Slide the window across the array
+    for (int right = 0; right < nums.length; right++) {
+      // Step 1: Add the new element entering the window
+      numFreqMap.put(nums[right], numFreqMap.getOrDefault(nums[right], 0) + 1);
+      
+      // Step 2: Once window reaches size k, start recording results
+      if (right >= k - 1) {
+        // The maximum element is the largest key in TreeMap
+        result[resultIndex++] = numFreqMap.lastKey();
+
+        // Step 3: Remove the element leaving the window
+        int windowStart = right - k + 1;
+        int leftElement = nums[windowStart];
+        numFreqMap.put(leftElement, numFreqMap.get(leftElement) - 1);
+        
+        // Step 4: Clean up if frequency reaches 0
+        if (numFreqMap.get(leftElement) == 0) {
+          numFreqMap.remove(leftElement);
+        }
+      }
+    }
+    
     return result;
   }
 }

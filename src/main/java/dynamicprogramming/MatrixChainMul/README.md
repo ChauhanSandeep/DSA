@@ -52,44 +52,44 @@ This is bottom-up (tabulation) approach,but a top-down (memoization) variant fol
 ```java
 public int matrixChainMultiplication(int[] inputArr) {  // inputArr = array of inputArr, size inputLength+1 for inputLength matrices
   // Step 1: Initialize variables and determine the number of matrices
-  int inputLength = inputArr.length - 1;  // Number of matrices is one less than inputArr array length
+  int matrixCount = inputArr.length - 1;  // Number of matrices is one less than inputArr array length
 
   // Step 2: Create and initialize DP table
-  int[][] dp = new int[inputLength + 1][inputLength + 1];
+  int[][] dp = new int[matrixCount + 1][matrixCount + 1];
   for (int[] row : dp) {
     Arrays.fill(row, Integer.MAX_VALUE / 2);  // Avoid overflow
   }
 
   // Step 3: Fill diagonal elements (base case - single matrix has 0 cost)
-  for (int i = 1; i <= inputLength; i++) {
+  for (int i = 1; i <= matrixCount; i++) {
     dp[i][i] = 0;
   }
 
-  // Step 4: Fill DP table for chains of increasing length
-  for (int length = 2; length <= inputLength; length++) {  // Chain length from 2 to inputLength
+  // Step 4: Fill DP table for chains of increasing gap
+  for (int gap = 2; gap <= matrixCount; gap++) {  // Chain length from 2 to matrixCount
 
     // Step 5: For each starting position of current chain length
-    for (int i = 1; i <= inputLength - length + 1; i++) {
+    for (int left = 1; left <= matrixCount - gap + 1; left++) {
 
       // Step 6: Calculate ending position for current chain
-      int j = i + length - 1;
+      int right = left + gap - 1;
 
       // Step 7: Try all possible intermediate split points
-      for (int intermediateIndex = i; intermediateIndex < j; intermediateIndex++) {
+      for (int intermediateIndex = left; intermediateIndex < right; intermediateIndex++) {
 
         // Step 8: Calculate cost for current split
-        int cost = dp[i][intermediateIndex] +
-            dp[intermediateIndex + 1][j] +
-            inputArr[i - 1] * inputArr[intermediateIndex] * inputArr[j];
+        int cost = dp[left][intermediateIndex] +
+            dp[intermediateIndex + 1][right] +
+            inputArr[left - 1] * inputArr[intermediateIndex] * inputArr[right];
 
         // Step 9: Update minimum cost for current subproblem
-        dp[i][j] = Math.min(dp[i][j], cost);
+        dp[left][right] = Math.min(dp[left][right], cost);
       }
     }
   }
 
   // Step 10: Return the minimum cost for the entire chain
-  return dp[1][inputLength];  // Fixed: was dp[10][inputLength] which was incorrect
+  return dp[1][matrixCount];  // Fixed: was dp[10][inputLength] which was incorrect
 }
 ```
 

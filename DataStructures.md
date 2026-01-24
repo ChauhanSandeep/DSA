@@ -55,7 +55,9 @@ int index = Arrays.binarySearch(arr, key);  // Binary search (sorted array) - O(
 ``` java
 List<Integer> list = Arrays.stream(arr).boxed().collect(Collectors.toList());  // Array to List - O(n)
 List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3));  // Array literal to List - O(n)
-int[] arr = list.stream().mapToInt(i -> i).toArray();  // List to array - O(n)
+int[] arr = list.stream()
+            .mapToInt(i -> i) // Unbox Integer to int
+            .toArray();  // List to array - O(n)
 ```
 
 #### 2D Array to List
@@ -68,7 +70,7 @@ List<int[]> list = new ArrayList<>(Arrays.asList(arr));  // Mutable list - O(n)
 
 List<List<Integer>> list = Arrays.stream(matrix)
             .map(row -> Arrays.stream(row)          // stream each row
-                              .boxed()             // convert int -> Integer
+                              .boxed()             // autobox int -> Integer
                               .collect(Collectors.toList()))
             .collect(Collectors.toList());
 
@@ -161,17 +163,17 @@ list.sort((a, b) -> a.getAge() - b.getAge()); // Sort in ascending age
 Collections.sort(list);  // Sort using natural ordering
 Collections.reverse(list);  // Reverse list order - O(n)
 
-Collections.sort(list, (a, b) -> Integer.compare(a, b));  // Custom comparator
+Collections.sort(list, (a, b) -> Integer.compare(a, b));  // Custom comparator, sort ascending
 ```
 
 #### Utilities
 *Common list utility operations*
 
 ``` java
-Collections.frequency(list, element);  // Count occurrences - O(n)
-Collections.swap(list, i, j);  // Swap two elements - O(1)
-Collections.fill(list, value);  // Fill with value - O(n)
-list.subList(fromIndex, toIndex);  // Get view (not copy) - O(1)
+int freq = Collections.frequency(list, element);  // Count occurrences - O(n). Returns int
+Collections.swap(list, i, j);  // Swap two elements - O(1). Mutates same list
+Collections.fill(list, value);  // Fill with value - O(n). Mutates same list
+List<Integer> sub = list.subList(fromIndex, toIndex);  // Get view [fromIndex, toIndex) - O(1). Changes reflect in original list
 ```
 
 ---
@@ -182,9 +184,10 @@ list.subList(fromIndex, toIndex);  // Get view (not copy) - O(1)
 *Create sets with different ordering guarantees*
 
 ``` java
-Set<Integer> set = new HashSet<>(list);  // Unordered, O(1) operations
-Set<Integer> set = new LinkedHashSet<>();  // Maintains insertion order
-Set<Integer> set = new TreeSet<>();  // Sorted, O(log n) operations
+Set<Integer> hashset = new HashSet<>(list);  // Unordered, O(1) operations
+Set<Integer> linkedHashSet = new LinkedHashSet<>();  // Maintains insertion order
+Set<Integer> treeSet = new TreeSet<>();  // Sorted, O(log n) operations
+Set<Integer> descendingTreeSet = new TreeSet<>((a, b) -> b - a); // custom descending order
 ```
 
 #### Set Operations
@@ -203,11 +206,11 @@ set1.removeAll(set2);   // Difference: remove elements in set2
 *Initialize map values safely and update entries efficiently - O(1) average*
 
 ``` java
-map.putIfAbsent(key, new ArrayList<>());  // Add key only if absent
+List<Integer> prevValue = map.putIfAbsent(key, new ArrayList<>());  // Add key only if absent
 map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);  // Compute and add in one step
-map.computeIfPresent(key, (k, v) -> v + 1);  // Update only if key exists
-map.merge(key, 1, Integer::sum);  // Merge values, perfect for frequency counting - O(1)
-map.getOrDefault(key, 0);  // Get value or return default - O(1)
+Integer updated = map.computeIfPresent(key, (k, v) -> v + 1);  // Update only if key exists
+Integer count = map.merge(key, 1, Integer::sum);  // Merge values, perfect for frequency counting - O(1)
+Integer count = map.getOrDefault(key, 0);  // Get value or return default - O(1)
 ```
 
 #### Iteration
@@ -260,6 +263,11 @@ map.ceilingKey(x);  // Smallest key >= x
 #### Queue Operations
 *FIFO data structure - all operations O(1)*
 
+Different implementations: LinkedList, ArrayDeque, PriorityQueue:
+- Use LinkedList when you need a simple queue.
+- Use ArrayDeque for better performance as a queue or stack.
+- Use PriorityQueue for priority-based ordering.
+
 ``` java
 Queue<Integer> queue = new LinkedList<>();
 queue.offer(x);         // Add to rear (better than add())
@@ -269,6 +277,10 @@ queue.peek();           // View front without removing
 
 #### Deque Operations
 *Double-ended queue - all operations O(1)*
+
+Different implementations: LinkedList, ArrayDeque:
+- Use LinkedList for a simple deque.
+- Use ArrayDeque for better performance.
 
 ``` java
 Deque<Integer> deque = new ArrayDeque<>();
@@ -282,7 +294,6 @@ deque.peekLast();       // View back
 ### Stack
 
 #### Legacy Stack (Avoid)
-*Old Stack class - synchronized overhead*
 
 ``` java
 Stack<Integer> stack = new Stack<>();
@@ -291,16 +302,6 @@ stack.pop();        // Pop element - O(1)
 stack.peek();       // View top - O(1)
 stack.isEmpty();    // Check if empty - O(1)
 stack.size();       // Get size - O(1)
-```
-
-#### Modern Stack (Recommended)
-*Use Deque for better performance - all operations O(1)*
-
-``` java
-Deque<Integer> stack = new ArrayDeque<>();
-stack.push(x);      // Push element (or addFirst)
-stack.pop();        // Pop element (or removeFirst)
-stack.peek();       // View top (or peekFirst)
 ```
 
 ### PriorityQueue (Heap)
@@ -361,25 +362,45 @@ Character.isLowerCase(ch);     // Check if lowercase
 *Convert case of characters and strings - O(n) for strings*
 
 ``` java
-s.toLowerCase();               // Convert string to lowercase
-s.toUpperCase();               // Convert string to uppercase
-Character.toLowerCase(ch);     // Convert char to lowercase - O(1)
-Character.toUpperCase(ch);     // Convert char to uppercase - O(1)
+String lowercase = s.toLowerCase();               // Convert string to lowercase - O(n)
+String uppercase = s.toUpperCase();               // Convert string to uppercase - O(n)
+char lowercaseChar = Character.toLowerCase(ch);   // Convert char to lowercase - O(1)
+char uppercaseChar = Character.toUpperCase(ch);   // Convert char to uppercase - O(1)
 ```
 
 #### Common String Operations
 *Essential string methods with their complexities*
 
 ``` java
-s.trim();                      // Remove leading/trailing whitespace - O(n)
-s.substring(start, end);       // Extract substring [start, end) - O(n)
-s.charAt(i);                   // Get character at index - O(1)
-s.indexOf(substring);          // Find first occurrence - O(n*m)
-s.lastIndexOf(substring);      // Find last occurrence - O(n*m)
-s.replace(oldChar, newChar);   // Replace all occurrences - O(n)
-s.replaceAll(regex, replacement); // Replace with regex - O(n)
-s.split("\\s+");               // Split by whitespace - O(n)
-String.join(", ", list);       // Join with delimiter - O(n)
+String t = s.trim();                      
+// returns String (new), removes leading/trailing whitespace – O(n)
+
+String sub = s.substring(start, end);    
+// returns String, range [start, end) – O(n) 
+
+char c = s.charAt(i);                     
+// returns char – O(1)
+
+int idx = s.indexOf(substring);           
+// returns int (first index or -1) – O(n * m)
+
+int lastIdx = s.lastIndexOf(substring);   
+// returns int (last index or -1) – O(n * m)
+
+String r = s.replace(oldCharSequence, newCharSequence);   
+// returns String (new), replaces all occurrences of oldCharSequence with newCharSequence – O(n)
+
+String r = s.replaceFirst(oldCharSequence, newCharSequence);
+// returns String (new), replaces first occurrence of oldCharSequence with newCharSequence – O(n)
+
+String r2 = s.replaceAll(regex, replacement); 
+// returns String (new), regex-based replace – O(n)*
+
+String[] parts = s.split("\\s+");         
+// returns String[] – O(n)*
+
+String joined = String.join(", ", list);  
+// returns String – O(n)
 ```
 
 #### StringBuilder
@@ -607,8 +628,8 @@ long count = list.stream().filter(x -> x > 0).count();  // Count matching elemen
 *Find minimum or maximum - O(n)*
 
 ``` java
-Optional<Integer> min = list.stream().min(Integer::compare);  // Minimum element
-Optional<Integer> max = list.stream().max(Integer::compare);  // Maximum element
+Optional<Integer> min = list.stream().min((a, b) -> a.compareTo(b)); // Find minimum number
+Optional<Integer> max = list.stream().max((a, b) -> a.compareTo(b)); // Find maximum number
 ```
 
 ### Advanced Collectors
@@ -877,373 +898,6 @@ boolean[] sieve(int n) {
     return isPrime;  // Array where isPrime[i] = true if i is prime
 }
 ```
-
----
-
-## 🎯 Common Patterns
-
-### Two Pointers
-
-#### Opposite Direction Pattern
-*Two pointers moving towards each other - O(n)*
-
-``` java
-// Use case: Two Sum in sorted array, Container With Most Water
-int left = 0, right = arr.length - 1;
-while (left < right) {
-    int sum = arr[left] + arr[right];
-    if (sum == target) return new int[]{left, right};  // Found pair
-    else if (sum < target) left++;   // Need larger sum
-    else right--;                    // Need smaller sum
-}
-```
-
-#### Same Direction Pattern
-*Fast and slow pointers - O(n)*
-
-``` java
-// Use case: Remove duplicates, partition array
-int slow = 0;
-for (int fast = 1; fast < arr.length; fast++) {
-    if (arr[fast] != arr[slow]) {      // Found new unique element
-        arr[++slow] = arr[fast];        // Move it to slow pointer position
-    }
-}
-```
-
-### Sliding Window
-
-#### Fixed Size Window
-*Window of constant size k - O(n)*
-
-``` java
-// Use case: Maximum sum subarray of size k
-int windowSum = 0;
-for (int i = 0; i < k; i++) windowSum += arr[i];  // Initial window
-int maxSum = windowSum;
-
-for (int i = k; i < arr.length; i++) {
-    windowSum += arr[i] - arr[i - k];  // Slide window: add new, remove old
-    maxSum = Math.max(maxSum, windowSum);
-}
-```
-
-#### Variable Size Window
-*Window size changes based on condition - O(n)*
-
-``` java
-// Use case: Longest substring without repeating characters
-int left = 0, maxLen = 0;
-for (int right = 0; right < arr.length; right++) {
-    // Add arr[right] to window
-    while (/* window invalid condition */) {
-        // Remove arr[left] from window
-        left++;  // Shrink window from left
-    }
-    maxLen = Math.max(maxLen, right - left + 1);  // Update result
-}
-```
-
-### Binary Search
-
-#### Standard Binary Search
-*Find exact element in sorted array - O(log n)*
-
-``` java
-int left = 0, right = arr.length - 1;
-while (left <= right) {
-    int mid = left + (right - left) / 2;  // Avoid overflow
-    if (arr[mid] == target) return mid;   // Found target
-    else if (arr[mid] < target) left = mid + 1;  // Search right half
-    else right = mid - 1;                 // Search left half
-}
-return -1;  // Target not found
-```
-
-#### Find Leftmost (Lower Bound)
-*Find first position where element >= target - O(log n)*
-
-``` java
-int left = 0, right = arr.length;
-while (left < right) {
-    int mid = left + (right - left) / 2;
-    if (arr[mid] < target) left = mid + 1;  // Target is on right
-    else right = mid;                        // Could be answer, search left
-}
-return left;  // Leftmost position
-```
-
-#### Find Rightmost (Upper Bound)
-*Find last position where element <= target - O(log n)*
-
-``` java
-int left = 0, right = arr.length;
-while (left < right) {
-    int mid = left + (right - left) / 2;
-    if (arr[mid] <= target) left = mid + 1;  // Can go further right
-    else right = mid;                         // Too far, search left
-}
-return left - 1;  // Rightmost position
-```
-
-### Prefix Sum
-
-#### 1D Prefix Sum
-*Precompute cumulative sums for range queries - O(n) build, O(1) query*
-
-``` java
-int[] prefix = new int[arr.length + 1];
-for (int i = 0; i < arr.length; i++) {
-    prefix[i + 1] = prefix[i] + arr[i];  // Cumulative sum
-}
-// Query: Sum of range [i, j] = prefix[j + 1] - prefix[i]
-```
-
-#### 2D Prefix Sum
-*Precompute 2D cumulative sums for submatrix queries - O(m*n) build, O(1) query*
-
-``` java
-int[][] prefix = new int[m + 1][n + 1];
-for (int i = 1; i <= m; i++) {
-    for (int j = 1; j <= n; j++) {
-        prefix[i][j] = matrix[i-1][j-1]   // Current cell
-                     + prefix[i-1][j]      // Top sum
-                     + prefix[i][j-1]      // Left sum
-                     - prefix[i-1][j-1];   // Remove overlap
-    }
-}
-// Query: Sum of rectangle from (r1,c1) to (r2,c2) using inclusion-exclusion
-```
-
-### Union-Find (Disjoint Set)
-
-*Efficiently manage disjoint sets with near-constant time operations*
-
-``` java
-class UnionFind {
-    private int[] parent, rank;
-    
-    // Initialize n elements, each in its own set - O(n)
-    public UnionFind(int n) {
-        parent = new int[n];
-        rank = new int[n];
-        for (int i = 0; i < n; i++) parent[i] = i;  // Each element is its own parent
-    }
-    
-    // Find root with path compression - O(α(n)) amortized
-    public int find(int x) {
-        if (parent[x] != x) {
-            parent[x] = find(parent[x]);  // Path compression: flatten tree
-        }
-        return parent[x];
-    }
-    
-    // Union two sets by rank - O(α(n)) amortized
-    public boolean union(int x, int y) {
-        int rootX = find(x), rootY = find(y);
-        if (rootX == rootY) return false;  // Already in same set
-        
-        // Union by rank: attach smaller tree under larger tree
-        if (rank[rootX] < rank[rootY]) {
-            parent[rootX] = rootY;
-        } else if (rank[rootX] > rank[rootY]) {
-            parent[rootY] = rootX;
-        } else {
-            parent[rootY] = rootX;
-            rank[rootX]++;  // Increase rank when trees are equal
-        }
-        return true;
-    }
-}
-```
-
----
-
-## ⚠️ Interview Pitfalls
-
-### Common Mistakes to Avoid
-
-#### Integer Overflow in Comparators
-*Always use safe comparison methods*
-
-``` java
-// ❌ WRONG: Subtraction can overflow
-Arrays.sort(arr, (a, b) -> a[0] - b[0]);
-
-// ✅ CORRECT: Safe comparison
-Arrays.sort(arr, (a, b) -> Integer.compare(a[0], b[0]));
-```
-
-#### List to Array Conversion
-*Always specify array type to avoid ClassCastException*
-
-``` java
-// ❌ WRONG: Returns Object[], causes ClassCastException
-Object[] arr = list.toArray();
-
-// ✅ CORRECT: Specify type
-String[] arr = list.toArray(new String[0]);  // For String array
-int[][] arr = list.toArray(new int[0][]);    // For 2D array
-```
-
-#### Modifying Collections During Iteration
-*Don't modify collection while iterating with for-each*
-
-``` java
-// ❌ WRONG: Throws ConcurrentModificationException
-for (int x : list) {
-    if (x > 5) list.remove(x);
-}
-
-// ✅ CORRECT: Use iterator
-Iterator<Integer> it = list.iterator();
-while (it.hasNext()) {
-    if (it.next() > 5) it.remove();  // Iterator's remove is safe
-}
-```
-
-#### Arrays.asList() Limitations
-*Returns fixed-size list, can't add/remove elements*
-
-``` java
-// ❌ WRONG: Throws UnsupportedOperationException
-List<String> list = Arrays.asList("a", "b");
-list.add("c");
-
-// ✅ CORRECT: Wrap in mutable ArrayList
-List<String> list = new ArrayList<>(Arrays.asList("a", "b"));
-```
-
-#### Array Equality Comparison
-*Use Arrays.equals() instead of ==*
-
-``` java
-// ❌ WRONG: Compares references, not contents
-if (arr1 == arr2)
-
-// ✅ CORRECT: Compares contents
-if (Arrays.equals(arr1, arr2))
-```
-
-#### Integer Object Comparison
-*Integer cache only works for -128 to 127*
-
-``` java
-// ❌ WRONG: == compares references
-Integer a = 128, b = 128;
-if (a == b)  // false (different objects outside cache range)
-
-// ✅ CORRECT: Use .equals()
-if (a.equals(b))  // true (compares values)
-```
-
-#### String Concatenation in Loops
-*Use StringBuilder to avoid O(n²) complexity*
-
-``` java
-// ❌ WRONG: Creates new string each iteration - O(n²)
-String s = "";
-for (int i = 0; i < n; i++) s += i;
-
-// ✅ CORRECT: StringBuilder is mutable - O(n)
-StringBuilder sb = new StringBuilder();
-for (int i = 0; i < n; i++) sb.append(i);
-```
-
-### Edge Cases to Remember
-
-#### Null and Empty Inputs
-*Always validate inputs before processing*
-
-``` java
-if (arr == null || arr.length == 0) return;  // Handle null/empty arrays
-```
-
-#### Single Element
-*Single element often requires special handling*
-
-``` java
-if (arr.length == 1) return arr[0];  // Base case for many algorithms
-```
-
-#### Integer Overflow Prevention
-*Avoid overflow when calculating midpoint*
-
-``` java
-int mid = left + (right - left) / 2;  // Safe - prevents overflow
-// NOT: int mid = (left + right) / 2;  // Can overflow if sum exceeds MAX_VALUE
-```
-
-#### Array Bounds
-*Watch for off-by-one errors in loops*
-
-``` java
-for (int i = 0; i < arr.length; i++)   // ✅ Correct: 0 to length-1
-for (int i = 0; i <= arr.length; i++)  // ❌ Wrong: ArrayIndexOutOfBoundsException
-```
-
-#### Negative Modulo
-*Handle negative numbers correctly in modulo*
-
-``` java
-int mod = ((x % n) + n) % n;  // Handles negative x correctly
-// Direct x % n gives negative result for negative x in Java
-```
-
----
-
-## ⏱️ Time Complexity Quick Reference
-
-| Operation | ArrayList | LinkedList | HashSet | TreeSet | HashMap | TreeMap |
-|-----------|-----------|------------|---------|---------|---------|---------|
-| Access    | O(1)      | O(n)       | -       | -       | O(1)    | -       |
-| Search    | O(n)      | O(n)       | O(1)    | O(log n)| O(1)    | O(log n)|
-| Insert    | O(1)*     | O(1)       | O(1)    | O(log n)| O(1)    | O(log n)|
-| Delete    | O(n)      | O(1)**     | O(1)    | O(log n)| O(1)    | O(log n)|
-
-*Amortized for ArrayList add at end; O(n) for insertion at arbitrary position  
-**O(1) if you have reference to the node; O(n) to find it
-
-### Algorithm Time Complexities
-- **Sorting**: O(n log n) - Arrays.sort(), Collections.sort()
-- **Binary Search**: O(log n)
-- **Linear Search**: O(n)
-- **BFS/DFS**: O(V + E)
-- **Dijkstra**: O((V + E) log V)
-- **Union-Find**: O(α(n)) ≈ O(1) amortized
-- **Kadane's Algorithm**: O(n)
-- **Two Pointers**: O(n)
-- **Sliding Window**: O(n)
-
----
-
-## ✨ Pro Tips
-
-### Performance
-- Use `StringBuilder` for string concatenation in loops
-- Prefer `ArrayList` over `LinkedList` in most cases
-- Use primitive arrays (`int[]`) over `List<Integer>` for better performance
-- Avoid autoboxing/unboxing in tight loops
-- Use `Arrays.sort()` instead of `Collections.sort()` for primitive arrays
-
-### Readability vs Performance
-- Prefer **streams** for readability in simple transformations
-- Use **loops** for complex logic or performance-critical sections
-- Use **method references** when possible: `String::length` vs `s -> s.length()`
-
-### Interview Favorites
-- `computeIfAbsent()` - Building graphs, grouping
-- `merge()` - Frequency counting
-- `Collectors.groupingBy()` - Grouping and aggregation
-- Monotonic stack - Next greater/smaller element
-- Sliding window - Subarray problems
-- Two pointers - Sorted array problems
-- Union-Find - Graph connectivity
-
-### Memory Optimization
-- Use space-optimized DP when possible (O(1) instead of O(n))
-- Reuse variables instead of creating new ones
-- Be mindful of recursion depth (stack space)
 
 ---
 

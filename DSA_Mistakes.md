@@ -56,3 +56,27 @@ first element of the second array top, first element of the second array bottom.
 But it seems like there is a much better approach where I can iterate over the array two times. And that way I'll just have the two variables instead of four, 
 which was seemingly more complex.
 
+## Pass by Reference in Java - Integer vs Array
+Java is always pass-by-value. When trying to modify a counter or value in a recursive method and expecting it to persist across calls, using `Integer` doesn't work because Integer is immutable and passed by value.
+
+**Wrong Approach:**
+```java
+void recursiveMethod(Integer count) {
+    count++;  // This creates a new Integer object, doesn't modify the original
+}
+```
+
+**Correct Approach:**
+Use a single-element array to simulate pass-by-reference:
+```java
+void recursiveMethod(int[] count) {
+    count[0]++;  // This modifies the value inside the array
+}
+
+// Usage
+int[] counter = new int[] {0};
+recursiveMethod(counter);
+```
+
+**Alternative:** Use class-level variables or return values instead of trying to simulate pass-by-reference.
+

@@ -1,6 +1,5 @@
 package trees.binarysearchtree;
 
-import trees.Node;
 import trees.TreeNode;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -41,23 +40,6 @@ import java.util.Queue;
  */
 
 public class SerializeDeserializeBst {
-
-    public static void main(String[] args) {
-        // Example tree construction
-        TreeNode root = new TreeNode(1);
-        root.left = new TreeNode(2);
-        root.right = new TreeNode(3);
-        root.right.left = new TreeNode(4);
-        root.right.right = new TreeNode(5);
-
-        // Serialize the tree
-        String serializedString = new SerializeDeserializeBst().serialize(root);
-        System.out.println("Serialized tree: " + serializedString);
-
-        // Deserialize the string back into a tree
-        TreeNode deserializedNode = new SerializeDeserializeBst().deserialize(serializedString);
-        System.out.println("Deserialized tree root: " + deserializedNode.val);
-    }
 
     /**
      * Serializes a binary tree into a string representation.
@@ -160,5 +142,73 @@ public class SerializeDeserializeBst {
             }
         }
         return root;
+    }
+
+    /**
+     * -- DFS-based Approach --
+     * Serializes a binary tree into a string using pre-order traversal.
+     * Approach:
+     * - Use pre-order traversal (DFS) to visit each node.
+     * - Append the value of each node to a string.
+     * - Use "null" to represent missing children.
+     * Example:   
+     *  
+     *           1
+     *          /   \
+     *         2     3
+     *        / \   / \
+     *      null 4  5  6
+     *             / \
+     *            7   8
+     *
+     * Serialized : [1,2,null,4,null,null,3,5,7,null,null,8,null,null,6,null,null]
+     */
+    public String serialize_UsingDfsApproach(TreeNode root) {
+        StringBuilder builder = new StringBuilder();
+        serializeRec(root, builder);
+        String res = builder.toString();
+        System.out.println(res);
+        return res;
+    }
+
+    private void serializeRec(TreeNode node, StringBuilder builder) {
+        if (node == null) {
+            builder.append("null,");
+            return;
+        }
+        builder.append(node.val).append(",");
+        serializeRec(node.left, builder);
+        serializeRec(node.right, builder);
+    }
+
+    /**
+     * -- DFS-based Approach --
+     * Deserializes a string into a binary tree using pre-order traversal.
+     * Approach:
+     * - Split the serialized string into an array of node values.
+     * - Use a recursive helper function to rebuild the tree in pre-order.
+     * - For each node, create its left and right children based on the array values.
+     * - Return the root of the reconstructed tree.
+     * Example:
+     * Serialized : [1,2,null,4,null,null,3,5,7,null,null,8,null,null,6,null,null]
+     */
+    public TreeNode deserialize_UsingDfsApproach(String data) {
+        if (data.isEmpty()) return null;
+        String[] arr = data.split(",");
+        int[] index = {0};
+        return deserializeRec(arr, index);
+    }
+
+    private TreeNode deserializeRec(String[] arr, int[] index) {
+        if (index[0] >= arr.length || "null".equals(arr[index[0]])) {
+            index[0]++;
+            return null;
+        }
+
+        TreeNode node = new TreeNode(Integer.parseInt(arr[index[0]]));
+        index[0]++;
+        node.left = deserializeRec(arr, index);
+        node.right = deserializeRec(arr, index);
+        return node;
     }
 }

@@ -1,4 +1,4 @@
-package dynamicprogramming;
+package dynamicprogramming.linearpartition;
 
 import java.util.*;
 

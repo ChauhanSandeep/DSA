@@ -2,37 +2,43 @@ package dynamicprogramming.MatrixChainMul;
 
 import java.util.Arrays;
 
-
 /**
  * Problem: Egg Drop Problem (Super Egg Drop)
  *
  * https://leetcode.com/problems/super-egg-drop/
  *
  * Problem Statement:
- * Given `k` eggs and `n` floors, determine the minimum number of trials required
- * to find out the highest floor from which an egg can be dropped without breaking.
+ * Given `k` eggs and `n` floors, determine the minimum number of trials
+ * required
+ * to find out the highest floor from which an egg can be dropped without
+ * breaking.
  *
  * You want to minimize the number of trials in the worst case.
  *
  * Example:
  * Input: k = 3, n = 14
  * Output: 4
- * Explanation: With 3 eggs and 14 floors, the minimum number of trials in the worst case is 4.
+ * Explanation: With 3 eggs and 14 floors, the minimum number of trials in the
+ * worst case is 4.
  * One optimal strategy is:
  * - Drop from floor 4: If it breaks, check floors 1-3 with 2 eggs (3 trials).
- * - If it doesn't break, drop from floor 8: If it breaks, check floors 5-7 with 2 eggs (3 trials).
- * - If it doesn't break, drop from floor 11: If it breaks, check floors 9-10 with 2 eggs (3 trials).
- * - If it doesn't break, drop from floor 14: If it breaks, check floors 12-13 with 2 eggs (3 trials).
+ * - If it doesn't break, drop from floor 8: If it breaks, check floors 5-7 with
+ * 2 eggs (3 trials).
+ * - If it doesn't break, drop from floor 11: If it breaks, check floors 9-10
+ * with 2 eggs (3 trials).
+ * - If it doesn't break, drop from floor 14: If it breaks, check floors 12-13
+ * with 2 eggs (3 trials).
  * In all scenarios, the worst-case number of trials is 4.
  *
  * Follow-up Questions:
  * 1. Can we optimize using Binary Search in the recursion?
- *    → Yes. Use binary search on the floor to reduce time complexity.
- *    → Problem Link: https://leetcode.com/problems/super-egg-drop/
+ * → Yes. Use binary search on the floor to reduce time complexity.
+ * → Problem Link: https://leetcode.com/problems/super-egg-drop/
  *
  * 2. Can we solve it using moves instead of floors?
- *    → Yes. Another approach uses DP with states (moves, eggs).
- *    → Problem Link: https://leetcode.com/problems/super-egg-drop/solutions/123831/dp-using-binary-search-over-answer/
+ * → Yes. Another approach uses DP with states (moves, eggs).
+ * → Problem Link:
+ * https://leetcode.com/problems/super-egg-drop/solutions/123831/dp-using-binary-search-over-answer/
  */
 public class EggDropProblem {
 
@@ -89,19 +95,23 @@ public class EggDropProblem {
     // Use binary search to find optimal drop floor
     while (lowFloor <= highFloor) {
       int dropFloor = lowFloor + (highFloor - lowFloor) / 2;
-      
-      // if the egg breaks in current floor then, number of egg decreases by 1, and we now need to check the floors below
+
+      // if the egg breaks in current floor then, number of egg decreases by 1, and we
+      // now need to check the floors below
       int breakCaseTrials = minTrialsRecHelper(eggs - 1, dropFloor - 1, memo);
-      // if the egg doesn't break in current floor then, number of eggs remains same, and we now need to check the floors above
+      // if the egg doesn't break in current floor then, number of eggs remains same,
+      // and we now need to check the floors above
       int noBreakCaseTrials = minTrialsRecHelper(eggs, floors - dropFloor, memo);
 
-      // Added 1 for the current trial and taking the maximum of both cases in worst case.
+      // Added 1 for the current trial and taking the maximum of both cases in worst
+      // case.
       int worstCase = 1 + Math.max(breakCaseTrials, noBreakCaseTrials);
       minAttempts = Math.min(minAttempts, worstCase);
 
       // Adjust search range based on the worst-case comparison
       if (breakCaseTrials == noBreakCaseTrials) {
-        // If both cases require the same number of trials, we've found the optimal floor
+        // If both cases require the same number of trials, we've found the optimal
+        // floor
         break;
       }
       if (noBreakCaseTrials > breakCaseTrials) {
@@ -119,24 +129,27 @@ public class EggDropProblem {
   /**
    * Iterative DP (Bottom-up with Linear Scan)
    * Steps:
-   * 1. Create DP table: dp[i][j] represents the minimum trials needed with i eggs and j floors.
+   * 1. Create DP table: dp[i][j] represents the minimum trials needed with i eggs
+   * and j floors.
    * 2. Base cases:
-   *    - 0 floors → 0 trials (nothing to check)
-   *    - 1 floor → 1 trial (just drop once)
-   *    - 1 egg → j trials (must check linearly from bottom: floor 1, 2, ..., j)
+   * - 0 floors → 0 trials (nothing to check)
+   * - 1 floor → 1 trial (just drop once)
+   * - 1 egg → j trials (must check linearly from bottom: floor 1, 2, ..., j)
    * 3. For each state (currentEgg, currentFloor):
-   *    - Try dropping from every possible floor (dropFloor = 1 to currentFloor)
-   *    - For each drop, calculate worst-case trials:
-   *      a. Egg breaks: We lose 1 egg, check floors below (1 to dropFloor-1)
-   *         → Subproblem: dp[currentEgg - 1][dropFloor - 1]
-   *      b. Egg survives: Keep same eggs, check floors above (dropFloor+1 to currentFloor)
-   *         → Subproblem: dp[currentEgg][currentFloor - dropFloor]
-   *      c. Worst case: max(breakCase, noBreakCase) + 1 (for current drop)
-   *    - Track the minimum across all possible drop floors
+   * - Try dropping from every possible floor (dropFloor = 1 to currentFloor)
+   * - For each drop, calculate worst-case trials:
+   * a. Egg breaks: We lose 1 egg, check floors below (1 to dropFloor-1)
+   * → Subproblem: dp[currentEgg - 1][dropFloor - 1]
+   * b. Egg survives: Keep same eggs, check floors above (dropFloor+1 to
+   * currentFloor)
+   * → Subproblem: dp[currentEgg][currentFloor - dropFloor]
+   * c. Worst case: max(breakCase, noBreakCase) + 1 (for current drop)
+   * - Track the minimum across all possible drop floors
    *
    * 4. Result: dp[eggs][floors] gives the answer.
    *
-   * Time Complexity: O(eggs * floors²) - For each state, we try all floors linearly.
+   * Time Complexity: O(eggs * floors²) - For each state, we try all floors
+   * linearly.
    * Space Complexity: O(eggs * floors) - DP table storage.
    *
    * @param eggs   Number of eggs available.
@@ -161,12 +174,15 @@ public class EggDropProblem {
 
         dp[currentEgg][currentFloor] = Integer.MAX_VALUE;
         for (int dropFloor = 1; dropFloor <= currentFloor; dropFloor++) {
-          // if the egg breaks in current floor then, number of egg decreases by 1, and we now need to check the floors below. 
+          // if the egg breaks in current floor then, number of egg decreases by 1, and we
+          // now need to check the floors below.
           // Count of remaining floors is dropFloor - 1.
           int breakCaseTrials = dp[currentEgg - 1][dropFloor - 1];
 
-          // if the egg doesn't break in current floor then, number of eggs remains same, and we now need to check the floors above. 
-          // Remaining floors are dropFloor + 1 to currentFloor. Count of remaining floors is currentFloor - dropFloor.
+          // if the egg doesn't break in current floor then, number of eggs remains same,
+          // and we now need to check the floors above.
+          // Remaining floors are dropFloor + 1 to currentFloor. Count of remaining floors
+          // is currentFloor - dropFloor.
           int remainingFloors = currentFloor - dropFloor;
           int noBreakCaseTrials = dp[currentEgg][remainingFloors];
 
@@ -213,9 +229,11 @@ public class EggDropProblem {
 
         while (lowFloor <= highFloor) {
           int dropFloor = lowFloor + (highFloor - lowFloor) / 2;
-          // if the egg breaks in current floor then, number of egg decreases by 1, and we now need to check the floors below
+          // if the egg breaks in current floor then, number of egg decreases by 1, and we
+          // now need to check the floors below
           int breakCase = dp[currentEgg - 1][dropFloor - 1];
-          // if the egg doesn't break in current floor then, number of eggs remains same, and we now need to check the floors above
+          // if the egg doesn't break in current floor then, number of eggs remains same,
+          // and we now need to check the floors above
           int noBreakCase = dp[currentEgg][currentFloor - dropFloor];
 
           int worstCase = 1 + Math.max(breakCase, noBreakCase);

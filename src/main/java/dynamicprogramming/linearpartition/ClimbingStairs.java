@@ -1,4 +1,4 @@
-package dynamicprogramming;
+package dynamicprogramming.linearpartition;
 
 /**
  * Problem: Climbing Stairs (LeetCode #70)
