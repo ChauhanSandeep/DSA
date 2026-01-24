@@ -1,4 +1,4 @@
-package dynamicprogramming.MiscellaneousDP;
+package dynamicprogramming.longestcommonsubsequence;
 
 import java.util.Arrays;
 
