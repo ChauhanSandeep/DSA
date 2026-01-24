@@ -26,7 +26,7 @@ import java.util.Optional;
  * 3. How would you modify this for a doubly linked list?
  *    - Same logic applies, though reverse traversal becomes easier.
  * LeetCode Contest Rating: 1232
- **/
+ */
 public class MiddleElement {
 
   public static void main(String[] args) {

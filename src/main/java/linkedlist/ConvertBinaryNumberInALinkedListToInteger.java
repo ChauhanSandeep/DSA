@@ -23,7 +23,7 @@ package linkedlist;
  * Q: Can we solve this in-place without modifying the list?
  * A: Yes, both provided solutions don't modify the original list.
  * LeetCode Contest Rating: 1151
- **/
+ */
 public class ConvertBinaryNumberInALinkedListToInteger {
 
     // Definition for singly-linked list

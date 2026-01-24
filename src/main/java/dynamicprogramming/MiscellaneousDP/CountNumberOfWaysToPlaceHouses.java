@@ -49,7 +49,7 @@ package dynamicprogramming.MiscellaneousDP;
  *
  * LeetCode: https://leetcode.com/problems/count-number-of-ways-to-place-houses/
  * LeetCode Contest Rating: 1608
- **/
+ */
 public class CountNumberOfWaysToPlaceHouses {
     private static final int MOD = 1_000_000_007;
 

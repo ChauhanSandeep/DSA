@@ -24,7 +24,7 @@ import java.util.*;
  * 3. Can we compute the minimum number of swaps? - Yes, by calculating the total distance each 'L' or 'R' needs to move, but ensuring no crossings.
  * Relevant follow-up problem: https://leetcode.com/problems/move-pieces-to-obtain-a-string/ (similar movement constraints).
  * LeetCode Contest Rating: 1939
- **/
+ */
 public class SwapAdjacentInLRString {
 
   /**

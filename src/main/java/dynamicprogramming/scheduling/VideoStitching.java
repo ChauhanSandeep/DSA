@@ -52,7 +52,7 @@ import java.util.Arrays;
  *
  * LeetCode: https://leetcode.com/problems/video-stitching/
  * LeetCode Contest Rating: 1746
- **/
+ */
 public class VideoStitching {
 
     /**

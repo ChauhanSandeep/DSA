@@ -38,7 +38,7 @@ import java.util.Queue;
  * 3. Can this be solved bidirectionally?
  *    - Yes, bidirectional BFS reduces search space significantly.
  * LeetCode Contest Rating: 1658
- **/
+ */
 public class ShortestPath {
 
   // Directions: up, down, left, right, and 4 diagonals

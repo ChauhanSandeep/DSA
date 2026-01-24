@@ -34,7 +34,7 @@ package arrays.kadane;
  * Q: How does this relate to other array manipulation problems?
  * A: Similar to maximum sum subarray problems, but with splicing flexibility.
  * LeetCode Contest Rating: 1791
- **/
+ */
 public class MaxScoreSplicedArray {
 
   public static void main(String[] args) {

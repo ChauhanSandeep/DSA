@@ -36,7 +36,7 @@ package graphs;
  * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
  * - Number of Provinces (https://leetcode.com/problems/number-of-provinces/)
  * LeetCode Contest Rating: 2136
- **/
+ */
 public class RegionsCutBySlashes {
     /**
      * Calculates the number of regions formed by the slashes in the grid.

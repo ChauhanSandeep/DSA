@@ -15,7 +15,7 @@ package arrays;
  * - What if we want digit sum divisible by k? (Modify sum checking condition)
  * - Can we solve without iterating all numbers? (Mathematical approach based on patterns)
  * LeetCode Contest Rating: 1257
- **/
+ */
 public class CountIntegersWithEvenDigitSum {
 
     /**

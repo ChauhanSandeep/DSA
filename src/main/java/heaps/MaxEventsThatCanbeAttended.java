@@ -20,7 +20,7 @@ import java.util.PriorityQueue;
  * Explanation: You can attend events 1, 2, 3, and 5 on days 1, 2, 3, and 4 respectively.
  *
  * LeetCode Contest Rating: 2016
- **/
+ */
 public class MaxEventsThatCanbeAttended {
     public static void main(String[] args) {
         int[][] events = {

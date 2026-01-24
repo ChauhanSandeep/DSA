@@ -24,7 +24,7 @@ import java.util.Arrays;
  * 3. How does this relate to matrix chain multiplication? - It's analogous: cuts are like dimensions, cost is like multiplication cost.
  * Relevant follow-up problem: https://leetcode.com/problems/burst-balloons/ (similar interval DP but maximization).
  * LeetCode Contest Rating: 2116
- **/
+ */
 public class MinCostCutStick {
 
     /**

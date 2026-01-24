@@ -38,7 +38,7 @@ import java.util.Arrays;
  * Q5: How would you extend this to 3D (a cubic cake with 3 types of cuts)?
  * A5: Apply the same logic to all three dimensions independently, then multiply the three maximum gaps.
  * LeetCode Contest Rating: 1445
- **/
+ */
 public class BiggestCakePiece {
     private static final int MOD = 1_000_000_007;
 

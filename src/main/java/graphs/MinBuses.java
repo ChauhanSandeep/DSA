@@ -38,7 +38,7 @@ import java.util.*;
  * - LeetCode 1129: Shortest Path with Alternating Colors: https://leetcode.com/problems/shortest-path-with-alternating-colors/
  * - LeetCode 847: Shortest Path Visiting All Nodes: https://leetcode.com/problems/shortest-path-visiting-all-nodes/
  * LeetCode Contest Rating: 1964
- **/
+ */
 public class MinBuses {
   public static void main(String[] args) {
     int[][] routes = {

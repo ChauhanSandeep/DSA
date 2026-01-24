@@ -34,7 +34,7 @@ import java.util.Arrays;
  * - Can we avoid using strings and work directly with bits?
  *   Yes, you can optimize memory and speed using bitwise operations on integers.
  * LeetCode Contest Rating: 1980
- **/
+ */
 public class MaxGoodPeople {
 
   public static void main(String[] args) {

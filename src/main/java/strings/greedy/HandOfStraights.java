@@ -40,7 +40,7 @@ import java.util.*;
  *  - LeetCode 659 (Split Array into Consecutive Subsequences): https://leetcode.com/problems/split-array-into-consecutive-subsequences/
  *  - LeetCode 1121 (Divide Array Into Increasing Sequences): https://leetcode.com/problems/divide-array-into-increasing-sequences/
  * LeetCode Contest Rating: 1565
- **/
+ */
 public class HandOfStraights {
 
     /**

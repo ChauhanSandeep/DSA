@@ -15,7 +15,7 @@ package arrays.simulation;
  *
  * LeetCode Problem: https://leetcode.com/problems/robot-bounded-in-circle/
  * LeetCode Contest Rating: 1521
- **/
+ */
 public class BoundedRobot {
     public static void main(String[] args) {
         String instructions = "GGLLGG";

@@ -14,7 +14,7 @@ package dynamicprogramming.LongestCommonSubsequence;
  *
  * LeetCode link: https://leetcode.com/problems/shortest-common-supersequence/
  * LeetCode Contest Rating: 1977
- **/
+ */
 public class ShortestCommonSupersequence {
 
     /**

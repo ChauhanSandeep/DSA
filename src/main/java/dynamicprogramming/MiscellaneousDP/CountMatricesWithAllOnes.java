@@ -46,7 +46,7 @@ import java.util.*;
  *    Answer: Use sliding window or prefix sum 2D approach. For each submatrix, calculate
  *    sum using prefix sums and count those with sum >= k.
  * LeetCode Contest Rating: 1845
- **/
+ */
 public class CountMatricesWithAllOnes {
 
   public static void main(String[] args) {

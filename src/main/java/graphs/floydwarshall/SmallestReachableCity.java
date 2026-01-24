@@ -19,7 +19,7 @@ import java.util.Arrays;
  * Input: n = 4, edges = [[0,1,3],[1,2,1],[1,3,4],[2,3,1]], distanceThreshold = 4
  * Output: 3
  * LeetCode Contest Rating: 1855
- **/
+ */
 public class SmallestReachableCity {
 
     /**

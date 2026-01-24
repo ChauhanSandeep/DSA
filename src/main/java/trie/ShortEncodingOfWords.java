@@ -57,7 +57,7 @@ import java.util.Set;
  *    of others would be eliminated instead of suffixes.
  *    Related problem: https://leetcode.com/problems/replace-words/
  * LeetCode Contest Rating: 1632
- **/
+ */
 public class ShortEncodingOfWords {
 
     /**

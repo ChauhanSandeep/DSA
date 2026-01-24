@@ -39,7 +39,7 @@ package arrays.twopointers;
  * - 1043. Partition Array for Maximum Sum: https://leetcode.com/problems/partition-array-for-maximum-sum/
  * - 132. Palindrome Partitioning II: https://leetcode.com/problems/palindrome-partitioning-ii/
  * LeetCode Contest Rating: 1501
- **/
+ */
 public class PartitionArrayIntoDisjointIntervals {
 
     /**

@@ -46,7 +46,7 @@ import java.util.Set;
  *    Answer: Use HashMap<String, List<String>> instead of HashSet, where key is the normalized
  *    email and value is the list of original emails that map to it.
  * LeetCode Contest Rating: 1199
- **/
+ */
 public class UniqueEmailAddresses {
 
     /**

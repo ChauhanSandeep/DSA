@@ -34,7 +34,7 @@ import java.util.List;
  * — Yes, with a mark-and-swap approach using a mapping array.
  *    Follow-up: https://leetcode.com/problems/find-and-replace-in-string/solutions/205982/java-c-python-o-n/
  * LeetCode Contest Rating: 1461
- **/
+ */
 public class FindReplaceInString {
 
   public static void main(String[] args) {

@@ -33,7 +33,7 @@ import java.util.*;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 2020
- **/
+ */
 public class SnakesAndLadders {
 
     /**

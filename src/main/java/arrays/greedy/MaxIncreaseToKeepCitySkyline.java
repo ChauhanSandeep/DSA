@@ -86,7 +86,7 @@ package arrays.greedy;
  *    current skyline constraints. Update maximums incrementally. This is useful for online
  *    scenarios where updates come sequentially.
  * LeetCode Contest Rating: 1376
- **/
+ */
 public class MaxIncreaseToKeepCitySkyline {
 
     /**

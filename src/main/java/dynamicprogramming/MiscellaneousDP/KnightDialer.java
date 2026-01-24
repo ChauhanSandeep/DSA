@@ -29,7 +29,7 @@ import java.util.*;
  * Q: Can we count paths that avoid certain numbers?
  * A: Modify DP state to exclude forbidden positions.
  * LeetCode Contest Rating: 1690
- **/
+ */
 public class KnightDialer {
 
     private static final int MOD = 1000000007;

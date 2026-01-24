@@ -78,7 +78,7 @@ package arrays.prefixsum;
  *    O(log m * log n), making it efficient for dynamic scenarios. Static prefix sum becomes
  *    inefficient if matrix changes frequently.
  * LeetCode Contest Rating: 1484
- **/
+ */
 public class MatrixBlockSum {
 
     /**

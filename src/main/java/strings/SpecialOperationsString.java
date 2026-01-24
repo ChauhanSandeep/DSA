@@ -37,7 +37,7 @@ package strings;
  * Time Complexity: O(n) where n = length of input string
  * Space Complexity: O(1) extra space
  * LeetCode Contest Rating: 2011
- **/
+ */
 public class SpecialOperationsString {
 
   private static final char REMOVE_LAST = '*';

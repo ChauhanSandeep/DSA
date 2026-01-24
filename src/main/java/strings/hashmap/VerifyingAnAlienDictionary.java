@@ -27,7 +27,7 @@ package strings.hashmap;
  * - How would you extend to support numbers and special characters? (Expand character mapping)
  * - What if we need to sort the words instead of just verify? (Use custom comparator with same logic)
  * LeetCode Contest Rating: 1300
- **/
+ */
 public class VerifyingAnAlienDictionary {
 
     /**

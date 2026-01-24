@@ -19,7 +19,7 @@ import java.util.*;
  * - How to handle negative numbers? (Current solution handles them correctly)
  * - What if multiple original arrays are possible? (Problem guarantees unique solution)
  * LeetCode Contest Rating: 1557
- **/
+ */
 public class FindOriginalArrayFromDoubledArray {
 
     /**

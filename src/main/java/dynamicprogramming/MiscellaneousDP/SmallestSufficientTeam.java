@@ -26,7 +26,7 @@ import java.util.*;
  * Q: Can we find multiple optimal teams or teams within size constraints?
  * A: Modify DP to track all optimal solutions or add size constraints.
  * LeetCode Contest Rating: 2251
- **/
+ */
 public class SmallestSufficientTeam {
 
     /**

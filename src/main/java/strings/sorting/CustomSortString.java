@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  * - Relative Sort Array: https://leetcode.com/problems/relative-sort-array/
  * - Valid Anagram: https://leetcode.com/problems/valid-anagram/
  * LeetCode Contest Rating: 1424
- **/
+ */
 public class CustomSortString {
 
     /**

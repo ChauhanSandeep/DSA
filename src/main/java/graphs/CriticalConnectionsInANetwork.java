@@ -26,7 +26,7 @@ import java.util.*;
  * Q: Can we find critical connections in directed graphs?
  * A: Use strongly connected components and bridge-finding in condensation graph.
  * LeetCode Contest Rating: 2085
- **/
+ */
 public class CriticalConnectionsInANetwork {
 
     /**

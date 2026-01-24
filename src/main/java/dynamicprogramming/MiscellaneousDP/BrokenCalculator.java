@@ -45,7 +45,7 @@ import java.util.*;
  *    Answer: The problem becomes more complex as we have four operations. Use BFS with
  *    state space exploration to find the shortest path, or apply bidirectional search.
  * LeetCode Contest Rating: 1909
- **/
+ */
 public class BrokenCalculator {
 
   /**

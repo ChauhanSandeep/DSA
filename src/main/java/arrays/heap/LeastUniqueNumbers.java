@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  *    Answer: Same greedy approach but stop early if we've eliminated all unique integers
  *    before using all k removals. Return 0 as soon as unique count reaches 0.
  * LeetCode Contest Rating: 1284
- **/
+ */
 public class LeastUniqueNumbers {
 
     public static void main(String[] args) {

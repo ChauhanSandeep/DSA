@@ -60,7 +60,7 @@ import java.util.PriorityQueue;
  *
  * LeetCode: https://leetcode.com/problems/furthest-building-you-can-reach/
  * LeetCode Contest Rating: 1962
- **/
+ */
 public class FurthestBuildingYouCanReach {
 
     /**

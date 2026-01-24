@@ -14,7 +14,7 @@ package strings;
  *
  * LeetCode Link: https://leetcode.com/problems/long-pressed-name/
  * LeetCode Contest Rating: 1271
- **/
+ */
 public class LongPressedName {
 
     /**

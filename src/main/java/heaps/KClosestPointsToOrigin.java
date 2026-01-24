@@ -32,7 +32,7 @@ import java.util.Random;
  *    Answer: Use MapReduce with local k-closest computation followed by global merge.
  *
  * LeetCode Contest Rating: 1214
- **/
+ */
 public class KClosestPointsToOrigin {
 
     /**

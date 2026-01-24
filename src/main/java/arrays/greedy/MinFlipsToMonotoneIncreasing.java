@@ -47,7 +47,7 @@ package arrays.greedy;
  *    Answer: Process in chunks, maintaining state (ones_count, flip_count) between chunks.
  *    Update state incrementally as new characters arrive. Space remains O(1).
  * LeetCode Contest Rating: 1602
- **/
+ */
 public class MinFlipsToMonotoneIncreasing {
 
   public static void main(String[] args) {

@@ -38,7 +38,7 @@ import java.util.*;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 1614
- **/
+ */
 public class CountTheHiddenSequences {
 
     /**

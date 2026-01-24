@@ -38,7 +38,7 @@ import java.util.*;
  * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
  * - Number of Provinces (https://leetcode.com/problems/number-of-provinces/)
  * LeetCode Contest Rating: 2035
- **/
+ */
 public class MostStonesRemovedWithSameRowOrColumn {
     /**
      * Calculates the maximum number of stones that can be removed.

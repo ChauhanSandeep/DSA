@@ -67,7 +67,7 @@ import java.util.List;
  *    algorithm to partition the graph. We'd still use Union-Find but optimize for sum
  *    rather than maximum, which changes the decision-making process significantly.
  * LeetCode Contest Rating: 1642
- **/
+ */
 public class MinimizeMaximumComponentCost {
 
   /**

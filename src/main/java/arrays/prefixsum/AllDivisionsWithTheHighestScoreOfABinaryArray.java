@@ -55,7 +55,7 @@ import java.util.stream.Stream;
  *    Answer: Maintain separate prefix sums for each distinct value in the array. The score
  *    calculation would need to be generalized based on the specific scoring rules for each value.
  * LeetCode Contest Rating: 1391
- **/
+ */
 public class AllDivisionsWithTheHighestScoreOfABinaryArray {
 
     /**

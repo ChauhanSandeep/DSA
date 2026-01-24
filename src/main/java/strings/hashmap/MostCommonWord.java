@@ -22,7 +22,7 @@ import java.util.*;
  * - How would you extend to return top k most common words? (Use priority queue)
  * - What if banned words can contain punctuation? (Apply same normalization to banned words)
  * LeetCode Contest Rating: 1298
- **/
+ */
 public class MostCommonWord {
 
     /**

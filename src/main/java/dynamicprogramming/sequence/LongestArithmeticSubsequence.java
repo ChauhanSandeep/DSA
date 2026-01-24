@@ -26,7 +26,7 @@ import java.util.*;
  * Q: How to handle overflow with large differences?
  * A: Use HashMap with proper key handling or compress the difference range.
  * LeetCode Contest Rating: 1759
- **/
+ */
 public class LongestArithmeticSubsequence {
 
     /**

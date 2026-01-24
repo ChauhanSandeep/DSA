@@ -23,7 +23,7 @@ import java.util.Set;
  * - Q: Can we do better than sorting?
  *   A: You can use a priority queue or bucket sort, but time complexity will still be O(N).
  * LeetCode Contest Rating: 1510
- **/
+ */
 public class MinimumDeletionsToMakeFrequenciesUnique {
 
   public static void main(String[] args) {

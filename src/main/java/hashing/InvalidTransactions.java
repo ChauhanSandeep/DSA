@@ -26,7 +26,7 @@ import java.util.*;
  * Q: How to handle timezone differences?
  * A: Normalize all timestamps to UTC before processing.
  * LeetCode Contest Rating: 1659
- **/
+ */
 public class InvalidTransactions {
 
     /**

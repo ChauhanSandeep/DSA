@@ -33,7 +33,7 @@ import java.util.Stack;
  * - Unique Binary Search Trees (https://leetcode.com/problems/unique-binary-search-trees/)
  * - Binary Tree Maximum Path Sum (https://leetcode.com/problems/binary-tree-maximum-path-sum/)
  * LeetCode Contest Rating: 1919
- **/
+ */
 public class MinimumCostTreeFromLeafValues {
     /**
      * Calculates the minimum possible sum of the values of each non-leaf node.

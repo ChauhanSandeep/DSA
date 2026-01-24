@@ -26,7 +26,7 @@ import java.util.Queue;
  * Time Complexity: O(V + E)
  * Space Complexity: O(V)
  * LeetCode Contest Rating: 1625
- **/
+ */
 public class Bipartite {
 
   /**

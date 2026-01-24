@@ -30,7 +30,7 @@ import java.util.List;
  * 2. How would you scale this for streaming logs?
  * — Use a priority queue or external merge sort with file buffers.
  * LeetCode Contest Rating: 1387
- **/
+ */
 public class ReOrderLogFile {
 
     public static void main(String[] args) {

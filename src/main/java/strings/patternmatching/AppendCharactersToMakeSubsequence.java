@@ -24,7 +24,7 @@ package strings.patternmatching;
  *    → It becomes similar to pattern matching or wildcard matching.
  *    → Ref: https://leetcode.com/problems/wildcard-matching/
  * LeetCode Contest Rating: 1363
- **/
+ */
 
 public class AppendCharactersToMakeSubsequence {
 

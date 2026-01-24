@@ -23,7 +23,7 @@ package strings.patternmatching;
  * - What if the rotation is not fixed
  *  Answer: https://leetcode.com/problems/rotate-string/ solved in canBeRotated method.
  * LeetCode Contest Rating: 1167
- **/
+ */
 public class RotatedString {
 
   public static void main(String[] args) {

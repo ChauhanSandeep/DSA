@@ -34,7 +34,7 @@ import java.util.TreeMap;
  *
  * LeetCode Problem Link: https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/
  * LeetCode Contest Rating: 1676
- **/
+ */
 public class VerticalTraversal {
 
     public static void main(String[] args) {

@@ -19,7 +19,7 @@ package dynamicprogramming.statemachine;
  *
  * Related Leetcode: https://leetcode.com/problems/domino-and-tromino-tiling/
  * LeetCode Contest Rating: 1830
- **/
+ */
 public class TilingDominoes {
 
     public static void main(String[] args) {

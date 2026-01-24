@@ -17,7 +17,7 @@ import java.util.*;
  *
  * Link: https://leetcode.com/problems/connecting-cities-with-minimum-cost/
  * LeetCode Contest Rating: 1753
- **/
+ */
 public class ConnectingCitiesWithMinimumCost_Prim {
 
   private static class Edge {

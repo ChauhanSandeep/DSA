@@ -41,7 +41,7 @@ package arrays.slidingwindow;
  * - Minimum Adjacent Swaps for K Consecutive Ones: https://leetcode.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/
  * - Sliding Window Maximum: https://leetcode.com/problems/sliding-window-maximum/
  * LeetCode Contest Rating: 1508
- **/
+ */
 public class MinimumSwapsToGroupAll1sTogether {
 
     /**

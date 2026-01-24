@@ -18,7 +18,7 @@ import java.util.*;
  * - What if we want lonely numbers within distance d? (Check range [x-d, x+d])
  * - Can we solve without using extra space? (Sorting approach possible but O(n log n))
  * LeetCode Contest Rating: 1276
- **/
+ */
 public class FindAllLonelyNumbersInTheArray {
 
     /**

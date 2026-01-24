@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
  * - What if we want students in decreasing order? (Sort in reverse order)
  * - Can we solve without sorting? (Use counting sort since heights are bounded)
  * LeetCode Contest Rating: 1303
- **/
+ */
 public class HeightChecker {
 
     /**

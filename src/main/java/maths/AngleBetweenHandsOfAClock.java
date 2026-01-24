@@ -24,7 +24,7 @@ package maths;
  *    Answer: Use continuous time calculations instead of discrete hour/minute values.
  *    Related: https://leetcode.com/problems/minimum-time-difference/
  * LeetCode Contest Rating: 1325
- **/
+ */
 public class AngleBetweenHandsOfAClock {
 
     public static void main(String[] args) {

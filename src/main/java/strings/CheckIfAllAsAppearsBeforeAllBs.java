@@ -17,7 +17,7 @@ package strings;
  * - How would you solve this for multiple characters? (Extend to check ordering of k different characters)
  * - Can you solve this with a single pass without string search? (Track state transitions)
  * LeetCode Contest Rating: 1202
- **/
+ */
 public class CheckIfAllAsAppearsBeforeAllBs {
 
     /**

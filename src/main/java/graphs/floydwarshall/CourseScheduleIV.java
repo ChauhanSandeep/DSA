@@ -38,7 +38,7 @@ import java.util.*;
  * 3. Can we handle dynamic prerequisites (edges added/removed)?
  *    - Yes, but requires advanced techniques like Dynamic Transitive Closure (using DAG reachability data structures).
  * LeetCode Contest Rating: 1693
- **/
+ */
 public class CourseScheduleIV {
 
   /**

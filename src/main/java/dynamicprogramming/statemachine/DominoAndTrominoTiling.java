@@ -37,7 +37,7 @@ package dynamicprogramming.statemachine;
  * 4. How to optimize space for very large n?
  *    Answer: Since we only need last 3 values, use rolling variables instead of array.
  * LeetCode Contest Rating: 1830
- **/
+ */
 public class DominoAndTrominoTiling {
 
   private static final int MODULO = 1_000_000_007;

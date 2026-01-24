@@ -28,7 +28,7 @@ import java.util.PriorityQueue;
  * 3. Can this be parallelized?
  *    ➤ Only partially. Final result is inherently sequential due to dependency.
  * LeetCode Contest Rating: 1482
- **/
+ */
 public class MinimumCostToConnectSticks {
 
   public static void main(String[] args) {

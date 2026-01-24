@@ -38,7 +38,7 @@ import java.util.*;
  * - Can you solve it with 0-1 BFS instead of Dijkstra? (Yes) → [0-1 BFS](https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/editorial/)
  * - What if diagonal directions are added? (Extend direction arrays accordingly)
  * LeetCode Contest Rating: 2069
- **/
+ */
 public class MinCostSum {
     public static void main(String[] args) {
         int rows = 3;

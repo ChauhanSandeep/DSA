@@ -20,7 +20,7 @@ import java.util.*;
  * (original problem constraint)
  * 2. TreeMap-based: Handles arbitrary timestamp insertion order
  * LeetCode Contest Rating: 1575
- **/
+ */
 public class TimeMap {
     private Map<String, List<Pair>> map;
     private Map<String, TreeMap<Integer, String>> treeMapStorage;

@@ -33,7 +33,7 @@ import java.util.PriorityQueue;
  * 2. What if tasks can be interrupted (preemption)?
  *    - Requires simulation using a priority queue with current job tracking.
  * LeetCode Contest Rating: 1798
- **/
+ */
 public class SingleThreadCPU {
 
     /**

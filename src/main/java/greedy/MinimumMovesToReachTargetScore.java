@@ -30,7 +30,7 @@ package greedy;
  *    Answer: Use dynamic programming with cost optimization instead of simple move counting.
  *    Related: https://leetcode.com/problems/2-keys-keyboard/
  * LeetCode Contest Rating: 1417
- **/
+ */
 public class MinimumMovesToReachTargetScore {
 
     /**

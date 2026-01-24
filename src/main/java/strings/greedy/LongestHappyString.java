@@ -26,7 +26,7 @@ import java.util.PriorityQueue;
  * 2. Can we do it without heap?
  *    → Yes, greedy character selection can be done using manual comparisons.
  * LeetCode Contest Rating: 1821
- **/
+ */
 public class LongestHappyString {
 
   public static void main(String[] args) {

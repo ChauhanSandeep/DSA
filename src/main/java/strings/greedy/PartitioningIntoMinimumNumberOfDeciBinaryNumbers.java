@@ -27,7 +27,7 @@ package strings.greedy;
  * - How would you construct actual deci-binary numbers instead of just count? (Build numbers digit by digit)
  * - What if we need to minimize sum of deci-binary numbers instead of count? (Different optimization problem)
  * LeetCode Contest Rating: 1355
- **/
+ */
 public class PartitioningIntoMinimumNumberOfDeciBinaryNumbers {
 
     /**

@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 1694
- **/
+ */
 public class ConsecutiveNumbersSum {
 
     /**

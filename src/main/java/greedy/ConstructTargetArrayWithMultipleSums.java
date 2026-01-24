@@ -39,7 +39,7 @@ import java.util.PriorityQueue;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 2015
- **/
+ */
 public class ConstructTargetArrayWithMultipleSums {
 
     /**

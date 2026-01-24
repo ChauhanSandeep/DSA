@@ -32,7 +32,7 @@ import java.util.Arrays;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 1335
- **/
+ */
 public class DestroyingAsteroids {
 
     /**

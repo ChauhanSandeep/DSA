@@ -47,7 +47,7 @@ import java.util.*;
  * - Sort Array by Parity II: https://leetcode.com/problems/sort-array-by-parity-ii/
  * - Shuffle the Array: https://leetcode.com/problems/shuffle-the-array/
  * LeetCode Contest Rating: 1236
- **/
+ */
 public class RearrangeArrayElementsBySign {
 
     /**

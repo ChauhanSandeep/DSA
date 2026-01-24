@@ -25,7 +25,7 @@ package graphs;
  * Q: Can we preprocess for multiple queries with different X values?
  * A: Use prefix sums and binary search for efficient range queries.
  * LeetCode Contest Rating: 1418
- **/
+ */
 public class GrumpyBookstoreOwner {
 
     /**

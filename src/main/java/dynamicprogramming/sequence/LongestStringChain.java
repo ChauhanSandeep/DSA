@@ -45,7 +45,7 @@ import java.util.*;
  *
  * LeetCode: https://leetcode.com/problems/longest-string-chain/
  * LeetCode Contest Rating: 1599
- **/
+ */
 public class LongestStringChain {
 
     /**

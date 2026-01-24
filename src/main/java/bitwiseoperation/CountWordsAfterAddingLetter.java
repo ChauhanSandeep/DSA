@@ -24,7 +24,7 @@ import java.util.*;
  * - Is it necessary to group words by length?
  *   👉 Not with bitmasking; length grouping is only helpful when comparing sorted strings.
  * LeetCode Contest Rating: 1828
- **/
+ */
 public class CountWordsAfterAddingLetter {
 
   public static void main(String[] args) {

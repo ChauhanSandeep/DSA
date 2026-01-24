@@ -30,7 +30,7 @@ package linkedlist;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 1333
- **/
+ */
 public class MergeNodesInBetweenZeros {
 
     // Definition for singly-linked list

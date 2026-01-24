@@ -14,7 +14,7 @@ package dynamicprogramming.gametheory;
  *
  * LeetCode Problem: https://leetcode.com/problems/stone-game/
  * LeetCode Contest Rating: 1590
- **/
+ */
 public class StoneGame {
 
     public static void main(String[] args) {

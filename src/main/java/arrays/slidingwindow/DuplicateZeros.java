@@ -55,7 +55,7 @@ import java.util.Arrays;
  *    A: Modify the counting logic to multiply zero count by k, and in the backward pass,
  *    insert k copies of zero instead of 2. The algorithm structure remains the same.
  * LeetCode Contest Rating: 1263
- **/
+ */
 public class DuplicateZeros {
 
     /**

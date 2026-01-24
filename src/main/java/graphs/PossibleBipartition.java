@@ -33,7 +33,7 @@ import java.util.*;
  * - Is Graph Bipartite? (https://leetcode.com/problems/is-graph-bipartite/)
  * - Flower Planting With No Adjacent (https://leetcode.com/problems/flower-planting-with-no-adjacent/)
  * LeetCode Contest Rating: 1795
- **/
+ */
 public class PossibleBipartition {
     /**
      * Checks if the given graph is bipartite using BFS.

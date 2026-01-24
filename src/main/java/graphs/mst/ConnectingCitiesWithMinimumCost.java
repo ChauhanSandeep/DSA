@@ -16,7 +16,7 @@ import java.util.*;
  *
  * LeetCode Link: https://leetcode.com/problems/connecting-cities-with-minimum-cost/
  * LeetCode Contest Rating: 1753
- **/
+ */
 public class ConnectingCitiesWithMinimumCost {
 
     /**

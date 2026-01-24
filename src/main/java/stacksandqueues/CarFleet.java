@@ -34,7 +34,7 @@ import java.util.Arrays;
  *    Answer: Use physics equations with variable acceleration instead of constant speed.
  *    Related: https://leetcode.com/problems/race-car/
  * LeetCode Contest Rating: 1678
- **/
+ */
 public class CarFleet {
 
     /**

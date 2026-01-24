@@ -55,7 +55,7 @@ import java.util.*;
  *    Answer: Use absolute difference same way. Dijkstra's still works because
  *    edge weights (differences) remain non-negative.
  * LeetCode Contest Rating: 1948
- **/
+ */
 public class PathWithMinimumEffort {
 
     private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};

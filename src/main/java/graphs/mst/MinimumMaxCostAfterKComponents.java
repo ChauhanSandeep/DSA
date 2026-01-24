@@ -21,7 +21,7 @@ import java.util.*;
  Link: https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/
  *
  * LeetCode Contest Rating: 2243
- **/
+ */
 public class MinimumMaxCostAfterKComponents {
 
   /** Pair to represent (node, weight) for adjacency list and priority queue. */

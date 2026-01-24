@@ -37,7 +37,7 @@ import java.util.*;
  * - LeetCode 210: Course Schedule II (Topological Sort)
  * - LeetCode 1059: All Paths from Source Lead to Destination
  * LeetCode Contest Rating: 2449
- **/
+ */
 public class MaxInvitations {
 
   public static void main(String[] args) {

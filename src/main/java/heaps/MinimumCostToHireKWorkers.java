@@ -35,7 +35,7 @@ import java.util.*;
  * - Maximum Performance of a Team (https://leetcode.com/problems/maximum-performance-of-a-team/)
  * - IPO (https://leetcode.com/problems/ipo/)
  * LeetCode Contest Rating: 2260
- **/
+ */
 public class MinimumCostToHireKWorkers {
     /**
      * Calculates the minimum cost to hire k workers with given quality and wage constraints.

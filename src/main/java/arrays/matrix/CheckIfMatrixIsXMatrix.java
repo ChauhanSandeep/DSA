@@ -22,7 +22,7 @@ package arrays.matrix;
  * - What if we want to allow different non-zero values on diagonals? (Current solution already handles this)
  * - Can we solve without nested loops? (No, need to examine each element)
  * LeetCode Contest Rating: 1201
- **/
+ */
 public class CheckIfMatrixIsXMatrix {
 
     /**

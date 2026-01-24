@@ -50,7 +50,7 @@ import java.util.*;
  * - Pacific Atlantic Water Flow: https://leetcode.com/problems/pacific-atlantic-water-flow/
  * - Battleships in a Board: https://leetcode.com/problems/battleships-in-a-board/
  * LeetCode Contest Rating: 1280
- **/
+ */
 public class NumberOfLaserBeamsInABank {
 
     /**

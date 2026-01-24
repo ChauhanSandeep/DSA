@@ -27,7 +27,7 @@ import java.util.*;
  *    → Partition words array across machines, each processes independently and aggregates results.
  *
  * LeetCode Contest Rating: 1695
- **/
+ */
 public class NumberOfMatchingSubsequences {
 
     /**

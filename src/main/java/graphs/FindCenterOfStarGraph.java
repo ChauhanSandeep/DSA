@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author Sandeep
  * LeetCode Contest Rating: 1287
- **/
+ */
 public class FindCenterOfStarGraph {
 
     /**

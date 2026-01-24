@@ -40,7 +40,7 @@ import java.util.Arrays;
  * → Problem Link:
  * https://leetcode.com/problems/super-egg-drop/solutions/123831/dp-using-binary-search-over-answer/
  * LeetCode Contest Rating: 2377
- **/
+ */
 public class EggDropProblem {
 
   public static void main(String[] args) {

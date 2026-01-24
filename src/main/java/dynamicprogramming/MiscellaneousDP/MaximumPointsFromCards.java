@@ -50,7 +50,7 @@ package dynamicprogramming.MiscellaneousDP;
  *
  * LeetCode: https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/
  * LeetCode Contest Rating: 1574
- **/
+ */
 public class MaximumPointsFromCards {
 
     /**
