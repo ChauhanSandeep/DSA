@@ -1,4 +1,4 @@
-package dynamicprogramming.KnapsackUnbounded;
+package dynamicprogramming.knapsackunbounded;
 
 /**
  * Problem: Rod Cutting Problem (Unbounded Knapsack)
