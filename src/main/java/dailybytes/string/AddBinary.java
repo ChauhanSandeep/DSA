@@ -16,6 +16,7 @@ package dailybytes.string;
  * 1. What if inputs are very large (millions of bits)? ➤ Use streaming or chunking
  * 2. What if inputs are mutable char arrays? ➤ Do in-place with reverse traversal
  * 3. What if base is not binary but k-ary (base-k)? ➤ Generalize logic with modular arithmetic
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AddBinary {
 

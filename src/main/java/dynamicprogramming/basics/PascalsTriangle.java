@@ -45,6 +45,7 @@ import java.util.List;
  *    Answer: We can traverse the triangle row by row, alternating between left-to-right and right-to-left.
  *
  * LeetCode: https://leetcode.com/problems/pascals-triangle/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PascalsTriangle {
 

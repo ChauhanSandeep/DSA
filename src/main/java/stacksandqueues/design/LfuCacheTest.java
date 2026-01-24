@@ -41,6 +41,7 @@ import java.util.Map;
  *   (Use a lazy update mechanism and sync when accessed)
  * - What if frequent inserts and gets happen in high-concurrency systems?
  *   (Consider using ConcurrentHashMap + locking strategies or `java.util.concurrent` data structures)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 class LFUCache {
   private final int capacity; // Maximum capacity of the cache

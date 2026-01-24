@@ -41,6 +41,7 @@ import java.util.*;
  *  - LeetCode 139 (Word Break): https://leetcode.com/problems/word-break/
  *  - LeetCode 140 (Word Break II): https://leetcode.com/problems/word-break-ii/
  *  - LeetCode 820 (Short Encoding of Words): https://leetcode.com/problems/short-encoding-of-words/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ConcatenatedWords {
 

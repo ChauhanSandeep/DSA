@@ -51,6 +51,7 @@ import java.util.*;
  * 5. What if node values can be multi-digit or contain special characters?
  *    Answer: The current solution handles this correctly. StringBuilder concatenates values
  *    as strings, so multi-digit numbers and special characters are preserved in the output.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinaryTreePaths {
 

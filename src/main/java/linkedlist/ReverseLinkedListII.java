@@ -19,6 +19,7 @@ package linkedlist;
  *
  * 2. How would this change if you needed to reverse nodes based on value range instead of position?
  *    → You'd need to scan for matching nodes by value and use dummy heads to build sublists accordingly.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class ReverseLinkedListII {

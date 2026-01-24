@@ -58,6 +58,7 @@ import java.util.Set;
  * Related Problems:
  * - Word Ladder II (LeetCode #126) - Return all shortest transformation sequences
  * - Minimum Genetic Mutation (LeetCode #433)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 class DoubletsSolution {
     

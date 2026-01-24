@@ -27,6 +27,7 @@ import java.util.*;
  *
  * Q: Can we optimize space for very wide trees?
  * A: Use level-by-level processing to avoid storing all positions.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumWidthOfBinaryTree {
 

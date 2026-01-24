@@ -20,6 +20,7 @@ package arrays.twopointers;
  * The bars trap 1 unit of water at index 2, 1 at 4, 2 at 5, 1 at 6, and 1 at 10 — total = 6 units.
  *
  * 🔗 Leetcode: https://leetcode.com/problems/trapping-rain-water/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TrappingRainWater {
   public static void main(String[] args) {

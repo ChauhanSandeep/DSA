@@ -34,6 +34,7 @@ package strings;
  * Related Problems:
  * - Text Justification (https://leetcode.com/problems/text-justification/)
  * - Encode and Decode Strings (https://leetcode.com/problems/encode-and-decode-strings/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ZigZagConversion {
 

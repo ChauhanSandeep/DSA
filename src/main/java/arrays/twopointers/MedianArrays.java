@@ -18,6 +18,7 @@ package arrays.twopointers;
  * - What if the arrays are unsorted? (Sort before applying logic)
  * - Can this be done without merging? (Yes, use binary search on partition)
  * - Can you extend this to k sorted arrays? (Use min-heap)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MedianArrays {
 

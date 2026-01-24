@@ -16,6 +16,7 @@ package arrays.binarysearch;
  * 1. Can you write it recursively? ✅ See {@link #binarySearchRecursive}
  * 2. How do you handle duplicates? ➤ First or last occurrence: use modified binary search.
  * 3. What if the array is rotated? ➤ Apply binary search on rotated sorted array (Leetcode 33).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinarySearch {
 

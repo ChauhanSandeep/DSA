@@ -21,6 +21,7 @@ import java.util.Queue;
  * --- Complexity Analysis ---
  * - **Time Complexity:** O(N * M) → Each cell is processed at most once.
  * - **Space Complexity:** O(N * M) → Queue stores at most N * M elements.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ShortestDistance {
 

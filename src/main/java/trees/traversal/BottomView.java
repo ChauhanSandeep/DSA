@@ -29,6 +29,7 @@ import java.util.*;
  * **Space Complexity:** O(N) - For storing nodes in a queue and map.
  *
  * **LeetCode Link:** https://leetcode.com/problems/binary-tree-bottom-view/ (similar problem)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BottomView {
     public static void main(String[] args) {

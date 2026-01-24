@@ -43,6 +43,7 @@ import java.util.Map;
  *
  * Q5: Can you solve this with O(1) space but allowing modification of input array?
  * A5: Not efficiently in O(n) time. Sorting would take O(n log n), then two-pointers in O(n).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TwoSum {
     public static void main(String[] args) {

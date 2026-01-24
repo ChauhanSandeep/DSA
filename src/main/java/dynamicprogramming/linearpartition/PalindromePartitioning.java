@@ -17,6 +17,7 @@ import java.util.List;
  * Explanation: The string "aab" can be partitioned into palindromic substrings in two ways:
  * - ["a", "a", "b"]: Each character is a palindrome.
  * - ["aa", "b"]: "aa" is a palindrome, and "b" is a palindrome.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PalindromePartitioning {
 

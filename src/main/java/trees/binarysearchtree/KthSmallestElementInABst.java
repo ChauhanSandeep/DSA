@@ -21,6 +21,7 @@ import java.util.*;
  * 1. What if BST is modified frequently? - Use augmented BST with subtree sizes
  * 2. What about kth largest? - Reverse inorder (right-root-left) or (n-k+1)th smallest
  * 3. How to handle very large k? - Early termination when k is reached
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class KthSmallestElementInABst {
 

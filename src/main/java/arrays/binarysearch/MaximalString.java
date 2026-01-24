@@ -20,6 +20,7 @@ package arrays.binarysearch;
  *   A: Greedy or segment tree for max digit per suffix, avoid recursive state-space exploration.
  * - Q: What’s the difference between this and Leetcode 670?
  *   A: Leetcode 670 only allows one swap. This allows up to `k` swaps and requires full exploration.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximalString {
 

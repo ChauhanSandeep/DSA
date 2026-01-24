@@ -29,6 +29,7 @@ import java.util.*;
  *    - If after topological sort the output length < total unique characters, a cycle exists.
  * 3. Can this be solved using DFS instead of BFS?
  *    - Yes, perform a DFS-based topological sort with cycle detection.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AlienDictionary {
 

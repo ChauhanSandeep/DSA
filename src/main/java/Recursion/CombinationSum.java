@@ -39,6 +39,7 @@ import java.util.List;
  *
  * Q5: What if negative numbers are allowed in candidates?
  * A5: The problem becomes more complex - need to handle potential infinite loops and use memoization.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CombinationSum {
   public static void main(String[] args) {

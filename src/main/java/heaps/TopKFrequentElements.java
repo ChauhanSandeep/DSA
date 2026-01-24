@@ -31,6 +31,7 @@ import java.util.HashMap;
  *    Related: https://leetcode.com/problems/top-k-frequent-words/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TopKFrequentElements {
 

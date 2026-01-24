@@ -33,6 +33,7 @@ import java.util.Map;
  *
  * 3. Can you deduplicate on-the-fly while building permutations?
  *    - Yes. Use a set to track duplicates per recursion level (less efficient than `used[]` with sorting).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Permutation2 {
 

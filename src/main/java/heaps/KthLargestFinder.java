@@ -17,6 +17,7 @@ import java.util.PriorityQueue;
  * 🔹 Follow-ups:
  * - Can you do this with average O(n) time instead of O(n log k)? → Use QuickSelect [Leetcode #215]
  * - What if numbers are huge or streamed in chunks? → Use Min-Heap [Leetcode #703]
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class KthLargestFinder {
 

@@ -26,6 +26,7 @@ import java.util.*;
  * 
  * Q: How to handle cache warming and persistence?
  * A: Add methods for bulk loading and serialization/deserialization.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LRUCache {
     

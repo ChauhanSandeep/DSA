@@ -25,6 +25,7 @@ import java.util.Set;
  *    - Yes, by using bit masking instead of HashSet for better performance and less memory. Solved in method 2.
  * 3. Can you solve iteratively?
  *    - Possible, but recursion is cleaner for this problem.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NQueen2 {
 

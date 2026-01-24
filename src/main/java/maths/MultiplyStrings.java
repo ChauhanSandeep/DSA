@@ -35,6 +35,7 @@ package maths;
  * https://leetcode.com/problems/add-two-numbers/
  * - LeetCode 415 (Add Strings): https://leetcode.com/problems/add-strings/
  * - LeetCode 67 (Add Binary): https://leetcode.com/problems/add-binary/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MultiplyStrings {
 

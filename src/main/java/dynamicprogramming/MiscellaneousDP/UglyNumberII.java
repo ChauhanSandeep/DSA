@@ -15,6 +15,7 @@ package dynamicprogramming.MiscellaneousDP;
  *
  * Time Complexity: O(n)
  * Space Complexity: O(n)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class UglyNumberII {
     public int nthUglyNumber(int n) {

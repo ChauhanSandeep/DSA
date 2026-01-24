@@ -20,6 +20,7 @@ package linkedlist;
  * - Can you solve it with O(1) space and O(n) time without modifying the list? (Yes, use two-pointer approach)
  * - What if the list is extremely long? (Optimize length alignment or use the two-pointer no-length method)
  * - Can you find intersection in case of looped/circular linked lists? (Use Floyd’s cycle detection + intersection logic)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class IntersectionList {
 

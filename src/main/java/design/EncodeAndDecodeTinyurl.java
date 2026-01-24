@@ -24,6 +24,7 @@ import java.util.*;
  * 
  * Q: How to scale to billions of URLs?
  * A: Use distributed hash tables, database sharding, and caching layers.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class EncodeAndDecodeTinyurl {
     

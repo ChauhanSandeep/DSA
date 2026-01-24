@@ -28,6 +28,7 @@ import java.util.*;
  *
  * 3. What if the nested structure is extremely deep?
  *    Answer: Use iterative approach with explicit stack to avoid stack overflow.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NestedListWeightSum {
 

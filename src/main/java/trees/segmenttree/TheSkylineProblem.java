@@ -34,6 +34,7 @@ import java.util.*;
  *    Answer: Use coordinate compression to map x-coordinates to smaller consecutive range.
  * 4. What's the space-time tradeoff between different approaches?
  *    Answer: Segment tree uses more space (4n) but provides flexibility for range operations and updates.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TheSkylineProblem {
 

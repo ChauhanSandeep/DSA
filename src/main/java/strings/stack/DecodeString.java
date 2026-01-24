@@ -43,6 +43,7 @@ import java.util.*;
  * - Valid Parentheses: https://leetcode.com/problems/valid-parentheses/
  * - Basic Calculator: https://leetcode.com/problems/basic-calculator/
  * - Remove Duplicate Letters: https://leetcode.com/problems/remove-duplicate-letters/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DecodeString {
 

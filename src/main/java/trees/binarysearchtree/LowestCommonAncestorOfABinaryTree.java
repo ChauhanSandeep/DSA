@@ -49,6 +49,7 @@ import java.util.*;
  *    are smaller than current node, go left; if both are larger, go right; otherwise, current node
  *    is the LCA. This is more efficient as we only traverse one path.
  *    Related problem: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LowestCommonAncestorOfABinaryTree {
 

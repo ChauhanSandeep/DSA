@@ -17,6 +17,7 @@ package arrays.twopointers;
  *    - You need to ensure the two occurrences are at different indices.
  * 2. What if this function needs to be called many times? (Leetcode follow-up: https://leetcode.com/problems/shortest-word-distance-ii/)
  *    - Preprocess the word positions and optimize with two-pointer technique.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ShortestWordDistance {
 

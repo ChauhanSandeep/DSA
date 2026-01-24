@@ -26,6 +26,7 @@ package greedy;
  *    - Use weighted median or dynamic programming approach.
  * 5. What if we can only move people to specific designated positions?
  *    - Model as minimum cost bipartite matching problem using Hungarian algorithm.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumMovesToAggregateSeats {
 

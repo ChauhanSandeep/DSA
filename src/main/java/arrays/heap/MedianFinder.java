@@ -20,6 +20,7 @@ import java.util.PriorityQueue;
  * - double findMedian() - Return the median of all elements so far.
  *
  * LeetCode: https://leetcode.com/problems/find-median-from-data-stream/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MedianFinder {
 

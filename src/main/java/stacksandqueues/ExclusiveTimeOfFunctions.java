@@ -33,6 +33,7 @@ import java.util.List;
  *    Related: https://leetcode.com/problems/design-log-storage-system/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ExclusiveTimeOfFunctions {
 

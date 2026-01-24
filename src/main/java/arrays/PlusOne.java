@@ -36,6 +36,7 @@ package arrays;
  * - 67. Add Binary: https://leetcode.com/problems/add-binary/
  * - 415. Add Strings: https://leetcode.com/problems/add-strings/
  * - 989. Add to Array-Form of Integer: https://leetcode.com/problems/add-to-array-form-of-integer/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PlusOne {
 

@@ -33,6 +33,7 @@ import java.util.PriorityQueue;
  *    - Preprocess matrix into a sorted array or use segment tree for range queries.
  * 6. How would you handle updates to matrix elements?
  *    - Rebuild heap or use balanced BST with lazy propagation for dynamic updates.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class KthSmallestInSortedMatrix {
 

@@ -46,6 +46,7 @@ import java.util.Map;
  *    A: Trie enables prefix-based operations (autocomplete, word suggestions) in O(k) where k is
  *       prefix length. HashMap requires O(n) to find all words with given prefix. Trie also saves
  *       space when many words share common prefixes.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TrieTest {
   public static void main(String[] args) {

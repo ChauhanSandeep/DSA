@@ -43,6 +43,7 @@ import java.util.Arrays;
  * 5. How would you handle very large triangles that don't fit in memory?
  *    Answer: Process row by row from bottom to top, keeping only current and next row in memory.
  *    This is already achieved by the O(n) space solution.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumPathSumTriangle {
 

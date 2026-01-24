@@ -29,6 +29,7 @@ package dynamicprogramming.stockbuysell;
  * 4. What if there's a daily holding fee? - Add daily fee to holding state calculation
  * 5. How to handle percentage-based fees? - Calculate fee as percentage of transaction amount
  * 6. What if we want actual transaction details? - Maintain transaction log during DP
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BestTimeToBuyAndSellStockWithTransactionFee {
 

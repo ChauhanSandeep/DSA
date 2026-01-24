@@ -12,6 +12,7 @@ package strings;
  * Output: "5F3Z-2E9W"
  *
  * LeetCode Link: https://leetcode.com/problems/license-key-formatting/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LicenseKeyFormatting {
 

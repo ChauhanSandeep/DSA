@@ -32,6 +32,7 @@ import java.util.*;
  *    Answer: Replace BFS with Dijkstra's algorithm using priority queue for weighted shortest paths.
  * 4. What if words can have different lengths with insertion/deletion operations?
  *    Answer: Extend to edit distance problem using dynamic programming with 3D state space.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordLadder2 {
 

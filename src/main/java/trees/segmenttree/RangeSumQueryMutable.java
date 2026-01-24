@@ -26,6 +26,7 @@ package trees.segmenttree;
  *    Answer: Use coordinate compression to map indices to smaller range.
  * 4. What's the space-time tradeoff between BIT and Segment Tree?
  *    Answer: BIT uses less space (n vs 4n) but segment tree supports more operations like range min/max.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RangeSumQueryMutable {
 

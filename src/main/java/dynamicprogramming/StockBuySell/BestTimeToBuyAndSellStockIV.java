@@ -31,6 +31,7 @@ package dynamicprogramming.stockbuysell;
  * 4. Q: Handle transaction fees in this scenario?
  *    A: Extend DP states to subtract fees on each transaction
  * 5. Q: Related problems? A: Stock I/II/III problems, Best Time to Buy and Sell Stock with Transaction Fee
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BestTimeToBuyAndSellStockIV {
 

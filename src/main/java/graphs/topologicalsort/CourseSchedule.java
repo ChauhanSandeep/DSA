@@ -26,6 +26,7 @@ import java.util.*;
  *
  * - How to handle very large input efficiently?
  *   Use iterative approaches and adjacency lists.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CourseSchedule {
   private static final int UNVISITED = 0;

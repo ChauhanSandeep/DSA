@@ -55,6 +55,7 @@ import java.util.Arrays;
  * https://leetcode.com/problems/burst-balloons/
  * - LeetCode 1039 (Minimum Score Triangulation of Polygon):
  * https://leetcode.com/problems/minimum-score-triangulation-of-polygon/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MatrixChainMultiplication {
 

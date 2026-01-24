@@ -23,6 +23,7 @@ import java.util.*;
  *
  * Q: How to optimize for sparse changes (few pixels affected)?
  * A: Check early termination conditions and use efficient data structures.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FloodFill {
 

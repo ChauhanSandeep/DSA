@@ -28,6 +28,7 @@ import java.util.Stack;
  *    Related: https://leetcode.com/problems/next-greater-element-ii/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DailyTemperatures {
 

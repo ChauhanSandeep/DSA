@@ -45,6 +45,7 @@ package arrays.twopointers;
  * 5. How would you find k containers with largest areas?
  *    Answer: Use min-heap of size k. Store all possible (area, left, right) tuples.
  *    Extract k largest. Time: O(n log k), Space: O(k).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ContainerWithMostWater {
 

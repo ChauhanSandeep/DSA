@@ -10,6 +10,7 @@ package dailybytes.array;
  * - Space Complexity: O(1)
  *
  * LeetCode Problem Link: https://leetcode.com/problems/valid-anagram/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidAnagram {
 

@@ -44,6 +44,7 @@ import java.util.Set;
  * 5. How would you solve this in a streaming scenario where numbers arrive one by one?
  *    Answer: Maintain the Trie and update maximum XOR as each number arrives. Insert new
  *    number into Trie, compute its max XOR with existing numbers, update global maximum.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumXorOfTwoNumbersInArray {
 

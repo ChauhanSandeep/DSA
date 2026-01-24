@@ -37,6 +37,7 @@ import java.util.List;
  *
  * 3. Can you solve this iteratively?
  *    - Yes, using a queue or dynamic programming-like approach to build permutations level-by-level.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Permutation {
 

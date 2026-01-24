@@ -8,6 +8,7 @@ import java.util.*;
  * that can be formed with 'n' nodes.
  *
  * LeetCode Problem Link: https://leetcode.com/problems/unique-binary-search-trees/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class UniqueBinaryTree {
 

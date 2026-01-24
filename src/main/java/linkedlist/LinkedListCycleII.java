@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: What if there are multiple cycles?
  * A: This problem assumes at most one cycle; for multiple cycles, need graph algorithms.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LinkedListCycleII {
 

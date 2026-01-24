@@ -26,6 +26,7 @@ import trees.Node;
  * Space Complexity:
  * - The space complexity is O(h), where h is the height of the tree,
  *   due to the recursion stack. In the worst case, this is O(n) for a skewed tree.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FlattenTree {
 

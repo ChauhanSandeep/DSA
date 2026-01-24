@@ -25,6 +25,7 @@ import java.util.*;
  * 
  * Q: How to handle very large key ranges?
  * A: Use consistent hashing or hierarchical hash tables.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DesignHashset {
     

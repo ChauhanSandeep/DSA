@@ -26,6 +26,7 @@ import java.util.Map;
  *    - Use regex: ^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
  * 3. Can you design this as a bi-directional converter using a shared abstraction?
  *    - Yes, using an Enum or Symbol table class to store mapping and invertibility.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RomanNumbers {
 

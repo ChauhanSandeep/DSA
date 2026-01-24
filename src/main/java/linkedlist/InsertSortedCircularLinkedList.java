@@ -13,6 +13,7 @@ package linkedlist;
  *
  * Problem Link: https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class InsertSortedCircularLinkedList {
 

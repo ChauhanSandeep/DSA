@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: Can we support different constraint patterns (e.g., no same color in k-neighborhood)?
  * A: Extend DP state to track more complex constraint patterns.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PaintHouseII {
 

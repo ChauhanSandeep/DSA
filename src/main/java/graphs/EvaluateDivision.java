@@ -30,6 +30,7 @@ import java.util.*;
  * Follow-up Questions:
  * - Can you handle dynamic updates (add/remove equations)?
  * - Can you do this with Union-Find (Disjoint Set) instead of DFS/BFS?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class EvaluateDivision {
 

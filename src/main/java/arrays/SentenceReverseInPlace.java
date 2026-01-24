@@ -22,6 +22,7 @@ import java.util.Arrays;
  *   A: Yes, punctuation is considered part of a word unless told otherwise.
  * - Q: Can you solve this in O(1) extra space?
  *   A: Yes, current solution does it in-place.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SentenceReverseInPlace {
 

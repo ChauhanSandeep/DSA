@@ -17,6 +17,7 @@ package arrays.sorting;
  *    → No. When duplicates are present, binary search degenerates to linear search in the worst case.
  * 2. Can you find the index of the target instead of just checking existence?
  *    → Yes, but with O(n) worst-case due to duplicates.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RotatedSortedSearchWithDuplicates {
 

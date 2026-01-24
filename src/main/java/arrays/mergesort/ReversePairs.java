@@ -30,6 +30,7 @@ import java.util.*;
  * Related Problems:
  * - Count of Range Sum (https://leetcode.com/problems/count-of-range-sum/)
  * - Count of Smaller Numbers After Self (https://leetcode.com/problems/count-of-smaller-numbers-after-self/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReversePairs {
     private int count = 0;

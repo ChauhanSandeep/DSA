@@ -31,6 +31,7 @@ package dynamicprogramming.stockbuysell;
  *  - Add risk factor to profit calculation
  * 6. Handle very large price arrays efficiently?
  *  - Use divide and conquer or sliding window optimizations
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BuySellStock3 {
 

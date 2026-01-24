@@ -17,6 +17,7 @@ package dailybytes.string;
  * 1. Can we handle Unicode? ➤ Use Character classes instead of ASCII
  * 2. Can we do this in O(1) space? ➤ Yes, using in-place two pointers
  * 3. What if it's a stream of characters? ➤ Use a queue and deque
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidPalindrome {
 

@@ -22,6 +22,7 @@ package arrays.slidingwindow;
  *
  * 3. What if some elements are negative?
  *    → The original problem assumes non-negative integers. If negatives are allowed, it becomes a different problem (may require graph traversal or DP with memoization).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class JumpGame {
 

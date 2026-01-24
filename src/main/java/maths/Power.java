@@ -3,6 +3,7 @@ package maths;
 /**
  * Implementation of a function to calculate power (x^n) using fast exponentiation.
  * LeetCode Reference: https://leetcode.com/problems/powx-n/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Power {
     public static void main(String[] args) {

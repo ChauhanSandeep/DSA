@@ -20,6 +20,7 @@ import java.util.Comparator;
  * 1. How can we optimize further? → Use bitmask DP to reduce repeated states.
  * 2. Can we solve without sorting? → Yes, but sorting helps prune the search space.
  * 3. How to count the number of valid partitions instead of just checking existence?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class EqualSumSubsetPartition {
 

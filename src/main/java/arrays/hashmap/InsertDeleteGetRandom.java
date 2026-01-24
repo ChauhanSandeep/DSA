@@ -29,6 +29,7 @@ import java.util.*;
  * - Use ArrayList to store elements for O(1) random access
  * - Use HashMap to track element index for O(1) insert/remove
  * - On remove, swap with last element and delete in O(1)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class InsertDeleteGetRandom {
   public static void main(String[] args) {

@@ -42,6 +42,7 @@ package arrays.backtracking;
  * - Combination Sum (backtracking with constraints)
  *
  * @author Sandeep Chauhan
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SudokuSolve {
     private static final int SIZE = 9; // Standard Sudoku size (9x9 grid)

@@ -21,6 +21,7 @@ package linkedlist;
  *
  * Q: Can we handle cycles?
  * A: This method ignores cycles; more context needed.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DeleteNodeInALinkedList {
 

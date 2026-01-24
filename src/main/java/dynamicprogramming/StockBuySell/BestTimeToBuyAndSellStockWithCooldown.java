@@ -25,6 +25,7 @@ package dynamicprogramming.stockbuysell;
  * 3. Q: How to handle transaction fees? A: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/
  * 4. Q: Limited transactions version? A: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
  * 5. Q: Return actual buy/sell days, not just profit? A: Backtrack through DP states to reconstruct path
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BestTimeToBuyAndSellStockWithCooldown {
 

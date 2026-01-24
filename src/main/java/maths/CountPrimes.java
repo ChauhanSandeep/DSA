@@ -12,6 +12,7 @@ package maths;
  * There are 4 prime numbers less than 10: 2, 3, 5, 7
  * 
  * LeetCode Problem: https://leetcode.com/problems/count-primes/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CountPrimes {
 

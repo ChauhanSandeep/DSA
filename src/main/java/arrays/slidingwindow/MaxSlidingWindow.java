@@ -22,6 +22,7 @@ import java.util.TreeMap;
  * - Can you do this in O(n) time? (Deque-based solution)
  * - Can you solve it in parallel using multiple threads? (Divide-and-conquer approach)
  * - How would you adapt this to streams? (Use monotonic queue or Segment Tree)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxSlidingWindow {
 

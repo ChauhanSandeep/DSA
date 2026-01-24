@@ -11,6 +11,7 @@ import java.util.LinkedList;
  * Explanation: ((2 + 1) * 3) = 9
  *
  * Problem Link: https://leetcode.com/problems/evaluate-reverse-polish-notation/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReversePolishNotation {
 

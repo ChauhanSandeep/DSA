@@ -25,6 +25,7 @@ import java.util.*;
  * 
  * Q: How to handle thread safety?
  * A: Use concurrent data structures and proper synchronization.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class InsertDeleteGetrandomO1DuplicatesAllowed {
     

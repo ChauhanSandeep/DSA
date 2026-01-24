@@ -18,6 +18,7 @@ package graphs;
  * --- Complexity Analysis ---
  * - **Time Complexity:** O(m * n) in the worst case (every cell visited once).
  * - **Space Complexity:** O(m * n) in worst case (DFS recursion stack).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NumberOfIslands {
 

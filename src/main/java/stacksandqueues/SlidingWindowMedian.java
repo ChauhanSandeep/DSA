@@ -33,6 +33,7 @@ import java.util.*;
  *
  * Time Complexity: O(n log k) where n is the number of elements in nums
  * Space Complexity: O(k) for the heaps
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SlidingWindowMedian {
     private PriorityQueue<Integer> maxHeap; // contains the smaller half

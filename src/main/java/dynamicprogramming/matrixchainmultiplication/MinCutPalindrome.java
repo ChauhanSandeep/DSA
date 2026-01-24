@@ -33,6 +33,7 @@ import java.util.Arrays;
  *    Answer: Use different DP state definition focusing on segment lengths rather than cut count.
  * 4. How to extend to allow at most k non-palindromic segments?
  *    Answer: Add another dimension to DP state tracking number of non-palindromic segments used.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinCutPalindrome {
 

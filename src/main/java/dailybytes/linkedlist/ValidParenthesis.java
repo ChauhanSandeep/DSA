@@ -14,6 +14,7 @@ import java.util.*;
  * Algorithm: Stack-based approach
  * Time Complexity: O(n) - We traverse the string once and perform O(1) operations for each character.
  * Space Complexity: O(n) - In the worst case, all characters are pushed onto the stack.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidParenthesis {
 

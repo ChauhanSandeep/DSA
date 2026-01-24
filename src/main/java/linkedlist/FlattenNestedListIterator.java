@@ -30,6 +30,7 @@ import java.util.LinkedList;
  *    Related: https://leetcode.com/problems/mini-parser/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FlattenNestedListIterator {
 

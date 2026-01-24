@@ -44,6 +44,7 @@ package dynamicprogramming.linearpartition;
  *    instead of maintaining a full DP array, as shown in the solution below.
  *
  * LeetCode: https://leetcode.com/problems/climbing-stairs/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ClimbingStairs {
 

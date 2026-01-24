@@ -71,6 +71,7 @@ package trie;
  *    A: Store the complete word at each end node. During DFS search with wildcards, collect all 
  *    words where is_end is true. Return the collected list instead of a boolean.
  *    Related: LeetCode 212 - Word Search II (https://leetcode.com/problems/word-search-ii/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DesignAddAndSearchWordsDataStructure {
 

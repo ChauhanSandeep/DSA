@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: How to extend to 2D maximum rectangle problem?
  * A: Use this as subroutine, treating each row as histogram base.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LargestRectangleInHistogram {
 

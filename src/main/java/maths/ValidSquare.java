@@ -19,6 +19,7 @@ import java.util.Set;
  *
  * Time Complexity: O(1) as we're only dealing with 4 points
  * Space Complexity: O(1) as we're using a fixed-size set
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidSquare {
     public boolean validSquare(int[] p1, int[] p2, int[] p3, int[] p4) {

@@ -36,6 +36,7 @@ import java.util.List;
  * - LeetCode 78: Subsets (Without duplicates)
  * - LeetCode 40: Combination Sum II (Sum with duplicates)
  * - LeetCode 47: Permutations II (Permutations with duplicates)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Subset2 {
 

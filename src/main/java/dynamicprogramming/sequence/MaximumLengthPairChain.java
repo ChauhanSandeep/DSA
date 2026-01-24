@@ -31,6 +31,7 @@ import java.util.Comparator;
  * 5. Q: Maximum number of non-overlapping intervals?
  *    A: Classic activity selection problem - greedy by earliest finish time
  *       (https://leetcode.com/problems/non-overlapping-intervals/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumLengthPairChain {
 

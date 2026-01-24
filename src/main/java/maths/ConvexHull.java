@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: How to handle degenerate cases like collinear points?
  * A: Carefully handle boundary conditions and include collinear points on hull.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ConvexHull {
 

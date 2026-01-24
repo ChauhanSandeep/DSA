@@ -25,6 +25,7 @@ import java.util.*;
  * - getNewsFeed(): O(m + k log m) where m=followees, k=10 tweets
  *
  * Space Complexity: O(T + F) where T=total tweets, F=total follow relationships
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 class Twitter {
     Map<Integer, Set<Integer>> userFollowerMap; // followerId → set of followeeIds

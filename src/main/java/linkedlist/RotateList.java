@@ -17,6 +17,7 @@ package linkedlist;
  *    - Rotate right by (length - k) positions.
  * 3. What if the list is circular?
  *    - Track cycle, break at the correct location to rotate effectively.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RotateList {
   public static void main(String[] args) {

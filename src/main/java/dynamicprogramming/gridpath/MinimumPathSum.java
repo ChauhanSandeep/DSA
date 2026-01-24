@@ -27,6 +27,7 @@ package dynamicprogramming.gridpath;
  *    A: Extend DP transition to include diagonal move: min(up, left, diagonal) + current
  * 5. Q: Maximum Path Sum instead of minimum?
  *    A: Change Math.min to Math.max in the recurrence relation
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumPathSum {
 

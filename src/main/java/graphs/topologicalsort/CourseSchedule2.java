@@ -24,6 +24,7 @@ import java.util.*;
  *
  * - Can you return all valid topological orderings?
  *   Not with this approach. Requires backtracking.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CourseSchedule2 {
   private static final int UNVISITED = 0;

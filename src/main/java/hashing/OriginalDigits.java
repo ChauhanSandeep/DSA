@@ -9,6 +9,7 @@ package hashing;
  * Example Input: "owoztneoer"
  * Output: "012"
  * Explanation: The string contains the words for "zero", "one", and "two" in a jumbled form.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class OriginalDigits {
 

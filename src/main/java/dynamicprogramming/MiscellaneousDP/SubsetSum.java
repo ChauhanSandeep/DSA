@@ -15,6 +15,7 @@ import java.util.Arrays;
  * - This is a special case of 0/1 Knapsack where:
  *     -> Each item’s "value" is same as its "weight".
  *     -> We just need to check if it's **possible** to achieve a sum (not maximize it).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SubsetSum {
     public static void main(String[] args) {

@@ -37,6 +37,7 @@ import java.util.*;
  *
  * Q5: How would you optimize if the array is very large but target is small?
  * A5: Pre-filter candidates to include only those <= target, and prune branches early when target becomes negative.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CombinationSum2 {
 

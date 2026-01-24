@@ -22,6 +22,7 @@ import java.util.*;
  * - What if tasks are not all capital English letters? (Need a Map instead of an array)
  * - What if multiple CPUs are available? (Extend to multi-threaded version)
  * - What if tasks have different execution times or cooldown periods?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TaskScheduler {
 

@@ -25,6 +25,7 @@ import java.util.*;
  * 
  * Q: How to handle deletions in open addressing?
  * A: Use tombstone markers to maintain probe sequences.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DesignHashmap {
     

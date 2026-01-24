@@ -32,6 +32,7 @@ package dynamicprogramming.knapsackunbounded;
  *
  * 4. Q: How would you handle very large amounts efficiently?
  *    A: Use space-optimized 1D DP array and consider mathematical approaches for specific coin systems.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CoinChange2 {
 

@@ -24,6 +24,7 @@ package dynamicprogramming.statemachine;
  *    - Yes. Use top-down recursion with memoization over the "points" index.
  * 2. How would the solution change if you could also delete `nums[i] ± 2`?
  *    - You would modify the DP recurrence to skip two indices ahead.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DeleteAndEarn {
 

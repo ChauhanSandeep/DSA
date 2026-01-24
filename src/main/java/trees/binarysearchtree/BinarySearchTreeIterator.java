@@ -28,6 +28,7 @@ import java.util.*;
  *
  * Q: What if we need to support arbitrary position jumping?
  * A: Pre-compute all nodes in array or use augmented BST with size information.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinarySearchTreeIterator {
 

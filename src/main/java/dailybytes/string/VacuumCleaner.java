@@ -25,6 +25,7 @@ package dailybytes.string;
  * 1. What if invalid characters exist? ➤ You can skip or throw an error.
  * 2. What if moves are diagonal or 3D? ➤ Need vector-based position tracking.
  * 3. Can you extend to return path length? ➤ Track manhattan distance.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class VacuumCleaner {
 

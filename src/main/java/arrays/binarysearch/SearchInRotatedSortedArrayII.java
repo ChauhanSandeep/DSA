@@ -29,6 +29,7 @@ package arrays.binarysearch;
  * Related Problems:
  * - Search in Rotated Sorted Array (https://leetcode.com/problems/search-in-rotated-sorted-array/)
  * - Find Minimum in Rotated Sorted Array II (https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SearchInRotatedSortedArrayII {
     /**

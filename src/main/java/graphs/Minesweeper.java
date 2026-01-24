@@ -40,6 +40,7 @@ import java.util.Queue;
  *    - Use a visited set or modify the board in-place to avoid re-processing cells.
  * 3. Can this be extended to multiplayer or streaming boards?
  *    - Yes, but would require incremental updates and careful synchronization.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Minesweeper {
 

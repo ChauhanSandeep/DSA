@@ -37,6 +37,7 @@ import java.util.Queue;
  * Space Complexity: O(N) for storing the serialized string and the queue during deserialization.
  *
  * LeetCode Link: https://leetcode.com/problems/serialize-and-deserialize-binary-tree/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class SerializeDeserializeBst {

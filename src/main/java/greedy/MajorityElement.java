@@ -18,6 +18,7 @@ import java.util.Map;
  *    - Validate if the candidate is truly the majority element.
  * 2. **HashMap Approach** (O(n) time, O(n) space):
  *    - Maintain a frequency map and return the first element exceeding ⌊ n/2 ⌋ occurrences.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MajorityElement {
 

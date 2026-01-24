@@ -34,6 +34,7 @@ import java.util.Arrays;
  * 4. What if memory access is expensive and we want to minimize swaps?
  *    Answer: Use counting sort - only 2 passes, no swaps needed.
  *    Related: LeetCode 41 - First Missing Positive (cycle sort minimizes writes)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SortColors {
 

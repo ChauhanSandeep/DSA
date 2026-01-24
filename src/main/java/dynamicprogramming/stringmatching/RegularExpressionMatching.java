@@ -48,6 +48,7 @@ package dynamicprogramming.stringmatching;
  *    Answer: Parse the pattern to identify character classes and modify the matching logic
  *    to check if current character belongs to the specified class range.
  *    Related problem: https://leetcode.com/problems/wildcard-matching/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RegularExpressionMatching {
 

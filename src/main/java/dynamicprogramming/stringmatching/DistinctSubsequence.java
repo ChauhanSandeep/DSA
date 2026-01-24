@@ -24,6 +24,7 @@ package dynamicprogramming.stringmatching;
  * 3. Find actual subsequences instead of just count? - Maintain path tracking during DP
  * 4. What if strings are very large? - Consider rolling hash or suffix array optimizations
  * 5. Case-insensitive matching? - Normalize strings before processing
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DistinctSubsequence {
 

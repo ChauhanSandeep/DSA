@@ -24,6 +24,7 @@ import trees.Node;
  * Space Complexity: O(N), for the memoization array.
  *
  * LeetCode Link: https://leetcode.com/problems/unique-binary-search-trees-ii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class PermutationBst {

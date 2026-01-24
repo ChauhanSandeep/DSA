@@ -43,6 +43,7 @@ package strings;
  *    Answer: The two-pointer technique remains applicable. We'd modify the counting logic and
  *    how we write the count (e.g., always include count, use special delimiter, etc).
  *    Related problem: https://leetcode.com/problems/string-compression-ii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class StringCompression {
 

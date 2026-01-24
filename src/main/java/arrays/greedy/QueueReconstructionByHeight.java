@@ -26,6 +26,7 @@ import java.util.*;
  *    - The reconstruction is unique based on constraints; if multiple possible, we'd need additional sorting or DP.
  * 3. How to handle if the input may not form a valid queue (invalid k values)?
  *    - Add validation during insertion to check if k is feasible, but problem assumes valid input.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class QueueReconstructionByHeight {
 

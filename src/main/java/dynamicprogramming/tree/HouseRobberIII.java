@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: Can we solve for a general graph instead of tree?
  * A: NP-hard problem; need approximation algorithms or exact exponential solutions.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class HouseRobberIII {
 

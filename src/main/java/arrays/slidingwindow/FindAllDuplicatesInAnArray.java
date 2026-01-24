@@ -23,6 +23,7 @@ import java.util.*;
  *
  * Q: How to handle if array is read-only?
  * A: Cannot use in-place marking; must use extra space with Set/Map.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FindAllDuplicatesInAnArray {
 

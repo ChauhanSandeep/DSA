@@ -31,6 +31,7 @@ import java.util.Stack;
  * Related Problems:
  * - Validate Binary Search Tree (https://leetcode.com/problems/validate-binary-search-tree/)
  * - Binary Tree Inorder Traversal (https://leetcode.com/problems/binary-tree-inorder-traversal/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RecoverBinarySearchTree {
     private TreeNode first = null;    // First misplaced node
