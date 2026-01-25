@@ -47,6 +47,7 @@ package arrays.matrix;
  * 5. How would you handle if matrix dimensions are not known in advance?
  *    Answer: Exponential search to find bounds first. Start with small range, double until
  *    finding element out of bounds, then apply binary search on discovered range.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Search2DMatrix {
 

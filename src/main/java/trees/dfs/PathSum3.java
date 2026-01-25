@@ -10,6 +10,7 @@ import java.util.Map;
  * and it does not need to start or end at the root or a leaf.
  *
  * LeetCode Problem Link: https://leetcode.com/problems/path-sum-iii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PathSum3 {
 

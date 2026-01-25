@@ -32,6 +32,7 @@ package linkedlist;
  * 4. What if we need to reverse pairs instead of swapping?
  *    Answer: Same algorithm works since swapping two nodes effectively reverses the pair.
  *    Related: LeetCode 206 - https://leetcode.com/problems/reverse-linked-list/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SwapPairs {
 

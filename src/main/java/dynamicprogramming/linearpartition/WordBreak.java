@@ -21,6 +21,7 @@ import java.util.*;
  * - Return all possible segmentations (see: https://leetcode.com/problems/word-break-ii/)
  * - Minimize the number of segments
  * - Count total number of ways to segment
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordBreak {
 

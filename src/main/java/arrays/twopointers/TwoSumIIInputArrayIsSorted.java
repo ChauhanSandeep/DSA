@@ -43,6 +43,7 @@ package arrays.twopointers;
  *    Answer: Use a HashMap to store complements. For each element, check if target minus current
  *    exists in the map. This gives O(n) time with O(n) space, but violates the constant space requirement.
  *    Related problem: https://leetcode.com/problems/two-sum/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TwoSumIIInputArrayIsSorted {
 

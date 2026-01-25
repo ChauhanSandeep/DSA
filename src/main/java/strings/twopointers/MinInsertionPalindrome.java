@@ -20,6 +20,7 @@ package strings.twopointers;
  *      Leetcode: https://leetcode.com/problems/longest-palindromic-subsequence/
  * 3. Can space be optimized from O(n²) to O(n)?
  *    - Yes, with rolling 1D arrays since we only need `dp[i+1][j-1]`, `dp[i+1][j]`, and `dp[i][j-1]`
+ * LeetCode Contest Rating: 1787
  */
 
 public class MinInsertionPalindrome {

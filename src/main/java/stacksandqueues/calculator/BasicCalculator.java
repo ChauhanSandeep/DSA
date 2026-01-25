@@ -29,6 +29,7 @@ import java.util.*;
  *
  * Q: Can we solve without using stack?
  * A: Yes, use recursion for parentheses or convert to postfix notation first.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BasicCalculator {
 

@@ -33,6 +33,7 @@ import java.util.List;
  *    - Modify the algorithm to only consider factors within the given range.
  * 6. How to optimize for multiple test cases with similar n values?
  *    - Use memoization or precompute factors for commonly queried numbers.
+ * LeetCode Contest Rating: 1232
  */
 public class KthFactorOfNumber {
   public static void main(String[] args) {

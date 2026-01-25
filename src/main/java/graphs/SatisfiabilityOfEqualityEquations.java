@@ -18,6 +18,7 @@ package graphs;
  *
  * Time Complexity: O(n) where n is the number of equations
  * Space Complexity: O(1) since we have a fixed number of letters (26)
+ * LeetCode Contest Rating: 1638
  */
 public class SatisfiabilityOfEqualityEquations {
     private int[] parent;

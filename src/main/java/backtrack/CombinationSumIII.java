@@ -26,6 +26,7 @@ import java.util.*;
  *
  * Q: Can we optimize using mathematical constraints?
  * A: Yes, early termination when sum exceeds target or remaining numbers can't reach target.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CombinationSumIII {
 

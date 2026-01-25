@@ -31,6 +31,7 @@ import java.util.Queue;
  *
  * 3. Can this be extended for multiple clients/IDs?
  *    → Use a `Map<ClientId, Queue<Integer>>` to track timestamps per client.
+ * LeetCode Contest Rating: 1338
  */
 public class CallCounter {
 

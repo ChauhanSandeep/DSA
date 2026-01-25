@@ -43,6 +43,7 @@ package arrays.twopointers;
  * - Remove Duplicates from Sorted Array II: https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
  * - Remove Duplicates from Sorted List: https://leetcode.com/problems/remove-duplicates-from-sorted-list/
  * - Remove Element: https://leetcode.com/problems/remove-element/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveDuplicatesFromSortedArray {
 

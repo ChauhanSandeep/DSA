@@ -26,6 +26,7 @@ import java.util.*;
  *
  * Q: How to support batch insertions of multiple intervals?
  * A: Use sweep line algorithms or bulk insertion optimizations.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class InsertInterval {
 

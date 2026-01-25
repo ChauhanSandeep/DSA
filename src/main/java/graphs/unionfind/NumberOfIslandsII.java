@@ -42,6 +42,7 @@ import java.util.*;
  *  - LeetCode 200 (Number of Islands): https://leetcode.com/problems/number-of-islands/
  *  - LeetCode 547 (Number of Provinces): https://leetcode.com/problems/number-of-provinces/
  *  - LeetCode 323 (Number of Connected Components in Undirected Graph): https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NumberOfIslandsII {
 

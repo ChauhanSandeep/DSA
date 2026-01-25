@@ -10,6 +10,7 @@ import java.util.Arrays;
  *
  * LeetCode Link:
  * https://leetcode.com/problems/game-of-life/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class GameOfLife {
 

@@ -50,6 +50,7 @@ import java.util.*;
  * 5. How would you modify this to create an AVL tree with explicit balance factors?
  *    Answer: During construction, track and store the balance factor (height difference between
  *    left and right subtrees) in each node. Calculate heights bottom-up during recursion return.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ConvertSortedArrayToBinarySearchTree {
     /**

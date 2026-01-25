@@ -14,6 +14,7 @@ import java.util.*;
  * Output: 20
  *
  * LeetCode Link: https://leetcode.com/problems/min-cost-to-connect-all-points/
+ * LeetCode Contest Rating: 1858
  */
 public class MinCostToConnectPoints {
 

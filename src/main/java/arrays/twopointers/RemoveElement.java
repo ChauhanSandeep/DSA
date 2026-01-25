@@ -45,6 +45,7 @@ import java.util.*;
  * - Remove Duplicates from Sorted Array: https://leetcode.com/problems/remove-duplicates-from-sorted-array/
  * - Move Zeroes: https://leetcode.com/problems/move-zeroes/
  * - Remove Duplicates from Sorted Array II: https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveElement {
 

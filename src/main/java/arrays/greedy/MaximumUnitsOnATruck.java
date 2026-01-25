@@ -49,6 +49,7 @@ import java.util.*;
  * - Fractional Knapsack: Classic greedy algorithm problem
  * - Maximum Bags With Full Capacity of Rocks: https://leetcode.com/problems/maximum-bags-with-full-capacity-of-rocks/
  * - Assign Cookies: https://leetcode.com/problems/assign-cookies/
+ * LeetCode Contest Rating: 1310
  */
 public class MaximumUnitsOnATruck {
 

@@ -29,6 +29,7 @@ package linkedlist;
  * - Remove Duplicates from Sorted List (https://leetcode.com/problems/remove-duplicates-from-sorted-list/)
  * - Remove Linked List Elements (https://leetcode.com/problems/remove-linked-list-elements/)
  * - Delete Node in a Linked List (https://leetcode.com/problems/delete-node-in-a-linked-list/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveNthNodeFromEndOfList {
 

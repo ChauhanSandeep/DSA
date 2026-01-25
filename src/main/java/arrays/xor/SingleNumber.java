@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  * - 137. Single Number II: https://leetcode.com/problems/single-number-ii/
  * - 260. Single Number III: https://leetcode.com/problems/single-number-iii/
  * - 540. Single Element in a Sorted Array: https://leetcode.com/problems/single-element-in-a-sorted-array/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SingleNumber {
 

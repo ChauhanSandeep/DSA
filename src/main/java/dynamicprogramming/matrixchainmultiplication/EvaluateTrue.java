@@ -20,6 +20,7 @@ import java.util.Arrays;
  *
  * Time Complexity: O(N^3) (Since each subproblem takes O(N) and there are O(N^2) subproblems)
  * Space Complexity: O(N^2) (For memoization storage)
+ * LeetCode Contest Rating: 1880
  */
 public class EvaluateTrue {
     public static void main(String[] args) {

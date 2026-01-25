@@ -22,6 +22,7 @@ import java.util.List;
  *
  * Follow-up:
  * - What if you want only the closest attacking queen in each direction? → This solution does that.
+ * LeetCode Contest Rating: 1392
  */
 public class QueensAttackKing {
 

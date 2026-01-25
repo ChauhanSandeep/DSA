@@ -8,6 +8,7 @@ package linkedlist;
  * If the number of nodes is not a multiple of `k`, then the remaining nodes at the end should remain unchanged.
  * For given the list   1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 and k = 2,
  * the output should be 3 -> 2 -> 1 -> 6 -> 5 -> 4 -> 9 -> 8 -> 7 -> 12 -> 11 -> 10 -> 13
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReverseListInKGroup {
 

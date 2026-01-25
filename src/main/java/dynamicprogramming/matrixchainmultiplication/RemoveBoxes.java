@@ -35,6 +35,7 @@ package dynamicprogramming.matrixchainmultiplication;
  * Related Problems:
  * - Burst Balloons (https://leetcode.com/problems/burst-balloons/)
  * - Strange Printer (https://leetcode.com/problems/strange-printer/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveBoxes {
     private int[][][] memo;

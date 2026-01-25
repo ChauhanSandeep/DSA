@@ -47,6 +47,7 @@ package trees.dfs;
  *    Answer: Use a min-heap of size k to track top k path sums. During DFS, whenever
  *    calculating a path sum, add to heap. Keep heap size at k by removing minimum
  *    when size exceeds k. Return heap contents at end.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinaryTreeMaximumPathSum {
     /**

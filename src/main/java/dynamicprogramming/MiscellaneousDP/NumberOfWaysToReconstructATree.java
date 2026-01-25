@@ -38,6 +38,7 @@ import java.util.*;
  * Related Problems:
  * - Reconstruct Itinerary (https://leetcode.com/problems/reconstruct-itinerary/)
  * - Minimum Height Trees (https://leetcode.com/problems/minimum-height-trees/)
+ * LeetCode Contest Rating: 3018
  */
 public class NumberOfWaysToReconstructATree {
     private static final int MOD = 1000000007;

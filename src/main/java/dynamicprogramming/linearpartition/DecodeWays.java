@@ -26,6 +26,7 @@ import java.util.Map;
  *    - Use rolling DP array/variables to reduce space.
  * 5. Can the problem be solved in O(1) space?
  *    - Yes, use two rolling variables by iterating from the right to left.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DecodeWays {
 

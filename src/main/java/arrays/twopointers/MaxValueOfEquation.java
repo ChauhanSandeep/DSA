@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: Can we optimize for sparse point distributions?
  * A: Use coordinate compression or spatial data structures like KD-trees.
+ * LeetCode Contest Rating: 2456
  */
 public class MaxValueOfEquation {
 

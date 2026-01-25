@@ -25,6 +25,7 @@ import java.util.*;
  * 
  * Q: How to optimize news feed generation for inactive users?
  * A: Precompute feeds for active users, generate on-demand for others.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DesignTwitter {
     

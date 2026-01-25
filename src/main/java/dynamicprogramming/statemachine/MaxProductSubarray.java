@@ -30,6 +30,7 @@ package dynamicprogramming.statemachine;
  * Follow-Up:
  * - How would you return the actual subarray?
  * - Can this be extended to 2D matrix for max product rectangle?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxProductSubarray {
 

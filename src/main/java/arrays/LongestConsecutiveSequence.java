@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
  *
  * Q5: How would you modify this to find the longest arithmetic sequence with any common difference?
  * A5: Use HashMap with (value, length) pairs and for each number, check if (num - diff) exists for various diffs.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestConsecutiveSequence {
     public static void main(String[] args) {

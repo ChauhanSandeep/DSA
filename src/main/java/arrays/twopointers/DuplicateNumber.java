@@ -22,6 +22,7 @@ package arrays.twopointers;
  * - Can you do this using bit manipulation?
  * - Can you find the duplicate if there are multiple duplicates? (Not allowed in original constraints)
  * - What if modifying the array was allowed? (Negative marking or cyclic sort variants work)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DuplicateNumber {
 

@@ -27,6 +27,7 @@ package arrays.binarysearch;
  *    Related: https://leetcode.com/problems/single-number/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SingleElementInASortedArray {
 

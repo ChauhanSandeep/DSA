@@ -16,6 +16,7 @@ import java.util.*;
  *
  * Output:
  *   [["root/a/1.txt", "root/c/3.txt"], ["root/a/2.txt", "root/c/d/4.txt", "root/4.txt"]]
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DuplicateFile {
 

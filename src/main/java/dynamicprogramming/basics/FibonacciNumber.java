@@ -41,6 +41,7 @@ package dynamicprogramming.basics;
  *    efficient when m is not too large.
  *
  * LeetCode: https://leetcode.com/problems/fibonacci-number/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FibonacciNumber {
 

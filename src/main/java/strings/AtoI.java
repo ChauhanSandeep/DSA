@@ -24,6 +24,7 @@ package strings;
  *    - Use `Double.parseDouble()` or write a custom parser to handle decimal point.
  * 3. Can you support scientific notation like "1.2e3"?
  *    - Not with this implementation; would require a separate parser or regex-based tokenizer.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class AtoI {

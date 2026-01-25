@@ -40,6 +40,7 @@ import java.util.*;
  * - Minimum Moves to Equal Array Elements: https://leetcode.com/problems/minimum-moves-to-equal-array-elements/
  * - Best Meeting Point: https://leetcode.com/problems/best-meeting-point/
  * - Minimum Operations to Make Array Equal: https://leetcode.com/problems/minimum-operations-to-make-array-equal/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumMovesToEqualArrayElementsII {
 

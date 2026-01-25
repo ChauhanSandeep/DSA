@@ -38,6 +38,7 @@ import java.util.*;
  * Related Problems:
  * - Integer to Roman (https://leetcode.com/problems/integer-to-roman/)
  * - Valid Number (https://leetcode.com/problems/valid-number/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class StringToIntegerAtoi {
 

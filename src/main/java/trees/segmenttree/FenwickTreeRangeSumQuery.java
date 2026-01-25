@@ -29,6 +29,7 @@ package trees.segmenttree;
  * Space Complexity: O(n)
  *
  * LeetCode: https://leetcode.com/problems/range-sum-query-mutable/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FenwickTreeRangeSumQuery {
 

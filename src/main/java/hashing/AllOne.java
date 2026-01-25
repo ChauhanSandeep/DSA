@@ -43,6 +43,7 @@ import java.util.*;
  *  - LeetCode 146 (LRU Cache): https://leetcode.com/problems/lru-cache/
  *  - LeetCode 460 (LFU Cache): https://leetcode.com/problems/lfu-cache/
  *  - LeetCode 895 (Maximum Frequency Stack): https://leetcode.com/problems/maximum-frequency-stack/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AllOne {
 

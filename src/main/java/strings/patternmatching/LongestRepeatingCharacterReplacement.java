@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: How to handle lowercase letters or other characters?
  * A: Expand the frequency array size or use HashMap for arbitrary characters.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestRepeatingCharacterReplacement {
 

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  *   🔗 https://leetcode.com/problems/reverse-words-in-a-string-ii/
  * - What if multiple spaces exist between words? (Already handled via `split("\\s+")`)
  * - How would you implement this with O(1) extra space if allowed to modify the original string?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReverseWordsInString {
 

@@ -30,6 +30,7 @@ import java.util.Arrays;
  * 3. How to handle if some balloons give negative coins?
  *      - DP would still work, but we'd need to consider if skipping is allowed; here all must be burst.
  * Relevant follow-up problem: https://leetcode.com/problems/matrix-chain-multiplication/ (similar interval DP optimization).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BurstBalloon {
 

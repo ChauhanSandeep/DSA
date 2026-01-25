@@ -38,6 +38,7 @@ import java.util.Arrays;
  * - Permutations II (LeetCode 47): https://leetcode.com/problems/permutations-ii/
  * - Permutation Sequence (LeetCode 60): https://leetcode.com/problems/permutation-sequence/
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NextPermutation {
 

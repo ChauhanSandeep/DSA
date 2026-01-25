@@ -12,6 +12,7 @@ import java.util.Queue;
  * - Space Complexity: O(n)
  *
  * LeetCode Problem Link: https://leetcode.com/problems/implement-stack-using-queues/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class QueueStack {
     private Queue<Integer> queue;

@@ -38,6 +38,7 @@ import java.util.Random;
  *    - Use weighted reservoir sampling or cumulative distribution function.
  * 6. What if multiple threads need to shuffle simultaneously?
  *    - Use ThreadLocalRandom or synchronize access to shared Random instance.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RandomizedArrayShuffler {
 

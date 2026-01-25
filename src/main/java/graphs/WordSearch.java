@@ -22,6 +22,7 @@ package graphs;
  * - What if words can also be constructed diagonally?
  * - How would you handle large dictionaries? (Use Trie + DFS)
  * - What if multiple words need to be found? (Word Search II: https://leetcode.com/problems/word-search-ii/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordSearch {
 

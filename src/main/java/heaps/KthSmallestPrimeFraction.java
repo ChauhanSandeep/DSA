@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: Can we optimize space usage for large arrays?
  * A: Use binary search approach which uses O(1) extra space.
+ * LeetCode Contest Rating: 2169
  */
 public class KthSmallestPrimeFraction {
 

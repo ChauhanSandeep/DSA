@@ -28,6 +28,7 @@ import java.util.List;
  *
  * 3. What if `nums[i]` can be negative?
  *    → The original problem assumes non-negative inputs. With negatives, we need a different problem model (e.g., graph BFS/DFS).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class JumpGame2 {
 

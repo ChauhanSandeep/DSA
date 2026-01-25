@@ -15,6 +15,7 @@ import java.util.*;
  *
  * Link: https://leetcode.com/problems/online-stock-span/
  *
+ * LeetCode Contest Rating: 1709
  */
 public class StockSpanProblem {
 

@@ -36,6 +36,7 @@ import java.util.*;
  *    → Modify algorithm to accept starting airport as parameter; Hierholzer's algorithm still works.
  *  - Can you determine if an Eulerian path exists before attempting to find it?
  *    → Yes, check if at most 2 vertices have odd degree (for undirected) or specific in/out-degree conditions (for directed).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReconstructItinerary {
 

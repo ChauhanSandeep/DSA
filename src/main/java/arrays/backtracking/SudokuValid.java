@@ -29,6 +29,7 @@ package arrays.backtracking;
  * - What if the board is to be solved? (Use backtracking)
  *   Leetcode: https://leetcode.com/problems/sudoku-solver/
  * - How to validate solved board? (Same code works)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SudokuValid {
   public static void main(String[] args) {

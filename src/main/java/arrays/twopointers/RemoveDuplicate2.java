@@ -18,6 +18,7 @@ import java.util.Arrays;
  *
  * ✅ Follow-up:
  * 1. What if at most `k` duplicates are allowed? → Generalize the pattern by tracking last `k` writes.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveDuplicate2 {
 

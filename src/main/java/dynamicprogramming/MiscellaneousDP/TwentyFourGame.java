@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: What about integer overflow?
  * A: Use double precision and check bounds, or use BigDecimal for exact arithmetic.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TwentyFourGame {
 

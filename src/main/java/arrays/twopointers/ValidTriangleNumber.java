@@ -46,6 +46,7 @@ import java.util.Arrays;
  * 5. How would you optimize for very large arrays with many zeros?
  *    Answer: Filter out zeros during preprocessing since they cannot form valid triangles
  *    with positive sides. This reduces the effective array size before applying the main algorithm.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidTriangleNumber {
 

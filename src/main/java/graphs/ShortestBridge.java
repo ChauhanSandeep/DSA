@@ -26,6 +26,7 @@ import java.util.Queue;
  *
  * --- Tags ---
  * Graph, DFS, BFS, Matrix, Flood Fill
+ * LeetCode Contest Rating: 1826
  */
 public class ShortestBridge {
 

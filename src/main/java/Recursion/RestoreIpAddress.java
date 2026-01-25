@@ -19,6 +19,7 @@ import java.util.List;
  *    → Return empty list or throw validation error; current problem restricts to digits only.
  * 2. Can you return only one valid IP?
  *    → Yes. Exit early once the first valid result is found (modify recursion).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RestoreIpAddress {
 

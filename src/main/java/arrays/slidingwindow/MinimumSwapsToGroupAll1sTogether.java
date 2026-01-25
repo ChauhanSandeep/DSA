@@ -40,6 +40,7 @@ package arrays.slidingwindow;
  * - Minimum Swaps to Group All 1's Together II: https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/
  * - Minimum Adjacent Swaps for K Consecutive Ones: https://leetcode.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/
  * - Sliding Window Maximum: https://leetcode.com/problems/sliding-window-maximum/
+ * LeetCode Contest Rating: 1508
  */
 public class MinimumSwapsToGroupAll1sTogether {
 

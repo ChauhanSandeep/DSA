@@ -21,6 +21,7 @@ package dynamicprogramming.knapsackbounded;
  *      Relevant problem: https://leetcode.com/problems/partition-to-k-equal-sum-subsets/
  * 3. What if negative numbers are allowed?
  *    - The problem becomes NP-hard in general, but for small ranges, DP can still work with offset for negatives.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class EqualSum {
   public static void main(String[] args) {

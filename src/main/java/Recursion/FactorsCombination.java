@@ -40,6 +40,7 @@ import java.util.List;
  *
  * Q5: How can we find just the number of factorizations without listing them?
  * A5: Use dynamic programming with memoization counting ways to factorize each number.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FactorsCombination {
     public static void main(String[] args) {

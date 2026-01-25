@@ -23,6 +23,7 @@ import java.util.*;
  * 1. What about minimum depth? - Similar approach but careful with incomplete paths
  * 2. How to find diameter? - Maximum depth through any node (not necessarily root)
  * 3. What if tree is extremely deep? - Use iterative approach to avoid stack overflow
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumDepthOfBinaryTree {
 

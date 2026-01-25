@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: How to handle negative numbers?
  * A: Modulo operation works with negatives by adjusting remainder.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ContinuousSubarraySum {
 

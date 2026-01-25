@@ -25,6 +25,7 @@ package trees.dfs;
  * 1. What if cameras had different ranges? - Use DP with different states for each range
  * 2. What if we want to minimize cost instead of count? - Modify state values to track costs
  * 3. What about forest of trees? - Apply same logic to each tree and sum results
+ * LeetCode Contest Rating: 2124
  */
 public class BinaryTreeCameras {
 

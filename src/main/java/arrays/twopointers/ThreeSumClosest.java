@@ -19,6 +19,7 @@ import java.util.Arrays;
  * Follow-up:
  * - What if you need to find the closest sum of 4 integers (4Sum Closest)?
  *   - Approach: Similar two-pointer technique, with an extra outer loop for the fourth number.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ThreeSumClosest {
 

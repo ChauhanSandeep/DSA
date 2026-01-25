@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
  * - LeetCode 322: Coin Change (DP optimization)
  * - LeetCode 698: Partition to K Equal Sum Subsets (Subset partitioning)
  * - LeetCode 473: Matchsticks to Square (Backtracking with pruning)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class OptimalAccountBalancing {
     // Memoization cache for overlapping subproblems

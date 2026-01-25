@@ -6,6 +6,7 @@ import java.util.TreeSet;
 
 /**
  * https://leetcode.com/problems/logger-rate-limiter/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 class Logger {
 

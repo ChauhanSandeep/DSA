@@ -27,6 +27,7 @@ import java.util.PriorityQueue;
  *    ➤ No, heap is required for optimality in O(N log N). Without it, solution becomes brute-force.
  * 3. Can this be parallelized?
  *    ➤ Only partially. Final result is inherently sequential due to dependency.
+ * LeetCode Contest Rating: 1482
  */
 public class MinimumCostToConnectSticks {
 

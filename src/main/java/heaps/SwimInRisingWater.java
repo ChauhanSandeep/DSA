@@ -40,6 +40,7 @@ import java.util.*;
  *  - LeetCode 778 (Swim in Rising Water): https://leetcode.com/problems/swim-in-rising-water/
  *  - LeetCode 1631 (Path With Minimum Effort): https://leetcode.com/problems/path-with-minimum-effort/
  *  - LeetCode 1102 (Path With Maximum Minimum Value): https://leetcode.com/problems/path-with-maximum-minimum-value/
+ * LeetCode Contest Rating: 2097
  */
 public class SwimInRisingWater {
 

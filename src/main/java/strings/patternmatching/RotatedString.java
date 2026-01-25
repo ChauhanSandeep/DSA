@@ -22,6 +22,7 @@ package strings.patternmatching;
  *  Answer: Yes, it can be adapted for circular buffer checks.
  * - What if the rotation is not fixed
  *  Answer: https://leetcode.com/problems/rotate-string/ solved in canBeRotated method.
+ * LeetCode Contest Rating: 1167
  */
 public class RotatedString {
 

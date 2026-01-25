@@ -18,6 +18,7 @@ package arrays.binarysearch;
  *     - If API calls are costly, consider caching previous guesses or using a more balanced search strategy to minimize calls.
  * 2️⃣ What if the range is huge (like 10^9)?
  *     - The same binary search approach still applies, as it’s logarithmic in time.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class GuessingGame {
 

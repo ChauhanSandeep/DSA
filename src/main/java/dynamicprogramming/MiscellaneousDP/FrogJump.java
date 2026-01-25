@@ -21,6 +21,7 @@ import java.util.*;
  * then 4 units to the 7th stone,
  * then 5 units to the 8th stone.
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FrogJump {
     public static void main(String[] args) {

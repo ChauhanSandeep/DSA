@@ -18,6 +18,7 @@ import java.util.*;
  * - What if elements can be tripled instead? (Check for x*3 instead of x*2)
  * - How to handle negative numbers? (Current solution handles them correctly)
  * - What if multiple original arrays are possible? (Problem guarantees unique solution)
+ * LeetCode Contest Rating: 1557
  */
 public class FindOriginalArrayFromDoubledArray {
 

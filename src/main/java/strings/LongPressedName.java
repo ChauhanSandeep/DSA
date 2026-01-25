@@ -13,6 +13,7 @@ package strings;
  * Explanation: 'a' and 'e' in 'alex' were long pressed.
  *
  * LeetCode Link: https://leetcode.com/problems/long-pressed-name/
+ * LeetCode Contest Rating: 1271
  */
 public class LongPressedName {
 

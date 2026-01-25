@@ -56,6 +56,7 @@ import java.util.*;
  *    paths from each cell and caches the results.
  *
  * LeetCode: https://leetcode.com/problems/longest-increasing-path-in-a-matrix/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestIncreasingPathInAMatrix {
     // Directions: up, right, down, left

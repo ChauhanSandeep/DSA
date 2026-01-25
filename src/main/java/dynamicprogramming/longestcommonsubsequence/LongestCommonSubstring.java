@@ -15,6 +15,7 @@ import java.util.Arrays;
  * Explanation: The longest common substring is "ab" with length 2.
  *
  * LeetCode Link: https://leetcode.com/problems/longest-common-substring/ (not direct but similar to "Maximum Length of Repeated Subarray")
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestCommonSubstring {
 

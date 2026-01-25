@@ -13,6 +13,7 @@ package bitwiseoperation;
  *
  * Time Complexity: O(1) as we're working with fixed-size integers (32 bits)
  * Space Complexity: O(1)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SumOfTwoIntegers {
     public int getSum(int a, int b) {

@@ -22,6 +22,7 @@ package strings.twopointers;
  * - Can you optimize for very large numbers? (Only reverse half the number for comparison)
  * - How would you handle overflow in number reversal? (Use long type or half-reversal approach)
  * - What if we need to check palindrome in different bases? (Modify digit extraction logic)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PalindromeNumber {
 

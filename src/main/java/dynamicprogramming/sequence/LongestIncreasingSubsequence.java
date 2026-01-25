@@ -35,6 +35,7 @@ import java.util.List;
  *  - LeetCode 673 (Number of Longest Increasing Subsequence): https://leetcode.com/problems/number-of-longest-increasing-subsequence/
  *  - LeetCode 1048 (Longest String Chain): https://leetcode.com/problems/longest-string-chain/
  *  - LeetCode 646 (Maximum Length of Pair Chain): https://leetcode.com/problems/maximum-length-of-pair-chain/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestIncreasingSubsequence {
     public static void main(String[] args) {

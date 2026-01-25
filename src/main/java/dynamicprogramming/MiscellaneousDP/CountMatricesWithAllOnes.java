@@ -45,6 +45,7 @@ import java.util.*;
  * 5. What if you need to count submatrices with at least k ones instead of all ones?
  *    Answer: Use sliding window or prefix sum 2D approach. For each submatrix, calculate
  *    sum using prefix sums and count those with sum >= k.
+ * LeetCode Contest Rating: 1845
  */
 public class CountMatricesWithAllOnes {
 

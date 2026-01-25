@@ -49,6 +49,7 @@ package dynamicprogramming.MiscellaneousDP;
  *    to account for weights, making it more complex.
  *
  * LeetCode: https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/
+ * LeetCode Contest Rating: 1574
  */
 public class MaximumPointsFromCards {
 

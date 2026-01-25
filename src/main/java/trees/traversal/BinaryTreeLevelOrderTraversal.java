@@ -22,6 +22,7 @@ import java.util.*;
  * 1. What if we need reverse level order? - Use Collections.reverse() or build result backwards
  * 2. What about zigzag traversal? - Alternate direction flag with Collections.reverse()
  * 3. How to handle very wide trees? - Consider iterative approach to avoid stack overflow
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinaryTreeLevelOrderTraversal {
 

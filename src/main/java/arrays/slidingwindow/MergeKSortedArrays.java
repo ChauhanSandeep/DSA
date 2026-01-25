@@ -22,6 +22,7 @@ import java.util.*;
  *    🔗 https://leetcode.com/problems/merge-k-sorted-lists/discuss/10527/A-java-solution-based-on-divide-and-conquer
  * 2. Can you merge arrays in-place? → Only possible if you control the original arrays.
  * 3. What if arrays are streaming in real-time? → Use a sliding window and a heap for real-time merging.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MergeKSortedArrays {
 

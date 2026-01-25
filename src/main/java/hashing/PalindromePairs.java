@@ -18,6 +18,7 @@ import java.util.*;
  * 1. Can we do this in O(n * k) where k = average word length? (Trie-based optimization possible)
  *    Leetcode follow-up ref: https://leetcode.com/problems/palindrome-pairs/solutions/79215/o-n-k-2-java-solution-with-trie-structure/
  * 2. How to handle duplicates in the list? (Not required here as words are unique)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PalindromePairs {
 

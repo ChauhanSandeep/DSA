@@ -34,6 +34,7 @@ import java.util.*;
  * Related Problems:
  * - Shortest Path in Binary Matrix (https://leetcode.com/problems/shortest-path-in-binary-matrix/)
  * - The Maze II (https://leetcode.com/problems/the-maze-ii/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CutOffTreesForGolfEvent {
     private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};

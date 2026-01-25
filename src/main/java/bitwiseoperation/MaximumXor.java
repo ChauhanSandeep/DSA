@@ -23,6 +23,7 @@ import java.util.HashSet;
  *    - Use unsigned masks, take care with Java's sign extension, optimize with Trie or BitSet.
  * 4. How do you handle streaming data to maintain maximum XOR in real time?
  *    - Use online Trie insertions and maintain max as stream arrives.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumXor {
 

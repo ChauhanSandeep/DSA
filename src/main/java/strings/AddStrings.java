@@ -18,6 +18,7 @@ package strings;
  * - How would you handle negative numbers? (Extend to support subtraction with sign handling)
  * - Can you optimize for very large strings? (Consider chunked processing for memory efficiency)
  * - How would you extend this to support decimal numbers? (Add decimal point handling and alignment)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AddStrings {
 

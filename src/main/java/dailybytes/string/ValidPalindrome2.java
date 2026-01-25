@@ -16,6 +16,7 @@ package dailybytes.string;
  * 1. What if you’re allowed to delete up to k characters? ➤ Extend with a recursive or DP approach
  * 2. What if you need to return **which character** to delete? ➤ Store the index where mismatch occurs
  * 3. Can you do this in O(1) space? ➤ Yes, with index-based checks (no new strings)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidPalindrome2 {
 

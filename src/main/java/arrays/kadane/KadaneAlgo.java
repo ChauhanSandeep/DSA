@@ -22,6 +22,7 @@ import java.util.Arrays;
  * - How do you solve this using Divide and Conquer? (See Leetcode Hard variant)
  * - What if you needed to return multiple max subarrays of equal sum?
  *  (Requires additional logic to track all max subarrays)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class KadaneAlgo {
 

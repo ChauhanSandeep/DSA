@@ -35,6 +35,7 @@ package dynamicprogramming.scheduling;
  * Related Problems:
  * - Minimum Number of Days to Eat N Oranges (https://leetcode.com/problems/minimum-number-of-days-to-eat-n-oranges/)
  * - Minimum Cost to Cut a Stick (https://leetcode.com/problems/minimum-cost-to-cut-a-stick/)
+ * LeetCode Contest Rating: 2035
  */
 public class MinimumDifficultyOfAJobSchedule {
     /**

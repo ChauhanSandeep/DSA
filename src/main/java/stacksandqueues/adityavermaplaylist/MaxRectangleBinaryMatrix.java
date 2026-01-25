@@ -19,6 +19,7 @@ import java.util.*;
  * Output: 6
  *
  * Leetcode: https://leetcode.com/problems/maximal-rectangle/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxRectangleBinaryMatrix {
 

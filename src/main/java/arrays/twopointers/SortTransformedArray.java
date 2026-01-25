@@ -17,6 +17,7 @@ import java.util.Arrays;
  * - What if function is cubic or higher degree? (Use similar two-pointer approach)
  * - How to handle floating point coefficients? (Same algorithm applies)
  * - Can we avoid computing all values first? (Yes, current approach does this optimally)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SortTransformedArray {
 

@@ -25,6 +25,7 @@ import java.util.Arrays;
  *   A: Use Trie or Interval Trees to compact expression or generate bytecode instead of a string.
  * - Q: Can you minimize the output string length further?
  *   A: Merge contiguous numbers or use regular expressions (in case of strings).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CreateExpression {
 

@@ -26,6 +26,7 @@ import java.util.*;
  *
  * Q: How to extend to 3D grids or different movement patterns?
  * A: Generalize direction vectors and neighbor calculation logic.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordSearchII {
 

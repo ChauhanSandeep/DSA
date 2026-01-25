@@ -13,6 +13,7 @@ import java.util.LinkedList;
  * - Space Complexity: O(n + m)
  *
  * LeetCode Problem Link: https://leetcode.com/problems/merge-two-sorted-lists/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MergeSortedLinkedList {
 

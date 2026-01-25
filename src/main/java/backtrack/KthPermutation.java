@@ -35,6 +35,7 @@ import java.util.List;
  * 4. What if we need the kth permutation in different ordering (not lexicographic)?
  *    Answer: Apply custom comparison function and use similar factorial-based calculation.
  *    Related: Custom permutation ordering problems
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class KthPermutation {
     public static void main(String[] args) {

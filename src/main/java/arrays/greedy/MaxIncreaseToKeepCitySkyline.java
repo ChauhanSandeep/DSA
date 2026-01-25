@@ -85,6 +85,7 @@ package arrays.greedy;
  *    current row and column maximums. Before increasing a building, check if it would exceed
  *    current skyline constraints. Update maximums incrementally. This is useful for online
  *    scenarios where updates come sequentially.
+ * LeetCode Contest Rating: 1376
  */
 public class MaxIncreaseToKeepCitySkyline {
 

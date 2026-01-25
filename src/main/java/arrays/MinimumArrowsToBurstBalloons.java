@@ -29,6 +29,7 @@ import java.util.List;
  *
  * 2. How does the solution change if the balloons are not guaranteed to be non-overlapping?
  *    → No change required; overlapping is already handled by the merging strategy.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class MinimumArrowsToBurstBalloons {

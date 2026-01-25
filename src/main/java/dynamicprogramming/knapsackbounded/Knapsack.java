@@ -37,6 +37,7 @@ package dynamicprogramming.knapsackbounded;
  *  - LeetCode 416 (Partition Equal Subset Sum): https://leetcode.com/problems/partition-equal-subset-sum/
  *  - LeetCode 494 (Target Sum): https://leetcode.com/problems/target-sum/
  *  - LeetCode 1049 (Last Stone Weight II): https://leetcode.com/problems/last-stone-weight-ii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Knapsack {
 

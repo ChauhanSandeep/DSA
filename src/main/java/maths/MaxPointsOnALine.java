@@ -26,6 +26,7 @@ import java.util.*;
  * 3. How would you extend this to 3D space?
  *    Answer: Use plane equations instead of line equations, requiring 3 points to define a plane.
  *    Related: https://leetcode.com/problems/minimum-lines-to-represent-a-line-chart/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxPointsOnALine {
 

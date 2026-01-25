@@ -18,6 +18,7 @@ package arrays.sorting;
  * - What if duplicates are allowed? (Check Leetcode #81)
  * - Can you do this with a recursive binary search?
  * - How to find the rotation pivot index itself?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RotatedSortedSearch {
 

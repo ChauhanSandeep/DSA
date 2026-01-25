@@ -24,6 +24,7 @@ import java.util.Map;
  * - Trace recursion and record each split/swap used in the transformation.
  * 4. What if swaps must be balanced or minimal?
  * - Add constraints in recursion and minimize swap operations in DP.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ScrambleString {
     private final Map<String, Boolean> memo = new HashMap<>();

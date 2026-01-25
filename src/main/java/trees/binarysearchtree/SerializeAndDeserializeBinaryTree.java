@@ -26,6 +26,7 @@ import java.util.*;
  *
  * Q: How to ensure backward compatibility with format changes?
  * A: Include version headers and support multiple format versions.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SerializeAndDeserializeBinaryTree {
 

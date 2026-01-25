@@ -18,6 +18,7 @@ import java.util.*;
  *
  * Time Complexity: O(n * m * k) where n is the length of s, m is the number of words, and k is the length of each word
  * Space Complexity: O(m) for the frequency map
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SubstringWithConcatenationOfAllWords {
     public List<Integer> findSubstring(String s, String[] words) {

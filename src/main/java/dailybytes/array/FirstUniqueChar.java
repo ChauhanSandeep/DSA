@@ -20,6 +20,7 @@ import java.util.Map;
  * 1. What if you need to return the first unique *character* instead of index? ➤ Small change in logic
  * 2. Can this be done in one pass? ➤ Not reliably without using LinkedHashMap
  * 3. What if the input stream is continuous? ➤ Use a frequency map + queue to track candidates
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FirstUniqueChar {
 

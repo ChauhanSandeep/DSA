@@ -29,6 +29,7 @@ import java.util.Stack;
  * Related Problems:
  * - Create Maximum Number (https://leetcode.com/problems/create-maximum-number/)
  * - Monotone Increasing Digits (https://leetcode.com/problems/monotone-increasing-digits/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveKDigits {
     /**

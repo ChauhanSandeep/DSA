@@ -16,6 +16,7 @@ import java.util.Arrays;
  * ### Follow-up:
  * - Can you modify this to return the k-th largest number instead of the largest overall?
  * - What if the input is a stream of numbers?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LargestNumber {
 

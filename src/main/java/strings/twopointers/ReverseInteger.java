@@ -25,6 +25,7 @@ package strings.twopointers;
  * - Can you optimize for numbers with many trailing zeros? (Current approach naturally handles this)
  * - How would you extend to 64-bit integers? (Use BigInteger or similar overflow detection)
  * - What if we need to preserve leading zeros in output? (Return as string instead of integer)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReverseInteger {
 

@@ -44,6 +44,7 @@ package dynamicprogramming.MiscellaneousDP;
  *    Answer: For very large strings, we might need more advanced algorithms like Manacher's algorithm (O(n) time).
  *
  * LeetCode: https://leetcode.com/problems/palindromic-substrings/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PalindromicSubstrings {
 

@@ -41,6 +41,7 @@ import java.util.*;
  *  - LeetCode 543 (Diameter of Binary Tree): https://leetcode.com/problems/diameter-of-binary-tree/
  *  - LeetCode 1245 (Tree Diameter): https://leetcode.com/problems/tree-diameter/
  *  - LeetCode 310 (Minimum Height Trees): https://leetcode.com/problems/minimum-height-trees/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LargestDistanceNodes {
 

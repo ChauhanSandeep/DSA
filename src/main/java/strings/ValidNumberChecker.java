@@ -32,6 +32,7 @@ package strings;
  *    - Split into tokens, handle sign, digits, dot, and exponent using a state machine.
  * 3. Is this a valid use case for a finite state machine (FSM)?
  *    - Yes. You can model each parsing state explicitly for maintainability and extensibility.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class ValidNumberChecker {

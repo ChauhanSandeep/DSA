@@ -23,6 +23,7 @@ import java.util.*;
  *
  * Q: Can we optimize space usage?
  * A: Can use iterative DFS instead of recursion to avoid call stack overhead.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CloneGraph {
 

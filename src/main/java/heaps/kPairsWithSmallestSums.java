@@ -31,6 +31,7 @@ import java.util.Set;
  *    - Not efficiently; heap ensures optimal time due to min-sum tracking.
  * 3. What if you had to return K largest pairs?
  *    - Use a max heap and invert the comparison logic.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class kPairsWithSmallestSums {
 

@@ -23,6 +23,7 @@ import java.util.PriorityQueue;
  *
  * Time Complexity: O(n^2 * log n) where n is the size of the grid
  * Space Complexity: O(n^2) for the priority queue and visited set
+ * LeetCode Contest Rating: 2097
  */
 public class SwimInRisingWater {
     // Directions for 4-directional movement

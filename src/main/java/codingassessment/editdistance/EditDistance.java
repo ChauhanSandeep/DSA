@@ -53,6 +53,7 @@ package codingassessment.editdistance;
  * - Longest Common Subsequence (LeetCode #1143)
  * - Delete Operation for Two Strings (LeetCode #583)
  * - Minimum ASCII Delete Sum for Two Strings (LeetCode #712)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class EditDistance {
 

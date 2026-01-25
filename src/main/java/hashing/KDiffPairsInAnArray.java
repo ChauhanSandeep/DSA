@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: Can we optimize for very large arrays?
  * A: Use HashMap approach which is already O(n), can't improve asymptotically.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class KDiffPairsInAnArray {
 

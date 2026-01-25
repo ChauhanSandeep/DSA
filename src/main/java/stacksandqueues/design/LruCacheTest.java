@@ -36,6 +36,7 @@ import java.util.Map;
  * 4. What if we need to persist cache to disk for recovery?
  *    Answer: Implement write-through or write-back policies with serialization.
  *    Related: Design distributed cache systems
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 class LRUCache {
   private final int capacity; // Maximum capacity of the cache

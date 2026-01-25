@@ -34,6 +34,7 @@ import java.util.*;
  * - 3Sum Closest (https://leetcode.com/problems/3sum-closest/)
  * - 4Sum (https://leetcode.com/problems/4sum/)
  * - Two Sum (https://leetcode.com/problems/two-sum/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ThreeSum {
 

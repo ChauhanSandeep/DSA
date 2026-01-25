@@ -24,6 +24,7 @@ package dynamicprogramming.gridpath;
  * - Can you optimize the space complexity to O(n) using a rolling array? (Yes)
  *   https://leetcode.com/problems/dungeon-game/discuss/52827/O(n)-space-solution
  * - What if knight can move in all four directions? (Cycle detection + memoized DFS)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DungeonGame {
 

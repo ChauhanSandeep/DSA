@@ -23,6 +23,7 @@ package arrays.xor;
  *   A: Modify formula/XOR to go from 0 to N instead of 1 to N.
  * - Q: How to detect duplicates instead of missing?
  *   A: Use HashSet or frequency counter approach.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MissingNumber {
 

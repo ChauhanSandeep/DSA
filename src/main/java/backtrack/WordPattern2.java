@@ -25,6 +25,7 @@ import java.util.Set;
  * 2. Can we return all possible mappings? → Yes, use a list to store mappings instead of boolean.
  * 3. How would you handle overlapping mappings? → Not possible here due to bijection constraint.
  * 4. Can you optimize substring creation? → Use `StringBuilder` with backtracking to avoid excessive string creation.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordPattern2 {
 

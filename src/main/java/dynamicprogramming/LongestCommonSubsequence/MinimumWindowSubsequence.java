@@ -46,6 +46,7 @@ package dynamicprogramming.longestcommonsubsequence;
  * 5. How would you optimize for multiple queries with different s2 values on same s1?
  *    Answer: Preprocess s1 to build a next occurrence map for each character at each position.
  *    This allows O(|s2|) lookup per query after O(26 * |s1|) preprocessing.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumWindowSubsequence {
 

@@ -23,6 +23,7 @@ package dynamicprogramming.knapsackunbounded;
  * - How would you reconstruct the actual cut sequence?
  *   → Track choices in a separate array (backtracking path).
  *     (Related problem: https://leetcode.com/problems/coin-change/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RodCutting {
   public static void main(String[] args) {

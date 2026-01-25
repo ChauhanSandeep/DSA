@@ -23,6 +23,7 @@ package maths;
  * 3. How would you animate the clock hands smoothly?
  *    Answer: Use continuous time calculations instead of discrete hour/minute values.
  *    Related: https://leetcode.com/problems/minimum-time-difference/
+ * LeetCode Contest Rating: 1325
  */
 public class AngleBetweenHandsOfAClock {
 

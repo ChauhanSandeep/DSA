@@ -14,6 +14,7 @@ import java.util.List;
  * - Space Complexity: O(1)
  *
  * LeetCode Problem Link: https://leetcode.com/problems/longest-common-prefix/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestCommonPrefix {
 

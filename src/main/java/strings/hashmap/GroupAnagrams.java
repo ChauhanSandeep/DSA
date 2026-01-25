@@ -35,6 +35,7 @@ import java.util.*;
  * Related Problems:
  * - Valid Anagram: https://leetcode.com/problems/valid-anagram/
  * - Find All Anagrams in a String: https://leetcode.com/problems/find-all-anagrams-in-a-string/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class GroupAnagrams {
 

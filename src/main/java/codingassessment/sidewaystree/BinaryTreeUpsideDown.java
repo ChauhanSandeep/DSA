@@ -47,6 +47,7 @@ import utils.TreeNode;
  * - Original right child becomes new left child
  * - Original parent becomes new right child
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinaryTreeUpsideDown {
 

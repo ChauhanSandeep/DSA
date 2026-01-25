@@ -26,6 +26,7 @@ import java.util.Stack;
  *
  * Time Complexity: **O(N)**
  * Space Complexity: **O(N)** (for stack & result storage)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NextGreaterElement {
 

@@ -34,6 +34,7 @@ package arrays;
  *
  * Q5: How would you extend this to remove groups of 3 or more consecutive identical characters?
  * A5: Same approach but only process groups where count >= 3, keeping the highest-cost character in each group.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DeleteRepeatingLetter {
     public static void main(String[] args) {

@@ -34,6 +34,7 @@ package bitwiseoperation;
  *    Answer: Similar DP approach but with different state transitions for handling "00" patterns.
  * 4. How to optimize space for very large n values?
  *    Answer: Use rolling arrays since we only need previous few Fibonacci values.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NonConsecutiveOnesCounter {
 

@@ -16,6 +16,7 @@ import java.util.*;
  *
  * Time Complexity:  O(N!) → Each queen placement reduces available options significantly.
  * Space Complexity: O(N^2) → Storing board configurations in the result list.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NQueen {
     public static void main(String[] args) {

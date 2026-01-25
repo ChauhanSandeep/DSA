@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: How to find all maximum-length combinations?
  * A: Modify backtracking to collect all solutions that achieve maximum length.
+ * LeetCode Contest Rating: 1720
  */
 public class MaximumLengthOfAConcatenatedStringWithUniqueCharacters {
 

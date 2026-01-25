@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: How to handle very large matrices?
  * A: Use divide-and-conquer or approximation algorithms for massive datasets.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxSumOfRectangleNoLargerThanK {
 

@@ -16,6 +16,7 @@ package arrays.binarysearch;
  *
  * Time Complexity: O(n * log(S)) where n is the length of nums and S is the sum of elements in nums
  * Space Complexity: O(1)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SplitArrayLargestSum {
     public int splitArray(int[] nums, int m) {

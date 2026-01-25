@@ -19,6 +19,7 @@ import java.util.Arrays;
  *   A: Yes, by using binary search twice.
  * - Q: What if the array is rotated?
  *   A: You need to adapt binary search logic accordingly.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FirstAndLastPositionBinarySearch {
 

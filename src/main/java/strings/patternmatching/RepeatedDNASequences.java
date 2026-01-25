@@ -35,6 +35,7 @@ import java.util.Set;
  * Related Problems:
  * - Substring with Concatenation of All Words (https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
  * - Find All Anagrams in a String (https://leetcode.com/problems/find-all-anagrams-in-a-string/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RepeatedDNASequences {
     /**

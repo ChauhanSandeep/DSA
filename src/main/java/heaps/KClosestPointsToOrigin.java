@@ -31,6 +31,7 @@ import java.util.Random;
  * 3. How would you solve this in a distributed system with millions of points?
  *    Answer: Use MapReduce with local k-closest computation followed by global merge.
  *
+ * LeetCode Contest Rating: 1214
  */
 public class KClosestPointsToOrigin {
 

@@ -43,6 +43,7 @@ import java.util.Stack;
  *    asteroid's mass by the collision impact. Continue until mass reaches zero or no more
  *    collisions occur.
  *    Related problem: https://leetcode.com/problems/car-fleet/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AsteroidCollision {
 

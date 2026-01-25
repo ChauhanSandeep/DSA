@@ -20,6 +20,7 @@ import java.util.Arrays;
  * 1. Can this be solved without sorting? ➤ No, sorting is needed to apply greedy bounds
  * 2. Can we precompute powers of 2 to optimize? ➤ Yes, using modular exponentiation
  * 3. What if target is very large? ➤ No change; sorting and logic stays same
+ * LeetCode Contest Rating: 2276
  */
 public class SubsequenceSumCondition {
 

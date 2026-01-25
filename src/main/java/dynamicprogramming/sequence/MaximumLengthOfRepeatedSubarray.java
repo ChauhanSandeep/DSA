@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: What if arrays are very large?
  * A: Use rolling hash with binary search or suffix array approaches.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumLengthOfRepeatedSubarray {
 

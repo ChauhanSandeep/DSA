@@ -18,6 +18,7 @@ package dynamicprogramming.statemachine;
  *   Explanation: There are 8 ways to tile a 2 x 5 board.
  *
  * Related Leetcode: https://leetcode.com/problems/domino-and-tromino-tiling/
+ * LeetCode Contest Rating: 1830
  */
 public class TilingDominoes {
 

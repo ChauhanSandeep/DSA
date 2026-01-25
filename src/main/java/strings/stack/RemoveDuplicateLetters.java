@@ -27,6 +27,7 @@ import java.util.Stack;
  * Related Problems:
  * - Smallest Subsequence of Distinct Characters (https://leetcode.com/problems/smallest-subsequence-of-distinct-characters/)
  * - Remove K Digits (https://leetcode.com/problems/remove-k-digits/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveDuplicateLetters {
     /**

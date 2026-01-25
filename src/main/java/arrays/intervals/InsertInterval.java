@@ -26,6 +26,7 @@ import java.util.List;
  *
  * 2. Can you do this in-place for large datasets?
  *    → Yes, if you’re allowed to modify the input list directly, use a single pass with an output index tracker.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class InsertInterval {

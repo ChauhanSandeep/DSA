@@ -22,6 +22,7 @@ import java.util.*;
  * 1. What if `k = 1`? ➤ All characters will be removed.
  * 2. What if we want to remove all adjacent duplicates regardless of count? ➤ Use two-pointer approach.
  * 3. Can we do it in-place? ➤ Yes, with character array + index pointer stack.
+ * LeetCode Contest Rating: 1542
  */
 public class RemoveDuplicateRecursively {
 

@@ -25,6 +25,7 @@ import java.util.*;
  * 1. What if duplicates are allowed? - Modify conditions to use <= or >=
  * 2. How to fix an invalid BST? - Find violations and swap nodes
  * 3. What about BST with range constraints? - Use additional min/max parameters
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidateBinarySearchTree {
 
