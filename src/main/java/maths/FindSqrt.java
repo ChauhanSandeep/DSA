@@ -19,6 +19,7 @@ package maths;
  * Space Complexity: O(1)
  *
  * LeetCode Reference: https://leetcode.com/problems/sqrtx/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FindSqrt {
     public static void main(String[] args) {

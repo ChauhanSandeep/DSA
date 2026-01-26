@@ -27,6 +27,7 @@ import java.util.*;
  * 
  * Q: Can we solve in O(1) space complexity?
  * A: Use mathematical approach counting peaks and valleys in single pass.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Candy {
     

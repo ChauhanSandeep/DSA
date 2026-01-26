@@ -52,6 +52,7 @@ package dynamicprogramming.knapsackunbounded;
  *    A: Modify the DP to store lists of combinations instead of counts. At each step, for each way 
  *    to make (amount - coin), append the current coin to create new combinations. This significantly 
  *    increases space complexity to O(number_of_combinations * average_combination_length).
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CoinChangeII {
     public static void main(String[] args) {

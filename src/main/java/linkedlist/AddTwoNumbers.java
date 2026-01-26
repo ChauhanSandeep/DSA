@@ -26,6 +26,7 @@ package linkedlist;
  *    Answer: Current solution handles this by checking for null and treating missing digits as 0.
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AddTwoNumbers {
 

@@ -4,6 +4,7 @@ package arrays;
  * Given a 2D binary matrix filled with 0s and 1s, find the largest square containing only 1s and return its area.
  *
  * LeetCode: https://leetcode.com/problems/maximal-square/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximalSquare {
     public static void main(String[] args) {

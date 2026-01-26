@@ -23,6 +23,7 @@ import java.util.*;
  * 🔁 Follow-up:
  * - Can you generalize this to k-sum? (Yes, this solution does that!)
  * - Can you optimize further for space? (Using streaming logic or iterative control)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FourSum {
 

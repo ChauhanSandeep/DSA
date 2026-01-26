@@ -34,6 +34,7 @@ import java.util.Arrays;
  *
  * 4. Q: What if some colors are forbidden for some houses?
  *    A: Mark those costs as `Integer.MAX_VALUE` and skip them in the loop.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PaintHouse2 {
 

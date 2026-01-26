@@ -21,6 +21,7 @@ package linkedlist;
  * - `reverseList()`: O(1) - Uses constant extra space.
  * - `reverseListRec()`: O(N) - Due to recursive function calls.
  * - `reverseInGroups()`: O(N) - Due to recursive calls.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReverseLinkedList {
 

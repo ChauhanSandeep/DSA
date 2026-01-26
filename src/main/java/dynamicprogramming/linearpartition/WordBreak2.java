@@ -19,6 +19,7 @@ import java.util.*;
  * - For every starting index, try all end indices
  * - If substring from start to end is a valid word, recursively generate sentences from end index onward
  * - Memoize results for each index to avoid recomputation
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordBreak2 {
 

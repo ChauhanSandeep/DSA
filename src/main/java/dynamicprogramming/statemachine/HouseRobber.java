@@ -46,6 +46,7 @@ package dynamicprogramming.statemachine;
  *    the DP array to reconstruct the solution.
  *
  * LeetCode: https://leetcode.com/problems/house-robber/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class HouseRobber {
 

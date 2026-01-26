@@ -44,6 +44,7 @@ package arrays.matrix;
  * - Rotate Array: https://leetcode.com/problems/rotate-array/
  * - Spiral Matrix: https://leetcode.com/problems/spiral-matrix/
  * - Transpose Matrix: https://leetcode.com/problems/transpose-matrix/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RotateImage {
 

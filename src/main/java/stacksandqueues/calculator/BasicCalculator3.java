@@ -40,6 +40,7 @@ import java.util.Stack;
  * 6. How would you handle floating point numbers and operator precedence?
  *    Answer: Consider implementing a Shunting Yard algorithm.
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class BasicCalculator3 {

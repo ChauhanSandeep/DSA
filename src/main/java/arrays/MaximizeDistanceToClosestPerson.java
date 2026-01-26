@@ -18,6 +18,7 @@ import java.util.Arrays;
  * - What if multiple seats have same max distance? (Return any one of them)
  * - How to handle all seats occupied? (Problem guarantees at least one empty seat)
  * - Can we solve without finding all distances? (Yes, track segments between occupied seats)
+ * LeetCode Contest Rating: 1383
  */
 public class MaximizeDistanceToClosestPerson {
 

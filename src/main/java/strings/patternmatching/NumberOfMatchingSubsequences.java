@@ -26,6 +26,7 @@ import java.util.*;
  *  - How would you parallelize this for distributed systems?
  *    → Partition words array across machines, each processes independently and aggregates results.
  *
+ * LeetCode Contest Rating: 1695
  */
 public class NumberOfMatchingSubsequences {
 

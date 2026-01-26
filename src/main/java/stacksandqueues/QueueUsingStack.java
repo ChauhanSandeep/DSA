@@ -30,6 +30,7 @@ import java.util.Stack;
  *    - To perform `pop()` or `peek()`, make recursive call to pop elements until reaching the **bottom-most element**
  *      (which is the front of the queue).
  *    - Return that element and **rebuild the stack** while unwinding the recursion.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class QueueUsingStack {
 

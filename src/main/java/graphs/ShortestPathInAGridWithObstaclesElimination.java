@@ -37,6 +37,7 @@ import java.util.*;
  *    Related: https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: 1967
  */
 public class ShortestPathInAGridWithObstaclesElimination {
 

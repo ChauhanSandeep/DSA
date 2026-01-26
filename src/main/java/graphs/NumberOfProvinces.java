@@ -35,6 +35,7 @@ import java.util.*;
  * Related Problems:
  * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
  * - Friend Circles (same as this problem)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NumberOfProvinces {
     /**

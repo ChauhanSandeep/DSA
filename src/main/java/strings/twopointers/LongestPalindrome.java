@@ -26,6 +26,7 @@ package strings.twopointers;
  *  - LeetCode 647 (Palindromic Substrings): https://leetcode.com/problems/palindromic-substrings/
  *  - LeetCode 516 (Longest Palindromic Subsequence): https://leetcode.com/problems/longest-palindromic-subsequence/
  *  - LeetCode 214 (Shortest Palindrome): https://leetcode.com/problems/shortest-palindrome/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestPalindrome {
     public static void main(String[] args) {

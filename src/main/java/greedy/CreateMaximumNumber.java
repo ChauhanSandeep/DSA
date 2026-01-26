@@ -26,6 +26,7 @@ package greedy;
  * Related Problems:
  * - Remove K Digits (https://leetcode.com/problems/remove-k-digits/)
  * - Maximum Swap (https://leetcode.com/problems/maximum-swap/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CreateMaximumNumber {
     /**

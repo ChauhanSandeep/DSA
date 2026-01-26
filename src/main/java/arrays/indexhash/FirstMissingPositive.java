@@ -21,6 +21,7 @@ package arrays.indexhash;
  *    - The current approach already handles duplicates by ignoring them during placement or marking, as we only care about presence of each positive from 1 to n.
  * 3. What if the array is read-only and we cannot modify it?
  *    - We would need to use extra space like a set for tracking presence, but that violates O(1) space; alternatively, find a way to compute without modification, possibly with math, but it's challenging for O(n) time.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FirstMissingPositive {
 

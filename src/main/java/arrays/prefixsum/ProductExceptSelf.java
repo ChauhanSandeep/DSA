@@ -7,6 +7,7 @@ import java.util.Arrays;
  * You must write an algorithm that runs in O(n) time and without using the division operation.
  *
  * Leetcode link: https://leetcode.com/problems/product-of-array-except-self/description/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ProductExceptSelf {
     public static void main(String[] args) {

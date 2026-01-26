@@ -26,6 +26,7 @@ import java.util.Deque;
  *    - Naively yes, but that takes O(N²) time. Stack is optimal O(N).
  * 3. Can we find how many subarrays each element is the minimum for?
  *    - Yes. That's the core of this approach using left and right spans.
+ * LeetCode Contest Rating: 1976
  */
 public class MinSubarraySum {
 

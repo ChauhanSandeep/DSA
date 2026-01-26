@@ -22,6 +22,7 @@ import java.util.*;
  *
  * Time Complexity: O(n * log m) where n is the total number of elements and m is the number of lists
  * Space Complexity: O(m) for the min heap
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SmallestRangeCoveringElementsFromKLists {
     public int[] smallestRange(List<List<Integer>> nums) {

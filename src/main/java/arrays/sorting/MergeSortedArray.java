@@ -15,6 +15,7 @@ package arrays.sorting;
  * - How to merge k sorted arrays? (Use priority queue or divide-and-conquer)
  * - What if arrays are not sorted? (Sort first or use different merging strategy)
  * - Can we solve without extra space? (Current solution is already in-place)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MergeSortedArray {
 

@@ -41,6 +41,7 @@ import java.util.Arrays;
  *
  * Q5: What if we want to set rows/columns to a different value instead of 0?
  * A5: Same algorithm - just change the final value we set from 0 to the desired value.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SetMatrixZero {
 

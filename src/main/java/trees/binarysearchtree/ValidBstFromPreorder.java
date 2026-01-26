@@ -15,6 +15,7 @@ import java.util.ArrayDeque;
  *              25  35    100
  *
  * LeetCode Link: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidBstFromPreorder {
     public static void main(String[] args) {

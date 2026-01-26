@@ -16,6 +16,7 @@ import java.util.Arrays;
  * Output: 5
  * Explanation: 2 candies for the first child, 1 candy for the second child, and 2 candies for the third child.
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CandyDistribution {
 

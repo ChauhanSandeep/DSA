@@ -19,7 +19,9 @@ import java.util.*;
  Explanation: Remove edge (3-4 with weight 6), components have costs [4, 0], max = 4.
 
  Link: https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/
- **/
+ *
+ * LeetCode Contest Rating: 2243
+ */
 public class MinimumMaxCostAfterKComponents {
 
   /** Pair to represent (node, weight) for adjacency list and priority queue. */

@@ -16,6 +16,7 @@ import java.util.*;
  * Explanation : Connect 1-2 with cost 5 and 2-3 with cost 1.
  *
  * Link: https://leetcode.com/problems/connecting-cities-with-minimum-cost/
+ * LeetCode Contest Rating: 1753
  */
 public class ConnectingCitiesWithMinimumCost_Prim {
 

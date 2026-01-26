@@ -41,6 +41,7 @@ import java.util.Map;
  * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
  * - LeetCode 3: Longest Substring Without Repeating Characters
  * - LeetCode 424: Longest Repeating Character Replacement
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestSubstringWithAtMostKDistinctCharacters {
 

@@ -40,6 +40,7 @@ import java.util.Arrays;
  * - LeetCode 312: Burst Balloons (Interval DP)
  * - LeetCode 1130: Minimum Cost Tree From Leaf Values (Interval DP)
  * - LeetCode 375: Guess Number Higher or Lower II (Interval DP)
+ * LeetCode Contest Rating: 2423
  */
 public class MinimumCostMergeStones {
 

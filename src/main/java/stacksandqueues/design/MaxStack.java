@@ -33,6 +33,7 @@ import java.util.*;
  * 3. How would you handle concurrent access to the stack?
  *    Answer: Add synchronization using locks or use concurrent data structures.
  *    Related: https://leetcode.com/problems/min-stack/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxStack {
 

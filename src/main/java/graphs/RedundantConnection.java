@@ -35,6 +35,7 @@ import java.util.*;
  * Related Problems:
  * - Redundant Connection II (https://leetcode.com/problems/redundant-connection-ii/)
  * - Graph Valid Tree (https://leetcode.com/problems/graph-valid-tree/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RedundantConnection {
     /**

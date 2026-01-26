@@ -23,6 +23,7 @@ import java.util.*;
  *
  * Time Complexity: O(n) where n is the number of elements in the original array
  * Space Complexity: O(n) for storing the graph and result
+ * LeetCode Contest Rating: 1579
  */
 public class RestoreTheArrayFromAdjacentPairs {
     public int[] restoreArray(int[][] adjacentPairs) {

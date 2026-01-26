@@ -6,6 +6,7 @@ package strings.patternmatching;
  * Explanation: The substring "For" starts at index 5 in the string "GeeksForGeeks".
  *
  * LeetCode Equivalent: https://leetcode.com/problems/implement-strstr/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class StrStr {
   public static void main(String[] args) {

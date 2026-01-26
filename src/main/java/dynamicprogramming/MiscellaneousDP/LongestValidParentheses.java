@@ -35,6 +35,7 @@ import java.util.*;
  *  - LeetCode 20 (Valid Parentheses): https://leetcode.com/problems/valid-parentheses/
  *  - LeetCode 22 (Generate Parentheses): https://leetcode.com/problems/generate-parentheses/
  *  - LeetCode 301 (Remove Invalid Parentheses): https://leetcode.com/problems/remove-invalid-parentheses/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestValidParentheses {
   public static void main(String[] args) {

@@ -31,6 +31,7 @@ package arrays.prefixsum;
  *    Answer: Extend prefix sum concept to 3D using inclusion-exclusion principle.
  * 4. Can we optimize space if queries are sparse?
  *    Answer: Lazy evaluation - compute prefix sums on-demand and cache results.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RangeSumQuery2DImmutable {
 

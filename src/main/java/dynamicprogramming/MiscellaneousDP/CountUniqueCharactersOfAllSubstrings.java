@@ -45,6 +45,7 @@ import java.util.*;
  * - LeetCode 3: Longest Substring Without Repeating Characters
  * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
  * - LeetCode 992: Subarrays with K Different Integers
+ * LeetCode Contest Rating: 2034
  */
 public class CountUniqueCharactersOfAllSubstrings {
 

@@ -16,6 +16,7 @@ package graphs;
  *
  * Time Complexity: O(m * n) where m is the number of rows and n is the number of columns
  * Space Complexity: O(m * n) in the worst case for the recursion stack
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SurroundedRegions {
     public void solve(char[][] board) {

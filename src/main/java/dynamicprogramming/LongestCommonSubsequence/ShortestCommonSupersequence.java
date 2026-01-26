@@ -13,6 +13,7 @@ package dynamicprogramming.LongestCommonSubsequence;
  * Explanation: One possible result is "cabac".
  *
  * LeetCode link: https://leetcode.com/problems/shortest-common-supersequence/
+ * LeetCode Contest Rating: 1977
  */
 public class ShortestCommonSupersequence {
 

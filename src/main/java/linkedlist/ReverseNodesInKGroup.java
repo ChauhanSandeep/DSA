@@ -26,6 +26,7 @@ import java.util.*;
  *
  * Q: Can we support different group sizes for different segments?
  * A: Extend to take array of group sizes and process accordingly.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ReverseNodesInKGroup {
 

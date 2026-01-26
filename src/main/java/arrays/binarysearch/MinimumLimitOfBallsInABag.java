@@ -45,6 +45,7 @@ import java.util.PriorityQueue;
  * Related Problems:
  * - Koko Eating Bananas (https://leetcode.com/problems/koko-eating-bananas/)
  * - Split Array Largest Sum (https://leetcode.com/problems/split-array-largest-sum/)
+ * LeetCode Contest Rating: 1940
  */
 public class MinimumLimitOfBallsInABag {
     /**

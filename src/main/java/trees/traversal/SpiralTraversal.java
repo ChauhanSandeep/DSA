@@ -33,6 +33,7 @@ import java.util.Stack;
  * Space Complexity: O(N), due to the space used by the stacks and the result list.
  *
  * LeetCode Link: https://leetcode.com/problems/spiral-order-traversal-of-binary-tree/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class SpiralTraversal {

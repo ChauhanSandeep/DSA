@@ -25,6 +25,7 @@ import java.util.*;
  * Follow-ups:
  * - How would you handle a dynamic dictionary (add/remove at runtime)?
  * - Can this be parallelized using multiple threads on rows/regions?
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordSearch2 {
 

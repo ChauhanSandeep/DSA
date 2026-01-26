@@ -27,6 +27,7 @@ import java.util.List;
  *   A: Yes, define boundaries and recurse on each layer.
  * - Q: What if it's a jagged matrix?
  *   A: Handle each row’s length individually; logic gets trickier.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SpiralMatrixTraversal {
 

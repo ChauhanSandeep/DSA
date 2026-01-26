@@ -32,6 +32,7 @@ import java.util.*;
  *  - Use segment trees or interval trees for dynamic updates
  * 4. Memory optimization for large datasets?
  *  - Use space-optimized DP or coordinate compression
+ * LeetCode Contest Rating: 2023
  */
 public class MaximumProfitJobScheduling {
 

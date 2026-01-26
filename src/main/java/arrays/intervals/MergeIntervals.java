@@ -23,6 +23,7 @@ import java.util.List;
  *    → Not easily with primitives (`int[][]`) in Java. You’d need to manage indices manually.
  * 3. How to handle huge data (millions of intervals)?
  *    → Use streaming (e.g., sorted iterator) to avoid keeping everything in memory.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MergeIntervals {
 

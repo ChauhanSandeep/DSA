@@ -21,6 +21,7 @@ import trees.Node;
  * Space Complexity: O(H), where H is the height of the tree, due to the recursive call stack.
  *
  * LeetCode Link: https://leetcode.com/problems/check-if-a-binary-tree-is-a-sum-tree/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class SumTree {

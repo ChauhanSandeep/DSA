@@ -18,6 +18,7 @@ import java.util.Map;
  * Space Complexity: O(m * n) (For memoization storage)
  *
  * LeetCode Link: https://leetcode.com/problems/unique-paths/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NumberOfPaths {
 

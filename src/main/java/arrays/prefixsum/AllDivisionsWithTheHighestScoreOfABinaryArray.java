@@ -54,6 +54,7 @@ import java.util.stream.Stream;
  * 5. How would you extend this to handle array elements with values other than 0 and 1?
  *    Answer: Maintain separate prefix sums for each distinct value in the array. The score
  *    calculation would need to be generalized based on the specific scoring rules for each value.
+ * LeetCode Contest Rating: 1391
  */
 public class AllDivisionsWithTheHighestScoreOfABinaryArray {
 

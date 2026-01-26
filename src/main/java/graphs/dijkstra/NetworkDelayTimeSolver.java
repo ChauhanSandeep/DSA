@@ -15,6 +15,7 @@ import java.util.*;
  * Output: 2
  *
  * LeetCode Link: https://leetcode.com/problems/network-delay-time/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NetworkDelayTimeSolver {
 

@@ -31,6 +31,7 @@ import java.util.Map;
  *    Related: https://leetcode.com/problems/clone-graph/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CopyListWithRandomPointer {
 

@@ -14,6 +14,7 @@ package linkedlist;
  *
  * 📊 **Time Complexity:** O(N) - Traverses the list twice.
  * 🛠 **Space Complexity:** O(1) - Uses constant extra space.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PalindromeList {
 

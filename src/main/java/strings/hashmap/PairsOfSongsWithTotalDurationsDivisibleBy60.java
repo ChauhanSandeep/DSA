@@ -27,6 +27,7 @@ import java.util.Map;
  * - Can you optimize for very large arrays with limited time ranges? (Use array instead of HashMap)
  * - How would you find actual pairs instead of just count? (Store indices along with remainders)
  * - What if we need triplets instead of pairs? (Extend to three nested loops or more complex logic)
+ * LeetCode Contest Rating: 1377
  */
 public class PairsOfSongsWithTotalDurationsDivisibleBy60 {
 

@@ -29,6 +29,7 @@ import java.util.Arrays;
  *     S1 = (target + total_sum)/2
  *
  * - Hence, the problem reduces to **counting the number of subsets with sum = (target + total_sum)/2**.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TargetSum {
     public static void main(String[] args) {

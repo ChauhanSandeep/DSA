@@ -29,6 +29,7 @@ import java.util.List;
  * — Not easily without auxiliary space because sorting of letter-logs is required.
  * 2. How would you scale this for streaming logs?
  * — Use a priority queue or external merge sort with file buffers.
+ * LeetCode Contest Rating: 1387
  */
 public class ReOrderLogFile {
 

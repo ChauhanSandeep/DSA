@@ -43,6 +43,7 @@ import java.util.Arrays;
  *
  * Q5: What if we want to find the maximum number of coins instead of minimum?
  * A5: Change the logic to maximize instead of minimize, useful for maximizing change given.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CoinChange {
 

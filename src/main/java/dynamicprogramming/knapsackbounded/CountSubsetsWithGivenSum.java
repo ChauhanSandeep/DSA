@@ -12,6 +12,7 @@ package dynamicprogramming.knapsackbounded;
  * - Classic variation where instead of checking for possibility, we count the number of ways.
  * - Every element has two choices: include or exclude.
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CountSubsetsWithGivenSum {
     public static void main(String[] args) {

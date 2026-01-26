@@ -23,6 +23,7 @@ import java.util.List;
  *    - Yes, using the formula: grayCode(i) = i ^ (i >> 1). Solved in method 2.
  * 3. How would you adapt this for very large n?
  *    - Use bit manipulation to generate integers directly, avoiding string operations.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class GrayCode {
   public static void main(String[] args) {

@@ -40,6 +40,7 @@ import java.util.*;
  * A: This algorithm will return any one of them based on traversal order.
  *
  * Leetcode link: https://leetcode.com/problems/course-schedule-ii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TopologicalSort {
 

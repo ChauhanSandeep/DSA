@@ -45,6 +45,7 @@ import java.util.Set;
  * 5. What if we need to group emails by their normalized form?
  *    Answer: Use HashMap<String, List<String>> instead of HashSet, where key is the normalized
  *    email and value is the list of original emails that map to it.
+ * LeetCode Contest Rating: 1199
  */
 public class UniqueEmailAddresses {
 

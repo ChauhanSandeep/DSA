@@ -28,6 +28,7 @@ import java.util.*;
  *
  * Q: How to optimize for very large documents?
  * A: Use streaming approach and parallel processing for independent sections.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TextJustification {
     // Helper method to repeat spaces (Java 8 compatible)

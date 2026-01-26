@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: How to find all maximum-length windows?
  * A: Track all windows that achieve the maximum length during traversal.
+ * LeetCode Contest Rating: 1656
  */
 public class MaxConsecutiveOnesIII {
 

@@ -17,6 +17,7 @@ import java.util.Stack;
  *
  * Time Complexity: O(N), where N is the length of the input string.
  * Space Complexity: O(N), for storing numbers in the stack.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BasicCalculator2 {
 

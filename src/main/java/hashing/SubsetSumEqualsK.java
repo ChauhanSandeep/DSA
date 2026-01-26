@@ -10,6 +10,7 @@ import java.util.Map;
  * whose sum equals `k`. The array can contain both positive and negative integers.
  *
  * **LeetCode Problem:** https://leetcode.com/problems/subarray-sum-equals-k/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SubsetSumEqualsK {
     public static void main(String[] args) {

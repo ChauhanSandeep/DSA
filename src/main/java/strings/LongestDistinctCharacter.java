@@ -40,6 +40,7 @@ import java.util.Map;
  * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
  * - LeetCode 340: Longest Substring with At Most K Distinct Characters
  * - LeetCode 424: Longest Repeating Character Replacement
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestDistinctCharacter {
 

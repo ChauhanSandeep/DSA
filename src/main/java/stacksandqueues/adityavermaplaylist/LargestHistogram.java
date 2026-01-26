@@ -21,6 +21,7 @@ import java.util.Stack;
  * - A monotonic increasing stack helps maintain indices of histogram bars in increasing order of height.
  * This allows efficient determination of the previous smaller element (left bound) and the
  * next smaller element (right bound) for each bar.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LargestHistogram {
 

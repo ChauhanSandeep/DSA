@@ -27,6 +27,7 @@ import java.util.List;
  * - Can you optimize for very large input with limited time range? (Use boolean array for O(1) lookup)
  * - How would you extend to handle time zones? (Convert all times to UTC before processing)
  * - What if we need k smallest differences instead of just minimum? (Use priority queue or sorting)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumTimeDifference {
 

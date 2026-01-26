@@ -54,6 +54,7 @@ import java.util.*;
  * 5. How would you handle if some cells have negative heights?
  *    Answer: Use absolute difference same way. Dijkstra's still works because
  *    edge weights (differences) remain non-negative.
+ * LeetCode Contest Rating: 1948
  */
 public class PathWithMinimumEffort {
 

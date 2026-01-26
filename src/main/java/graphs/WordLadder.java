@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: Can we handle different transformation rules (e.g., insertions/deletions)?
  * A: Extend distance function to support edit distance operations.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WordLadder {
 

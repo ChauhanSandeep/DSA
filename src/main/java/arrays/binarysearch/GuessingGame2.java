@@ -17,6 +17,7 @@ package arrays.binarysearch;
  *     - It uses a variation of the minimax algorithm, ensuring the worst-case cost is minimized.
  * 2️⃣ Can you optimize further?
  *     - Since the decision range is continuous and costs accumulate, space optimization can be done by reusing a smaller matrix, but the time complexity remains.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class GuessingGame2 {
 

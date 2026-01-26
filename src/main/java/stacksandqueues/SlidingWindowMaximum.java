@@ -39,6 +39,7 @@ import java.util.Deque;
  * Related Problems:
  * - Minimum Window Substring (https://leetcode.com/problems/minimum-window-substring/)
  * - Longest Substring Without Repeating Characters (https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SlidingWindowMaximum {
     /**

@@ -9,6 +9,7 @@ package dailybytes.linkedlist;
  * - Space Complexity: O(1)
  *
  * LeetCode Problem Link: https://leetcode.com/problems/remove-linked-list-elements/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveNodes {
 

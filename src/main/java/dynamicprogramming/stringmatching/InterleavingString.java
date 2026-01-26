@@ -19,6 +19,7 @@ package dynamicprogramming.stringmatching;
  * - Can you solve this using Bottom-Up DP with reduced space? (Yes: 2D array → 1D array)
  * - Can you solve using BFS/DFS iterative approach?
  *   LeetCode: https://leetcode.com/problems/interleaving-string/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class InterleavingString {
 

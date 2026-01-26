@@ -25,6 +25,7 @@ package linkedlist;
  * - Even and odd-length lists.
  *
  * Link: https://leetcode.com/problems/palindrome-linked-list/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class OddEvenLinkedList {
 

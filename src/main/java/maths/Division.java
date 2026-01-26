@@ -24,6 +24,7 @@ import java.util.HashMap;
  * Space Complexity: O(N) - To store remainders in a HashMap.
  * 
  * LeetCode Link: https://leetcode.com/problems/fraction-to-recurring-decimal/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Division {
     public static void main(String[] args) {

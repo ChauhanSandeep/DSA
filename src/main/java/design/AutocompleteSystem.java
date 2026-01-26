@@ -8,6 +8,7 @@ import java.util.PriorityQueue;
 
 /**
  * https://leetcode.com/problems/design-search-autocomplete-system/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AutocompleteSystem {
 

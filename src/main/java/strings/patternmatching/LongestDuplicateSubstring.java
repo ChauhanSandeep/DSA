@@ -23,6 +23,7 @@ import java.util.*;
  *
  * Q: How to extend to multiple strings (longest common substring)?
  * A: Generalize suffix array approach or use advanced string matching.
+ * LeetCode Contest Rating: 2429
  */
 public class LongestDuplicateSubstring {
 

@@ -36,6 +36,7 @@ package dynamicprogramming.stringmatching;
  *    Answer: Yes, we can optimize the space complexity by using two 1D arrays instead of a 2D array.
  *
  * LeetCode: https://leetcode.com/problems/delete-operation-for-two-strings/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class DeleteOperationForTwoStrings {
 

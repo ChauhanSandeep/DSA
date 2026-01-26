@@ -14,6 +14,7 @@ package trees.binarysearchtree;
  * Space Complexity: O(1), since we're using only a constant amount of extra space.
  *
  * LeetCode Problem Link: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class LowestCommonAncestorOfBinarySearchTree {

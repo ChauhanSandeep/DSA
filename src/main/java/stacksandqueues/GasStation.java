@@ -34,6 +34,7 @@ package stacksandqueues;
  *    Related: https://leetcode.com/problems/minimum-number-of-refueling-stops/
  * 4. What about optimizing for real-time traffic conditions?
  *    Answer: Use weighted costs and dynamic recalculation as conditions change.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class GasStation {
 

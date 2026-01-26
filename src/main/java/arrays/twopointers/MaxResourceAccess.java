@@ -37,6 +37,7 @@ import java.util.*;
  *    - Use streaming algorithms with sliding windows instead of sorting all timestamps.
  * 3. What if we also want the users who accessed in that window?
  *    - Maintain user IDs in the sliding window while counting.
+ * LeetCode Contest Rating: 1851
  */
 public class MaxResourceAccess {
 

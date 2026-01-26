@@ -46,6 +46,7 @@ import java.util.Set;
  * - 290. Word Pattern: https://leetcode.com/problems/word-pattern/
  * - 242. Valid Anagram: https://leetcode.com/problems/valid-anagram/
  * - 49. Group Anagrams: https://leetcode.com/problems/group-anagrams/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class IsomorphicStrings {
 

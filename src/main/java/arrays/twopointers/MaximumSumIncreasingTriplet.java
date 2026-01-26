@@ -24,6 +24,7 @@ import java.util.stream.Stream;
  * 3. How to handle very large arrays (n=10^6) efficiently?
  *    - The O(n log n) approach scales well; for larger, parallelize or approximate if exact not needed.
  *    Relevant problem: https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumSumIncreasingTriplet {
 

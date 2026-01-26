@@ -14,6 +14,7 @@ package graphs.mst;
  * Output: 1
  *
  * Link: https://leetcode.com/problems/number-of-operations-to-make-network-connected/
+ * LeetCode Contest Rating: 1633
  */
 public class NetworkConnectivity_KruskalStyle {
 

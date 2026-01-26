@@ -20,6 +20,7 @@ import java.util.Queue;
  *
  * **Time Complexity:** **O(N)** (Each node is processed once)
  * **Space Complexity:** **O(N)** (Space for queue, at worst when the last level is in the queue)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ConnectNode {
 

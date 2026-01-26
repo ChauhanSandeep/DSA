@@ -49,6 +49,7 @@ import java.util.Map;
  *    the binary search approach mentioned in the first follow-up.
  *
  * LeetCode: https://leetcode.com/problems/is-subsequence/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class IsSubsequence {
 

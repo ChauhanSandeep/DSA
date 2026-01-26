@@ -68,6 +68,7 @@ import java.util.PriorityQueue;
  * applying the greedy approach.
  *
  * LeetCode: https://leetcode.com/problems/course-schedule-iii/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CourseScheduleIII {
 

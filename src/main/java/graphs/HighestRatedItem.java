@@ -34,6 +34,7 @@ import java.util.*;
  *    - Use pruning (stop BFS when no further valid items can be found within the required `k`).
  * 3. How to optimize memory if visited array is too large?
  *    - Use a BitSet or encode visited positions into a HashSet with "row*cols+col".
+ * LeetCode Contest Rating: 1837
  */
 public class HighestRatedItem {
 

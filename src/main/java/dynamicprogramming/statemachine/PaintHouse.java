@@ -25,6 +25,7 @@ import java.util.Arrays;
  * - Paint house 1 with green (cost = 5)
  * - Paint house 2 with blue (cost = 3)
  * Total cost = 2 + 5 + 3 = 10
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PaintHouse {
 

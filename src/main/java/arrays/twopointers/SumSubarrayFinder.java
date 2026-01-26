@@ -28,6 +28,7 @@ import java.util.Map;
  *   A: Extract sublist using indices returned.
  * - Q: How do we count all such subarrays?
  *   A: Use a variation of the prefix sum hashmap with count. (Leetcode: https://leetcode.com/problems/subarray-sum-equals-k/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SumSubarrayFinder {
 

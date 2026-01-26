@@ -48,6 +48,7 @@ package dynamicprogramming.MiscellaneousDP;
  *    Answer: We could extend the DP state to track both the count of arrangements and the total number of houses placed.
  *
  * LeetCode: https://leetcode.com/problems/count-number-of-ways-to-place-houses/
+ * LeetCode Contest Rating: 1608
  */
 public class CountNumberOfWaysToPlaceHouses {
     private static final int MOD = 1_000_000_007;

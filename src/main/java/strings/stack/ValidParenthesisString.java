@@ -29,6 +29,7 @@ package strings.stack;
  * - Can you solve this using dynamic programming? (DP approach with state: position and open count)
  * - How would you find the actual assignment of '*' characters? (Backtracking with assignment tracking)
  * - What if '*' could represent more than one character? (Modify the range expansion logic)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ValidParenthesisString {
 

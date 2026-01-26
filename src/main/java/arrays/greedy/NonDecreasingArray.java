@@ -33,6 +33,7 @@ package arrays.greedy;
  * - 2289. Steps to Make Array Non-decreasing: https://leetcode.com/problems/steps-to-make-array-non-decreasing/
  * - 2263. Make Array Non-decreasing or Non-increasing
  * - 300. Longest Increasing Subsequence
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NonDecreasingArray {
 

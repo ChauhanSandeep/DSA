@@ -25,6 +25,7 @@ package maths;
  * Related Problems:
  * - Factorial Trailing Zeroes (https://leetcode.com/problems/factorial-trailing-zeroes/)
  * - Count Digit One (https://leetcode.com/problems/count-digit-one/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NumberOfDigitOne {
     /**

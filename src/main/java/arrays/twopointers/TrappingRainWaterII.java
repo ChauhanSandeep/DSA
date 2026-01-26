@@ -48,6 +48,7 @@ import java.util.*;
  * 5. How would you handle continuous rainfall that fills tank over time?
  *    Answer: Add time dimension. Calculate fill rate based on rainfall intensity.
  *    Simulate water level rising, accounting for overflow and drainage dynamics.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class TrappingRainWaterII {
     /**

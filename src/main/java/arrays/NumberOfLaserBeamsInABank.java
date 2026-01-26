@@ -49,6 +49,7 @@ import java.util.*;
  * - Number of Islands: https://leetcode.com/problems/number-of-islands/
  * - Pacific Atlantic Water Flow: https://leetcode.com/problems/pacific-atlantic-water-flow/
  * - Battleships in a Board: https://leetcode.com/problems/battleships-in-a-board/
+ * LeetCode Contest Rating: 1280
  */
 public class NumberOfLaserBeamsInABank {
 

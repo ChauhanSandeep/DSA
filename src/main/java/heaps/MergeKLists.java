@@ -37,6 +37,7 @@ import java.util.PriorityQueue;
  *      Relevant problem: https://leetcode.com/problems/merge-sorted-array/
  * 6. How to merge without extra space?
  *    - Not possible efficiently without modifying lists, but divide and conquer can be done recursively with O(log k) space.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MergeKLists {
 

@@ -44,6 +44,7 @@ import java.util.*;
  * 5. How would you modify this to handle negative numbers or arbitrary ranges?
  *    Answer: Instead of using [1, n], accept an array of numbers as input. Iterate
  *    through array indices instead of number values. The backtracking structure remains same.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Combinations {
 

@@ -40,6 +40,7 @@ package arrays.matrix;
  * - Rotate Image: https://leetcode.com/problems/rotate-image/
  * - Reverse Words in a String: https://leetcode.com/problems/reverse-words-in-a-string/
  * - Rotate List: https://leetcode.com/problems/rotate-list/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RotateArray {
 

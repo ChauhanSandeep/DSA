@@ -31,6 +31,7 @@ import java.util.Arrays;
  *    Related: https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: 1335
  */
 public class DestroyingAsteroids {
 

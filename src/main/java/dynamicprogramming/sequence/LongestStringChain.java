@@ -44,6 +44,7 @@ import java.util.*;
  *    The longest chain would then be the longest path in this DAG, which can be found using topological sorting.
  *
  * LeetCode: https://leetcode.com/problems/longest-string-chain/
+ * LeetCode Contest Rating: 1599
  */
 public class LongestStringChain {
 

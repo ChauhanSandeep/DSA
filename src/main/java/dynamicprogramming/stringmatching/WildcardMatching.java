@@ -17,6 +17,7 @@ package dynamicprogramming.stringmatching;
  * - Can you optimize space to O(pattern.length())? (Yes, use rolling arrays)
  * - Can you implement it using recursion + memoization? [LC link: https://leetcode.com/problems/wildcard-matching/]
  *
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WildcardMatching {
 

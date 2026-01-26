@@ -22,6 +22,7 @@ package dynamicprogramming.MiscellaneousDP;
  *
  * Q: How to handle very large n efficiently?
  * A: Use mathematical formula with modular exponentiation.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class IntegerBreak {
 

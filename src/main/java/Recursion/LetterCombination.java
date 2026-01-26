@@ -39,6 +39,7 @@ import java.util.List;
  *
  * Q5: What if digits can repeat and we want unique combinations only?
  * A5: Use a Set to store results instead of List, or sort and deduplicate afterwards.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LetterCombination {
 

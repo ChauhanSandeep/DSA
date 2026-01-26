@@ -44,6 +44,7 @@ import java.util.stream.IntStream;
  * - LeetCode 598: Range Addition II
  * - LeetCode 307: Range Sum Query - Mutable
  * - LeetCode 1109: Corporate Flight Bookings (Same pattern)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RangeAddition {
 

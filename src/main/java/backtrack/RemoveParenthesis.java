@@ -13,6 +13,7 @@ import java.util.*;
  *
  * Input: s = "()())()"
  * Output: ["(())()","()()()"]
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveParenthesis {
 

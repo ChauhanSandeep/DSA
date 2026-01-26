@@ -50,6 +50,7 @@ import java.util.List;
  *    - Abstract the direction pattern into configurable movement vectors.
  * 6. How to optimize for multiple conversions with same numRows?
  *    - Precompute the cyclic pattern and reuse for different strings.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ZigZagStringConverter {
 

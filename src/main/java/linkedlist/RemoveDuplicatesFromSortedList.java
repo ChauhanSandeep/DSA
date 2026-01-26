@@ -25,6 +25,7 @@ package linkedlist;
  *    Answer: Yes, recursively process the list and skip duplicates.
  *
  * @author Sandeep
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RemoveDuplicatesFromSortedList {
 

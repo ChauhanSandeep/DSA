@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: How to handle ordinal numbers (1st, 2nd, 3rd)?
  * A: Add ordinal conversion methods with appropriate suffix rules.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class IntegerToEnglishWords {
 

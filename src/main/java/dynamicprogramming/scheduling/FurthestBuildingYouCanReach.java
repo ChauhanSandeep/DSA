@@ -59,6 +59,7 @@ import java.util.PriorityQueue;
  *    some form of sorting or priority queue, leading to at least O(k) space.
  *
  * LeetCode: https://leetcode.com/problems/furthest-building-you-can-reach/
+ * LeetCode Contest Rating: 1962
  */
 public class FurthestBuildingYouCanReach {
 

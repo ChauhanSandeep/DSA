@@ -41,6 +41,7 @@ import java.util.*;
  * - LeetCode 496: Next Greater Element I
  * - LeetCode 739: Daily Temperatures (Similar monotonic stack pattern)
  * - LeetCode 84: Largest Rectangle in Histogram (Advanced monotonic stack)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NextGreaterElementII {
 

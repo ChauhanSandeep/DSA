@@ -36,6 +36,7 @@ import java.util.*;
  *    Related: https://leetcode.com/problems/my-calendar-ii/
  * 4. What's the space-time tradeoff between TreeMap and Segment Tree approaches?
  *    Answer: TreeMap uses O(n) space with O(n log n) per query, Segment Tree uses O(range) space with O(log range) per query.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MyCalendarThree {
 

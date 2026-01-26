@@ -25,6 +25,7 @@ import java.util.*;
  * 1. What if we need count of paths only? - Same traversal but increment counter
  * 2. What about paths between any two nodes? - DFS from each node or path decomposition
  * 3. How to handle negative numbers? - Same algorithm works, no optimization possible
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PathSum2 {
 

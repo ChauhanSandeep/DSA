@@ -25,6 +25,7 @@ import java.util.List;
  *    ➤ Maintain a `Set<String>` of anagram substrings and return its size.
  * 3. What if matching is case-insensitive?
  *    ➤ Normalize the input using `.toLowerCase()` before processing.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class AllAnagrams {
 

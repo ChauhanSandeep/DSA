@@ -31,6 +31,7 @@ import java.util.*;
  *    - Mathematical approaches (checking if n is perfect square, sum of two squares, etc.) can be faster than DP for large n.
  * 4. What if we needed to return the actual squares used, not just the count?
  *    - We'd need to backtrack through the DP table or use a different approach to reconstruct the solution.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PerfectSquares {
   public static void main(String[] args) {

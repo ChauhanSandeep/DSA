@@ -53,6 +53,7 @@ package maths;
  *    Answer: Implement division using strings or BigInteger-like structures. Process digit
  *    by digit similar to long division taught in elementary school. This becomes a string
  *    manipulation problem with carry handling.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class IntegerDivisionWithoutOperators {
 

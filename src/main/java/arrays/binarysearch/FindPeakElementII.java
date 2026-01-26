@@ -37,6 +37,7 @@ package arrays.binarysearch;
  *
  * Related Problems:
  * - Find Peak Element (1D version): https://leetcode.com/problems/find-peak-element/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FindPeakElementII {
 

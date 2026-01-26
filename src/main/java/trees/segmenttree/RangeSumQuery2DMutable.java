@@ -29,6 +29,7 @@ package trees.segmenttree;
  * sumRegion(2, 1, 4, 3) returns 10
  *
  * LeetCode Link: https://leetcode.com/problems/range-sum-query-2d-mutable
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RangeSumQuery2DMutable {
     public static void main(String[] args) {

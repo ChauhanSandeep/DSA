@@ -33,6 +33,7 @@ import java.util.Stack;
  * Space Complexity: **O(N)** (in worst case, all characters are pushed onto the stack)
  *
  * LeetCode Link: https://leetcode.com/problems/valid-parentheses/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class ParenthesisChecker {
 

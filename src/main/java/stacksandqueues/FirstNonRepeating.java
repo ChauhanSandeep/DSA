@@ -21,6 +21,7 @@ import java.util.*;
  * <p>LeetCode Problem Link:
  * <a href="https://leetcode.com/problems/first-unique-character-in-a-string/">First Unique Character in a String</a>
  * </p>
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class FirstNonRepeating {
 

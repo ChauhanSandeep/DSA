@@ -34,6 +34,7 @@ import java.util.*;
  *
  * Q: Can we use DFS instead of BFS?
  * A: Yes, DFS is also valid and easier to write recursively.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class WaterFlow {
 

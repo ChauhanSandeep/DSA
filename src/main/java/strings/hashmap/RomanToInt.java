@@ -13,6 +13,7 @@ import java.util.Map;
  * - The numeral is read from left to right, and the values are added together.
  *
  * LeetCode Equivalent: https://leetcode.com/problems/roman-to-integer/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RomanToInt {
     public static void main(String[] args) {

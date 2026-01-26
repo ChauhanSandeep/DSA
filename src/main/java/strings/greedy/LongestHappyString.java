@@ -25,6 +25,7 @@ import java.util.PriorityQueue;
  *    → Yes, use a max-heap and generalize the logic for any char with streak constraint.
  * 2. Can we do it without heap?
  *    → Yes, greedy character selection can be done using manual comparisons.
+ * LeetCode Contest Rating: 1821
  */
 public class LongestHappyString {
 

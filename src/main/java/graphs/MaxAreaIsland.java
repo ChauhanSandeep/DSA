@@ -17,6 +17,7 @@ import java.util.Stack;
  *
  * Time Complexity: O(M × N) → Visiting each cell once
  * Space Complexity: O(M × N) → For visited array in worst case (all land)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaxAreaIsland {
     private static final int[][] DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // Down, Up, Right, Left

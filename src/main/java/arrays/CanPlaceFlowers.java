@@ -16,6 +16,7 @@ package arrays;
  * - How to find maximum flowers that can be planted? (Count all valid positions)
  * - What if flowers can be adjacent with distance >= 2? (Modify checking condition)
  * - How to handle circular flowerbed? (Check wraparound conditions)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CanPlaceFlowers {
 

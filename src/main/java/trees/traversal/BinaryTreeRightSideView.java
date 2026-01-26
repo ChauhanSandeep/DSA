@@ -47,6 +47,7 @@ import java.util.Queue;
  * 5. What if the tree is extremely wide but shallow?
  *    Answer: BFS is optimal as it processes one level at a time with O(width) space. DFS would
  *    use less space (O(height)) but the height-to-width ratio makes BFS more practical.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class BinaryTreeRightSideView {
   /**

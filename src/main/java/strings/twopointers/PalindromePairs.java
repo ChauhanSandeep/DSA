@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: How to extend to k-way palindrome combinations?
  * A: Generalize to k words using dynamic programming with trie traversal.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PalindromePairs {
 

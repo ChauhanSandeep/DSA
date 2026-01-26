@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: What if we have obstacles that block paths?
  * A: Modify BFS to skip obstacle cells, treating them like boundaries.
+ * LeetCode Contest Rating: 1666
  */
 public class AsFarFromLandAsPossible {
 

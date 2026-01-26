@@ -23,6 +23,7 @@ import java.util.*;
  *   👉 Yes. Use a bitmask (int) to represent the characters in each word for constant-time comparison.
  * - Is it necessary to group words by length?
  *   👉 Not with bitmasking; length grouping is only helpful when comparing sorted strings.
+ * LeetCode Contest Rating: 1828
  */
 public class CountWordsAfterAddingLetter {
 

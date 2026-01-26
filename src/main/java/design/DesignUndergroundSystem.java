@@ -25,6 +25,7 @@ import java.util.*;
  * 
  * Q: How to optimize for very frequent queries on same routes?
  * A: Cache computed averages, update incrementally on new data.
+ * LeetCode Contest Rating: 1465
  */
 public class DesignUndergroundSystem {
     

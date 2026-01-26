@@ -24,6 +24,7 @@ package strings;
  * Answer: You can use a single StringBuilder to build the next sequence without storing all previous terms.
  * - Can this be generated without string builders using character arrays?
  * Answer: Yes, by using a character array and managing indices.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CountAndSay {
 

@@ -12,6 +12,7 @@ package strings;
  * Explanation: The last word is "World" with length 5.
  *
  * LeetCode Link: https://leetcode.com/problems/length-of-last-word/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LengthOfLastWord {
 

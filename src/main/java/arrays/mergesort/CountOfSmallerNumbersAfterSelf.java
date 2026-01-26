@@ -25,6 +25,7 @@ import java.util.*;
  *
  * Q: How to handle very large numbers or floating point values?
  * A: Use discretization/coordinate compression to map to smaller integer range.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CountOfSmallerNumbersAfterSelf {
 

@@ -35,6 +35,7 @@ import java.util.Arrays;
  * 4. What if we need to minimize the number of initial pushes to achieve a target state?
  *    Answer: Dynamic programming or backtracking to find optimal initial configuration.
  *    Related: LeetCode 1284 - Minimum Number of Flips to Convert Binary Matrix
+ * LeetCode Contest Rating: 1638
  */
 public class PushDominoes {
 

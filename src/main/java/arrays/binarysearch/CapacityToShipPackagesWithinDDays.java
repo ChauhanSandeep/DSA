@@ -22,6 +22,7 @@ package arrays.binarysearch;
  *
  * Q: Can we optimize for very large arrays?
  * A: Current solution is already optimal O(n log(sum)), can't improve asymptotically.
+ * LeetCode Contest Rating: 1725
  */
 public class CapacityToShipPackagesWithinDDays {
 

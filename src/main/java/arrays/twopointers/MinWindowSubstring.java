@@ -25,6 +25,7 @@ import java.util.Map;
  * 3. How would you handle if the window must contain exactly the characters in t, no extras?
  *    - That's a different problem (permutation in string); use similar sliding window but ensure window size == t.length().
  *      Relevant problem: https://leetcode.com/problems/permutation-in-string/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinWindowSubstring {
 

@@ -37,6 +37,7 @@ import java.util.*;
  *    Related: https://leetcode.com/problems/subarray-sum-equals-k/
  *
  * @author Sandeep
+ * LeetCode Contest Rating: 1614
  */
 public class CountTheHiddenSequences {
 

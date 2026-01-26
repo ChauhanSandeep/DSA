@@ -17,6 +17,7 @@ import java.util.Deque;
  * Input: nums = [2,-1,2], k = 3
  * Output: 3
  * Explanation: The subarray [2, -1, 2] has a sum of 3, which is >= k.
+ * LeetCode Contest Rating: 2307
  */
 public class ShortestSubarraySum {
 

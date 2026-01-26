@@ -25,6 +25,7 @@ import java.util.*;
  *    - Leetcode: https://leetcode.com/problems/count-number-of-nice-subarrays/
  * 2. Can you extend this to return the actual subarrays (start, end indices)?
  *    - This requires nested loops or pre-storing positions of odd numbers.
+ * LeetCode Contest Rating: 1624
  */
 public class NiceSubarray {
 

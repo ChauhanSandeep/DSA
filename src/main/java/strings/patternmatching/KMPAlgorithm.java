@@ -17,6 +17,7 @@ package strings.patternmatching;
  * Explanation: The pattern "ababd" is found at index 10 in the text.
  *
  * LeetCode Link: https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 
 public class KMPAlgorithm {

@@ -31,6 +31,7 @@ import java.util.Set;
  *
  * 3. Can you sort permutations lexicographically without using a Set?
  *    - Yes. Sort the string initially and skip duplicates during backtracking.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class PermutationII {
 

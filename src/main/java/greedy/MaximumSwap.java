@@ -24,6 +24,7 @@ package greedy;
  *
  * Q4. Why doesn't a greedy strategy always work for **K swaps**?
  * Greedy might miss optimal swaps because the best option may involve future decisions. Backtracking required to explore all possibilities.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MaximumSwap {
 

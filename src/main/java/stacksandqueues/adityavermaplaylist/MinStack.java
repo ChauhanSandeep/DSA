@@ -25,6 +25,7 @@ import java.util.Stack;
  *
  * **LeetCode Link:**
  * https://leetcode.com/problems/min-stack/
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 class MinStack {
     private Stack<Integer> stack;

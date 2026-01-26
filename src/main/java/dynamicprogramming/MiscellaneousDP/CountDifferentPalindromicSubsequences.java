@@ -24,6 +24,7 @@ import java.util.*;
  *
  * Q: What about distinct substrings instead?
  * A: Use suffix automaton or suffix array techniques.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class CountDifferentPalindromicSubsequences {
 

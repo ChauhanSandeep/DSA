@@ -26,6 +26,7 @@ import java.util.Map;
  *    - Change validation logic in window to handle per-character k constraints.
  * 5. How does top-down divide-and-conquer compare to sliding window for very large strings?
  *    - Sliding window is optimal for constant set sizes, divide & conquer suits variable alphabets.
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class LongestSubstringKRepeating {
 

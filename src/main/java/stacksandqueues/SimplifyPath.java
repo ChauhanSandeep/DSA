@@ -29,6 +29,7 @@ import java.util.Deque;
  *
  * Time Complexity: O(n) where n is the length of the path
  * Space Complexity: O(n) for the stack
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class SimplifyPath {
     public String simplifyPath(String path) {

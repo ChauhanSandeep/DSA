@@ -20,6 +20,7 @@ import java.util.*;
  * - What if we need to return the actual path instead of just the cost?
  * - Can we adapt the solution to handle dynamic changes in the flight network?
  * - What changes are needed if the constraints change to *at most K edges* (vs stops)?
+ * LeetCode Contest Rating: 1786
  */
 public class CheapestFlightWithStops {
 

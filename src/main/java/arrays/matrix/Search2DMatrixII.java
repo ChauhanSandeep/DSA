@@ -27,6 +27,7 @@ package arrays.matrix;
  * Related Problems:
  * - Search a 2D Matrix (https://leetcode.com/problems/search-a-2d-matrix/)
  * - Kth Smallest Element in a Sorted Matrix (https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+ * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class Search2DMatrixII {
   /**
