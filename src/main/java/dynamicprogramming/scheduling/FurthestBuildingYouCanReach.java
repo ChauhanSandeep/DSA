@@ -1,4 +1,4 @@
-package dynamicprogramming.MiscellaneousDP;
+package dynamicprogramming.scheduling;
 
 import java.util.Arrays;
 import java.util.PriorityQueue;

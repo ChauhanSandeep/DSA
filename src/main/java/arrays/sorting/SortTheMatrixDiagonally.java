@@ -86,19 +86,19 @@ public class SortTheMatrixDiagonally {
         return mat;
     }
 
-/**
- * In-place sorting of each diagonal using selection sort.
- *
- * Intuitive Steps:
- * 1. For each diagonal starting from the first row and first column:
- *    a. Collect all positions (row, col) that belong to the diagonal.
- *    b. For each position in the diagonal, find the minimum element among the remaining positions.
- *    c. Swap the current element with the minimum found, sorting the diagonal in ascending order.
- * 2. Repeat for all diagonals, ensuring each is sorted independently.
- *
- * Time Complexity: O(m*n*min(m, n)), where m and n are matrix dimensions.
- * Space Complexity: O(1), as sorting is done in-place.
- */
+    /**
+     * In-place sorting of each diagonal using selection sort.
+     *
+     * Intuitive Steps:
+     * 1. For each diagonal starting from the first row and first column:
+     *    a. Collect all positions (row, col) that belong to the diagonal.
+     *    b. For each position in the diagonal, find the minimum element among the remaining positions.
+     *    c. Swap the current element with the minimum found, sorting the diagonal in ascending order.
+     * 2. Repeat for all diagonals, ensuring each is sorted independently.
+     *
+     * Time Complexity: O(m*n*min(m, n)), where m and n are matrix dimensions.
+     * Space Complexity: O(1), as sorting is done in-place.
+     */
     public int[][] diagonalSortInPlace(int[][] mat) {
         int rows = mat.length;
         int cols = mat[0].length;
