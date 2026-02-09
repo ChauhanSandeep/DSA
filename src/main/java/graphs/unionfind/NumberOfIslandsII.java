@@ -99,13 +99,13 @@ public class NumberOfIslandsII {
             
             // Check all 4 neighbors
             for (int[] dir : directions) {
-                int newRow = row + dir[0];
-                int newCol = col + dir[1];
+                int neighborRow = row + dir[0];
+                int neighborCol = col + dir[1];
                 
                 // Check bounds and if neighbor is land
-                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols && islandPresent[newRow][newCol]) {
+                if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols && islandPresent[neighborRow][neighborCol]) {
                     int cellId = row * cols + col;  // Convert 2D to 1D index
-                    int neighborCellId = newRow * cols + newCol;
+                    int neighborCellId = neighborRow * cols + neighborCol;
                     
                     // If neighbor is in different component, merge
                     if (unionFind.findRoot(cellId) != unionFind.findRoot(neighborCellId)) {

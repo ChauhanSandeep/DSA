@@ -1,4 +1,4 @@
-package arrays.backtracking;
+package backtrack;
 
 /**
  * Sudoku Solver using Backtracking

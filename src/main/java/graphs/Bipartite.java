@@ -46,7 +46,7 @@ public class Bipartite {
     // There can be multiple disconnected components in the graph, for loop ensures that all the subgraphs are checked
     for (int node = 0; node < len; node++) {
       if (visited[node] != 0) {
-//      This node is already visited in previous subgraph
+        // This node is already visited in previous subgraph
         continue;
       }
 

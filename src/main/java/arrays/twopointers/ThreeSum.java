@@ -52,7 +52,7 @@ public class ThreeSum {
      * 4. Return unique triplets.
      *
      * Time Complexity: O(n²) - sorting O(n log n) + nested iteration O(n²)
-     * Space Complexity: O(1) or O(n) depending on sorting algorithm (excluding result storage)
+     * Space Complexity: O(1) or O(n) depending on sorting algorithm
      *
      * @param nums The input array of integers
      * @return A list of all unique triplets that sum to zero
@@ -75,12 +75,12 @@ public class ThreeSum {
 
             int leftPointer = 0;
             int rightPointer = targetIndex - 1;
-            int remainingTarget = -nums[targetIndex];
+            int requiredSum = -nums[targetIndex];
 
             while (leftPointer < rightPointer) {
                 int twoSum = nums[leftPointer] + nums[rightPointer];
 
-                if (twoSum == remainingTarget) {
+                if (twoSum == requiredSum) {
                     triplets.add(Arrays.asList(nums[leftPointer], nums[rightPointer], nums[targetIndex]));
 
                     // Skip duplicate elements for left and right pointers
@@ -89,7 +89,7 @@ public class ThreeSum {
 
                     leftPointer++;
                     rightPointer--;
-                } else if (twoSum < remainingTarget) {
+                } else if (twoSum < requiredSum) {
                     leftPointer++;
                 } else {
                     rightPointer--;
@@ -133,12 +133,12 @@ public class ThreeSum {
 
             int leftPointer = firstIndex + 1;
             int rightPointer = nums.length - 1;
-            int remainingSum = targetSum - nums[firstIndex];
+            int requiredSum = targetSum - nums[firstIndex];
 
             while (leftPointer < rightPointer) {
                 int pairSum = nums[leftPointer] + nums[rightPointer];
 
-                if (pairSum == remainingSum) {
+                if (pairSum == requiredSum) {
                     triplets.add(Arrays.asList(nums[firstIndex], nums[leftPointer], nums[rightPointer]));
 
                     while (leftPointer < rightPointer && nums[leftPointer] == nums[leftPointer + 1]) leftPointer++;
@@ -146,7 +146,7 @@ public class ThreeSum {
 
                     leftPointer++;
                     rightPointer--;
-                } else if (pairSum < remainingSum) {
+                } else if (pairSum < requiredSum) {
                     leftPointer++;
                 } else {
                     rightPointer--;

@@ -10,14 +10,11 @@ import java.util.Map;
  * Given a binary tree and a target node, find all the cousins of the target node.
  * Cousins are nodes at the same level in the tree, but with different parents.
  *
- * Intuition:
- * - To find the cousins, we need to first locate the target node and its level.
- * - Once the level is determined, we can identify all nodes at that level except for the siblings of the target node.
- *
- * Algorithm:
- * 1. Perform a level order traversal of the binary tree.
- * 2. Track nodes at each level in a map.
- * 3. Once the target node is found, retrieve all nodes at the same level, except the target's sibling.
+ * Steps:
+ * - First, perform a DFS traversal to find the target node and record the level of each node.
+ * - Store nodes at each level in a map.
+ * - Once the target node is found, retrieve the list of nodes at that level from the map,
+ *  excluding the target node's sibling.
  *
  * Time Complexity:
  * - The time complexity is O(n), where n is the number of nodes in the binary tree.

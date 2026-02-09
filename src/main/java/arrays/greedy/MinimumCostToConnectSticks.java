@@ -7,9 +7,9 @@ import java.util.PriorityQueue;
  *
  * You are given an array of integers representing the lengths of sticks.
  * You can connect any two sticks into one. The cost is equal to the sum of their lengths.
- * The goal is to connect all sticks into one stick with the **minimum total cost**.
+ * The goal is to connect all sticks into one stick with the minimum total cost.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/minimum-cost-to-connect-sticks/
+ * Leetcode: https://leetcode.com/problems/minimum-cost-to-connect-sticks/
  *
  * Example:
  * Input: [1, 8, 3, 5]
@@ -22,11 +22,11 @@ import java.util.PriorityQueue;
  *
  * Follow-up:
  * 1. Why does greedy (always combine smallest two) work?
- *    ➤ Huffman coding principle — combining smaller parts early reduces cost growth.
+ *    Huffman coding principle — combining smaller parts early reduces cost growth.
  * 2. Can you avoid using a heap?
- *    ➤ No, heap is required for optimality in O(N log N). Without it, solution becomes brute-force.
+ *    No, heap is required for optimality in O(N log N). Without it, solution becomes brute-force.
  * 3. Can this be parallelized?
- *    ➤ Only partially. Final result is inherently sequential due to dependency.
+ *    Only partially. Final result is inherently sequential due to dependency.
  * LeetCode Contest Rating: 1482
  */
 public class MinimumCostToConnectSticks {

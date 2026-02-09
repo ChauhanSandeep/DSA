@@ -63,39 +63,44 @@ public class FlattenTree {
         printFlattenedList(root);
     }
 
+    public void flatten(Node root) {
+        flattenAndReturnTail(root);
+    }
+
     /**
-     * This method flattens the binary tree into a linked list in-place.
-     * The left child of each node will be set to null, and the right child will contain the next node in the preorder traversal.
+     * Recursively flattens the tree rooted at 'node' and returns the tail of the
+     * flattened list.
      *
-     * @param node The root node of the binary tree.
+     * Idea:
+     * - Recursively flatten left and right subtrees.
+     * - If there is a left subtree:
+     *     - Attach the flattened left list between current node and flattened right list.
+     *     - Move left list to the right and set left to null.
      */
-    public void flatten(Node node) {
-        // Base case: if the node is null or it's a leaf node, no flattening needed
-        if (node == null) return;
-
-        // If the node has a left child, we flatten the left subtree
-        if (node.left != null) {
-            flatten(node.left); // Recursively flatten the left subtree
-
-            // Store the original right subtree
-            Node originalRightNode = node.right;
-
-            // Move the left subtree to the right
-            node.right = node.left;
-            node.left = null; // Set the left child to null
-
-            // Find the last node of the new right subtree (which was the left subtree)
-            Node currentRightNode = node.right;
-            while (currentRightNode.right != null) {
-                currentRightNode = currentRightNode.right;
-            }
-
-            // Attach the original right subtree to the end of the new right subtree
-            currentRightNode.right = originalRightNode;
+    private Node flattenAndReturnTail(Node node) {
+        if (node == null) {
+            return null;
         }
 
-        // Recursively flatten the right subtree
-        flatten(node.right);
+        // Flatten left and right subtrees
+        Node leftTail = flattenAndReturnTail(node.left);
+        Node rightTail = flattenAndReturnTail(node.right);
+
+        // If there was a left subtree, we shuffle the connections
+        if (leftTail != null) {
+            leftTail.right = node.right; // attach original right to end of left list
+            node.right = node.left;      // move left list to the right
+            node.left = null;            // set left to null
+        }
+
+        // Return the tail of the flattened list for this subtree
+        if (rightTail != null) {
+            return rightTail;
+        }
+        if (leftTail != null) {
+            return leftTail;
+        }
+        return node;
     }
 
     /**

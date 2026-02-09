@@ -28,8 +28,7 @@ import java.util.*;
  * **Time Complexity:** O(N) - We visit each node once in BFS.
  * **Space Complexity:** O(N) - For storing nodes in a queue and map.
  *
- * **LeetCode Link:** https://leetcode.com/problems/binary-tree-bottom-view/ (similar problem)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * **LeetCode Link:** https://www.geeksforgeeks.org/dsa/bottom-view-binary-tree/
  */
 public class BottomView {
     public static void main(String[] args) {
@@ -59,7 +58,7 @@ public class BottomView {
         if (root == null) return Collections.emptyList();
 
         // TreeMap to maintain the last node at each horizontal distance (hd)
-        Map<Integer, Integer> bottomViewMap = new TreeMap<>();
+        Map<Integer, Integer> bottomViewMap = new TreeMap<>(); // hd -> node value
         Queue<NodeWithHorizontalDistance> queue = new LinkedList<>();
 
         // Initialize root node with horizontal distance 0

@@ -59,13 +59,13 @@ public class ThreeSumClosest {
         int closestSum = 0; // Result to hold the closest sum
 
         // Iterate through each number as the first element of the triplet
-        for (int i = 0; i < len - 2; i++) {
-            int left = i + 1;
+        for (int fixedIndex = 0; fixedIndex < len - 2; fixedIndex++) {
+            int left = fixedIndex + 1;
             int right = len - 1;
 
             // Two-pointer approach to find the best pair
             while (left < right) {
-                int currentSum = nums[i] + nums[left] + nums[right];
+                int currentSum = nums[fixedIndex] + nums[left] + nums[right];
 
                 // If exact match found, return immediately
                 if (currentSum == target) {

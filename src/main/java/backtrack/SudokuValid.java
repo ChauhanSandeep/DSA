@@ -1,4 +1,4 @@
-package arrays.backtracking;
+package backtrack;
 
 /**
  * ✅ Problem: Valid Sudoku

@@ -97,4 +97,40 @@ public class LongestConsecutiveSequence {
 
         return maxSequenceLength;
     }
+
+    /**
+     * Alternative approach using sorting (O(n log n) time).
+     * Steps:
+     * 1. Sort the array.
+     * 2. Iterate through sorted array, counting consecutive sequences.
+     * 3. Handle duplicates by skipping them.
+     * 4. Track and return the maximum sequence length.
+     * 
+     * Time Complexity: O(n log n) due to sorting
+     * Space Complexity: O(1) if sorting in-place
+     */
+    public int longestConsecutiveSorting(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        java.util.Arrays.sort(nums);
+        int maxLength = 1;
+        int currentLength = 1;
+
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1]) {
+                // Duplicate: skip counting.
+                continue;
+            }
+            if (nums[i] == nums[i - 1] + 1) {
+                currentLength++;
+            } else {
+                currentLength = 1;
+            }
+            maxLength = Math.max(maxLength, currentLength);
+        }
+
+        return maxLength;
+    }
 }

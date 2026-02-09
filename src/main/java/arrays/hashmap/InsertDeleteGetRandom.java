@@ -49,13 +49,13 @@ public class InsertDeleteGetRandom {
  */
 class RandomizedSet {
   private final List<Integer> elements;         // Stores values for random access
-  private final Map<Integer, Integer> indexMap; // Maps value -> index in elements
+  private final Map<Integer, Integer> valueToIndexMap; // value -> index in elements
   private final Random random;                  // Random number generator
 
   /** Constructor to initialize data structures. */
   public RandomizedSet() {
     this.elements = new ArrayList<>();
-    this.indexMap = new HashMap<>();
+    this.valueToIndexMap = new HashMap<>();
     this.random = new Random();
   }
 
@@ -68,10 +68,10 @@ class RandomizedSet {
    * Space: O(1)
    */
   public boolean insert(int val) {
-    if (indexMap.containsKey(val)) {
+    if (valueToIndexMap.containsKey(val)) {
       return false;
     }
-    indexMap.put(val, elements.size());
+    valueToIndexMap.put(val, elements.size());
     elements.add(val);
     return true;
   }
@@ -89,20 +89,20 @@ class RandomizedSet {
    * Space: O(1)
    */
   public boolean remove(int val) {
-    if (!indexMap.containsKey(val)) {
+    if (!valueToIndexMap.containsKey(val)) {
       return false;
     }
 
-    int indexToRemove = indexMap.get(val);
+    int indexToRemove = valueToIndexMap.get(val);
     int lastElement = elements.get(elements.size() - 1);
 
     // Move last element into the position of the element to be removed
     elements.set(indexToRemove, lastElement);
-    indexMap.put(lastElement, indexToRemove);
+    valueToIndexMap.put(lastElement, indexToRemove);
 
     // Remove last element and clean up map
     elements.remove(elements.size() - 1);
-    indexMap.remove(val);
+    valueToIndexMap.remove(val);
 
     return true;
   }

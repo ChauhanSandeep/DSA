@@ -77,7 +77,8 @@ public class FactorsCombination {
      * Key Insight: Start from minFactor (not 2 each time) to maintain non-decreasing order
      * and avoid duplicates like [2,3] and [3,2].
      *
-     * Time Complexity: O(2^log n) - pruned by factorization tree structure
+     * Time Complexity: O(2^log n)
+     * - Time complexity is not 2^n because the depth is not n. It's divided in each step by factors.
      * Space Complexity: O(log n) - recursion depth limited by number of prime factors
      *
      * @param remainingTarget The number still to be factorized

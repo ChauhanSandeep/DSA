@@ -86,7 +86,6 @@ Arrays.stream(arr).sum();          // Sum all elements
 Arrays.stream(arr).max().getAsInt();  // Find maximum
 Arrays.stream(arr).min().getAsInt();  // Find minimum
 Arrays.stream(arr).average().getAsDouble();  // Calculate average
-Arrays.stream(arr).count();        // Count elements
 ```
 
 #### Array Comparison
@@ -121,7 +120,6 @@ double x = Double.parseDouble(str); // String to double
 
 ``` java
 String s = String.valueOf(num);    // Any number to String
-String s = Integer.toString(num);  // Int to String
 ```
 
 #### Character-Number Conversions
@@ -156,14 +154,12 @@ List<String> list = List.of("a", "b", "c");  // Immutable (Java 9+)
 *Sort lists in various orders - O(n log n)*
 
 ``` java
-list.sort(Comparator.naturalOrder());  // Sort in ascending order
-list.sort(Comparator.reverseOrder());  // Sort in descending order
 list.sort((a, b) -> a.getAge() - b.getAge()); // Sort in ascending age
 
 Collections.sort(list);  // Sort using natural ordering
-Collections.reverse(list);  // Reverse list order - O(n)
-
 Collections.sort(list, (a, b) -> Integer.compare(a, b));  // Custom comparator, sort ascending
+
+Collections.reverse(list);  // Reverse list order - O(n)
 ```
 
 #### Utilities
@@ -209,7 +205,6 @@ set1.removeAll(set2);   // Difference: remove elements in set2
 List<Integer> prevValue = map.putIfAbsent(key, new ArrayList<>());  // Add key only if absent
 map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);  // Compute and add in one step
 Integer updated = map.computeIfPresent(key, (k, v) -> v + 1);  // Update only if key exists
-Integer count = map.merge(key, 1, Integer::sum);  // Merge values, perfect for frequency counting - O(1)
 Integer count = map.getOrDefault(key, 0);  // Get value or return default - O(1)
 ```
 
@@ -284,10 +279,19 @@ Different implementations: LinkedList, ArrayDeque:
 
 ``` java
 Deque<Integer> deque = new ArrayDeque<>();
+
+// Add elements
+deque.offer(x);         // Add to back (same as offerLast)
 deque.offerFirst(x);    // Add to front
 deque.offerLast(x);     // Add to back
+
+// Remove elements
+deque.poll();           // Remove from front (same as pollFirst)
 deque.pollFirst();      // Remove from front
 deque.pollLast();       // Remove from back
+
+// View elements (no removal)
+deque.peek();           // View front (same as peekFirst)
 deque.peekFirst();      // View front
 deque.peekLast();       // View back
 ```
@@ -387,11 +391,11 @@ int idx = s.indexOf(substring);
 int lastIdx = s.lastIndexOf(substring);   
 // returns int (last index or -1) – O(n * m)
 
-String r = s.replace(oldCharSequence, newCharSequence);   
-// returns String (new), replaces all occurrences of oldCharSequence with newCharSequence – O(n)
-
 String r = s.replaceFirst(oldCharSequence, newCharSequence);
 // returns String (new), replaces first occurrence of oldCharSequence with newCharSequence – O(n)
+
+String r = s.replace(oldCharSequence, newCharSequence);   
+// returns String (new), replaces all occurrences of oldCharSequence with newCharSequence – O(n)
 
 String r2 = s.replaceAll(regex, replacement); 
 // returns String (new), regex-based replace – O(n)*
@@ -400,7 +404,7 @@ String[] parts = s.split("\\s+");
 // returns String[] – O(n)*
 
 String joined = String.join(", ", list);  
-// returns String – O(n)
+// returns comma-separated String – O(n)
 ```
 
 #### StringBuilder
@@ -408,9 +412,9 @@ String joined = String.join(", ", list);
 
 ``` java
 StringBuilder sb = new StringBuilder();
-sb.append(str);                // Append string
-sb.insert(index, str);         // Insert at position
-sb.deleteCharAt(index);        // Delete character
+sb.append(str);                // Append string - O(1) amortized
+sb.insert(index, str);         // Insert at position - O(n) due to shifting
+sb.deleteCharAt(index);        // Delete character - O(n) due to shifting
 sb.reverse();                  // Reverse string - O(n)
 sb.toString();                 // Convert to String - O(n)
 ```

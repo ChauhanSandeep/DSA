@@ -97,7 +97,20 @@ public class RemoveParenthesis {
     private Set<String> validExpressions = new HashSet<>();
 
     /**
-     * Main method to be called to remove invalid parentheses.
+     * DFS based main method to be called to remove invalid parentheses.
+     * 
+     * Steps:
+     * 1. Calculate the number of misplaced '(' and ')' parentheses.
+     * 2. Use DFS to explore all possible strings by either including or excluding each character.
+     * 3. Only include a ')' if it does not exceed the number of '(' included
+     * 4. When the end of the string is reached, check if all misplaced parentheses have been removed.
+     5. If valid, add to results.
+     6. Use backtracking to explore other possibilities.
+     7. Return all valid expressions found.
+     * 
+     * Time complexity: O(2^N) in the worst case.
+     *     Because for each character, we have two choices: include it or exclude it.
+     * Space complexity: O(2^N) for storing results and recursion stack.
      */
     public List<String> removeInvalidParenthesesImproved(String input) {
         int misplacedOpen = 0, misplacedClose = 0;
@@ -121,17 +134,6 @@ public class RemoveParenthesis {
         return new ArrayList<>(validExpressions);
     }
 
-    /**
-     * Recursive DFS to try out all combinations by removing misplaced parentheses.
-     *
-     * @param input            Original string
-     * @param index            Current index in the string
-     * @param openCount        Count of open '(' in the current path
-     * @param closeCount       Count of close ')' in the current path
-     * @param openToRemove     Number of '(' left to remove
-     * @param closeToRemove    Number of ')' left to remove
-     * @param currentExpression Current state of the expression being built
-     */
     private void dfs(String input, int index, int openCount, int closeCount,
         int openToRemove, int closeToRemove, StringBuilder currentExpression) {
 

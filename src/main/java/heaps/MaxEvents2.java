@@ -69,14 +69,14 @@ public class MaxEvents2 {
     Arrays.sort(events, (a, b) -> (a[0] != b[0]) ? Integer.compare(a[0], b[0]) : Integer.compare(a[1], b[1]));
 
     this.eventCount = events.length;
-    this.memoTable = new int[eventCount][k + 1]; // memo[i][j] = max value from event i with j slots left
+    this.memoTable = new int[eventCount][k + 1]; // memo[i][j] = max value from i-th event with j events left
 
     // Initialize DP with -1 (uncomputed state)
     for (int[] row : memoTable) {
       Arrays.fill(row, -1);
     }
 
-    computeMax(events, k, 0);
+    computeMaxRec(events, k, 0);
     return memoTable[0][k]; // Start from first event with k slots available
   }
 
@@ -88,7 +88,7 @@ public class MaxEvents2 {
    * @param index     Current index in event list.
    * @return Maximum value obtainable from current state.
    */
-  private int computeMax(int[][] events, int allowedEvents, int index) {
+  private int computeMaxRec(int[][] events, int allowedEvents, int index) {
     // Base cases
       if (index >= eventCount || allowedEvents == 0) {
           return 0;
@@ -98,11 +98,11 @@ public class MaxEvents2 {
       }
 
     // Case 1: Skip current event
-    int maxIfSkipped = computeMax(events, allowedEvents, index + 1);
+    int maxIfSkipped = computeMaxRec(events, allowedEvents, index + 1);
 
     // Case 2: Attend current event
     int nextIndex = findNextAvailableEvent(events, events[index][1] + 1); // next available event starts after current ends
-    int maxIfAttended = events[index][2] + computeMax(events, allowedEvents - 1, nextIndex);
+    int maxIfAttended = events[index][2] + computeMaxRec(events, allowedEvents - 1, nextIndex);
 
     // Store and return result
     return memoTable[index][allowedEvents] = Math.max(maxIfSkipped, maxIfAttended);
