@@ -87,33 +87,33 @@ public class MaxBinaryRectangle {
      * For each bar, we find the shortest bar to the left and right, and calculate the area using the height of the popped bar.
      */
     private int computeLargestHistogramArea(List<Integer> heights) {
-        Stack<Integer> stack = new Stack<>();
-        stack.push(-1); // Sentinel value to avoid empty stack issues
+        Stack<Integer> monotonicStack = new Stack<>();
+        monotonicStack.push(-1); // Sentinel value to avoid empty stack issues
 
         int maxArea = 0;
 
         for (int i = 0; i < heights.size(); i++) {
-            while (stack.peek() != -1 && heights.get(stack.peek()) >= heights.get(i)) {
-                maxArea = Math.max(maxArea, computeArea(heights, stack, i));
+            while (monotonicStack.peek() != -1 && heights.get(monotonicStack.peek()) >= heights.get(i)) {
+                int middleIndex = monotonicStack.pop();
+                int leftIndex = monotonicStack.peek();
+                maxArea = Math.max(maxArea, computeArea(heights, leftIndex, middleIndex, i));
             }
-            stack.push(i);
+            monotonicStack.push(i);
         }
 
         // Process remaining elements in stack
-        while (stack.peek() != -1) {
-            maxArea = Math.max(maxArea, computeArea(heights, stack, heights.size()));
+        while (monotonicStack.peek() != -1) {
+            int middleIndex = monotonicStack.pop();
+            int leftIndex = monotonicStack.peek();
+            maxArea = Math.max(maxArea, computeArea(heights, leftIndex, middleIndex, heights.size()));
         }
 
         return maxArea;
     }
 
-    /**
-     * Computes the area of a rectangle given a popped index from the stack.
-     */
-    private int computeArea(List<Integer> heights, Stack<Integer> stack, int rightBoundary) {
-        int heightIndex = stack.pop();
-        int height = heights.get(heightIndex);
-        int width = rightBoundary - stack.peek() - 1; // Compute width based on next left boundary
+    private int computeArea(List<Integer> heights, int leftIndex, int middleIndex, int rightIndex) {
+        int height = heights.get(middleIndex);
+        int width = rightIndex - leftIndex - 1; // Compute width based on next left boundary
         return width * height;
     }
 }

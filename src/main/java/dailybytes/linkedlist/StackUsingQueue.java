@@ -11,18 +11,19 @@ import java.util.Queue;
  * - Time Complexity: O(n) for pop and O(1) for push and peek operations.
  * - Space Complexity: O(n)
  *
- * LeetCode Problem Link: https://leetcode.com/problems/implement-stack-using-queues/
+ * LeetCode Problem Link:
+ * https://leetcode.com/problems/implement-stack-using-queues/
  * LeetCode Contest Rating: Not available (not a contest problem)
  */
-public class QueueStack {
+public class StackUsingQueue {
     private Queue<Integer> queue;
 
-    public QueueStack() {
+    public StackUsingQueue() {
         this.queue = new LinkedList<>();
     }
 
     public static void main(String[] args) {
-        QueueStack myStack = new QueueStack();
+        StackUsingQueue myStack = new StackUsingQueue();
         myStack.push(1);
         myStack.push(2);
         myStack.push(3);
@@ -37,6 +38,7 @@ public class QueueStack {
 
     /**
      * Pushes an element onto the stack.
+     * 
      * @param element The element to be pushed.
      */
     public void push(int element) {
@@ -45,6 +47,7 @@ public class QueueStack {
 
     /**
      * Pops an element from the stack.
+     * 
      * @return The popped element.
      * @throws RuntimeException if the stack is empty.
      */
@@ -63,6 +66,7 @@ public class QueueStack {
 
     /**
      * Peeks the top element of the stack.
+     * 
      * @return The top element of the stack.
      */
     public int peek() {
