@@ -6,8 +6,10 @@ import java.util.*;
  * LeetCode: https://leetcode.com/problems/remove-invalid-parentheses/
  *
  * Problem:
- * Given a string containing parentheses and characters, remove the minimum number
- * of invalid parentheses to make the expression valid. Return all possible results.
+ * Given a string containing parentheses and characters, remove the minimum
+ * number
+ * of invalid parentheses to make the expression valid. Return all possible
+ * results.
  *
  * Example
  *
@@ -15,7 +17,7 @@ import java.util.*;
  * Output: ["(())()","()()()"]
  * LeetCode Contest Rating: Not available (not a contest problem)
  */
-public class RemoveParenthesis {
+public class RemoveInvalidParenthesis {
 
     public static void main(String[] args) {
         String input = "(a)())()";
@@ -26,14 +28,15 @@ public class RemoveParenthesis {
     /**
      * Finds all valid expressions by removing the fewest invalid parentheses.
      * Steps:
-     * 1. Use BFS to explore all possible strings by removing one parenthesis at a time.
+     * 1. Use BFS to explore all possible strings by removing one parenthesis at a
+     * time.
      * 2. Check if the current string is valid (balanced parentheses).
      * 3. If valid, add to results and mark that we found a valid expression
      * 4. If valid expression found at current level, do not explore further levels.
      * 5. Use a set to avoid processing the same string multiple times.
      * 
      * Time complexity: O(2^N) in the worst case.
-     *      Because for each character, we have two choices: include it or exclude it.
+     * Because for each character, we have two choices: include it or exclude it.
      * Space complexity: O(2^N) for storing results and visited states.
      * 
      * @param str The input string containing parentheses.
@@ -41,7 +44,8 @@ public class RemoveParenthesis {
      */
     public static List<String> removeInvalidParentheses(String str) {
         List<String> validResults = new ArrayList<>();
-        if (str == null) return validResults;
+        if (str == null)
+            return validResults;
 
         Set<String> visited = new HashSet<>();
         Queue<String> queue = new LinkedList<>();
@@ -59,12 +63,14 @@ public class RemoveParenthesis {
             }
 
             // If we've found valid expressions, we stop processing further removals
-            if (foundValidExpression) continue;
+            if (foundValidExpression)
+                continue;
 
             // Generate all possible strings by removing one parenthesis at a time
             for (int i = 0; i < currentExpression.length(); i++) {
                 char currentChar = currentExpression.charAt(i);
-                if (currentChar != '(' && currentChar != ')') continue;
+                if (currentChar != '(' && currentChar != ')')
+                    continue;
 
                 String nextCandidate = currentExpression.substring(0, i) + currentExpression.substring(i + 1);
                 if (!visited.contains(nextCandidate)) {
@@ -85,9 +91,11 @@ public class RemoveParenthesis {
     private static boolean isBalancedParentheses(String str) {
         int openCount = 0;
         for (char c : str.toCharArray()) {
-            if (c == '(') openCount++;
+            if (c == '(')
+                openCount++;
             if (c == ')') {
-                if (openCount == 0) return false;
+                if (openCount == 0)
+                    return false;
                 openCount--;
             }
         }
@@ -101,15 +109,17 @@ public class RemoveParenthesis {
      * 
      * Steps:
      * 1. Calculate the number of misplaced '(' and ')' parentheses.
-     * 2. Use DFS to explore all possible strings by either including or excluding each character.
+     * 2. Use DFS to explore all possible strings by either including or excluding
+     * each character.
      * 3. Only include a ')' if it does not exceed the number of '(' included
-     * 4. When the end of the string is reached, check if all misplaced parentheses have been removed.
-     5. If valid, add to results.
-     6. Use backtracking to explore other possibilities.
-     7. Return all valid expressions found.
+     * 4. When the end of the string is reached, check if all misplaced parentheses
+     * have been removed.
+     * 5. If valid, add to results.
+     * 6. Use backtracking to explore other possibilities.
+     * 7. Return all valid expressions found.
      * 
      * Time complexity: O(2^N) in the worst case.
-     *     Because for each character, we have two choices: include it or exclude it.
+     * Because for each character, we have two choices: include it or exclude it.
      * Space complexity: O(2^N) for storing results and recursion stack.
      */
     public List<String> removeInvalidParenthesesImproved(String input) {
@@ -135,7 +145,7 @@ public class RemoveParenthesis {
     }
 
     private void dfs(String input, int index, int openCount, int closeCount,
-        int openToRemove, int closeToRemove, StringBuilder currentExpression) {
+            int openToRemove, int closeToRemove, StringBuilder currentExpression) {
 
         // If we've processed all characters
         if (index == input.length()) {
@@ -151,10 +161,10 @@ public class RemoveParenthesis {
         // Option 1: Discard current character if it's a parenthesis and can be removed
         if (currentChar == '(' && openToRemove > 0) {
             dfs(input, index + 1, openCount, closeCount,
-                openToRemove - 1, closeToRemove, currentExpression);
+                    openToRemove - 1, closeToRemove, currentExpression);
         } else if (currentChar == ')' && closeToRemove > 0) {
             dfs(input, index + 1, openCount, closeCount,
-                openToRemove, closeToRemove - 1, currentExpression);
+                    openToRemove, closeToRemove - 1, currentExpression);
         }
 
         // Option 2: Include current character
