@@ -4,8 +4,10 @@ package greedy;
  * Problem: Seats - Minimum Moves to Aggregate All Occupied Seats
  *
  * Given a row of seats represented by '.' (empty) and 'X' (occupied),
- * find the minimum moves required to aggregate all 'X' together in a contiguous block.
- * A move consists of moving a person one position left or right to an empty seat.
+ * find the minimum moves required to aggregate all 'X' together in a contiguous
+ * block.
+ * A move consists of moving a person one position left or right to an empty
+ * seat.
  *
  * Example:
  * Input: "....X..XX...X.."
@@ -16,16 +18,18 @@ package greedy;
  *
  * Follow-up Questions (FAANG-style):
  * 1. What if we want to minimize the maximum distance any person has to move?
- *    - Use minimax approach or binary search on the answer with feasibility check.
- * 2. What if there are different types of people and they need to be grouped separately?
- *    - Apply the same median-based approach for each group independently.
+ * - Use minimax approach or binary search on the answer with feasibility check.
+ * 2. What if there are different types of people and they need to be grouped
+ * separately?
+ * - Apply the same median-based approach for each group independently.
  * 3. How would you handle a 2D grid of seats?
- *    - Apply median approach in both dimensions, treat as separate 1D problems.
- *    - Related: https://leetcode.com/problems/minimum-moves-to-equal-array-elements/
+ * - Apply median approach in both dimensions, treat as separate 1D problems.
+ * - Related:
+ * https://leetcode.com/problems/minimum-moves-to-equal-array-elements/
  * 4. What if moving has different costs based on distance?
- *    - Use weighted median or dynamic programming approach.
+ * - Use weighted median or dynamic programming approach.
  * 5. What if we can only move people to specific designated positions?
- *    - Model as minimum cost bipartite matching problem using Hungarian algorithm.
+ * - Model as minimum cost bipartite matching problem using Hungarian algorithm.
  * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class MinimumMovesToAggregateSeats {
@@ -35,30 +39,38 @@ public class MinimumMovesToAggregateSeats {
     System.out.println(new MinimumMovesToAggregateSeats().calculateMinimumMoves(seatingConfiguration));
 
     // Test edge cases
-    System.out.println(new MinimumMovesToAggregateSeats().calculateMinimumMoves("......"));     // 0 (no occupied seats)
-    System.out.println(new MinimumMovesToAggregateSeats().calculateMinimumMoves("X"));          // 0 (single seat)
+    System.out.println(new MinimumMovesToAggregateSeats().calculateMinimumMoves("......")); // 0 (no occupied seats)
+    System.out.println(new MinimumMovesToAggregateSeats().calculateMinimumMoves("X")); // 0 (single seat)
     System.out.println(
-        new MinimumMovesToAggregateSeats().calculateMinimumMoves("XXX"));        // 0 (already aggregated)
+        new MinimumMovesToAggregateSeats().calculateMinimumMoves("XXX")); // 0 (already aggregated)
   }
 
   private static final int MODULO = 10000003;
 
-
   /**
-   * Greedy Approach: Median-Based Aggregation
+   * Greedy Approach: Median-Based Simplified Formula
    *
-   * The key insight is that the median minimizes the sum of absolute deviations from a set of points.
-   * This is because moving towards the median reduces the total distance more effectively than any other point.
+   * Key Insight:
+   * The median minimizes the sum of absolute deviations. To form a contiguous
+   * block,
+   * each seat needs to move to the median position minus its offset from the
+   * median index.
    *
-   * Algorithm: Direct Calculation without Extra Storage
-   * Steps:
-   * 1.Iterate through the string and count the total number of occupied seats ('X').
-   * 2. Iterate again to find the position of the median occupied seat (the seat at index totalOccupiedSeats / 2 among all 'X').
-   * 3. For each occupied seat to the left and right of the median occupied seat, calculate the moves needed to bring
-   * them next to the median, summing the distances while skipping empty seats.
+   * Formula: For each occupied seat at index i with position p[i]:
+   * moves = |p[i] - median_position| - |i - median_index|
    *
-   * Time Complexity: O(n)
-   * Space Complexity: O(1) - constant space optimization
+   * This accounts for both:
+   * 1. Distance to median position
+   * 2. Offset needed to form consecutive seats (subtract relative index distance)
+   *
+   * Algorithm:
+   * 1. Collect all occupied seat positions
+   * 2. Find median position (position of median occupied seat)
+   * 3. Apply formula: sum(|pos[i] - median_pos| - |i - median_idx|)
+   *
+   * Time Complexity: O(n) - single pass to collect positions, single pass to
+   * calculate
+   * Space Complexity: O(k) - where k is number of occupied seats
    *
    * @param seatingConfiguration string representing seat row
    * @return minimum number of moves required
@@ -68,90 +80,73 @@ public class MinimumMovesToAggregateSeats {
       return 0;
     }
 
-    // Count total occupied seats
-    int totalOccupiedSeats = countOccupiedSeats(seatingConfiguration);
-    if (totalOccupiedSeats <= 1) {
+    // Collect all occupied seat positions
+    int[] occupiedPositions = getOccupiedPositions(seatingConfiguration);
+
+    if (occupiedPositions.length <= 1) {
       return 0;
     }
 
-    // Find median position in single pass
-    int medianRank = totalOccupiedSeats / 2;
-    int medianPosition = findMedianPosition(seatingConfiguration, medianRank);
+    int medianIndex = occupiedPositions.length / 2; // Median index in the occupied positions array
+    int medianPosition = occupiedPositions[medianIndex];
 
-    return calculateMoves(seatingConfiguration, medianPosition, totalOccupiedSeats);
+    return calculateMovesUsingMedian(occupiedPositions, medianIndex, medianPosition);
   }
 
   /**
-   * Counts total number of occupied seats in the configuration.
+   * Collects all positions where seats are occupied.
    *
    * @param seatingConfiguration string representing seat row
-   * @return count of occupied seats
+   * @return array of occupied positions
    */
-  private int countOccupiedSeats(String seatingConfiguration) {
+  private int[] getOccupiedPositions(String seatingConfiguration) {
+    // First count to allocate exact array size
     int count = 0;
     for (int i = 0; i < seatingConfiguration.length(); i++) {
       if (isOccupiedSeat(seatingConfiguration.charAt(i))) {
         count++;
       }
     }
-    return count;
-  }
 
-  /**
-   * Finds the position of the median occupied seat.
-   *
-   * @param seatingConfiguration string representing seat row
-   * @param medianRank the rank of median element (0-based)
-   * @return position of median occupied seat
-   */
-  private int findMedianPosition(String seatingConfiguration, int medianRank) {
-    int currentRank = 0;
-
-    for (int position = 0; position < seatingConfiguration.length(); position++) {
-      if (isOccupiedSeat(seatingConfiguration.charAt(position))) {
-        if (currentRank == medianRank) {
-          return position;
-        }
-        currentRank++;
+    // Collect positions
+    int[] positions = new int[count];
+    int index = 0;
+    for (int i = 0; i < seatingConfiguration.length(); i++) {
+      if (isOccupiedSeat(seatingConfiguration.charAt(i))) {
+        positions[index++] = i;
       }
     }
 
-    return -1; // Should never reach here with valid input
+    return positions;
   }
 
   /**
-   * Calculates total moves required to form a contiguous block centered around median position.
+   * Calculates total moves using simplified median formula.
    *
-   * Maps each occupied seat to its target position in the contiguous block.
-   * The contiguous block is formed with the median seat at the center, and all other seats
-   * are mapped to consecutive positions around it.
+   * For each seat: distance_to_median - distance_of_index_from_median_index
+   * This directly computes how much extra movement is needed beyond reaching
+   * median
+   * to form consecutive seats.
    *
-   * @param seating string representing seat row
-   * @param medianPosition the center position for aggregation
-   * @param totalOccupiedSeats total number of occupied seats
+   * @param positions      array of occupied seat positions
+   * @param medianIndex    index of median seat in the array
+   * @param medianPosition position of median seat in the row
    * @return total number of moves required
    */
-  private int calculateMoves(String seating, int medianPosition, int totalOccupiedSeats) {
+  private int calculateMovesUsingMedian(int[] positions, int medianIndex, int medianPosition) {
     long totalMoves = 0;
 
-    // Calculate the starting position of the contiguous block
-    // The block should be centered around the median position
-    int blockStartPosition = medianPosition - (totalOccupiedSeats / 2);
+    for (int i = 0; i < positions.length; i++) {
+      // Distance from current position to median position
+      int distanceToMedian = Math.abs(positions[i] - medianPosition);
 
-    int targetIndexInBlock = 0; // Index within the contiguous block (0, 1, 2, ...)
+      // Distance of current index from median index (offset in consecutive
+      // arrangement)
+      int indexOffset = Math.abs(i - medianIndex);
 
-    // Iterate through all positions and map occupied seats to target positions
-    for (int currentPosition = 0; currentPosition < seating.length(); currentPosition++) {
-      if (isOccupiedSeat(seating.charAt(currentPosition))) {
-        // Calculate target position in the contiguous block
-        int targetPosition = blockStartPosition + targetIndexInBlock;
-
-        // Add the absolute distance (number of moves required)
-        long moves = Math.abs(currentPosition - targetPosition);
-        totalMoves = (totalMoves + moves) % MODULO;
-
-        targetIndexInBlock++; // Move to next position in the contiguous block
-      }
+      // Actual moves needed = distance to median - offset already accounted for
+      long moves = distanceToMedian - indexOffset;
+      totalMoves = (totalMoves + moves) % MODULO;
     }
 
     return (int) totalMoves;

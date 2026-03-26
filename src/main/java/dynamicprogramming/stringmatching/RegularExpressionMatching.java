@@ -115,6 +115,7 @@ public class RegularExpressionMatching {
 
           // Option 2: Match ONE OR MORE occurrences
           if (charMatches(sChar, prevPatternChar)) {
+            // if current character matches the previous character, then we can match one or more occurrences
             dp[strIndex][patternIndex] = dp[strIndex][patternIndex] || dp[strIndex - 1][patternIndex];
           }
         } else {

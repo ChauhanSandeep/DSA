@@ -58,10 +58,6 @@ public class SortTheMatrixDiagonally {
      * @param mat input matrix to sort diagonally
      * @return matrix with sorted diagonals
      */
-    /**
-     * Using priority queue for each diagonal
-     * Time Complexity: O(m*n*log(min(m,n))), Space Complexity: O(m*n)
-     */
     public int[][] diagonalSortPriorityQueue(int[][] mat) {
         int rows = mat.length;
         int cols = mat[0].length;

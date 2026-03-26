@@ -5,57 +5,73 @@ import java.util.*;
 /**
  * Problem: Shortest Path in a Grid with Obstacles Elimination
  *
- * You are given an m x n integer matrix grid where each cell is either 0 (empty) or 1 (obstacle).
- * You can move up, down, left, or right from and to an empty cell. Return the minimum number of steps
- * to walk from the upper left corner (0, 0) to the lower right corner (m - 1, n - 1) given that
- * you can eliminate at most k obstacles. If it is not possible to find such walk, return -1.
+ * You are given an m x n integer matrix grid where each cell is either 0
+ * (empty) or 1 (obstacle).
+ * You can move up, down, left, or right from and to an empty cell. Return the
+ * minimum number of steps
+ * to walk from the upper left corner (0, 0) to the lower right corner (m - 1, n
+ * - 1) given that
+ * you can eliminate at most k obstacles. If it is not possible to find such
+ * walk, return -1.
  *
  * Example:
  * Input: grid = [
- *      [0,0,0],
- *      [1,1,0],
- *      [0,0,0],
- *      [0,1,1],
- *      [0,0,0]
+ * [0,0,0],
+ * [1,1,0],
+ * [0,0,0],
+ * [0,1,1],
+ * [0,0,0]
  * ],
  * k = 1
  * Output: 6
  * Explanation: The shortest path without eliminating any obstacle is 10.
  * The shortest path with one obstacle elimination at position (3,2) is 6.
  *
- * LeetCode: https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination
+ * LeetCode:
+ * https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination
  *
  * Follow-up Questions:
  * 1. What if we need to find all possible shortest paths?
- *    Answer: Modify BFS to track all parent nodes and reconstruct all paths.
+ * Answer: Modify BFS to track all parent nodes and reconstruct all paths.
  *
  * 2. How would you handle negative weights (rewards for eliminating obstacles)?
- *    Answer: Use Dijkstra's algorithm instead of BFS for weighted shortest path.
+ * Answer: Use Dijkstra's algorithm instead of BFS for weighted shortest path.
  *
  * 3. What if obstacles have different elimination costs?
- *    Answer: Extend state to track remaining budget and use priority queue.
- *    Related: https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/
+ * Answer: Extend state to track remaining budget and use priority queue.
+ * Related:
+ * https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/
  *
  * @author Sandeep
- * LeetCode Contest Rating: 1967
+ *         LeetCode Contest Rating: 1967
  */
 public class ShortestPathInAGridWithObstaclesElimination {
 
     /**
-     * Finds shortest path using BFS with state tracking for obstacle eliminations.
+     * Finds shortest path using BFS with optimized state tracking.
      *
      * Algorithm:
-     * 1. Use BFS with state (row, col, obstacles_eliminated)
-     * 2. Track visited states to avoid revisiting same configuration
-     * 3. For each cell, try moving in all 4 directions
-     * 4. If next cell is obstacle, check if we can eliminate it (k > 0)
-     * 5. Return steps when we reach destination, -1 if impossible
+     * 1. Use BFS with state (row, col, obstacles_remaining)
+     * 2. Track the maximum remaining eliminations seen at each cell
+     * 3. Only process a cell if we reach it with MORE remaining eliminations than
+     * before
+     * 4. This allows revisiting cells with better states (more flexibility)
+     * 5. For each cell, try moving in all 4 directions
+     * 6. If next cell is obstacle, check if we can eliminate it (k > 0)
+     * 7. Return steps when we reach destination, -1 if impossible
      *
-     * Time Complexity: O(m * n * k) where m, n are grid dimensions and k is max eliminations
-     * Space Complexity: O(m * n * k) for visited state tracking
+     * Insights: Instead of tracking all (row, col, k) states, we only track
+     * the best k value seen at each (row, col). If we reach a cell with more
+     * remaining
+     * eliminations, that's a strictly better state worth exploring.
+     *
+     * Time Complexity: O(m * n * k) where m, n are grid dimensions and k is max
+     * eliminations
+     * Space Complexity: O(m * n) for tracking max remaining eliminations at each
+     * cell
      *
      * @param grid 2D grid with 0s (empty) and 1s (obstacles)
-     * @param k Maximum number of obstacles that can be eliminated
+     * @param k    Maximum number of obstacles that can be eliminated
      * @return Minimum steps to reach destination, -1 if impossible
      */
     public int shortestPath(int[][] grid, int k) {
@@ -71,16 +87,20 @@ public class ShortestPathInAGridWithObstaclesElimination {
             return rows + cols - 2;
         }
 
-        // BFS with state tracking
+        // BFS with optimized state tracking
         Queue<State> queue = new LinkedList<>();
-        boolean[][][] visited = new boolean[rows][cols][k + 1]; // visited[row][col][remaining_k] = true if visited
+        // Track the maximum remaining eliminations we've seen at each cell
+        int[][] maxRemainingAt = new int[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            Arrays.fill(maxRemainingAt[i], -1); // -1 means not visited yet
+        }
 
         // Directions: up, right, down, left
-        int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        int[][] directions = { { -1, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 } };
 
         // Start from top-left corner
         queue.offer(new State(0, 0, 0, k));
-        visited[0][0][k] = true;
+        maxRemainingAt[0][0] = k;
 
         while (!queue.isEmpty()) {
             State current = queue.poll();
@@ -110,14 +130,12 @@ public class ShortestPathInAGridWithObstaclesElimination {
                     newObstaclesRemaining--;
                 }
 
-                // Check if we've visited this state before
-                if (visited[newRow][newCol][newObstaclesRemaining]) {
-                    continue;
+                // Only process this cell if we have MORE remaining eliminations than before
+                // This ensures we always keep the best state (most flexible path)
+                if (newObstaclesRemaining > maxRemainingAt[newRow][newCol]) {
+                    maxRemainingAt[newRow][newCol] = newObstaclesRemaining;
+                    queue.offer(new State(newRow, newCol, current.steps + 1, newObstaclesRemaining));
                 }
-
-                // Mark as visited and add to queue
-                visited[newRow][newCol][newObstaclesRemaining] = true;
-                queue.offer(new State(newRow, newCol, current.steps + 1, newObstaclesRemaining));
             }
         }
 

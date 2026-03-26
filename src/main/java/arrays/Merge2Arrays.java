@@ -96,9 +96,12 @@ public class Merge2Arrays {
         int temp = arr1[pointer1];
         arr1[pointer1] = arr2[pointer2];
         arr2[pointer2] = temp;
+        pointer1--;
+        pointer2++;
+      } else {
+        pointer1--; // Move left in arr1 if current element is in correct order
       }
-      pointer1--;
-      pointer2++;
+      
     }
 
     // Sort both arrays to maintain sorted order

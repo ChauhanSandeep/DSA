@@ -1,5 +1,8 @@
 package trees.binarysearchtree;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import trees.Node;
 import trees.TreeNode;
 
@@ -39,6 +42,9 @@ public class ConstructBst {
         System.out.println(root);
     }
 
+    int preorderIndex;
+    Map<Integer, Integer> inorderIndexMap;
+
     /**
      * This method constructs the binary tree using preorder and inorder traversals.
      *
@@ -68,63 +74,28 @@ public class ConstructBst {
      * @return          The root of the constructed binary tree.
      */
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        if (preorder == null || inorder == null || preorder.length == 0 || inorder.length == 0) {
-            return null; // Base case: if input arrays are empty, return null
+        preorderIndex = 0;
+        // build a hashmap to store value -> its index relations
+        inorderIndexMap = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            inorderIndexMap.put(inorder[i], i);
         }
-        // Call the helper method to build the tree
-        return buildTree(preorder, inorder, 0, inorder.length - 1, 0);
+
+        return arrayToTree(preorder, 0, preorder.length - 1);
     }
 
-    /**
-     * Helper method to recursively construct the binary tree.
-     *
-     * @param preorder   The preorder traversal array.
-     * @param inorder    The inorder traversal array.
-     * @param inorderLeftIndex     The left index of the inorder array for the current subtree.
-     * @param inorderRightIndex    The right index of the inorder array for the current subtree.
-     * @param preorderStartIndex   The current index in the preorder array.
-     * @return           The root of the current subtree.
-     */
-    private TreeNode buildTree(int[] preorder, int[] inorder, int inorderLeftIndex, int inorderRightIndex, int preorderStartIndex) {
-        // Base case: if the current segment is invalid, return null
-        if (inorderLeftIndex > inorderRightIndex || preorderStartIndex >= preorder.length) {
-            return null;
-        }
+    private TreeNode arrayToTree(int[] preorder, int left, int right) {
+        // if there are no elements to construct the tree
+        if (left > right) return null;
 
-        // Create the current node (root) using the current element from preorder
-        TreeNode rootNode = new TreeNode(preorder[preorderStartIndex]);
+        // select the preorder_index element as the root and increment it
+        int rootValue = preorder[preorderIndex++];
+        TreeNode root = new TreeNode(rootValue);
 
-        // Find the index of the current root in inorder traversal
-        int rootIndexInInorder = findIndex(inorder, preorder[preorderStartIndex]);
-
-        // Recursively build the left and right subtrees
-        // Left subtree will be constructed using elements before the root in inorder
-        TreeNode leftSubtree = buildTree(preorder, inorder, inorderLeftIndex, rootIndexInInorder - 1, preorderStartIndex + 1);
-
-        // Right subtree will be constructed using elements after the root in inorder
-        int nextPreorderStartIndex = preorderStartIndex + 1 + (rootIndexInInorder - inorderLeftIndex); // because we have already used one element for the left subtree
-        TreeNode rightSubtree = buildTree(preorder, inorder, rootIndexInInorder + 1, inorderRightIndex, nextPreorderStartIndex);
-
-        // Attach the left and right subtrees to the current root
-        rootNode.left = leftSubtree;
-        rootNode.right = rightSubtree;
-
-        return rootNode;
-    }
-
-    /**
-     * Finds the index of the target element in the given array.
-     *
-     * @param arr   The array to search in.
-     * @param target The element to find in the array.
-     * @return      The index of the target element, or -1 if not found.
-     */
-    private int findIndex(int[] arr, int target) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == target) {
-                return i; // Return the index if found
-            }
-        }
-        return -1; // Return -1 if the target is not found
+        // build left and right subtree
+        // excluding inorderIndexMap[rootValue] element because it's the root
+        root.left = arrayToTree(preorder, left, inorderIndexMap.get(rootValue) - 1);
+        root.right = arrayToTree(preorder, inorderIndexMap.get(rootValue) + 1, right);
+        return root;
     }
 }

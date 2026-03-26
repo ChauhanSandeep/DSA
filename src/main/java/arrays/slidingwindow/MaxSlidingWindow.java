@@ -38,9 +38,10 @@ public class MaxSlidingWindow {
    *
    * Steps:
    * 1. Use a Deque to store indices of elements in the current window.
-   * 2. Remove indices from the front if they are outside the window.
-   * 3. Maintain a decreasing order in the deque — remove all elements smaller than the current.
-   * 4. The front of the deque always represents the max of the current window.
+   * 2. Remove indices from the first of the deque if they are out of the current window (i - k).
+   * 3. Remove indices from the end of the deque while the current element is greater than the elements at those indices, as they cannot be the maximum if the current element is greater.
+   * 4. Maintain a decreasing order in the deque — remove all elements smaller than the current.
+   * 5. The front of the deque always holds the index of the maximum element for the current window.
    *
    * Time Complexity: O(n) — each element is added/removed from deque at most once.
    * Space Complexity: O(k) — deque holds at most `k` indices at a time.

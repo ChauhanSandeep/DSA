@@ -4,6 +4,49 @@ This document summarizes common Data Structures and Algorithms (DSA) patterns us
 
 ---
 
+## Table of Contents
+
+### Core Algorithm Patterns
+1. [Sliding Window](#1-sliding-window)
+2. [Two Pointers](#2-two-pointers)
+3. [Binary Search](#3-binary-search)
+9. [Heap / Priority Queue](#9-heap--priority-queue)
+10. [Graph Traversal - BFS](#10-graph-traversal---bfs)
+11. [Graph Traversal - DFS](#11-graph-traversal---dfs)
+12. [Union-Find (Disjoint Set)](#12-union-find-disjoint-set)
+13. [Monotonic Stack](#13-monotonic-stack)
+    - [Finding Both Next Smaller and Previous Smaller in Single Iteration](#finding-both-next-smaller-and-previous-smaller-in-single-iteration)
+14. [Fast & Slow Pointers (Floyd's Cycle Detection)](#14-fast--slow-pointers-floyds-cycle-detection)
+15. [Bit Manipulation](#15-bit-manipulation)
+16. [Segment Tree](#16-segment-tree)
+17. [Dijkstra's Algorithm](#17-dijkstras-algorithm)
+18. [Topological Sort (Kahn's Algorithm)](#18-topological-sort-kahns-algorithm)
+
+### Reference Guides
+- [Pattern Selection Guide](#pattern-selection-guide) - Problem type to pattern mapping
+- [Additional Tips](#additional-tips) - Best practices and recognition strategies
+
+### Micro-Patterns (FAANG-Level Optimizations)
+19. [Micro-Patterns Overview](#19-micro-patterns)
+    - [Index-as-Hash (Negative Marking)](#micro-pattern-index-as-hash-negative-marking)
+    - [Prefix Sum with HashMap](#micro-pattern-prefix-sum-with-hashmap)
+    - [XOR for Bit-Level Prefix Optimization](#micro-pattern-xor-for-bit-level-prefix-optimization)
+    - [Monotonic Stack for Next Greater/Smaller](#micro-pattern-monotonic-stack-for-next-greatersmaller)
+    - [Floyd's Cycle Detection as Array Index Following](#micro-pattern-floyds-cycle-detection-as-array-index-following)
+    - [Linked List Interweaving for O(1) Space Cloning](#micro-pattern-linked-list-interweaving-for-o1-space-cloning)
+    - [Linked List Reversal with Head-Insertion Method](#micro-pattern-linked-list-reversal-with-head-insertion-method)
+    - [Kadane's Running Maximum with Reset](#micro-pattern-kadanes-running-maximum-with-reset)
+    - [Two-Variable Space Optimization in DP](#micro-pattern-two-variable-space-optimization-in-dp)
+    - [Greedy Bit Manipulation with Carry Simulation](#micro-pattern-greedy-bit-manipulation-with-carry-simulation)
+    - [Sliding Window Maximum with Deque](#micro-pattern-sliding-window-maximum-with-deque)
+    - [Binary Search on Answer Space](#micro-pattern-binary-search-on-answer-space)
+    - [Fast HashMap Initialization with computeIfAbsent](#micro-pattern-fast-hashmap-initialization-with-computeifabsent)
+    - [In-Place Array Reversal with Two Pointers](#micro-pattern-in-place-array-reversal-with-two-pointers)
+    - [Math Trick - Finding Single Element with XOR](#micro-pattern-math-trick---finding-single-element-with-xor)
+    - [Sentinel Nodes for Edge Case Handling](#micro-pattern-sentinel-nodes-for-edge-case-handling)
+
+---
+
 ## 1. Sliding Window
 
 **When to use:** When you need to find a subarray or substring that satisfies a condition (like sum, distinct elements, or max/min length). Useful for contiguous sequence problems where you need to track a window of elements.
@@ -355,20 +398,31 @@ public class DisjointSet {
 - Largest Rectangle in Histogram
 - Trapping Rain Water
 
+### Monotonic Stack Cheatsheet
+
+| To Find       | Traversal Direction | Pop Condition       | Stack Property              |
+|---------------|--------------------|---------------------|-------------------------------|
+| Next Greater  | n-1 → 0            | peek ≤ current      | Monotonic Decreasing          |
+| Next Smaller  | n-1 → 0            | peek ≥ current      | Monotonic Increasing          |
+| Prev Greater  | 0 → n-1            | peek ≤ current      | Monotonic Decreasing          |
+| Prev Smaller  | 0 → n-1            | peek ≥ current      | Monotonic Increasing          |
+
+
+
 **Code snippet:**
+
 ```java
 // Find next warmer day for daily temperatures
 public int[] dailyTemperatures(int[] temperatures) {
-    int n = temperatures.length;
-    int[] result = new int[n];
-    Stack<Integer> stack = new Stack<>();  // Store indices
-    
-    for (int i = 0; i < n; i++) {
-        // Pop while current temperature is warmer
-        while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
-            int prevIndex = stack.pop();
-            result[prevIndex] = i - prevIndex;
+    int length = temperatures.length;
+    int[] result = new int[length];
+    Stack<Integer> stack = new Stack<>();  // Monotonic Decreasing Stack (stores indices)
+
+    for (int i = length - 1; i >= 0; i--) {
+        while (!stack.isEmpty() && temperatures[stack.peek()] <= temperatures[i]) {
+            stack.pop();
         }
+        result[i] = stack.isEmpty() ? 0 : stack.peek() - i;
         stack.push(i);
     }
     
@@ -746,6 +800,7 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
 | Range queries | Segment Tree, Prefix Sum |
 | Bit-level operations | Bit Manipulation |
 | Task scheduling | Topological Sort, Greedy |
+| Linked list reversal/reordering | Head-Insertion Reversal, Sentinel Nodes |
 
 ---
 
@@ -970,6 +1025,58 @@ while (curr != null) {
 **Complexity:** Time - O(n), Space - O(1) excluding result
 
 **Notes:** Alternative to HashMap approach. Three-pass algorithm. Preserves original list if needed. Key insight: `original.random.next` gives copied random node.
+
+---
+
+### Micro-Pattern: Linked List Reversal with Head-Insertion Method
+
+**Problem Context:** Reversing entire linked list, reversing a sublist between positions, or reversing in groups of k nodes.
+
+**Key Idea:** Use dummy node and head-insertion technique: repeatedly take the node after current and insert it right after prev, effectively reversing the order. This pattern is versatile and handles complete reversal, range reversal, and k-group reversal uniformly.
+
+**LeetCode Problems:**
+- [206. Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
+- [92. Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)
+- [25. Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)
+- [24. Swap Nodes in Pairs](https://leetcode.com/problems/swap-nodes-in-pairs/)
+
+**Code Snippet:**
+```java
+// Reverse sublist from position left to right
+public ListNode reverseBetween(ListNode head, int left, int right) {
+    if (head == null || left == right) return head;
+
+    ListNode dummy = new ListNode(0, head);
+    ListNode prev = dummy;
+
+    // Move prev to node just before `left`
+    for (int i = 1; i < left; i++) {
+        prev = prev.next;
+    }
+
+    // Reverse using head-insertion method
+    ListNode curr = prev.next; // first node of sublist
+
+    for (int i = 0; i < right - left; i++) {
+        ListNode next = curr.next;
+        curr.next = next.next;      // Remove next from its position
+        next.next = prev.next;      // Insert next after prev
+        prev.next = next;           // Update prev.next to next
+    }
+    // curr is at the end of reversed sublist
+    return dummy.next;
+}
+```
+
+**Variations:**
+```java
+// Complete reversal: reverseBetween(head, 1, length)
+// Reverse in k-groups: Apply reverseBetween repeatedly with appropriate boundaries
+```
+
+**Complexity:** Time - O(n), Space - O(1)
+
+**Notes:** Head-insertion technique avoids extra pointers needed in traditional reversal. `curr` stays at the original first node throughout reversal - only its neighbors change. After each iteration, a new node is moved to the front of the reversed section. Works with dummy node pattern for edge case handling. More intuitive than three-pointer reversal for range operations.
 
 ---
 

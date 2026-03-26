@@ -123,7 +123,7 @@ public class MinimizeMaximumComponentCost {
     Arrays.sort(edges, Comparator.comparingInt(edge -> edge[2]));
 
     DSU disjointSet = new DSU(numNodes);
-    List<Integer> mstEdgeWeights = new ArrayList<>();
+    List<Integer> sortedMstEdgeWeights = new ArrayList<>();
 
     // Add edges to MST if they connect different components
     for (int[] edge : edges) {
@@ -132,17 +132,17 @@ public class MinimizeMaximumComponentCost {
       int weight = edge[2];
       
       if (disjointSet.union(nodeA, nodeB)) {
-        mstEdgeWeights.add(weight);
+        sortedMstEdgeWeights.add(weight);
       }
     }
 
     // Step 2: Remove (k-1) heaviest edges to create k components
     // MST has (n-1) edges, removing (k-1) leaves us with (n-k) edges
-    int edgesAfterRemoval = mstEdgeWeights.size() - (numComponents - 1);
+    int edgesAfterRemoval = sortedMstEdgeWeights.size() - (numComponents - 1);
 
     // Step 3: The maximum weight among remaining edges is the answer
     // Since mstEdgeWeights is sorted, the last remaining edge has max weight
-    return mstEdgeWeights.get(edgesAfterRemoval - 1);
+    return sortedMstEdgeWeights.get(edgesAfterRemoval - 1);
   }
 
   /**

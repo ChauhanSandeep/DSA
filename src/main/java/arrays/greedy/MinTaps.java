@@ -60,43 +60,62 @@ public class MinTaps {
    * @return minimum number of taps to open, or -1 if impossible
    */
   public int minTapsToWaterGarden(int gardenLength, int[] ranges) {
-    // coverage[i] = farthest point we can water starting from position i
-    // index is left boundary, value is right boundary
+
+    // coverage[i] = farthest right position we can water
+    // using a tap whose watering interval starts at position i.
+    // Think of this as compressing all intervals by their left boundary.
     int[] coverage = new int[gardenLength + 1];
 
-    // Preprocess: build max coverage intervals for each tap
+    // Convert taps into intervals and record the best interval for each left boundary.
+    // Tap at position i waters:
+    //      [i - ranges[i], i + ranges[i]]
     for (int i = 0; i <= gardenLength; i++) {
-      int leftReachable = Math.max(0, i - ranges[i]);
-      int rightReachable = Math.min(gardenLength, i + ranges[i]);
-      coverage[leftReachable] = Math.max(coverage[leftReachable], rightReachable);
+        int leftReachable = Math.max(0, i - ranges[i]);
+        int rightReachable = Math.min(gardenLength, i + ranges[i]);
+
+        // If multiple taps start at the same left boundary,
+        // keep the one that extends farthest.
+        coverage[leftReachable] = Math.max(coverage[leftReachable], rightReachable);
     }
 
     int tapsCount = 0;
-    int maxReachable = 0; // end of current coverage
-    int currentReachable = 0; // farthest we can reach in the next step
 
-    // Go from left to right in the garden. Keep tracking the best tap to open.
-    // Once we reach the end of current coverage, we open the best tap found.
+    // maxReachable = end of coverage using taps we have already "opened"
+    int maxReachable = 0;
+
+    // currentReachable = farthest position we could reach
+    // by opening one more tap among those seen so far
+    int currentReachable = 0;
+
+    // Scan from left to right through the garden.
     for (int i = 0; i < gardenLength; i++) {
-      int currTapLeftRange = i;
-      int currTapRightRange = coverage[i];
-      // It means that there is a tap that can water from currTapLeftRange to currTapRightRange
 
-      currentReachable = Math.max(currentReachable, currTapRightRange);
+        // If there is a tap whose interval starts at i,
+        // update the best extension we can achieve.
+        currentReachable = Math.max(currentReachable, coverage[i]);
 
-      if (currTapLeftRange == maxReachable) { // we have reached the end of current coverage
-        if (currentReachable <= currTapLeftRange) {
-          // stuck: no tap can extend coverage
-          return -1;
+        // When we reach the end of the current committed coverage,
+        // we must open another tap to extend coverage.
+        if (i == maxReachable) {
+
+            // If even the best candidate tap cannot extend coverage,
+            // there is a gap and watering the entire garden is impossible.
+            if (currentReachable <= i) {
+                return -1;
+            }
+
+            // Open the tap that extends coverage the farthest.
+            tapsCount++;
+
+            // Extend the committed coverage boundary.
+            maxReachable = currentReachable;
         }
-        // Open the best tap found and extend coverage
-        tapsCount++;
-        maxReachable = currentReachable;
-      }
     }
 
+    // If the final coverage reaches the end of the garden,
+    // return the number of taps opened.
     return maxReachable >= gardenLength ? tapsCount : -1;
-  }
+}
 
   /**
    * Alternative solution

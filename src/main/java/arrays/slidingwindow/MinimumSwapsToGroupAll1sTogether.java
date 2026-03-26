@@ -3,8 +3,10 @@ package arrays.slidingwindow;
 /**
  * Problem: Minimum Swaps to Group All 1's Together
  *
- * Given a binary array data, return the minimum number of swaps required to group all 1's
- * present in the array together in any place in the array. A swap means exchanging the
+ * Given a binary array data, return the minimum number of swaps required to
+ * group all 1's
+ * present in the array together in any place in the array. A swap means
+ * exchanging the
  * positions of two elements in the array.
  *
  * Example:
@@ -21,25 +23,30 @@ package arrays.slidingwindow;
  * Output: 0
  * Explanation: Since there is only one 1, no swaps needed.
  *
- * LeetCode: https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together
+ * LeetCode:
+ * https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together
  *
  * Follow-up Questions:
  * 1. Q: What if the array is circular (like problem 2134)?
- *    A: Extend the array by duplicating it and apply the same sliding window technique.
+ * A: Extend the array by duplicating it and apply the same sliding window
+ * technique.
  *
  * 2. Q: What if we want to group all 0's together instead of 1's?
- *    A: Same approach but count 0's and find window with maximum 0's.
+ * A: Same approach but count 0's and find window with maximum 0's.
  *
  * 3. Q: How would you handle very large arrays with memory constraints?
- *    A: Current O(1) space solution is already optimal for memory usage.
+ * A: Current O(1) space solution is already optimal for memory usage.
  *
  * 4. Q: What if swaps have different costs based on distance?
- *    A: Would require dynamic programming approach to minimize total cost.
+ * A: Would require dynamic programming approach to minimize total cost.
  *
  * Related Problems:
- * - Minimum Swaps to Group All 1's Together II: https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/
- * - Minimum Adjacent Swaps for K Consecutive Ones: https://leetcode.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/
- * - Sliding Window Maximum: https://leetcode.com/problems/sliding-window-maximum/
+ * - Minimum Swaps to Group All 1's Together II:
+ * https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/
+ * - Minimum Adjacent Swaps for K Consecutive Ones:
+ * https://leetcode.com/problems/minimum-adjacent-swaps-for-k-consecutive-ones/
+ * - Sliding Window Maximum:
+ * https://leetcode.com/problems/sliding-window-maximum/
  * LeetCode Contest Rating: 1508
  */
 public class MinimumSwapsToGroupAll1sTogether {
@@ -70,26 +77,33 @@ public class MinimumSwapsToGroupAll1sTogether {
         // Edge case: no 1s or all are 1s
         if (onesCount <= 1) return 0;
 
-        int length = data.length;
         int windowSize = onesCount;
-
-        // Count 0s in first window
         int zerosInWindow = 0;
-        for (int i = 0; i < windowSize; i++) {
-            if (data[i] == 0) zerosInWindow++;
-        }
+        int minSwaps = Integer.MAX_VALUE;
+        int left = 0;
 
-        int minSwaps = zerosInWindow; // these 0s need to be swapped
+        // Sliding window
+        for (int right = 0; right < data.length; right++) {
+            // Expand: add right element to window
+            if (data[right] == 0) {
+                zerosInWindow++;
+            }
 
-        // Slide the window using start and end indices
-        for (int start = 1, end = windowSize; end < length; start++, end++) {
-            if (data[start - 1] == 0) zerosInWindow--;
-            if (data[end] == 0) zerosInWindow++;
-            minSwaps = Math.min(minSwaps, zerosInWindow);
+            // Shrink: when window size exceeds target, remove left element
+            if (right - left + 1 > windowSize) {
+                if (data[left] == 0) {
+                    zerosInWindow--;
+                }
+                left++;
+            }
+
+            // Calculate result: when window size equals target
+            if (right - left + 1 == windowSize) {
+                minSwaps = Math.min(minSwaps, zerosInWindow);
+            }
         }
 
         return minSwaps;
     }
-
 
 }

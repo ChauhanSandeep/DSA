@@ -103,7 +103,8 @@ public class NumberOfIslandsII {
                 int neighborCol = col + dir[1];
                 
                 // Check bounds and if neighbor is land
-                if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols && islandPresent[neighborRow][neighborCol]) {
+                if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < cols 
+                        && islandPresent[neighborRow][neighborCol]) {
                     int cellId = row * cols + col;  // Convert 2D to 1D index
                     int neighborCellId = neighborRow * cols + neighborCol;
                     

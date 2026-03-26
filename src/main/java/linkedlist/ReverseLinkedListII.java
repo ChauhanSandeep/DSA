@@ -50,27 +50,27 @@ public class ReverseLinkedListII {
       ListNode dummyHead = new ListNode(-1);
       dummyHead.next = originalHead;
 
-      ListNode previousGroupEnd = dummyHead;
+      ListNode prevNode = dummyHead;
 
       // Step 2: Traverse to the node just before the start of sublist
       for (int i = 1; i < startPosition; i++) {
-        previousGroupEnd = previousGroupEnd.next;
+        prevNode = prevNode.next;
       }
 
       // Step 3: Perform in-place reversal of the sublist
-      ListNode currentGroupStart = previousGroupEnd.next;
-      ListNode nodeToMove = currentGroupStart.next;
+      ListNode currNode = prevNode.next;
+      ListNode nextNode = currNode.next;
 
       for (int i = 0; i < endPosition - startPosition; i++) {
         // Detach nodeToMove
-        currentGroupStart.next = nodeToMove.next;
+        currNode.next = nextNode.next;
 
-        // Insert nodeToMove right after previousGroupEnd
-        nodeToMove.next = previousGroupEnd.next;
-        previousGroupEnd.next = nodeToMove;
+        // Insert nodeToMove right after prevNode
+        nextNode.next = prevNode.next;
+        prevNode.next = nextNode;
 
         // Move nodeToMove forward
-        nodeToMove = currentGroupStart.next;
+        nextNode = currNode.next;
       }
 
       return dummyHead.next;

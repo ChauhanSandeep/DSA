@@ -61,33 +61,33 @@ public class ReverseLinkedList {
 
         ListNode prev = dummy;
         ListNode curr = head;
-        ListNode then = curr.next;
+        ListNode next = curr.next;
 
         /**
-         * Complete states: prev = 0, curr = 1, then = 2
+         * Complete states: prev = 0, curr = 1, next = 2
          * 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null
          *
-         * Complete states: prev = 0, curr = 1, then = 3
+         * Complete states: prev = 0, curr = 1, next = 3
          * 0 -> 2 -> 1 -> 3 -> 4 -> 5 -> 6 -> null
          *
-         * Complete states: prev = 0, curr = 1, then = 4
+         * Complete states: prev = 0, curr = 1, next = 4
          * 0 -> 3 -> 2 -> 1 -> 4 -> 5 -> 6 -> null
          *
-         * Complete states: prev = 0, curr = 1, then = 5
+         * Complete states: prev = 0, curr = 1, next = 5
          * 0 -> 4 -> 3 -> 2 -> 1 -> 5 -> 6 -> null
          *
-         * Complete states: prev = 0, curr = 1, then = 6
+         * Complete states: prev = 0, curr = 1, next = 6
          * 0 -> 5 -> 4 -> 3 -> 2 -> 1 -> 6 -> null
          *
-         * Basically this is a head-insertion method where we take the `then` node and insert it right after `prev`.
-         * We repeat this until `then` becomes null, which means we have processed all nodes.
+         * Basically this is a head-insertion method where we take the `next` node and insert it right after `prev`.
+         * We repeat this until `next` becomes null, which means we have processed all nodes.
          */
-        while (then != null) {
-            curr.next = then.next;
-            then.next = prev.next;
-            prev.next = then;
-            then = curr.next;
-            System.out.println("Complete states: prev = " + prev.val + ", curr = " + curr.val + ", then = " + (then != null ? then.val : "null"));
+        while (next != null) {
+            curr.next = next.next;
+            next.next = prev.next;
+            prev.next = next;
+            next = curr.next;
+            System.out.println("Complete states: prev = " + prev.val + ", curr = " + curr.val + ", next = " + (next != null ? next.val : "null"));
         }
 
         return dummy.next;

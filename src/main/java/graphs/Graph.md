@@ -18,6 +18,14 @@
 - [Articulation Points and Bridges](#articulation-points-and-bridges)
 - [Kosaraju's Algorithm](#kosarajus-algorithm)
 
+### Pattern Legend
+- `(*)` on any step means **"only if not already visited"**: `MARK(*)` = mark node as visited (skip if already marked); `ADD(*)` = add only unvisited neighbors.
+- ⚠️ The critical difference across algorithms is **when** `MARK(*)` executes:
+  - **BFS**: `MARK(*)` fires inside `ADD(*)` — node is marked **before** entering the queue. No duplicates possible.
+  - **DFS / Dijkstra / Prim**: `MARK(*)` fires at `SELECT` — node is marked **after** popping. Duplicates can exist in the queue; the `MARK(*)` guard discards stale ones.
+  - **Kahn's**: No explicit `MARK(*)` — `inDegree` reaching 0 is the implicit guard; a node is enqueued exactly once.
+
+---
 ## Introduction to Graphs
 A graph is a non-linear data structure consisting of vertices (or nodes) and edges that connect these vertices. Graphs are used to represent networks of many kinds, including social networks, computer networks, roads, and much more.
 
@@ -101,16 +109,16 @@ sets such that no two graph vertices within the same set are adjacent)
 - Finding all nodes within one connected component
 
 ### Steps 
-Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
+Follows patterns `(SELECT → WORK → ADD + MARK(*))`
 - Create a `queue` and a `visited[]` array.  
 - Add the starting node to the queue and mark it as visited.
 - **SELECT**: Remove the front node from the queue.
-- **MARK(*)**: Ensure the node is marked as visited to avoid reprocessing.
 - **WORK**: Process the node (e.g., print, track level, update parent map).
-- **ADD(*)**:For all unvisited neighbors of the current node,  
-  mark them as visited and add them to the queue.
+- **ADD + MARK(*)**: For all unvisited neighbors of the current node,  
+  add them to the queue and mark them as visited.
 - **Repeat**: Continue until the queue is empty.
 
+> **Note**: ADD + MARK(*) ensures that no node is added to the queue more than once, which is crucial in BFS with edges having weights.
 ### Code Implementation
 
 ```java
@@ -211,6 +219,8 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **ADD(*)**:  For all unvisited neighbors of the current node,  
   mark them as visited and push them onto the stack.
 - **Repeat**: Continue until the stack is empty (or all nodes are visited in recursion).
+
+> **Note**: `MARK(*)` fires at `SELECT` — node is marked after popping. The same node can be pushed onto the stack multiple times before being popped; the `MARK(*)` guard at SELECT discards these stale entries.
 
 ### Code Implementation
 
@@ -436,6 +446,8 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **ADD(*)**: For each neighbor of the current node, reduce its in-degree by 1. If in-degree becomes 0, enqueue the neighbor.
 - **Repeat**: Continue until the queue is empty. If the result list size is less than the total nodes, then there is a cycle in the graph.
 
+> **Note**: No explicit `visited[]` needed. `inDegree` reaching 0 is the implicit `MARK(*)` guard — a node is enqueued exactly once. Cycle detection: `processedCount != totalVertices`.
+
 #### Code Implementation
 ```java
 import java.util.*;
@@ -490,6 +502,7 @@ public class TopologicalSortKahn {
     while (!zeroInDegreeQueue.isEmpty()) {
       // SELECT: Dequeue a vertex with in-degree 0
       int current = zeroInDegreeQueue.poll();
+      // MARK(*) : Conceptually mark this node as processed by adding it to the result list.
       // WORK: Add it to the topological order
       topologicalOrder.add(current);
       processedCount++;
@@ -608,6 +621,8 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **WORK**: Update the shortest path info for the current node (e.g., record distance to the node).
 - **ADD(*)**: For all unvisited neighbors of the current node, if a shorter path is found via the current node, update their distance and add them to the min-heap.
 - **Repeat**: Continue until the min-heap is empty.
+
+> **Note**: `MARK(*)` fires after `SELECT` — a node can appear in the heap multiple times (once per relaxation). The `MARK(*)` guard on SELECT discards stale entries; the first pop always carries the true shortest distance. Using `MARK(*)` inside `ADD(*)` instead (BFS style) would block later shorter paths → wrong answer.
 
 ### Code Implementation
 
@@ -1053,11 +1068,11 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **Initialize**: Create a `min-heap` (priority queue) to store `(toNode, distance)`, and a `visited[]` array. Start with an arbitrary node (usually 0), and add `(0, 0)` to the heap. Initialize `totalMstDistance = 0`.
 - **SELECT**: Extract the edge with the minimum distance from the heap.
 - **MARK(*)**: If the destination node is already visited, skip it; otherwise, mark it as visited.
-- **WORK**: Add the edge’s distance to the total MST cost.
+- **WORK**: Add the edge's distance to the total MST cost.
 - **ADD(*)**: For all unvisited neighbors of the current node, add them to the heap along with their edge distance.
 - **Repeat**: Continue until all nodes are added to the MST (heap is empty or all nodes are visited).
 
-**Note:** In Dijkstra's (to find shortest distance between a source to destinations), the heap stores (shortestDistanceFromSource, node) while in Prim's (to find MST), it stores (toNode, distance).
+> **Note**: `MARK(*)` fires at `SELECT` — same as Dijkstra. Key difference from Dijkstra: heap stores `(individualEdgeWeight, node)` not `(totalDistanceFromSource, node)`.
 
 ### Code Implementation
 

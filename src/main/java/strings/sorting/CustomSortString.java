@@ -1,18 +1,21 @@
 package strings.sorting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 /**
  * Problem: Custom Sort String
  *
- * You are given two strings order and s. All the characters of order are unique and were
- * sorted in some custom order previously. Permute the characters of s so that they match
- * the order that order was sorted. More specifically, if character x occurs before
+ * You are given two strings order and s. All the characters of order are unique
+ * and were
+ * sorted in some custom order previously. Permute the characters of s so that
+ * they match
+ * the order that order was sorted. More specifically, if character x occurs
+ * before
  * character y in order, then x should occur before y in the permuted string.
  *
  * Return any permutation of s that satisfies this property.
@@ -26,25 +29,30 @@ import java.util.stream.Collectors;
  *
  * Input: order = "cbafg", s = "abcd"
  * Output: "cbad"
- * Explanation: Characters "c", "b", "a" from order come first in that order, then "d"
+ * Explanation: Characters "c", "b", "a" from order come first in that order,
+ * then "d"
  *
  * LeetCode: https://leetcode.com/problems/custom-sort-string/
  *
  * Follow-up Questions:
  * 1. Q: What if the order string contains duplicate characters?
- *    A: Problem states order has unique characters, but we could handle by using first occurrence.
+ * A: Problem states order has unique characters, but we could handle by using
+ * first occurrence.
  *
  * 2. Q: How would you handle Unicode characters or case sensitivity?
- *    A: Current solution works with Unicode. For case-insensitive, convert to same case first.
+ * A: Current solution works with Unicode. For case-insensitive, convert to same
+ * case first.
  *
  * 3. Q: What about very large strings with memory constraints?
- *    A: Consider counting approach to avoid creating character arrays, or streaming approach.
+ * A: Consider counting approach to avoid creating character arrays, or
+ * streaming approach.
  *
  * 4. Q: How would you optimize if order string is much larger than s?
- *    A: Use Set for faster lookups when checking if character exists in order.
+ * A: Use Set for faster lookups when checking if character exists in order.
  *
  * Related Problems:
- * - Sort Array by Increasing Frequency: https://leetcode.com/problems/sort-array-by-increasing-frequency/
+ * - Sort Array by Increasing Frequency:
+ * https://leetcode.com/problems/sort-array-by-increasing-frequency/
  * - Relative Sort Array: https://leetcode.com/problems/relative-sort-array/
  * - Valid Anagram: https://leetcode.com/problems/valid-anagram/
  * LeetCode Contest Rating: 1424
@@ -55,7 +63,8 @@ public class CustomSortString {
      * Sorts string str according to custom order using priority-based sorting.
      *
      * Algorithm:
-     * 1. Create priority mapping where each character in order gets index as priority
+     * 1. Create priority mapping where each character in order gets index as
+     * priority
      * 2. Characters not in order get default priority (placed at end)
      * 3. Convert string to character array and sort using custom comparator
      * 4. Join sorted characters back into string
@@ -64,7 +73,7 @@ public class CustomSortString {
      * Space Complexity: O(n) for character array and priority mapping
      *
      * @param order the string defining custom sort order
-     * @param str the string to be sorted according to custom order
+     * @param str   the string to be sorted according to custom order
      * @return string str sorted according to order
      */
     public String customSortString(String order, String str) {
@@ -78,23 +87,27 @@ public class CustomSortString {
             charPriority.put(order.charAt(i), i);
         }
 
-        // Convert string to list for sorting
-        List<Character> charList = new ArrayList<>();
-        for (char c : str.toCharArray()) {
-            charList.add(c);
+        // Convert string to Character array (boxed) for sorting with custom comparator
+        // Note: We need Character[] (not char[]) because Arrays.sort with Comparator
+        // only works with Object arrays, not primitive arrays
+        Character[] chars = new Character[str.length()];
+        for (int i = 0; i < str.length(); i++) {
+            chars[i] = str.charAt(i);
         }
 
-        // Sort using custom priority (characters not in order get high priority to appear at end)
-        charList.sort((c1, c2) -> {
+        // Sort using custom priority (characters not in order get high priority to ppear at end)
+        Arrays.sort(chars, (c1, c2) -> {
             int priority1 = charPriority.getOrDefault(c1, Integer.MAX_VALUE);
             int priority2 = charPriority.getOrDefault(c2, Integer.MAX_VALUE);
             return Integer.compare(priority1, priority2);
         });
 
         // Convert back to string
-        return charList.stream()
-            .map(obj -> String.valueOf(obj))
-            .collect(Collectors.joining());
+        StringBuilder result = new StringBuilder();
+        for (char c : chars) {
+            result.append(c);
+        }
+        return result.toString();
     }
 
     /**
@@ -108,10 +121,11 @@ public class CustomSortString {
      * 4. Return reconstructed string
      *
      * Time Complexity: O(n + m) where n is length of str and m is length of order
-     * Space Complexity: O(1) as we use fixed-size array for counting (26 lowercase letters)
+     * Space Complexity: O(1) as we use fixed-size array for counting (26 lowercase
+     * letters)
      *
      * @param order the string defining custom sort order
-     * @param str the string to be sorted according to custom order
+     * @param str   the string to be sorted according to custom order
      * @return string str sorted according to order
      */
     public String customSortStringOptimized(String order, String str) {

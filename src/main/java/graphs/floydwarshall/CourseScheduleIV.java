@@ -162,6 +162,8 @@ public class CourseScheduleIV {
      *
      * Algorithm: Topological Sort with prerequisite propagation.
      * Time Complexity: O(V + E + V * max_prereqs) ≈ O(V²) in practice
+     *  - 1. Time complexity for topological sort: O(V + E)
+     *  - 2. Time complexity for propagating prerequisites: O(V * max_prereqs), where max_prereqs is the maximum number of prerequisites for any course (worst case)
      * Space Complexity: O(V²) for prerequisite sets.
      * 
      * Best when: DAG structure, clear dependency ordering.
