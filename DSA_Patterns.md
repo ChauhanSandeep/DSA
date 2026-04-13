@@ -7,27 +7,32 @@ This document summarizes common Data Structures and Algorithms (DSA) patterns us
 ## Table of Contents
 
 ### Core Algorithm Patterns
+
 1. [Sliding Window](#1-sliding-window)
 2. [Two Pointers](#2-two-pointers)
 3. [Binary Search](#3-binary-search)
-9. [Heap / Priority Queue](#9-heap--priority-queue)
-10. [Graph Traversal - BFS](#10-graph-traversal---bfs)
-11. [Graph Traversal - DFS](#11-graph-traversal---dfs)
-12. [Union-Find (Disjoint Set)](#12-union-find-disjoint-set)
-13. [Monotonic Stack](#13-monotonic-stack)
-    - [Finding Both Next Smaller and Previous Smaller in Single Iteration](#finding-both-next-smaller-and-previous-smaller-in-single-iteration)
-14. [Fast & Slow Pointers (Floyd's Cycle Detection)](#14-fast--slow-pointers-floyds-cycle-detection)
-15. [Bit Manipulation](#15-bit-manipulation)
-16. [Segment Tree](#16-segment-tree)
-17. [Dijkstra's Algorithm](#17-dijkstras-algorithm)
-18. [Topological Sort (Kahn's Algorithm)](#18-topological-sort-kahns-algorithm)
+4. [Heap / Priority Queue](#9-heap--priority-queue)
+5. [Graph Traversal - BFS](#10-graph-traversal---bfs)
+6. [Graph Traversal - DFS](#11-graph-traversal---dfs)
+7. [Union-Find (Disjoint Set)](#12-union-find-disjoint-set)
+8. [Monotonic Stack](#13-monotonic-stack)
+
+   - [Finding Both Next Smaller and Previous Smaller in Single Iteration](#finding-both-next-smaller-and-previous-smaller-in-single-iteration)
+9. [Fast & Slow Pointers (Floyd's Cycle Detection)](#14-fast--slow-pointers-floyds-cycle-detection)
+10. [Bit Manipulation](#15-bit-manipulation)
+11. [Segment Tree](#16-segment-tree)
+12. [Dijkstra's Algorithm](#17-dijkstras-algorithm)
+13. [Topological Sort (Kahn's Algorithm)](#18-topological-sort-kahns-algorithm)
 
 ### Reference Guides
+
 - [Pattern Selection Guide](#pattern-selection-guide) - Problem type to pattern mapping
 - [Additional Tips](#additional-tips) - Best practices and recognition strategies
 
 ### Micro-Patterns (FAANG-Level Optimizations)
+
 19. [Micro-Patterns Overview](#19-micro-patterns)
+
     - [Index-as-Hash (Negative Marking)](#micro-pattern-index-as-hash-negative-marking)
     - [Prefix Sum with HashMap](#micro-pattern-prefix-sum-with-hashmap)
     - [XOR for Bit-Level Prefix Optimization](#micro-pattern-xor-for-bit-level-prefix-optimization)
@@ -52,12 +57,14 @@ This document summarizes common Data Structures and Algorithms (DSA) patterns us
 **When to use:** When you need to find a subarray or substring that satisfies a condition (like sum, distinct elements, or max/min length). Useful for contiguous sequence problems where you need to track a window of elements.
 
 **Example problems:**
+
 - Sliding Window Maximum
 - Longest Substring Without Repeating Characters
 - Maximum Sum Subarray of Size K
 - Minimum Window Substring
 
 **Code snippet:**
+
 ```java
 // Find maximum sum of subarray of size K
 // ADD -> SHRINK -> PROCESS
@@ -96,12 +103,14 @@ public int findMaxSum(int[] arr, int k) {
 **When to use:** When you need to search pairs in a sorted/unsorted array, or find elements satisfying certain conditions. Often used with sorted arrays to optimize from O(n²) to O(n).
 
 **Example problems:**
+
 - Container With Most Water
 - Two Sum (sorted array)
 - Remove Duplicates from Sorted Array
 - Trapping Rain Water
 
 **Code snippet:**
+
 ```java
 // Find max area of water container
 public int maxArea(int[] heights) {
@@ -135,12 +144,14 @@ public int maxArea(int[] heights) {
 **When to use:** When searching in a sorted array or when you can define a monotonic search space where you can eliminate half the candidates in each iteration.
 
 **Example problems:**
+
 - Search in Rotated Sorted Array
 - Find Peak Element
 - Find Minimum in Rotated Sorted Array
 - Single Element in a Sorted Array
 
 **Code snippet:**
+
 ```java
 // Standard binary search of target in sorted array
 public int binarySearch(int[] arr, int target) {
@@ -167,11 +178,13 @@ public int binarySearch(int[] arr, int target) {
 ```
 
 When we have to find the boundary condition instead of fixed target, like minimum in rotated sorted array or peak element,
- then we use condition `left < right` to avoid infinite loop.
+then we use condition `left < right` to avoid infinite loop.
+
 ```java
 // Find minimum in rotated sorted array
 int left = 0, right = nums.length - 1;
 
+// Note: Here we use (left < right) instead of (left <= right)
 while (left < right) {
     int mid = left + (right - left) / 2;
     
@@ -193,12 +206,14 @@ return nums[left];
 **When to use:** When you need to repeatedly find minimum/maximum elements, or maintain a sorted order dynamically as elements are added/removed.
 
 **Example problems:**
+
 - Kth Largest Element
 - Merge K Sorted Lists
 - Top K Frequent Elements
 - Meeting Rooms II
 
 **Code snippet:**
+
 ```java
 // Kth Largest using Min-Heap
 public int findKthLargestUsingMinHeap(int[] inputArray, int k) {
@@ -224,12 +239,14 @@ public int findKthLargestUsingMinHeap(int[] inputArray, int k) {
 **When to use:** When you need to explore a graph level by level, find shortest paths in unweighted graphs, or process nodes by distance from source.
 
 **Example problems:**
+
 - Binary Tree Level Order Traversal
 - Shortest Path in Binary Matrix
 - Word Ladder
 - Rotting Oranges
 
 **Code snippet:**
+
 ```java
 // BFS to find shortest path from source to all other vertices
 public static int[] shortestPath(List<List<Integer>> graph, int startNode) {
@@ -274,12 +291,14 @@ public static int[] shortestPath(List<List<Integer>> graph, int startNode) {
 **When to use:** When you need to explore all paths, detect cycles, or traverse to maximum depth. Uses recursion or explicit stack.
 
 **Example problems:**
+
 - Number of Islands
 - Path Sum
 - Clone Graph
 - Course Schedule
 
 **Code snippet:**
+
 ```java
 // Recursive DFS for graph traversal
 public void dfs(int node, boolean[] visited, List<List<Integer>> graph) {
@@ -294,6 +313,7 @@ public void dfs(int node, boolean[] visited, List<List<Integer>> graph) {
 ```
 
 DFS approach using stack and formula SELECT -> MARK(*) > WORK -> ADD(*):
+
 ```java
 public static void iterativeDFS(List<List<Integer>> graph, int startNode) {
     int size = graph.size();
@@ -337,12 +357,14 @@ public static void iterativeDFS(List<List<Integer>> graph, int startNode) {
 **When to use:** When you need to group elements into disjoint sets and efficiently check connectivity or merge sets. Common in graph connectivity problems.
 
 **Example problems:**
+
 - Number of Connected Components
 - Redundant Connection
 - Accounts Merge
 - Minimum Spanning Tree (Kruskal's)
 
 **Code snippet:**
+
 ```java
 // Union-Find with path compression and union by rank
 public class DisjointSet {
@@ -393,39 +415,102 @@ public class DisjointSet {
 **When to use:** When you need to find the next greater/smaller element or maintain elements in monotonic order for range queries.
 
 **Example problems:**
+
 - Daily Temperatures
 - Next Greater Element
 - Largest Rectangle in Histogram
 - Trapping Rain Water
 
-### Monotonic Stack Cheatsheet
+### Monotonic Stack Cheatsheet (Always Left-to-Right)
 
-| To Find       | Traversal Direction | Pop Condition       | Stack Property              |
-|---------------|--------------------|---------------------|-------------------------------|
-| Next Greater  | n-1 → 0            | peek ≤ current      | Monotonic Decreasing          |
-| Next Smaller  | n-1 → 0            | peek ≥ current      | Monotonic Increasing          |
-| Prev Greater  | 0 → n-1            | peek ≤ current      | Monotonic Decreasing          |
-| Prev Smaller  | 0 → n-1            | peek ≥ current      | Monotonic Increasing          |
+| To Find      | Pop Condition                       | Stack Property       | How Result Is Produced |
+| ------------ | ----------------------------------- | -------------------- | ---------------------- |
+| Next Greater | while nums[i] > nums[stack.peek()]  | Monotonic Decreasing | Pop to resolve         |
+| Next Smaller | while nums[i] < nums[stack.peek()]  | Monotonic Increasing | Pop to resolve         |
+| Prev Greater | while nums[i] >= nums[stack.peek()] | Monotonic Decreasing | Top gives answer       |
+| Prev Smaller | while nums[i] <= nums[stack.peek()] | Monotonic Increasing | Top gives answer       |
 
+- Next -> Pop to resolve
+- Prev -> Top gives the answer
+- Greater -> Monotonic Decreasing with `nums[i] > nums[stack.peek()]`
+- Smaller -> Monotonic Increasing with `nums[i] < nums[stack.peek()]`
 
+**Duplicate handling:** Use strict comparisons (`<`, `>`) when equal values should remain candidates; use non-strict (`<=`, `>=`) when equal values should be popped/ignored.
 
-**Code snippet:**
+**Java snippets (all Left-to-Right):**
 
 ```java
-// Find next warmer day for daily temperatures
-public int[] dailyTemperatures(int[] temperatures) {
-    int length = temperatures.length;
-    int[] result = new int[length];
-    Stack<Integer> stack = new Stack<>();  // Monotonic Decreasing Stack (stores indices)
+// Next Greater (pop-to-resolve)
+public int[] nextGreater(int[] nums) {
+    int n = nums.length;
+    int[] result = new int[n];
+    Arrays.fill(result, -1);
+    Stack<Integer> stack = new Stack<>(); // unresolved indices, decreasing by value
 
-    for (int i = length - 1; i >= 0; i--) {
-        while (!stack.isEmpty() && temperatures[stack.peek()] <= temperatures[i]) {
-            stack.pop();
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
+            int idx = stack.pop();
+            result[idx] = nums[i];
         }
-        result[i] = stack.isEmpty() ? 0 : stack.peek() - i;
         stack.push(i);
     }
-    
+    return result;
+}
+```
+
+```java
+// Next Smaller (pop-to-resolve)
+public int[] nextSmaller(int[] nums) {
+    int n = nums.length;
+    int[] result = new int[n];
+    Arrays.fill(result, -1);
+    Stack<Integer> stack = new Stack<>(); // unresolved indices, increasing by value
+
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && nums[i] < nums[stack.peek()]) {
+            int idx = stack.pop();
+            result[idx] = nums[i];
+        }
+        stack.push(i);
+    }
+    return result;
+}
+```
+
+```java
+// Previous Greater (query stack top after cleanup)
+public int[] prevGreater(int[] nums) {
+    int n = nums.length;
+    int[] result = new int[n];
+    Arrays.fill(result, -1);
+    Stack<Integer> stack = new Stack<>(); // candidate indices, decreasing by value
+
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && nums[stack.peek()] <= nums[i]) {
+            stack.pop();
+        }
+        result[i] = stack.isEmpty() ? -1 : nums[stack.peek()];
+        stack.push(i);
+    }
+    return result;
+}
+```
+
+```java
+// Previous Smaller (query stack top after cleanup)
+public int[] prevSmaller(int[] nums) {
+    int n = nums.length;
+    int[] result = new int[n];
+    Arrays.fill(result, -1);
+    Stack<Integer> stack = new Stack<>(); // candidate indices, increasing by value
+
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && nums[stack.peek()] >= nums[i]) {
+            stack.pop();
+        }
+        result[i] = stack.isEmpty() ? -1 : nums[stack.peek()];
+        stack.push(i);
+    }
     return result;
 }
 ```
@@ -441,11 +526,13 @@ public int[] dailyTemperatures(int[] temperatures) {
 **Key Idea:** Use a monotonic increasing stack. When you pop elements (because current element is smaller), the popped element has found its **next smaller** (current element), and the element now at stack top becomes the **previous smaller** for the current element.
 
 **Example problems:**
+
 - [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
 - [85. Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)
 - [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/) (uses similar concept)
 
 **Code snippet:**
+
 ```java
 // Find largest rectangle in histogram
 public int largestRectangleArea(int[] heights) {
@@ -496,12 +583,14 @@ public int largestRectangleArea(int[] heights) {
 **When to use:** When you need to detect cycles in linked lists or find the middle element. Also known as the "tortoise and hare" algorithm.
 
 **Example problems:**
+
 - Linked List Cycle
 - Linked List Cycle II
 - Find Middle of Linked List
 - Happy Number
 
 **Code snippet:**
+
 ```java
 // Detect cycle and find cycle start in linked list
 public ListNode detectCycle(ListNode head) {
@@ -539,12 +628,14 @@ public ListNode detectCycle(ListNode head) {
 **When to use:** When you need to perform operations at the bit level for optimization or when dealing with subsets, masks, or XOR properties.
 
 **Example problems:**
+
 - Single Number
 - Power of Two
 - Counting Bits
 - Maximum XOR of Two Numbers
 
 **Code snippet:**
+
 ```java
 // Find maximum XOR of two numbers in an array
 public int findMaximumXor(int[] arr) {
@@ -585,11 +676,13 @@ public int findMaximumXor(int[] arr) {
 **When to use:** When you need to perform range queries and updates efficiently on an array, such as range sum, range minimum/maximum.
 
 **Example problems:**
+
 - Range Sum Query - Mutable
 - My Calendar III
 - The Skyline Problem
 
 **Code snippet:**
+
 ```java
 // Segment Tree for range sum queries
 class SegmentTree {
@@ -637,11 +730,13 @@ class SegmentTree {
 **When to use:** When you need to find the shortest path in a weighted graph with non-negative edge weights.
 
 **Example problems:**
+
 - Network Delay Time
 - Path With Minimum Effort
 - Cheapest Flights Within K Stops
 
 **Code snippet:**
+
 ```java
 // Find shortest time to reach all nodes from source k
 public class DijkstraShortestPath {
@@ -727,12 +822,14 @@ public class DijkstraShortestPath {
 **When to use:** When you need to order nodes in a directed acyclic graph (DAG) such that for every edge u → v, u comes before v.
 
 **Example problems:**
+
 - Course Schedule
 - Course Schedule II
 - Alien Dictionary
 - Task Scheduling
 
 **Code snippet:**
+
 ```java
 // Find order of courses to finish all prerequisites
 public int[] findOrder(int numCourses, int[][] prerequisites) {
@@ -784,22 +881,22 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
 
 ### Problem Type → Pattern Mapping
 
-| Problem Type | Recommended Pattern |
-|-------------|-------------------|
-| Contiguous subarray/substring | Sliding Window |
-| Sorted array search | Binary Search, Two Pointers |
-| Optimization with constraints | Binary Search on Answer, DP, Greedy |
-| All combinations/permutations | Backtracking, Recursion |
-| Overlapping subproblems | Dynamic Programming |
-| Graph connectivity | Union-Find, DFS, BFS |
-| Shortest path (weighted) | Dijkstra, Bellman-Ford |
-| Shortest path (unweighted) | BFS |
-| Next greater/smaller | Monotonic Stack |
-| K largest/smallest | Heap |
-| Cycle detection | Fast & Slow Pointers, DFS |
-| Range queries | Segment Tree, Prefix Sum |
-| Bit-level operations | Bit Manipulation |
-| Task scheduling | Topological Sort, Greedy |
+| Problem Type                    | Recommended Pattern                     |
+| ------------------------------- | --------------------------------------- |
+| Contiguous subarray/substring   | Sliding Window                          |
+| Sorted array search             | Binary Search, Two Pointers             |
+| Optimization with constraints   | Binary Search on Answer, DP, Greedy     |
+| All combinations/permutations   | Backtracking, Recursion                 |
+| Overlapping subproblems         | Dynamic Programming                     |
+| Graph connectivity              | Union-Find, DFS, BFS                    |
+| Shortest path (weighted)        | Dijkstra, Bellman-Ford                  |
+| Shortest path (unweighted)      | BFS                                     |
+| Next greater/smaller            | Monotonic Stack                         |
+| K largest/smallest              | Heap                                    |
+| Cycle detection                 | Fast & Slow Pointers, DFS               |
+| Range queries                   | Segment Tree, Prefix Sum                |
+| Bit-level operations            | Bit Manipulation                        |
+| Task scheduling                 | Topological Sort, Greedy                |
 | Linked list reversal/reordering | Head-Insertion Reversal, Sentinel Nodes |
 
 ---
@@ -827,12 +924,14 @@ These are **tactical, reusable coding patterns** that appear across multiple DSA
 **Key Idea:** Use array indices as hash keys by negating values at `nums[i] - 1` to mark that number `i` has been seen, achieving O(1) space without extra data structures.
 
 **LeetCode Problems:**
+
 - [442. Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)
 - [448. Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)
 - [41. First Missing Positive](https://leetcode.com/problems/first-missing-positive/)
 - [287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/) (with modification)
 
 **Code Snippet:**
+
 ```java
 // Mark presence by negating value at index
 for (int i = 0; i < nums.length; i++) {
@@ -859,12 +958,14 @@ for (int i = 0; i < nums.length; i++) {
 **Key Idea:** Store cumulative sums in a HashMap; if the same prefix sum appears twice, the subarray between those indices has sum zero (or use `prefixSum - target` for sum k problems).
 
 **LeetCode Problems:**
+
 - [560. Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
 - [523. Continuous Subarray Sum](https://leetcode.com/problems/continuous-subarray-sum/)
 - [525. Contiguous Array](https://leetcode.com/problems/contiguous-array/)
 - [974. Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
 
 **Code Snippet:**
+
 ```java
 Map<Integer, Integer> prefixSumMap = new HashMap<>();
 prefixSumMap.put(0, -1);  // Handle subarrays starting at index 0
@@ -893,11 +994,13 @@ for (int i = 0; i < nums.length; i++) {
 **Key Idea:** Build XOR results bit-by-bit from MSB to LSB, using HashSet to check if complementary prefixes exist that can set each bit greedily.
 
 **LeetCode Problems:**
+
 - [421. Maximum XOR of Two Numbers in an Array](https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/)
 - [1707. Maximum XOR With an Element From Array](https://leetcode.com/problems/maximum-xor-with-an-element-from-array/)
 - [1938. Maximum Genetic Difference Query](https://leetcode.com/problems/maximum-genetic-difference-query/)
 
 **Code Snippet:**
+
 ```java
 int maxXor = 0, mask = 0;
 for (int i = 31; i >= 0; i--) {
@@ -929,6 +1032,7 @@ for (int i = 31; i >= 0; i--) {
 **Key Idea:** Maintain a monotonic stack (increasing/decreasing) and pop elements when a larger/smaller element is found, resolving their "next greater/smaller" in one pass.
 
 **LeetCode Problems:**
+
 - [496. Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
 - [503. Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)
 - [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
@@ -936,6 +1040,7 @@ for (int i = 31; i >= 0; i--) {
 - [901. Online Stock Span](https://leetcode.com/problems/online-stock-span/)
 
 **Code Snippet:**
+
 ```java
 Stack<Integer> stack = new Stack<>();  // Store indices
 int[] result = new int[n];
@@ -952,7 +1057,7 @@ for (int i = 0; i < n; i++) {
 
 **Complexity:** Time - O(n), Space - O(n)
 
-**Notes:** Each element pushed/popped exactly once. Store indices (not values) for distance calculations. Use decreasing stack for "next greater", increasing for "next smaller". Right-to-left traversal finds "previous" elements instead.
+**Notes:** Each element pushed/popped exactly once. Store indices (not values) for distance calculations. Use decreasing stack for "next greater", increasing for "next smaller". In top-query style, right-to-left traversal typically finds "next" elements (left-to-right typically finds "previous" elements).
 
 ---
 
@@ -963,11 +1068,13 @@ for (int i = 0; i < n; i++) {
 **Key Idea:** Treat array as linked list where `next = nums[current]`, then apply two-pointer cycle detection to find the cycle entrance (the duplicate).
 
 **LeetCode Problems:**
+
 - [287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
 - [142. Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
 - [202. Happy Number](https://leetcode.com/problems/happy-number/)
 
 **Code Snippet:**
+
 ```java
 // Phase 1: Detect cycle
 int slow = nums[0], fast = nums[0];
@@ -998,10 +1105,12 @@ return slow;  // The duplicate number
 **Key Idea:** Interweave copied nodes with original nodes (original→copy→original→copy), set pointers using relationships, then separate lists.
 
 **LeetCode Problems:**
+
 - [138. Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/)
 - [133. Clone Graph](https://leetcode.com/problems/clone-graph/) (uses similar HashMap concept)
 
 **Code Snippet:**
+
 ```java
 // Step 1: Interweave - create copies next to originals
 Node curr = head;
@@ -1030,17 +1139,21 @@ while (curr != null) {
 
 ### Micro-Pattern: Linked List Reversal with Head-Insertion Method
 
-**Problem Context:** Reversing entire linked list, reversing a sublist between positions, or reversing in groups of k nodes.
+**Problem Context:** Full reversal, fixed-size batches (k=2, k=3, …), position ranges, or **variable-length segments** (e.g. reverse until a sentinel value).
 
-**Key Idea:** Use dummy node and head-insertion technique: repeatedly take the node after current and insert it right after prev, effectively reversing the order. This pattern is versatile and handles complete reversal, range reversal, and k-group reversal uniformly.
+**Key Idea:** **Head-insertion** (and a **dummy** node when the head can move) reverses **one uninterrupted block** of nodes—the block from index `left` through `right` in the snippet below. That is the reusable “engine.”
+
+Harder problems ask you to flip **several blocks in a row**. You still use the same engine each time; only the rule for **where the current block stops** changes (fixed indices, “next k nodes,” end of list, or “until this value”). *Reverse in k-group* vs *reverse each segment until 0* is the same pattern with a different stop rule.
 
 **LeetCode Problems:**
+
 - [206. Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
 - [92. Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)
 - [25. Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)
 - [24. Swap Nodes in Pairs](https://leetcode.com/problems/swap-nodes-in-pairs/)
 
 **Code Snippet:**
+
 ```java
 // Reverse sublist from position left to right
 public ListNode reverseBetween(ListNode head, int left, int right) {
@@ -1053,9 +1166,10 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
     for (int i = 1; i < left; i++) {
         prev = prev.next;
     }
+		// At this point, prev points to index just before left i.e. left - 1;
 
     // Reverse using head-insertion method
-    ListNode curr = prev.next; // first node of sublist
+    ListNode curr = prev.next; // first node of sublist i.e. left
 
     for (int i = 0; i < right - left; i++) {
         ListNode next = curr.next;
@@ -1068,15 +1182,13 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
 }
 ```
 
-**Variations:**
-```java
-// Complete reversal: reverseBetween(head, 1, length)
-// Reverse in k-groups: Apply reverseBetween repeatedly with appropriate boundaries
-```
+**Quick boundary cheat sheet:** one block = whole list; **k-group / pairs** = next k nodes (k=2 for pairs; tail handling per problem); **sentinel** = next block ends at delimiter or end of list.
+
+**Variations (same `reverseBetween` / same head-insertion per chunk):** `reverseBetween(head, 1, n)`; repeated blocks with `prev` advanced after each reverse; partial last block only when the statement allows.
 
 **Complexity:** Time - O(n), Space - O(1)
 
-**Notes:** Head-insertion technique avoids extra pointers needed in traditional reversal. `curr` stays at the original first node throughout reversal - only its neighbors change. After each iteration, a new node is moved to the front of the reversed section. Works with dummy node pattern for edge case handling. More intuitive than three-pointer reversal for range operations.
+**Notes:** `curr` stays at the original sublist head while head-insertion runs; only links around it change. For k-group, some solutions use a quick pointer to test “k nodes exist” before reversing to avoid a messy partial reverse.
 
 ---
 
@@ -1087,12 +1199,14 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
 **Key Idea:** Track running sum/product; if it becomes unfavorable (negative for sum, < 1 for product), reset to current element as new potential starting point.
 
 **LeetCode Problems:**
+
 - [53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
 - [152. Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)
 - [918. Maximum Sum Circular Subarray](https://leetcode.com/problems/maximum-sum-circular-subarray/)
 - [1749. Maximum Absolute Sum of Any Subarray](https://leetcode.com/problems/maximum-absolute-sum-of-any-subarray/)
 
 **Code Snippet:**
+
 ```java
 int maxSum = Integer.MIN_VALUE;
 int currentSum = 0;
@@ -1121,6 +1235,7 @@ return maxSum;
 **Key Idea:** Instead of maintaining full DP array, keep only the last two values needed, reducing space from O(n) to O(1).
 
 **LeetCode Problems:**
+
 - [198. House Robber](https://leetcode.com/problems/house-robber/)
 - [213. House Robber II](https://leetcode.com/problems/house-robber-ii/)
 - [70. Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
@@ -1128,6 +1243,7 @@ return maxSum;
 - [1137. N-th Tribonacci Number](https://leetcode.com/problems/n-th-tribonacci-number/)
 
 **Code Snippet:**
+
 ```java
 int prev2 = nums[0];           // dp[i-2]
 int prev1 = Math.max(nums[0], nums[1]);  // dp[i-1]
@@ -1153,11 +1269,13 @@ return prev1;
 **Key Idea:** XOR gives sum without carry, AND shifted left gives carry; iterate until no carry remains.
 
 **LeetCode Problems:**
+
 - [371. Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
 - [67. Add Binary](https://leetcode.com/problems/add-binary/)
 - [989. Add to Array-Form of Integer](https://leetcode.com/problems/add-to-array-form-of-integer/)
 
 **Code Snippet:**
+
 ```java
 while (b != 0) {
     int carry = a & b;      // Calculate carry bits
@@ -1180,11 +1298,13 @@ return a;
 **Key Idea:** Use monotonic deque to maintain potential maximums in decreasing order; remove from front when outside window, from back when smaller than current.
 
 **LeetCode Problems:**
+
 - [239. Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)
 - [1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/)
 - [862. Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/)
 
 **Code Snippet:**
+
 ```java
 Deque<Integer> deque = new ArrayDeque<>();  // Stores indices
 int[] result = new int[nums.length - k + 1];
@@ -1218,6 +1338,7 @@ for (int i = 0; i < nums.length; i++) {
 **Key Idea:** Binary search not on array indices but on the range of possible answers; use a feasibility function to check if an answer works.
 
 **LeetCode Problems:**
+
 - [1011. Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
 - [410. Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)
 - [875. Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)
@@ -1225,6 +1346,7 @@ for (int i = 0; i < nums.length; i++) {
 - [1482. Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)
 
 **Code Snippet:**
+
 ```java
 int left = maxElement, right = totalSum;
 
@@ -1256,12 +1378,14 @@ private boolean isFeasible(int[] nums, int capacity, int k) {
 **Key Idea:** Use `computeIfAbsent` to avoid null checks and make code cleaner when values are collections or complex objects.
 
 **LeetCode Problems:**
+
 - [49. Group Anagrams](https://leetcode.com/problems/group-anagrams/)
 - [582. Kill Process](https://leetcode.com/problems/kill-process/)
 - [692. Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/)
 - [1152. Analyze User Website Visit Pattern](https://leetcode.com/problems/analyze-user-website-visit-pattern/)
 
 **Code Snippet:**
+
 ```java
 Map<Integer, List<Integer>> graph = new HashMap<>();
 
@@ -1288,12 +1412,14 @@ graph.computeIfAbsent(node, k -> new ArrayList<>()).add(neighbor);
 **Key Idea:** Use two pointers (start and end) moving toward center, swapping elements until they meet.
 
 **LeetCode Problems:**
+
 - [189. Rotate Array](https://leetcode.com/problems/rotate-array/)
 - [344. Reverse String](https://leetcode.com/problems/reverse-string/)
 - [151. Reverse Words in a String](https://leetcode.com/problems/reverse-words-in-a-string/)
 - [186. Reverse Words in a String II](https://leetcode.com/problems/reverse-words-in-a-string-ii/)
 
 **Code Snippet:**
+
 ```java
 private void reverse(int[] arr, int start, int end) {
     while (start < end) {
@@ -1320,12 +1446,14 @@ private void reverse(int[] arr, int start, int end) {
 **Key Idea:** XOR has properties `a ^ a = 0` and `a ^ 0 = a`, so XORing all elements cancels duplicates leaving only the unique one.
 
 **LeetCode Problems:**
+
 - [136. Single Number](https://leetcode.com/problems/single-number/)
 - [137. Single Number II](https://leetcode.com/problems/single-number-ii/)
 - [260. Single Number III](https://leetcode.com/problems/single-number-iii/)
 - [540. Single Element in a Sorted Array](https://leetcode.com/problems/single-element-in-a-sorted-array/)
 
 **Code Snippet:**
+
 ```java
 int unique = 0;
 for (int num : nums) {
@@ -1347,6 +1475,7 @@ return unique;  // All duplicates cancel out
 **Key Idea:** Create a dummy node pointing to head; all operations treat it uniformly, eliminating special cases for head operations.
 
 **LeetCode Problems:**
+
 - [21. Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
 - [83. Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/)
 - [82. Remove Duplicates from Sorted List II](https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/)
@@ -1354,6 +1483,7 @@ return unique;  // All duplicates cancel out
 - [86. Partition List](https://leetcode.com/problems/partition-list/)
 
 **Code Snippet:**
+
 ```java
 ListNode dummy = new ListNode(0);
 dummy.next = head;
