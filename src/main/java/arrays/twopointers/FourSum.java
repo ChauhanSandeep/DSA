@@ -57,7 +57,11 @@ public class FourSum {
     List<List<Integer>> result = new ArrayList<>();
 
     // Base case optimizations
-    if (start == nums.length || nums[start] * k > target || nums[nums.length - 1] * k < target) {
+    if (start == nums.length) {
+      return result;
+    }
+    if (nums[start] * k > target || nums[nums.length - 1] * k < target) {
+      // If the smallest number in the remaining array is too large or the largest number is too small, return empty result
       return result;
     }
 

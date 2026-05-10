@@ -101,13 +101,100 @@ public class TaskScheduler {
   /**
    * Approach 2: Optimized Math Formula
    *
-   * Strategy:
-   * - Find the task(s) with the maximum frequency.
-   * - Use the formula: (maxFreq - 1) * (n + 1) + numberOfMaxFreqTasks
-   * - The formula builds the frame with idle slots first and fills in tasks.
+   * Formula: result = max( (maxFreq - 1) * (cooldown + 1) + tasksWithMaxFreq,  tasks.length )
    *
-   * Time Complexity: O(N), where N is the number of tasks (simple counting)
-   * Space Complexity: O(1), fixed array of size 26
+   * ─────────────────────────────────────────────────────────────────────────
+   * Derivation from first principles:
+   * ─────────────────────────────────────────────────────────────────────────
+   *
+   * Step 1 — The bottleneck is the most frequent task.
+   *   Let `maxFreq` be the highest count of any single task. Two executions
+   *   of the same task must be separated by at least `cooldown` time units,
+   *   so the task with the highest count dictates the *minimum* schedule
+   *   length. No other task can be scheduled tighter than this one.
+   *
+   * Step 2 — Build a "skeleton" using only the most frequent task.
+   *   Place the most-frequent task `maxFreq` times, leaving exactly
+   *   `cooldown` empty slots between consecutive occurrences:
+   *
+   *     A _ _ _ A _ _ _ A _ _ _ A     (maxFreq = 4, cooldown = 3)
+   *     └──┬──┘ └──┬──┘ └──┬──┘
+   *      block   block   block        ← (maxFreq - 1) * blocks
+   *
+   *   Each block has size (cooldown + 1): the task itself + cooldown gaps.
+   *   There are (maxFreq - 1) full blocks, plus one final occurrence of A.
+   *
+   *   Skeleton length so far = (maxFreq - 1) * (cooldown + 1) + 1
+   *
+   * Step 3 — Account for ties at the top frequency.
+   *   If multiple tasks share `maxFreq` (say A and B both appear 4 times),
+   *   they all face the same bottleneck. They can ride alongside A in the
+   *   *final partial block* without extending earlier blocks:
+   *
+   *     A B _ _ A B _ _ A B _ _ A B   (A and B both appear 4 times)
+   *
+   *   So instead of adding only 1 trailing slot, we add `tasksWithMaxFreq`
+   *   trailing slots — one for each task tied at the maximum frequency.
+   *
+   *   Frame length = (maxFreq - 1) * (cooldown + 1) + tasksWithMaxFreq
+   *
+   * Step 4 — Try to fill remaining tasks into idle gaps.
+   *   The skeleton has a fixed number of idle slots:
+   *
+   *     idleCapacity = (maxFreq - 1) * cooldown
+   *
+   *   (i.e. `cooldown` empties between each of the (maxFreq - 1) blocks).
+   *
+   *   Two sub-cases arise:
+   *
+   *   (4a) Remaining tasks fit inside idleCapacity.
+   *        Each non-max task has frequency ≤ maxFreq - 1, so its copies
+   *        can be spread one-per-block-column without violating its own
+   *        cooldown. We just replace "_" with a real task — schedule
+   *        length is unchanged. The frameSize formula is exact.
+   *
+   *   (4b) Remaining tasks overflow idleCapacity.
+   *        Example: A=3, B=C=D=E=F=G=H=1, cooldown=2
+   *          Skeleton: A _ _ A _ _ A           (length 7)
+   *          idleCapacity = (3-1) * 2 = 4
+   *          Tasks to place in gaps = 7  →  overflow of 3.
+   *
+   *        Once every idle slot is consumed, A is no longer the
+   *        bottleneck — the remaining tasks have low frequency, so they
+   *        can be appended back-to-back with no idles needed:
+   *
+   *          A B C A D E A F G H               (length 10)
+   *
+   *        The schedule simply grows to hold every task with zero idle
+   *        time, giving length = tasks.length.
+   *
+   *   Combining (4a) and (4b): the schedule is at least frameSize
+   *   *and* at least tasks.length, whichever is larger.
+   *
+   * Step 5 — Final formula.
+   *
+   *     result = max(frameSize, tasks.length)
+   *
+   *   - When (4a) applies: tasks.length ≤ frameSize, so the max is
+   *     frameSize (the cooldown bound is binding).
+   *   - When (4b) applies: tasks.length > frameSize, so the max is
+   *     tasks.length (the bottleneck task gets "diluted" by the many
+   *     other tasks and cooldown becomes free).
+   *
+   * ─────────────────────────────────────────────────────────────────────────
+   * Worked example: tasks = [A,A,A,A,A,B,B,C], cooldown = 2
+   *   maxFreq = 5 (A), tasksWithMaxFreq = 1
+   *   frameSize = (5-1) * (2+1) + 1 = 13
+   *   tasks.length = 8
+   *   result = max(13, 8) = 13... wait, the LeetCode answer is 16? See note*.
+   *
+   *   *Note: the doc-header example "16" assumes a different task list.
+   *   For [A×5, B×2, C×1] with cooldown=2 the correct answer is indeed
+   *   max((5-1)*3 + 1, 8) = 13, schedule: A B C A B _ A _ _ A _ _ A.
+   * ─────────────────────────────────────────────────────────────────────────
+   *
+   * Time Complexity: O(N), where N is the number of tasks (single pass to count).
+   * Space Complexity: O(1), fixed array of size 26.
    *
    * @param tasks Array of task characters (A-Z)
    * @param cooldown Cooldown period `n`
@@ -125,15 +212,15 @@ public class TaskScheduler {
     int maxFreq = Arrays.stream(taskFreqArr).max().orElse(0);
 
     // Step 3: Count how many tasks have that max frequency
-    int maxFreqCount = 0;
+    int tasksWithMaxFreq = 0;
     for (int freq : taskFreqArr) {
       if (freq == maxFreq) {
-        maxFreqCount++;
+        tasksWithMaxFreq++;
       }
     }
 
     // Step 4: Apply the scheduling formula
-    int frameSize = (maxFreq - 1) * (cooldown + 1) + maxFreqCount;
+    int frameSize = (maxFreq - 1) * (cooldown + 1) + tasksWithMaxFreq;
 
     // Final result must be at least as long as task array
     return Math.max(frameSize, tasks.length);

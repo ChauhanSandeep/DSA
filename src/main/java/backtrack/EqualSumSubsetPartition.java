@@ -57,16 +57,16 @@ public class EqualSumSubsetPartition {
    * Space Complexity: O(N) for `used` array and recursion stack.
    *
    * @param nums Input array
-   * @param k    Number of subsets
+   * @param partitions    Number of subsets
    * @return True if partition possible, false otherwise
    */
-  public static boolean canPartitionKSubsets(int[] nums, int k) {
+  public static boolean canPartitionKSubsets(int[] nums, int partitions) {
     int totalSum = Arrays.stream(nums).sum();
-    if (totalSum % k != 0) {
+    if (totalSum % partitions != 0) {
       return false;
     }
 
-    int target = totalSum / k;
+    int target = totalSum / partitions;
 
     // sort in descending order.
     // This helps in pruning branches early. However, the worst case time complexity is still O(2^N)
@@ -76,7 +76,7 @@ public class EqualSumSubsetPartition {
         .mapToInt(Integer::intValue)
         .toArray();
     boolean[] used = new boolean[nums.length]; // used[i] = true if nums[i] is used
-    return backtrack(nums, used, 0, 0, k, target);
+    return backtrack(nums, used, 0, 0, partitions, target);
   }
 
   /**

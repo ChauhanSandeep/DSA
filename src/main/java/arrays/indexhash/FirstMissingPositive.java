@@ -60,6 +60,7 @@ public class FirstMissingPositive {
      */
     public int firstMissingPositive(int[] nums) {
         int len = nums.length;
+        boolean containsOne = false;
 
         // Replace negative numbers, zeros,
         // and numbers larger than n with 1s.
@@ -67,11 +68,15 @@ public class FirstMissingPositive {
         for (int i = 0; i < len; i++) {
             // Check whether 1 is in the original array
             if (nums[i] == 1) {
-                return 1;
+                containsOne = true;
             }
             if (nums[i] <= 0 || nums[i] > len) {
                 nums[i] = 1;
             }
+        }
+
+        if (!containsOne) {
+            return 1;
         }
 
         // Mark whether integers 1 to n are in nums

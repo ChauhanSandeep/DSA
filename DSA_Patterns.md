@@ -178,7 +178,7 @@ public int binarySearch(int[] arr, int target) {
 ```
 
 When we have to find the boundary condition instead of fixed target, like minimum in rotated sorted array or peak element,
-then we use condition `left < right` to avoid infinite loop.
+then we use condition `left < right`. This is to avoid risk of getting stuck with 2 elements if updates are `left = mid + 1` or `right = mid`
 
 ```java
 // Find minimum in rotated sorted array
@@ -204,6 +204,9 @@ return nums[left];
 ## 9. Heap / Priority Queue
 
 **When to use:** When you need to repeatedly find minimum/maximum elements, or maintain a sorted order dynamically as elements are added/removed.
+
+- Finding largest K element -> Min Heap
+- Finding smallest K element -> Max Heap
 
 **Example problems:**
 
@@ -1025,42 +1028,6 @@ for (int i = 31; i >= 0; i--) {
 
 ---
 
-### Micro-Pattern: Monotonic Stack for Next Greater/Smaller
-
-**Problem Context:** Finding next greater/smaller element, stock span, daily temperatures, histogram problems.
-
-**Key Idea:** Maintain a monotonic stack (increasing/decreasing) and pop elements when a larger/smaller element is found, resolving their "next greater/smaller" in one pass.
-
-**LeetCode Problems:**
-
-- [496. Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
-- [503. Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)
-- [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
-- [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
-- [901. Online Stock Span](https://leetcode.com/problems/online-stock-span/)
-
-**Code Snippet:**
-
-```java
-Stack<Integer> stack = new Stack<>();  // Store indices
-int[] result = new int[n];
-Arrays.fill(result, -1);
-
-for (int i = 0; i < n; i++) {
-    while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
-        int prevIdx = stack.pop();
-        result[prevIdx] = nums[i];  // Found next greater
-    }
-    stack.push(i);
-}
-```
-
-**Complexity:** Time - O(n), Space - O(n)
-
-**Notes:** Each element pushed/popped exactly once. Store indices (not values) for distance calculations. Use decreasing stack for "next greater", increasing for "next smaller". In top-query style, right-to-left traversal typically finds "next" elements (left-to-right typically finds "previous" elements).
-
----
-
 ### Micro-Pattern: Floyd's Cycle Detection as Array Index Following
 
 **Problem Context:** Finding duplicates in arrays where values point to indices, or detecting cycles in functional graphs.
@@ -1159,7 +1126,7 @@ Harder problems ask you to flip **several blocks in a row**. You still use the s
 public ListNode reverseBetween(ListNode head, int left, int right) {
     if (head == null || left == right) return head;
 
-    ListNode dummy = new ListNode(0, head);
+    ListNode dummy = new ListNode(0, head); // dummy node with next as head
     ListNode prev = dummy;
 
     // Move prev to node just before `left`
