@@ -38,6 +38,17 @@ public class MergeSortedArray {
      * @param len2 number of elements in nums2
      */
     public void merge(int[] nums1, int len1, int[] nums2, int len2) {
+        validateInputs(nums1, len1, nums2, len2);
+
+        if (len2 == 0) {
+            return;
+        }
+
+        if (len1 == 0) {
+            System.arraycopy(nums2, 0, nums1, 0, len2);
+            return;
+        }
+
         int index1 = len1 - 1;      // Last element in nums1
         int index2 = len2 - 1;      // Last element in nums2
         int writeIndex = len1 + len2 - 1;  // Last position in merged array
@@ -62,5 +73,27 @@ public class MergeSortedArray {
         }
 
         // No need to copy remaining from nums1 as they're already in place
+    }
+
+    private void validateInputs(int[] nums1, int len1, int[] nums2, int len2) {
+        if (nums1 == null || nums2 == null) {
+            throw new IllegalArgumentException("Input arrays must not be null");
+        }
+
+        if (len1 < 0 || len2 < 0) {
+            throw new IllegalArgumentException("Array lengths must be non-negative");
+        }
+
+        if (len1 > nums1.length) {
+            throw new IllegalArgumentException("len1 cannot exceed nums1 length");
+        }
+
+        if (len2 > nums2.length) {
+            throw new IllegalArgumentException("len2 cannot exceed nums2 length");
+        }
+
+        if (len1 + len2 > nums1.length) {
+            throw new IllegalArgumentException("nums1 does not have enough capacity for merge");
+        }
     }
 }

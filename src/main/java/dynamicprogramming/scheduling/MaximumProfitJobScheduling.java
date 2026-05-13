@@ -106,6 +106,52 @@ public class MaximumProfitJobScheduling {
   }
 
   /**
+   * Same optimum as {@link #jobScheduling(int[], int[], int[])}, computed via recursion:
+   * {@code maxProfit(i) = max(maxProfit(i-1), profit[i] + maxProfit(prevNonOverlapping))}.
+   * The call chain starts at index {@code 0} and steps forward to {@code n} ({@code index -> index + 1}),
+   * filling {@code memo[0 .. n-1]} in order (same recurrence as the iterative DP table).
+   *
+   * Time Complexity: O(n log n) — sorting plus binary search per index along the forward chain
+   * Space Complexity: O(n) — memo array plus recursion depth {@code n}
+   */
+  public int jobSchedulingRecursive(int[] startTime, int[] endTime, int[] profit) {
+    int numberOfJobs = startTime.length;
+    if (numberOfJobs == 0) {
+      return 0;
+    }
+
+    List<JobSchedule> jobs = new ArrayList<>();
+    for (int i = 0; i < numberOfJobs; i++) {
+      jobs.add(new JobSchedule(startTime[i], endTime[i], profit[i]));
+    }
+    jobs.sort(Comparator.comparingInt(job -> job.endTime));
+
+    int[] memo = new int[numberOfJobs];
+    return maxProfitForwardRecursive(jobs, 0, memo);
+  }
+
+  /**
+   * Computes {@code memo[index]} from the prefix {@code 0 .. index}, then recurses with {@code index + 1}.
+   * Entry is {@code (jobs, 0)} so the stack traces indices {@code 0, 1, ..., n} forward only.
+   */
+  private int maxProfitForwardRecursive(List<JobSchedule> jobs, int index, int[] memo) {
+    int n = jobs.size();
+    if (index >= n) {
+      return memo[n - 1];
+    }
+
+    int profitIfExcluded = index == 0 ? 0 : memo[index - 1];
+
+    int previousNonOverlappingJobIndex = findPreviousNonOverlappingJob(jobs, index);
+    int profitFromPrev = previousNonOverlappingJobIndex >= 0 ? memo[previousNonOverlappingJobIndex] : 0;
+    int profitIfIncluded = jobs.get(index).profit + profitFromPrev;
+
+    memo[index] = Math.max(profitIfExcluded, profitIfIncluded);
+
+    return maxProfitForwardRecursive(jobs, index + 1, memo);
+  }
+
+  /**
    * Uses binary search to find the latest job that doesn't overlap with current job.
    * This finds non overlapping job on the left side of currentJobIndex.
    *

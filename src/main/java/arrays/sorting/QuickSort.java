@@ -17,7 +17,7 @@ import java.util.Arrays;
  * 3. Recursively sort the left and right subarrays
  *
  * Key Characteristics:
- * - In-place sorting (requires O(1) extra space for iterative version)
+ * - Returns a new sorted array without modifying input
  * - Not stable (relative order of equal elements may change)
  * - Generally faster than merge sort and heap sort in practice
  * - Performance depends on pivot selection
@@ -53,53 +53,48 @@ public class QuickSort {
         int[] data = {8, 7, 2, 1, 0, 9, 6};
         System.out.println("Unsorted Array: " + Arrays.toString(data));
 
-        quickSort(data, 0, data.length - 1);
+        int[] sortedData = sortArray(data);
 
-        System.out.println("Sorted Array in Ascending Order: " + Arrays.toString(data));
+        System.out.println("Original Array (unchanged): " + Arrays.toString(data));
+        System.out.println("Sorted Array in Ascending Order: " + Arrays.toString(sortedData));
     }
 
     /**
-     * QuickSort main function - recursively sorts the array.
+     * Sorts the given array using QuickSort and returns a sorted copy.
      *
-     * Divide and Conquer Approach:
-     * 1. If low < high, partition the array to get the pivot index
-     * 2. Recursively sort the left subarray (elements before pivot)
-     * 3. Recursively sort the right subarray (elements after pivot)
-     * 4. Base case: when low >= high, subarray has 0 or 1 element (already sorted)
-     *
-     * @param array The array to sort
-     * @param left Starting index of the subarray to sort
-     * @param right Ending index of the subarray to sort
+     * @param array The input array to sort
+     * @return A new sorted array, leaving input array unchanged
      */
-    public static void quickSort(int[] array, int left, int right) {
-        if (left < right) {
-            int partitionIndex = partition(array, left, right);
-            quickSort(array, left, partitionIndex - 1);
-            quickSort(array, partitionIndex + 1, right);
+    public static int[] sortArray(int[] array) {
+        if (array == null) {
+            return null;
         }
+
+        int[] result = Arrays.copyOf(array, array.length);
+        quickSort(result, 0, result.length - 1);
+        return result;
+    }
+
+    /**
+     * Internal recursive QuickSort that sorts the provided array in-place.
+     */
+    private static void quickSort(int[] array, int left, int right) {
+        if (left >= right) return;
+
+        int partitionIndex = partition(array, left, right);
+        quickSort(array, left, partitionIndex - 1);
+        quickSort(array, partitionIndex + 1, right);
     }
 
     /**
      * Partition function - rearranges elements around a pivot.
-     *
-     * Partitioning Logic (Lomuto Partition Scheme):
-     * - Choose rightmost element as pivot
-     * - Use partitionIndex to track where next smaller element should go
-     * - Scan array from left to right
-     * - When element <= pivot is found, swap it to partitionIndex position
-     * - After scanning, place pivot in its correct sorted position
-     *
-     * Example: array = [8, 7, 2, 1, 0, 9, 6], pivot = 6
-     * - After partitioning: [2, 1, 0, 6, 8, 9, 7]
-     * - Pivot 6 is now at its final sorted position (index 3)
-     * - All elements < 6 are on the left
-     * - All elements > 6 are on the right
-     *
-     * Invariant maintained:
-     * - Elements at indices [left, partitionIndex) are <= pivot
-     * - Elements at indices [partitionIndex, i) are > pivot
-     * - Elements at indices [i, right) are unprocessed
-     * - Element at index right is the pivot
+     * 
+     * Algorithm Steps:
+     * 1. Choose the rightmost element as the pivot
+     * 2. Use partitionIndex to track where next smaller element should go
+     * 3. Scan array from left to right
+     * 4. When element <= pivot is found, swap it to partitionIndex position
+     * 5. After scanning, place pivot in its correct sorted position
      *
      * @param array The array to partition
      * @param left Starting index of subarray
