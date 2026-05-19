@@ -140,26 +140,45 @@ public int maxArea(int[] heights) {
 ---
 
 ## 3. Binary Search
+Use binary search when:
+- array is sorted
+- search space is monotonic
+- we can eliminate half of the candidates in every iteration
 
-**When to use:** When searching in a sorted array or when you can define a monotonic search space where you can eliminate half the candidates in each iteration.
+---
 
-**Example problems:**
+### Binary Search Has 2 Main Patterns
 
+| Type | Goal | Loop Condition |
+|---|---|---|
+| Exact target search | Find exact value | `while(left <= right)` |
+| Boundary search | Find first/last/minimum/peak | `while(left < right)` |
+
+---
+
+#### 1. Exact Target Search
+This is used when:
+- searching exact value
+- equality matters
+
+##### Example Problems
+
+- Binary Search
+- Search Insert Position
 - Search in Rotated Sorted Array
-- Find Peak Element
-- Find Minimum in Rotated Sorted Array
-- Single Element in a Sorted Array
 
-**Code snippet:**
+##### Template
 
-```java
-// Standard binary search of target in sorted array
+```java id="xv92yl"
 public int binarySearch(int[] arr, int target) {
+
     int left = 0;
     int right = arr.length - 1;
 
-    // Use <= so the case where left == right is checked
-    while (left <= right) { 
+    // Use <= because when left == right,
+    // that element still needs to be checked
+    while (left <= right) {
+
         int mid = left + (right - left) / 2;
 
         if (arr[mid] == target) {
@@ -173,31 +192,196 @@ public int binarySearch(int[] arr, int target) {
         }
     }
 
-    return -1; // Target not found
+    return -1;
 }
 ```
 
-When we have to find the boundary condition instead of fixed target, like minimum in rotated sorted array or peak element,
-then we use condition `left < right`. This is to avoid risk of getting stuck with 2 elements if updates are `left = mid + 1` or `right = mid`
+---
 
-```java
-// Find minimum in rotated sorted array
-int left = 0, right = nums.length - 1;
+#### 2. Boundary Search
+This is used when finding:
+- minimum
+- peak
+- first occurrence
+- last occurrence
+- lower bound
+- first true answer
 
-// Note: Here we use (left < right) instead of (left <= right)
+##### Example Problems
+
+- Find Minimum in Rotated Sorted Array
+- Find Peak Element
+- First Bad Version
+
+---
+
+### Most Important Rule
+
+> Ask can `mid` still be the answer?
+
+#### If YES → keep mid
+
+```java id="c4k0fb"
+right = mid;
+```
+
+#### If NO → discard mid
+
+```java id="b7j4yq"
+left = mid + 1;
+```
+
+---
+
+### Boundary Search Template
+
+```java id="o0mztf"
 while (left < right) {
+
     int mid = left + (right - left) / 2;
-    
-    if (nums[mid] > nums[right]) {
-        left = mid + 1;  // Minimum is in right half
+
+    if (condition) {
+
+        // mid cannot be answer
+        left = mid + 1;
+
     } else {
-        right = mid;  // Minimum could be mid or in left half
+
+        // mid can still be answer
+        right = mid;
     }
 }
+```
+
+---
+
+### Example — Find Minimum in Rotated Sorted Array
+
+```java id="7j0ctq"
+int left = 0;
+int right = nums.length - 1;
+
+while (left < right) {
+
+    int mid = left + (right - left) / 2;
+
+    if (nums[mid] > nums[right]) {
+
+        // minimum is on right side
+        left = mid + 1;
+
+    } else {
+
+        // mid can still be minimum
+        right = mid;
+    }
+}
+
 return nums[left];
 ```
 
-**Complexity:** Time - O(log n), Space - O(1)
+---
+
+### Important Tricks
+
+#### Trick 1 — Keep vs Discard Mid
+
+| Situation | Update |
+|---|---|
+| mid can still be answer | `right = mid` |
+| mid cannot be answer | `left = mid + 1` |
+
+---
+
+#### Trick 2 — Loop Condition
+
+| Goal | Loop |
+|---|---|
+| Exact target | `left <= right` |
+| Boundary search | `left < right` |
+
+---
+
+#### Trick 3 — Compare Against Correct Side
+
+| Problem Type                         | Compare Against | Why |
+|--------------------------------------|---|---|
+| Find Minimum in Rotated Sorted Array | `nums[mid] > nums[right]` | `right` helps identify whether `mid` is in the larger sorted portion or smaller rotated portion. If `nums[mid] > nums[right]`, minimum must be on right side. |
+| Search in Rotated Sorted Array       | `nums[mid] >= nums[left]` | `left` helps determine which half is normally sorted. If `nums[mid] >= nums[left]`, left half is sorted. |
+| Find Peak Element                    | Neighbor (`nums[mid + 1]`) | Compare slope direction. If right neighbor is bigger, peak exists on right side. Otherwise peak exists on left side including `mid`. |
+| First Occurrence of target           | `target` | Decide whether current value is large enough to be possible answer. |
+| Last Occurrence of target            | `target` | Decide whether current value is still valid and can extend further right. |
+
+---
+
+#### Quick Intuition
+
+##### 1. Compare with `nums[right]`
+Used to find Minimum in Rotated Sorted Array
+Reason:
+- `right` usually belongs to smaller sorted section
+- helps identify pivot direction
+
+Example:
+
+```text id="3u95iu"
+4 5 6 7 0 1 2
+            ^
+          right
+```
+
+If:
+
+```java id="7v6bdf"
+nums[mid] > nums[right]
+```
+
+then `mid` is in left larger section, so minimum is on right side.
+
+---
+
+##### 2. Compare with `nums[left]`
+Used in search in Rotated Sorted Array
+- helps identify which half is sorted normally
+
+Example:
+
+```text id="j6m6fp"
+4 5 6 7 0 1 2
+^
+left
+```
+
+If:
+
+```java id="0s2t9j"
+nums[mid] >= nums[left]
+```
+
+then left half is sorted.
+
+---
+
+##### 3. Compare with Neighbor
+
+Used in Find Peak Element
+- neighbor comparison tells whether we are moving uphill or downhill
+
+If:
+
+```java id="u1lw4n"
+nums[mid] < nums[mid + 1]
+```
+
+then peak must exist on right side.
+
+If:
+
+```java id="7q4z9h"
+nums[mid] > nums[mid + 1]
+```
+
+then peak exists on left side including `mid`.
 
 ---
 
