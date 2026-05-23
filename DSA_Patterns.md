@@ -435,39 +435,50 @@ public int findKthLargestUsingMinHeap(int[] inputArray, int k) {
 **Code snippet:**
 
 ```java
-// BFS to find shortest path from source to all other vertices
+// BFS to find shortest path from source to all other vertices.
+// Optimization: initialize `distance` with Integer.MAX_VALUE and only enqueue
+// a neighbor when the new distance would actually improve its current value.
+// This avoids pushing the same node onto the queue multiple times.
+// `visited` is still used to guarantee each node is processed (work step)
+// at most once, even if it ever gets enqueued more than once.
 public static int[] shortestPath(List<List<Integer>> graph, int startNode) {
     int size = graph.size();
     boolean[] visited = new boolean[size];
     int[] distance = new int[size];
-    Arrays.fill(distance, -1);
-    
-    Queue<Pair> queue = new LinkedList<>();
-    
-    // Initial Add
-    queue.offer(new Pair(startNode, 0));
-    
+    Arrays.fill(distance, Integer.MAX_VALUE);
+    distance[startNode] = 0;
+
+    Queue<Integer> queue = new ArrayDeque<>();
+    queue.offer(startNode);
+
     while (!queue.isEmpty()) {
         // 1. SELECT
-        Pair node = queue.poll();
-        
-        // 2. MARK(*)
-        if (visited[node.v]) continue;
-        visited[node.v] = true;
-        // 3. WORK
-        distance[node.v] = node.d; // Update the final distance array
-        
-        // 4. ADD(*)
-        for (int neighbor : graph.get(node.v)) {
-            if (!visited[neighbor]) {
-                // Add the neighbor with distance + 1
-                queue.offer(new Pair(neighbor, node.d + 1));
+        int node = queue.poll();
+
+        // 2. MARK(*) — Skip the node if visited, else mark visited
+        if (visited[node]) continue;
+        visited[node] = true;
+
+        // 3. WORK - ADD: relax each neighbor
+        for (int neighbor : graph.get(node)) {
+            if (visited[neighbor]) continue;
+            int newDist = distance[node] + 1;
+            if (newDist < distance[neighbor]) {   // only enqueue if it improves
+                distance[neighbor] = newDist;
+                queue.offer(neighbor);
             }
         }
     }
     return distance;
 }
 ```
+
+> Note: For an unweighted graph, `newDist < distance[v]` is true only the
+> first time we reach `v` (BFS reaches every node by its shortest path first),
+> so each node is enqueued at most once. The `visited` array is kept as a
+> defensive guard so the SELECT → MARK → WORK → ADD template stays uniform
+> with the DFS / Dijkstra templates below, and to make the code robust if the
+> relaxation rule is ever changed.
 
 **Complexity:** Time - O(V + E), Space - O(w) where w is maximum width
 
@@ -1045,9 +1056,15 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
     int index = 0;
     
     while (!queue.isEmpty()) {
+        // 1. SELECT
         int course = queue.poll();
+
+        // 2. MARK(*) — in-degree 0 guarantees first-time processing, no visited[] needed
+
+        // 3. WORK
         result[index++] = course;
-        
+
+        // 4. ADD(*) — decrement neighbors; enqueue when in-degree becomes 0
         for (int next : graph.get(course)) {
             inDegree[next]--;
             if (inDegree[next] == 0) {

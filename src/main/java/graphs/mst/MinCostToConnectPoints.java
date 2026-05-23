@@ -40,7 +40,9 @@ public class MinCostToConnectPoints {
     PriorityQueue<Edge> minHeap = new PriorityQueue<>((x, y) -> Integer.compare(x.cost, y.cost));
     // Track whether a point is already included in the MST
     boolean[] visited = new boolean[length];
-    // Best known cost to connect each point to the current MST
+
+    // Best known cost to connect each point to the current MST.
+    // This is optimization to avoid unnecessarily adding nodes into the heap multiple times.
     int[] minDist = new int[length];
     Arrays.fill(minDist, Integer.MAX_VALUE);
 
@@ -58,11 +60,11 @@ public class MinCostToConnectPoints {
     }
 
     // Continue adding edges until all points are in the MST
-    while (edgesUsed < length - 1 && !minHeap.isEmpty()) {
+    while (!minHeap.isEmpty()) {
       Edge edge = minHeap.poll();
 
       if (visited[edge.to] || edge.cost > minDist[edge.to]) {
-        continue; // Skip visited nodes and stale heap entries
+        continue;
       }
 
       // Add the edge to the MST
@@ -70,13 +72,66 @@ public class MinCostToConnectPoints {
       totalCost += edge.cost;
       edgesUsed++;
 
-      // Relax edges from the newly added point
+      // Add edges from this point to the queue
       for (int next = 0; next < length; next++) {
         if (!visited[next]) {
           int cost = manhattanDistance(points[edge.to], points[next]);
           if (cost < minDist[next]) {
             minDist[next] = cost;
             minHeap.offer(new Edge(edge.to, next, cost));
+          }
+        }
+      }
+    }
+
+    return totalCost;
+  }
+
+  /**
+   * Solves the same MST problem with an optimized Prim approach for dense graphs.
+   *
+   * Optimization: Replace the min-heap with a linear scan over {@code minDist}. In a complete
+   * graph (like this problem), each node can reach all others, so avoiding heap push/pop removes
+   * the extra {@code logN} factor and improves from {@code O(N^2 logN)} to {@code O(N^2)}.
+   *
+   * Steps:
+   * 1. Initialize minDist[i] as the best known cost to connect node i
+   * to the current MST.
+   * 2. Repeatedly pick the unvisited node with smallest minDist using a linear scan.
+   * 3. Add it to MST and add that cost to answer.
+   * 4. Relax all unvisited nodes by updating {@code minDist} with Manhattan distance from the newly added node.
+   *
+   * Time Complexity: O(N^2)
+   * Space Complexity: O(N)
+   */
+  public int minCostConnectPointsOptimized(int[][] points) {
+    int length = points.length;
+    boolean[] visited = new boolean[length];
+    int[] minDist = new int[length];
+    Arrays.fill(minDist, Integer.MAX_VALUE);
+    minDist[0] = 0;
+
+    int totalCost = 0;
+
+    for (int used = 0; used < length; used++) {
+      int current = -1;
+
+      // Pick the unvisited node with the smallest connection cost.
+      for (int node = 0; node < length; node++) {
+        if (!visited[node] && (current == -1 || minDist[node] < minDist[current])) {
+          current = node;
+        }
+      }
+
+      visited[current] = true;
+      totalCost += minDist[current];
+
+      // Relax the best known cost to connect each remaining node.
+      for (int next = 0; next < length; next++) {
+        if (!visited[next]) {
+          int cost = manhattanDistance(points[current], points[next]);
+          if (cost < minDist[next]) {
+            minDist[next] = cost;
           }
         }
       }

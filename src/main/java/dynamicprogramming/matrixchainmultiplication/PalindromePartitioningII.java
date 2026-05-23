@@ -2,13 +2,38 @@ package dynamicprogramming.matrixchainmultiplication;
 
 import java.util.Arrays;
 
+/**
+ * Given a string s, partition s such that every substring of the partition is a palindrome.
+ * Return the minimum cuts needed for a palindrome partitioning of s.
+ *
+ * Example:
+ * Input: s = "aab"
+ * Output: 1
+ * Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cut.
+ *
+ * LeetCode Link: https://leetcode.com/problems/palindrome-partitioning-ii
+ *
+ * Follow-up Questions:
+ * 1. What if we want to return one of the actual partitions achieving the minimum cuts?
+ *    Answer: Track the chosen split index for each prefix in a parent array, then backtrack from minCuts[length].
+ * 2. How would you reduce the space complexity?
+ *    Answer: Replace the 2D palindrome table with Manacher's algorithm or expand-around-center to get O(N) extra space.
+ * 3. What if cuts had non-uniform costs (e.g., cost depends on position)?
+ *    Answer: Replace the "+1" in the recurrence with the position-specific cut cost and minimize total cost.
+ * 4. How would you extend this to allow at most K non-palindromic segments?
+ *    Answer: Add a second dimension minCuts[i][k] tracking remaining allowance of non-palindromic pieces.
+ * 5. What if the string is streamed and you must answer queries online?
+ *    Answer: Use incremental palindrome tracking (e.g., Eertree/palindromic tree) along with DP updates per new character.
+ *
+ * LeetCode Contest Rating: Not available (not a contest problem)
+ */
 public class PalindromePartitioningII {
 
     /**
      * Finds the minimum number of cuts needed for a palindrome partitioning of a string.
      * * STEPS TO SOLVE:
      * 1. Precompute Palindromes (Interval DP Pattern):
-     * - Use a 2D boolean table 'isPalindrome[left][right]' to store whether substring 
+     * - Use a 2D boolean table 'isPalindrome[left][right]' to store whether substring
      * from index 'left' to 'right' is a palindrome.
      * - Use the 'gap' strategy to fill this table in O(N^2) time.
      * * 2. Calculate Minimum Cuts (Linear Partition DP Pattern):
@@ -64,7 +89,7 @@ public class PalindromePartitioningII {
                     if (left == 0) {
                         minCuts[right] = 0;
                     } else {
-                        // Otherwise, take the best solution for the prefix ending at left, 
+                        // Otherwise, take the best solution for the prefix ending at left,
                         // and add 1 more cut for the current palindrome [left...right-1]
                         minCuts[right] = Math.min(minCuts[right], minCuts[left] + 1);
                     }

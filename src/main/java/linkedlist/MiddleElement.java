@@ -1,7 +1,5 @@
 package linkedlist;
 
-import java.util.Optional;
-
 
 /**
  * Problem: Find the Middle Element of a Singly Linked List
@@ -38,8 +36,8 @@ public class MiddleElement {
     list.add(new ListNode(5));
     list.add(new ListNode(6));
 
-    Optional<Integer> middleValue = findMiddleElement(head);
-    System.out.println("Middle Element: " + middleValue.orElse(-1));
+    ListNode middle = findMiddleElement(head);
+    System.out.println("Middle Element: " + (middle != null ? middle.getVal() : -1));
   }
 
   /**
@@ -57,11 +55,11 @@ public class MiddleElement {
    * Space Complexity: O(1) — No extra data structures used.
    *
    * @param head The head node of the linked list.
-   * @return An Optional containing the value of the middle node.
+   * @return The middle node of the linked list, or {@code null} if the list is empty.
    */
-  private static Optional<Integer> findMiddleElement(ListNode head) {
+  private static ListNode findMiddleElement(ListNode head) {
       if (head == null) {
-          return Optional.empty();
+          return null;
       }
 
     ListNode slow = head;
@@ -73,7 +71,7 @@ public class MiddleElement {
       fast = fast.getNext().getNext();
     }
 
-    return Optional.of(slow.getVal());
+    return slow;
   }
 }
 
