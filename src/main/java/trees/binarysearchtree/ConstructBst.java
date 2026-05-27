@@ -42,8 +42,6 @@ public class ConstructBst {
         System.out.println(root);
     }
 
-    int preorderIndex;
-    Map<Integer, Integer> inorderIndexMap;
 
     /**
      * This method constructs the binary tree using preorder and inorder traversals.
@@ -74,28 +72,31 @@ public class ConstructBst {
      * @return          The root of the constructed binary tree.
      */
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        preorderIndex = 0;
-        // build a hashmap to store value -> its index relations
-        inorderIndexMap = new HashMap<>();
+        // Map each value in the inorder traversal to its index for O(1) root lookup.
+        Map<Integer, Integer> valueToInorderIndex = new HashMap<>();
         for (int i = 0; i < inorder.length; i++) {
-            inorderIndexMap.put(inorder[i], i);
+            valueToInorderIndex.put(inorder[i], i);
         }
 
-        return arrayToTree(preorder, 0, preorder.length - 1);
+        // Wrap the preorder cursor in a single-element array so it is shared
+        // (and incremented) across recursive calls.
+        int[] preorderCursor = {0};
+        return buildSubtree(preorder, 0, inorder.length - 1, preorderCursor, valueToInorderIndex);
     }
 
-    private TreeNode arrayToTree(int[] preorder, int left, int right) {
-        // if there are no elements to construct the tree
-        if (left > right) return null;
+    private TreeNode buildSubtree(int[] preorder, int inorderStart, int inorderEnd,
+                                  int[] preorderCursor, Map<Integer, Integer> valueToInorderIndex) {
+        // No elements remain in this inorder range — subtree is empty.
+        if (inorderStart > inorderEnd) return null;
 
-        // select the preorder_index element as the root and increment it
-        int rootValue = preorder[preorderIndex++];
+        // The next value in preorder is the root of the current subtree.
+        int rootValue = preorder[preorderCursor[0]++];
         TreeNode root = new TreeNode(rootValue);
 
-        // build left and right subtree
-        // excluding inorderIndexMap[rootValue] element because it's the root
-        root.left = arrayToTree(preorder, left, inorderIndexMap.get(rootValue) - 1);
-        root.right = arrayToTree(preorder, inorderIndexMap.get(rootValue) + 1, right);
+        // Split the inorder range around the root to form left and right subtrees.
+        int rootInorderIndex = valueToInorderIndex.get(rootValue);
+        root.left = buildSubtree(preorder, inorderStart, rootInorderIndex - 1, preorderCursor, valueToInorderIndex);
+        root.right = buildSubtree(preorder, rootInorderIndex + 1, inorderEnd, preorderCursor, valueToInorderIndex);
         return root;
     }
 }
