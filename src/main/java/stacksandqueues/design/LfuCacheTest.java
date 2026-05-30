@@ -46,10 +46,13 @@ import java.util.Map;
 class LFUCache {
   private final int capacity; // Maximum capacity of the cache
   private int minFrequency; // Minimum frequency of any key in the cache
+
   private final Map<Integer, Integer> keyToValueMap; // Maps keys to their values
   private final Map<Integer, Integer> keyToFrequencyMap; // Maps keys to their frequency counts
+
   // Maps frequencies to sets of keys with that frequency. LinkedHashSet is used to maintain insertion order for LRU eviction.
   private final Map<Integer, LinkedHashSet<Integer>> frequencyToKeysMap;
+
   public LFUCache(int capacity) {
     this.capacity = capacity;
     this.minFrequency = 0;
