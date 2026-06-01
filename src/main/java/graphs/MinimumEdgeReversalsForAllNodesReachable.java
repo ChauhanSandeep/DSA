@@ -9,73 +9,39 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 2858. Minimum Edge Reversals So Every Node Is Reachable  (Hard, ~rating 2400)
+ * 2858. Minimum Edge Reversals So Every Node Is Reachable  (Hard)
+ *
+ * Problem: You are given a directed graph with n nodes labeled 0..n-1 and
+ * exactly n-1 edges. The underlying undirected structure forms a tree. For
+ * each node i, return the minimum number of edge reversals needed so that
+ * every other node is reachable from i by following edge directions.
+ *
+ * Example 1:
+ *   Input:  n = 4, edges = [[2,0],[2,1],[1,3]]
+ *   Output: [1, 1, 0, 2]
+ *   Explanation:
+ *     - From 0: reverse 2→0 so 0 → 2 → 1 → 3. 1 reversal.
+ *     - From 1: reverse 2→1 so 1 → 2 → 0, and 1 → 3 already works. 1 reversal.
+ *     - From 2: nothing to reverse. 0 reversals.
+ *     - From 3: reverse 1→3 and 2→1. 2 reversals.
+ *
+ * Example 2:
+ *   Input:  n = 3, edges = [[1,2],[2,0]]
+ *   Output: [2, 0, 1]
+ *
+ * Constraints:
+ *   2 <= n <= 10^5
+ *   edges.length == n - 1
+ *   The underlying graph (ignoring directions) is a tree.
+ *
  * LeetCode: https://leetcode.com/problems/minimum-edge-reversals-so-every-node-is-reachable
- *
- * ──────────────────────────────────────────────────────────────────────────────
- *  PROBLEM (one line):
- *     The graph is a tree with directed edges. For each node i, return the
- *     minimum number of edges we must reverse so that every other node is
- *     reachable from i by following edge directions.
- *
- *  KEY INSIGHT  (this is the whole solution — re-read this first):
- *     Treat the tree as undirected. Give every edge TWO costs:
- *         cost(u -> v) = 0  if the original arrow already points u -> v
- *         cost(v -> u) = 1  (we'd have to flip it)
- *     For ANY edge: cost(u -> v) + cost(v -> u) == 1.   ← the magic invariant
- *
- *     answer[root] = sum of edge step-costs when walking outward from `root`.
- *
- *     When we MOVE the root from u to a neighbor v, only ONE edge changes
- *     direction relative to the root — the edge (u, v) itself. Every other
- *     edge is still "above vs below" the same way as before. Therefore:
- *
- *         answer[v] = answer[u] - cost(u -> v) + cost(v -> u)        (★)
- *                   = answer[u] - cost(u -> v) + (1 - cost(u -> v))
- *
- *     So once we know answer[0], every other answer follows in O(1) per node.
- *
- *  ALGORITHM (two linear passes, O(n) total):
- *     STEP 1  Build undirected adjacency where each entry carries its step-cost.
- *     STEP 2  BFS from node 0:
- *               - compute answer[0] (sum of step-costs encountered)
- *               - remember parentOf[v] and costFromParent[v] for every v
- *               - remember the BFS order so STEP 3 sees parents before children
- *     STEP 3  Walk nodes in BFS order; apply recurrence (★) in O(1) each.
- *
- *  WORKED EXAMPLE  (edges = [[2,0],[2,1],[1,3]],  n = 4):
- *
- *       2                  Edge costs:
- *      ↓ ↓                   0—2 : 0→2 costs 1, 2→0 costs 0
- *      0 1                   1—2 : 1→2 costs 1, 2→1 costs 0
- *        ↓                   1—3 : 3→1 costs 1, 1→3 costs 0
- *        3
- *
- *     STEP 2 (BFS from 0):
- *       0 → 2 (cost 1), 2 → 1 (cost 0), 1 → 3 (cost 0)
- *       answer[0] = 1.   bfsOrder = [0, 2, 1, 3]
- *
- *     STEP 3 (re-root):
- *       v=2, parent=0, cost(0→2)=1 → answer[2] = 1 - 1 + 0 = 0
- *       v=1, parent=2, cost(2→1)=0 → answer[1] = 0 - 0 + 1 = 1
- *       v=3, parent=1, cost(1→3)=0 → answer[3] = 1 - 0 + 1 = 2
- *
- *     Result = [1, 1, 0, 2]  ✓
- *
- *  WHY ITERATIVE BFS (not recursion)?
- *     n can be 10^5 and the tree can be a straight line → recursion would
- *     blow the JVM call stack. Iterative is mandatory here.
- *
- *  WHY STORE bfsOrder?
- *     STEP 3 needs parents processed before children. BFS order guarantees
- *     that for free, so we replace a second traversal with a flat for-loop.
- * ──────────────────────────────────────────────────────────────────────────────
  */
 public class MinimumEdgeReversalsForAllNodesReachable {
 
-    /* ───── Invariant: for any edge, COST_WITH_ARROW + COST_AGAINST_ARROW == 1 ───── */
-    private static final int COST_WITH_ARROW    = 0;  // walking with the arrow is free
-    private static final int COST_AGAINST_ARROW = 1;  // walking against requires 1 reversal
+    /** Cost of walking with the original arrow (free) — invariant: WITH + AGAINST == 1. */
+    private static final int COST_WITH_ARROW    = 0;
+    /** Cost of walking against the original arrow (needs one reversal). */
+    private static final int COST_AGAINST_ARROW = 1;
 
     /** A neighbor in the undirected adjacency list, plus the cost of stepping toward it. */
     private static final class Edge {
@@ -84,17 +50,49 @@ public class MinimumEdgeReversalsForAllNodesReachable {
         Edge(int neighbor, int cost) { this.neighbor = neighbor; this.cost = cost; }
     }
 
-    /* ─── Shared bookkeeping (fields keep helper signatures small & readable) ─── */
+    // Shared bookkeeping (fields keep helper signatures small).
     private Map<Integer, List<Edge>> adjacency;
-    private int[] parentOf;          // parentOf[v]       = v's parent in the BFS tree from node 0
+    private int[] parentOf;          // parentOf[v]       = v's parent in BFS tree from node 0
     private int[] costFromParent;    // costFromParent[v] = cost of stepping parentOf[v] -> v
-    private int[] bfsOrder;          // nodes in discovery order (parents before children)
+    private int[] bfsOrder;          // discovery order from node 0 (parents before children)
     private int[] answer;            // answer[i]         = min reversals when rooted at i
 
     /**
-     * Entry point: see class Javadoc for the full algorithm.
-     * Time  O(n)  -  two linear BFS-style passes.
-     * Space O(n)  -  adjacency list + bookkeeping arrays.
+     * Insight (re-rooting tree DP):
+     *   Treat the tree as undirected. Give every edge TWO costs:
+     *       cost(u→v) = 0 if the original arrow already points u→v, else 1.
+     *   For ANY edge: cost(u→v) + cost(v→u) == 1.   ← the magic invariant
+     *
+     *   answer[root] = sum of edge step-costs when walking outward from `root`.
+     *
+     *   Moving the root from u to a neighbor v flips ONLY the edge (u, v);
+     *   every other edge is still "above vs below" the same way. So:
+     *       answer[v] = answer[u] - cost(u→v) + cost(v→u)              (★)
+     *                 = answer[u] - cost(u→v) + (1 - cost(u→v))
+     *   Once we know answer[0], every other answer follows in O(1).
+     *
+     * Steps:
+     *   1. Build the weighted undirected adjacency (see {@link #buildWeightedAdjacency}).
+     *   2. BFS from node 0 to compute answer[0] and record parent / step-cost / BFS order
+     *      (see {@link #seedAnswerForRootZero}).
+     *   3. Walk bfsOrder; apply recurrence (★) once per child
+     *      (see {@link #rerootToAllOtherNodes}).
+     *
+     * Worked trace (Example 1, edges = [[2,0],[2,1],[1,3]]):
+     *   Step 2 — BFS from 0: 0→2 (+1), 2→1 (+0), 1→3 (+0)  →  answer[0] = 1
+     *            bfsOrder = [0, 2, 1, 3]
+     *   Step 3 — apply (★):
+     *     v=2, parent=0, cost(0→2)=1 → answer[2] = 1 - 1 + 0 = 0
+     *     v=1, parent=2, cost(2→1)=0 → answer[1] = 0 - 0 + 1 = 1
+     *     v=3, parent=1, cost(1→3)=0 → answer[3] = 1 - 0 + 1 = 2
+     *   Result = [1, 1, 0, 2]  ✓
+     *
+     * Why iterative BFS (not recursion)?
+     *   n can be 10^5 and the tree can be a straight line → recursion would blow
+     *   the JVM call stack.
+     *
+     * Time  O(n) — two linear BFS-style passes.
+     * Space O(n) — adjacency map + bookkeeping arrays.
      */
     public int[] minEdgeReversals(int nodes, int[][] edges) {
         parentOf       = new int[nodes];
@@ -110,7 +108,10 @@ public class MinimumEdgeReversalsForAllNodesReachable {
         return answer;
     }
 
-    /** STEP 1 — Undirected adjacency where each edge carries its per-direction cost. */
+    /**
+     * Builds an undirected adjacency map where each entry is {neighbor, cost}.
+     * For original edge from → to: store (to, 0) at `from` and (from, 1) at `to`.
+     */
     private void buildWeightedAdjacency(int nodes, int[][] edges) {
         adjacency = new HashMap<>(nodes * 2);
         for (int i = 0; i < nodes; i++) {
@@ -118,16 +119,14 @@ public class MinimumEdgeReversalsForAllNodesReachable {
         }
         for (int[] edge : edges) {
             int from = edge[0], to = edge[1];
-            // Original arrow is from -> to.
-            adjacency.get(from).add(new Edge(to,   COST_WITH_ARROW));     // with arrow
-            adjacency.get(to)  .add(new Edge(from, COST_AGAINST_ARROW));  // against arrow
+            adjacency.get(from).add(new Edge(to,   COST_WITH_ARROW));
+            adjacency.get(to)  .add(new Edge(from, COST_AGAINST_ARROW));
         }
     }
 
     /**
-     * STEP 2 — BFS from node 0.
-     *   - returns answer[0] = total step-cost reaching every node from 0
-     *   - fills parentOf[], costFromParent[], bfsOrder[] for STEP 3
+     * BFS from node 0. Returns answer[0] (sum of step-costs to reach everyone)
+     * and fills parentOf, costFromParent, bfsOrder for the re-rooting pass.
      */
     private int seedAnswerForRootZero() {
         int totalCost = 0;
@@ -144,11 +143,10 @@ public class MinimumEdgeReversalsForAllNodesReachable {
 
             for (Edge edge : adjacency.get(current)) {
                 if (visited[edge.neighbor]) continue;
-
                 visited[edge.neighbor]        = true;
                 parentOf[edge.neighbor]       = current;
-                costFromParent[edge.neighbor] = edge.cost;   // cost of (current -> neighbor)
-                totalCost                    += edge.cost;   // accumulated only for root = 0
+                costFromParent[edge.neighbor] = edge.cost;
+                totalCost                    += edge.cost;
                 queue.offer(edge.neighbor);
             }
         }
@@ -156,16 +154,10 @@ public class MinimumEdgeReversalsForAllNodesReachable {
     }
 
     /**
-     * STEP 3 — Apply recurrence (★) in BFS order so every parent is already solved
-     * when we reach its child:
-     *     answer[child] = answer[parent] - cost(parent -> child) + cost(child -> parent)
-     *                   = answer[parent] - costParentToChild     + (1 - costParentToChild)
-     *
-     * Intuition: moving the root across edge (parent, child) flips ONLY that
-     * edge's contribution; every other edge stays "above vs below" as before.
+     * Walks bfsOrder so every parent's answer is final before its child is read,
+     * applying recurrence (★): answer[child] = answer[parent] - cP + (1 - cP).
      */
     private void rerootToAllOtherNodes() {
-        // bfsOrder[0] is node 0; its answer is already set.
         for (int i = 1; i < bfsOrder.length; i++) {
             int child  = bfsOrder[i];
             int parent = parentOf[child];
@@ -177,11 +169,9 @@ public class MinimumEdgeReversalsForAllNodesReachable {
         }
     }
 
-    /* ──────────────────────────── Local smoke test ──────────────────────────── */
     public static void main(String[] args) {
-        int[][] edges = {{2, 0}, {2, 1}, {1, 3}};
-        int[] result  = new MinimumEdgeReversalsForAllNodesReachable()
-                            .minEdgeReversals(4, edges);
-        System.out.println(Arrays.toString(result));   // Expected: [1, 1, 0, 2]
+        MinimumEdgeReversalsForAllNodesReachable solver = new MinimumEdgeReversalsForAllNodesReachable();
+        System.out.println(Arrays.toString(solver.minEdgeReversals(4, new int[][]{{2,0},{2,1},{1,3}}))); // [1,1,0,2]
+        System.out.println(Arrays.toString(solver.minEdgeReversals(3, new int[][]{{1,2},{2,0}})));       // [2,0,1]
     }
 }
