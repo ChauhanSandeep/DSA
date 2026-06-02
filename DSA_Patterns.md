@@ -147,241 +147,161 @@ Use binary search when:
 
 ---
 
-### Binary Search Has 2 Main Patterns
+### The Only 3 Patterns You Need
 
-| Type | Goal | Loop Condition |
-|---|---|---|
-| Exact target search | Find exact value | `while(left <= right)` |
-| Boundary search | Find first/last/minimum/peak | `while(left < right)` |
+Every binary-search problem reduces to exactly one of these. Pick by
+asking: *what shape is my search space?*
+
+| # | Pattern        | Search space shape | Loop          | Returns                          |
+|---|----------------|--------------------|---------------|----------------------------------|
+| 1 | Exact Search   | sorted array       | `left <= right` | index of target, or `-1`        |
+| 2 | First True     | `F F F T T T T`    | `left < right`  | smallest index where `P` is true |
+| 3 | First False    | `T T T T F F F`    | `left < right`  | smallest index where `P` is false (= last true + 1) |
+
+**Decision flow:**
+1. Need the *exact value* and nothing else? → **Pattern 1**.
+2. Predicate flips false → true once? → **Pattern 2**.
+3. Predicate flips true → false once? → **Pattern 3**.
+
+> Strictly speaking, Pattern 3 is Pattern 2 with the predicate negated,
+> and Pattern 1 is Pattern 2 + an equality check. We keep all three
+> because flipping predicates in your head at 2 a.m. is where bugs live.
 
 ---
 
-#### 1. Exact Target Search
-This is used when:
-- searching exact value
-- equality matters
+#### 1. Exact Search
 
-##### Example Problems
+**Use when** you have a sorted array and need to know *if and where* a
+value exists. Equality matters; you can return early on a hit.
 
-- Binary Search
-- Search Insert Position
-- Search in Rotated Sorted Array
+**Key choices:**
+- `right = nums.length - 1` (inclusive), loop is `left <= right` so
+  the single-element case `left == right` is still checked.
+- Three branches: equal → return, greater → go left, smaller → go right.
+- `left = mid + 1` / `right = mid - 1` — never keep `mid`, you just
+  checked it.
 
-##### Template
+```java id="exact-search"
+int binarySearch(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
 
-```java id="xv92yl"
-public int binarySearch(int[] arr, int target) {
-
-    int left = 0;
-    int right = arr.length - 1;
-
-    // Use <= because when left == right,
-    // that element still needs to be checked
     while (left <= right) {
+        int mid = left + (right - left) / 2;       // overflow-safe midpoint
 
-        int mid = left + (right - left) / 2;
-
-        if (arr[mid] == target) {
-            return mid;
-        }
-
-        if (arr[mid] > target) {
-            right = mid - 1;
-        } else {
-            left = mid + 1;
-        }
+        if (nums[mid] == target) return mid;
+        if (nums[mid] < target)  left  = mid + 1;
+        else                     right = mid - 1;
     }
-
     return -1;
 }
 ```
 
----
-
-#### 2. Boundary Search
-This is used when finding:
-- minimum
-- peak
-- first occurrence
-- last occurrence
-- lower bound
-- first true answer
-
-##### Example Problems
-
-- Find Minimum in Rotated Sorted Array
-- Find Peak Element
-- First Bad Version
+**Examples:** Binary Search (LC 704), Search in Rotated Sorted Array
+(LC 33 — same skeleton, but pick which half is sorted before deciding
+where `target` lies).
 
 ---
 
-### Most Important Rule
+#### 2. First True (`FFFF...TTTT`)
 
-> Ask can `mid` still be the answer?
+**Use when** the predicate flips from false to true exactly once and you
+want the **smallest** index where it's true. This is the workhorse —
+~80% of binary-search problems are this pattern.
 
-#### If YES → keep mid
+**Key choices:**
+- `right = nums.length` (exclusive) — the answer can legitimately be
+  *past the end* if the predicate is never true.
+- Loop is `left < right`; no equality return — `left` converges onto the
+  boundary.
+- Predicate true → `right = mid` (keep `mid`, it might be the answer).
+- Predicate false → `left = mid + 1` (`mid` is definitely not).
 
-```java id="c4k0fb"
-right = mid;
-```
+```java id="first-true"
+// Returns smallest index where predicate(i) is true; n if none.
+int firstTrue(int[] nums) {
+    int left = 0, right = nums.length;
 
-#### If NO → discard mid
+    while (left < right) {
+        int mid = left + (right - left) / 2;
 
-```java id="b7j4yq"
-left = mid + 1;
-```
-
----
-
-### Boundary Search Template
-
-```java id="o0mztf"
-while (left < right) {
-
-    int mid = left + (right - left) / 2;
-
-    if (condition) {
-
-        // mid cannot be answer
-        left = mid + 1;
-
-    } else {
-
-        // mid can still be answer
-        right = mid;
+        if (predicate(nums, mid)) {
+            right = mid;          // mid is a candidate, keep it
+        } else {
+            left = mid + 1;       // mid fails, discard
+        }
     }
+    return left;                  // left == right == answer
 }
 ```
 
+**Common predicates:**
+
+| Problem                                 | Predicate `P(mid)`               |
+|-----------------------------------------|----------------------------------|
+| Lower bound (`firstGreaterOrEqual`)     | `nums[mid] >= target`            |
+| Upper bound (`firstGreaterThan`)        | `nums[mid] > target`             |
+| First Bad Version (LC 278)              | `isBadVersion(mid)`              |
+| Find Min in Rotated Sorted Array (153)  | `nums[mid] <= nums[right]`       |
+| Find Peak Element (LC 162)              | `nums[mid] > nums[mid + 1]`      |
+| Koko Eating Bananas (LC 875)            | `canFinish(piles, mid, hours)`   |
+| Capacity to Ship in D Days (LC 1011)    | `canShip(weights, mid, days)`    |
+| Split Array Largest Sum (LC 410)        | `canSplit(nums, mid, k)`         |
+
+> **Binary search on the answer** (Koko, Ship, Split Array) is just this
+> pattern with the predicate evaluated over an integer answer range
+> instead of an array index. The skeleton is identical.
+
 ---
 
-### Example — Find Minimum in Rotated Sorted Array
+#### 3. First False / Last True (`TTTT...FFFF`)
 
-```java id="7j0ctq"
-int left = 0;
-int right = nums.length - 1;
+**Use when** the predicate flips from true to false exactly once and you
+want the **last** true index (or equivalently, the first false).
 
-while (left < right) {
+**Key choices:** mirror image of Pattern 2.
+- Predicate true → `left = mid + 1` (look further right for the boundary).
+- Predicate false → `right = mid` (keep `mid` as a candidate first-false).
+- Return `left` for first-false, `left - 1` for last-true.
 
-    int mid = left + (right - left) / 2;
+```java id="last-true"
+// Returns largest index where predicate(i) is true; -1 if none.
+int lastTrue(int[] nums) {
+    int left = 0, right = nums.length;
 
-    if (nums[mid] > nums[right]) {
+    while (left < right) {
+        int mid = left + (right - left) / 2;
 
-        // minimum is on right side
-        left = mid + 1;
-
-    } else {
-
-        // mid can still be minimum
-        right = mid;
+        if (predicate(nums, mid)) {
+            left = mid + 1;       // mid passes; the boundary is further right
+        } else {
+            right = mid;          // mid fails; boundary is at or before mid
+        }
     }
+    return left - 1;              // -1 if predicate never held
 }
-
-return nums[left];
 ```
+
+**Common predicates:**
+
+| Problem                          | Predicate `P(mid)`         |
+|----------------------------------|----------------------------|
+| `lastLessThan(target)`           | `nums[mid] < target`       |
+| `lastLessOrEqual(target)`        | `nums[mid] <= target`      |
+| Sqrt(x) (LC 69)                  | `mid * mid <= x`           |
+| Last occurrence of `target` (34) | `nums[mid] <= target`, then equality-check the result |
 
 ---
 
-### Important Tricks
+### Common Reductions
 
-#### Trick 1 — Keep vs Discard Mid
+Once you have Patterns 2 and 3, most "named" searches are one-liners:
 
-| Situation | Update |
-|---|---|
-| mid can still be answer | `right = mid` |
-| mid cannot be answer | `left = mid + 1` |
-
----
-
-#### Trick 2 — Loop Condition
-
-| Goal | Loop |
-|---|---|
-| Exact target | `left <= right` |
-| Boundary search | `left < right` |
-
----
-
-#### Trick 3 — Compare Against Correct Side
-
-| Problem Type                         | Compare Against | Why |
-|--------------------------------------|---|---|
-| Find Minimum in Rotated Sorted Array | `nums[mid] > nums[right]` | `right` helps identify whether `mid` is in the larger sorted portion or smaller rotated portion. If `nums[mid] > nums[right]`, minimum must be on right side. |
-| Search in Rotated Sorted Array       | `nums[mid] >= nums[left]` | `left` helps determine which half is normally sorted. If `nums[mid] >= nums[left]`, left half is sorted. |
-| Find Peak Element                    | Neighbor (`nums[mid + 1]`) | Compare slope direction. If right neighbor is bigger, peak exists on right side. Otherwise peak exists on left side including `mid`. |
-| First Occurrence of target           | `target` | Decide whether current value is large enough to be possible answer. |
-| Last Occurrence of target            | `target` | Decide whether current value is still valid and can extend further right. |
-
----
-
-#### Quick Intuition
-
-##### 1. Compare with `nums[right]`
-Used to find Minimum in Rotated Sorted Array
-Reason:
-- `right` usually belongs to smaller sorted section
-- helps identify pivot direction
-
-Example:
-
-```text id="3u95iu"
-4 5 6 7 0 1 2
-            ^
-          right
+```text
+firstOccurrence(target) = firstTrue(nums[i] >= target),  then check equality
+lastOccurrence(target)  = firstTrue(nums[i] >  target) - 1, then check equality
+lastLessThan(target)    = firstTrue(nums[i] >= target) - 1
+countInRange(lo, hi)    = firstTrue(nums[i] > hi) - firstTrue(nums[i] >= lo)
 ```
-
-If:
-
-```java id="7v6bdf"
-nums[mid] > nums[right]
-```
-
-then `mid` is in left larger section, so minimum is on right side.
-
----
-
-##### 2. Compare with `nums[left]`
-Used in search in Rotated Sorted Array
-- helps identify which half is sorted normally
-
-Example:
-
-```text id="j6m6fp"
-4 5 6 7 0 1 2
-^
-left
-```
-
-If:
-
-```java id="0s2t9j"
-nums[mid] >= nums[left]
-```
-
-then left half is sorted.
-
----
-
-##### 3. Compare with Neighbor
-
-Used in Find Peak Element
-- neighbor comparison tells whether we are moving uphill or downhill
-
-If:
-
-```java id="u1lw4n"
-nums[mid] < nums[mid + 1]
-```
-
-then peak must exist on right side.
-
-If:
-
-```java id="7q4z9h"
-nums[mid] > nums[mid + 1]
-```
-
-then peak exists on left side including `mid`.
 
 ---
 

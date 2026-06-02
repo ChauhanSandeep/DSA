@@ -1,7 +1,12 @@
 package graphs.unionfind;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -90,8 +95,8 @@ public class UnlockableLocks {
     int len = locks.length;
     DisjointSetUnion dsu = new DisjointSetUnion(len);
 
-    for (int[] edge : friends) {
-      dsu.union(edge[0], edge[1]);
+    for (int[] friend : friends) {
+      dsu.union(friend[0], friend[1]);
     }
 
     // Aggregate the set of available key numbers for each connected component.
@@ -99,7 +104,7 @@ public class UnlockableLocks {
     
     for (int i = 0; i < len; i++) {
       int root = dsu.find(i);
-      rootToKeys.computeIfAbsent(root, r -> new HashSet<>()).add(keys[i]);
+      rootToKeys.computeIfAbsent(root, k -> new HashSet<>()).add(keys[i]);
     }
 
     // A person's lock is unlockable iff some key in their component matches it.
@@ -107,6 +112,80 @@ public class UnlockableLocks {
     for (int i = 0; i < len; i++) {
       int root = dsu.find(i);
       if (rootToKeys.get(root).contains(locks[i])) {
+        unlocked++;
+      }
+    }
+    return unlocked;
+  }
+
+  /**
+   * Alternative: BFS labelling instead of DSU.
+   *
+   * Step-by-step:
+   *  1. Build an undirected adjacency list from the friendship pairs.
+   *  2. BFS from every unvisited person, tagging each reachable person with the
+   *     current componentId. This produces the same equivalence classes as DSU
+   *     but in one explicit pass.
+   *  3. Pool keys[i] into a HashSet per componentId.
+   *  4. For each person i, increment the counter if their component's key-set
+   *     contains locks[i].
+   *
+   * Key Insight:
+   * Same three-phase "discover components -> bucket -> match" template as the DSU
+   * solution. Use this variant when the graph is given up-front and you may want
+   * per-component traversal data; DSU is preferred when edges arrive incrementally.
+   *
+   * Time Complexity:  O(n + m) -- single BFS over the friendship graph.
+   * Space Complexity: O(n + m) for the adjacency list and componentOf array.
+   */
+  public int maxUnlockedLocksBFS(int[] locks, int[] keys, int[][] friends) {
+    int len = locks.length;
+
+    // --- Phase 1: build adjacency list ------------------------------------
+    List<List<Integer>> adjacency = new ArrayList<>(len);
+    for (int i = 0; i < len; i++) {
+      adjacency.add(new ArrayList<>());
+    }
+    for (int[] edge : friends) {
+      adjacency.get(edge[0]).add(edge[1]);
+      adjacency.get(edge[1]).add(edge[0]);
+    }
+
+    // --- Phase 2: BFS-label every person with its componentId -------------
+    int[] componentOf = new int[len];
+    Arrays.fill(componentOf, -1);
+    int componentCount = 0;
+
+    for (int start = 0; start < len; start++) {
+      if (componentOf[start] != -1) continue;
+      Deque<Integer> bfsQueue = new ArrayDeque<>();
+      bfsQueue.offer(start);
+      componentOf[start] = componentCount;
+      while (!bfsQueue.isEmpty()) {
+        int person = bfsQueue.poll();
+        for (int friend : adjacency.get(person)) {
+          if (componentOf[friend] == -1) {
+            componentOf[friend] = componentCount;
+            bfsQueue.offer(friend);
+          }
+        }
+      }
+      componentCount++;
+    }
+
+    // --- Phase 3: pool keys per component ---------------------------------
+    List<Set<Integer>> keysOfComponent = new ArrayList<>(componentCount);
+    for (int c = 0; c < componentCount; c++) {
+      keysOfComponent.add(new HashSet<>());
+    }
+    for (int i = 0; i < len; i++) {
+      keysOfComponent.get(componentOf[i]).add(keys[i]);
+    }
+
+    // --- Phase 4: count unlockable locks ----------------------------------
+    int unlocked = 0;
+    for (int i = 0; i < len; i++) {
+      if (keysOfComponent.get(componentOf[i]).contains(locks[i])) {
         unlocked++;
       }
     }
@@ -171,6 +250,21 @@ public class UnlockableLocks {
     // Edge case: no friendships, every person isolated
     // locks=[1,2], keys=[1,3] -> only person 0 can unlock their own lock -> 1
     System.out.println(solver.maxUnlockedLocks(
+        new int[]{1, 2},
+        new int[]{1, 3},
+        new int[][]{}));
+
+    // BFS variant should produce identical results
+    System.out.println("--- BFS variant ---");
+    System.out.println(solver.maxUnlockedLocksBFS(
+        new int[]{1, 2, 3, 4},
+        new int[]{2, 1, 4, 5},
+        new int[][]{{0, 1}, {1, 2}}));
+    System.out.println(solver.maxUnlockedLocksBFS(
+        new int[]{1, 2, 3, 4},
+        new int[]{4, 3, 2, 1},
+        new int[][]{{0, 1}, {1, 2}, {2, 3}}));
+    System.out.println(solver.maxUnlockedLocksBFS(
         new int[]{1, 2},
         new int[]{1, 3},
         new int[][]{}));
