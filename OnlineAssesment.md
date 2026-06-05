@@ -16,9 +16,10 @@ For example, if the test case input format is:
 ```
 
 ```java
-int t = Integer.parseInt(sc.nextLine()); // Safely consume the first line without newline issues
-while (t-- > 0) {
-    String line = sc.nextLine();         // Grab the whole line
+Scanner scanner = new Scanner(System.in);
+int lines = Integer.parseInt(scanner.nextLine()); // Safely consume the first line without newline issues
+while (lines-- > 0) {
+    String line = scanner.nextLine();         // Grab the whole line
     String[] parts = line.trim().split("\\s+"); // Split by any whitespace
     // Convert strings to ints manually...
 }
@@ -45,12 +46,13 @@ foo 15 bar 20
 ```
 
 ```java
-int t = sc.nextInt(); 
-while (t-- > 0) {
-    String str1 = sc.next();      // Read first string
-    int num1 = sc.nextInt();      // Read first integer
-    String str2 = sc.next();      // Read second string
-    int num2 = sc.nextInt();      // Read second integer
+Scanner scanner = new Scanner(System.in);
+int lines = scanner.nextInt(); 
+while (lines-- > 0) {
+    String str1 = scanner.next();      // Read first string
+    int num1 = scanner.nextInt();      // Read first integer
+    String str2 = scanner.next();      // Read second string
+    int num2 = scanner.nextInt();      // Read second integer
     // Process the inputs...
 }
 
@@ -59,7 +61,7 @@ while (t-- > 0) {
 ### Why use this?
 
 * **Simplicity:** It’s much cleaner and requires less boilerplate code (no manual splitting or parsing).
-* **Automatic Skipping:** `sc.next()` and `sc.nextInt()` automatically skip over whitespace and newlines to find the next relevant "token."
+* **Automatic Skipping:** `scanner.next()` and `scanner.nextInt()` automatically skip over whitespace and newlines to find the next relevant "token."
 * **Predictability:** Best used when the problem statement says: *"Each test case contains four space-separated values..."*
 
 ---

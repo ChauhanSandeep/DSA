@@ -77,19 +77,19 @@ public int findMaxSum(int[] arr, int k) {
         // 1. ADD: Expand the window by including the current element
         currentSum += arr[right];
 
-        // 2. SHRINK: Ensure window does not exceed size K
+        // 2. SHRINK: Ensure window is valid (size <= k)
         // Using 'while' keeps the logic generic for variable sizes
         while (right - left + 1 > k) {
             currentSum -= arr[left]; // Remove the element going out of view
             left++;
         }
 
-        // 3. PROCESS: If we hit the target size, check for max
+        // 3. PROCESS: If window is valid, update results
         if (right - left + 1 == k) {
             maxSum = Math.max(maxSum, currentSum);
         }
     }
-    
+  
     return maxSum;
 }
 ```
@@ -123,7 +123,7 @@ public int maxArea(int[] heights) {
         int width = right - left;
         int currentArea = minHeight * width;
         maxWater = Math.max(maxWater, currentArea);
-        
+  
         // Move pointer with smaller height
         if (heights[left] < heights[right]) {
             left++;
@@ -140,7 +140,9 @@ public int maxArea(int[] heights) {
 ---
 
 ## 3. Binary Search
+
 Use binary search when:
+
 - array is sorted
 - search space is monotonic
 - we can eliminate half of the candidates in every iteration
@@ -152,13 +154,15 @@ Use binary search when:
 Every binary-search problem reduces to exactly one of these. Pick by
 asking: *what shape is my search space?*
 
-| # | Pattern        | Search space shape | Loop          | Returns                          |
-|---|----------------|--------------------|---------------|----------------------------------|
-| 1 | Exact Search   | sorted array       | `left <= right` | index of target, or `-1`        |
-| 2 | First True     | `F F F T T T T`    | `left < right`  | smallest index where `P` is true |
-| 3 | First False    | `T T T T F F F`    | `left < right`  | smallest index where `P` is false (= last true + 1) |
+
+| # | Pattern      | Search space shape | Loop            | Returns                                            |
+| - | ------------ | ------------------ | --------------- | -------------------------------------------------- |
+| 1 | Exact Search | sorted array       | `left <= right` | index of target, or`-1`                            |
+| 2 | First True   | `F F F T T T T`    | `left < right`  | smallest index where`P` is true                    |
+| 3 | First False  | `T T T T F F F`    | `left < right`  | smallest index where`P` is false (= last true + 1) |
 
 **Decision flow:**
+
 1. Need the *exact value* and nothing else? → **Pattern 1**.
 2. Predicate flips false → true once? → **Pattern 2**.
 3. Predicate flips true → false once? → **Pattern 3**.
@@ -175,13 +179,14 @@ asking: *what shape is my search space?*
 value exists. Equality matters; you can return early on a hit.
 
 **Key choices:**
-- `right = nums.length - 1` (inclusive), loop is `left <= right` so
-  the single-element case `left == right` is still checked.
+
+- `right = nums.length - 1` (inclusive)
+- Loop is `left <= right` so the single-element case `left == right` is still checked.
 - Three branches: equal → return, greater → go left, smaller → go right.
 - `left = mid + 1` / `right = mid - 1` — never keep `mid`, you just
   checked it.
 
-```java id="exact-search"
+```java
 int binarySearch(int[] nums, int target) {
     int left = 0, right = nums.length - 1;
 
@@ -196,9 +201,11 @@ int binarySearch(int[] nums, int target) {
 }
 ```
 
-**Examples:** Binary Search (LC 704), Search in Rotated Sorted Array
-(LC 33 — same skeleton, but pick which half is sorted before deciding
-where `target` lies).
+**Examples:**
+
+- Binary Search (LC 704)
+- Search in Rotated Sorted Array (LC 33 — same skeleton, but pick which half is sorted before deciding
+  where `target` lies).
 
 ---
 
@@ -209,6 +216,7 @@ want the **smallest** index where it's true. This is the workhorse —
 ~80% of binary-search problems are this pattern.
 
 **Key choices:**
+
 - `right = nums.length` (exclusive) — the answer can legitimately be
   *past the end* if the predicate is never true.
 - Loop is `left < right`; no equality return — `left` converges onto the
@@ -216,7 +224,7 @@ want the **smallest** index where it's true. This is the workhorse —
 - Predicate true → `right = mid` (keep `mid`, it might be the answer).
 - Predicate false → `left = mid + 1` (`mid` is definitely not).
 
-```java id="first-true"
+```java
 // Returns smallest index where predicate(i) is true; n if none.
 int firstTrue(int[] nums) {
     int left = 0, right = nums.length;
@@ -236,16 +244,17 @@ int firstTrue(int[] nums) {
 
 **Common predicates:**
 
-| Problem                                 | Predicate `P(mid)`               |
-|-----------------------------------------|----------------------------------|
-| Lower bound (`firstGreaterOrEqual`)     | `nums[mid] >= target`            |
-| Upper bound (`firstGreaterThan`)        | `nums[mid] > target`             |
-| First Bad Version (LC 278)              | `isBadVersion(mid)`              |
-| Find Min in Rotated Sorted Array (153)  | `nums[mid] <= nums[right]`       |
-| Find Peak Element (LC 162)              | `nums[mid] > nums[mid + 1]`      |
-| Koko Eating Bananas (LC 875)            | `canFinish(piles, mid, hours)`   |
-| Capacity to Ship in D Days (LC 1011)    | `canShip(weights, mid, days)`    |
-| Split Array Largest Sum (LC 410)        | `canSplit(nums, mid, k)`         |
+
+| Problem                                | Predicate`P(mid)`              |
+| -------------------------------------- | ------------------------------ |
+| Lower bound (`firstGreaterOrEqual`)    | `nums[mid] >= target`          |
+| Upper bound (`firstGreaterThan`)       | `nums[mid] > target`           |
+| First Bad Version (LC 278)             | `isBadVersion(mid)`            |
+| Find Min in Rotated Sorted Array (153) | `nums[mid] <= nums[right]`     |
+| Find Peak Element (LC 162)             | `nums[mid] > nums[mid + 1]`    |
+| Koko Eating Bananas (LC 875)           | `canFinish(piles, mid, hours)` |
+| Capacity to Ship in D Days (LC 1011)   | `canShip(weights, mid, days)`  |
+| Split Array Largest Sum (LC 410)       | `canSplit(nums, mid, k)`       |
 
 > **Binary search on the answer** (Koko, Ship, Split Array) is just this
 > pattern with the predicate evaluated over an integer answer range
@@ -259,11 +268,12 @@ int firstTrue(int[] nums) {
 want the **last** true index (or equivalently, the first false).
 
 **Key choices:** mirror image of Pattern 2.
+
 - Predicate true → `left = mid + 1` (look further right for the boundary).
 - Predicate false → `right = mid` (keep `mid` as a candidate first-false).
 - Return `left` for first-false, `left - 1` for last-true.
 
-```java id="last-true"
+```java
 // Returns largest index where predicate(i) is true; -1 if none.
 int lastTrue(int[] nums) {
     int left = 0, right = nums.length;
@@ -283,12 +293,13 @@ int lastTrue(int[] nums) {
 
 **Common predicates:**
 
-| Problem                          | Predicate `P(mid)`         |
-|----------------------------------|----------------------------|
-| `lastLessThan(target)`           | `nums[mid] < target`       |
-| `lastLessOrEqual(target)`        | `nums[mid] <= target`      |
-| Sqrt(x) (LC 69)                  | `mid * mid <= x`           |
-| Last occurrence of `target` (34) | `nums[mid] <= target`, then equality-check the result |
+
+| Problem                         | Predicate`P(mid)`                                     |
+| ------------------------------- | ----------------------------------------------------- |
+| `lastLessThan(target)`          | `nums[mid] < target`                                  |
+| `lastLessOrEqual(target)`       | `nums[mid] <= target`                                 |
+| Sqrt(x) (LC 69)                 | `mid * mid <= x`                                      |
+| Last occurrence of`target` (34) | `nums[mid] <= target`, then equality-check the result |
 
 ---
 
@@ -325,14 +336,14 @@ countInRange(lo, hi)    = firstTrue(nums[i] > hi) - firstTrue(nums[i] >= lo)
 // Kth Largest using Min-Heap
 public int findKthLargestUsingMinHeap(int[] inputArray, int k) {
     PriorityQueue<Integer> minHeap = new PriorityQueue<>();
-    
+  
     for (int num : inputArray) {
         minHeap.offer(num);
         if (minHeap.size() > k) {
             minHeap.poll();  // Remove smallest element
         }
     }
-    
+  
     return minHeap.peek();  // Root is kth largest
 }
 ```
@@ -355,16 +366,21 @@ public int findKthLargestUsingMinHeap(int[] inputArray, int k) {
 **Code snippet:**
 
 ```java
-// BFS to find shortest path from source to all other vertices.
-// Optimization: initialize `distance` with Integer.MAX_VALUE and only enqueue
-// a neighbor when the new distance would actually improve its current value.
-// This avoids pushing the same node onto the queue multiple times.
-// `visited` is still used to guarantee each node is processed (work step)
-// at most once, even if it ever gets enqueued more than once.
+/* 
+ * BFS to find shortest path from source to all other vertices.
+ * 
+ * `visited` is used to guarantee each node is processed (work step)
+ * at most once, even if it ever gets enqueued more than once.
+ * 
+ * Optimization: initialize `distance` with Integer.MAX_VALUE and only enqueue
+ * a neighbor when the new distance would actually improve its current value.
+ * This avoids pushing the same node onto the queue multiple times.
+ */
 public static int[] shortestPath(List<List<Integer>> graph, int startNode) {
     int size = graph.size();
     boolean[] visited = new boolean[size];
     int[] distance = new int[size];
+  
     Arrays.fill(distance, Integer.MAX_VALUE);
     distance[startNode] = 0;
 
@@ -421,7 +437,7 @@ public static int[] shortestPath(List<List<Integer>> graph, int startNode) {
 // Recursive DFS for graph traversal
 public void dfs(int node, boolean[] visited, List<List<Integer>> graph) {
     visited[node] = true;
-    
+  
     for (int neighbor : graph.get(node)) {
         if (!visited[neighbor]) {
             dfs(neighbor, visited, graph);
@@ -436,17 +452,17 @@ DFS approach using stack and formula SELECT -> MARK(*) > WORK -> ADD(*):
 public static void iterativeDFS(List<List<Integer>> graph, int startNode) {
     int size = graph.size();
     boolean[] visited = new boolean[size];
-    
+  
     // Use a Stack instead of a Queue
     Stack<Pair> stack = new Stack<>();
-    
+  
     // Initial Add
     stack.push(new Pair(startNode, 0));
-    
+  
     while (!stack.isEmpty()) {
         // 1. SELECT (Pop instead of Poll)
         Pair node = stack.pop();
-        
+  
         // 2. MARK(*)
         // This is crucial in Iterative DFS because a node 
         // might be pushed onto the stack multiple times.
@@ -455,7 +471,7 @@ public static void iterativeDFS(List<List<Integer>> graph, int startNode) {
 
         // 3. WORK
         System.out.println("Visited: " + node.v + " at depth " + node.d);
-        
+  
         // 4. ADD(*)
         for (int neighbor : graph.get(node.v)) {
             if (!visited[neighbor]) {
@@ -488,7 +504,7 @@ public static void iterativeDFS(List<List<Integer>> graph, int startNode) {
 public class DisjointSet {
     private int[] parent;
     private int[] rank;
-    
+  
     public DisjointSet(int n) {
         parent = new int[n];
         rank = new int[n];
@@ -496,7 +512,7 @@ public class DisjointSet {
             parent[i] = i;
         }
     }
-    
+  
     // Find with path compression
     public int find(int x) {
         if (parent[x] != x) {
@@ -504,14 +520,14 @@ public class DisjointSet {
         }
         return parent[x];
     }
-    
+  
     // Union by rank
-    public void union(int x, int y) {
+    public boolean union(int x, int y) {
         int rootX = find(x);
         int rootY = find(y);
-        
-        if (rootX == rootY) return;
-        
+  
+        if (rootX == rootY) return false;
+  
         if (rank[rootX] < rank[rootY]) {
             parent[rootX] = rootY;
         } else if (rank[rootX] > rank[rootY]) {
@@ -520,6 +536,7 @@ public class DisjointSet {
             parent[rootY] = rootX;
             rank[rootX]++;
         }
+        return true;
     }
 }
 ```
@@ -541,17 +558,18 @@ public class DisjointSet {
 
 ### Monotonic Stack Cheatsheet (Always Left-to-Right)
 
-| To Find      | Pop Condition                       | Stack Property       | How Result Is Produced |
-| ------------ | ----------------------------------- | -------------------- | ---------------------- |
-| Next Greater | while nums[i] > nums[stack.peek()]  | Monotonic Decreasing | Pop to resolve         |
-| Next Smaller | while nums[i] < nums[stack.peek()]  | Monotonic Increasing | Pop to resolve         |
-| Prev Greater | while nums[i] >= nums[stack.peek()] | Monotonic Decreasing | Top gives answer       |
-| Prev Smaller | while nums[i] <= nums[stack.peek()] | Monotonic Increasing | Top gives answer       |
+
+| To Find      | Stack Property       | Pop Condition                       | How Result Is Produced |
+| ------------ | -------------------- | ----------------------------------- | ---------------------- |
+| Next Greater | Monotonic Decreasing | while nums[i] > nums[stack.peek()]  | Pop to resolve         |
+| Next Smaller | Monotonic Increasing | while nums[i] < nums[stack.peek()]  | Pop to resolve         |
+| Prev Greater | Monotonic Decreasing | while nums[i] >= nums[stack.peek()] | Top gives answer       |
+| Prev Smaller | Monotonic Increasing | while nums[i] <= nums[stack.peek()] | Top gives answer       |
 
 - Next -> Pop to resolve
 - Prev -> Top gives the answer
-- Greater -> Monotonic Decreasing with `nums[i] > nums[stack.peek()]`
-- Smaller -> Monotonic Increasing with `nums[i] < nums[stack.peek()]`
+- Greater -> Monotonic Decreasing Stack with `nums[i] > nums[stack.peek()]`
+- Smaller -> Monotonic Increasing Stack with `nums[i] < nums[stack.peek()]`
 
 **Duplicate handling:** Use strict comparisons (`<`, `>`) when equal values should remain candidates; use non-strict (`<=`, `>=`) when equal values should be popped/ignored.
 
@@ -560,12 +578,12 @@ public class DisjointSet {
 ```java
 // Next Greater (pop-to-resolve)
 public int[] nextGreater(int[] nums) {
-    int n = nums.length;
-    int[] result = new int[n];
+    int len = nums.length;
+    int[] result = new int[len];
     Arrays.fill(result, -1);
     Stack<Integer> stack = new Stack<>(); // unresolved indices, decreasing by value
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < len; i++) {
         while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
             int idx = stack.pop();
             result[idx] = nums[i];
@@ -579,12 +597,12 @@ public int[] nextGreater(int[] nums) {
 ```java
 // Next Smaller (pop-to-resolve)
 public int[] nextSmaller(int[] nums) {
-    int n = nums.length;
-    int[] result = new int[n];
+    int len = nums.length;
+    int[] result = new int[len];
     Arrays.fill(result, -1);
     Stack<Integer> stack = new Stack<>(); // unresolved indices, increasing by value
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < len; i++) {
         while (!stack.isEmpty() && nums[i] < nums[stack.peek()]) {
             int idx = stack.pop();
             result[idx] = nums[i];
@@ -596,14 +614,14 @@ public int[] nextSmaller(int[] nums) {
 ```
 
 ```java
-// Previous Greater (query stack top after cleanup)
+// Previous Greater (Monotonic Decreasing, query stack top after cleanup)
 public int[] prevGreater(int[] nums) {
-    int n = nums.length;
-    int[] result = new int[n];
+    int len = nums.length;
+    int[] result = new int[len];
     Arrays.fill(result, -1);
     Stack<Integer> stack = new Stack<>(); // candidate indices, decreasing by value
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < len; i++) {
         while (!stack.isEmpty() && nums[stack.peek()] <= nums[i]) {
             stack.pop();
         }
@@ -615,14 +633,14 @@ public int[] prevGreater(int[] nums) {
 ```
 
 ```java
-// Previous Smaller (query stack top after cleanup)
+// Previous Smaller (Monotonic Increasing, query stack top after cleanup)
 public int[] prevSmaller(int[] nums) {
-    int n = nums.length;
-    int[] result = new int[n];
+    int len = nums.length;
+    int[] result = new int[len];
     Arrays.fill(result, -1);
     Stack<Integer> stack = new Stack<>(); // candidate indices, increasing by value
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < len; i++) {
         while (!stack.isEmpty() && nums[stack.peek()] >= nums[i]) {
             stack.pop();
         }
@@ -654,40 +672,39 @@ public int[] prevSmaller(int[] nums) {
 ```java
 // Find largest rectangle in histogram
 public int largestRectangleArea(int[] heights) {
-    int n = heights.length;
+    int len = heights.length;
     int maxArea = 0;
     Stack<Integer> stack = new Stack<>();  // Monotonic increasing stack (stores indices)
-    
-    for (int i = 0; i < n; i++) {
+       for (int i = 0; i < len; i++) {  
         // While current bar is shorter than stack top, calculate area for popped bars
         while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
             int heightIndex = stack.pop();
             int height = heights[heightIndex];
-            
+  
             // Previous smaller: element at current stack top (or -1 if stack empty)
             // Next smaller: current element at index i
             int prevSmaller = stack.isEmpty() ? -1 : stack.peek();
             int nextSmaller = i;
-            
+  
             int width = nextSmaller - prevSmaller - 1;
             int area = height * width;
             maxArea = Math.max(maxArea, area);
         }
         stack.push(i);
     }
-    
+  
     // Process remaining bars in stack (no next smaller exists, use n as boundary)
     while (!stack.isEmpty()) {
         int heightIndex = stack.pop();
         int height = heights[heightIndex];
         int prevSmaller = stack.isEmpty() ? -1 : stack.peek();
         int nextSmaller = n;  // No next smaller, so width extends to end
-        
+  
         int width = nextSmaller - prevSmaller - 1;
         int area = height * width;
         maxArea = Math.max(maxArea, area);
     }
-    
+  
     return maxArea;
 }
 ```
@@ -713,26 +730,26 @@ public int largestRectangleArea(int[] heights) {
 // Detect cycle and find cycle start in linked list
 public ListNode detectCycle(ListNode head) {
     if (head == null || head.next == null) return null;
-    
+  
     // Phase 1: Detect cycle
     ListNode slow = head;
     ListNode fast = head;
-    
+  
     while (fast != null && fast.next != null) {
         slow = slow.next;
         fast = fast.next.next;
         if (slow == fast) break;
     }
-    
+  
     if (fast == null || fast.next == null) return null;
-    
+  
     // Phase 2: Find cycle start
     slow = head;
     while (slow != fast) {
         slow = slow.next;
         fast = fast.next;
     }
-    
+  
     return slow;
 }
 ```
@@ -759,17 +776,17 @@ public ListNode detectCycle(ListNode head) {
 public int findMaximumXor(int[] arr) {
     int maxXor = 0;
     int mask = 0;
-    
+  
     // Process from most significant bit to least
     for (int i = 31; i >= 0; i--) {
         mask = mask | (1 << i);
         HashSet<Integer> prefixes = new HashSet<>();
-        
+  
         // Store all prefixes at current bit level
         for (int num : arr) {
             prefixes.add(num & mask);
         }
-        
+  
         // Try to set current bit in result
         int newMax = maxXor | (1 << i);
         for (int prefix : prefixes) {
@@ -780,7 +797,7 @@ public int findMaximumXor(int[] arr) {
             }
         }
     }
-    
+  
     return maxXor;
 }
 ```
@@ -806,13 +823,13 @@ public int findMaximumXor(int[] arr) {
 class SegmentTree {
     private int[] tree;
     private int n;
-    
+  
     public SegmentTree(int[] nums) {
         n = nums.length;
         tree = new int[4 * n];
         build(nums, 0, 0, n - 1);
     }
-    
+  
     private void build(int[] nums, int node, int start, int end) {
         if (start == end) {
             tree[node] = nums[start];
@@ -823,15 +840,15 @@ class SegmentTree {
             tree[node] = tree[2 * node + 1] + tree[2 * node + 2];
         }
     }
-    
+  
     public int query(int left, int right) {
         return queryUtil(0, 0, n - 1, left, right);
     }
-    
+  
     private int queryUtil(int node, int start, int end, int l, int r) {
         if (r < start || l > end) return 0;
         if (l <= start && end <= r) return tree[node];
-        
+  
         int mid = start + (end - start) / 2;
         return queryUtil(2 * node + 1, start, mid, l, r) +
                queryUtil(2 * node + 2, mid + 1, end, l, r);
@@ -858,29 +875,29 @@ class SegmentTree {
 ```java
 // Find shortest time to reach all nodes from source k
 public class DijkstraShortestPath {
-    
+  
     // Class representing an edge in the graph
     static class Edge {
         int destination;
         int weight;
-        
+  
         public Edge(int destination, int weight) {
             this.destination = destination;
             this.weight = weight;
         }
     }
-    
+  
     // Helper class for priority queue entries
     static class Node {
         int id;
         int distance;
-        
+  
         public Node(int id, int distance) {
             this.id = id;
             this.distance = distance;
         }
     }
-    
+  
     /**
      * Finds shortest paths from source to all vertices using Dijkstra's algorithm.
      * 
@@ -892,32 +909,32 @@ public class DijkstraShortestPath {
         int numVertices = graph.size();
         int[] distance = new int[numVertices];
         boolean[] visited = new boolean[numVertices];
-        
+  
         // Initialize all distances as infinity
         Arrays.fill(distance, Integer.MAX_VALUE);
         distance[source] = 0;
-        
+  
         // Min-heap: prioritize nodes with smallest distance
         PriorityQueue<Node> minHeap = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
         minHeap.offer(new Node(source, 0));
-        
+  
         while (!minHeap.isEmpty()) {
             // SELECT: Extract node with minimum distance
             Node current = minHeap.poll();
             int currentNode = current.id;
-            
+  
             // MARK(*): Skip if already processed
             if (visited[currentNode]) continue;
             visited[currentNode] = true;
-            
+  
             // WORK: Current node's shortest path is finalized
             // (Optional: can track parent for path reconstruction)
-            
+  
             // ADD(*): Explore all neighbors and update distances
             for (Edge edge : graph.get(currentNode)) {
                 int neighbor = edge.destination;
                 int newDistance = distance[currentNode] + edge.weight;
-                
+      
                 // Relaxation: update if we found a shorter path
                 if (!visited[neighbor] && newDistance < distance[neighbor]) {
                     distance[neighbor] = newDistance;
@@ -925,7 +942,7 @@ public class DijkstraShortestPath {
                 }
             }
         }
-        
+  
         return distance;
     }
 }
@@ -954,16 +971,16 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
     // Build graph and calculate in-degrees
     List<List<Integer>> graph = new ArrayList<>();
     int[] inDegree = new int[numCourses];
-    
+  
     for (int i = 0; i < numCourses; i++) {
         graph.add(new ArrayList<>());
     }
-    
+  
     for (int[] prereq : prerequisites) {
         graph.get(prereq[1]).add(prereq[0]);
         inDegree[prereq[0]]++;
     }
-    
+  
     // Start with nodes having 0 in-degree
     Queue<Integer> queue = new LinkedList<>();
     for (int i = 0; i < numCourses; i++) {
@@ -971,10 +988,10 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
             queue.offer(i);
         }
     }
-    
+  
     int[] result = new int[numCourses];
     int index = 0;
-    
+  
     while (!queue.isEmpty()) {
         // 1. SELECT
         int course = queue.poll();
@@ -992,7 +1009,7 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
             }
         }
     }
-    
+  
     return index == numCourses ? result : new int[0];
 }
 ```
@@ -1004,6 +1021,7 @@ public int[] findOrder(int numCourses, int[][] prerequisites) {
 ## Pattern Selection Guide
 
 ### Problem Type → Pattern Mapping
+
 
 | Problem Type                    | Recommended Pattern                     |
 | ------------------------------- | --------------------------------------- |
@@ -1165,7 +1183,9 @@ for (int i = 31; i >= 0; i--) {
 
 ```java
 // Phase 1: Detect cycle
-int slow = nums[0], fast = nums[0];
+int slow = nums[0];
+int fast = nums[0];
+
 do {
     slow = nums[slow];
     fast = nums[nums[fast]];
@@ -1254,10 +1274,10 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
     for (int i = 1; i < left; i++) {
         prev = prev.next;
     }
-		// At this point, prev points to index just before left i.e. left - 1;
+    // At this point, prev points to index just before left i.e. left - 1;
 
     // Reverse using head-insertion method
-    ListNode curr = prev.next; // first node of sublist i.e. left
+    ListNode curr = prev.next;
 
     for (int i = 0; i < right - left; i++) {
         ListNode next = curr.next;
@@ -1270,7 +1290,11 @@ public ListNode reverseBetween(ListNode head, int left, int right) {
 }
 ```
 
-**Quick boundary cheat sheet:** one block = whole list; **k-group / pairs** = next k nodes (k=2 for pairs; tail handling per problem); **sentinel** = next block ends at delimiter or end of list.
+**Quick boundary cheat sheet:**
+
+- one block = whole list
+- **k-group / pairs** = next k nodes (k=2 for pairs tail handling per problem)
+- **sentinel** = next block ends at delimiter or end of list.
 
 **Variations (same `reverseBetween` / same head-insertion per chunk):** `reverseBetween(head, 1, n)`; repeated blocks with `prev` advanced after each reverse; partial last block only when the statement allows.
 
@@ -1302,7 +1326,7 @@ int currentSum = 0;
 for (int num : nums) {
     currentSum += num;
     maxSum = Math.max(maxSum, currentSum);
-    
+  
     if (currentSum < 0) {
         currentSum = 0;  // Reset - start fresh
     }
@@ -1398,6 +1422,9 @@ Deque<Integer> deque = new ArrayDeque<>();  // Stores indices
 int[] result = new int[nums.length - k + 1];
 
 for (int i = 0; i < nums.length; i++) {
+    // Add current candidate
+    deque.offerLast(i);
+
     // Remove indices outside window
     while (!deque.isEmpty() && deque.peekFirst() < i - k + 1) {
         deque.pollFirst();
@@ -1406,7 +1433,7 @@ for (int i = 0; i < nums.length; i++) {
     while (!deque.isEmpty() && nums[i] > nums[deque.peekLast()]) {
         deque.pollLast();
     }
-    deque.offerLast(i);
+  
     if (i >= k - 1) {
         result[i - k + 1] = nums[deque.peekFirst()];
     }
@@ -1440,7 +1467,7 @@ int left = maxElement, right = totalSum;
 
 while (left < right) {
     int mid = left + (right - left) / 2;
-    
+  
     if (isFeasible(nums, mid, constraints)) {
         right = mid;  // Try smaller answer
     } else {
@@ -1556,7 +1583,7 @@ return unique;  // All duplicates cancel out
 
 ---
 
-### Micro-Pattern: Sentinel Nodes for Edge Case Handling
+### Micro-Pattern: Dummy Nodes for Edge Case Handling
 
 **Problem Context:** Linked list operations (merge, insert, delete) where head might change.
 
