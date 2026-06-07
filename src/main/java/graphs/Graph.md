@@ -6,16 +6,16 @@
 - [Breadth-First Search (BFS)](#breadth-first-search-bfs)`(SELECT → MARK(*) → WORK → ADD(*))` [In Queue]
 - [Depth-First Search (DFS)](#depth-first-search-dfs)`(SELECT → MARK(*) → WORK → ADD(*))` [In Stack]
 - [Topological Sort](#topological-sort)
-    - [1. DFS-based Topological Sort](#1-dfs-based-topological-sort)
-    - [2. Kahn&#39;s Algorithm (PREFERRED)](#2-kahns-algorithm-based-topological-sort)`(SELECT → MARK(*) → WORK → ADD(*))` [In Queue with 0 In-Degree]
+  - [1. DFS-based Topological Sort](#1-dfs-based-topological-sort)
+  - [2. Kahn&#39;s Algorithm (PREFERRED)](#2-kahns-algorithm-based-topological-sort)`(SELECT → MARK(*) → WORK → ADD(*))` [In Queue with 0 In-Degree]
 - [Shortest Path Algorithms](#shortest-path-algorithms)
-    - [1. Dijkstra&#39;s Algorithm](#1-dijkstras-algorithm)`(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with total path distance]
-    - [2. Bellman-Ford Algorithm](#2-bellman-ford-algorithm)
-    - [3. Floyd-Warshall Algorithm](#3-floyd-warshall-algorithm)
+  - [1. Dijkstra&#39;s Algorithm](#1-dijkstras-algorithm)`(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with total path distance]
+  - [2. Bellman-Ford Algorithm](#2-bellman-ford-algorithm)
+  - [3. Floyd-Warshall Algorithm](#3-floyd-warshall-algorithm)
 - [Disjoint Sets (Union-Find)](#disjoint-sets-union-find)
 - [Minimum Spanning Tree](#minimum-spanning-tree)
-    - [1. Prim&#39;s Algorithm](#1-prims-algorithm)`(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with individual Nodes]
-    - [2. Kruskal&#39;s Algorithm](#2-kruskals-algorithm)
+  - [1. Prim&#39;s Algorithm](#1-prims-algorithm)`(SELECT → MARK(*) → WORK → ADD(*))` [In Min-Heap with individual Nodes]
+  - [2. Kruskal&#39;s Algorithm](#2-kruskals-algorithm)
 - [Articulation Points and Bridges](#articulation-points-and-bridges)
 - [Kosaraju&#39;s Algorithm](#kosarajus-algorithm)
 
@@ -23,9 +23,9 @@
 
 - `(*)` on any step means**"only if not already visited"**:`MARK(*)` = mark node as visited (skip if already marked);`ADD(*)` = add only unvisited neighbors.
 - ⚠️ The critical difference across algorithms is**when**`MARK(*)` executes:
-    - **BFS**:`MARK(*)` fires inside`ADD(*)` — node is marked**before** entering the queue. No duplicates possible.
-    - **DFS / Dijkstra / Prim**:`MARK(*)` fires at`SELECT` — node is marked**after** popping. Duplicates can exist in the queue; the`MARK(*)` guard discards stale ones.
-    - **Kahn's**: No explicit`MARK(*)` —`inDegree` reaching 0 is the implicit guard; a node is enqueued exactly once.
+  - **BFS**:`MARK(*)` fires inside`ADD(*)` — node is marked**before** entering the queue. No duplicates possible.
+  - **DFS / Dijkstra / Prim**:`MARK(*)` fires at`SELECT` — node is marked**after** popping. Duplicates can exist in the queue; the`MARK(*)` guard discards stale ones.
+  - **Kahn's**: No explicit`MARK(*)` —`inDegree` reaching 0 is the implicit guard; a node is enqueued exactly once.
 
 ---
 
@@ -92,7 +92,7 @@ public class AdjacencyListGraph {
     public static class Edge {
         int dest;
         int weight;
-    
+  
         public Edge(int dest, int weight) {
             this.dest = dest;
             this.weight = weight;
@@ -138,16 +138,16 @@ public class BFS {
         int V = graph.size();
         boolean[] visited = new boolean[V];
         Queue<Integer> queue = new LinkedList<>();
-    
+  
         // Mark the source vertex as visited and enqueue it
         visited[s] = true;
         queue.offer(s);
-    
+  
         while (!queue.isEmpty()) {
             // Dequeue a vertex from queue and print it
             int u = queue.poll();
             System.out.print(u + " ");
-        
+      
             // Get all adjacent vertices of the dequeued vertex
             // If an adjacent vertex has not been visited, mark it
             // visited and enqueue it
@@ -167,14 +167,14 @@ public class BFS {
         int[] distance = new int[V];
         Arrays.fill(distance, Integer.MAX_VALUE); // Initialize distances as infinity
         distance[s] = 0; // Distance of source from itself is 0
-    
+  
         Queue<Integer> queue = new LinkedList<>();
         visited[s] = true;
         queue.offer(s);
-    
+  
         while (!queue.isEmpty()) {
             int u = queue.poll();
-        
+      
             for (int v : graph.get(u)) {
                 if (!visited[v]) {
                     visited[v] = true;
@@ -183,7 +183,7 @@ public class BFS {
                 }
             }
         }
-    
+  
         return distance;
     }
 }
@@ -248,7 +248,7 @@ public class DFS {
         // Mark the current node as visited and print it
         visited[vertex] = true;
         System.out.print(vertex + " ");
-    
+  
         // Recursively process all the adjacent vertices
         for (int neighbor : graph.get(vertex)) {
             if (!visited[neighbor]) {
@@ -261,7 +261,7 @@ public class DFS {
     public static void dfs(List<List<Integer>> graph, int startVertex) {
         int V = graph.size();
         boolean[] visited = new boolean[V];
-    
+  
         // Call the recursive helper function
         dfsRecursive(graph, startVertex, visited);
     }
@@ -270,28 +270,28 @@ public class DFS {
     public static void dfsIterative(List<List<Integer>> graph, int startVertex) {
         int V = graph.size();
         boolean[] visited = new boolean[V];
-    
+  
         // Create a stack for DFS
         Stack<Integer> stack = new Stack<>();
-    
+  
         // Push the source vertex
         stack.push(startVertex);
-    
+  
         while (!stack.isEmpty()) {
             // 1. SELECT: Pop a vertex from the stack
             int vertex = stack.pop();
-        
+      
             // Skip if already visited
             if (visited[vertex]) {
                 continue;
             }
-        
+      
             // 2. MARK(*): Mark the vertex as visited
             visited[vertex] = true;
-        
+      
             // 3. WORK: Process the vertex
             System.out.print(vertex + " ");
-        
+      
             // 4. ADD(*): Push all unvisited neighbors to stack
             for (int neighbor : graph.get(vertex)) {
                 if (!visited[neighbor]) {
@@ -305,7 +305,7 @@ public class DFS {
     public static boolean hasCycle(List<List<Integer>> graph) {
         int V = graph.size();
         boolean[] visited = new boolean[V];
-    
+  
         // Check for cycles starting from each unvisited vertex
         for (int i = 0; i < V; i++) {
             if (!visited[i]) {
@@ -321,7 +321,7 @@ public class DFS {
                                        boolean[] visited, int parent) {
         // Mark the current node as visited
         visited[vertex] = true;
-    
+  
         // Check all neighbors
         for (int neighbor : graph.get(vertex)) {
             // If neighbor is not visited, recursively check if its subgraph has cycle
@@ -378,7 +378,7 @@ Topological sort is the process of ordering the vertices of a directed graph suc
 
 ### 1. DFS-based Topological Sort
 
-In this approach, topological sorting is performed using DFS. A vertex is pushed to the result stack only after all of its outgoing DFS branches finish. 
+In this approach, topological sorting is performed using DFS. A vertex is pushed to the result stack only after all of its outgoing DFS branches finish.
 
 > To detect cycle in graph, you must distinguish “currently on the recursion stack” from “fully finished”: if an edge leads to a vertex still on the stack, that is a **back edge** and the graph has a **cycle** — no valid topological order exists.
 
@@ -469,7 +469,7 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 
 > **Note**: No explicit `visited[]` needed. `inDegree` reaching 0 is the implicit `MARK(*)` guard — a node is enqueued exactly once. Cycle detection: `processedCount != totalVertices`.
 
-#### Code Implementation
+### Code Implementation
 
 ```java
 import java.util.*;
@@ -650,7 +650,7 @@ Follows patterns `(SELECT → MARK(*) → WORK → ADD(*))`
 - **ADD(*)**: For all unvisited neighbors of the current node, if a shorter path is found via the current node, update their distance and add them to the min-heap.
 - **Repeat**: Continue until the min-heap is empty.
 
-> **Note**: `MARK(*)` must fire after `SELECT` because a node can appear in the heap multiple times (once per relaxation). The `MARK(*)` guard on SELECT discards stale entries; the first pop always carries the true shortest distance. 
+> **Note**: `MARK(*)` must fire after `SELECT` because a node can appear in the heap multiple times (once per relaxation). The `MARK(*)` guard on SELECT discards stale entries; the first pop always carries the true shortest distance.
 >
 > Using `MARK(*)` inside `ADD(*)` instead (BFS style) would block later shorter paths which would wrong answer.
 
@@ -677,7 +677,7 @@ public class DijkstraShortestPath {
     static class Edge {
         int destination;
         int weight;
-    
+  
         public Edge(int destination, int weight) {
             this.destination = destination;
             this.weight = weight;
@@ -688,7 +688,7 @@ public class DijkstraShortestPath {
     static class Node {
         int id;
         int distance;
-    
+  
         public Node(int id, int distance) {
             this.id = id;
             this.distance = distance;
@@ -706,32 +706,32 @@ public class DijkstraShortestPath {
         int numVertices = graph.size();
         int[] distance = new int[numVertices];
         boolean[] visited = new boolean[numVertices];
-    
+  
         // Initialize all distances as infinity
         Arrays.fill(distance, Integer.MAX_VALUE);
         distance[source] = 0;
-    
+  
         // Min-heap: prioritize nodes with smallest distance
         PriorityQueue<Node> minHeap = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
         minHeap.offer(new Node(source, 0));
-    
+  
         while (!minHeap.isEmpty()) {
             // SELECT: Extract node with minimum distance
             Node current = minHeap.poll();
             int currentNode = current.id;
-        
+      
             // MARK(*): Skip if already processed
             if (visited[currentNode]) continue;
             visited[currentNode] = true;
-        
+      
             // WORK: Current node's shortest path is finalized
             // (Optional: can track parent for path reconstruction)
-        
+      
             // ADD(*): Explore all neighbors and update distances
             for (Edge edge : graph.get(currentNode)) {
                 int neighbor = edge.destination;
                 int newDistance = distance[currentNode] + edge.weight;
-            
+          
                 // Relaxation: update if we found a shorter path
                 if (!visited[neighbor] && newDistance < distance[neighbor]) {
                     distance[neighbor] = newDistance;
@@ -739,7 +739,7 @@ public class DijkstraShortestPath {
                 }
             }
         }
-    
+  
         return distance;
     }
 }
@@ -769,8 +769,8 @@ Bellman-Ford is a single-source shortest path algorithm that works even with neg
 2. Relax All Edges (n - 1) Times
 
 - Why n - 1?
-    - The longest possible simple path in a graph with n nodes has n - 1 edges.
-    - So, to propagate information across all cities, you need n - 1 rounds of updates.
+  - The longest possible simple path in a graph with n nodes has n - 1 edges.
+  - So, to propagate information across all cities, you need n - 1 rounds of updates.
 - “Relaxing an edge” means: Can I reach`to` from`from` more cheaply than I thought before?
 
 3. After n - 1 rounds, if any edge can still be relaxed, it means you’ve found a cycle that can keep reducing cost forever — a trap!
@@ -789,7 +789,7 @@ public class BellmanFord {
         int from;
         int to;
         int weight;
-    
+  
         public Edge(int from, int to, int weight) {
             this.from = from;
             this.to = to;
@@ -810,12 +810,12 @@ public class BellmanFord {
         int[] distance = new int[numVertices];
         Arrays.fill(distance, Integer.MAX_VALUE);
         distance[source] = 0; // Distance from source to itself is 0
-    
+  
         // Step 1: Relax all edges (V - 1) times
         // Why V-1? Longest simple path has at most V-1 edges
         for (int iteration = 0; iteration < numVertices - 1; iteration++) {
             boolean updated = false;
-        
+      
             for (Edge edge : edges) {
                 // Relaxation: Check if path through 'from' is shorter
                 if (distance[edge.from] != Integer.MAX_VALUE &&
@@ -824,11 +824,11 @@ public class BellmanFord {
                     updated = true;
                 }
             }
-        
+      
             // Early termination: if no update in this iteration, we're done
             if (!updated) break;
         }
-    
+  
         // Step 2: Check for negative-weight cycles
         // If we can still relax any edge, a negative cycle exists
         for (Edge edge : edges) {
@@ -838,7 +838,7 @@ public class BellmanFord {
                 return null;
             }
         }
-    
+  
         return distance;
     }
 }
@@ -872,8 +872,8 @@ That’s the Floyd-Warshall algorithm: try improving every path by passing throu
 2. Loop over every node k as an intermediate node.
 
 - For every pair (i, j), check:
-    - “Can I go from i to j via k and get a shorter path?”
-    - If yes, update distance[i][j] = distance[i][k] + distance[k][j]
+  - “Can I go from i to j via k and get a shorter path?”
+  - If yes, update distance[i][j] = distance[i][k] + distance[k][j]
 
 3. After all updates, if distance to itself (any diagonal distance[i][i] < 0 ), a negative weight cycle exists.
 
@@ -896,25 +896,25 @@ public class FloydWarshall {
     public static int[][] allPairsShortestPath(int[][] graph) {
         int numVertices = graph.length;
         int[][] distance = new int[numVertices][numVertices];
-    
+  
         // Step 1: Initialize distance matrix with original graph values
         for (int i = 0; i < numVertices; i++) {
             for (int j = 0; j < numVertices; j++) {
                 distance[i][j] = graph[i][j];
             }
         }
-    
+  
         // Step 2: Try each vertex as an intermediate point
         // For each pair (i, j), check if path i -> k -> j is shorter than i -> j
         for (int k = 0; k < numVertices; k++) {
             for (int i = 0; i < numVertices; i++) {
                 for (int j = 0; j < numVertices; j++) {
-                
+              
                     // Skip if either segment doesn't exist
                     if (distance[i][k] == INF || distance[k][j] == INF) {
                         continue;
                     }
-                
+              
                     // Relaxation: update if path through k is shorter
                     if (distance[i][k] + distance[k][j] < distance[i][j]) {
                         distance[i][j] = distance[i][k] + distance[k][j];
@@ -922,7 +922,7 @@ public class FloydWarshall {
                 }
             }
         }
-    
+  
         // Step 3: Check for negative weight cycles
         // If distance from a vertex to itself becomes negative, cycle exists
         for (int i = 0; i < numVertices; i++) {
@@ -931,7 +931,7 @@ public class FloydWarshall {
                 return null;
             }
         }
-    
+  
         return distance;
     }
 }
@@ -1086,11 +1086,11 @@ public class CycleDetectionUsingDisjointSet {
 ### Time and Space Complexity
 
 - **Time Complexity**:
-    - find: O(α(n)) => O(1) for practical purposes
-    - union: O(α(n)) => O(1) for practical purposes
+  - find: O(α(n)) => O(1) for practical purposes
+  - union: O(α(n)) => O(1) for practical purposes
 - **Space Complexity**:
-    - find: O(n) for the parent and rank arrays
-    - union: O(n) for the parent and rank arrays
+  - find: O(n) for the parent and rank arrays
+  - union: O(n) for the parent and rank arrays
 
 **Notes** : α(n) is practically ≤ 5 for all reasonable n, so operations are near-constant time in practice.
 
@@ -1215,29 +1215,30 @@ public class PrimMST {
 
 ### 2. Kruskal's Algorithm
 
-Instead of starting from a node and growing like Prim’s, Kruskal’s starts with all nodes as isolated components, and adds the shortest edge available that does not create a cycle — until all nodes are connected. It heavily relies on a Disjoint Set Union (DSU) or Union-Find data structure to efficiently check whether adding an edge would form a cycle.
+Instead of starting from a node and growing like Prim’s, Kruskal’s starts with all nodes as isolated components, and adds the shortest edge available that does not create a cycle — until all nodes are connected. It heavily relies on a Disjoint Set Union (DSU) to efficiently check whether adding an edge would form a cycle.
 
 Imagine the graph as a bunch of islands (nodes) and edges as bridges between them.
 
 - We want to connect all islands using the cheapest bridges, without forming loops (cycles).
 - So we:
-    - Sort bridges by cost
-    - Use Union-Find to only connect two islands if they’re still separate
-    - Repeat until all islands are connected (i.e., MST has V - 1 edges)
+  - Sort bridges by cost
+  - Use Union-Find to only connect two islands if they’re still separate
+  - Repeat until all islands are connected (i.e., MST has V - 1 edges)
 
 ### Use Cases
 
 - **Sparse graphs**: When the graph has fewer edges, Kruskal’s algorithm is more efficient since it works by sorting edges and is faster when edges are sparse.
 - **Building a minimum spanning tree (MST)**: If the task is to find the MST of a graph, Kruskal's is one of the most straightforward algorithms, particularly if the edges are already sorted.
-- **Union-Find operations are efficient**: Kruskal’s works well when you can efficiently manage disjoint sets using Union-Find (or DSU) to check for cycles.
+- **Union-Find operations are efficient**: Kruskal’s works well when you can efficiently manage disjoint sets using DSU to check for cycles.
 
 ### Steps
 
 1. Sort all edges in ascending order of weight
-2. Initialize a disjoint-set (Union-Find) structure for the nodes
+2. Initialize a disjoint-set structure for the nodes
 3. For each edge:
 
 - it connects two different components, include it in MST and merge the components
+
 - it connects nodes in the same component, skip it (would form a cycle)
 
 4. Stop when MST has exactly V - 1 edges
@@ -1254,7 +1255,7 @@ public class KruskalMST {
         int from;
         int to;
         int weight;
-    
+  
         public Edge(int from, int to, int weight) {
             this.from = from;
             this.to = to;
@@ -1276,40 +1277,40 @@ public class KruskalMST {
     public static int computeMST(int numVertices, List<Edge> edges) {
         // Step 1: Sort edges by weight in ascending order
         edges.sort(Comparator.comparingInt(e -> e.weight));
-    
+  
         // Step 2: Initialize Union-Find (Disjoint Set)
         int[] parent = new int[numVertices];
         int[] rank = new int[numVertices];
-    
+  
         for (int i = 0; i < numVertices; i++) {
             parent[i] = i;  // Each vertex is its own parent initially
             rank[i] = 0;    // Rank for union-by-rank optimization
         }
-    
+  
         int totalWeight = 0;
         int edgesAdded = 0;
-    
+  
         // Step 3: Process edges in sorted order
         for (Edge edge : edges) {
             int rootFrom = find(edge.from, parent);
             int rootTo = find(edge.to, parent);
-        
+      
             // Only add edge if it connects two different components (no cycle)
             if (rootFrom != rootTo) {
                 union(rootFrom, rootTo, parent, rank);
                 totalWeight += edge.weight;
                 edgesAdded++;
-            
+          
                 System.out.printf("Edge added: %d -> %d (weight = %d)%n",
                     edge.from, edge.to, edge.weight);
-            
+          
                 // MST is complete when we have V-1 edges
                 if (edgesAdded == numVertices - 1) {
                     break;
                 }
             }
         }
-    
+  
         return totalWeight;
     }
   
@@ -1370,12 +1371,12 @@ Articulation points (or cut vertices) are vertices in an undirected graph whose 
 2. For each vertex, track:
 
 - Discovery time
-    - Lowest vertex reachable from its subtree
+  - Lowest vertex reachable from its subtree
 
 3. A vertex is an articulation point if either:
 
 - It is the root of the DFS tree and has at least two children
-    - It is not the root and has a child whose lowest reachable vertex is not an ancestor of the vertex
+  - It is not the root and has a child whose lowest reachable vertex is not an ancestor of the vertex
 
 ### Code Implementation
 
@@ -1393,16 +1394,16 @@ public class ArticulationPointsAndBridges {
         int[] low = new int[V];     // Earliest visited vertex reachable from subtree
         int[] parent = new int[V];  // Parent vertices in DFS tree
         boolean[] ap = new boolean[V]; // To mark articulation points
-    
+  
         Arrays.fill(parent, -1);
-    
+  
         // Call the recursive helper function for all unvisited vertices
         for (int i = 0; i < V; i++) {
             if (!visited[i]) {
                 dfsArticulationPoint(graph, i, visited, disc, low, parent, ap);
             }
         }
-    
+  
         // Collect articulation points
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < V; i++) {
@@ -1410,7 +1411,7 @@ public class ArticulationPointsAndBridges {
                 result.add(i);
             }
         }
-    
+  
         return result;
     }
   
@@ -1418,37 +1419,37 @@ public class ArticulationPointsAndBridges {
                                     int[] disc, int[] low, int[] parent, boolean[] ap) {
         // Count of children in DFS tree
         int children = 0;
-    
+  
         // Mark the current node as visited
         visited[u] = true;
-    
+  
         // Initialize discovery time and low value
         disc[u] = low[u] = ++time;
-    
+  
         // Go through all neighbors
         for (int v : graph.get(u)) {
             // Skip if v is parent of u
             if (parent[u] == v) {
                 continue;
             }
-        
+      
             // If v is not visited yet, make it a child in DFS tree
             if (!visited[v]) {
                 children++;
                 parent[v] = u;
-            
+          
                 // Recursive call for the neighbor
                 dfsArticulationPoint(graph, v, visited, disc, low, parent, ap);
-            
+          
                 // Check if subtree rooted at v has a connection to an ancestor of u
                 low[u] = Math.min(low[u], low[v]);
-            
+          
                 // u is an articulation point in following cases:
                 // 1) u is root of DFS tree and has two or more children
                 if (parent[u] == -1 && children > 1) {
                     ap[u] = true;
                 }
-            
+          
                 // 2) u is not root and low value of one of its children is greater than or equal to discovery value of u
                 if (parent[u] != -1 && low[v] >= disc[u]) {
                     ap[u] = true;
@@ -1464,7 +1465,7 @@ public class ArticulationPointsAndBridges {
     // Class to represent a bridge edge
     static class Bridge {
         int src, dest;
-    
+  
         public Bridge(int src, int dest) {
             this.src = src;
             this.dest = dest;
@@ -1479,17 +1480,17 @@ public class ArticulationPointsAndBridges {
         int[] low = new int[V];
         int[] parent = new int[V];
         List<Bridge> bridges = new ArrayList<>();
-    
+  
         Arrays.fill(parent, -1);
         time = 0;
-    
+  
         // Call the recursive helper function for all unvisited vertices
         for (int i = 0; i < V; i++) {
             if (!visited[i]) {
                 dfsBridge(graph, i, visited, disc, low, parent, bridges);
             }
         }
-    
+  
         return bridges;
     }
   
@@ -1497,27 +1498,27 @@ public class ArticulationPointsAndBridges {
                          int[] disc, int[] low, int[] parent, List<Bridge> bridges) {
         // Mark the current node as visited
         visited[u] = true;
-    
+  
         // Initialize discovery time and low value
         disc[u] = low[u] = ++time;
-    
+  
         // Go through all neighbors
         for (int v : graph.get(u)) {
             // Skip if v is parent of u
             if (parent[u] == v) {
                 continue;
             }
-        
+      
             // If v is not visited yet, make it a child in DFS tree
             if (!visited[v]) {
                 parent[v] = u;
-            
+          
                 // Recursive call for the neighbor
                 dfsBridge(graph, v, visited, disc, low, parent, bridges);
-            
+          
                 // Check if subtree rooted at v has a connection to an ancestor of u
                 low[u] = Math.min(low[u], low[v]);
-            
+          
                 // If the lowest vertex reachable from subtree under v is
                 // below u in DFS tree, then u-v is a bridge
                 if (low[v] > disc[u]) {
@@ -1574,24 +1575,24 @@ public class KosarajuSCC {
         boolean[] visited = new boolean[V];
         Stack<Integer> stack = new Stack<>();
         List<List<Integer>> result = new ArrayList<>();
-    
+  
         // Step 1: Fill vertices in stack according to their finishing times
         for (int i = 0; i < V; i++) {
             if (!visited[i]) {
                 fillOrder(graph, i, visited, stack);
             }
         }
-    
+  
         // Step 2: Create the transpose of the graph
         List<List<Integer>> transposedGraph = transposeGraph(graph);
-    
+  
         // Reset visited array
         Arrays.fill(visited, false);
-    
+  
         // Step 3: Process all vertices in the stack
         while (!stack.isEmpty()) {
             int v = stack.pop();
-        
+      
             // Print SCC of popped vertex
             if (!visited[v]) {
                 List<Integer> scc = new ArrayList<>();
@@ -1599,21 +1600,21 @@ public class KosarajuSCC {
                 result.add(scc);
             }
         }
-    
+  
         return result;
     }
   
     // Fills vertices in stack according to their finishing times
     private void fillOrder(List<List<Integer>> graph, int v, boolean[] visited, Stack<Integer> stack) {
         visited[v] = true;
-    
+  
         // Recur for all adjacent vertices
         for (int adj : graph.get(v)) {
             if (!visited[adj]) {
                 fillOrder(graph, adj, visited, stack);
             }
         }
-    
+  
         // Push current vertex to stack after all its adjacent vertices are processed
         stack.push(v);
     }
@@ -1685,8 +1686,8 @@ public class KosarajuSCC {
 - Drawing problems (e.g., draw without lifting pen)
 - Bioinformatics (e.g., genome assembly using de Bruijn graphs)
 - Leetcode problems:
-    - Reconstruct Itinerary (LC 332)
-    - Cracking the Safe (LC 753)
+  - Reconstruct Itinerary (LC 332)
+  - Cracking the Safe (LC 753)
 
 ### Steps
 
@@ -1724,14 +1725,14 @@ public class EulerianPathFinder {
         for (String vertex : graph.keySet()) {
             adjacency.put(vertex, new ArrayDeque<>(graph.get(vertex)));
         }
-    
+  
         // Find the starting vertex
         String startVertex = findStartVertex(adjacency);
         List<String> path = new ArrayList<>();
-    
+  
         // Perform DFS to build the path
         buildPath(startVertex, adjacency, path);
-    
+  
         // Reverse to get the correct order (nodes added in reverse during DFS)
         Collections.reverse(path);
         return path;
@@ -1743,17 +1744,17 @@ public class EulerianPathFinder {
      */
     private void buildPath(String vertex, Map<String, Deque<String>> adjacency, List<String> path) {
         Deque<String> neighbors = adjacency.get(vertex);
-    
+  
         while (neighbors != null && !neighbors.isEmpty()) {
             String nextVertex = neighbors.pollFirst(); // Remove edge
-        
+      
             // For undirected graph, also remove reverse edge
             adjacency.get(nextVertex).remove(vertex);
-        
+      
             // Recursively visit next vertex
             buildPath(nextVertex, adjacency, path);
         }
-    
+  
         // Add vertex to path after all its edges are explored
         path.add(vertex);
     }
@@ -1765,21 +1766,21 @@ public class EulerianPathFinder {
      */
     private String findStartVertex(Map<String, Deque<String>> adjacency) {
         String start = null;
-    
+  
         for (String vertex : adjacency.keySet()) {
             int degree = adjacency.get(vertex).size();
-        
+      
             // If odd degree, must start here for Euler Path
             if (degree % 2 == 1) {
                 return vertex;
             }
-        
+      
             // Keep track of any vertex as fallback
             if (start == null) {
                 start = vertex;
             }
         }
-    
+  
         return start;
     }
 }
