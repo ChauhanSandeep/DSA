@@ -1,75 +1,51 @@
 package strings;
 
 /**
- * Valid Number Checker
+ * Problem: Valid Number
  *
- * -------------------------------------
- * 🧠 Problem Statement:
- * -------------------------------------
- * Given a string `s`, determine if it represents a valid number. Valid numbers include:
- * - Integers (e.g., "2", "0089", "-90", "+6")
- * - Decimals (e.g., "-0.1", "3.14", "4.", "-.9")
- * - Scientific notation (e.g., "2e10", "-90E3", "3e+7", "53.5e93")
+ * Determine whether a string is a valid decimal number with optional sign,
+ * decimal point, and exponent with its own optional sign.
  *
- * Invalid numbers include those with:
- * - Alphabetic characters: "abc", "1a", "95a54e53"
- * - Misused exponent: "1e", "e3", "99e2.5"
- * - Misplaced or extra signs: "--6", "-+3"
+ * Leetcode: https://leetcode.com/problems/valid-number/ (Hard)
+ * Rating:   acceptance 23.2% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Parser state | Flag validation
  *
- * 🔗 Leetcode Link:
- * https://leetcode.com/problems/valid-number/
+ * Example:
+ *   Input:  str = "53.5e93"
+ *   Output: true
+ *   Why:    the base and exponent both contain digits in valid positions.
  *
- * 🔍 Example:
- * Input: "53.5e93" → true
- * Input: "1e" → false
- *
- * -------------------------------------
- * ❓ Follow-Up Questions:
- * -------------------------------------
- * 1. Can this be implemented using a regex?
- *    - Yes, though harder to maintain and debug. Regex pattern exists for compact solution.
- * 2. How would you write a parser for floating-point numbers?
- *    - Split into tokens, handle sign, digits, dot, and exponent using a state machine.
- * 3. Is this a valid use case for a finite state machine (FSM)?
- *    - Yes. You can model each parsing state explicitly for maintainability and extensibility.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Regex solution? Possible, but a state parser is easier to explain and extend.
+ *   2. Hex literals? Add prefix states and base-specific digit checks.
+ *   3. Error reporting? Return the first invalid index and failed rule.
  */
-
 public class ValidNumberChecker {
 
   public static void main(String[] args) {
-    String[] validNumbers =
-        {"2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789"};
-
-    String[] invalidNumbers = {"abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53"};
-
     ValidNumberChecker validator = new ValidNumberChecker();
-
-    System.out.println("✅ Valid Numbers:");
-    for (String number : validNumbers) {
-      System.out.println(number + " → " + validator.isValidNumber(number));
-    }
-
-    System.out.println("\n❌ Invalid Numbers:");
-    for (String number : invalidNumbers) {
-      System.out.println(number + " → " + validator.isValidNumber(number));
+    String[] inputs = {"2", "53.5e93", "1e", "--6"};
+    boolean[] expected = {true, true, false, false};
+    for (int i = 0; i < inputs.length; i++) {
+      boolean got = validator.isValidNumber(inputs[i]);
+      System.out.printf("str=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
     }
   }
 
-  /**
-   * Determines whether a given string is a valid number.
+
+    /**
+   * Intuition: validation is a small state machine represented by flags. Digits
+   * make the current part valid, dot is allowed only before exponent, exponent is
+   * allowed only after digits, and sign is allowed only at the start of a part.
    *
-   * Steps:
-   * 1. Track flags for digit, decimal, exponent, and sign.
-   * 2. Iterate over characters and apply rules based on current state.
-   * 3. Handle special rules for signs and exponent placement.
-   * 4. Ensure at least one digit is present at the end.
+   * Algorithm:
+   *   1. Track whether digit, dot, exponent, and sign have appeared.
+   *   2. Scan each character and update the matching state.
+   *   3. Reject invalid dot, exponent, sign, or unknown character placements.
+   *   4. Return true only if the final part has a digit.
    *
-   * Time Complexity: O(N) — Single pass through string.
-   * Space Complexity: O(1)
-   *
-   * @param str The string to validate.
-   * @return true if valid number; false otherwise.
+   * Time:  O(n) - one pass over the string.
+   * Space: O(1) - only flags are stored.
    */
   public boolean isValidNumber(String str) {
     boolean seenDigit = false;

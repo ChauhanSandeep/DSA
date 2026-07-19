@@ -1,49 +1,54 @@
 package strings;
 
 /**
- * The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this:
- * P   A   H   N
- * A P L S I I G
- * Y   I   R
+ * Problem: ZigZag Conversion
  *
- * And then read line by line: "PAHNAPLSIIGYIR"
+ * Write a string across a fixed number of rows by moving down and diagonally up,
+ * then return the characters read row by row.
  *
- * Example 1:
- * Input: s = "PAYPALISHIRING", numRows = 3
- * Output: "PAHNAPLSIIGYIR"
+ * Leetcode: https://leetcode.com/problems/zigzag-conversion/ (Medium)
+ * Rating:   acceptance 54.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Row builders | Cyclic traversal
  *
- * Example 2:
- * Input: s = "PAYPALISHIRING", numRows = 4
- * Output: "PINALSIGYAHRPI"
- * Explanation:
- * P     I    N
- * A   L S  I G
- * Y A   H R
- * P     I
+ * Example:
+ *   Input:  s = "PAYPALISHIRING", numRows = 3
+ *   Output: "PAHNAPLSIIGYIR"
+ *   Why:    reading the three zigzag rows top to bottom gives that string.
  *
- * LeetCode: https://leetcode.com/problems/zigzag-conversion/
+ * Follow-ups:
+ *   1. Print the grid? Simulate row and column movement into a 2D array.
+ *   2. Avoid row buffers? Use cycle length 2*numRows-2 to append by row.
+ *   3. Invert conversion? Count row lengths and replay the zigzag path.
  *
- * Follow-up Questions:
- * 1. How would you modify your solution to print the zigzag pattern?
- *    - We can build a 2D array to represent the pattern and then print it.
- * 2. What if we need to convert from the zigzag format back to the original string?
- *    - We can reverse the process by calculating the original positions.
- * 3. How would you handle very large strings efficiently?
- *    - We can optimize by processing the string in chunks or using mathematical patterns.
- *
- * Related Problems:
- * - Text Justification (https://leetcode.com/problems/text-justification/)
- * - Encode and Decode Strings (https://leetcode.com/problems/encode-and-decode-strings/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Text Justification (68).
  */
 public class ZigZagConversion {
 
-    /**
-     * Converts the given string into a zigzag pattern with the specified number of rows.
+    public static void main(String[] args) {
+        ZigZagConversion solver = new ZigZagConversion();
+        String[] inputs = {"PAYPALISHIRING", "PAYPALISHIRING", "A"};
+        int[] rows = {3, 4, 1};
+        String[] expected = {"PAHNAPLSIIGYIR", "PINALSIGYAHRPI", "A"};
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.convert(inputs[i], rows[i]);
+            System.out.printf("s=%s rows=%d -> %s  expected=%s%n", inputs[i], rows[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: simulate writing the zigzag row by row. The current row moves
+     * down until the bottom, then up until the top; boundary rows flip direction.
+     * Joining the row builders gives the requested read order.
      *
-     * @param s The input string
-     * @param numRows The number of rows in the zigzag pattern
-     * @return The converted string read line by line
+     * Algorithm:
+     *   1. Return s for one row or when the string fits within the rows.
+     *   2. Create one builder per row.
+     *   3. Append each character to currentRow and flip direction at boundaries.
+     *   4. Concatenate all rows.
+     *
+     * Time:  O(n) - each character is appended and copied once.
+     * Space: O(n) - row builders store the output.
      */
     public String convert(String s, int numRows) {
         if (numRows == 1 || s.length() <= numRows) {

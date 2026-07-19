@@ -1,38 +1,59 @@
 package strings;
 
 /**
- * LeetCode 415. Add Strings
+ * Problem: Add Strings
  *
- * Given two non-negative integers num1 and num2 represented as strings, return the sum of num1 and num2 as a string.
- * You must solve the problem without using any built-in library for handling large integers (such as BigInteger).
- * You must also not convert the inputs to integers directly.
+ * Add two non-negative integers represented as decimal strings and return their
+ * sum as a string. The solution cannot use BigInteger or convert the full inputs
+ * directly to numeric types.
  *
- * Example 1:
- * Input: num1 = "11", num2 = "123"
- * Output: "134"
- * Explanation: 11 + 123 = 134
+ * Leetcode: https://leetcode.com/problems/add-strings/ (Easy)
+ * Rating:   acceptance 52.2% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Elementary math | Carry from right to left
  *
- * LeetCode Link: https://leetcode.com/problems/add-strings/
+ * Example:
+ *   Input:  num1 = "456", num2 = "77"
+ *   Output: "533"
+ *   Why:    column addition produces 3, then 3 with carry, then 5.
  *
- * Follow-up Questions:
- * - How would you handle negative numbers? (Extend to support subtraction with sign handling)
- * - Can you optimize for very large strings? (Consider chunked processing for memory efficiency)
- * - How would you extend this to support decimal numbers? (Add decimal point handling and alignment)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Support negative numbers? Compare absolute values and choose add or subtract by sign.
+ *   2. Support decimal strings? Align decimal points before doing the same carry pass.
+ *   3. Add many strings? Accumulate columns from right to left or add pairwise.
+ *
+ * Related: Multiply Strings (43), Add Binary (67), Plus One (66).
  */
 public class AddStrings {
 
-    /**
-     * Adds two non-negative integer strings using elementary addition algorithm.
+    public static void main(String[] args) {
+        AddStrings solver = new AddStrings();
+        String[] first = {"11", "456", "0"};
+        String[] second = {"123", "77", "0"};
+        String[] expected = {"134", "533", "0"};
+        for (int i = 0; i < first.length; i++) {
+            String got = solver.addStrings(first[i], second[i]);
+            System.out.printf("num1=%s num2=%s -> %s  expected=%s%n", first[i], second[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: this is paper addition from right to left. Keep a carry, append
+     * each result digit as it is discovered, then reverse because the builder was
+     * filled from least significant digit to most significant digit.
      *
      * Algorithm:
-     * 1. Start from the rightmost digits of both strings
-     * 2. Add corresponding digits along with carry from previous position
-     * 3. Calculate new digit (sum % 10) and new carry (sum / 10)
-     * 4. Continue until both strings are processed and no carry remains
+     *   1. Start i and j at the end of num1 and num2.
+     *   2. Read missing digits as 0, add both digits and carry, and append sum % 10.
+     *   3. Move both indices left and keep sum / 10 as the next carry.
+     *   4. Reverse the builder and return it.
      *
-     * Time Complexity: O(max(m, n)) where m, n are lengths of num1, num2
-     * Space Complexity: O(max(m, n)) for the result string
+     * Time:  O(max(m, n)) - one pass over the longer string.
+     * Space: O(max(m, n)) - the returned sum stores the output digits.
+     *
+     * @param num1 first non-negative integer string
+     * @param num2 second non-negative integer string
+     * @return decimal string for num1 + num2
      */
     public String addStrings(String num1, String num2) {
         StringBuilder result = new StringBuilder();

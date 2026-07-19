@@ -1,35 +1,52 @@
 package strings;
 
 /**
- * LeetCode 482. License Key Formatting
+ * Problem: License Key Formatting
  *
- * You are given a license key represented as a string s that consists of only alphanumeric
- * characters and dashes. We want to reformat the string s such that each group contains
- * exactly k characters, except for the first group, which could be shorter than k.
+ * Remove dashes, uppercase letters, and regroup a license key so every group has
+ * groupSize characters except possibly the first group.
  *
- * Example 1:
- * Input: s = "5F3Z-2e-9-w", k = 4
- * Output: "5F3Z-2E9W"
+ * Leetcode: https://leetcode.com/problems/license-key-formatting/ (Easy)
+ * Rating:   acceptance 46.3% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Reverse scan | Fixed-size groups
  *
- * LeetCode Link: https://leetcode.com/problems/license-key-formatting/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  key = "5F3Z-2e-9-w", groupSize = 4
+ *   Output: "5F3Z-2E9W"
+ *   Why:    groups are filled from the right after removing old dashes.
+ *
+ * Follow-ups:
+ *   1. Avoid reverse? Count cleaned characters first, then build forward.
+ *   2. Custom separators? Parameterize the separator to skip and insert.
+ *   3. Validate input? Reject non-alphanumeric non-separator characters.
  */
 public class LicenseKeyFormatting {
 
-    /**
-     * Formats license key by grouping characters and converting to uppercase.
+    public static void main(String[] args) {
+        LicenseKeyFormatting solver = new LicenseKeyFormatting();
+        String[] inputs = {"5F3Z-2e-9-w", "2-5g-3-J", "---"};
+        int[] groupSizes = {4, 2, 3};
+        String[] expected = {"5F3Z-2E9W", "2-5G-3J", ""};
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.licenseKeyFormatting(inputs[i], groupSizes[i]);
+            System.out.printf("key=%s k=%d -> %s  expected=%s%n", inputs[i], groupSizes[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: all complete groups are measured from the right, so scan from
+     * the end. Skip old dashes, uppercase kept characters, insert a dash whenever
+     * the current reversed group is full, then reverse the builder.
      *
      * Algorithm:
-     * 1. Initialize a StringBuilder for the result and a counter for characters in the current group.
-     * 2. Traverse the input string from end to start:
-     *   - If the character is not a dash, append its uppercase version to the result
-     *   and increment the counter.
-     *   - If the counter reaches groupSize, append a dash to the result and reset the counter.
-     * 3. After processing all characters, reverse the result string to get the correct order
-     *  and return it.
+     *   1. Scan key from right to left.
+     *   2. Skip dashes and uppercase kept characters.
+     *   3. Insert a dash before starting a new full group.
+     *   4. Reverse and return the builder.
      *
-     * Time Complexity: O(n) where n is length of input string
-     * Space Complexity: O(n) for the result string
+     * Time:  O(n) - each character is inspected once.
+     * Space: O(n) - the formatted key is stored in the builder.
      */
     public String licenseKeyFormatting(String key, int groupSize) {
         StringBuilder result = new StringBuilder();

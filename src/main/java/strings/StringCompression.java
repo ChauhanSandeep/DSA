@@ -1,77 +1,57 @@
 package strings;
+import java.util.Arrays;
 
 /**
- * LeetCode 443. String Compression
+ * Problem: String Compression
  *
- * Given an array of characters chars, compress it using the following algorithm:
- * Begin with an empty string s. For each group of consecutive repeating characters in chars:
- * - If the group's length is 1, append the character to s.
- * - Otherwise, append the character followed by the group's length.
+ * Compress consecutive character runs in place. Each run writes the character and
+ * then its decimal count digits only when the count is greater than one.
  *
- * Example 1:
- * Input: chars = ['a','a','b','b','c','c','c']
- * Output: Return 6, and the first 6 characters of the input array should be: ['a','2','b','2','c','3']
+ * Leetcode: https://leetcode.com/problems/string-compression/ (Medium)
+ * Rating:   acceptance 60.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Two pointers | In-place run-length encoding
  *
- * Example 2:
- * Input: chars = ['a']
- * Output: Return 1, and the first 1 character of the input array should be: ['a']
+ * Example:
+ *   Input:  chars = ['a','a','b','b','c','c','c']
+ *   Output: 6 with prefix ['a','2','b','2','c','3']
+ *   Why:    the runs are a x2, b x2, and c x3.
  *
- * LeetCode Link: https://leetcode.com/problems/string-compression/
+ * Follow-ups:
+ *   1. Decompress? Parse count digits after each character and expand into a new buffer.
+ *   2. Different format? Keep read/write pointers and change run emission.
+ *   3. Longer compressed output? Caller can compare returned length to original length.
  *
- * Follow-up Questions:
- *
- * 1. What if the compressed string is longer than the original string?
- *    Answer: The algorithm still works correctly. We compress in-place and return the new length.
- *    Callers can compare the returned length with the original to decide whether to use compression.
- *
- * 2. How would you handle counts greater than 9999?
- *    Answer: The current solution handles any count size by converting it to a string and writing
- *    each digit separately. For very large counts, we could optimize by using a more efficient
- *    integer-to-string conversion or buffer management strategy.
- *
- * 3. Can you decompress a compressed string back to original?
- *    Answer: Yes, we'd iterate through the compressed string, read each character, then read
- *    following digits (if any) to get the count, and expand by writing that character count times.
- *    This would require O(N) space for the decompressed result.
- *
- * 4. How would you optimize for strings with very few repeating characters?
- *    Answer: We could add an early exit check by scanning once to estimate compression ratio.
- *    If most characters appear only once, we could skip compression. However, this adds overhead
- *    and the current solution is already optimal for the general case.
- *
- * 5. What if we need to compress using run-length encoding with different rules?
- *    Answer: The two-pointer technique remains applicable. We'd modify the counting logic and
- *    how we write the count (e.g., always include count, use special delimiter, etc).
- *    Related problem: https://leetcode.com/problems/string-compression-ii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: String Compression II (1531), Count and Say (38).
  */
 public class StringCompression {
 
-  /**
-   * Compresses character array in-place using two-pointer technique.
+  public static void main(String[] args) {
+    StringCompression solver = new StringCompression();
+    char[][] inputs = {{'a', 'a', 'b', 'b', 'c', 'c', 'c'}, {'a'}, {'a', 'b', 'c'}};
+    int[] expectedLengths = {6, 1, 3};
+    String[] expectedPrefixes = {"a2b2c3", "a", "abc"};
+    for (int i = 0; i < inputs.length; i++) {
+      char[] chars = inputs[i].clone();
+      int gotLength = solver.compress(chars);
+      String gotPrefix = new String(chars, 0, gotLength);
+      System.out.printf("chars=%s -> length=%d prefix=%s  expected=%d/%s%n", Arrays.toString(inputs[i]), gotLength, gotPrefix, expectedLengths[i], expectedPrefixes[i]);
+    }
+  }
+
+
+    /**
+   * Intuition: read one run at a time and write its compressed form into the
+   * front of the same array. The write pointer never needs data that the read
+   * pointer has not already consumed.
    *
    * Algorithm:
-   * 1. Use read pointer to traverse and count consecutive identical characters
-   * 2. Use write pointer to write compressed result back to same array
-   * 3. For each group: write character, then write count digits if count > 1
-   * 4. Convert count to string and write each digit separately
-   * 5. Return final write position as new array length
+   *   1. Use readPointer to scan runs and writePointer to write output.
+   *   2. Count the current run length.
+   *   3. Write the character and then count digits when count > 1.
+   *   4. Return writePointer as the compressed length.
    *
-   * Key insight: We write the compressed version to the front of the array while
-   * reading from current position. Since compression reduces or maintains size,
-   * we never overwrite unprocessed data.
-   *
-   * Time Complexity: O(N) where N is the length of chars array. We traverse
-   * the array once with the read pointer, and each character is processed once.
-   * Converting count to string is O(log K) where K is the count, but this is
-   * bounded by O(log N) per group.
-   *
-   * Space Complexity: O(1) as we modify the array in-place and use only a
-   * constant amount of extra variables. The count string conversion uses O(log N)
-   * space but this is considered constant relative to input size.
-   *
-   * @param chars array of characters to compress in-place
-   * @return new length of the compressed array
+   * Time:  O(n) - each input character is read once.
+   * Space: O(1) - compression is in-place.
    */
   public int compress(char[] chars) {
     int writePointer = 0;

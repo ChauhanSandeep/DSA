@@ -1,59 +1,56 @@
 package strings;
 
 /**
- * Leetcode: https://leetcode.com/problems/process-string-with-special-operations-ii
+ * Problem: Process String with Special Operations II
  *
- * Problem Statement:
- * You are given a string `s` consisting of lowercase English letters and the special characters: '*', '#', and '%'.
- * You are also given an integer `k`.
+ * Process lowercase letters plus '*', '#', and '%' where letters append, '*'
+ * deletes, '#' duplicates, and '%' reverses. Return the kth final character or '.'.
  *
- * Process the string from left to right to build a result string following these rules:
- * - If the character is a lowercase letter, append it to the result.
- * - If the character is '*', remove the last character from the result if it exists.
- * - If the character is '#', duplicate the current result and append it to itself.
- * - If the character is '%', reverse the current result string.
- *
- * Your task is to return the kth (0-indexed) character of the final result string. If k is out of bounds, return '.'.
+ * Leetcode: https://leetcode.com/problems/process-string-with-special-operations-ii/ (Hard)
+ * Rating:   zerotrac 2011 (Q3, weekly-458)
+ * Pattern:  String | Reverse simulation | Length-only processing
  *
  * Example:
- * Input: s = "cd%#*#", k = 3
- * Output: "d"
+ *   Input:  inputStr = "cd%#*#", k = 3
+ *   Output: 'd'
+ *   Why:    the final string is "dcddcd", whose index 3 is 'd'.
  *
- * Explanation:
- * - Start: ""
- * - 'c' → "c"
- * - 'd' → "cd"
- * - '%' → "dc"
- * - '#' → "dcdc"
- * - '*' → "dcd"
- * - '#' → "dcddcd"
- * - Return char at index 3 → "d"
- *
- * Follow-Up Questions:
- * 1. Can we construct the final string and return the k-th char? (Not feasible for large strings - O(n) space)
- * 2. Can we simulate this in reverse to avoid full construction? (Yes, and that’s what this optimal solution does)
- * 3. How to handle huge values of `k` (up to 10^15)? (Avoid string construction, use length simulation)
- *
- * Time Complexity: O(n) where n = length of input string
- * Space Complexity: O(1) extra space
- * LeetCode Contest Rating: 2011
+ * Follow-ups:
+ *   1. Why not build the string? Duplication can make it too large.
+ *   2. Huge k? Use long lengths and cap values above the queried range.
+ *   3. Return a range? Map requested indices backward through the operations.
  */
 public class SpecialOperationsString {
+
+  public static void main(String[] args) {
+    SpecialOperationsString solver = new SpecialOperationsString();
+    String[] inputs = {"cd%#*#", "abc*", "a#"};
+    long[] indices = {3, 2, 1};
+    char[] expected = {'d', '.', 'a'};
+    for (int i = 0; i < inputs.length; i++) {
+      char got = solver.processStringAndFindKthChar(inputs[i], indices[i]);
+      System.out.printf("inputStr=%s k=%d -> %c  expected=%c%n", inputs[i], indices[i], got, expected[i]);
+    }
+  }
+
 
   private static final char REMOVE_LAST = '*';
   private static final char DUPLICATE = '#';
   private static final char REVERSE = '%';
 
-  /**
-   * Returns the k-th character in the final string after processing, or '.' if k is out of bounds.
+    /**
+   * Intuition: the final string can be too large, but each operation has a simple
+   * effect on length and on an index. Compute final length, then walk operations
+   * backward to map k into the previous virtual string until it reaches a letter.
    *
-   * @param inputStr The input string containing lowercase letters and special characters '*', '#', '%'.
-   * @param k The 0-indexed position to fetch from the processed result.
-   * @return The k-th character or '.' if out of bounds.
+   * Algorithm:
+   *   1. Simulate only the final length from left to right.
+   *   2. Return '.' if k is outside that length.
+   *   3. Walk right to left and undo reverse, duplicate, and delete operations.
+   *   4. Return the lowercase character that maps to k.
    *
-   * Steps:
-   * 1. First pass (Left to Right): Calculate only the length of the final string without building it.
-   * 2. Second pass (Right to Left): Trace back the operations to find the k-th character using reverse simulation.
+   * Time:  O(n) - two scans of the operation string.
+   * Space: O(1) - only length and index state are stored.
    */
   public char processStringAndFindKthChar(String inputStr, long k) {
     // Used to simulate result string's length

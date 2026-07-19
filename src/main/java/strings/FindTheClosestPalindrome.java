@@ -1,56 +1,51 @@
 package strings;
 
 /**
- * LeetCode 564. Find the Closest Palindrome
+ * Problem: Find the Closest Palindrome
  *
- * Given a string n representing an integer, return the closest integer (not including itself),
- * which is a palindrome. If there is a tie, return the smaller one.
+ * Given an integer string, return the nearest different palindrome. If two
+ * candidates are equally close, return the smaller one.
  *
- * The closest is defined as the absolute difference minimized between two integers.
+ * Leetcode: https://leetcode.com/problems/find-the-closest-palindrome/ (Hard)
+ * Rating:   acceptance 32.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Palindrome candidates | Mirror the prefix
  *
- * Example 1:
- * Input: n = "123"
- * Output: "121"
+ * Example:
+ *   Input:  n = "123"
+ *   Output: "121"
+ *   Why:    121 is closer to 123 than the next mirrored candidate 131.
  *
- * Example 2:
- * Input: n = "1"
- * Output: "0"
- * Explanation: 0 and 2 are the closest palindromes but we return the smallest which is 0.
- *
- * Constraints:
- * - 1 <= n.length <= 18
- * - n consists of only digits.
- * - n does not have leading zeros.
- * - n is representing an integer in the range [1, 10^18 - 1].
- *
- * LeetCode Link: https://leetcode.com/problems/find-the-closest-palindrome/
- *
- * Follow-up Questions:
- * - How would you find the k closest palindromes? (Generate candidates iteratively around n)
- * - How would you handle arbitrary precision numbers beyond long range?
- *   (Use BigInteger arithmetic on the candidates, the same algorithm still works on strings.)
- * - How would you find the closest palindrome with additional constraints
- *   (e.g., must be prime)? (Extend candidate generation with a validity filter.)
- *
- * LeetCode Contest Rating: Hard (~2000 difficulty)
+ * Follow-ups:
+ *   1. k closest palindromes? Generate nearby prefixes and keep the best k by distance.
+ *   2. Beyond long range? Compare string candidates with BigInteger or manual subtraction.
+ *   3. Extra validity rules? Filter candidates and expand generation if needed.
  */
 public class FindTheClosestPalindrome {
 
-    /**
-     * Finds the closest palindrome to the given integer string.
+    public static void main(String[] args) {
+        FindTheClosestPalindrome solver = new FindTheClosestPalindrome();
+        String[] inputs = {"123", "1", "1234", "10"};
+        String[] expected = {"121", "0", "1221", "9"};
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.nearestPalindromic(inputs[i]);
+            System.out.printf("n=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: the nearest palindrome comes from mirroring the prefix, except
+     * near powers of ten where length-boundary palindromes matter. Trying the
+     * prefix itself, prefix - 1, prefix + 1, and both boundaries covers the closest candidate.
      *
-     * Algorithm (mirror-the-prefix with 5 candidates):
-     * The closest palindrome to n must be one of these five candidates:
-     *   1. Mirror the left half of n onto the right half.
-     *   2. Mirror (left_half - 1) onto the right half.
-     *   3. Mirror (left_half + 1) onto the right half.
-     *   4. 10^(len-1) - 1   e.g., 999...9   (handles cases like 10000 -> 9999)
-     *   5. 10^len + 1       e.g., 100...01  (handles cases like 99 -> 101)
-     * Among these candidates, exclude n itself, then pick the one with the
-     * smallest absolute difference; on a tie, pick the smaller value.
+     * Algorithm:
+     *   1. Handle single digits by returning num - 1.
+     *   2. Add the lower and upper power-of-ten boundary palindromes.
+     *   3. Mirror leftHalf - 1, leftHalf, and leftHalf + 1.
+     *   4. Skip n itself and choose the smallest difference, breaking ties smaller.
      *
-     * Time Complexity:  O(L) where L = n.length() (string ops on length-L strings)
-     * Space Complexity: O(L) for candidate strings
+     * Time:  O(l) - a constant number of length-l candidates are built.
+     * Space: O(l) - mirrored candidate strings are length proportional to n.
      */
     public String nearestPalindromic(String n) {
         int len = n.length();
@@ -88,13 +83,7 @@ public class FindTheClosestPalindrome {
         return String.valueOf(bestPalindrome);
     }
 
-    /**
-     * Mirrors the given half to form a palindrome.
-     *
-     * @param half      The left half of the palindrome (including the middle digit for odd length).
-     * @param evenLen   true  -> result length is 2 * half.length      (mirror the entire half)
-     *                  false -> result length is 2 * half.length - 1  (skip the middle when mirroring)
-     */
+        /** Mirrors the left half into a full palindrome of the requested parity. */
     private long mirror(long half, boolean evenLen) {
         String left = String.valueOf(half);
         // For odd length palindromes, drop the last char before reversing (it's the middle)
@@ -103,36 +92,5 @@ public class FindTheClosestPalindrome {
         return Long.parseLong(left + reversed);
     }
 
-    /**
-     * Driver method to test {@link #nearestPalindromic(String)} with both
-     * odd-length and even-length inputs, plus a few edge cases.
-     */
-    public static void main(String[] args) {
-        FindTheClosestPalindrome solver = new FindTheClosestPalindrome();
-
-        String[][] tests = {
-            // {input, expected, description}
-            {"123",     "121",     "Odd length  - mirror left half"},
-//            {"1",       "0",       "Odd length  - single digit edge case"},
-//            {"12932",   "12921",   "Odd length  - mirror produces closer palindrome"},
-//            {"99999",   "100001",  "Odd length  - all 9s, jumps to next power of 10"},
-//            {"1000",    "999",     "Even length - power of 10 boundary"},
-            {"1234",    "1221",    "Even length - mirror left half"},
-//            {"11",      "9",       "Even length - tie, prefer smaller"},
-//            {"88",      "77",      "Even length - mirror leftHalf-1 wins"},
-//            {"10",      "9",       "Even length - small boundary"}
-        };
-
-        int passed = 0;
-        for (String[] t : tests) {
-            String input = t[0], expected = t[1], desc = t[2];
-            String actual = solver.nearestPalindromic(input);
-            boolean ok = expected.equals(actual);
-            if (ok) passed++;
-            System.out.printf("[%s] input=%-6s expected=%-7s actual=%-7s | %s%n",
-                ok ? "PASS" : "FAIL", input, expected, actual, desc);
-        }
-        System.out.printf("%n%d/%d tests passed%n", passed, tests.length);
     }
-}
 

@@ -5,63 +5,53 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * LeetCode 788. Rotated Digits
+ * Problem: Rotated Digits
  *
- * An integer x is a good number if after rotating each digit individually by
- * 180 degrees,
- * we get a valid number that is different from x. Each digit must be rotated -
- * we cannot choose to leave it alone.
+ * Count numbers from 1 to n that are valid after every digit is rotated 180
+ * degrees and become a different number after rotation.
  *
- * A number is valid if each digit remains a digit after rotation. Here are the
- * valid rotations of each digit:
- * 0 -> 0, 1 -> 1, 8 -> 8
- * 2 -> 5, 5 -> 2
- * 6 -> 9, 9 -> 6
- * Rest of the digits do not rotate to any other number and become invalid.
+ * Leetcode: https://leetcode.com/problems/rotated-digits/ (Medium)
+ * Rating:   zerotrac 1397 (Q1, weekly-73)
+ * Pattern:  String/Math | Digit classification | Digit DP
  *
- * Example 1:
- * Input: n = 10
- * Output: 4
- * Explanation: There are four good numbers in the range [1, 10] : 2, 5, 6, 9.
+ * Example:
+ *   Input:  n = 10
+ *   Output: 4
+ *   Why:    2, 5, 6, and 9 are the only good numbers from 1 through 10.
  *
- * LeetCode Link: https://leetcode.com/problems/rotated-digits/
- *
- * Follow-up Questions:
- * - How would you optimize for very large n? (Use mathematical patterns or
- * digit DP)
- * - Can you solve without converting numbers to strings? (Use modular
- * arithmetic)
- * - How would you extend to different rotation rules? (Modify rotation mapping)
- * - What if we need to count numbers that remain the same after rotation?
- * (Change validity condition)
- * LeetCode Contest Rating: 1397
+ * Follow-ups:
+ *   1. Very large n? Use digit DP over the decimal representation.
+ *   2. No string conversion? Inspect digits with modulo and division.
+ *   3. Count unchanged numbers? Allow only 0, 1, and 8.
  */
 public class RotatedDigits {
+
+    public static void main(String[] args) {
+        RotatedDigits solver = new RotatedDigits();
+        int[] inputs = {1, 10, 30};
+        int[] expected = {0, 4, 15};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.rotatedDigits(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
 
     private final Set<Integer> INVALID_DIGITS = new HashSet<>(Arrays.asList(3, 4, 7));
     private final Set<Integer> ROTATING_DIGITS = new HashSet<>(Arrays.asList(2, 5, 6, 9));
 
-    /**
-     * Counts good numbers from 1 to n where rotation produces different valid
-     * number.
-     * Brute Force Solution.
+        /**
+     * Intuition: a good number has only rotatable digits and at least one digit
+     * that changes after rotation. Check those two facts for every number in the range.
      *
      * Algorithm:
-     * 1. For each number from 1 to n, check if it's a good number
-     * 2. A good number must contain at least one digit that changes when rotated
-     * (2,5,6,9)
-     * 3. A good number cannot contain invalid digits (3,4,7) that don't have
-     * rotations
-     * 4. Valid unchanged digits (0,1,8) are allowed but at least one changing digit
-     * required otherwise number will be unchanged
-     * 5. Count all numbers satisfying these conditions
+     *   1. Iterate from 1 through n.
+     *   2. Reject numbers containing 3, 4, or 7.
+     *   3. Accept only numbers with at least one of 2, 5, 6, or 9.
+     *   4. Return the count of accepted numbers.
      *
-     * Time Complexity: O(n * log n) where n is input number (log n for digit
-     * processing per number)
-     * Space Complexity: O(1) - only uses constant extra space
-     *
-     * @param n Upper bound for checking good numbers
-     * @return Count of good numbers in range [1, n]
+     * Time:  O(n log n) - each number scans its digits.
+     * Space: O(1) - only fixed digit sets and counters are used.
      */
     public int rotatedDigits(int n) {
         int goodCount = 0;
@@ -107,6 +97,7 @@ public class RotatedDigits {
     }
 
     // Helper method for digit DP recursion
+    /** Counts valid rotated numbers with digit-DP state. */
     private int solve(int pos, int hasRotating, int tight, String num, Integer[][][] dp) {
         // Base case: reached end of number
         if (pos == num.length()) {
@@ -144,6 +135,7 @@ public class RotatedDigits {
     }
 
     // Helper method to check if a number is good
+    /** Returns true when every digit is valid and at least one digit changes. */
     private boolean isGoodNumber(int num) {
         boolean hasRotatingDigit = false;
 

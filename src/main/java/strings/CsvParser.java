@@ -2,69 +2,59 @@ package strings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 
 /**
- * CSV Parser
+ * Problem: CSV Parser
  *
- * Problem Statement:
- * Given multiple lines of CSV-formatted input strings, parse each line and extract fields correctly,
- * considering CSV-specific edge cases such as:
- * - Quoted fields: e.g., `"San Francisco, CA"` should be parsed as a single field.
- * - Escaped quotes within quoted fields: e.g., `"Alexandra ""Alex"""` should parse as `Alexandra "Alex"`.
- * - Empty fields: consecutive commas like `1,,2` imply an empty field between `1` and `2`.
+ * Parse CSV lines into fields while handling quoted fields, escaped quotes,
+ * commas inside quotes, and empty fields. This is a common tokenizer design
+ * interview problem rather than a Leetcode problem.
  *
- * Not a Leetcode problem, but frequently asked in FAANG-style rounds as a string parsing or tokenizer design question.
+ * Leetcode: Not a Leetcode problem (Interview)
+ * Pattern:  String | Tokenization | Quote-state parsing
  *
  * Example:
- * Input:
- * [
- *   "\"Alexandra \"\"Alex\"\"\",Menendez,alex.menendez@gmail.com,Miami,1",
- *   "John,Smith,john.smith@gmail.com,Los Angeles,10",
- *   "Jane,Roberts,janer@msn.com,\"San Francisco, CA\",0",
- *   "1,2,,4,\"5\""
- * ]
+ *   Input:  line = "1,\"San Francisco, CA\",\"Alex \"\"A\"\"\""
+ *   Output: ["1", "San Francisco, CA", "Alex \"A\""]
+ *   Why:    quoted commas stay inside the field and doubled quotes decode to one quote.
  *
- * Output:
- * [
- *   ["Alexandra \"Alex\"", "Menendez", "alex.menendez@gmail.com", "Miami", "1"],
- *   ["John", "Smith", "john.smith@gmail.com", "Los Angeles", "10"],
- *   ["Jane", "Roberts", "janer@msn.com", "San Francisco, CA", "0"],
- *   ["1", "2", "", "4", "5"]
- * ]
- *
- * 🔍 Follow-up Questions:
- * - Can you write a CSV serializer that converts structured data back into CSV?
- * - How would you handle multiline quoted fields in streaming input? (Hint: maintain state across lines)
- * - What changes are needed to support configurable delimiters (e.g., semicolon `;` instead of comma)?
- *
+ * Follow-ups:
+ *   1. CSV serializer? Quote fields that need escaping and double embedded quotes.
+ *   2. Multiline fields? Carry quote state across physical lines.
+ *   3. Custom delimiter? Parameterize delimiter and quote characters.
  */
 public class CsvParser {
 
   public static void main(String[] args) {
-    String[] input = {"\"Alexandra \"\"Alex\"\"\",Menendez,alex.menendez@gmail.com,Miami,1",
-        "John,Smith,john.smith@gmail.com,Los Angeles,10", "Jane,Roberts,janer@msn.com,\"San Francisco, CA\",0",
-        "1,2,,4,\"5\""};
-
-    List<List<String>> parsedData = parseCSVLines(input);
-
-    for (List<String> row : parsedData) {
-      System.out.println(row);
+    String[] inputs = {"1,2,,4,\"5\"", "\"Alexandra \"\"Alex\"\"\",Menendez,\"San Francisco, CA\""};
+    List<List<String>> expected = new ArrayList<>();
+    expected.add(Arrays.asList("1", "2", "", "4", "5"));
+    expected.add(Arrays.asList("Alexandra \"Alex\"", "Menendez", "San Francisco, CA"));
+    for (int i = 0; i < inputs.length; i++) {
+      List<String> got = parseSingleLine(inputs[i]);
+      System.out.printf("line=%s -> %s  expected=%s%n", inputs[i], got, expected.get(i));
     }
   }
 
-  /**
-   * Parses an array of CSV lines into structured rows of fields.
+
+    /**
+   * Intuition: when quoted fields do not span lines, each physical line is an
+   * independent CSV record. Parse each line with the single-line parser and keep
+   * the rows in input order.
    *
-   * @param csvLines An array of strings, each representing a CSV line.
-   * @return A list of rows, where each row is a list of parsed field values.
+   * Algorithm:
+   *   1. Create the parsed row list.
+   *   2. Parse each input line with parseSingleLine.
+   *   3. Add every parsed row to the result.
+   *   4. Return all rows.
    *
-   * 🔹 Steps:
-   * - Iterate over each line.
-   * - Use parseSingleLine() to parse each line independently.
+   * Time:  O(n) - every input character is parsed once.
+   * Space: O(f) - returned rows store all parsed fields.
    *
-   * Time Complexity: O(N), where N = total characters in all input lines.
-   * Space Complexity: O(M), where M = total number of parsed fields.
+   * @param csvLines CSV records to parse
+   * @return parsed rows of fields
    */
   public static List<List<String>> parseCSVLines(String[] csvLines) {
     List<List<String>> parsedRows = new ArrayList<>();
@@ -74,20 +64,22 @@ public class CsvParser {
     return parsedRows;
   }
 
-  /**
-   * Parses a single line of CSV input, accounting for quotes, escaped quotes, and commas inside quotes.
+    /**
+   * Intuition: a comma ends a field only outside quotes. Quotes toggle quoted
+   * mode, except doubled quotes inside quoted mode represent one literal quote.
+   * A builder accumulates the current field until an unquoted comma closes it.
    *
-   * @param line A single line of CSV data.
-   * @return A list of parsed fields for the line.
+   * Algorithm:
+   *   1. Scan the line while tracking insideQuotes.
+   *   2. Decode doubled quotes inside quoted fields.
+   *   3. On an unquoted comma, store the current field and reset the builder.
+   *   4. Store the final field after the loop.
    *
-   * 🔹 Steps:
-   * - Traverse character-by-character.
-   * - Maintain a flag `insideQuotes` to track quoted sections.
-   * - Accumulate characters in `fieldBuilder` until a field delimiter (unquoted comma) is found.
-   * - Handle escaped quotes (i.e., double double-quotes).
+   * Time:  O(l) - one scan of the line.
+   * Space: O(f) - stores parsed fields for the line.
    *
-   * Time Complexity: O(L), where L = number of characters in the line.
-   * Space Complexity: O(F), where F = number of fields in the line.
+   * @param line single CSV record
+   * @return parsed fields for that record
    */
   public static List<String> parseSingleLine(String line) {
     List<String> fields = new ArrayList<>();
@@ -121,14 +113,7 @@ public class CsvParser {
     return fields;
   }
 
-  /**
-   * Removes wrapping quotes from a field and trims whitespace if applicable.
-   *
-   * @param rawField The raw field string as accumulated from CSV.
-   * @return Cleaned and unquoted field value.
-   *
-   * 🔹 Example: "\"Alex\"" -> Alex ; " San Francisco " -> " San Francisco "
-   */
+    /** Removes one pair of wrapping quotes from a parsed field when present. */
   private static String trimQuotes(String rawField) {
     rawField = rawField.trim();
     if (rawField.startsWith("\"") && rawField.endsWith("\"") && rawField.length() >= 2) {
