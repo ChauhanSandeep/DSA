@@ -3,29 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 355. Design Twitter
- * 
- * Problem: Design a simplified version of Twitter with the ability to post tweets,
- * follow/unfollow users, and see the 10 most recent tweets in the user's news feed.
- * 
+ * Problem: Design Twitter
+ *
+ * Design a miniature social feed with posting, following, unfollowing, and reading
+ * the 10 most recent visible tweets. A user's feed includes their own tweets and
+ * tweets from everyone they currently follow.
+ *
+ * Leetcode: https://leetcode.com/problems/design-twitter/ (Medium)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Hash map | K-way merge with priority queue
+ *
  * Example:
- * Twitter twitter = new Twitter();
- * twitter.postTweet(1, 5);
- * twitter.getNewsFeed(1); // [5]
- * twitter.follow(1, 2);
- * 
- * LeetCode: https://leetcode.com/problems/design-twitter
- * 
- * Follow-up questions:
- * Q: How to scale to millions of users?
- * A: Use distributed systems, caching, and database sharding.
- * 
- * Q: How to handle trending topics?
- * A: Maintain counters for hashtags and keywords with time decay.
- * 
- * Q: How to optimize news feed generation for inactive users?
- * A: Precompute feeds for active users, generate on-demand for others.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  postTweet(1,5), getNewsFeed(1), follow(1,2), postTweet(2,6), getNewsFeed(1)
+ *   Output: [[5], [6,5]]
+ *   Why:    after following user 2, the newer tweet 6 appears before user 1's tweet 5.
+ *
+ * Follow-ups:
+ *   1. How would you scale feed reads for celebrity accounts?
+ *      Fan out normal users on write and generate celebrity feeds on read.
+ *   2. How would you support deletes?
+ *      Mark tweets deleted and skip them during feed merge or cleanup.
+ *   3. How would you rank by relevance instead of recency?
+ *      Replace timestamp ordering with a scoring model and maintain top-k candidates.
+ *
+ * Related: Merge k Sorted Lists (23), Design Log Storage System (635).
  */
 public class DesignTwitter {
     
@@ -61,10 +62,28 @@ public class DesignTwitter {
             following = new HashMap<>();
         }
         
+        /**
+         * Records a new tweet for the user with the next timestamp.
+         *
+         * Time:  O(1) - appends to one user's tweet list.
+         * Space: O(1) - stores one tweet object.
+         *
+         * @param userId author id
+         * @param tweetId tweet id
+         */
         public void postTweet(int userId, int tweetId) {
             tweets.computeIfAbsent(userId, k -> new ArrayList<>()).add(new Tweet(tweetId, timestamp++));
         }
         
+        /**
+         * Returns up to 10 most recent tweet ids visible to the user.
+         *
+         * Time:  O(F log F + 10 log F) - F followed users may seed the merge heap.
+         * Space: O(F) - heap stores one latest tweet per visible author.
+         *
+         * @param userId user requesting the feed
+         * @return most recent visible tweet ids
+         */
         public List<Integer> getNewsFeed(int userId) {
             List<Integer> feed = new ArrayList<>();
             
@@ -112,12 +131,30 @@ public class DesignTwitter {
             return feed;
         }
         
+        /**
+         * Makes one user follow another user.
+         *
+         * Time:  O(1) average - updates one hash set.
+         * Space: O(1) - stores one follow edge when new.
+         *
+         * @param followerId user who follows
+         * @param followeeId user being followed
+         */
         public void follow(int followerId, int followeeId) {
             if (followerId != followeeId) {
                 following.computeIfAbsent(followerId, k -> new HashSet<>()).add(followeeId);
             }
         }
         
+        /**
+         * Removes one follow relationship when it exists.
+         *
+         * Time:  O(1) average - removes from one hash set.
+         * Space: O(1) - no extra storage.
+         *
+         * @param followerId user who unfollows
+         * @param followeeId user being unfollowed
+         */
         public void unfollow(int followerId, int followeeId) {
             Set<Integer> followees = following.get(followerId);
             if (followees != null) {
@@ -252,5 +289,21 @@ public class DesignTwitter {
                 following.get(followerId).remove(followeeId);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Twitter twitter = new Twitter();
+        twitter.postTweet(1, 5);
+        List<Integer> firstFeed = twitter.getNewsFeed(1);
+        System.out.printf("ops=postTweet(1,5),getNewsFeed(1) -> %s  expected=%s%n",
+                firstFeed, Arrays.toString(new int[]{5}));
+
+        twitter.follow(1, 2);
+        twitter.postTweet(2, 6);
+        List<Integer> followedFeed = twitter.getNewsFeed(1);
+        twitter.unfollow(1, 2);
+        List<Integer> unfollowedFeed = twitter.getNewsFeed(1);
+        System.out.printf("ops=follow,postTweet(2,6),feed,unfollow,feed -> %s  expected=%s%n",
+                Arrays.asList(followedFeed, unfollowedFeed), "[[6, 5], [5]]");
     }
 }

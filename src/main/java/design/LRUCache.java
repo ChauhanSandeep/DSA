@@ -3,30 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 146. LRU Cache
- * 
- * Problem: Design a data structure that follows LRU (Least Recently Used) caching
- * constraints. Implement LRUCache class with get(key) and put(key, value) methods.
- * 
+ * Problem: LRU Cache
+ *
+ * Design a fixed-capacity cache with get and put in O(1) time. Whenever the cache
+ * is full, inserting a new key evicts the least recently used key. Successful get
+ * and put operations mark the key as most recently used.
+ *
+ * Leetcode: https://leetcode.com/problems/lru-cache/ (Medium)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Hash map | Doubly linked list recency order
+ *
  * Example:
- * LRUCache lRUCache = new LRUCache(2);
- * lRUCache.put(1, 1);
- * lRUCache.get(1);    // returns 1
- * lRUCache.put(2, 2);
- * lRUCache.get(1);    // returns 1 (recently used)
- * 
- * LeetCode: https://leetcode.com/problems/lru-cache
- * 
- * Follow-up questions:
- * Q: How to make it thread-safe for concurrent access?
- * A: Use synchronization, locks, or concurrent data structures.
- * 
- * Q: Can we implement with different eviction policies?
- * A: Extend design to support LFU, FIFO, or custom policies.
- * 
- * Q: How to handle cache warming and persistence?
- * A: Add methods for bulk loading and serialization/deserialization.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  capacity = 2, put(1,1), put(2,2), get(1), put(3,3), get(2)
+ *   Output: [1, -1]
+ *   Why:    get(1) refreshes key 1, so key 2 is least recent and is evicted by put(3,3).
+ *
+ * Follow-ups:
+ *   1. How would you make it thread-safe?
+ *      Guard map and list mutations with one lock or use segmented caches.
+ *   2. How would you add time-based expiration?
+ *      Store expiry timestamps in nodes and remove expired entries on access or cleanup.
+ *   3. How would you support a different eviction policy?
+ *      Keep key lookup in a map and replace the recency list with a policy-specific order.
+ *
+ * Related: LFU Cache (460), Design Browser History (1472).
  */
 public class LRUCache {
     
@@ -48,6 +48,14 @@ public class LRUCache {
     private final Node head;
     private final Node tail;
     
+    /**
+     * Creates an empty cache with dummy head and tail nodes for O(1) list edits.
+     *
+     * Time:  O(1) - initializes the map and sentinel nodes.
+     * Space: O(1) - no real cache entries are stored yet.
+     *
+     * @param capacity maximum number of key-value pairs to keep
+     */
     public LRUCache(int capacity) {
         this.capacity = capacity;
         this.cache = new HashMap<>();
@@ -59,6 +67,15 @@ public class LRUCache {
         tail.prev = head;
     }
     
+    /**
+     * Reads a value and marks the key as most recently used when present.
+     *
+     * Time:  O(1) - one map lookup plus constant pointer rewiring.
+     * Space: O(1) - uses only a node reference.
+     *
+     * @param key cache key to read
+     * @return cached value, or -1 if the key is absent
+     */
     public int get(int key) {
         Node node = cache.get(key);
         if (node == null) {
@@ -70,6 +87,15 @@ public class LRUCache {
         return node.value;
     }
     
+    /**
+     * Inserts or updates a key and evicts the least recently used key if full.
+     *
+     * Time:  O(1) - map operations and list edits are constant time.
+     * Space: O(1) - at most one new node is created.
+     *
+     * @param key cache key to insert or update
+     * @param value value to store
+     */
     public void put(int key, int value) {
         Node existing = cache.get(key);
         
@@ -618,5 +644,24 @@ public class LRUCache {
             // Implementation would load cache state from file
             System.out.println("Loading cache from " + persistenceFile);
         }
+    }
+
+    public static void main(String[] args) {
+        LRUCache cache = new LRUCache(2);
+        cache.put(1, 1);
+        cache.put(2, 2);
+        int firstGet = cache.get(1);
+        cache.put(3, 3);
+        int secondGet = cache.get(2);
+        int[] got = {firstGet, secondGet};
+        int[] expected = {1, -1};
+        System.out.printf("ops=put(1),put(2),get(1),put(3),get(2) -> %s  expected=%s%n",
+                Arrays.toString(got), Arrays.toString(expected));
+
+        cache.put(4, 4);
+        int[] gotAfterEviction = {cache.get(1), cache.get(3), cache.get(4)};
+        int[] expectedAfterEviction = {-1, 3, 4};
+        System.out.printf("ops=put(4),get(1),get(3),get(4) -> %s  expected=%s%n",
+                Arrays.toString(gotAfterEviction), Arrays.toString(expectedAfterEviction));
     }
 }

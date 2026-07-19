@@ -3,29 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 381. Insert Delete GetRandom O(1) - Duplicates allowed
- * 
- * Problem: Design a data structure that supports insert, remove, and getRandom 
- * operations in average O(1) time, allowing duplicate values.
- * 
+ * Problem: Insert Delete GetRandom O(1) - Duplicates Allowed
+ *
+ * Design a randomized collection that supports inserting values, removing one
+ * occurrence of a value, and returning a random stored value in average O(1) time.
+ * Duplicate values are allowed, so each value must track all of its current indices.
+ *
+ * Leetcode: https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed/ (Hard)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Array list | Hash map from value to index set
+ *
  * Example:
- * RandomizedCollection collection = new RandomizedCollection();
- * collection.insert(1);   // return true
- * collection.insert(1);   // return false (1 already exists)
- * collection.getRandom(); // return 1
- * 
- * LeetCode: https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed
- * 
- * Follow-up questions:
- * Q: How to optimize for very frequent getRandom operations?
- * A: Use multiple hash functions or weighted sampling for better distribution.
- * 
- * Q: What if we need to get random with specific probabilities?
- * A: Implement alias method or use prefix sums with binary search.
- * 
- * Q: How to handle thread safety?
- * A: Use concurrent data structures and proper synchronization.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  insert(1), insert(1), insert(2), remove(1)
+ *   Output: [true, false, true, true]
+ *   Why:    the second 1 is a duplicate, and remove deletes one existing occurrence.
+ *
+ * Follow-ups:
+ *   1. How would you return random values with custom weights?
+ *      Maintain prefix weights or an alias table instead of uniform array indices.
+ *   2. How would you make the collection thread-safe?
+ *      Guard the list and all index sets with one lock for each mutation/read.
+ *   3. How would you support removeAll(value)?
+ *      Delete every tracked index while repeatedly swapping with the last live element.
+ *
+ * Related: Insert Delete GetRandom O(1) (380), Random Pick Index (398).
  */
 public class InsertDeleteGetrandomO1DuplicatesAllowed {
     
@@ -53,6 +54,15 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             random = new Random();
         }
         
+        /**
+         * Inserts one occurrence of a value.
+         *
+         * Time:  O(1) average - appends to the list and updates one index set.
+         * Space: O(1) - stores one index for the new occurrence.
+         *
+         * @param val value to insert
+         * @return true if the value did not already have an index set
+         */
         public boolean insert(int val) {
             boolean isNew = !indices.containsKey(val);
             
@@ -66,6 +76,15 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             return isNew;
         }
         
+        /**
+         * Removes one occurrence of a value when present.
+         *
+         * Time:  O(1) average - swaps with the last element and updates index sets.
+         * Space: O(1) - mutates existing storage in place.
+         *
+         * @param val value to remove
+         * @return true if an occurrence was removed
+         */
         public boolean remove(int val) {
             if (!indices.containsKey(val) || indices.get(val).isEmpty()) {
                 return false;
@@ -95,6 +114,14 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             return true;
         }
         
+        /**
+         * Returns a uniformly random stored value.
+         *
+         * Time:  O(1) - samples one array-list index.
+         * Space: O(1) - no extra storage.
+         *
+         * @return random value from the collection
+         */
         public int getRandom() {
             if (values.isEmpty()) {
                 throw new IllegalStateException("Collection is empty");
@@ -400,5 +427,18 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
         public Map<Integer, Integer> getValueFrequency() {
             return new HashMap<>(valueFrequency);
         }
+    }
+
+    public static void main(String[] args) {
+        RandomizedCollection collection = new RandomizedCollection();
+        boolean[] got = {collection.insert(1), collection.insert(1), collection.insert(2)};
+        boolean[] expected = {true, false, true};
+        System.out.printf("ops=insert(1),insert(1),insert(2) -> %s  expected=%s%n",
+                Arrays.toString(got), Arrays.toString(expected));
+
+        boolean[] gotAfterRemove = {collection.remove(1), collection.remove(3)};
+        boolean[] expectedAfterRemove = {true, false};
+        System.out.printf("ops=remove(1),remove(3) -> %s  expected=%s%n",
+                Arrays.toString(gotAfterRemove), Arrays.toString(expectedAfterRemove));
     }
 }

@@ -3,28 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * Problem: https://leetcode.com/problems/design-in-memory-file-system/
+ * Problem: Design In-Memory File System
  *
- * ### Problem Statement:
- * Design a basic in-memory file system to support operations like creating directories,
- * adding content to files, reading content, and listing directory contents.
+ * Design a basic in-memory file system that supports listing paths, recursively
+ * creating directories, appending file content, and reading file content. Paths are
+ * represented as slash-separated strings rooted at '/'.
  *
- * ### Example:
- * Input:
- * FileSystem fileSystem = new FileSystem();
- * fileSystem.mkdir("/a/b/c");
- * fileSystem.addContentToFile("/a/b/c/d", "hello");
- * List<String> list = fileSystem.ls("/"); // Returns ["a"]
- * String content = fileSystem.readContentFromFile("/a/b/c/d"); // Returns "hello"
+ * Leetcode: https://leetcode.com/problems/design-in-memory-file-system/ (Hard)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Trie-like tree | Path traversal
  *
- * ### Follow-up Questions:
- * 1. Can you implement `rm` (remove) command?
- *    - Yes, you'd need to handle both file and directory deletion carefully, ensuring safe traversal and clean-up.
- * 2. How to implement `move` command?
- *    - It involves detaching a node from one path and attaching it under another, similar to renaming directories.
- * 3. Can we handle concurrency?
- *    - Use locks on nodes or global read-write locks for thread safety.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  mkdir("/a/b/c"), addContentToFile("/a/b/c/d", "hello"), ls("/")
+ *   Output: ["a"]
+ *   Why:    only directory "a" exists directly under the root after creating the nested path.
+ *
+ * Follow-ups:
+ *   1. How would you implement rm recursively?
+ *      Traverse to the parent, then detach the child subtree or file node.
+ *   2. How would you support move or rename?
+ *      Remove the node from its old parent and attach it under the new parent/name.
+ *   3. How would you make it thread-safe?
+ *      Use a read-write lock globally or fine-grained locks per path node.
+ *
+ * Related: Design File System (1166), Design Search Autocomplete System (642).
  */
 public class FileSystem {
 
@@ -131,12 +133,16 @@ public class FileSystem {
     }
 
     public static void main(String[] args) {
-        FileSystem fs = new FileSystem();
-        fs.mkdir("/a/b/c");
-        fs.addContentToFile("/a/b/c/d", "hello");
-        System.out.println(fs.ls("/")); // [a]
-        System.out.println(fs.readContentFromFile("/a/b/c/d")); // "hello"
+        FileSystem fileSystem = new FileSystem();
+        fileSystem.mkdir("/a/b/c");
+        fileSystem.addContentToFile("/a/b/c/d", "hello");
+        System.out.printf("ls(/) -> %s  expected=%s%n", fileSystem.ls("/"), Arrays.asList("a"));
+
+        fileSystem.addContentToFile("/a/b/c/d", " world");
+        System.out.printf("read(/a/b/c/d) -> %s  expected=%s%n",
+                fileSystem.readContentFromFile("/a/b/c/d"), "hello world");
     }
+
 }
 
 /**

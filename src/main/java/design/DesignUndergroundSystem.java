@@ -3,29 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 1396. Design Underground System
- * 
- * Problem: Implement an underground system that calculates the average time it takes
- * to travel from one station to another.
- * 
+ * Problem: Design Underground System
+ *
+ * Track passenger check-ins and check-outs in a subway system, then answer average
+ * travel time queries for each start and end station pair. Active trips are keyed by
+ * passenger id, and completed trips update route-level running totals.
+ *
+ * Leetcode: https://leetcode.com/problems/design-underground-system/ (Medium)
+ * Rating:   LeetCode contest rating 1465
+ * Pattern:  Design | Hash map | Running aggregate
+ *
  * Example:
- * UndergroundSystem undergroundSystem = new UndergroundSystem();
- * undergroundSystem.checkIn(45, "Leyton", 3);
- * undergroundSystem.checkOut(45, "Waterloo", 15);
- * undergroundSystem.getAverageTime("Leyton", "Waterloo"); // 12.0
- * 
- * LeetCode: https://leetcode.com/problems/design-underground-system
- * 
- * Follow-up questions:
- * Q: How to handle peak hours vs off-peak analysis?
- * A: Store timestamps and segment averages by time ranges.
- * 
- * Q: What if we need percentile statistics instead of just averages?
- * A: Maintain sorted lists or histogram buckets for each route.
- * 
- * Q: How to optimize for very frequent queries on same routes?
- * A: Cache computed averages, update incrementally on new data.
- * LeetCode Contest Rating: 1465
+ *   Input:  checkIn(45,"Leyton",3), checkOut(45,"Waterloo",15), getAverageTime("Leyton","Waterloo")
+ *   Output: 12.0
+ *   Why:    the only completed Leyton->Waterloo trip took 15 - 3 = 12 minutes.
+ *
+ * Follow-ups:
+ *   1. How would you return percentiles instead of averages?
+ *      Store route histograms or balanced ordered duration structures.
+ *   2. How would you handle invalid duplicate check-ins?
+ *      Validate state transitions and reject or overwrite by policy.
+ *   3. How would you analyze peak hours?
+ *      Bucket route aggregates by time window in addition to station pair.
+ *
+ * Related: Design Logger Rate Limiter (359), Time Based Key-Value Store (981).
  */
 public class DesignUndergroundSystem {
     
@@ -78,10 +79,30 @@ public class DesignUndergroundSystem {
             routeStatistics = new HashMap<>();
         }
         
+        /**
+         * Records that a passenger started a trip at a station and time.
+         *
+         * Time:  O(1) average - updates the active journey map.
+         * Space: O(1) - stores one active journey.
+         *
+         * @param id passenger id
+         * @param stationName starting station
+         * @param t check-in time
+         */
         public void checkIn(int id, String stationName, int t) {
             activeJourneys.put(id, new CheckIn(stationName, t));
         }
         
+        /**
+         * Completes a passenger trip and updates the route aggregate.
+         *
+         * Time:  O(1) average - removes one active journey and updates one route.
+         * Space: O(1) - keeps only running totals per route.
+         *
+         * @param id passenger id
+         * @param stationName ending station
+         * @param t check-out time
+         */
         public void checkOut(int id, String stationName, int t) {
             CheckIn checkIn = activeJourneys.remove(id);
             if (checkIn != null) {
@@ -92,6 +113,16 @@ public class DesignUndergroundSystem {
             }
         }
         
+        /**
+         * Returns the average completed travel time for a route.
+         *
+         * Time:  O(1) average - reads one route aggregate.
+         * Space: O(1) - no extra storage.
+         *
+         * @param startStation route start
+         * @param endStation route end
+         * @return average travel time for completed trips on the route
+         */
         public double getAverageTime(String startStation, String endStation) {
             String route = startStation + "->" + endStation;
             return routeStatistics.get(route).getAverage();
@@ -295,5 +326,18 @@ public class DesignUndergroundSystem {
             String route = startStation + "->" + endStation;
             return routeStats.get(route).getCount();
         }
+    }
+
+    public static void main(String[] args) {
+        UndergroundSystem undergroundSystem = new UndergroundSystem();
+        undergroundSystem.checkIn(45, "Leyton", 3);
+        undergroundSystem.checkOut(45, "Waterloo", 15);
+        double firstAverage = undergroundSystem.getAverageTime("Leyton", "Waterloo");
+        System.out.printf("route=Leyton->Waterloo -> %.1f  expected=12.0%n", firstAverage);
+
+        undergroundSystem.checkIn(10, "A", 5);
+        undergroundSystem.checkOut(10, "B", 5);
+        double zeroDurationAverage = undergroundSystem.getAverageTime("A", "B");
+        System.out.printf("route=A->B -> %.1f  expected=0.0%n", zeroDurationAverage);
     }
 }

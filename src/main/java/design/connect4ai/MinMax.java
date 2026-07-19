@@ -4,21 +4,26 @@ import java.util.LinkedList;
 import java.util.Random;
 
 /**
- * Implements Minimax algorithm with depth-limiting for Connect Four AI.
+ * Problem: Connect Four Minimax Player
  *
- * ### Problem Context:
- * Design an AI that plays Connect Four optimally using the Minimax algorithm up to a fixed depth.
- * This AI assumes a deterministic and perfect opponent.
- * Uses a utility heuristic function provided by the `State` class to evaluate board states.
+ * Choose a Connect Four move by exploring future board states to a fixed depth.
+ * The computer maximizes the board utility for O, while the simulated user minimizes
+ * that utility for X.
  *
- * ### Features:
- * - Depth-limited Minimax.
- * - Random selection among equally optimal moves to introduce variability.
+ * Pattern:  Game AI | Minimax | Depth-limited search
  *
- * ### Follow-up Questions:
- * - How can you optimize this using Alpha-Beta pruning? (Hint: Prune branches that cannot affect final decision)
- * - How to add transposition tables for memoization?
- * - Can you adapt it for Monte Carlo Tree Search for larger search spaces?
+ * Example:
+ *   Input:  empty board with maxDepth = 0
+ *   Output: utility value 0
+ *   Why:    no moves are expanded at depth 0, so the neutral empty board is evaluated directly.
+ *
+ * Follow-ups:
+ *   1. How would you speed up search?
+ *      Add alpha-beta pruning to skip branches that cannot change the result.
+ *   2. How would you avoid recomputing states?
+ *      Store board hashes in a transposition table.
+ *   3. How would you reduce randomness in equal scores?
+ *      Prefer center columns or the shortest winning line as a deterministic tie-break.
  */
 public class MinMax {
     //Variable that holds the maximum depth the MinMax algorithm will reach (level of the three)
@@ -111,5 +116,16 @@ public class MinMax {
             }
             return maxMove;
         }
+    }
+
+    public static void main(String[] args) {
+        State emptyBoard = new State();
+        MinMax computer = new MinMax(State.O);
+        computer.maxDepth = 0;
+        GamePlay nextMove = computer.getNextMove(emptyBoard);
+        System.out.printf("maxDepth=0,getNextMove(empty) -> %d  expected=0%n", nextMove.getValue());
+
+        GamePlay minMove = computer.min(emptyBoard, 0);
+        System.out.printf("maxDepth=0,min(empty) -> %d  expected=0%n", minMove.getValue());
     }
 }

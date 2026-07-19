@@ -1,42 +1,26 @@
 package design.myconnect4;
 
 /**
- * Connect 4 Board Implementation
+ * Problem: Connect Four Board
  *
- * This class represents the game board for Connect 4, a two-player connection game
- * where players take turns dropping colored discs into a vertical grid. The objective
- * is to be the first to form a horizontal, vertical, or diagonal line of four discs.
+ * Represent a gravity-based Connect Four grid where players drop pieces into
+ * columns. The board can place a move, scan for any four-in-a-row win, and display
+ * the current grid.
  *
- * Board Structure:
- * - Standard Connect 4 board is 6 rows × 7 columns
- * - Gravity-based: pieces fall to the lowest available position in a column
- * - Empty cells represented by space character ' '
- * - Player pieces represented by their color character (e.g., 'R' for red, 'Y' for yellow)
+ * Pattern:  Design | 2D grid | Directional win scanning
  *
- * Game Rules:
- * - Players alternate turns dropping one disc per turn
- * - Discs fall straight down, occupying the lowest available space within the column
- * - A player wins by connecting 4 of their discs in a row (horizontal, vertical, or diagonal)
- * - Game is a draw if the board fills up with no winner
+ * Example:
+ *   Input:  four moves by the same player in column 0
+ *   Output: isWinner(player) = true
+ *   Why:    the pieces occupy four consecutive cells vertically.
  *
- * Design Decisions:
- * - 2D character array for simple and efficient storage
- * - Gravity simulation by filling from bottom row upward
- * - Four separate checks for different win conditions (horizontal, vertical, 2 diagonals)
- *
- * Time Complexity:
- * - makeMove(): O(rows) - scans column from bottom to find empty spot
- * - isWinner(): O(rows * cols) - checks all possible 4-in-a-row combinations
- * - display(): O(rows * cols) - prints entire board
- *
- * Space Complexity: O(rows * cols) for the grid
- *
- * Possible Optimizations:
- * - Track last move position to check only relevant win conditions
- * - Use bitboards for faster win checking
- * - Maintain column heights array to avoid scanning for empty spots
- *
- * @author Sandeep Chauhan
+ * Follow-ups:
+ *   1. How would you reject moves in a full column?
+ *      Track column heights and return false when the height reaches the row count.
+ *   2. How would you optimize winner detection?
+ *      Check only directions through the most recent move.
+ *   3. How would you support arbitrary connect-k games?
+ *      Parameterize the target run length and board dimensions.
  */
 public class Board {
 
@@ -178,5 +162,17 @@ public class Board {
         }
         System.out.println(" 0 1 2 3 4 5 6");
         System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Board board = new Board(6, 7);
+        Player player = new Player("P1", 'B');
+        for (int i = 0; i < 4; i++) {
+            board.makeMove(0, player);
+        }
+        System.out.printf("moves=column-0-four-times -> %s  expected=true%n", board.isWinner(player));
+
+        Board emptyBoard = new Board(6, 7);
+        System.out.printf("moves=empty-board -> %s  expected=false%n", emptyBoard.isWinner(player));
     }
 }

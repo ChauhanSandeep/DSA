@@ -3,29 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 706. Design HashMap
- * 
- * Problem: Design a HashMap without using built-in hash table libraries.
- * Implement put(key, value), get(key), and remove(key) operations.
- * 
+ * Problem: Design HashMap
+ *
+ * Implement a map from integer keys to integer values without using built-in hash
+ * table libraries. The public API must support put, get, and remove while returning
+ * -1 for missing keys.
+ *
+ * Leetcode: https://leetcode.com/problems/design-hashmap/ (Easy)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Hashing | Separate chaining
+ *
  * Example:
- * MyHashMap hashMap = new MyHashMap();
- * hashMap.put(1, 1);
- * hashMap.get(1); // returns 1
- * hashMap.remove(1);
- * 
- * LeetCode: https://leetcode.com/problems/design-hashmap
- * 
- * Follow-up questions:
- * Q: How to handle hash collisions efficiently?
- * A: Use separate chaining with linked lists or open addressing with probing.
- * 
- * Q: When to resize the hash table?
- * A: When load factor exceeds threshold (typically 0.75).
- * 
- * Q: How to handle deletions in open addressing?
- * A: Use tombstone markers to maintain probe sequences.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  put(1,1), put(2,2), get(1), remove(2), get(2)
+ *   Output: [1, -1]
+ *   Why:    key 1 remains mapped to 1, while key 2 is deleted before the final read.
+ *
+ * Follow-ups:
+ *   1. How would you handle high collision rates?
+ *      Resize and rehash, or convert long chains into balanced trees.
+ *   2. How would you support negative keys?
+ *      Normalize the hash with floorMod before indexing into buckets.
+ *   3. How would you make operations thread-safe?
+ *      Use striped locks per bucket or guard the entire table with one lock.
+ *
+ * Related: Design HashSet (705), LRU Cache (146).
  */
 public class DesignHashmap {
     
@@ -57,10 +58,20 @@ public class DesignHashmap {
             size = 0;
         }
         
+        /** Maps a key to a bucket index. */
         private int hash(int key) {
             return key % buckets.length;
         }
         
+        /**
+         * Inserts a new key-value pair or overwrites an existing key.
+         *
+         * Time:  O(1) average, O(n) worst case when many keys share a bucket.
+         * Space: O(1) - adds at most one node.
+         *
+         * @param key key to insert or update
+         * @param value value to store
+         */
         public void put(int key, int value) {
             int index = hash(key);
             Node head = buckets[index];
@@ -82,6 +93,15 @@ public class DesignHashmap {
             size++;
         }
         
+        /**
+         * Returns the stored value for a key.
+         *
+         * Time:  O(1) average, O(n) worst case within one chain.
+         * Space: O(1) - scans with one pointer.
+         *
+         * @param key key to read
+         * @return value mapped to key, or -1 if absent
+         */
         public int get(int key) {
             int index = hash(key);
             Node current = buckets[index];
@@ -96,6 +116,14 @@ public class DesignHashmap {
             return -1;
         }
         
+        /**
+         * Removes a key from the map when present.
+         *
+         * Time:  O(1) average, O(n) worst case within one chain.
+         * Space: O(1) - rewires existing nodes only.
+         *
+         * @param key key to remove
+         */
         public void remove(int key) {
             int index = hash(key);
             Node head = buckets[index];
@@ -331,5 +359,22 @@ public class DesignHashmap {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) {
+        MyHashMap hashMap = new MyHashMap();
+        hashMap.put(1, 1);
+        hashMap.put(2, 2);
+        int[] got = {hashMap.get(1), hashMap.get(3)};
+        int[] expected = {1, -1};
+        System.out.printf("ops=put(1,1),put(2,2),get(1),get(3) -> %s  expected=%s%n",
+                Arrays.toString(got), Arrays.toString(expected));
+
+        hashMap.put(2, 1);
+        hashMap.remove(2);
+        int[] gotAfterRemove = {hashMap.get(2)};
+        int[] expectedAfterRemove = {-1};
+        System.out.printf("ops=put(2,1),remove(2),get(2) -> %s  expected=%s%n",
+                Arrays.toString(gotAfterRemove), Arrays.toString(expectedAfterRemove));
     }
 }

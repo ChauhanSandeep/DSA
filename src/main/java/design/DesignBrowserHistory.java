@@ -3,29 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 1472. Design Browser History
- * 
- * Problem: Design a browser history system with visit, back, and forward operations.
- * 
+ * Problem: Design Browser History
+ *
+ * Design a browser history object with visit, back, and forward operations. A new
+ * visit from the middle of history must discard every forward page, while back and
+ * forward clamp at the oldest and newest reachable pages.
+ *
+ * Leetcode: https://leetcode.com/problems/design-browser-history/ (Medium)
+ * Rating:   LeetCode contest rating 1454
+ * Pattern:  Design | Dynamic array | Cursor over history
+ *
  * Example:
- * BrowserHistory browserHistory = new BrowserHistory("leetcode.com");
- * browserHistory.visit("google.com");       // Visit google.com
- * browserHistory.visit("facebook.com");     // Visit facebook.com
- * browserHistory.back(1);                   // Back 1 step to google.com
- * browserHistory.forward(1);                // Forward 1 step to facebook.com
- * 
- * LeetCode: https://leetcode.com/problems/design-browser-history
- * 
- * Follow-up questions:
- * Q: How to handle very large history?
- * A: Use circular buffer with size limit, or implement LRU cache.
- * 
- * Q: Can we optimize for memory when many pages visited?
- * A: Use linked list with size cap, or compress old history.
- * 
- * Q: How to support branching history (tree structure)?
- * A: Use tree structure instead of linear array/list.
- * LeetCode Contest Rating: 1454
+ *   Input:  homepage = "leetcode.com", visit("google.com"), back(1), forward(1)
+ *   Output: "facebook.com" after a later forward in the standard sequence
+ *   Why:    the cursor moves through a linear history, and visit clears any branch ahead.
+ *
+ * Follow-ups:
+ *   1. How would you support branching history like real browser tabs?
+ *      Store pages as a tree and let forward choose or list child branches.
+ *   2. How would you cap memory for very long sessions?
+ *      Use a circular buffer or evict old nodes beyond a configured limit.
+ *   3. How would you persist history across restarts?
+ *      Append operations to a log and replay or checkpoint the current list and cursor.
+ *
+ * Related: Design Circular Queue (622), LRU Cache (146).
  */
 public class DesignBrowserHistory {
     
@@ -44,12 +45,28 @@ public class DesignBrowserHistory {
         private List<String> history;
         private int current;
         
+        /**
+         * Starts history at the homepage.
+         *
+         * Time:  O(1) - stores one page.
+         * Space: O(1) - one history entry is allocated.
+         *
+         * @param homepage first page in the session
+         */
         public BrowserHistory(String homepage) {
             history = new ArrayList<>();
             history.add(homepage);
             current = 0;
         }
         
+        /**
+         * Visits a new URL and clears all forward history.
+         *
+         * Time:  O(f) - removes f forward entries before appending the URL.
+         * Space: O(1) - adds one page after discarded entries.
+         *
+         * @param url page to visit
+         */
         public void visit(String url) {
             // Clear forward history and add new page
             while (history.size() > current + 1) {
@@ -59,11 +76,29 @@ public class DesignBrowserHistory {
             current++;
         }
         
+        /**
+         * Moves the cursor back by at most the requested number of steps.
+         *
+         * Time:  O(1) - clamps and updates one index.
+         * Space: O(1) - no extra storage.
+         *
+         * @param steps maximum pages to move backward
+         * @return current page after moving
+         */
         public String back(int steps) {
             current = Math.max(0, current - steps);
             return history.get(current);
         }
         
+        /**
+         * Moves the cursor forward by at most the requested number of steps.
+         *
+         * Time:  O(1) - clamps and updates one index.
+         * Space: O(1) - no extra storage.
+         *
+         * @param steps maximum pages to move forward
+         * @return current page after moving
+         */
         public String forward(int steps) {
             current = Math.min(history.size() - 1, current + steps);
             return history.get(current);
@@ -261,5 +296,27 @@ public class DesignBrowserHistory {
             }
             return current.url;
         }
+    }
+
+    public static void main(String[] args) {
+        BrowserHistory browserHistory = new BrowserHistory("leetcode.com");
+        browserHistory.visit("google.com");
+        browserHistory.visit("facebook.com");
+        browserHistory.visit("youtube.com");
+
+        String[] got = {
+                browserHistory.back(1),
+                browserHistory.back(1),
+                browserHistory.forward(1)
+        };
+        String[] expected = {"facebook.com", "google.com", "facebook.com"};
+        System.out.printf("ops=back,back,forward -> %s  expected=%s%n",
+                Arrays.toString(got), Arrays.toString(expected));
+
+        browserHistory.visit("linkedin.com");
+        String[] gotAfterBranch = {browserHistory.forward(2), browserHistory.back(2), browserHistory.back(7)};
+        String[] expectedAfterBranch = {"linkedin.com", "google.com", "leetcode.com"};
+        System.out.printf("ops=visit,forward,back,back -> %s  expected=%s%n",
+                Arrays.toString(gotAfterBranch), Arrays.toString(expectedAfterBranch));
     }
 }

@@ -3,29 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 705. Design HashSet
- * 
- * Problem: Design a HashSet without using built-in hash table libraries.
- * Implement add(key), remove(key), and contains(key) operations.
- * 
+ * Problem: Design HashSet
+ *
+ * Implement a set of integer keys without using built-in hash table libraries. The
+ * data structure must support add, remove, and contains while ignoring duplicate
+ * inserts.
+ *
+ * Leetcode: https://leetcode.com/problems/design-hashset/ (Easy)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Hashing | Buckets
+ *
  * Example:
- * MyHashSet hashSet = new MyHashSet();
- * hashSet.add(1);
- * hashSet.contains(1); // returns true
- * hashSet.remove(1);
- * 
- * LeetCode: https://leetcode.com/problems/design-hashset
- * 
- * Follow-up questions:
- * Q: How to minimize memory usage for sparse data?
- * A: Use bit vector or compressed sparse representation.
- * 
- * Q: What's optimal bucket size for chaining?
- * A: Keep load factor around 0.75, resize dynamically.
- * 
- * Q: How to handle very large key ranges?
- * A: Use consistent hashing or hierarchical hash tables.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  add(1), add(2), contains(1), remove(2), contains(2)
+ *   Output: [true, false]
+ *   Why:    key 1 is still present, but key 2 is removed before the last check.
+ *
+ * Follow-ups:
+ *   1. How would you support a very sparse but huge key range?
+ *      Use hashing with lazy buckets instead of a full boolean array.
+ *   2. How would you support ordered iteration?
+ *      Add a linked list or use a tree-backed set variant.
+ *   3. How would you reduce worst-case chain length?
+ *      Resize by load factor and treeify overly long buckets.
+ *
+ * Related: Design HashMap (706), Insert Delete GetRandom O(1) (380).
  */
 public class DesignHashset {
     
@@ -47,10 +48,19 @@ public class DesignHashset {
             }
         }
         
+        /** Maps a key to a bucket index. */
         private int hash(int key) {
             return key % BUCKET_COUNT;
         }
         
+        /**
+         * Adds the key if it is not already present.
+         *
+         * Time:  O(1) average, O(n) worst case within one bucket.
+         * Space: O(1) - stores one key only when new.
+         *
+         * @param key key to add
+         */
         public void add(int key) {
             int index = hash(key);
             if (!buckets[index].contains(key)) {
@@ -58,11 +68,28 @@ public class DesignHashset {
             }
         }
         
+        /**
+         * Removes the key if present.
+         *
+         * Time:  O(1) average, O(n) worst case within one bucket.
+         * Space: O(1) - mutates one bucket list.
+         *
+         * @param key key to remove
+         */
         public void remove(int key) {
             int index = hash(key);
             buckets[index].remove(Integer.valueOf(key));
         }
         
+        /**
+         * Checks whether the set currently contains the key.
+         *
+         * Time:  O(1) average, O(n) worst case within one bucket.
+         * Space: O(1) - no extra storage.
+         *
+         * @param key key to search for
+         * @return true if the key is present
+         */
         public boolean contains(int key) {
             int index = hash(key);
             return buckets[index].contains(key);
@@ -249,5 +276,21 @@ public class DesignHashset {
             int bucket = hash1(key);
             return buckets[bucket] != null && buckets[bucket].contains(key);
         }
+    }
+
+    public static void main(String[] args) {
+        MyHashSet hashSet = new MyHashSet();
+        hashSet.add(1);
+        hashSet.add(2);
+        boolean[] got = {hashSet.contains(1), hashSet.contains(3), hashSet.contains(2)};
+        boolean[] expected = {true, false, true};
+        System.out.printf("ops=add(1),add(2),contains(1),contains(3),contains(2) -> %s  expected=%s%n",
+                Arrays.toString(got), Arrays.toString(expected));
+
+        hashSet.remove(2);
+        boolean[] gotAfterRemove = {hashSet.contains(2)};
+        boolean[] expectedAfterRemove = {false};
+        System.out.printf("ops=remove(2),contains(2) -> %s  expected=%s%n",
+                Arrays.toString(gotAfterRemove), Arrays.toString(expectedAfterRemove));
     }
 }
