@@ -5,43 +5,47 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * Validate Binary Search Tree
+ * Problem: Validate Binary Search Tree
  *
- * Problem Statement:
- * Given the root of a binary tree, determine if it is a valid binary search tree (BST).
- * A valid BST is defined as follows:
- * - The left subtree contains only nodes with keys less than the node's key
- * - The right subtree contains only nodes with keys greater than the node's key
- * - Both left and right subtrees must also be BSTs
+ * Determine whether a binary tree satisfies strict BST ordering. Every node must
+ * be greater than all values allowed by its left ancestors and smaller than all
+ * values allowed by its right ancestors.
+ *
+ * Leetcode: https://leetcode.com/problems/validate-binary-search-tree/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Recursive bounds and inorder validation
  *
  * Example:
- * Input: root = [2,1,3]
- * Output: true
- * Explanation: This forms a valid BST: 1 < 2 < 3
+ *   Input:  root = [2,1,3]
+ *   Output: true
+ *   Why:    the inorder order is [1,2,3], and every subtree respects ancestor bounds.
  *
- * LeetCode Link: https://leetcode.com/problems/validate-binary-search-tree
+ * Follow-ups:
+ *   1. What if the tree contains Integer.MIN_VALUE or Integer.MAX_VALUE?
+ *      Use long bounds, as the recursive method does.
+ *   2. What if duplicates are allowed?
+ *      Adjust the strict inequalities according to the duplicate-side rule.
+ *   3. How would you avoid recursion?
+ *      Use iterative inorder traversal and ensure values strictly increase.
+ *   4. How would you return a violation path?
+ *      Carry path state with bounds and stop at the first invalid node.
  *
- * Follow-up Questions:
- * 1. What if duplicates are allowed? - Modify conditions to use <= or >=
- * 2. How to fix an invalid BST? - Find violations and swap nodes
- * 3. What about BST with range constraints? - Use additional min/max parameters
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Recover Binary Search Tree (99), Binary Tree Inorder Traversal (94).
  */
 public class ValidateBinarySearchTree {
 
-    /**
-     * Validates BST using min/max bounds approach.
-     *
-     * Algorithm: Top-down validation with bounds
-     * - Pass min and max allowable values for each subtree
-     * - Root can have any value, left must be < root, right must be > root
-     * - Recursively narrow the bounds for subtrees
-     *
-     * Time Complexity: O(n) - visit each node once
-     * Space Complexity: O(h) - recursion stack depth
-     *
-     * @param root root of binary tree
-     * @return true if tree is valid BST, false otherwise
+    public static void main(String[] args) {
+        ValidateBinarySearchTree solver = new ValidateBinarySearchTree();
+        TreeNode valid = new TreeNode(2, new TreeNode(1), new TreeNode(3));
+        TreeNode invalid = new TreeNode(5, new TreeNode(1), new TreeNode(4, new TreeNode(3), new TreeNode(6)));
+
+        System.out.printf("root=[2,1,3] -> %b  expected=true%n", solver.isValidBstRecursiveApproach(valid));
+        System.out.printf("root=[5,1,4,null,null,3,6] -> %b  expected=false%n", solver.isValidBstRecursiveApproach(invalid));
+    }
+
+
+            /**
+     * Validates one subtree against inherited open min and max bounds.
      */
     public boolean isValidBstRecursiveApproach(TreeNode root) {
         return isValidRecHelper(root, Long.MIN_VALUE, Long.MAX_VALUE);

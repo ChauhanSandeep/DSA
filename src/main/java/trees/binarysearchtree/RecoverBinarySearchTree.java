@@ -5,43 +5,72 @@ import utils.TreeNode;
 import java.util.Stack;
 
 /**
- * You are given the root of a binary search tree (BST), where the values of exactly two nodes of the tree were swapped by mistake.
- * Recover the tree without changing its structure.
+ * Problem: Recover Binary Search Tree
  *
- * Example 1:
- * Input: root = [1,3,null,null,2]
- * Output: [3,1,null,null,2]
- * Explanation: 3 cannot be a leftChild child of 1 because 3 > 1. Swapping 1 and 3 makes the BST valid.
+ * Exactly two nodes in a BST were swapped by mistake. Restore the BST by swapping
+ * the two misplaced values back without changing the tree structure.
  *
- * Example 2:
- * Input: root = [3,1,4,null,null,2]
- * Output: [2,1,4,null,null,3]
- * Explanation: 2 cannot be in the rightChild subtree of 3 because 2 < 3. Swapping 2 and 3 makes the BST valid.
+ * Leetcode: https://leetcode.com/problems/recover-binary-search-tree/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Inorder inversion detection
  *
- * LeetCode: https://leetcode.com/problems/recover-binary-search-tree/
+ * Example:
+ *   Input:  root = [3,1,4,null,null,2]
+ *   Output: [2,1,4,null,null,3]
+ *   Why:    inorder should be sorted; values 3 and 2 create an inversion and must be swapped.
  *
- * Follow-up Questions:
- * 1. How would you handle the case where more than two nodes are swapped?
- *    - The problem guarantees exactly two nodes are swapped, but for k swaps, we'd need to track all violations.
- * 2. What if the tree is very large (e.g., 10^5 nodes)?
- *    - The Morris traversal solution uses O(1) extra space, making it suitable for large trees.
- * 3. How would you verify if the tree is a valid BST after recovery?
- *    - We could perform an in-order traversal and check if the sequence is strictly increasing.
+ * Follow-ups:
+ *   1. How would you use O(1) extra space?
+ *      Morris traversal threads the tree temporarily and restores links afterward.
+ *   2. What if more than two nodes are misplaced?
+ *      Collect all inorder violations and sort or rebuild the value order.
+ *   3. How would you verify recovery?
+ *      Run a strict inorder validation pass after swapping.
+ *   4. What if duplicate values are allowed?
+ *      The inversion check must match the tree's duplicate-side ordering policy.
  *
- * Related Problems:
- * - Validate Binary Search Tree (https://leetcode.com/problems/validate-binary-search-tree/)
- * - Binary Tree Inorder Traversal (https://leetcode.com/problems/binary-tree-inorder-traversal/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Validate Binary Search Tree (98), Binary Tree Inorder Traversal (94).
  */
 public class RecoverBinarySearchTree {
+
+    public static void main(String[] args) {
+        RecoverBinarySearchTree solver = new RecoverBinarySearchTree();
+        TreeNode root = new TreeNode(3);
+        root.leftChild = new TreeNode(1);
+        root.rightChild = new TreeNode(4);
+        root.rightChild.leftChild = new TreeNode(2);
+        solver.recoverTree(root);
+        System.out.printf("root=[3,1,4,null,null,2] -> root=%d rightLeft=%d  expected=root=2 rightLeft=3%n",
+            root.value, root.rightChild.leftChild.value);
+
+        TreeNode adjacent = new TreeNode(1);
+        adjacent.leftChild = new TreeNode(3);
+        adjacent.leftChild.rightChild = new TreeNode(2);
+        solver.recoverTreeRecursive(adjacent);
+        System.out.printf("root=[1,3,null,null,2] -> root=%d left=%d  expected=root=3 left=1%n",
+            adjacent.value, adjacent.leftChild.value);
+    }
+
     private TreeNode first = null;    // First misplaced node
     private TreeNode second = null;   // Second misplaced node
     private TreeNode prev = null;     // Previous node in in-order traversal
 
-    /**
-     * Recovers the BST by swapping the two misplaced nodes.
+        /**
+     * Intuition: inorder traversal of a valid BST is increasing. Swapping two values
+     * creates one inversion if the values are adjacent in inorder, or two inversions
+     * otherwise. The original fields first, second, and prev capture those misplaced
+     * nodes during traversal.
      *
-     * @param root Root of the binary search tree
+     * Algorithm:
+     *   1. Traverse the tree in inorder to find misplaced nodes.
+     *   2. On the first inversion, record prev as first and current as second.
+     *   3. On a later inversion, update second to current.
+     *   4. Swap first.value and second.value if both were found.
+     *
+     * Time:  O(n) - inorder traversal visits each node once.
+     * Space: O(h) - the iterative stack can hold one root-to-leaf path.
+     *
+     * @param root root of the BST to repair
      */
     public void recoverTree(TreeNode root) {
         // Find the two misplaced nodes
@@ -55,8 +84,8 @@ public class RecoverBinarySearchTree {
         }
     }
 
-    /**
-     * Performs in-order traversal to find the two misplaced nodes.
+        /**
+     * Finds the swapped nodes by scanning inorder values for inversions.
      */
     private void findMisplacedNodes(TreeNode root) {
         if (root == null) {
@@ -171,8 +200,8 @@ public class RecoverBinarySearchTree {
         }
     }
 
-    /**
-     * Performs in-order traversal to find the two misplaced nodes (recursive).
+        /**
+     * Recursive inorder scan that records the first and second misplaced nodes.
      */
     private void inOrderTraversal(TreeNode node) {
         if (node == null) {

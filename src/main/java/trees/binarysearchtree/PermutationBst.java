@@ -3,60 +3,75 @@ package trees.binarysearchtree;
 import trees.Node;
 
 /**
- * Problem: Find the number of Binary Search Trees (BSTs) that can be created
- * with N nodes, with a maximum height of h.
+ * Problem: Count BST Permutations With Height Limit
  *
- * Intuition: The problem is a combination of dynamic programming (DP) and
- * combinatorics. The idea is to recursively calculate the number of BSTs
- * for sub-problems based on the number of nodes and height constraints.
+ * Count how many BST shapes can be formed with a fixed number of nodes while not
+ * exceeding a maximum height. Each possible root splits the remaining nodes into
+ * left and right subtrees that must both fit in one less remaining height.
  *
- * The total number of BSTs for a given number of nodes and a specific height
- * is determined by the recursive partitioning of nodes into left and right subtrees,
- * ensuring that the maximum height constraint is adhered to.
+ * Leetcode: https://leetcode.com/problems/unique-binary-search-trees-ii/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST counting | Recursive Catalan-style partitioning
  *
- * Algorithm:
- * 1. The base case: If the number of nodes is less than or equal to 1, we have only one possible BST (empty tree or single node).
- * 2. For each root node, recursively calculate the number of BSTs for the left and right subtrees.
- * 3. The height constraint is enforced by limiting the depth of recursive calls.
- * 4. The final result is the sum of all valid BSTs formed by different root placements.
+ * Example:
+ *   Input:  numOfNodes = 3, maxHeight = 2
+ *   Output: 5
+ *   Why:    all five 3-node BST shapes fit when two edges of height are allowed.
  *
- * Time Complexity: O(N^2 * h), where N is the number of nodes, and h is the maximum height.
- * Space Complexity: O(N), for the memoization array.
+ * Follow-ups:
+ *   1. How would you count trees of exactly height h?
+ *      Subtract count(height <= h-1) from count(height <= h).
+ *   2. How would you avoid repeated subproblems?
+ *      Memoize by (numNodes, remainingHeightAllowed).
+ *   3. How would you include labeled insertion orders?
+ *      Multiply subtree counts by combinations choosing which labels go left.
+ *   4. How would you return actual trees instead of counts?
+ *      Generate every root choice and combine every left/right subtree pair.
  *
- * LeetCode Link: https://leetcode.com/problems/unique-binary-search-trees-ii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Unique Binary Search Trees (96), Unique Binary Search Trees II (95).
  */
 
 public class PermutationBst {
 
     private int[] memoizationArray;
 
-    public static void main(String[] args) {
-        System.out.println(new PermutationBst().countTrees(3, 2));  // Example with 3 nodes and height 2
+        public static void main(String[] args) {
+        PermutationBst solver = new PermutationBst();
+        int[][] inputs = { {3, 2}, {1, 0} };
+        int[] expected = {5, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countTrees(inputs[i][0], inputs[i][1]);
+            System.out.printf("numOfNodes=%d maxHeight=%d -> %d  expected=%d%n",
+                inputs[i][0], inputs[i][1], got, expected[i]);
+        }
     }
 
-    /**
-     * Public method to calculate the number of BSTs that can be formed with
-     * 'numOfNodes' nodes and a maximum tree height of 'maxHeight'.
+
+        /**
+     * Intuition: choosing a root decides exactly how many nodes must go left and how
+     * many go right. Both subtrees consume one level of allowed height, and every left
+     * shape can pair with every right shape.
      *
-     * @param numOfNodes  The number of nodes in the BST
-     * @param maxHeight   The maximum allowed height for the BST
-     * @return The number of valid BSTs that can be formed
+     * Algorithm:
+     *   1. Call the recursive counter with numOfNodes and maxHeight.
+     *   2. For 0 or 1 nodes, return one possible tree.
+     *   3. If height is exhausted with more nodes, return zero.
+     *   4. Try each root, multiply left and right counts, and add the products.
+     *
+     * Time:  O(Catalan-style exponential) - the original recursion recomputes subproblems.
+     * Space: O(h) - recursion depth follows the remaining height.
+     *
+     * @param numOfNodes number of nodes to place
+     * @param maxHeight maximum allowed height counter
+     * @return number of valid BST shapes under the height limit
      */
     public int countTrees(int numOfNodes, int maxHeight) {
         return countTreesRecursive(numOfNodes, maxHeight);
     }
 
-    /**
-     * Recursively calculates the number of BSTs that can be formed with 'numNodes'
-     * nodes given the remaining allowed height 'remainingHeightAllowed'.
-     *
-     * This approach simplifies the API by converting the absolute height into
-     * a decrementing counter, thus eliminating the need for an explicit 'currentHeight' parameter.
-     *
-     * @param numNodes               The number of nodes in the subtree.
-     * @param remainingHeightAllowed The remaining height available for placing nodes.
-     * @return The number of valid BSTs that can be formed.
+        /**
+     * Counts BST shapes for numNodes while decreasing the remaining height each level.
      */
     private int countTreesRecursive(int numNodes, int remainingHeightAllowed) {
         // Base Case: With 0 or 1 node, only one BST is possible.

@@ -5,52 +5,67 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Problem: Serialize and Deserialize a binary tree.
+ * Problem: Serialize and Deserialize Binary Tree
  *
- * Intuition:
- * The goal is to convert a binary tree into a string representation that can be stored
- * and later restored back into the original tree structure.
- * We use a level-order traversal (breadth-first traversal) for both serialization
- * and deserialization. For serialization, we capture the values of nodes at each
- * level, using "null" to represent missing children. For deserialization, we rebuild
- * the tree from the string by using the same level-order approach, constructing each
- * node and assigning its left and right children.
- *            1
- *          /   \
- *         2     3
- *        / \   / \
- *      null 4  5  6
- *             / \
- *            7   8
+ * Convert a binary tree to a string and rebuild the same tree. This file keeps a
+ * level-order codec as the primary API and also includes a DFS preorder variant.
  *
- *      Serialized : [1, 2, 3, null, 4, 5, 6, null, null, 7, 8, null, null]
+ * Leetcode: https://leetcode.com/problems/serialize-and-deserialize-binary-tree/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BFS codec | Queue-based reconstruction
  *
- * Algorithm:
- * 1. **Serialize**:
- * - Perform a level-order traversal (BFS) of the binary tree.
- * - For each node, append its value to a string. If a node is `null`, append "null".
- * 2. **Deserialize**:
- * - Split the serialized string into an array of node values.
- * - Rebuild the tree from the array by using a queue to manage node construction.
+ * Example:
+ *   Input:  root = [1,2,3,null,4]
+ *   Output: "1, 2, 3, null, 4, null, null, null, null"
+ *   Why:    BFS records each level and null markers preserve missing child slots.
  *
- * Time Complexity: O(N), where N is the number of nodes in the tree (since we visit each node once for both serialization and deserialization).
- * Space Complexity: O(N) for storing the serialized string and the queue during deserialization.
+ * Follow-ups:
+ *   1. How would you remove redundant trailing nulls?
+ *      Trim them during serialization and guard indexes during deserialization.
+ *   2. How would you serialize a BST more compactly?
+ *      Store preorder only and rebuild using BST value bounds.
+ *   3. How would you make the format robust to commas in values?
+ *      Use length-prefixed tokens or escaping.
+ *   4. How would you stream very large trees?
+ *      Serialize level chunks and deserialize from an iterator of tokens.
  *
- * LeetCode Link: https://leetcode.com/problems/serialize-and-deserialize-binary-tree/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Serialize and Deserialize BST (449), Binary Tree Level Order Traversal (102).
  */
 
 public class SerializeDeserializeBst {
 
-    /**
-     * Serializes a binary tree into a string representation.
-     * Approach:
-     * - Use level-order traversal (BFS) to visit each node.
-     * - Append the value of each node to a string.
-     * - Use "null" to represent missing children.
+    public static void main(String[] args) {
+        SerializeDeserializeBst codec = new SerializeDeserializeBst();
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
+        root.left.right = new TreeNode(4);
+
+        String serialized = codec.serialize(root);
+        TreeNode restored = codec.deserialize(serialized);
+        System.out.printf("root=[1,2,3,null,4] -> %s  expected=1, 2, 3, null, 4, null, null, null, null%n",
+            serialized);
+        System.out.printf("roundTripRoot -> %d  expected=1%n", restored.val);
+        System.out.printf("root=[] -> %s  expected=null%n", codec.serialize(null));
+    }
+
+
+        /**
+     * Intuition: level order treats the tree like an array layout. Real nodes enqueue
+     * both children, and null tokens mark missing positions so deserialize can attach
+     * children to the correct parent later.
      *
-     * @param root The root of the binary tree.
-     * @return A string representing the serialized binary tree.
+     * Algorithm:
+     *   1. Return "null" for an empty root.
+     *   2. BFS through a queue, appending node values or null markers.
+     *   3. Enqueue left and right children for every non-null node.
+     *   4. Remove the trailing comma and space before returning.
+     *
+     * Time:  O(n) - every real node and emitted null child position is processed once.
+     * Space: O(n) - queue and serialized string grow with the tree width and size.
+     *
+     * @param root root of the tree to serialize
+     * @return level-order string with null markers
      */
     public String serialize(TreeNode root) {
         /**
@@ -87,16 +102,22 @@ public class SerializeDeserializeBst {
         return builder.toString();
     }
 
-    /**
-     * Deserializes a string into a binary tree.
-     * Approach:
-     * - Split the serialized string into an array of node values.
-     * - Use a queue to reconstruct the tree in level-order.
-     * - For each node, create its left and right children based on the array values.
-     * - Return the root of the reconstructed tree.
+        /**
+     * Intuition: the BFS string lists children in the same order parents are removed
+     * from a queue. For each queued parent, the next two tokens are exactly its left
+     * and right children.
      *
-     * @param data A string representing the serialized binary tree.
-     * @return The root node of the deserialized binary tree.
+     * Algorithm:
+     *   1. Return null for blank or "null" data.
+     *   2. Split tokens and create the root from the first token.
+     *   3. Poll parents from a queue and consume the next left and right tokens.
+     *   4. Attach non-null children and enqueue them for later expansion.
+     *
+     * Time:  O(n) - each token is read once.
+     * Space: O(n) - token array plus queue.
+     *
+     * @param data level-order string with null markers
+     * @return reconstructed tree root
      */
     public TreeNode deserialize(String data) {
         /**
@@ -145,24 +166,8 @@ public class SerializeDeserializeBst {
         return root;
     }
 
-    /**
-     * -- DFS-based Approach --
-     * Serializes a binary tree into a string using pre-order traversal.
-     * Approach:
-     * - Use pre-order traversal (DFS) to visit each node.
-     * - Append the value of each node to a string.
-     * - Use "null" to represent missing children.
-     * Example:   
-     *  
-     *           1
-     *          /   \
-     *         2     3
-     *        / \   / \
-     *      null 4  5  6
-     *             / \
-     *            7   8
-     *
-     * Serialized : [1,2,null,4,null,null,3,5,7,null,null,8,null,null,6,null,null]
+        /**
+     * Appends preorder DFS tokens for node, including null markers.
      */
     public String serialize_UsingDfsApproach(TreeNode root) {
         StringBuilder builder = new StringBuilder();
@@ -182,16 +187,8 @@ public class SerializeDeserializeBst {
         serializeRec(node.right, builder);
     }
 
-    /**
-     * -- DFS-based Approach --
-     * Deserializes a string into a binary tree using pre-order traversal.
-     * Approach:
-     * - Split the serialized string into an array of node values.
-     * - Use a recursive helper function to rebuild the tree in pre-order.
-     * - For each node, create its left and right children based on the array values.
-     * - Return the root of the reconstructed tree.
-     * Example:
-     * Serialized : [1,2,null,4,null,null,3,5,7,null,null,8,null,null,6,null,null]
+        /**
+     * Consumes preorder DFS tokens using index as a shared cursor.
      */
     public TreeNode deserialize_UsingDfsApproach(String data) {
         if (data.isEmpty()) return null;

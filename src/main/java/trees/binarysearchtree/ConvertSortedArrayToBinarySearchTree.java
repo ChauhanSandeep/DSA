@@ -5,72 +5,50 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * Convert Sorted Array To Binary Search Tree
+ * Problem: Convert Sorted Array to Binary Search Tree
  *
- * Problem Statement:
- * Given an integer array nums where the elements are sorted in ascending order,
- * convert it to a height-balanced binary search tree.
- * A height-balanced binary tree is a binary tree in which the depth of the two subtrees
- * of every node never differs by more than one.
+ * Given a sorted integer array, build a height-balanced BST containing the same
+ * values. Picking the middle value as each subtree root keeps left and right sizes
+ * as even as possible.
+ *
+ * Leetcode: https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/ (Easy)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Divide and conquer midpoint construction
  *
  * Example:
- * Input: nums = [-10,-3,0,5,9]
- * Output: [0,-3,9,-10,null,5] (one possible balanced BST)
- * Explanation: This looks like
- *         0
- *         / \
- *       -3   9
- *       /    /
- *     -10   5
- * [0,-10,5,null,-3,null,9] would also be accepted
+ *   Input:  nums = [-10,-3,0,5,9]
+ *   Output: root = 0 with left subtree [-10,-3] and right subtree [5,9]
+ *   Why:    choosing the middle value as root splits the sorted array into balanced halves.
  *
- * LeetCode Link: https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree
+ * Follow-ups:
+ *   1. What if the input is a sorted linked list?
+ *      Use slow-fast pointers per subtree or simulate inorder construction.
+ *   2. Can you return every height-balanced BST?
+ *      Try every near-middle root recursively; the count grows combinatorially.
+ *   3. How would you build an AVL tree with heights?
+ *      Store height or balance factor while returning from recursion.
+ *   4. How would you avoid recursion?
+ *      Use an explicit stack of array ranges and parent attachment info.
  *
- * Follow-up Questions:
- *
- * 1. What if the input is a sorted linked list instead of an array?
- *    Answer: Convert the linked list to an array first for O(1) access to elements, or use
- *    a two-pointer approach with slow-fast pointers to find the middle element in O(n) time.
- *    The latter avoids extra space but increases time complexity per recursive call.
- *    Related problem: https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/
- *
- * 2. How would you ensure the tree is not just balanced but also complete?
- *    Answer: Use level-order construction instead of recursive midpoint selection. Fill nodes
- *    level by level from left to right to create a complete binary tree structure.
- *
- * 3. What if you need to return all possible balanced BSTs?
- *    Answer: At each step, instead of choosing only the middle element, try all elements as root
- *    and recursively generate all possible left and right subtrees. Combine them to get all
- *    valid BSTs. This increases complexity exponentially (Catalan number).
- *
- * 4. Can you construct the BST iteratively without recursion?
- *    Answer: Yes, use a stack to simulate recursion. Push tuples of (array range, parent node, direction)
- *    onto the stack and process them iteratively. This converts implicit recursion stack to explicit stack.
- *
- * 5. How would you modify this to create an AVL tree with explicit balance factors?
- *    Answer: During construction, track and store the balance factor (height difference between
- *    left and right subtrees) in each node. Calculate heights bottom-up during recursion return.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Convert Sorted List to Binary Search Tree (109).
  */
 public class ConvertSortedArrayToBinarySearchTree {
-    /**
-     * Converts sorted array to height-balanced BST using divide and conquer.
-     *
-     * Algorithm:
-     * 1. Choose middle element of array as root to ensure balance
-     * 2. Elements to the left form the left subtree (all smaller than root)
-     * 3. Elements to the right form the right subtree (all larger than root)
-     * 4. Recursively apply same process to left and right subarrays
-     * 5. Base case: when subarray is empty, return null
-     *
-     * Time Complexity: O(N) where N is the number of elements in the array. Each element
-     * is visited exactly once to create a corresponding tree node.
-     *
-     * Space Complexity: O(log N) for the recursion call stack in a balanced tree. The tree
-     * height is log N, which determines the maximum recursion depth.
-     *
-     * @param nums sorted array in ascending order
-     * @return root node of the constructed height-balanced BST
+
+    public static void main(String[] args) {
+        ConvertSortedArrayToBinarySearchTree solver = new ConvertSortedArrayToBinarySearchTree();
+        int[][] inputs = { {-10, -3, 0, 5, 9}, {} };
+        String[] expected = { "root=0", "root=null" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            TreeNode root = solver.sortedArrayToBST(inputs[i]);
+            String output = root == null ? "root=null" : "root=" + root.val;
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
+            /**
+     * Builds a balanced BST from nums[left..right] by choosing the middle value.
      */
     public TreeNode sortedArrayToBST(int[] nums) {
         if (nums == null || nums.length == 0) {

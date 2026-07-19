@@ -1,34 +1,50 @@
 package trees.segmenttree;
 
+import java.util.Arrays;
 /**
- * Range Sum Query - Mutable
+ * Problem: Range Sum Query - Mutable
  *
- * Problem Statement:
- * Given an integer array nums, handle multiple queries of the following types:
- * 1. Update the value of an element in nums
- * 2. Calculate the sum of elements between indices left and right inclusive
+ * Maintain an array under point updates and inclusive range-sum queries. The
+ * primary implementation stores segment sums in an array-backed segment tree.
+ *
+ * Leetcode: https://leetcode.com/problems/range-sum-query-mutable/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Segment tree | Divide and conquer ranges | Point update and range query
  *
  * Example:
- * Input: nums = [1, 3, 5]
- * sumRange(0, 2) returns 9 (1 + 3 + 5)
- * update(1, 2) changes array to [1, 2, 5]
- * sumRange(0, 2) returns 8 (1 + 2 + 5)
+ *   Input:  nums = [1,3,5], sumRange(0,2), update(1,2), sumRange(0,2)
+ *   Output: [9,8]
+ *   Why:    the updated array is [1,2,5], whose total is 8.
  *
- * LeetCode Link: https://leetcode.com/problems/range-sum-query-mutable
+ * Follow-ups:
+ *   1. How would you support range updates?
+ *      Add lazy propagation to defer updates for fully covered segments.
+ *   2. How would you reduce memory for pure sums?
+ *      Use a Fenwick Tree, which stores O(n) prefix contributions.
+ *   3. How would you support range min and range max too?
+ *      Store multiple aggregates per segment tree node.
+ *   4. How would you handle sparse indexes?
+ *      Use a dynamic segment tree with nodes created on demand.
  *
- * Follow-up Questions:
- * 1. How would you handle 2D range sum queries with updates?
- *    Answer: Use 2D Binary Indexed Tree where each row has its own BIT structure.
- *    Related: https://leetcode.com/problems/range-sum-query-2d-mutable/
- * 2. What if we need to support range updates (update all elements in a range)?
- *    Answer: Use difference array technique with BIT or lazy propagation in segment tree.
- * 3. How to handle very large arrays with sparse updates?
- *    Answer: Use coordinate compression to map indices to smaller range.
- * 4. What's the space-time tradeoff between BIT and Segment Tree?
- *    Answer: BIT uses less space (n vs 4n) but segment tree supports more operations like range min/max.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Range Sum Query 2D - Mutable (308).
  */
 public class RangeSumQueryMutable {
+
+  public static void main(String[] args) {
+    int[] nums = {1, 3, 5};
+    SegmentTreeApproach rangeSum = new SegmentTreeApproach(nums);
+    int before = rangeSum.sumRange(0, 2);
+    rangeSum.update(1, 2);
+    int after = rangeSum.sumRange(0, 2);
+    System.out.printf("nums=%s -> [%d, %d]  expected=[9, 8]%n",
+        Arrays.toString(nums), before, after);
+
+    int[] singleInput = {5};
+    SegmentTreeApproach single = new SegmentTreeApproach(singleInput);
+    System.out.printf("nums=%s -> %d  expected=5%n",
+        Arrays.toString(singleInput), single.sumRange(0, 0));
+  }
+
 
   /**
    * Segment Tree based implementation using Segment Tree.
@@ -59,9 +75,20 @@ public class RangeSumQueryMutable {
     private final int[] segmentTree;  // Segment tree array
     private final int arraySize;      // Size of the original array
 
-    /**
-     * Constructs the segment tree from the input array.
-     * @param nums input array
+        /**
+     * Intuition: each segment tree node stores the sum for one array interval. Leaves
+     * store single values; internal nodes combine left and right child sums.
+     *
+     * Algorithm:
+     *   1. Clone nums and remember arraySize.
+     *   2. Allocate a 4*n segment tree array.
+     *   3. Recursively build from the full range.
+     *   4. Store leaf values and combine child sums on return.
+     *
+     * Time:  O(n) - each segment tree node is built once.
+     * Space: O(n) - segment tree array plus cloned nums.
+     *
+     * @param nums initial array values
      */
     public SegmentTreeApproach(int[] nums) {
       this.nums = nums.clone();
@@ -75,7 +102,7 @@ public class RangeSumQueryMutable {
      * - If leaf node, store the array value.
      * - Find midpoint, build left and right children, then set current node sum.
      * - Handles segments defined by [start, end].
-     * 
+     *
      * @param treeIndex current index in segment tree array
      * @param start start index of the segment in original array
      * @param end end index of the segment in original array
@@ -96,10 +123,22 @@ public class RangeSumQueryMutable {
       segmentTree[treeIndex] = segmentTree[leftChildIndex] + segmentTree[rightChildIndex];
     }
 
-    /**
-     * Updates the value at the given index and propagates the change up the tree.
+        /**
+     * Intuition: a point update changes one leaf and every segment that contains that
+     * leaf. Recomputing sums on the path back to the root restores all affected range
+     * answers.
+     *
+     * Algorithm:
+     *   1. Recurse from the root range toward index.
+     *   2. Replace the leaf value with val.
+     *   3. Recompute each ancestor as left child sum plus right child sum.
+     *   4. Store val in nums.
+     *
+     * Time:  O(log n) - one root-to-leaf path is updated.
+     * Space: O(log n) - recursion depth is the tree height.
+     *
      * @param index index to update
-     * @param val new value
+     * @param val replacement value
      */
     public void update(int index, int val) {
       updateTree(0, 0, arraySize - 1, index, val);
@@ -137,12 +176,23 @@ public class RangeSumQueryMutable {
       segmentTree[treeIndex] = segmentTree[leftChildIndex] + segmentTree[rightChildIndex];
     }
 
-    /**
-     * Returns the sum of elements in the range [left, right].
+        /**
+     * Intuition: a query range can be decomposed into segment tree intervals. Segments
+     * outside the range contribute zero, segments fully inside contribute their stored
+     * sum, and partial segments split into children.
      *
-     * @param left left boundary (inclusive)
-     * @param right right boundary (inclusive)
-     * @return sum of elements in range
+     * Algorithm:
+     *   1. Query from the root segment.
+     *   2. Return 0 for no overlap.
+     *   3. Return the stored node sum for complete overlap.
+     *   4. Split partial overlap and add left and right query results.
+     *
+     * Time:  O(log n) - only boundary paths and covered segments are visited.
+     * Space: O(log n) - recursion stack follows tree height.
+     *
+     * @param left inclusive query start
+     * @param right inclusive query end
+     * @return sum of nums[left..right]
      */
     public int sumRange(int left, int right) {
       return queryTree(0, 0, arraySize - 1, left, right);

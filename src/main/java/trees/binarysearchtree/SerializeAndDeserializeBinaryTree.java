@@ -5,30 +5,50 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * 297. Serialize and Deserialize Binary Tree
+ * Problem: Serialize and Deserialize Binary Tree
  *
- * Problem: Design an algorithm to serialize and deserialize a binary tree.
- * Serialization is converting a tree to string. Deserialization is converting
- * string back to tree. Your design should work for any binary tree.
+ * Design a codec that converts any binary tree into a string and reconstructs the
+ * same structure later. Null markers are required so missing left and right child
+ * positions are not lost.
+ *
+ * Leetcode: https://leetcode.com/problems/serialize-and-deserialize-binary-tree/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | DFS preorder codec | Null-marker reconstruction
  *
  * Example:
- * Input: root = [1,2,3,null,null,4,5]
- * Output: "1,2,3,null,null,4,5"
+ *   Input:  root = [1,2,3,null,null,4,5]
+ *   Output: "1,2,null,null,3,4,null,null,5,null,null,"
+ *   Why:    preorder records each node before its children and null markers preserve empty child slots.
  *
- * LeetCode: https://leetcode.com/problems/serialize-and-deserialize-binary-tree
+ * Follow-ups:
+ *   1. How would you reduce string size?
+ *      Use binary encoding, compression, or omit trailing BFS nulls safely.
+ *   2. How would you support format changes?
+ *      Prefix serialized data with a version and keep old decoders.
+ *   3. How would you stream a huge tree?
+ *      Emit tokens in chunks and feed them back through an iterator or queue.
+ *   4. How would you handle arbitrary value types?
+ *      Escape values with length prefixes or use a structured format.
  *
- * Follow-up questions:
- * Q: How to optimize for very large trees?
- * A: Use compression, streaming, or incremental serialization techniques.
- *
- * Q: Can we handle different node value types?
- * A: Extend serialization format to support multiple data types.
- *
- * Q: How to ensure backward compatibility with format changes?
- * A: Include version headers and support multiple format versions.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Serialize and Deserialize BST (449), Construct Binary Tree from String (536).
  */
 public class SerializeAndDeserializeBinaryTree {
+
+    public static void main(String[] args) {
+        SerializeAndDeserializeBinaryTree outer = new SerializeAndDeserializeBinaryTree();
+        Codec codec = outer.new Codec();
+
+        TreeNode root = new TreeNode(1, new TreeNode(2), new TreeNode(3, new TreeNode(4), new TreeNode(5)));
+        String serialized = codec.serialize(root);
+        TreeNode restored = codec.deserialize(serialized);
+        System.out.printf("root=[1,2,3,null,null,4,5] -> %s  expected=1,2,null,null,3,4,null,null,5,null,null,%n",
+            serialized);
+        System.out.printf("roundTripRoot -> %d  expected=1%n", restored.val);
+
+        String empty = codec.serialize(null);
+        System.out.printf("root=[] -> %s  expected=null,%n", empty);
+    }
+
 
     // Definition for binary tree node
     public static class TreeNode {
@@ -59,7 +79,9 @@ public class SerializeAndDeserializeBinaryTree {
         private static final String SPLITTER = ",";
         private static final String NULL_NODE = "null";
 
-        // Encodes a tree to a single string
+                /**
+         * Appends preorder tokens for node, including null markers.
+         */
         public String serialize(TreeNode root) {
             StringBuilder sb = new StringBuilder();
             serializeHelper(root, sb);
@@ -76,7 +98,9 @@ public class SerializeAndDeserializeBinaryTree {
             }
         }
 
-        // Decodes your encoded data to tree
+                /**
+         * Consumes preorder tokens and rebuilds one subtree.
+         */
         public TreeNode deserialize(String data) {
             Queue<String> queue = new LinkedList<>(Arrays.asList(data.split(SPLITTER)));
             return deserializeHelper(queue);

@@ -4,25 +4,33 @@ import trees.Node;
 import trees.TreeNode;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
- * 173. Binary Search Tree Iterator
+ * Problem: Binary Search Tree Iterator
  *
- * Problem: Implement an iterator over a binary search tree (BST) that will iterate
- * over the BST in in-order traversal (smallest to largest).
+ * Implement an iterator over a BST that returns values from smallest to largest.
+ * The iterator exposes hasNext and next while preserving the original stack-based
+ * controlled inorder traversal.
  *
- * LeetCode: https://leetcode.com/problems/binary-search-tree-iterator
+ * Leetcode: https://leetcode.com/problems/binary-search-tree-iterator/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Inorder traversal with explicit stack
  *
- * Follow-up questions:
- * Q: Can you implement with O(1) time for both operations?
- * A: No, amortized O(1) is the best we can do due to tree traversal nature.
+ * Example:
+ *   Input:  root = [10,7,13,3,9,null,15]
+ *   Output: [3,7,9,10,13,15]
+ *   Why:    inorder traversal visits every BST node in sorted order.
  *
- * Q: How to implement previous() method?
- * A: Need to maintain parent pointers or use two stacks (forward/backward).
- *
- * Q: What if we need to support arbitrary position jumping?
- * A: Pre-compute all nodes in array or use augmented BST with size information.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can next be worst-case O(1)?
+ *      Precompute the inorder list, trading O(n) memory for O(1) calls.
+ *   2. How would you support previous()?
+ *      Keep a visited history stack or use parent pointers.
+ *   3. What changes for duplicate values?
+ *      The iterator logic stays the same; the BST insertion policy decides order.
+ *   4. How would you make it thread-safe?
+ *      Synchronize state-changing calls or give each thread its own iterator.
  */
 public class BstIterator {
     private final Deque<TreeNode> stack;
@@ -48,14 +56,22 @@ public class BstIterator {
         return !stack.isEmpty();
     }
 
-    /**
-     * Steps:
-     * 1. Pop the top node from the stack (this is the next smallest element).
-     * 2. If the popped node has a right child, push all its left descendants onto the stack.
-     * 3. Return the value of the popped node.
+        /**
+     * Intuition: inorder is the sorted traversal of a BST. The stack stores exactly
+     * the ancestors whose left side has already been explored but whose value has not
+     * been returned yet. Popping gives the next smallest node; pushing the left spine
+     * of its right child prepares the next larger value.
      *
-     * Time Complexity: O(1) amortized, because each node is pushed and popped exactly once.
-     * Space Complexity: O(H) where H is the height of the tree
+     * Algorithm:
+     *   1. Pop the current smallest node from stack.
+     *   2. Save its val as the result.
+     *   3. If it has a right child, push that right subtree's left spine.
+     *   4. Return the saved value.
+     *
+     * Time:  O(1) amortized - each node is pushed and popped once across all calls.
+     * Space: O(h) - stack holds at most one root-to-leaf path.
+     *
+     * @return next smallest BST value
      */
     public int next() {
         if (!hasNext()) {
@@ -73,9 +89,8 @@ public class BstIterator {
         return result;
     }
 
-    /**
-     * Pushes all left descendants of a given node onto the stack.
-     * @param node The starting node.
+        /**
+     * Pushes the left spine starting at node onto stack.
      */
     private void pushLeftSubtree(TreeNode node) {
         while (node != null) {
@@ -84,7 +99,7 @@ public class BstIterator {
         }
     }
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         TreeNode root = new TreeNode(10);
         root.left = new TreeNode(7);
         root.left.left = new TreeNode(3);
@@ -92,9 +107,19 @@ public class BstIterator {
         root.right = new TreeNode(13);
         root.right.right = new TreeNode(15);
 
+        int[] expected = {3, 7, 9, 10, 13, 15};
+        int[] output = new int[expected.length];
         BstIterator iterator = new BstIterator(root);
+        int index = 0;
         while (iterator.hasNext()) {
-            System.out.println(iterator.next());
+            output[index++] = iterator.next();
         }
+
+        TreeNode single = new TreeNode(1);
+        BstIterator singleIterator = new BstIterator(single);
+        System.out.printf("root=[10,7,13,3,9,null,15] -> %s  expected=%s%n",
+            Arrays.toString(output), Arrays.toString(expected));
+        System.out.printf("root=[1] -> %d  expected=1%n", singleIterator.next());
     }
+
 }
