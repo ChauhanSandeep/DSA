@@ -10,50 +10,68 @@ import java.util.PriorityQueue;
 /**
  * Problem: Meeting Rooms II
  *
- * Given an array of meeting time intervals where intervals[i] = [starti, endi],
- * determine the minimum number of conference rooms required.
+ * Given meeting intervals [start, end], return the minimum number of conference
+ * rooms needed so every meeting can be scheduled. Overlapping meetings require
+ * separate rooms; a meeting ending at time t frees a room for another starting at t.
+ *
+ * Leetcode: https://leetcode.com/problems/meeting-rooms-ii/ (Medium)
+ * Rating:   acceptance 52.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | Sweep line | Earliest ending meeting first
  *
  * Example:
- * Input: intervals = [[0,30],[5,10],[15,20]]
- * Output: 2
- * Explanation: We need two meeting rooms:
- * - Room 1: [0,30]
- * - Room 2: [5,10],[15,20]
+ *   Input:  intervals = [[0,30],[5,10],[15,20]]
+ *   Output: 2
+ *   Why:    [5,10] and [15,20] can reuse one room, while [0,30] needs another.
  *
- * LeetCode: https://leetcode.com/problems/meeting-rooms-ii
+ * Follow-ups:
+ *   1. Can you solve it without a heap?
+ *      Sort separate start and end arrays, then sweep with two pointers.
+ *   2. How do you return actual room assignments?
+ *      Store room ids with end times in the heap and append intervals to room lists.
+ *   3. What if meetings are added online?
+ *      Use a balanced tree or indexed calendar to query overlapping intervals.
+ *   4. What if rooms have capacities or equipment constraints?
+ *      Partition meetings by compatible room type, then run the greedy per group.
  *
- * Follow-up Questions:
- * 1. What if we need to return the actual room assignments?
- *    Answer: Modify heap to track room IDs and return mapping of meetings to rooms.
- *
- * 2. How would you handle meetings with priorities?
- *    Answer: Sort by priority first, then apply greedy room assignment with priority consideration.
- *
- * 3. What if rooms have different capacities?
- *    Answer: Use more complex data structure to track room capacity and current occupancy.
- *    Related: https://leetcode.com/problems/meeting-rooms/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Meeting Rooms (252), Maximum Number of Events That Can Be Attended (1353).
  */
+
 public class MeetingRoomsII {
 
-    /**
-     * Finds minimum meeting rooms using min heap approach.
+    public static void main(String[] args) {
+        MeetingRoomsII solver = new MeetingRoomsII();
+        int[][][] inputs = { {{0, 30}, {5, 10}, {15, 20}}, {} };
+        int[] expected = {2, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] copy = new int[inputs[i].length][];
+            for (int row = 0; row < inputs[i].length; row++) {
+                copy[row] = inputs[i][row].clone();
+            }
+            int got = solver.minMeetingRooms(copy);
+            System.out.printf("intervals=%s -> %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: a room is reusable exactly when its current meeting ends before
+     * or at the next meeting's start. Sorting by start time reveals meetings in
+     * chronological order, and a min heap keeps the earliest room end time on top.
      *
      * Algorithm:
-     * 1. Sort meetings by start time
-     * 2. Use min heap to track end times of ongoing meetings
-     * 3. For each meeting, remove finished meetings from heap
-     * 4. Add current meeting's end time to heap
-     * 5. Maximum heap size is the answer
+     *   1. Return 0 for null or empty intervals.
+     *   2. Sort meetings by start time.
+     *   3. Before scheduling each meeting, poll all rooms whose end time is <= start.
+     *   4. Offer the current meeting's end time and return the remaining heap size.
      *
-     * Time Complexity: O(n log n) where n is number of meetings
-     * Space Complexity: O(n) for the heap
+     * Time:  O(n log n) - sorting dominates and each interval updates the heap.
+     * Space: O(n) - the heap stores end times of active meetings.
      *
-     * @param intervals Array of meeting intervals [start, end]
-     * @return Minimum number of conference rooms required
+     * @param intervals meeting intervals as [start, end]
+     * @return number of rooms reported by the heap schedule
      */
+
     public int minMeetingRooms(int[][] intervals) {
         if (intervals == null || intervals.length == 0) {
             return 0;
@@ -122,7 +140,7 @@ public class MeetingRoomsII {
         return roomBookings;
     }
 
-    // Helper class for room assignment tracking
+    /** Tracks a room id and the end time of its latest assigned meeting. */
     static class RoomBooking {
         int roomId;
         int startTime;

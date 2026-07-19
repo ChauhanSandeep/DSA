@@ -3,17 +3,30 @@ package heaps.arraybased;
 import java.util.Arrays;
 
 /**
- * Array-backed max-heap with interview-focused core operations.
+ * Problem: Array-Based Max Heap
  *
- * Operations:
- * - peek: O(1)
- * - insert: O(log n)
- * - extractMax: O(log n)
- * - increaseKey: O(log n)
- * - updateValue: O(log n)
- * - deleteAtIndex: O(log n)
- * - buildHeap (constructor from array): O(n)
+ * Implement a max heap backed by an array, supporting insertion, maximum lookup,
+ * maximum extraction, key updates, deletion by index, and heap construction from
+ * an existing array.
+ *
+ * Pattern:  Heap | Array representation | Sift up and heapify down
+ *
+ * Example:
+ *   Input:  insert 10, insert 4, insert 15, then extractMax
+ *   Output: 15
+ *   Why:    a max heap always keeps the largest value at index 0.
+ *
+ * Follow-ups:
+ *   1. How would you implement a min heap?
+ *      Reverse the parent-child comparison in siftUp and heapifyDown.
+ *   2. How do you support arbitrary remove by value?
+ *      Maintain a value-to-indices map and then reuse deleteAtIndex.
+ *   3. How do you make it generic?
+ *      Store T[] with a Comparator<T> and replace integer comparisons.
+ *   4. How do you make updates stable for equal priorities?
+ *      Store insertion sequence numbers and compare them as a tie-breaker.
  */
+
 public class ArrayMaxHeap {
 
     private int[] heap;
@@ -110,12 +123,14 @@ public class ArrayMaxHeap {
         return Arrays.copyOf(heap, size);
     }
 
+    /** Restores heap order for the current array contents. */
     private void buildHeap() {
         for (int i = (size / 2) - 1; i >= 0; i--) {
             heapifyDown(i);
         }
     }
 
+    /** Moves a value upward until the max-heap parent rule is restored. */
     private void siftUp(int index) {
         int current = index;
         while (current > 0) {
@@ -128,6 +143,7 @@ public class ArrayMaxHeap {
         }
     }
 
+    /** Moves a value downward until both children are no larger. */
     private void heapifyDown(int index) {
         int current = index;
         while (true) {
@@ -151,30 +167,36 @@ public class ArrayMaxHeap {
         }
     }
 
+    /** Returns the parent index in the array heap. */
     private int parent(int index) {
         return (index - 1) / 2;
     }
 
+    /** Returns the left child index in the array heap. */
     private int left(int index) {
         return (2 * index) + 1;
     }
 
+    /** Returns the right child index in the array heap. */
     private int right(int index) {
         return (2 * index) + 2;
     }
 
+    /** Throws if index is outside the active heap range. */
     private void validateIndex(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of heap range: " + index);
         }
     }
 
+    /** Throws if a heap operation requires at least one value. */
     private void ensureNotEmpty(String operation) {
         if (isEmpty()) {
             throw new IllegalStateException("Heap is empty. Cannot perform: " + operation);
         }
     }
 
+    /** Grows the backing array when minimumCapacity exceeds current capacity. */
     private void ensureCapacity(int minimumCapacity) {
         if (minimumCapacity <= heap.length) {
             return;
@@ -183,6 +205,7 @@ public class ArrayMaxHeap {
         heap = Arrays.copyOf(heap, newCapacity);
     }
 
+    /** Swaps two positions in the backing array. */
     private void swap(int firstIndex, int secondIndex) {
         int temp = heap[firstIndex];
         heap[firstIndex] = heap[secondIndex];
@@ -192,22 +215,14 @@ public class ArrayMaxHeap {
     public static void main(String[] args) {
         int[] input = {12, 7, 25, 15, 8, 30, 3};
         ArrayMaxHeap maxHeap = new ArrayMaxHeap(input);
+        int firstGot = maxHeap.extractMax();
+        System.out.printf("input=%s extractMax -> %d  expected=%d%n",
+                Arrays.toString(input), firstGot, 30);
 
-        System.out.println("Initial heap array: " + Arrays.toString(maxHeap.toArray()));
-        System.out.println("Peek max: " + maxHeap.peek());
-
-        int extracted = maxHeap.extractMax();
-        System.out.println("Extracted max: " + extracted);
-        System.out.println("After extractMax: " + Arrays.toString(maxHeap.toArray()));
-
-        maxHeap.updateValue(2, 40);
-        System.out.println("After updateValue(index=2, value=40): " + Arrays.toString(maxHeap.toArray()));
-
-        maxHeap.insert(22);
-        System.out.println("After insert(22): " + Arrays.toString(maxHeap.toArray()));
-
-        int removed = maxHeap.deleteAtIndex(1);
-        System.out.println("Removed at index 1: " + removed);
-        System.out.println("After deleteAtIndex(1): " + Arrays.toString(maxHeap.toArray()));
+        ArrayMaxHeap single = new ArrayMaxHeap(1);
+        single.insert(42);
+        int secondGot = single.peek();
+        System.out.printf("input=%s peek -> %d  expected=%d%n",
+                Arrays.toString(new int[]{42}), secondGot, 42);
     }
 }

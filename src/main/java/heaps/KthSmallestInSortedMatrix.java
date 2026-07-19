@@ -1,67 +1,74 @@
 package heaps;
 
 import java.util.PriorityQueue;
+import java.util.Arrays;
 
 
 /**
- * Given an n x n matrix where each row and each column is sorted in ascending order,
- * return the k-th smallest element in the matrix.
+ * Problem: Kth Smallest Element in a Sorted Matrix
+ *
+ * Given an n x n matrix where every row and every column is sorted ascending,
+ * return the kth smallest value. The value-range binary search uses the matrix
+ * ordering to count how many entries are less than or equal to a guess.
+ *
+ * Leetcode: https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/ (Medium)
+ * Rating:   acceptance 64.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | Binary search on answer | Sorted matrix counting
  *
  * Example:
- * Input:
- * matrix = [
- *     [1,  5,  9],
- *     [10, 11, 13],
- *     [12, 13, 15]
- * ]
- * k = 8
- * Output: 13
+ *   Input:  matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8
+ *   Output: 13
+ *   Why:    the sorted order is [1,5,9,10,11,12,13,13,15], so item 8 is 13.
  *
- * LeetCode: https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
+ * Follow-ups:
+ *   1. What if k is tiny compared with n*n?
+ *      Use the heap method and expand only the smallest frontier cells.
+ *   2. What if the matrix is rectangular?
+ *      Generalize row and column bounds in both heap expansion and counting.
+ *   3. What if many kth queries are asked on the same matrix?
+ *      Precompute a sorted flattened array if memory is acceptable.
+ *   4. Can you use O(1) extra space?
+ *      Use binary search on values with bottom-left counting.
  *
- * Follow-up Questions (FAANG-style):
- * 1. Can you optimize it for very large matrix where n is large and k is small?
- *    - Yes, use a min-heap and only track minimal number of elements (heap size limited to number of rows).
- * 2. What if matrix is not square (m x n)?
- *    - Modify heap logic accordingly to support rectangular matrices.
- * 3. Can you solve it using constant space?
- *    - Yes, Binary Search on value range uses O(1) extra space.
- * 4. Can you find the kth largest element instead of smallest?
- *    - Yes, adapt the heap or invert the matrix index logic.
- *    - Related: https://leetcode.com/problems/kth-largest-element-in-an-array/
- * 5. What if we need to find kth smallest in multiple queries?
- *    - Preprocess matrix into a sorted array or use segment tree for range queries.
- * 6. How would you handle updates to matrix elements?
- *    - Rebuild heap or use balanced BST with lazy propagation for dynamic updates.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Kth Largest Element in an Array (215), Find K Pairs with Smallest Sums (373).
  */
+
 public class KthSmallestInSortedMatrix {
 
   public static void main(String[] args) {
-    int[][] matrix = {{1, 5, 9}, {10, 11, 13}, {12, 13, 15}};
-    int k = 8;
+    int[][][] matrices = { {{1, 5, 9}, {10, 11, 13}, {12, 13, 15}}, {{-5}} };
+    int[] kValues = {8, 1};
+    int[] expected = {13, -5};
 
-    System.out.println("Kth Smallest (Binary Search): " + findKthSmallestUsingBinarySearch(matrix, k)); // Expected: 13
-    System.out.println("Kth Smallest (Optimized Heap): " + findKthSmallestOptimizedHeap(matrix, k)); // Expected: 13
+    for (int i = 0; i < matrices.length; i++) {
+      int heapGot = findKthSmallestOptimizedHeap(matrices[i], kValues[i]);
+      int binaryGot = findKthSmallestUsingBinarySearch(matrices[i], kValues[i]);
+      System.out.printf("heap matrix=%s k=%d -> %d  expected=%d%n",
+          Arrays.deepToString(matrices[i]), kValues[i], heapGot, expected[i]);
+      System.out.printf("binary matrix=%s k=%d -> %d  expected=%d%n",
+          Arrays.deepToString(matrices[i]), kValues[i], binaryGot, expected[i]);
+    }
   }
 
-  /**
-   * Heap approach that maintains heap size proportional to min(k, n).
+    /**
+   * Intuition: the matrix is a sorted grid, so the next smallest unseen value is
+   * always on the right/down frontier of cells already removed. A min heap orders
+   * that frontier, and visited prevents reaching the same cell from two paths.
    *
-   * Algorithm: Space-Optimized Min-Heap
-   * Steps:
-   * 1. Use visited array to avoid duplicate processing
-   * 2. Start with only matrix[0][0] in heap
-   * 3. For each extraction, add valid neighbors (right and down)
-   * 4. Track visited cells to prevent duplicates
+   * Algorithm:
+   *   1. Validate input, then seed the heap with matrix[0][0].
+   *   2. Poll the heap k times, remembering the value just removed.
+   *   3. After each poll, offer the unvisited right and bottom neighbors.
+   *   4. Return the value from the kth extraction.
    *
-   * Time Complexity: O(k * log k)
-   * Space Complexity: O(k) for heap and visited set
+   * Time:  O(k log k) - each extraction may add frontier cells to the heap.
+   * Space: O(k) - the heap and visited frontier grow with processed cells.
    *
-   * @param matrix sorted n x n matrix
-   * @param k the position of smallest element to find
-   * @return k-th smallest element
+   * @param matrix row- and column-sorted matrix
+   * @param k one-based rank to find
+   * @return kth smallest value in the matrix
    */
+
   public static int findKthSmallestOptimizedHeap(int[][] matrix, int k) {
     if (matrix == null || matrix.length == 0 || k <= 0) {
       throw new IllegalArgumentException("Invalid input parameters");
@@ -145,23 +152,7 @@ public class KthSmallestInSortedMatrix {
     return searchLow;
   }
 
-  /**
-   * Efficiently counts elements in sorted matrix that are less than or equal to target.
-   *
-   * Algorithm: Two-pointer technique starting from bottom-left
-   * Steps:
-   * 1. Start from bottom-left corner (row = n-1, col = 0)
-   * 2. If current element <= target, all elements above are also <= target
-   * 3. Add (row + 1) to count and move right
-   * 4. If current element > target, move up
-   *
-   * Time Complexity: O(n)
-   * Space Complexity: O(1)
-   *
-   * @param matrix sorted n x n matrix
-   * @param target value to compare against
-   * @return count of elements <= target
-   */
+  /** Counts values less than or equal to target by walking from bottom-left. */
   private static int countElementsLessOrEqualToTarget(int[][] matrix, int target) {
     int count = 0;
     int matrixSize = matrix.length;

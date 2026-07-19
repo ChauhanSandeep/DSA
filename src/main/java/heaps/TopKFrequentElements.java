@@ -5,53 +5,72 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Arrays;
 
 /**
  * Problem: Top K Frequent Elements
  *
- * Given an integer array nums and an integer k, return the k most frequent elements.
- * You may return the answer in any order.
+ * Given an integer array nums, return k values with the highest frequencies. The
+ * answer may be returned in any order, and the original problem guarantees the
+ * selected set is unique.
+ *
+ * Leetcode: https://leetcode.com/problems/top-k-frequent-elements/ (Medium)
+ * Rating:   acceptance 66.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | Frequency map | Bucket sort alternative
  *
  * Example:
- * Input: nums = [1,1,1,2,2,3], k = 2
- * Output: [1,2]
- * Explanation: 1 appears 3 times, 2 appears 2 times, 3 appears 1 time. The 2 most frequent are [1,2].
+ *   Input:  nums = [1,1,1,2,2,3], k = 2
+ *   Output: [1,2]
+ *   Why:    1 appears 3 times and 2 appears 2 times, more than every other value.
  *
- * LeetCode: https://leetcode.com/problems/top-k-frequent-elements
+ * Follow-ups:
+ *   1. Can you do better than O(n log k)?
+ *      Bucket sort by frequency gives O(n) time when values can be grouped by counts.
+ *   2. How should ties be ordered?
+ *      Add a tie-breaker to the heap comparator or sort the final result.
+ *   3. What if numbers arrive as a stream?
+ *      Maintain counts plus a heap with lazy updates or use approximate heavy hitters.
+ *   4. What if k is close to the number of unique values?
+ *      A max heap or sorting all entries can be simpler with similar cost.
  *
- * Follow-up Questions:
- * 1. What if we need to return elements in order of frequency?
- *    Answer: Use max heap instead of min heap, or sort the result after extraction.
- *
- * 2. How would you handle ties in frequency?
- *    Answer: Problem guarantees unique answer, but could use lexicographic order or value order.
- *
- * 3. Can we achieve better than O(n log k) time complexity?
- *    Answer: Yes, use bucket sort approach for O(n) time complexity.
- *    Related: https://leetcode.com/problems/top-k-frequent-words/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Top K Frequent Words (692), Sort Characters By Frequency (451).
  */
+
 public class TopKFrequentElements {
 
-    /**
-     * Finds k most frequent elements using min heap approach.
+    public static void main(String[] args) {
+        TopKFrequentElements solver = new TopKFrequentElements();
+        int[][] inputs = { {1, 1, 1, 2, 2, 3}, {5} };
+        int[] kValues = {1, 1};
+        int[][] expected = { {1}, {5} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.topKFrequent(inputs[i], kValues[i]);
+            System.out.printf("nums=%s k=%d -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), kValues[i],
+                Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
+
+        /**
+     * Intuition: after counting frequencies, the top k elements are the k largest
+     * map entries by count. A min heap of size k keeps the current winners, and
+     * its root is the least frequent winner to evict when a better entry arrives.
      *
      * Algorithm:
-     * 1. Count frequency of each element using HashMap
-     * 2. Use min heap to maintain k most frequent elements
-     * 3. For each element, add to heap if size < k or if frequency > min frequency in heap
-     * 4. Extract all elements from heap as result
+     *   1. Return an empty array for null, empty, or non-positive k input.
+     *   2. Count each value's frequency in a HashMap.
+     *   3. Offer every map entry into a min heap ordered by frequency.
+     *   4. Poll whenever the heap grows past k, then extract the remaining keys.
      *
-     * Time Complexity: O(n log k) where n is array length because we are using min heap of size k and
-     * each insertion and deletion takes O(log k) time
-     * Space Complexity: O(n + k) for hashmap and heap
+     * Time:  O(n log k) - counting is linear and each unique value updates the heap.
+     * Space: O(n + k) - the map stores frequencies and the heap stores k entries.
      *
-     * @param nums Input array of integers
-     * @param k Number of most frequent elements to return
-     * @return Array of k most frequent elements
+     * @param nums input values
+     * @param k number of frequent values to return
+     * @return k most frequent values in heap extraction order
      */
+
     public int[] topKFrequent(int[] nums, int k) {
         if (nums == null || nums.length == 0 || k <= 0) {
             return new int[0];

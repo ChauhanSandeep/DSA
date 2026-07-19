@@ -7,51 +7,67 @@ import java.util.Random;
 /**
  * Problem: K Closest Points to Origin
  *
- * Given an array of points where points[i] = [xi, yi] represents a point on the X-Y plane
- * and an integer k, return the k closest points to the origin (0, 0).
- * The distance between two points on the X-Y plane is the Euclidean distance
- * (i.e., √((x1 - x2)² + (y1 - y2)²)).
- * You may return the answer in any order. The answer is guaranteed to be unique.
+ * Given points on a 2D plane, return any k points with the smallest Euclidean
+ * distance from the origin. Squared distance is enough because square root keeps
+ * the same ordering.
+ *
+ * Leetcode: https://leetcode.com/problems/k-closest-points-to-origin (Medium)
+ * Rating:   1214 (zerotrac Elo)
+ * Pattern:  Heap | Max heap of size k | QuickSelect alternative
  *
  * Example:
- * Input: points = [[1,3],[-2,2]], k = 1
- * Output: [[-2,2]]
- * Explanation: Distance between (1, 3) and origin is sqrt(10). Distance between (-2, 2) and origin is sqrt(8).
- * Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
+ *   Input:  points = [[1,3],[-2,2]], k = 1
+ *   Output: [[-2,2]]
+ *   Why:    (-2,2) has squared distance 8, which is smaller than 10 for (1,3).
  *
- * LeetCode: https://leetcode.com/problems/k-closest-points-to-origin
+ * Follow-ups:
+ *   1. Can you get average O(n) time?
+ *      Use QuickSelect to partition by squared distance and keep the first k points.
+ *   2. What if k is close to n?
+ *      A min-heap of all points or QuickSelect can avoid paying log k for every point.
+ *   3. What if the target is not the origin?
+ *      Replace x*x + y*y with squared distance from the requested target point.
+ *   4. What if points arrive as a stream?
+ *      Keep the same size-k max heap and evict the farthest point after each offer.
  *
- * Follow-up Questions:
- * 1. How would you handle the case where k is very close to n?
- *    Answer: Use min-heap instead of max-heap, or use QuickSelect algorithm for O(n) average time.
- *
- * 2. What if we need to find k closest points to an arbitrary point instead of origin?
- *    Answer: Modify distance calculation to use the given point instead of (0,0).
- *
- * 3. How would you solve this in a distributed system with millions of points?
- *    Answer: Use MapReduce with local k-closest computation followed by global merge.
- *
- * LeetCode Contest Rating: 1214
+ * Related: Kth Largest Element in an Array (215), Top K Frequent Elements (347).
  */
+
 public class KClosestPointsToOrigin {
 
-    /**
-     * Finds k closest points using max heap approach.
+    public static void main(String[] args) {
+        KClosestPointsToOrigin solver = new KClosestPointsToOrigin();
+        int[][][] inputs = { {{1, 3}, {-2, 2}}, {{3, 3}} };
+        int[] kValues = {1, 0};
+        int[][][] expected = { {{-2, 2}}, {} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] got = solver.kClosest(inputs[i], kValues[i]);
+            System.out.printf("points=%s k=%d -> %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), kValues[i],
+                Arrays.deepToString(got), Arrays.deepToString(expected[i]));
+        }
+    }
+
+        /**
+     * Intuition: keep only the best k candidates seen so far. A max heap puts the
+     * farthest saved point at the top, so once the heap grows past k, polling drops
+     * exactly the point that cannot belong to the final closest set.
      *
      * Algorithm:
-     * 1. Use max heap to maintain k closest points seen so far
-     * 2. For each point, calculate squared distance (avoid sqrt for efficiency)
-     * 3. If heap size < k, add point to heap
-     * 4. If heap size == k and current point is closer than farthest in heap, replace
-     * 5. Return all points in the heap
+     *   1. Return an empty matrix for null, empty, or non-positive k input.
+     *   2. Offer every point into a max heap ordered by squared distance.
+     *   3. Whenever the heap has more than k points, poll the current farthest.
+     *   4. Poll the heap into the result array.
      *
-     * Time Complexity: O(n log k) where n is number of points
-     * Space Complexity: O(k) for the heap
+     * Time:  O(n log k) - each of n points does one heap offer and maybe one poll.
+     * Space: O(k) - the heap stores at most k closest candidates.
      *
-     * @param points Array of points [x, y]
-     * @param k Number of closest points to return
-     * @return Array of k closest points to origin
+     * @param points array of [x, y] points
+     * @param k number of closest points to return
+     * @return k points closest to the origin, in heap poll order
      */
+
     public int[][] kClosest(int[][] points, int k) {
         if (points == null || points.length == 0 || k <= 0) {
             return new int[0][0];
@@ -100,7 +116,7 @@ public class KClosestPointsToOrigin {
         return Arrays.copyOfRange(points, 0, k);
     }
 
-    // QuickSelect implementation
+    /** Partitions until the first k positions contain the k closest points. */
     private void quickSelect(int[][] points, int left, int right, int k) {
         if (left >= right) return;
 
@@ -117,7 +133,7 @@ public class KClosestPointsToOrigin {
         }
     }
 
-    // Partition function for QuickSelect
+    /** Partitions points around a random pivot distance. */
     private int partition(int[][] points, int left, int right) {
         Random rand = new Random();
         int randomIndex = left + rand.nextInt(right - left + 1);
@@ -137,14 +153,14 @@ public class KClosestPointsToOrigin {
         return i;
     }
 
-    // Swap two points in array
+    /** Swaps two point references in the points array. */
     private void swap(int[][] points, int i, int j) {
         int[] temp = points[i];
         points[i] = points[j];
         points[j] = temp;
     }
 
-    // Calculate squared distance from origin (avoid sqrt for efficiency)
+    /** Returns squared distance from the origin. */
     private int getSquaredDistance(int[] point) {
         return point[0] * point[0] + point[1] * point[1];
     }

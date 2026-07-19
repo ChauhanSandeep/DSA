@@ -3,48 +3,70 @@ package heaps;
 import java.util.*;
 
 /**
- * There are n workers. You are given two integer arrays quality and wage where quality[i] is the quality of the ith worker and wage[i] is the minimum wage expectation for the ith worker.
+ * Problem: Minimum Cost to Hire K Workers
  *
- * We want to hire exactly k workers to form a paid group. When hiring a group of k workers, we must pay them according to the following rules:
- * 1. Every worker in the paid group must be paid at least their minimum wage expectation.
- * 2. In the group, each worker must be paid in the ratio of their quality compared to other workers in the paid group.
+ * Choose exactly k workers while paying everyone in the group at the same wage
+ * per quality ratio, and at least each worker's minimum wage. For any chosen
+ * group, the highest required ratio determines every worker's pay.
  *
- * Return the least amount of money needed to form a paid group satisfying the above conditions.
+ * Leetcode: https://leetcode.com/problems/minimum-cost-to-hire-k-workers/ (Hard)
+ * Rating:   2260 (zerotrac Elo)
+ * Pattern:  Heap | Greedy by wage-to-quality ratio | Keep smallest quality sum
  *
- * Example 1:
- * Input: quality = [10,20,5], wage = [70,50,30], k = 2
- * Output: 105.00000
- * Explanation: We pay 70 to 0th worker and 35 to 2nd worker.
+ * Example:
+ *   Input:  quality = [10,20,5], wage = [70,50,30], k = 2
+ *   Output: 105.00000
+ *   Why:    workers 0 and 2 use ratio 7, costing 10*7 + 5*7 = 105.
  *
- * Example 2:
- * Input: quality = [3,1,10,10,1], wage = [4,8,2,2,7], k = 3
- * Output: 30.66667
- * Explanation: We pay 4 to 0th worker, 13.33333 to 2nd and 3rd workers.
+ * Follow-ups:
+ *   1. Why sort by wage / quality ratio?
+ *      Once a worker is the highest ratio in the group, that ratio prices all chosen quality.
+ *   2. Why use a max heap of qualities?
+ *      For a fixed ratio, the cheapest group keeps the k smallest total qualities.
+ *   3. What if k equals n?
+ *      The cost is total quality times the maximum wage-to-quality ratio.
+ *   4. What if workers can be hired fractionally?
+ *      The discrete heap choice changes into a continuous optimization problem.
  *
- * LeetCode: https://leetcode.com/problems/minimum-cost-to-hire-k-workers/
- *
- * Follow-up Questions:
- * 1. How would you handle very large input sizes (e.g., n = 10000)?
- *    - The current solution is O(n log n) which should handle large inputs efficiently.
- * 2. What if k = n (we need to hire all workers)?
- *    - The solution will work correctly, but we could optimize by directly calculating the total cost.
- * 3. How would you handle if quality or wage contains zeros?
- *    - The problem guarantees quality[i] > 0 and wage[i] > 0.
- *
- * Related Problems:
- * - Maximum Performance of a Team (https://leetcode.com/problems/maximum-performance-of-a-team/)
- * - IPO (https://leetcode.com/problems/ipo/)
- * LeetCode Contest Rating: 2260
+ * Related: Maximum Performance of a Team (1383), IPO (502).
  */
+
 public class MinimumCostToHireKWorkers {
-    /**
-     * Calculates the minimum cost to hire k workers with given quality and wage constraints.
+
+    public static void main(String[] args) {
+        MinimumCostToHireKWorkers solver = new MinimumCostToHireKWorkers();
+        int[][] qualities = { {10, 20, 5}, {5} };
+        int[][] wages = { {70, 50, 30}, {30} };
+        int[] kValues = {2, 1};
+        double[] expected = {105.0, 30.0};
+
+        for (int i = 0; i < qualities.length; i++) {
+            double got = solver.mincostToHireWorkers(qualities[i], wages[i], kValues[i]);
+            System.out.printf("quality=%s wage=%s k=%d -> %.5f  expected=%.5f%n",
+                Arrays.toString(qualities[i]), Arrays.toString(wages[i]), kValues[i], got, expected[i]);
+        }
+    }
+        /**
+     * Intuition: if a worker with ratio r is the most demanding person in a group,
+     * every selected worker must be paid r times their quality. So after sorting
+     * workers by ratio, each step asks: among workers with ratio at most r, what is
+     * the smallest total quality of k workers?
      *
-     * @param quality Array representing quality of each worker
-     * @param wage Array representing minimum wage expectation of each worker
-     * @param k Number of workers to hire
-     * @return Minimum cost to hire k workers
+     * Algorithm:
+     *   1. Build worker pairs [wage / quality ratio, quality].
+     *   2. Sort workers by ratio ascending.
+     *   3. Add qualities to a max heap and remove the largest when more than k exist.
+     *   4. When exactly k workers are kept, minimize sumQuality * current ratio.
+     *
+     * Time:  O(n log n) - sorting plus heap updates for every worker.
+     * Space: O(n) - worker pairs and the quality heap are stored.
+     *
+     * @param quality quality for each worker
+     * @param wage minimum wage expectation for each worker
+     * @param k exact number of workers to hire
+     * @return minimum total cost to hire k workers
      */
+
     public double mincostToHireWorkers(int[] quality, int[] wage, int k) {
         int n = quality.length;
         // Create an array of worker data: [wage/quality ratio, quality]

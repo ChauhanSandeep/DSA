@@ -4,33 +4,52 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
- * LeetCode: https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/
+ * Problem: Maximum Number of Events That Can Be Attended
  *
- * Given an array of events where each event has a start and end day,
- * find the maximum number of events that can be attended by attending only one event per day.
- * For example:
- * Input: events = [[1,4],[4,4],[2,2],[3,4],[1,1]]
- * meaning that:
- * - Event 1 starts on day 1 and ends on day 4
- * * - Event 2 starts on day 4 and ends on day 4
- * * - Event 3 starts on day 2 and ends on day 2
- * * - Event 4 starts on day 3 and ends on day 4
- * * - Event 5 starts on day 1 and ends on day 1
- * Output: 4
- * Explanation: You can attend events 1, 2, 3, and 5 on days 1, 2, 3, and 4 respectively.
+ * Given events [startDay, endDay], attend at most one event per day and maximize
+ * how many events you attend. On each day, among currently available events, the
+ * safest greedy choice is the one that ends earliest.
  *
- * LeetCode Contest Rating: 2016
+ * Leetcode: https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/ (Medium)
+ * Rating:   2016 (zerotrac Elo)
+ * Pattern:  Heap | Greedy by earliest end day | Sweep line over days
+ *
+ * Example:
+ *   Input:  events = [[1,4],[4,4],[2,2],[3,4],[1,1]]
+ *   Output: 4
+ *   Why:    attend events on days 1, 2, 3, and 4, choosing an available event each day.
+ *
+ * Follow-ups:
+ *   1. How do you maximize value instead of count with at most k events?
+ *      Use weighted interval scheduling DP with binary search over next event.
+ *   2. What if multiple events can be attended on the same day?
+ *      Track daily capacity and poll up to that many earliest-ending events.
+ *   3. How do you avoid iterating over empty day ranges?
+ *      Jump today to the next event start whenever the heap is empty.
+ *   4. What if events are streamed by start day?
+ *      Feed starts into the same min heap as days advance.
+ *
+ * Related: Maximum Number of Events That Can Be Attended II (1751), Meeting Rooms II (253).
  */
+
 public class MaxEventsThatCanbeAttended {
     public static void main(String[] args) {
-        int[][] events = {
-                {1, 4},
-                {4, 4},
-                {2, 2},
-                {3, 4},
-                {1, 1}
+        MaxEventsThatCanbeAttended solver = new MaxEventsThatCanbeAttended();
+        int[][][] inputs = {
+                {{1, 4}, {4, 4}, {2, 2}, {3, 4}, {1, 1}},
+                {}
         };
-        System.out.println("Max events attended: " + new MaxEventsThatCanbeAttended().maxEvents(events));
+        int[] expected = {4, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] copy = new int[inputs[i].length][];
+            for (int row = 0; row < inputs[i].length; row++) {
+                copy[row] = inputs[i][row].clone();
+            }
+            int got = solver.maxEvents(copy);
+            System.out.printf("events=%s -> %d  expected=%d%n",
+                    Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
     }
 
     /**
@@ -67,20 +86,25 @@ public class MaxEventsThatCanbeAttended {
         return eventsAttended;
     }
 
-    /**
-     * Using a Min-Heap:
+        /**
+     * Intuition: once a day arrives, attending the available event with the
+     * earliest end day leaves the widest future window. Sorting by start day lets
+     * us add newly available events, while a min heap exposes the event that would
+     * expire first.
      *
      * Algorithm:
-     * - Sort events by start time (then by end time for tie-breaking).
-     * - Use a min-heap to track the earliest ending events available to attend.
-     * - Iterate through days, attending the event that ends the earliest first.
+     *   1. Return 0 for null or empty input.
+     *   2. Sort events by start day, then end day.
+     *   3. For each day, remove expired events and add events starting today.
+     *   4. Attend one earliest-ending available event, then move to the next day.
      *
-     * Time Complexity: O(N log N) due to sorting and heap operations.
-     * Space Complexity: O(N) for the heap.
+     * Time:  O(n log n) - sorting and one heap offer/poll per event.
+     * Space: O(n) - the heap can hold all currently available events.
      *
-     * @param events A 2D array where events[i] = [startDay, endDay].
-     * @return The maximum number of events that can be attended.
+     * @param events events as [startDay, endDay]
+     * @return maximum number of events that can be attended
      */
+
     public int maxEvents(int[][] events) {
         if (events == null || events.length == 0) return 0;
 

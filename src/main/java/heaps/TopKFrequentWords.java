@@ -5,54 +5,72 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Problem: Top K Frequent Words
  *
- * Given an array of strings words and an integer k, return the k most frequent strings.
- * Return the answer sorted by the frequency from highest to lowest. Sort the words with
- * the same frequency by their lexicographical order.
+ * Given words and k, return the k most frequent words sorted by decreasing
+ * frequency. Words with the same frequency must appear in lexicographical order.
+ *
+ * Leetcode: https://leetcode.com/problems/top-k-frequent-words/ (Medium)
+ * Rating:   acceptance 60.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | Frequency map | Lexicographic tie-break
  *
  * Example:
- * Input: words = ["i","love","leetcode","i","love","coding"], k = 2
- * Output: ["i","love"]
- * Explanation: "i" and "love" are the two most frequent words.
- * Note that "i" comes before "love" due to a lower lexicographical order.
+ *   Input:  words = ["i","love","leetcode","i","love","coding"], k = 2
+ *   Output: ["i","love"]
+ *   Why:    both words appear twice, and "i" comes before "love" lexicographically.
  *
- * LeetCode: https://leetcode.com/problems/top-k-frequent-words
+ * Follow-ups:
+ *   1. How do you handle data too large for memory?
+ *      Count per shard, merge partial counts, then run the top-k heap globally.
+ *   2. What if queries are prefix-based?
+ *      Store counts in a trie and run top-k within the prefix subtree.
+ *   3. What if words arrive in a stream?
+ *      Maintain counts plus a lazily refreshed heap or use approximate sketches.
+ *   4. How do you make ties locale-aware?
+ *      Replace String.compareTo with a Collator-based comparator.
  *
- * Follow-up Questions:
- * 1. What if we need to handle very large datasets that don't fit in memory?
- *    Answer: Use external sorting with multiple passes, or distributed computing with MapReduce.
- *
- * 2. How would you optimize for real-time streaming data?
- *    Answer: Use sliding window with heap, or approximate algorithms like Count-Min Sketch.
- *
- * 3. What if we need to support prefix-based queries?
- *    Answer: Use Trie data structure combined with frequency tracking at each node.
- *    Related: https://leetcode.com/problems/top-k-frequent-elements/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Top K Frequent Elements (347), Sort Characters By Frequency (451).
  */
+
 public class TopKFrequentWords {
 
-    /**
-     * Finds k most frequent words using min heap with custom comparator.
+    public static void main(String[] args) {
+        TopKFrequentWords solver = new TopKFrequentWords();
+        String[][] inputs = { {"i", "love", "leetcode", "i", "love", "coding"}, {"solo"} };
+        int[] kValues = {2, 1};
+        List<List<String>> expected = new ArrayList<>();
+        expected.add(Arrays.asList("i", "love"));
+        expected.add(Arrays.asList("solo"));
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<String> got = solver.topKFrequent(inputs[i], kValues[i]);
+            System.out.printf("words=%s k=%d -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), kValues[i], got, expected.get(i));
+        }
+    }
+
+        /**
+     * Intuition: keep the best k words, but make the heap root the weakest kept
+     * word. Lower frequency is weaker; for equal frequency, lexicographically
+     * larger words are weaker because the final answer wants smaller words first.
      *
      * Algorithm:
-     * 1. Count frequency of each word using HashMap
-     * 2. Use min heap to maintain k most frequent words
-     * 3. Custom comparator: lower frequency first, then reverse lexicographical order
-     * 4. Extract words from heap and reverse to get correct order
+     *   1. Return an empty list for null, empty, or non-positive k input.
+     *   2. Count every word's frequency in a HashMap.
+     *   3. Offer unique words into a min heap using frequency and reverse lexicographic tie-break.
+     *   4. Poll when heap size exceeds k, then add polled words to the front of result.
      *
-     * Time Complexity: O(n log k) where n is number of words
-     * Space Complexity: O(n) for frequency map and O(k) for heap
+     * Time:  O(n log k) - each unique word may update a heap of size k.
+     * Space: O(n) - the frequency map and result storage scale with unique words.
      *
-     * @param words Array of words
-     * @param k Number of top frequent words to return
-     * @return List of k most frequent words in required order
+     * @param words input words
+     * @param k number of words to return
+     * @return k most frequent words in required order
      */
+
     public List<String> topKFrequent(String[] words, int k) {
         if (words == null || words.length == 0 || k <= 0) {
             return new ArrayList<>();
@@ -275,7 +293,7 @@ public class TopKFrequentWords {
         }
     }
 
-    // Trie node class for prefix-aware approach
+    /** Trie node used by the prefix-aware alternative. */
     static class TrieNode {
         TrieNode[] children;
         boolean isEndOfWord;
@@ -286,7 +304,7 @@ public class TopKFrequentWords {
         }
     }
 
-    // Helper method to insert word into trie
+    /** Inserts one lowercase word into the trie. */
     private void insertWord(TrieNode root, String word) {
         TrieNode current = root;
         for (char c : word.toCharArray()) {
@@ -299,7 +317,7 @@ public class TopKFrequentWords {
         current.isEndOfWord = true;
     }
 
-    // Helper method to collect all words from trie
+    /** Collects complete words from the trie into words. */
     private void collectWords(TrieNode node, StringBuilder prefix, List<String> words) {
         if (node.isEndOfWord) {
             words.add(prefix.toString());
@@ -352,7 +370,7 @@ public class TopKFrequentWords {
         return true;
     }
 
-    // Helper method to count unique words
+    /** Counts distinct words in the input array. */
     private int getUniqueWordCount(String[] words) {
         return (int) java.util.Arrays.stream(words).distinct().count();
     }

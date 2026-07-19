@@ -3,70 +3,67 @@ package heaps;
 import java.util.*;
 
 /**
+ * Problem: Swim in Rising Water
  *
- * You are given an n x n integer matrix grid where each value grid[i][j] represents the elevation 
- * at that point (i, j).
- * 
- * The rain starts to fall. At time t, the depth of the water everywhere is t. You can swim from 
- * a square to another 4-directionally adjacent square if and only if the elevation of both squares 
- * individually are at most t. You can swim infinite distances in zero time.
- * 
- * Starting at the top left square (0, 0), return the minimum time until you can reach the bottom 
- * right square (n-1, n-1).
+ * Each grid value is an elevation, and at time t you may enter cells with
+ * elevation at most t. Return the minimum time needed to reach the bottom-right
+ * cell from the top-left cell using four-directional moves.
+ *
+ * Leetcode: https://leetcode.com/problems/swim-in-rising-water/ (Hard)
+ * Rating:   2097 (zerotrac Elo)
+ * Pattern:  Heap | Dijkstra on maximum path cost | Binary search alternative
  *
  * Example:
- * Input: grid = [[0,2],[1,3]]
- * Output: 3
- * Explanation:
- * At time 0, you are at grid[0][0] with elevation 0.
- * At time 1, you can move to grid[1][0] (elevation 1).
- * At time 2, you cannot move yet (grid[0][1] has elevation 2, grid[1][1] has elevation 3).
- * At time 3, you can move to grid[1][1].
- * Minimum time = 3.
+ *   Input:  grid = [[0,2],[1,3]]
+ *   Output: 3
+ *   Why:    every path to the destination must enter elevation 3, and time 3 makes it reachable.
  *
- * LeetCode link: https://leetcode.com/problems/swim-in-rising-water/
+ * Follow-ups:
+ *   1. Can you solve it with binary search?
+ *      Binary search time and BFS to test whether the destination is reachable.
+ *   2. What if diagonal moves are allowed?
+ *      Add the four diagonal directions to the neighbor loop.
+ *   3. How would you return the path too?
+ *      Store parent pointers when a cell is first accepted.
+ *   4. What if cells can be blocked forever?
+ *      Skip blocked cells during expansion and return -1 if the heap empties.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - What if you can move diagonally (8 directions)?
- *    → Same algorithm, just check 8 neighbors instead of 4.
- *  - Can you handle very large grids efficiently?
- *    → Current O(n² log n) is optimal; for massive grids, consider approximation algorithms.
- *  - What if there are obstacles (cells you can never visit)?
- *    → Mark obstacles, skip them during traversal, might return -1 if no path exists.
- *  - How would you find the actual path taken, not just the time?
- *    → Track parent pointers during traversal and backtrack from destination.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 778 (Swim in Rising Water): https://leetcode.com/problems/swim-in-rising-water/
- *  - LeetCode 1631 (Path With Minimum Effort): https://leetcode.com/problems/path-with-minimum-effort/
- *  - LeetCode 1102 (Path With Maximum Minimum Value): https://leetcode.com/problems/path-with-maximum-minimum-value/
- * LeetCode Contest Rating: 2097
+ * Related: Path With Minimum Effort (1631), Path With Maximum Minimum Value (1102).
  */
+
 public class SwimInRisingWater {
 
-    /**
-     * Main method: Dijkstra's algorithm with min heap (Optimal for interviews).
-     * Step-by-step:
-     *  1. Use min heap to process cells in order of minimum time needed
-     *  2. Track visited cells to avoid reprocessing
-     *  3. Start from (0,0) with time = grid[0][0]
-     *  4. For each cell popped from heap:
-     *     a. If reached destination, return current time
-     *     b. Explore all 4 neighbors
-     *     c. For each unvisited neighbor:
-     *        - Time to reach = max(current time, neighbor's elevation)
-     *        - Add to heap with this time
-     *  5. Continue until destination reached
+    public static void main(String[] args) {
+        SwimInRisingWater solver = new SwimInRisingWater();
+        int[][][] inputs = { {{0, 2}, {1, 3}}, {{0}} };
+        int[] expected = {3, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.swimInRisingWater(inputs[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: a path's cost is the maximum elevation seen along it, not the sum
+     * of elevations. This is still Dijkstra-shaped: always expand the cell with
+     * the currently smallest possible arrival time, and the first time the target
+     * is removed from the heap is optimal.
      *
-     * Key Insight:
-     * This is shortest path problem where "cost" is the maximum elevation along path.
-     * Use modified Dijkstra: instead of summing costs, track maximum elevation seen.
-     * Min heap ensures we explore paths with lower maximum elevations first.
+     * Algorithm:
+     *   1. Seed a min heap with the start cell and time grid[0][0].
+     *   2. Poll the lowest-time cell, skipping it if it was already visited.
+     *   3. Return the time when the destination cell is polled.
+     *   4. Offer each unvisited neighbor with max(current time, neighbor elevation).
      *
-     * Algorithm: Modified Dijkstra's algorithm.
-     * Time Complexity: O(n² log n), each cell processed once, heap operations are O(log n²).
-     * Space Complexity: O(n²) for visited array and heap.
+     * Time:  O(n^2 log n) - each cell can enter the heap and heap operations are logarithmic.
+     * Space: O(n^2) - visited matrix and heap can both grow with the grid.
+     *
+     * @param grid square elevation grid
+     * @return minimum time needed to reach the bottom-right cell
      */
+
     public int swimInRisingWater(int[][] grid) {
         int size = grid.length;
         boolean[][] visited = new boolean[size][size];
@@ -152,7 +149,7 @@ public class SwimInRisingWater {
         return left;
     }
 
-    // Helper: Check if destination is reachable at given time using BFS
+    /** Checks whether the destination is reachable using only cells at most time. */
     private boolean canReach(int[][] grid, int time) {
         int n = grid.length;
         

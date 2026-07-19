@@ -12,52 +12,63 @@ import java.util.Set;
 /**
  * Problem: Find K Pairs with Smallest Sums
  *
- * LeetCode Link: https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
+ * Given two sorted arrays nums1 and nums2, return k pairs [u, v] with the
+ * smallest sums where u comes from nums1 and v comes from nums2. The sorted grid
+ * of pair sums can be explored from the smallest cell with a min heap.
  *
- * Problem Statement:
- * - You are given two sorted integer arrays nums1 and nums2 and an integer k.
- * - Return the k pairs (u, v) such that u is from nums1 and v is from nums2 and
- *   the sum u + v is the smallest possible among all possible pairs.
+ * Leetcode: https://leetcode.com/problems/find-k-pairs-with-smallest-sums/ (Medium)
+ * Rating:   acceptance 42.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | Best-first search | Visited grid cells
  *
  * Example:
- * Input: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
- * Output: [[1,2],[1,4],[1,6]]
- * Explanation: The first 3 pairs with the smallest sums are: [1,2], [1,4], and [1,6].
+ *   Input:  nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+ *   Output: [[1,2],[1,4],[1,6]]
+ *   Why:    sums 3, 5, and 7 are the three smallest pair sums.
  *
- * Follow-up Questions:
- * 1. How would your solution change if arrays are not sorted?
- *    - Brute force O(N*M log K) or use a custom iterator-like traversal.
- * 2. Can you do it without using a heap?
- *    - Not efficiently; heap ensures optimal time due to min-sum tracking.
- * 3. What if you had to return K largest pairs?
- *    - Use a max heap and invert the comparison logic.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can you reduce the visited set?
+ *      Seed one entry per nums1 row and advance only in nums2, like k-way merge.
+ *   2. What if arrays are not sorted?
+ *      Sort them first if original order is irrelevant, or brute force with a size-k heap.
+ *   3. How would you return k largest sums?
+ *      Start from the largest index pair and use a max heap with left/up neighbors.
+ *   4. How do you handle duplicate values but unique index pairs?
+ *      Track visited indices, not pair values, exactly as this implementation does.
+ *
+ * Related: Kth Smallest Element in a Sorted Matrix (378), K Closest Points to Origin (973).
  */
+
 public class kPairsWithSmallestSums {
 
   public static void main(String[] args) {
-    int[] nums1 = {1, 7, 11};
-    int[] nums2 = {2, 4, 6};
-    int k = 5;
-
     kPairsWithSmallestSums finder = new kPairsWithSmallestSums();
-    List<List<Integer>> result = finder.kSmallestPairs(nums1, nums2, k);
+    int[][] nums1Cases = { {1, 7, 11}, {} };
+    int[][] nums2Cases = { {2, 4, 6}, {1, 2} };
+    int[] kValues = {3, 3};
+    String[] expected = {"[[1, 2], [1, 4], [1, 6]]", "[]"};
 
-    System.out.println("K Smallest Pairs: " + result);
+    for (int i = 0; i < nums1Cases.length; i++) {
+      List<List<Integer>> got = finder.kSmallestPairs(nums1Cases[i], nums2Cases[i], kValues[i]);
+      System.out.printf("nums1=%s nums2=%s k=%d -> %s  expected=%s%n",
+          Arrays.toString(nums1Cases[i]), Arrays.toString(nums2Cases[i]), kValues[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Finds the k pairs with the smallest sums from two sorted arrays.
+    /**
+   * Intuition: because both arrays are sorted, pair sums form a grid where moving
+   * right or down never decreases the sum. Start at the smallest cell, then use a
+   * min heap to always expand the next smallest frontier cell.
    *
-   * Approach (Min-Heap + Visited Set):
-   * - Since arrays are sorted, the smallest pair is (nums1[0], nums2[0]).
-   * - Use a min-heap to always pick the next smallest pair sum.
-   * - Push neighbors: (index1+1, index2) and (index1, index2+1) into heap.
-   * - Use a set to avoid visiting the same pair again.
+   * Algorithm:
+   *   1. Return an empty result if either array is empty or k is zero.
+   *   2. Seed a min heap with index pair (0,0) and mark it visited.
+   *   3. Poll the smallest sum, append its actual pair, and decrease k.
+   *   4. Offer unseen down and right neighbors for future consideration.
    *
-   * Time Complexity: O(k log k) — At most k heap operations, each O(log k)
-   * Space Complexity: O(k) — For heap and visited set
+   * Time:  O(k log k) - each reported pair can add up to two heap entries.
+   * Space: O(k) - the heap and visited set store generated frontier cells.
    */
+
   public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
     int len1 = nums1.length;
     int len2 = nums2.length;

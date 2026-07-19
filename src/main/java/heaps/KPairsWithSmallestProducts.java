@@ -9,85 +9,70 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
- * Problem: Find K Pairs with Smallest Products
+ * Problem: K Pairs with Smallest Products
  *
- * Problem Statement:
- * - Given two sorted lists of integers (may include negatives), find the first k pairs
- *   with the smallest product. A pair is one element from each list.
+ * Given two sorted integer arrays, return up to k pairs whose products are the
+ * smallest. The positive-only method uses grid monotonicity; the general method
+ * handles negatives by merging one sorted product sequence per nums1 row.
  *
- * Example 1 (all positive):
- * Input: nums1 = [1, 2, 5, 9], nums2 = [1, 3, 4, 6], k = 5
- * Output: [[1,1], [2,1], [1,3], [1,4], [5,1]]  (products: 1, 2, 3, 4, 5)
+ * Pattern:  Heap | K-way merge | Grid best-first search
  *
- * Example 2 (with negatives):
- * Input: nums1 = [-3, -1, 2, 5], nums2 = [-2, 1, 4], k = 4
- * Output: [[-3,4], [5,-2], [-1,4], [2,-2]]  (products: -12, -10, -4, -4)
+ * Example:
+ *   Input:  nums1 = [-3,-1,2,5], nums2 = [-2,1,4], k = 2
+ *   Output: [[-3,4], [5,-2]]
+ *   Why:    the products are -12 and -10, smaller than every other pair product.
  *
- * Two Approaches:
- *
- * Approach 1 — Min-Heap + Visited Set (positive-only arrays):
- *   Because all values are positive, products grow monotonically as indices increase.
- *   The smallest product is always at (0,0). From any cell (i,j), neighbors (i+1,j) and
- *   (i,j+1) are the only candidates for the next minimum. A visited set prevents
- *   duplicate enqueues since the same cell is reachable from two paths.
- *   Time: O(k log k)  Space: O(k)
- *
- * Approach 2 — Row-wise Merge (general: handles any integers):
- *   For a fixed nums1[i], the products nums1[i] * nums2[j] form a sorted list — but the
- *   direction depends on the sign of nums1[i]:
- *     nums1[i] > 0 → products ascending left→right in nums2  (start j = 0,       dir = +1)
- *     nums1[i] < 0 → products ascending right→left in nums2  (start j = len2-1,  dir = -1)
- *     nums1[i] = 0 → all products are 0                       (start j = 0,       dir = +1)
- *   Seed the heap with the first element of each row's sorted sequence, then advance
- *   one step per row when its entry is popped. No visited set needed — each (i, j)
- *   is visited at most once since each row advances in a single direction.
- *   Time: O(M + k log M)  Space: O(M)  (M = nums1.length)
- *
- * Follow-up Questions:
- * 1. Why does Approach 1 break with negatives?
- *    - neg × large_positive is very negative (smallest), but (0,0) may not hold such a pair.
- *      Moving right/down no longer monotonically increases the product.
- * 2. Why is Approach 2 better for large arrays?
- *    - O(M + k log M) vs O(k log k). When k >> M the heap stays small (size M) rather than
- *      growing to size 2k.
- * 3. What if k > M*N?
- *    - The heap naturally empties; return whatever pairs were collected.
+ * Follow-ups:
+ *   1. Why does the grid-walk method fail with negatives?
+ *      Products stop being monotonic when moving right or down can make values smaller.
+ *   2. How do you cap work when k exceeds nums1.length * nums2.length?
+ *      Let the heap empty naturally and return all generated pairs.
+ *   3. How would you return largest products instead?
+ *      Reverse the heap ordering and seed each row from its largest product direction.
+ *   4. How do you avoid overflow for large values?
+ *      Store products as long and compare with long arithmetic.
  */
+
 public class KPairsWithSmallestProducts {
 
   public static void main(String[] args) {
     KPairsWithSmallestProducts finder = new KPairsWithSmallestProducts();
 
-    int[] nums1 = {1, 2, 5, 9};
-    int[] nums2 = {1, 3, 4, 6};
-    System.out.println("All-positive (Approach 1): " + finder.kSmallestProductPairs(nums1, nums2, 5));
-    // Expected: [[1,1], [2,1], [1,3], [1,4], [5,1]]
+    int[] positiveNums1 = {1, 2, 5, 9};
+    int[] positiveNums2 = {1, 3, 4, 6};
+    List<List<Integer>> positiveGot = finder.kSmallestProductPairs(positiveNums1, positiveNums2, 5);
+    System.out.printf("nums1=%s nums2=%s k=%d -> %s  expected=%s%n",
+        Arrays.toString(positiveNums1), Arrays.toString(positiveNums2), 5,
+        positiveGot, "[[1, 1], [2, 1], [1, 3], [1, 4], [5, 1]]");
 
-    System.out.println("All-positive (Approach 2): " + finder.kSmallestProductPairsWithNegatives(nums1, nums2, 5));
-    // Expected: [[1,1], [2,1], [1,3], [1,4], [5,1]]
-
-    int[] n1 = {-3, -1, 2, 5};
-    int[] n2 = {-2, 1, 4};
-    System.out.println("With negatives (Approach 2): " + finder.kSmallestProductPairsWithNegatives(n1, n2, 4));
-    // Expected: [[-3,4], [5,-2], [-1,4], [2,-2]]  (products: -12, -10, -4, -4)
+    int[] mixedNums1 = {-3, -1, 2, 5};
+    int[] mixedNums2 = {-2, 1, 4};
+    List<List<Integer>> mixedGot = finder.kSmallestProductPairsWithNegatives(mixedNums1, mixedNums2, 2);
+    System.out.printf("nums1=%s nums2=%s k=%d -> %s  expected=%s%n",
+        Arrays.toString(mixedNums1), Arrays.toString(mixedNums2), 2,
+        mixedGot, "[[-3, 4], [5, -2]]");
   }
 
-  /**
-   * Approach 1: Min-Heap + Visited Set.
-   * Works correctly only when both arrays contain positive integers.
+    /**
+   * Intuition: with positive sorted arrays, the product grid grows as you move
+   * down or right. That makes (0,0) the first answer, and every next answer must
+   * come from a right/down neighbor of a pair already removed from the heap.
    *
-   * - Seed the heap with (nums1[0], nums2[0]) — the globally smallest product.
-   * - On each pop of (i, j): push neighbors (i+1, j) and (i, j+1) if unseen.
-   * - Visited set prevents duplicate enqueues (cell reachable from two directions).
+   * Algorithm:
+   *   1. Return an empty list when either array is empty or k is zero.
+   *   2. Seed a min heap with product cell (0,0) and mark it visited.
+   *   3. Repeatedly poll the smallest product and append its pair to result.
+   *   4. Offer unseen down and right neighbors so each index pair appears once.
    *
-   * Time Complexity: O(k log k)
-   * Space Complexity: O(k)
+   * Time:  O(k log k) - at most two offers and one poll for each reported pair.
+   * Space: O(k) - the heap and visited set grow with the frontier of generated pairs.
    *
-   * @param nums1 first sorted array of positive integers
-   * @param nums2 second sorted array of positive integers
-   * @param k     number of pairs to return
-   * @return k pairs with smallest products in non-decreasing order
+   * @param nums1 first sorted positive array
+   * @param nums2 second sorted positive array
+   * @param k number of pairs to return
+   * @return pairs with the smallest products in poll order
    */
+
   public List<List<Integer>> kSmallestProductPairs(int[] nums1, int[] nums2, int k) {
     List<List<Integer>> result = new ArrayList<>();
 
@@ -129,36 +114,26 @@ public class KPairsWithSmallestProducts {
     return result;
   }
 
-  /**
-   * Approach 2: Row-wise Sorted-List Merge (handles any integers including negatives).
+    /**
+   * Intuition: for one fixed nums1[i], multiplying across nums2 is sorted, but
+   * the direction depends on the sign of nums1[i]. Seed each row at its smallest
+   * product, then k-way merge those row sequences with a min heap.
    *
-   * Key insight — for a fixed nums1[i], the sequence of products with each nums2[j] is sorted,
-   * but the traversal direction through nums2 depends on the sign of nums1[i]:
+   * Algorithm:
+   *   1. Return an empty list when either array is empty or k is zero.
+   *   2. For each nums1 row, seed the smallest product and its j direction.
+   *   3. Poll the globally smallest row head and append its pair.
+   *   4. Advance that same row by dir and offer the next product if it is in range.
    *
-   *   nums1[i] > 0 : multiplying by larger nums2 gives larger product  → traverse left→right
-   *                  seed at j = 0 (smallest nums2), direction = +1
+   * Time:  O(m + k log m) - m initial row heads, then k heap polls over m rows.
+   * Space: O(m) - the heap stores at most one active entry per nums1 row.
    *
-   *   nums1[i] < 0 : multiplying by larger nums2 gives more-negative product → traverse right→left
-   *                  seed at j = len2-1 (largest nums2), direction = -1
-   *
-   *   nums1[i] = 0 : product is always 0 → traverse in any direction
-   *                  seed at j = 0, direction = +1
-   *
-   * Each row's products form an independent ascending sequence. We merge M such sequences
-   * with a size-M min-heap, advancing each row's pointer by one step (in its direction)
-   * after it is popped.
-   *
-   * No visited set is required: each (i, j) is enqueued exactly once — seeded initially
-   * and then advanced one step at a time, so no duplicate paths exist.
-   *
-   * Time Complexity: O(M + k log M) — M initial inserts + k heap pops each O(log M)
-   * Space Complexity: O(M) — heap holds at most M entries at any point
-   *
-   * @param nums1 first sorted array (may contain negative integers)
-   * @param nums2 second sorted array (may contain negative integers)
-   * @param k     number of pairs to return
-   * @return k pairs with smallest products in non-decreasing order
+   * @param nums1 first sorted array, possibly containing negatives
+   * @param nums2 second sorted array, possibly containing negatives
+   * @param k number of pairs to return
+   * @return pairs with the smallest products in poll order
    */
+
   public List<List<Integer>> kSmallestProductPairsWithNegatives(int[] nums1, int[] nums2, int k) {
     List<List<Integer>> result = new ArrayList<>();
 
