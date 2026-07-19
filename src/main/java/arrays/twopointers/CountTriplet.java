@@ -5,33 +5,43 @@ import java.util.Set;
 import java.util.Arrays;
 
 /**
- * Find all triplets in an array such that the sum of two elements equals the third element.
+ * Problem: Count Triplets Whose Two Values Sum to the Third
  *
- * ### Problem Statement:
- * Given an integer array, count the number of unique triplets (i, j, k) such that:
- *   arr[i] + arr[j] == arr[k], and all indices are distinct.
+ * Given an integer array, count pairs of values whose sum is also present as a
+ * third value in the array. The optimized version sorts the array and fixes the
+ * target value from the right.
  *
- * ### Example:
- * Input: [5, 32, 1, 7, 10, 50, 19, 21, 2]
- * Output: 4
- * Explanation: (1, 2, 3), (1, 4, 5), etc.
+ * Source: https://www.geeksforgeeks.org/find-the-number-of-triplets-in-array-whose-sum-is-equal-to-a-given-number/
+ * Pattern:  Array | Sorting | Fixed target plus two pointers
  *
- * ### Link:
- * https://www.geeksforgeeks.org/find-the-number-of-triplets-in-array-whose-sum-is-equal-to-a-given-number/
+ * Example:
+ *   Input:  arr = [1,2,3]
+ *   Output: 1
+ *   Why:    1 + 2 equals 3, so exactly one triplet is counted.
  *
- * ### Follow-up Questions:
- * - Can you avoid using extra space?
- *    Yes, using sorting + two pointers.
- * - What if we want to return all triplets, not just the count?
- *    Use a `Set<List<Integer>>` to store triplets.
+ * Follow-ups:
+ *   1. Return the actual triplets instead of the count?
+ *      Store each matching value triple, using sorting or a set to avoid duplicates.
+ *   2. How should duplicate values be counted?
+ *      Decide whether the count is by index triples or by unique value triples first.
+ *   3. Can this avoid extra space?
+ *      Yes, sort in place and use the two-pointer scan for each fixed target.
+ *
+ * Related: 3Sum (15), 3Sum Closest (16), Valid Triangle Number (611).
  */
 public class CountTriplet {
 
-  public static void main(String[] args) {
-    int[] arr = {5, 32, 1, 7, 10, 50, 19, 21, 2};
-    System.out.println("Total triplets (HashSet approach): " + countTripletsHashSet(arr));
-    System.out.println("Total triplets (Two pointer approach): " + countTripletsTwoPointer(arr));
+public static void main(String[] args) {
+  int[][] inputs = { {5, 32, 1, 7, 10, 50, 19, 21, 2}, {1, 2, 3} };
+  int[] expected = { 2, 1 };
+
+  for (int i = 0; i < inputs.length; i++) {
+    int hashSetGot = countTripletsHashSet(inputs[i].clone());
+    int twoPointerGot = countTripletsTwoPointer(inputs[i].clone());
+    System.out.printf("arr=%s -> hash=%d twoPointer=%d  expected=%d%n",
+        Arrays.toString(inputs[i]), hashSetGot, twoPointerGot, expected[i]);
   }
+}
 
   /**
    * Counts the number of triplets using HashSet lookup method.
@@ -67,19 +77,23 @@ public class CountTriplet {
   }
 
   /**
-   * Optimized approach using sorting and two pointers.
-   * Finds triplets such that arr[i] + arr[j] == arr[k]
-   *
-   * Steps:
-   * - Sort the array
-   * - Fix the third element and use two pointers to find pairs that sum to it
-   * - When sum is less than target, move left pointer right
-   * - When sum is greater than target, move right pointer left
-   * - When sum equals target, increment count and move both pointers
-   *
-   * Time Complexity: O(n^2)
-   * Space Complexity: O(1)
-   */
+ * Intuition: after sorting, a fixed target arr[targetIndex] can be searched the
+ * same way as Two Sum II. If the two-pointer sum is too small, only moving the
+ * left pointer right can increase it; if too large, only moving the right
+ * pointer left can decrease it.
+ *
+ * Algorithm:
+ *   1. Sort arr.
+ *   2. Fix targetIndex from the end down to index 2.
+ *   3. Search arr[0..targetIndex-1] with leftIndex and rightIndex.
+ *   4. Count matches and move both pointers; otherwise move the pointer that fixes the sum.
+ *
+ * Time:  O(n^2) - each fixed target runs one inward two-pointer scan.
+ * Space: O(1) - the scan uses only counters and pointers besides sorting storage.
+ *
+ * @param arr input array, sorted in place by this method
+ * @return number of matching triplets counted by the two-pointer scan
+ */
   static int countTripletsTwoPointer(int[] arr) {
     Arrays.sort(arr);
     int length = arr.length;

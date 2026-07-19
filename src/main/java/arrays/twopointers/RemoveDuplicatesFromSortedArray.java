@@ -1,68 +1,68 @@
 package arrays.twopointers;
 
+import java.util.Arrays;
+
 /**
  * Problem: Remove Duplicates from Sorted Array
  *
- * Given an integer array nums sorted in non-decreasing order, remove the duplicates
- * in-place such that each unique element appears only once. The relative order of
- * the elements should be kept the same.
+ * Given a sorted array, keep one copy of each distinct value in the front of the
+ * same array. Return the number of unique values; content after that prefix is
+ * irrelevant.
  *
- * Since it is impossible to change the length of the array in some languages, you must
- * instead have the result be placed in the first part of the array nums. More formally,
- * if there are k elements after removing the duplicates, then the first k elements of
- * nums should hold the final result. It does not matter what you leave beyond the first k elements.
- *
- * Return k after placing the final result in the first k slots of nums.
+ * Leetcode: https://leetcode.com/problems/remove-duplicates-from-sorted-array/ (Easy)
+ * Rating:   acceptance 63.3% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Unique prefix write
  *
  * Example:
- * Input: nums = [1,1,2]
- * Output: 2, nums = [1,2,_]
- * Explanation: Your function should return k = 2, with first two elements being 1 and 2.
- * It does not matter what you leave beyond the returned k (hence they are underscores).
+ *   Input:  nums = [0,0,1,1,1,2,2,3,3,4]
+ *   Output: 5, nums = [0,1,2,3,4,_,_,_,_,_]
+ *   Why:    each distinct sorted value is written once into the valid prefix.
  *
- * Input: nums = [0,0,1,1,1,2,2,3,3,4]
- * Output: 5, nums = [0,1,2,3,4,_,_,_,_,_]
- * Explanation: First 5 elements contain unique values: [0,1,2,3,4]
+ * Follow-ups:
+ *   1. Allow each value at most k times?
+ *      Compare the candidate with the value k positions before the write index.
+ *   2. Handle unsorted input while preserving order?
+ *      Use a HashSet of seen values and the same write-prefix idea.
+ *   3. Count how many duplicates were removed?
+ *      Return nums.length - writeIndex or track skipped elements during the scan.
  *
- * LeetCode: https://leetcode.com/problems/remove-duplicates-from-sorted-array
- *
- * Follow-up Questions:
- * 1. Q: What if the array allowed duplicates up to k times?
- *    A: Modify condition to check nums[writeIndex - k] instead of nums[writeIndex - 1].
- *
- * 2. Q: How would you handle an unsorted array?
- *    A: Would need to sort first O(n log n) or use HashSet to track seen elements O(n) space.
- *
- * 3. Q: What if you needed to maintain count of removed duplicates?
- *    A: Track duplicateCount++ whenever nums[i] == nums[writeIndex - 1].
- *
- * 4. Q: How would you handle very large arrays with memory constraints?
- *    A: Current O(1) space solution is already optimal for memory usage.
- *
- * Related Problems:
- * - Remove Duplicates from Sorted Array II: https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
- * - Remove Duplicates from Sorted List: https://leetcode.com/problems/remove-duplicates-from-sorted-list/
- * - Remove Element: https://leetcode.com/problems/remove-element/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Remove Duplicates from Sorted Array II (80), Remove Element (27).
  */
 public class RemoveDuplicatesFromSortedArray {
 
+public static void main(String[] args) {
+    RemoveDuplicatesFromSortedArray solver = new RemoveDuplicatesFromSortedArray();
+    int[][] inputs = { {1, 1, 2}, {} };
+    int[] expectedLengths = { 2, 0 };
+    int[][] expectedPrefixes = { {1, 2}, {} };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int[] nums = inputs[i].clone();
+        int gotLength = solver.removeDuplicates(nums);
+        int[] gotPrefix = Arrays.copyOf(nums, gotLength);
+        System.out.printf("nums=%s -> len=%d prefix=%s  expected=len=%d prefix=%s%n",
+            Arrays.toString(inputs[i]), gotLength, Arrays.toString(gotPrefix),
+            expectedLengths[i], Arrays.toString(expectedPrefixes[i]));
+    }
+}
+
     /**
-     * Removes duplicates using two-pointer technique for in-place modification.
-     *
-     * Algorithm:
-     * 1. Use writeIndex to track position for next unique element
-     * 2. Iterate through array with read pointer (enhanced for loop)
-     * 3. If current element is different from last written element, write it
-     * 4. Always write first element (writeIndex == 0 case)
-     * 5. Return writeIndex which represents count of unique elements
-     *
-     * Time Complexity: O(n) where n is length of array
-     * Space Complexity: O(1) using constant extra space
-     *
-     * @param nums sorted array to remove duplicates from
-     * @return number of unique elements after removing duplicates
-     */
+ * Intuition: in a sorted array, every duplicate sits next to the value already
+ * written into the unique prefix. writeIndex points to the next prefix slot,
+ * so a value is copied only when it differs from nums[writeIndex - 1].
+ *
+ * Algorithm:
+ *   1. Return 0 for null or empty input.
+ *   2. Start writeIndex at 0.
+ *   3. Scan every currentElement in nums.
+ *   4. Write it when it is the first value or differs from the last written value.
+ *
+ * Time:  O(n) - one pass reads each element once.
+ * Space: O(1) - the valid prefix is written in the original array.
+ *
+ * @param nums sorted array to compress in place
+ * @return number of unique values in the prefix
+ */
     public int removeDuplicates(int[] nums) {
         if (nums == null || nums.length == 0) {
             return 0;

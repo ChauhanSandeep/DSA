@@ -3,46 +3,44 @@ package arrays.twopointers;
 import java.util.Arrays;
 
 /**
- * Sort Colors - LeetCode Problem 75
+ * Problem: Sort Colors
  *
- * Problem Statement:
- * Given an array nums with n objects colored red, white, or blue, sort them in-place
- * so that objects of the same color are adjacent, with colors in the order red, white, blue.
- * Use integers 0, 1, and 2 to represent red, white, and blue respectively.
- * Must solve without using library's sort function.
+ * Given an array containing only 0, 1, and 2, sort it in place so equal colors
+ * are adjacent in red-white-blue order. The optimal method is the Dutch national
+ * flag partition in one pass.
+ *
+ * Leetcode: https://leetcode.com/problems/sort-colors/ (Medium)
+ * Rating:   acceptance 70.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Dutch national flag | Three-way partition
  *
  * Example:
- * Input: nums = [2,0,2,1,1,0]
- * Output: [0,0,1,1,2,2]
- * Explanation: All red (0) objects first, then white (1), then blue (2).
- * The Dutch National Flag algorithm partitions in one pass: 0s to left,
- * 2s to right, 1s naturally end up in middle.
+ *   Input:  nums = [2,0,2,1,1,0]
+ *   Output: [0,0,1,1,2,2]
+ *   Why:    all 0s are moved left, all 2s right, and 1s remain in the middle.
  *
- * LeetCode Link: https://leetcode.com/problems/sort-colors/
+ * Follow-ups:
+ *   1. Extend this to k colors?
+ *      Use counting sort for O(n + k), or repeated partitions for small k.
+ *   2. Make the sort stable?
+ *      Dutch flag is not stable; use counting plus rewrite or stable partitioning.
+ *   3. Minimize swaps when memory is cheap?
+ *      Count each color, then overwrite the array in two passes with no swaps.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you extend this to k colors instead of 3?
- *    Answer: Use counting sort O(n+k) or modified quicksort with k-way partitioning.
- *
- * 2. What if we need to maintain relative order of equal elements (stable sort)?
- *    Answer: Dutch Flag isn't stable. Use counting sort or merge sort for stability.
- *    Related: LeetCode 324 - Wiggle Sort II (requires stable partitioning)
- *
- * 3. How to handle this problem if colors have priorities other than 0<1<2?
- *    Answer: Map priorities to indices, apply Dutch Flag, then map back.
- *
- * 4. What if memory access is expensive and we want to minimize swaps?
- *    Answer: Use counting sort - only 2 passes, no swaps needed.
- *    Related: LeetCode 41 - First Missing Positive (cycle sort minimizes writes)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Sort Array by Parity II (922), Wiggle Sort II (324).
  */
 public class SortColors {
 
-  public static void main(String[] args) {
-    int[] colors = {2, 0, 2, 1, 1, 0};
-    sortColors(colors);
-    System.out.println("Sorted array: " + Arrays.toString(colors));
+public static void main(String[] args) {
+  int[][] inputs = { {2, 0, 2, 1, 1, 0}, {1} };
+  int[][] expected = { {0, 0, 1, 1, 2, 2}, {1} };
+
+  for (int i = 0; i < inputs.length; i++) {
+    int[] nums = inputs[i].clone();
+    sortColors(nums);
+    System.out.printf("nums=%s -> %s  expected=%s%n",
+        Arrays.toString(inputs[i]), Arrays.toString(nums), Arrays.toString(expected[i]));
   }
+}
 
   /**
    * Steps:
@@ -79,24 +77,22 @@ public class SortColors {
   }
 
   /**
-   * Optimal Dutch National Flag Algorithm (Single Pass, In-Place)
-   *
-   * Sorts the input array containing 0s, 1s, and 2s using three pointers:
-   * - `zeroPointer` tracks position to place 0s
-   * - `twoPointer` tracks position to place 2s
-   * - `current` scans the array
-   *
-   * Steps:
-   * 1. Traverse array with `current` pointer.
-   * 2. Swap current with `zeroPointer` if element is 0, then move both forward.
-   * 3. Swap current with `twoPointer` if element is 2, then only move `twoPointer` backward.
-   * 4. If element is 1, just move `current`.
-   *
-   * Time Complexity: O(n) — one pass
-   * Space Complexity: O(1) — in-place sorting
-   *
-   * @param nums Array containing only 0, 1, and 2
-   */
+ * Intuition: maintain three regions: confirmed 0s before zeroPointer,
+ * confirmed 2s after twoPointer, and unknown values at currentPointer. A 0 is
+ * swapped into the left region; a 2 is swapped into the right region and must
+ * be rechecked because the incoming value is unknown; a 1 is already central.
+ *
+ * Algorithm:
+ *   1. Guard null or length <= 1 input.
+ *   2. Start zeroPointer at 0, currentPointer at 0, and twoPointer at the end.
+ *   3. Swap 0s left and advance zeroPointer and currentPointer.
+ *   4. Swap 2s right and only decrement twoPointer; advance currentPointer on 1.
+ *
+ * Time:  O(n) - each position is processed a constant number of times.
+ * Space: O(1) - sorting is in place with three pointers.
+ *
+ * @param nums array containing only 0, 1, and 2
+ */
   public static void sortColors(int[] nums) {
     if (nums == null || nums.length <= 1) return;
 

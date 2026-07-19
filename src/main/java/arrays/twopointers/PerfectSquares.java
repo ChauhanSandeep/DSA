@@ -3,68 +3,60 @@ package arrays.twopointers;
 import java.util.*;
 
 /**
- * Leetcode Problem 279: Perfect Squares
- * https://leetcode.com/problems/perfect-squares/
+ * Problem: Perfect Squares
  *
- * Problem Statement:
- * Given an integer n, return the least number of perfect square numbers that
- * sum to n.
- * A perfect square is an integer that is the square of an integer; in other
- * words,
- * it is the product of some integer with itself. For example, 1, 4, 9, and 16
- * are perfect squares
- * since they are 1×1, 2×2, 3×3, and 4×4, respectively.
+ * Given an integer n, return the fewest perfect square numbers whose sum is n.
+ * The primary method builds the answer bottom up for every value from 0 through
+ * the target.
+ *
+ * Leetcode: https://leetcode.com/problems/perfect-squares/ (Medium)
+ * Rating:   acceptance 56.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming | BFS shortest path | Perfect-square transitions
  *
  * Example:
- * Input: n = 12
- * Output: 3
- * Explanation: 12 = 4 + 4 + 4 (three perfect squares: 2², 2², 2²)
+ *   Input:  n = 12
+ *   Output: 3
+ *   Why:    12 = 4 + 4 + 4, and it cannot be represented with fewer squares.
  *
- * Input: n = 13
- * Output: 2
- * Explanation: 13 = 4 + 9 (two perfect squares: 2² + 3²)
+ * Follow-ups:
+ *   1. What is the maximum answer for any positive n?
+ *      Lagrange's four-square theorem says at most four squares are needed.
+ *   2. Can this be solved with number theory faster?
+ *      Check one square, two squares, and Legendre's three-square theorem cases.
+ *   3. Return the actual squares used?
+ *      Store predecessor choices in the DP table and reconstruct from n.
  *
- * Follow-up Questions (FAANG interview style):
- * 1. What's the theoretical maximum number of perfect squares needed for any
- * number?
- * - By Lagrange's Four-Square Theorem, every positive integer can be
- * represented as the sum of at most four perfect squares.
- * 2. Can you optimize this further using mathematical theorems?
- * - Yes, using Legendre's Three-Square Theorem: a number can be expressed as
- * sum of three squares if and only if it's not of the form 4^a(8b+7).
- * 3. How would you handle very large numbers efficiently?
- * - Mathematical approaches (checking if n is perfect square, sum of two
- * squares, etc.) can be faster than DP for large n.
- * 4. What if we needed to return the actual squares used, not just the count?
- * - We'd need to backtrack through the DP table or use a different approach to
- * reconstruct the solution.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Coin Change (322), Sum of Square Numbers (633).
  */
 public class PerfectSquares {
-  public static void main(String[] args) {
-    PerfectSquares solution = new PerfectSquares();
-    System.out.println("DP Solution: " + solution.numSquaresDp(13));
-    System.out.println("BFS Solution: " + solution.numSquaresBFS(13));
+public static void main(String[] args) {
+  PerfectSquares solver = new PerfectSquares();
+  int[] inputs = { 12, 13 };
+  int[] expected = { 3, 2 };
+
+  for (int i = 0; i < inputs.length; i++) {
+    int got = solver.numSquaresDp(inputs[i]);
+    System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
   }
+}
 
   /**
-   * Main solution method - Dynamic Programming (Bottom-up).
-   *
-   * Algorithm Overview:
-   * 1. Create a DP array where dp[i] represents minimum perfect squares needed to
-   * sum to i.
-   * 2. Initialize dp[0] = 0 (base case: 0 squares needed for sum 0).
-   * 3. For each number i from 1 to n, try all perfect squares j² ≤ i.
-   * 4. Update dp[i] = min(dp[i], dp[i - j²] + 1) for all valid j.
-   * 5. Return dp[n] as the minimum squares needed for n.
-   *
-   * Time Complexity: O(n * √n) - for each number up to n, we check all perfect
-   * squares up to √n
-   * Space Complexity: O(n) - DP array of size n+1
-   *
-   * @param target the target number to represent as sum of perfect squares
-   * @return minimum number of perfect squares that sum to n
-   */
+ * Intuition: think of target as a shortest coin-change problem where the coins
+ * are perfect squares. If square is the last square used for sum i, then the
+ * best count is dp[i - square] + 1. Trying every square gives the minimum.
+ *
+ * Algorithm:
+ *   1. Create dp[0..target] and initialize unknown values high.
+ *   2. Mark every perfect square as reachable in one step.
+ *   3. For each i, try every square j * j <= i.
+ *   4. Minimize dp[i] using dp[i - square] + 1, then return dp[target].
+ *
+ * Time:  O(n * sqrt(n)) - each value tries all squares up to its square root.
+ * Space: O(n) - dp stores one best count for each value up to target.
+ *
+ * @param target number to represent as a sum of perfect squares
+ * @return minimum number of perfect squares needed
+ */
   public int numSquaresDp(int target) {
     int[] dp = new int[target + 1]; // dp[i] will hold the least number of perfect squares that sum to i
     Arrays.fill(dp, Integer.MAX_VALUE);

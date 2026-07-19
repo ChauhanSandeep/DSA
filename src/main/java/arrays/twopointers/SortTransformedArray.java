@@ -4,41 +4,68 @@ import java.util.Arrays;
 
 
 /**
- * Sort Transformed Array
+ * Problem: Sort Transformed Array
  *
- * Problem: Transform sorted array using quadratic function f(x) = ax² + bx + c and return result in sorted order.
+ * Given sorted nums and a quadratic function f(x) = ax^2 + bx + c, return the
+ * transformed values in sorted order. The primary method uses the parabola shape
+ * to merge the transformed extremes in linear time.
  *
- * Example: nums = [-4,-2,2,4], a = 1, b = 3, c = 5 -> Output: [3,9,15,33]
- * f(-4) = 16 - 12 + 5 = 9, f(-2) = 4 - 6 + 5 = 3, f(2) = 4 + 6 + 5 = 15, f(4) = 16 + 12 + 5 = 33
+ * Leetcode: https://leetcode.com/problems/sort-transformed-array/ (Medium)
+ * Rating:   acceptance 58.2% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Quadratic extremes
  *
- * LeetCode: https://leetcode.com/problems/sort-transformed-array
+ * Example:
+ *   Input:  nums = [-4,-2,2,4], a = 1, b = 3, c = 5
+ *   Output: [3,9,15,33]
+ *   Why:    transformed values are [9,3,15,33], which sort to [3,9,15,33].
  *
- * Follow-up Questions:
- * - What if function is cubic or higher degree? (Use similar two-pointer approach)
- * - How to handle floating point coefficients? (Same algorithm applies)
- * - Can we avoid computing all values first? (Yes, current approach does this optimally)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. What if the function is linear?
+ *      The same code treats a = 0 with the a >= 0 branch, but explicit reversal can be clearer.
+ *   2. What if coefficients are floating point?
+ *      Use double transformation and compare doubles carefully for sorted output.
+ *   3. Can this work for cubic functions?
+ *      Not with only the two extremes; higher-degree functions may have more turning points.
+ *
+ * Related: Squares of a Sorted Array (977), Merge Sorted Array (88).
  */
 public class SortTransformedArray {
 
+public static void main(String[] args) {
+    SortTransformedArray solver = new SortTransformedArray();
+    int[][] inputs = { {-4, -2, 2, 4}, {-4, -2, 2, 4} };
+    int[][] coefficients = { {1, 3, 5}, {-1, 3, 5} };
+    int[][] expected = { {3, 9, 15, 33}, {-23, -5, 1, 7} };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int[] got = solver.sortTransformedArray(inputs[i], coefficients[i][0], coefficients[i][1], coefficients[i][2]);
+        System.out.printf("nums=%s coeff=%s -> %s  expected=%s%n",
+            Arrays.toString(inputs[i]), Arrays.toString(coefficients[i]),
+            Arrays.toString(got), Arrays.toString(expected[i]));
+    }
+}
+
     /**
-     * Sorts transformed array using two-pointer technique based on parabola properties.
-     *
-     * Algorithm:
-     * 1. If a > 0: parabola opens upward, extremes have larger values
-     * 2. If a < 0: parabola opens downward, extremes have smaller values
-     * 3. If a = 0: linear function, order depends on sign of b
-     * 4. Use two pointers from ends, compare transformed values, fill result accordingly
-     *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(n) for result array
-     *
-     * @param nums sorted input array
-     * @param a coefficient of x²
-     * @param b coefficient of x
-     * @param c constant term
-     * @return sorted array of transformed values
-     */
+ * Intuition: on a sorted input, a quadratic's extreme transformed values are
+ * at the ends when the parabola opens upward, and the smallest transformed
+ * values are at the ends when it opens downward. Comparing transformed left
+ * and right values lets us fill the result from the correct side.
+ *
+ * Algorithm:
+ *   1. Start left at 0 and right at the last index.
+ *   2. If a >= 0, compare transformed ends and fill result from right to left.
+ *   3. If a < 0, compare transformed ends and fill result from left to right.
+ *   4. Move the pointer whose transformed value was written.
+ *
+ * Time:  O(n) - each pointer moves across the array once.
+ * Space: O(n) - result stores all transformed values.
+ *
+ * @param nums sorted input values
+ * @param a coefficient of x^2
+ * @param b coefficient of x
+ * @param c constant term
+ * @return transformed values in sorted order
+ */
     public int[] sortTransformedArray(int[] nums, int a, int b, int c) {
         int length = nums.length;
         int[] result = new int[length];

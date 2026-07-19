@@ -5,78 +5,61 @@ import java.util.Arrays;
 /**
  * Problem: Valid Triangle Number
  *
- * Given an integer array nums, return the number of triplets chosen from the array
- * that can make triangles if we take them as side lengths of a triangle.
+ * Given side lengths, count index triplets that can form a valid triangle. After
+ * sorting, only the sum of the two smaller sides must be checked against the
+ * largest side.
  *
- * For three sides to form a valid triangle, they must satisfy the triangle inequality:
- * the sum of any two sides must be greater than the third side.
+ * Leetcode: https://leetcode.com/problems/valid-triangle-number/ (Medium)
+ * Rating:   acceptance 57.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Sorting | Two pointers counting window
  *
  * Example:
- * Input: nums = [2,2,3,4]
- * Output: 3
- * Explanation: Valid combinations are: (2,3,4) using first 2, (2,3,4) using second 2, and (2,2,3).
+ *   Input:  nums = [2,2,3,4]
+ *   Output: 3
+ *   Why:    the valid index triplets are the two (2,3,4) choices and (2,2,3).
  *
- * Constraints:
- * - 1 <= nums.length <= 1000
- * - 0 <= nums[i] <= 1000
+ * Follow-ups:
+ *   1. Return the actual triangles?
+ *      Emit each value or index triplet instead of adding the whole window count at once.
+ *   2. Count unique value triplets only?
+ *      Skip duplicate values or store normalized triplets in a set.
+ *   3. Find the maximum valid perimeter?
+ *      Sort and scan largest sides from the end, returning the first valid high-perimeter triplet.
  *
- * LeetCode Problem: https://leetcode.com/problems/valid-triangle-number
- *
- * Follow-up Questions:
- *
- * 1. What if you need to return the actual triplets instead of just the count?
- *    Answer: Store each valid triplet (i, j, k) in a list when found. Modify the count
- *    increment logic to add all triplets between left and right pointers individually.
- *
- * 2. How would you handle duplicate triplets if the same values appear at different indices?
- *    Answer: Use a Set with sorted triplet values as keys, or skip duplicates by checking
- *    if current value equals previous value and skipping accordingly during iteration.
- *
- * 3. Can you solve this for quadrilaterals (4 sides) instead of triangles?
- *    Answer: For a quadrilateral, the sum of any three sides must be greater than the fourth.
- *    Fix the largest side and use three nested pointers or extend the current approach with
- *    an additional dimension. Complexity would become O(n^3).
- *
- * 4. What if we need to find the longest valid triangle perimeter?
- *    Answer: Sort the array and iterate from the end. For each triplet that forms a valid
- *    triangle, calculate and track the maximum perimeter. Use early exit once found since
- *    larger values come first.
- *    Related problem: https://leetcode.com/problems/largest-perimeter-triangle/
- *
- * 5. How would you optimize for very large arrays with many zeros?
- *    Answer: Filter out zeros during preprocessing since they cannot form valid triangles
- *    with positive sides. This reduces the effective array size before applying the main algorithm.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Largest Perimeter Triangle (976), 3Sum Smaller (259).
  */
 public class ValidTriangleNumber {
 
+public static void main(String[] args) {
+    ValidTriangleNumber solver = new ValidTriangleNumber();
+    int[][] inputs = { {2, 2, 3, 4}, {4, 2, 3, 4} };
+    int[] expected = { 3, 4 };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int got = solver.triangleNumber(inputs[i].clone());
+        System.out.printf("nums=%s -> %d  expected=%d%n",
+            Arrays.toString(inputs[i]), got, expected[i]);
+    }
+}
+
     /**
-     * Counts valid triangle triplets using two-pointer technique after sorting.
-     *
-     * Algorithm:
-     * 1. Sort the array to enable efficient triangle inequality checking
-     * 2. Fix the largest side at position i (iterate from end to start)
-     * 3. Use two pointers: left at start, right at i-1
-     * 4. If nums[left] + nums[right] > nums[i], all elements between left and right
-     *    form valid triangles with right and i, so add (right - left) to count
-     * 5. Move right pointer left if valid, or left pointer right if not valid
-     * 6. Continue until all combinations are checked
-     *
-     * Key insight: After sorting, [a, b, c, d] : if a + b > c where c is the largest side, then
-     * a + c > b and b + c > a are automatically satisfied due to ordering. We only
-     * need to check one inequality. 
-     * Additionally, if nums[left] + nums[right] > nums[i],
-     * then all values between left and right also satisfy the condition with right.
-     *
-     * Time Complexity: O(N^2) where N is the array length. Sorting takes O(N log N),
-     * then we have outer loop O(N) with inner two-pointer traversal O(N), giving O(N^2).
-     *
-     * Space Complexity: O(1) if we exclude the space used by sorting algorithm.
-     * Java's Arrays.sort() uses O(log N) space for quicksort recursion.
-     *
-     * @param nums array of non-negative integers representing potential triangle sides
-     * @return count of valid triangle triplets
-     */
+ * Intuition: once side lengths are sorted, fix the largest side at rightIndex.
+ * If nums[leftIndex] + nums[middleIndex] is greater than that largest side,
+ * then every value between leftIndex and middleIndex also works with
+ * middleIndex and rightIndex, so count that whole window at once.
+ *
+ * Algorithm:
+ *   1. Return 0 for null or fewer than three values.
+ *   2. Sort nums.
+ *   3. Fix rightIndex as the largest side from right to left.
+ *   4. Move leftIndex or middleIndex based on the triangle inequality, counting valid windows.
+ *
+ * Time:  O(n^2) - each fixed largest side runs one two-pointer scan.
+ * Space: O(1) - excluding sorting implementation storage.
+ *
+ * @param nums non-negative side lengths
+ * @return count of valid triangle index triplets
+ */
     public int triangleNumber(int[] nums) {
         if (nums == null || nums.length < 3) {
             return 0;

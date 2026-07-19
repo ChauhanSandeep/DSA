@@ -5,68 +5,61 @@ import java.util.*;
 /**
  * Problem: Rearrange Array Elements by Sign
  *
- * You are given a 0-indexed integer array nums of even length consisting of an equal number
- * of positive and negative integers. You should rearrange the elements of nums such that the
- * modified array follows the given conditions:
+ * Given an even-length array with the same number of positive and negative
+ * values, rearrange it so signs alternate, the first value is positive, and the
+ * relative order within each sign is preserved.
  *
- * 1. Every consecutive pair of integers have opposite signs
- * 2. For all integers with the same sign, the order in which they were present in nums is preserved
- * 3. The rearranged array begins with a positive integer
- *
- * Return the array that satisfies the above conditions.
+ * Leetcode: https://leetcode.com/problems/rearrange-array-elements-by-sign/ (Medium)
+ * Rating:   zerotrac 1236 (Q2, weekly-contest-277)
+ * Pattern:  Array | Two write pointers | Stable sign partition
  *
  * Example:
- * Input: nums = [3,1,-2,-5,2,-4]
- * Output: [3,-2,1,-5,2,-4]
- * Explanation:
- * - Positive numbers in order: [3,1,2]
- * - Negative numbers in order: [-2,-5,-4]
- * - Alternating pattern: [3,-2,1,-5,2,-4]
+ *   Input:  nums = [3,1,-2,-5,2,-4]
+ *   Output: [3,-2,1,-5,2,-4]
+ *   Why:    positives stay [3,1,2], negatives stay [-2,-5,-4], and signs alternate from positive.
  *
- * Input: nums = [-1,1]
- * Output: [1,-1]
- * Explanation: Positive first, then negative: [1,-1]
+ * Follow-ups:
+ *   1. What if positive and negative counts differ?
+ *      Alternate while both signs remain, then append the leftover sign group by rule.
+ *   2. Start with a negative value instead?
+ *      Swap the initial write positions so negatives write to even indices.
+ *   3. Can this be stable and in-place?
+ *      Yes, but it needs rotations/cyclic moves and is more complex than the output-array solution.
  *
- * LeetCode: https://leetcode.com/problems/rearrange-array-elements-by-sign
- *
- * Follow-up Questions:
- * 1. Q: What if positive and negative counts are not equal?
- *    A: Would need to handle remaining elements separately at the end of array.
- *
- * 2. Q: What if we wanted to start with negative numbers instead?
- *    A: Simply swap the initial positions: negatives at even indices, positives at odd.
- *
- * 3. Q: How would you solve this in-place without extra space?
- *    A: More complex - would require cyclic replacements or multiple passes with careful index management.
- *
- * 4. Q: What if there were three types of elements (positive, negative, zero)?
- *    A: Would need a three-pointer approach to manage placement of each type.
- *
- * Related Problems:
- * - Sort Array by Parity: https://leetcode.com/problems/sort-array-by-parity/
- * - Sort Array by Parity II: https://leetcode.com/problems/sort-array-by-parity-ii/
- * - Shuffle the Array: https://leetcode.com/problems/shuffle-the-array/
- * LeetCode Contest Rating: 1236
+ * Related: Sort Array by Parity II (922), Shuffle the Array (1470).
  */
 public class RearrangeArrayElementsBySign {
 
+public static void main(String[] args) {
+    RearrangeArrayElementsBySign solver = new RearrangeArrayElementsBySign();
+    int[][] inputs = { {3, 1, -2, -5, 2, -4}, {-1, 1} };
+    int[][] expected = { {3, -2, 1, -5, 2, -4}, {1, -1} };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int[] got = solver.rearrangeArray(inputs[i]);
+        System.out.printf("nums=%s -> %s  expected=%s%n",
+            Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+    }
+}
+
     /**
-     * Rearranges array using two-pointer technique for optimal placement.
-     *
-     * Algorithm:
-     * 1. Create result array of same size as input
-     * 2. Use two pointers: one for even indices (positives), one for odd indices (negatives)
-     * 3. Iterate through original array once
-     * 4. Place positive numbers at even indices (0,2,4...), increment by 2
-     * 5. Place negative numbers at odd indices (1,3,5...), increment by 2
-     * 6. Return rearranged array
-     *
-     * Time Complexity: O(n) where n is length of array
-     * Space Complexity: O(1) excluding output array
-     *
-     * @param nums array with equal positive and negative integers
-     * @return rearranged array with alternating signs starting with positive
-     */
+ * Intuition: the output positions are known before scanning. Positive values
+ * must occupy even indices and negative values must occupy odd indices. Two
+ * write pointers preserve order because each sign group is written exactly in
+ * the order encountered in the original array.
+ *
+ * Algorithm:
+ *   1. Create a result array of the same length.
+ *   2. Start positiveIndex at 0 and negativeIndex at 1.
+ *   3. Scan nums once, writing positives to positiveIndex and negatives to negativeIndex.
+ *   4. Advance the matching index by 2 after each write and return result.
+ *
+ * Time:  O(n) - each input value is read and written once.
+ * Space: O(1) - excluding the required output array, only two indices are kept.
+ *
+ * @param nums array with equal positive and negative counts
+ * @return rearranged array with alternating signs starting positive
+ */
     public int[] rearrangeArray(int[] nums) {
         if (nums == null || nums.length == 0) {
             return new int[0];

@@ -4,40 +4,67 @@ import java.util.Arrays;
 
 
 /**
- * Given a sorted array, rearrange it so that:
- * - The first element is the largest
- * - The second element is the smallest
- * - The third element is the second largest
- * - The fourth element is the second smallest, and so on.
+ * Problem: Rearrange Array Alternately
+ *
+ * Given a sorted array, rearrange it in max, min, second max, second min order.
+ * The file keeps both the direct extra-array version and the in-place encoding
+ * version for the same interview pattern.
+ *
+ * Source: https://www.geeksforgeeks.org/dsa/rearrange-array-maximum-minimum-form
+ * Pattern:  Array | Two pointers | Max-min interleaving
  *
  * Example:
- * Input:  [1, 2, 3, 4, 5, 6]
- * Output: [6, 1, 5, 2, 4, 3]
+ *   Input:  arr = [1,2,3,4,5,6]
+ *   Output: [6,1,5,2,4,3]
+ *   Why:    take 6 from the right, 1 from the left, then keep alternating extremes.
  *
- * GFG Link: https://www.geeksforgeeks.org/dsa/rearrange-array-maximum-minimum-form
+ * Follow-ups:
+ *   1. Can this be done without extra space?
+ *      Encode the old and new values in each slot, then decode in a second pass.
+ *   2. What breaks if the array contains negative values?
+ *      The modulo encoding assumes non-negative values below maxElement, so offset first.
+ *   3. How would you support very large values safely?
+ *      Use long arithmetic or the extra-array method to avoid integer overflow.
+ *
+ * Related: Wiggle Sort II (324), Rearrange Array Elements by Sign (2149).
  */
 public class AlternateArray {
 
-    public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 4, 5, 6};
-        AlternateArray alternateArray = new AlternateArray();
+public static void main(String[] args) {
+    AlternateArray solver = new AlternateArray();
+    int[][] inputs = { {1, 2, 3, 4, 5, 6}, {7} };
+    int[][] expected = { {6, 1, 5, 2, 4, 3}, {7} };
 
-        // Using extra space approach
-        alternateArray.rearrangeWithExtraSpace(arr);
-        System.out.println("Rearranged Array (Extra Space): " + Arrays.toString(arr));
+    for (int i = 0; i < inputs.length; i++) {
+        int[] extraSpaceInput = inputs[i].clone();
+        solver.rearrangeWithExtraSpace(extraSpaceInput);
+        System.out.printf("extra nums=%s -> %s  expected=%s%n",
+            Arrays.toString(inputs[i]), Arrays.toString(extraSpaceInput), Arrays.toString(expected[i]));
 
-        // Using optimized in-place approach
-        int[] arr2 = {1, 2, 3, 4, 5, 6};
-        alternateArray.rearrangeInPlace(arr2);
-        System.out.println("Rearranged Array (In-Place): " + Arrays.toString(arr2));
+        int[] inPlaceInput = inputs[i].clone();
+        solver.rearrangeInPlace(inPlaceInput);
+        System.out.printf("inPlace nums=%s -> %s  expected=%s%n",
+            Arrays.toString(inputs[i]), Arrays.toString(inPlaceInput), Arrays.toString(expected[i]));
     }
+}
 
     /**
-     *
-     * @param arr Input array (must be sorted)
-     * Time Complexity: O(N)
-     * Space Complexity: O(N) (due to extra array)
-     */
+ * Intuition: keep one pointer on the smallest remaining value and one pointer
+ * on the largest remaining value. A boolean decides which side supplies the
+ * next output slot, so the temporary array is filled in the required max-min
+ * order before being copied back.
+ *
+ * Algorithm:
+ *   1. Allocate temp with the same length as arr.
+ *   2. Start left at 0, right at n - 1, and pick from right first.
+ *   3. Fill each temp slot from right or left, then flip the pick direction.
+ *   4. Copy temp back into arr.
+ *
+ * Time:  O(n) - one fill pass plus one copy pass.
+ * Space: O(n) - temp stores the rearranged values.
+ *
+ * @param arr sorted non-negative input array, mutated in place
+ */
     public void rearrangeWithExtraSpace(int[] arr) {
         int n = arr.length;
         int[] temp = new int[n];
@@ -55,82 +82,22 @@ public class AlternateArray {
     }
 
     /**
-     * Optimized approach to rearrange the array in-place using encoding technique.
-     * This avoids extra space usage.
-     *
-     * Logic:
-     * - Use two pointers: one from the start (minIndex) and one from the end (maxIndex).
-     * - Alternate between picking the maximum and minimum elements.
-     * - Encode the values in a way that allows us to decode them later without using extra space.
-     *
-     * Example:
-     * Input:  [1, 2, 3, 4, 5, 6]
-     * Output: [6, 1, 5, 2, 4, 3]
-     *
-     * ═══════════════════════════════════════════════════════════════════════════════
-     * ENCODING TECHNIQUE - SIMPLIFIED EXPLANATION
-     * ═══════════════════════════════════════════════════════════════════════════════
-     *
-     * Think of it like storing two pieces of information in a single number, similar to
-     * how you might write "hours and minutes" as a single number (e.g., 1430 = 2:30 PM).
-     *
-     * ───────────────────────────────────────────────────────────────────────────────
-     * STEP-BY-STEP EXAMPLE:
-     * ───────────────────────────────────────────────────────────────────────────────
-     * Array: [1, 2, 3, 4, 5, 6]
-     * maxElement = 7 (we use 7 because it's greater than the max value 6)
-     *
-     * At index 0:
-     *   - Original value: 1
-     *   - New value we want to store: 6 (the largest element)
-     *   - Encoded value: 1 + (6 × 7) = 1 + 42 = 43
-     *
-     * Now arr[0] = 43, which contains BOTH values:
-     *   - To get original value: 43 % 7 = 1 ✓
-     *   - To get new value: 43 / 7 = 6 ✓
-     *
-     * ───────────────────────────────────────────────────────────────────────────────
-     * WHY THIS WORKS (Simple Math):
-     * ───────────────────────────────────────────────────────────────────────────────
-     *
-     * Formula: encoded = original + (new × maxElement)
-     *
-     * 1. EXTRACTING ORIGINAL VALUE (using modulo %):
-     *    encoded % maxElement = (original + new × maxElement) % maxElement
-     *
-     *    Breaking it down:
-     *    - (new × maxElement) is perfectly divisible by maxElement, so remainder = 0
-     *    - original is smaller than maxElement, so remainder = original
-     *    - Result: original ✓
-     *
-     *    Real example: 43 % 7
-     *    = (1 + 42) % 7
-     *    = 1 % 7 + 42 % 7
-     *    = 1 + 0 = 1
-     *
-     * 2. EXTRACTING NEW VALUE (using integer division /):
-     *    encoded / maxElement = (original + new × maxElement) / maxElement
-     *
-     *    Breaking it down:
-     *    - original / maxElement = 0 (since original < maxElement)
-     *    - (new × maxElement) / maxElement = new
-     *    - Result: new ✓
-     *
-     *    Real example: 43 / 7
-     *    = (1 + 42) / 7
-     *    = 1/7 + 42/7
-     *    = 0 + 6 = 6
-     * ═══════════════════════════════════════════════════════════════════════════════
-     *
-     * Assumptions:
-     *   - Array is sorted in non-decreasing order.
-     *   - All elements are non-negative integers.
-     *   - The array does not contain values so large that encoding overflows Integer.MAX_VALUE.
-     *
-     * @param arr Input array (must be sorted)
-     * Time Complexity: O(N)
-     * Space Complexity: O(1) (in-place modification)
-     */
+ * Intuition: the array is sorted, so maxIndex and minIndex already point to
+ * the next values we want. To avoid a second array, each slot temporarily
+ * stores oldValue + newValue * maxElement; modulo recovers old values while
+ * division extracts the new arrangement at the end.
+ *
+ * Algorithm:
+ *   1. Let maxIndex point to the last value and minIndex point to the first.
+ *   2. For even i, encode arr[maxIndex] as the next value and move maxIndex.
+ *   3. For odd i, encode arr[minIndex] as the next value and move minIndex.
+ *   4. Decode every slot by dividing by maxElement.
+ *
+ * Time:  O(n) - one encoding pass and one decoding pass.
+ * Space: O(1) - only indices and encoded values are stored.
+ *
+ * @param arr sorted non-negative input array, mutated in place
+ */
     public void rearrangeInPlace(int[] arr) {
         int length = arr.length;
         int maxIndex = length - 1, minIndex = 0;
