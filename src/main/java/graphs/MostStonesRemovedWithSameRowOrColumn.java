@@ -3,48 +3,63 @@ package graphs;
 import java.util.*;
 
 /**
- * On a 2D plane, we place n stones at some integer coordinate points. Each coordinate point may have at most one stone.
- * A stone can be removed if it shares either the same row or the same column as another stone that has not been removed.
+ * Problem: Most Stones Removed with Same Row or Column
  *
- * Given an array stones of length n where stones[i] = [xi, yi] represents the location of the ith stone,
- * return the largest possible number of stones that can be removed.
+ * Stones sit on integer grid coordinates. A stone may be removed if another
+ * remaining stone shares its row or column. Return the maximum number of stones
+ * that can be removed.
  *
- * Example 1:
- * Input: stones = [[0,0],[0,1],[1,0],[1,2],[2,1],[2,2]]
- * Output: 5
- * Explanation: One way to remove 5 stones is as follows:
- * 1. Remove stone [2,2] because it shares the same row as [2,1].
- * 2. Remove stone [2,1] because it shares the same column as [0,1].
- * 3. Remove stone [1,2] because it shares the same column as [1,0].
- * 4. Remove stone [1,0] because it shares the same row as [0,0].
- * 5. Remove stone [0,1] because it shares the same row as [0,0].
- * Stone [0,0] cannot be removed since it does not share a row/column with another stone.
+ * Leetcode: https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/ (Medium)
+ * Rating:   2035 (zerotrac Elo)
+ * Pattern:  Graph | Union-find | Connected components
  *
- * Example 2:
- * Input: stones = [[0,0],[0,2],[1,1],[2,0],[2,2]]
- * Output: 3
+ * Example:
+ *   Input:  stones = [[0,0],[0,1],[1,0],[1,2],[2,1],[2,2]]
+ *   Output: 5
+ *   Why:    all six stones are connected through shared rows or columns, so one
+ *           stone must remain and the other five can be removed.
  *
- * LeetCode: https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/
+ * Follow-ups:
+ *   1. Return a valid removal order?
+ *      For each component, keep one representative and remove other stones from leaves inward.
+ *   2. Coordinates are up to 10^9?
+ *      Use hash maps for row and column ids instead of dense arrays.
+ *   3. Add stones dynamically and query removals?
+ *      Maintain DSU components and update removable count after each union.
  *
- * Follow-up Questions:
- * 1. How would you modify the solution if stones could share both row and column with any number of other stones?
- *    - The current solution already handles this case as it's part of the problem statement.
- * 2. What if the grid is very large (e.g., 10^9 x 10^9)?
- *    - The union-find solution is efficient as it only considers the actual stone positions.
- * 3. How would you find which stones to remove to achieve the maximum removals?
- *    - We could modify the solution to track the removal order or the connected components.
- *
- * Related Problems:
- * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
- * - Number of Provinces (https://leetcode.com/problems/number-of-provinces/)
- * LeetCode Contest Rating: 2035
+ * Related: Number of Provinces (547), Number of Islands II (305).
  */
 public class MostStonesRemovedWithSameRowOrColumn {
+
+    public static void main(String[] args) {
+        MostStonesRemovedWithSameRowOrColumn solver = new MostStonesRemovedWithSameRowOrColumn();
+        int[][][] inputs = {
+            {{0, 0}, {0, 1}, {1, 0}, {1, 2}, {2, 1}, {2, 2}},
+            {{0, 0}}
+        };
+        int[] expected = {5, 0};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.removeStones(inputs[i]);
+            System.out.printf("stones=%s  ->  %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
-     * Calculates the maximum number of stones that can be removed.
+     * Intuition: stones connected by sharing a row or column form a component. In
+     * each component, all but one stone can be removed because there is always some
+     * remaining stone sharing its row or column until one representative is left.
+     * Union-find groups stones by shared rows and columns.
      *
-     * @param stones Array of stone positions [x, y]
-     * @return Maximum number of stones that can be removed
+     * Algorithm:
+     *   1. Give each stone its own union-find parent.
+     *   2. Union pairs of stones that share a row or a column.
+     *   3. Count the number of connected components after all unions.
+     *   4. Return stones.length - components.
+     *
+     * Time:  O(n^2 * alpha(n)) - every stone pair is checked and union-find is nearly constant time.
+     * Space: O(n) - parent and rank arrays store one entry per stone.
+     *
+     * @param stones stone coordinates [row, col]
+     * @return maximum removable stones
      */
     public int removeStones(int[][] stones) {
         // Use a map to represent the union-find data structure

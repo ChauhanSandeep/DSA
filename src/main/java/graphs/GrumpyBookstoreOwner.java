@@ -1,43 +1,69 @@
 package graphs;
 
+
+import java.util.Arrays;
 /**
- * 1052. Grumpy Bookstore Owner
+ * Problem: Grumpy Bookstore Owner
  *
- * Problem: The bookstore owner is grumpy for some minutes during the day.
- * If the owner is grumpy during the i-th minute, customers[i] customers will be unsatisfied.
- * The owner can use a technique for X minutes to not be grumpy. Find the maximum number
- * of satisfied customers.
+ * A bookstore owner has customers each minute and is grumpy during some minutes.
+ * For one contiguous window of length minutes, the owner can suppress grumpiness.
+ * Return the maximum number of satisfied customers.
+ *
+ * Leetcode: https://leetcode.com/problems/grumpy-bookstore-owner/ (Medium)
+ * Rating:   1418 (zerotrac Elo)
+ * Pattern:  Array | Sliding window | Baseline plus best gain
  *
  * Example:
- * Input: customers = [1,0,1,2,1,1,7,5], grumpy = [0,1,0,1,0,1,0,1], X = 3
- * Output: 16
- * Explanation: Use technique during minutes 1, 2, and 3. Total satisfied = 1+1+1+2+1+1+7+5 = 16
+ *   Input:  customers = [1,0,1,2,1,1,7,5], grumpy = [0,1,0,1,0,1,0,1], minutes = 3
+ *   Output: 16
+ *   Why:    customers already satisfied contribute 10, and using the trick on
+ *           minutes 5 through 7 adds 6 more otherwise-grumpy customers.
  *
- * LeetCode: https://leetcode.com/problems/grumpy-bookstore-owner
+ * Follow-ups:
+ *   1. Choose two non-overlapping calm windows?
+ *      Use prefix/suffix best-window gains or dynamic programming over windows.
+ *   2. Window lengths vary by cost budget?
+ *      Turn the gain array into a variable-size sliding window or knapsack variant.
+ *   3. Return which window was chosen?
+ *      Track the start index whenever the best extra gain improves.
  *
- * Follow-up questions:
- * Q: What if X can be used multiple times but with gaps?
- * A: Dynamic programming to optimize multiple intervals with constraints.
- *
- * Q: How to handle if grumpiness has different intensities?
- * A: Weight the sliding window calculation by grumpiness levels.
- *
- * Q: Can we preprocess for multiple queries with different X values?
- * A: Use prefix sums and binary search for efficient range queries.
- * LeetCode Contest Rating: 1418
+ * Related: Maximum Average Subarray I (643), Sliding Window Maximum (239).
  */
 public class GrumpyBookstoreOwner {
 
+
+    public static void main(String[] args) {
+        GrumpyBookstoreOwner solver = new GrumpyBookstoreOwner();
+        int[][] customers = {{1, 0, 1, 2, 1, 1, 7, 5}, {4, 10, 10}};
+        int[][] grumpy = {{0, 1, 0, 1, 0, 1, 0, 1}, {0, 0, 0}};
+        int[] minutes = {3, 2};
+        int[] expected = {16, 24};
+
+        for (int i = 0; i < customers.length; i++) {
+            int output = solver.maxSatisfied(customers[i], grumpy[i], minutes[i]);
+            System.out.printf("customers=%s grumpy=%s minutes=%d  ->  %d  expected=%d%n",
+                Arrays.toString(customers[i]), Arrays.toString(grumpy[i]), minutes[i], output, expected[i]);
+        }
+    }
     /**
-     * Sliding window approach to maximize satisfied customers.
+     * Intuition: customers during non-grumpy minutes are already satisfied, so the
+     * secret technique should target one window where it recovers the most otherwise
+     * lost customers. Sliding the window keeps that recoverable gain in O(1) update
+     * time per minute.
      *
      * Algorithm:
-     * - Calculate baseline satisfaction (when owner is naturally not grumpy)
-     * - Use sliding window of size X to find maximum additional customers
-     * - Additional customers = customers who would be unsatisfied but can be saved
+     *   1. Add customers from non-grumpy minutes to the always-satisfied base total.
+     *   2. Build a sliding window of grumpy-minute customers that could be recovered.
+     *   3. Keep the maximum recoverable window sum of length X.
+     *   4. Return base satisfaction plus that maximum extra gain.
      *
-     * Time Complexity: O(n) where n is number of minutes
-     * Space Complexity: O(1) constant extra space
+     * Time:  O(n) - one scan maintains the window and totals.
+     * Space: O(1) - only counters and window sums are stored.
+     *
+     * @param customers customers entering each minute
+     * @param grumpy 1 when the owner is grumpy at that minute, otherwise 0
+     * @param X length of the secret technique window
+     * @return maximum number of satisfied customers
      */
     public int maxSatisfied(int[] customers, int[] grumpy, int X) {
         int n = customers.length;

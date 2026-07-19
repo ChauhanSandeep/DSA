@@ -1,53 +1,67 @@
 package graphs;
 
+
+import java.util.Arrays;
 /**
  * Problem: Battleships in a Board
  *
- * Given an m x n matrix board where each cell is a battleship 'X' or empty '.', return the number
- * of the battleships on board. Battleships can only be placed horizontally or vertically on board.
- * In other words, they can only be made of the shape 1 x k (1 row, k columns) or k x 1 (k rows, 1 column),
- * where k can be of any size. At least one horizontal or vertical cell separates between two battleships.
+ * Given a board containing 'X' battleship cells and '.' empty water, count how
+ * many battleships are present. Ships are straight horizontal or vertical lines,
+ * and valid boards keep separate ships from touching each other.
+ *
+ * Leetcode: https://leetcode.com/problems/battleships-in-a-board/ (Medium)
+ * Rating:   acceptance 77.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Matrix | One-pass counting | Top-left representative
  *
  * Example:
- * Input: board = [
- * ["X",".",".","X"],
- * [".",".",".","X"],
- * [".",".",".","X"]
- * ]
- * Output: 2
- * Explanation: There are 2 battleships on the board.
+ *   Input:  board = [[X,.,.,X],[.,.,.,X],[.,.,.,X]]
+ *   Output: 2
+ *   Why:    the single X in the first column starts one ship, and the vertical
+ *           run in the last column starts one more ship.
  *
- * LeetCode: https://leetcode.com/problems/battleships-in-a-board
+ * Follow-ups:
+ *   1. Validate whether an arbitrary board is legal?
+ *      Check that no ship bends and no two ships touch in forbidden positions.
+ *   2. What if diagonal ships are allowed?
+ *      Count connected components using eight directions instead of this corner rule.
+ *   3. What if ships can be rectangles?
+ *      Flood-fill each component and validate that it fills its bounding rectangle.
  *
- * Follow-up Questions:
- * 1. Could you solve it in one-pass, using only O(1) extra memory and without modifying the board?
- *    Answer: Yes, count only the top-left corner of each battleship (cells with no 'X' above or left).
- *
- * 2. What if battleships could be placed diagonally?
- *    Answer: Use DFS/BFS to find connected components considering diagonal directions.
- *
- * 3. How would you validate if the board configuration is valid?
- *    Answer: Check that no adjacent battleships exist and all battleships are rectangular.
- *    Related: https://leetcode.com/problems/number-of-islands/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Number of Islands (200), Max Area of Island (695).
  */
 public class BattleshipsInABoard {
 
+
+    public static void main(String[] args) {
+        BattleshipsInABoard solver = new BattleshipsInABoard();
+        char[][][] inputs = {
+            {{'X', '.', '.', 'X'}, {'.', '.', '.', 'X'}, {'.', '.', '.', 'X'}},
+            {{'.'}}
+        };
+        int[] expected = {2, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.countBattleships(inputs[i]);
+            System.out.printf("board=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
-     * Counts battleships by identifying top-left corners (one-pass, O(1) space).
+     * Intuition: each battleship is a straight horizontal or vertical run of X cells.
+     * Counting every X would overcount, so count only the first cell of each ship:
+     * the cell that has no X directly above it and no X directly to its left.
      *
      * Algorithm:
-     * 1. For each 'X' cell, check if it's the top-left corner of a battleship
-     * 2. A cell is top-left if there's no 'X' above it and no 'X' to its left
-     * 3. Count all such top-left corner cells
+     *   1. Scan every board cell in row-major order.
+     *   2. Skip water cells.
+     *   3. Skip X cells that continue a ship from above or from the left.
+     *   4. Count the remaining X cells as ship starts.
      *
-     * Time Complexity: O(m * n) where m and n are board dimensions
-     * Space Complexity: O(1) as required by follow-up
+     * Time:  O(m*n) - every cell is inspected once.
+     * Space: O(1) - only the running count is stored.
      *
-     * @param board 2D character array representing the board
-     * @return Number of battleships on the board
+     * @param board grid containing 'X' ship cells and '.' water cells
+     * @return number of battleships on the board
      */
     public int countBattleships(char[][] board) {
         if (board == null || board.length == 0 || board[0].length == 0) {

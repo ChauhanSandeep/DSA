@@ -4,54 +4,64 @@ import java.util.*;
 
 
 /**
- * LeetCode 827: Making A Large Island
- * Problem Link: https://leetcode.com/problems/making-a-large-island/
+ * Problem: Making A Large Island
  *
- * Problem Statement:
- * Given an n x n binary grid where 1 represents land and 0 represents water,
- * you may flip exactly one water cell (0) to land (1). Find the size of the
- * largest island (group of 1's connected vertically or horizontally) that can be formed.
- * Return the largest possible island size after making exactly one flip.
+ * Given an n by n binary grid, you may flip one water cell to land. Return the
+ * largest island size possible after that flip, where islands connect only in
+ * four directions.
+ *
+ * Leetcode: https://leetcode.com/problems/making-a-large-island/ (Hard)
+ * Rating:   1934 (zerotrac Elo)
+ * Pattern:  Graph | Island labeling | Local component merge
  *
  * Example:
- * Input: grid = [[1,1,1],[0,1,0],[0,0,1]]
- * Output: 7
- * Explanation:
- * Flip grid[2][0] or grid[2][1] to 1 to connect all 1's into a single large island of size 7.
+ *   Input:  grid = [[1,0],[0,1]]
+ *   Output: 3
+ *   Why:    flipping either zero connects the two diagonal islands through the
+ *           flipped cell, making one island of size three.
  *
- * Follow-up Questions:
- * - What if you can flip at most K zeroes? (Use Union-Find, multi-source BFS, intermediate merging)
- * - What if the grid is too large for in-place marking? (Hash-mapping outside grid or Union-Find)
+ * Follow-ups:
+ *   1. Flip up to k zeros?
+ *      Use a more global search or DSU plus windowing; one-cell local merging is not enough.
+ *   2. Avoid modifying the grid?
+ *      Keep a separate component-id matrix instead of writing ids into grid cells.
+ *   3. Process many flip queries?
+ *      Pre-label islands once, then answer each query by summing unique neighboring ids.
  *
- * Time Complexity: O(N^2) (for DFS labeling + checking all zeros)
- * Space Complexity: O(N^2) (for map and marking)
- * LeetCode Contest Rating: 1934
+ * Related: Max Area of Island (695), Number of Islands (200).
  */
 public class MakeLargeIsland {
 
-  /**
-   * Main method for simple test drive.
-   */
-  public static void main(String[] args) {
-    int[][] grid = {{1, 1, 1}, {0, 1, 0}, {0, 0, 1}};
-    int largestIsland = new MakeLargeIsland().largestIsland(grid);
-    System.out.println("Largest island after flipping one 0 is " + largestIsland);
-  }
 
-  /**
-   * Returns the size of the largest possible island after flipping one 0 to 1.
-   *
-   * Steps:
-   * 1. Use DFS to mark connected components (islands) with unique ids and record their areas.
-   * 2. For every water cell (0), simulate flipping and sum unique neighboring island areas.
-   * 3. Return the max possible island size.
-   *
-   * Algorithm: DFS island labeling + local neighbor set merging
-   * Time: O(N^2), Space: O(N^2)
-   *
-   * @param grid Input binary grid of land and water.
-   * @return Largest possible island size.
-   */
+
+    public static void main(String[] args) {
+        MakeLargeIsland solver = new MakeLargeIsland();
+        int[][][] inputs = {{{1, 0}, {0, 1}}, {{1, 1}, {1, 1}}};
+        int[] expected = {3, 4};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] grid = Arrays.stream(inputs[i]).map(int[]::clone).toArray(int[][]::new);
+            int output = solver.largestIsland(grid);
+            System.out.printf("grid=%s  ->  %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
+    /**
+     * Intuition: flipping one zero can connect the distinct islands touching that
+     * cell. First label every existing island with a unique id and remember its
+     * area. Then each zero only needs to add the areas of neighboring ids once.
+     *
+     * Algorithm:
+     *   1. DFS every unlabelled land island and store its area by island id.
+     *   2. For each zero cell, inspect four neighbors and collect distinct island ids.
+     *   3. Add one for the flipped cell plus each neighboring island area.
+     *   4. Return the largest possible area, including the all-land case.
+     *
+     * Time:  O(n^2) - each cell is labeled once and inspected again as a candidate.
+     * Space: O(n^2) - island labels/area storage and recursion stack in the worst case.
+     *
+     * @param grid square binary grid
+     * @return largest island area after flipping at most one zero
+     */
   public int largestIsland(int[][] grid) {
     int length = grid.length;
     int islandId = 2; // Start labeling with 2 to distinguish from 0 (water) and 1 (unmarked land)

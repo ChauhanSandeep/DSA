@@ -3,43 +3,64 @@ package graphs;
 import java.util.*;
 
 /**
- * 841. Keys and Rooms
+ * Problem: Keys and Rooms
  *
- * Problem: There are n rooms numbered from 0 to n-1. Room 0 is unlocked,
- * and each room contains a set of unique keys to other rooms. Return true
- * if you can visit all rooms.
+ * There are n locked rooms, and room 0 is initially open. Each room contains keys
+ * to other rooms. Decide whether all rooms can be visited by repeatedly using the
+ * keys found in rooms already opened.
+ *
+ * Leetcode: https://leetcode.com/problems/keys-and-rooms/ (Medium)
+ * Rating:   1412 (zerotrac Elo)
+ * Pattern:  Graph | DFS/BFS reachability | Directed traversal
  *
  * Example:
- * Input: rooms = [[1],[2],[3],[]]
- * Output: true
- * Explanation: Start at room 0, get key to room 1, then 2, then 3.
+ *   Input:  rooms = [[1],[2],[3],[]]
+ *   Output: true
+ *   Why:    room 0 gives key 1, room 1 gives key 2, and room 2 gives key 3, so
+ *           every room becomes reachable.
  *
- * LeetCode: https://leetcode.com/problems/keys-and-rooms
+ * Follow-ups:
+ *   1. Return rooms that remain locked?
+ *      After traversal, collect every index that was never visited.
+ *   2. Find the shortest key sequence to each room?
+ *      Use BFS and store the parent room for each first visit.
+ *   3. Support keys that expire after use?
+ *      The state must include both current room and remaining key inventory.
  *
- * Follow-up questions:
- * Q: What if some rooms have multiple keys to the same room?
- * A: Use Set to avoid revisiting rooms, algorithm remains the same.
- *
- * Q: How to find the minimum steps to visit all rooms?
- * A: Use BFS to find shortest path, tracking levels.
- *
- * Q: Can we determine which rooms are unreachable?
- * A: Track visited rooms and return the complement set.
- * LeetCode Contest Rating: 1412
+ * Related: Number of Provinces (547), Course Schedule (207).
  */
 public class KeysAndRooms {
 
+
+    public static void main(String[] args) {
+        KeysAndRooms solver = new KeysAndRooms();
+        List<List<List<Integer>>> inputs = Arrays.asList(
+            Arrays.asList(Arrays.asList(1), Arrays.asList(2), Arrays.asList(3), Arrays.asList()),
+            Arrays.asList(Arrays.asList(1, 3), Arrays.asList(3, 0, 1), Arrays.asList(2), Arrays.asList(0))
+        );
+        boolean[] expected = {true, false};
+
+        for (int i = 0; i < inputs.size(); i++) {
+            boolean output = solver.canVisitAllRooms(inputs.get(i));
+            System.out.printf("rooms=%s  ->  %s  expected=%s%n", inputs.get(i), output, expected[i]);
+        }
+    }
     /**
-     * DFS approach to traverse all reachable rooms.
+     * Intuition: rooms and keys form a directed graph. Starting in room 0, DFS opens
+     * every room reachable through collected keys. If the reachable count equals the
+     * number of rooms, every room can be visited.
      *
-     * Algorithm: Depth-First Search
-     * - Start from room 0 (always unlocked)
-     * - Mark room as visited, collect all keys
-     * - For each key, recursively visit the corresponding room if not visited
-     * - Return true if all rooms have been visited
+     * Algorithm:
+     *   1. Start DFS from room 0 with all rooms initially unvisited.
+     *   2. Mark a room visited as soon as it is entered.
+     *   3. Recursively follow every key found in that room.
+     *   4. Return true only if every room was marked visited.
      *
-     * Time Complexity: O(n + k) where n is rooms, k is total keys
-     * Space Complexity: O(n) for visited array and recursion stack
+     * Time:  O(V+E) - each room and key is processed at most once.
+     * Space: O(V) - visited storage plus recursion stack.
+     *
+     * @param rooms rooms[i] contains keys found in room i
+     * @return true if all rooms are reachable from room 0
      */
     public boolean canVisitAllRooms(List<List<Integer>> rooms) {
         boolean[] visited = new boolean[rooms.size()];

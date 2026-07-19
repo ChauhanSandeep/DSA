@@ -5,44 +5,71 @@ import java.util.stream.Collectors;
 
 
 /**
- * Capture all regions of 'O' that are completely surrounded by 'X'.
- * https://www.interviewbit.com/problems/capture-regions-on-board/
+ * Problem: Surrounded Regions
  *
- * **Approach:**
- * - Use **DFS (Depth-First Search)** to mark all 'O' cells connected to the border as **safe**.
- * - Convert the remaining 'O' cells (which are completely surrounded) to 'X'.
- * - Restore safe regions back to 'O'.
+ * Given a board of 'X' and 'O', capture every region of O cells that is fully
+ * surrounded by X cells. O cells connected to the border cannot be captured
+ * because they have an escape path outside the board.
  *
- * **Time Complexity:** O(R × C) (Each cell is processed at most twice)
- * **Space Complexity:** O(R × C) (Recursive stack for DFS in worst case)
+ * Leetcode: https://leetcode.com/problems/surrounded-regions/ (Medium)
+ * Rating:   acceptance 45.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Boundary DFS | Reverse marking
  *
+ * Example:
+ *   Input:  board = [[X,X,X,X],[X,O,O,X],[X,X,O,X],[X,O,X,X]]
+ *   Output: [[X,X,X,X],[X,X,X,X],[X,X,X,X],[X,O,X,X]]
+ *   Why:    the lower O touches the border and survives, while the middle O region
+ *           is enclosed by X cells and is flipped.
+ *
+ * Follow-ups:
+ *   1. Avoid recursion on a huge board?
+ *      Use an explicit queue or stack for the same boundary traversal.
+ *   2. Return the captured regions before flipping them?
+ *      Collect cells that remain O after boundary marking and before conversion.
+ *   3. Support many repeated flips on the same board?
+ *      Maintain connected components and whether each component touches the border.
+ *
+ * Related: Number of Islands (200), Pacific Atlantic Water Flow (417).
  */
 public class CaptureRegions {
 
+
+
     public static void main(String[] args) {
-        Character[][] matrix = {
-                {'O', 'O', 'O', 'X', 'X', 'X', 'O'},
-                {'X', 'X', 'X', 'O', 'O', 'O', 'O'},
-                {'X', 'X', 'O', 'X', 'O', 'X', 'O'},
-                {'O', 'X', 'O', 'X', 'O', 'X', 'O'},
-                {'X', 'X', 'O', 'X', 'O', 'X', 'X'},
-                {'X', 'O', 'O', 'O', 'X', 'X', 'O'},
-                {'O', 'X', 'X', 'O', 'X', 'O', 'O'},
-                {'O', 'X', 'O', 'O', 'X', 'O', 'X'}
+        CaptureRegions solver = new CaptureRegions();
+        Character[][][] inputs = {
+            {{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'X'}, {'X', 'X', 'O', 'X'}, {'X', 'O', 'X', 'X'}},
+            {{'O'}}
+        };
+        String[] expected = {
+            "[[X, X, X, X], [X, X, X, X], [X, X, X, X], [X, O, X, X]]",
+            "[[O]]"
         };
 
-        List<List<Character>> board = Arrays.stream(matrix)
-                .map(row -> new ArrayList<>(Arrays.asList(row)))
-                .collect(Collectors.toList());
-
-        new CaptureRegions().solve(board);
-        System.out.println(board);
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Character>> board = new ArrayList<>();
+            for (Character[] row : inputs[i]) {
+                board.add(new ArrayList<>(Arrays.asList(row)));
+            }
+            solver.solve(board);
+            System.out.printf("board=%s  ->  %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), board, expected[i]);
+        }
     }
-
     /**
-     * Captures all surrounded 'O' regions by converting them to 'X'.
+     * Intuition: an O-region is captured only if it cannot reach the border. The
+     * code protects border-connected O cells first, then flips whatever O cells
+     * remain inside. Protected cells are restored after the capture pass.
      *
-     * @param board 2D grid of characters ('O' or 'X').
+     * Algorithm:
+     *   1. Run DFS from every border O to mark safe cells.
+     *   2. Scan the whole board and flip unmarked O cells to X.
+     *   3. Restore the marked safe cells back to O.
+     *
+     * Time:  O(m*n) - each board cell is visited a constant number of times.
+     * Space: O(m*n) - recursive DFS can hold a border-connected region on the stack.
+     *
+     * @param board mutable board represented as rows of characters
      */
     public void solve(List<List<Character>> board) {
         if (board == null || board.isEmpty() || board.get(0).isEmpty()) return;

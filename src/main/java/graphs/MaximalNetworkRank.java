@@ -5,56 +5,63 @@ import java.util.*;
 
 /**
  * Problem: Maximal Network Rank
- * LeetCode: https://leetcode.com/problems/maximal-network-rank/
  *
- * Statement:
- * - The network rank of two different cities is defined as the total number of directly connected roads to either city.
- * - If a road is directly connected to both cities, it is counted only once.
- * - Given n cities and a list of roads, find the maximal network rank among all pairs of cities.
- * - Maximal network rank of two different cities is defined as the total number of directly connected roads to either city.
+ * Given n cities and undirected roads, the network rank of two different cities
+ * is the total number of roads touching either city, counting their shared road
+ * only once. Return the maximum rank over all city pairs.
+ *
+ * Leetcode: https://leetcode.com/problems/maximal-network-rank/ (Medium)
+ * Rating:   1522 (zerotrac Elo)
+ * Pattern:  Graph | Degree counting | Pair enumeration
  *
  * Example:
- * Input: n = 4, roads = [[0,1],[0,3],[1,2],[1,3]]
- * Output: 4
- * Explanation: City 1 and City 3 form the pair with maximal network rank of 4.
- * City 1 is directly connected to cities 0, 2, and 3. City 3 is directly connected to cities 0 and 1.
+ *   Input:  n = 4, roads = [[0,1],[0,3],[1,2],[1,3]]
+ *   Output: 4
+ *   Why:    cities 1 and 3 have degree 3 and 2, but their direct road is shared,
+ *           so their rank is 3 + 2 - 1 = 4.
  *
- * Follow-up Questions (FAANG-style):
- * 1. Can we solve this without checking all O(N^2) pairs?
- *    - Yes, we can optimize by sorting cities by degree and only checking top candidates.
- * 2. What if the number of roads is extremely large (dense graph)?
- *    - Use adjacency matrix instead of adjacency list for O(1) edge existence checks.
- * 3. Can this problem be extended to weighted edges?
- *    - Yes, instead of counting degrees, sum up weights of connected roads.
- * LeetCode Contest Rating: 1522
+ * Follow-ups:
+ *   1. Avoid checking all city pairs for very large n?
+ *      Focus on cities with the highest degrees and stop once no lower degree can improve the answer.
+ *   2. Handle weighted roads?
+ *      Replace degree counts with incident weight sums and subtract the shared edge weight.
+ *   3. Return all pairs with maximal rank?
+ *      Store each pair whose rank equals the best value while scanning.
+ *
+ * Related: Find Center of Star Graph (1791), Find the Town Judge (997).
  */
 public class MaximalNetworkRank {
 
-  public static void main(String[] args) {
-    int[][] roads = {{0, 1}, {0, 3}, {1, 2}, {1, 3}};
-    int result = maximalNetworkRank(4, roads);
-    System.out.println("Maximal network rank: " + result);
-  }
 
-  /**
-   * Computes the maximal network rank by checking all pairs of cities.
-   *
-   * Steps:
-   * 1. Build an adjacency list to represent the graph.
-   * 2. Track the degree (number of roads) for each city.
-   * 3. Iterate through all pairs of cities:
-   *      - Compute combined degree.
-   *      - Subtract 1 if the cities are directly connected.
-   * 4. Return the maximum rank found.
-   *
-   * Algorithm: Brute-force check with degree optimization.
-   * Time Complexity: O(N^2) for checking all city pairs.
-   * Space Complexity: O(N + E) for adjacency list and degree array.
-   *
-   * @param cityCount      number of cities
-   * @param roads  list of roads connecting the cities
-   * @return maximal network rank
-   */
+
+    public static void main(String[] args) {
+        int[][][] roads = {{{0, 1}, {0, 3}, {1, 2}, {1, 3}}, {}};
+        int[] cityCounts = {4, 2};
+        int[] expected = {4, 0};
+        for (int i = 0; i < roads.length; i++) {
+            int output = maximalNetworkRank(cityCounts[i], roads[i]);
+            System.out.printf("n=%d roads=%s  ->  %d  expected=%d%n",
+                cityCounts[i], Arrays.deepToString(roads[i]), output, expected[i]);
+        }
+    }
+    /**
+     * Intuition: the network rank of two cities is their combined degree, except a
+     * road directly between them is counted twice and must be subtracted once. After
+     * degrees and direct-road lookup are built, every city pair can be scored.
+     *
+     * Algorithm:
+     *   1. Count the degree of every city from the road list.
+     *   2. Store whether each pair of cities has a direct road.
+     *   3. Try every unordered city pair.
+     *   4. Maximize degree[i] + degree[j] minus one when the pair is directly connected.
+     *
+     * Time:  O(n^2 + r) - roads are read once and all city pairs are checked.
+     * Space: O(n^2) - direct connection matrix stores city pairs.
+     *
+     * @param cityCount number of cities labeled 0 to cityCount - 1
+     * @param roads undirected road list
+     * @return maximal network rank among all city pairs
+     */
   public static int maximalNetworkRank(int cityCount, int[][] roads) {
       if (cityCount == 0 || roads == null) {
           return 0;

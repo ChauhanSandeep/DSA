@@ -3,42 +3,69 @@ package graphs;
 import java.util.*;
 
 /**
- * 797. All Paths From Source to Target
+ * Problem: All Paths From Source to Target
  *
- * Problem: Given a directed acyclic graph (DAG) with n nodes labeled from 0 to n-1,
- * find all possible paths from node 0 to node n-1.
+ * Given a directed acyclic graph with nodes 0 through n - 1, return every path
+ * that starts at node 0 and ends at node n - 1. The graph is already given as
+ * adjacency lists, and the answer can be returned in any order.
+ *
+ * Leetcode: https://leetcode.com/problems/all-paths-from-source-to-target/ (Medium)
+ * Rating:   1383 (zerotrac Elo)
+ * Pattern:  Graph | DFS | Backtracking on a DAG
  *
  * Example:
- * Input: graph = [[1,2],[3],[3],[]]
- * Output: [[0,1,3],[0,2,3]]
- * Explanation: There are two paths from 0 to 3: 0->1->3 and 0->2->3
+ *   Input:  graph = [[1,2],[3],[3],[]]
+ *   Output: [[0,1,3], [0,2,3]]
+ *   Why:    from node 0 we can go through node 1 or node 2, and both routes end
+ *           at node 3; there are no other outgoing choices that reach the target.
  *
- * LeetCode: https://leetcode.com/problems/all-paths-from-source-to-target
+ * Follow-ups:
+ *   1. What if the graph may contain cycles?
+ *      Track nodes on the current path and skip them so DFS cannot loop forever.
+ *   2. What if only the number of paths is needed?
+ *      Use memoized DFS on the DAG and return counts instead of materialized paths.
+ *   3. What if the path list is too large to store?
+ *      Stream paths to a callback or iterator as soon as each target path is found.
  *
- * Follow-up questions:
- * Q: What if the graph has cycles?
- * A: Need to use visited array to avoid infinite loops, but problem guarantees DAG.
- *
- * Q: Can we optimize for space if we only need path count?
- * A: Yes, use DP to count paths without storing actual paths.
- *
- * Q: How to handle very large graphs?
- * A: Use iterative DFS with explicit stack, or implement path streaming.
- * LeetCode Contest Rating: 1383
+ * Related: Path Sum II (113), All Paths From Source Lead to Destination (1059).
  */
 public class AllPathsFromSourceToTarget {
 
+
+    public static void main(String[] args) {
+        AllPathsFromSourceToTarget solver = new AllPathsFromSourceToTarget();
+        int[][][] inputs = {
+            {{1, 2}, {3}, {3}, {}},
+            {{}}
+        };
+        String[] expected = {
+            "[[0, 1, 3], [0, 2, 3]]",
+            "[[0]]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Integer>> output = solver.allPathsSourceTarget(inputs[i]);
+            System.out.printf("graph=%s  ->  %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
-     * Finds all paths from source node 0 to target node n-1 in a DAG.
+     * Intuition: a path is built one vertex at a time from source 0. DFS keeps the
+     * current path in order; whenever it reaches the target, that path is a complete
+     * answer and a copy is stored. Because the graph is a DAG, the recursion can
+     * explore each outgoing edge without a visited set.
      *
-     * Algorithm: DFS with backtracking
-     * - Start from node 0 and explore all neighbors
-     * - When reaching target (n-1), add current path to result
-     * - Backtrack by removing current node from path
-     * - No visited array needed since graph is DAG (no cycles)
+     * Algorithm:
+     *   1. Start a path list with source node 0.
+     *   2. Recursively try every neighbor from the current node, appending it first.
+     *   3. When the current node is the target, copy the path into the result list.
+     *   4. After each recursive call, remove the last node to backtrack to the prefix.
      *
-     * Time Complexity: O(2^N * N) where N is number of nodes
-     * Space Complexity: O(2^N * N) for storing all paths, O(N) for recursion stack
+     * Time:  O(2^n * n) - a DAG can contain exponentially many source-to-target paths, and copying each path costs up to n.
+     * Space: O(n) - the recursion stack and active path hold at most one path length.
+     *
+     * @param graph adjacency list where graph[i] contains outgoing neighbors of i
+     * @return all paths from node 0 to node graph.length - 1
      */
     public List<List<Integer>> allPathsSourceTarget(int[][] graph) {
         List<List<Integer>> result = new ArrayList<>();

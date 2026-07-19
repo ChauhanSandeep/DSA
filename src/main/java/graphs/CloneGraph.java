@@ -3,30 +3,53 @@ package graphs;
 import java.util.*;
 
 /**
- * 133. Clone Graph
+ * Problem: Clone Graph
  *
- * Problem: Given a reference of a node in a connected undirected graph,
- * return a deep copy (clone) of the graph.
+ * Given a reference to a node in a connected undirected graph, return a deep
+ * copy of the whole graph. Each cloned node must be new, while preserving the
+ * same values and neighbor relationships as the original graph.
+ *
+ * Leetcode: https://leetcode.com/problems/clone-graph/ (Medium)
+ * Rating:   acceptance 65.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | DFS/BFS | Hash map for object cloning
  *
  * Example:
- * Input: adjList = [[2,4],[1,3],[2,4],[1,3]]
- * Output: [[2,4],[1,3],[2,4],[1,3]]
+ *   Input:  adjList = [[2,4],[1,3],[2,4],[1,3]]
+ *   Output: [[2,4],[1,3],[2,4],[1,3]]
+ *   Why:    the clone has four different node objects, but each node keeps the
+ *           same value and neighbor values as the corresponding original node.
  *
- * LeetCode: https://leetcode.com/problems/clone-graph
+ * Follow-ups:
+ *   1. Clone a disconnected graph?
+ *      Iterate over every known node and start cloning from each unvisited component.
+ *   2. Avoid recursion for a very deep graph?
+ *      Use the BFS method with an explicit queue instead of recursive DFS.
+ *   3. Clone nodes that have random extra pointers?
+ *      Add every pointer type to the same original-to-clone map before wiring edges.
  *
- * Follow-up questions:
- * Q: How to handle disconnected graphs?
- * A: Need to iterate through all nodes, current solution works for connected components only.
- *
- * Q: What if graph has cycles?
- * A: Current solution handles cycles using visited map to avoid infinite loops.
- *
- * Q: Can we optimize space usage?
- * A: Can use iterative DFS instead of recursion to avoid call stack overhead.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Copy List with Random Pointer (138), Course Schedule (207).
  */
 public class CloneGraph {
 
+
+    public static void main(String[] args) {
+        CloneGraph solver = new CloneGraph();
+
+        Node first = new Node(1);
+        Node second = new Node(2);
+        first.neighbors.add(second);
+        second.neighbors.add(first);
+
+        Node[] inputs = { first, null };
+        boolean[] expected = { true, true };
+
+        for (int i = 0; i < inputs.length; i++) {
+            Node clone = solver.cloneGraph(inputs[i]);
+            boolean output = inputs[i] == null ? clone == null : solver.areGraphsIdentical(inputs[i], clone) && inputs[i] != clone;
+            System.out.printf("graphCase=%d  ->  %s  expected=%s%n",
+                i + 1, output, expected[i]);
+        }
+    }
     // Definition for a Node
     static class Node {
         public int val;
@@ -47,17 +70,22 @@ public class CloneGraph {
             this.neighbors = neighbors;
         }
     }
-
     /**
-     * Clones an undirected graph using DFS traversal.
+     * Intuition: cloning a graph is traversal plus a registry. The map says which
+     * original nodes already have clones, so cycles and repeated edges reuse the
+     * same clone instead of creating duplicates or recursing forever.
      *
-     * Algorithm: DFS with hash map to track cloned nodes
-     * - Use map to store mapping from original node to cloned node
-     * - For each node, create clone if not exists, then recursively clone neighbors
-     * - Map prevents infinite loops in cyclic graphs and ensures single copy per node
+     * Algorithm:
+     *   1. Return null for a null starting node.
+     *   2. If the node already exists in the map, return its clone.
+     *   3. Create and store the clone before exploring neighbors.
+     *   4. Recursively clone each neighbor and append it to the clone's neighbor list.
      *
-     * Time Complexity: O(N + M) where N is nodes and M is edges
-     * Space Complexity: O(N) for the hash map and recursion stack
+     * Time:  O(V+E) - each node is cloned once and each adjacency entry is copied once.
+     * Space: O(V) - the map and recursion stack hold graph nodes in the worst case.
+     *
+     * @param node any node from the connected graph
+     * @return deep copy of the connected graph, or null for null input
      */
     public Node cloneGraph(Node node) {
         if (node == null) {

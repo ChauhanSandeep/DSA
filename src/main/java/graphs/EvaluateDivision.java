@@ -6,64 +6,63 @@ import java.util.*;
 /**
  * Problem: Evaluate Division
  *
- * LeetCode Link: https://leetcode.com/problems/evaluate-division/
+ * Given equations such as a / b = 2.0, answer division queries such as a / c.
+ * If the variables cannot be connected through known equations, the query result
+ * is -1.0.
  *
- * Given a list of equations of the form `A / B = value`, return the results of
- * the division queries such as `C / D`. If the division cannot be evaluated,
- * return -1.0 for that query.
+ * Leetcode: https://leetcode.com/problems/evaluate-division/ (Medium)
+ * Rating:   acceptance 64.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Weighted DFS | Multiplicative paths
  *
  * Example:
- * Input:
- *   equations = [["a","b"],["b","c"]],
- *   values = [2.0,3.0],
- *   queries = [["a","c"],["b","a"],["a","e"],["a","a"],["x","x"]]
- * Output:
- *   [6.0,0.5,-1.0,1.0,-1.0]
+ *   Input:  equations = [[a,b],[b,c]], values = [2.0,3.0], queries = [[a,c],[b,a],[x,x]]
+ *   Output: [6.0, 0.5, -1.0]
+ *   Why:    a/c follows a to b to c and multiplies 2.0 * 3.0, while x is unknown.
  *
- * Explanation:
- * Here the input equations mean:
- * *   - a / b = 2.0
- * *   - b / c = 3.0
- * * The queries can be evaluated as follows:
- *   - a / c = a / b * b / c = 2.0 * 3.0 = 6.0
+ * Follow-ups:
+ *   1. Answer many queries after one build?
+ *      Use weighted union-find or precompute all-pairs ratios per component.
+ *   2. Support adding equations online?
+ *      Weighted union-find can merge components and preserve ratios incrementally.
+ *   3. Detect inconsistent equations?
+ *      When two variables are already connected, compare the implied ratio with the new value.
  *
- * Follow-up Questions:
- * - Can you handle dynamic updates (add/remove equations)?
- * - Can you do this with Union-Find (Disjoint Set) instead of DFS/BFS?
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Currency conversion graphs, Satisfiability of Equality Equations (990).
  */
 public class EvaluateDivision {
 
-  public static void main(String[] args) {
-    List<List<String>> equations = Arrays.asList(Arrays.asList("a", "b"), Arrays.asList("b", "c"));
-    double[] values = {2.0, 3.0};
 
-    List<List<String>> queries =
-        Arrays.asList(Arrays.asList("a", "c"), Arrays.asList("b", "a"), Arrays.asList("a", "e"),
-            Arrays.asList("a", "a"), Arrays.asList("x", "x"));
 
-    EvaluateDivision solver = new EvaluateDivision();
-    double[] results = solver.evaluateEquations(equations, values, queries);
-    System.out.println("Query Results: " + Arrays.toString(results));
-  }
-
-  /**
-   * Evaluates each query using DFS on the graph built from equations.
-   *
-   * Steps:
-   * 1. Construct a graph where each variable points to its neighbors with edge weights.
-   * Here a/b becomes an edge a -> b with weight 2.0 and b -> a with weight 0.5.
-   * a/c is calculated as path a -> b -> c with weights 2.0 * 3.0 = 6.0.
-   * 2. For each query, run DFS to find a path from numerator to denominator.
-   *
-   * Time Complexity: O(Q * (V + E)) — Q queries and DFS per query.
-   * Space Complexity: O(V + E) — to store the graph.
-   *
-   * @param equations List of variable pairs ["a", "b"] representing equations.
-   * @param values    Array of corresponding equation values (a / b = value).
-   * @param queries   Queries to evaluate as pairs ["a", "c"].
-   * @return Array of results for each query.
-   */
+    public static void main(String[] args) {
+        EvaluateDivision solver = new EvaluateDivision();
+        List<List<String>> equations = Arrays.asList(Arrays.asList("a", "b"), Arrays.asList("b", "c"));
+        double[] values = {2.0, 3.0};
+        List<List<String>> queries = Arrays.asList(
+            Arrays.asList("a", "c"), Arrays.asList("b", "a"), Arrays.asList("a", "e"), Arrays.asList("a", "a"), Arrays.asList("x", "x")
+        );
+        double[] output = solver.evaluateEquations(equations, values, queries);
+        System.out.printf("queries=%s  ->  %s  expected=%s%n",
+            queries, Arrays.toString(output), Arrays.toString(new double[]{6.0, 0.5, -1.0, 1.0, -1.0}));
+    }
+    /**
+     * Intuition: each equation a / b = value is two directed weighted edges: a to b
+     * with value, and b to a with the reciprocal. Answering a query is graph search
+     * where the path product gives the requested ratio.
+     *
+     * Algorithm:
+     *   1. Build the weighted adjacency map from equations and reciprocal edges.
+     *   2. For each query, reject it if either variable is missing.
+     *   3. DFS from numerator to denominator, multiplying edge weights along the path.
+     *   4. Return the product found, or -1.0 when no path exists.
+     *
+     * Time:  O(E + Q*(V+E)) - building is linear, and each query can search the graph.
+     * Space: O(V+E) - graph storage plus visited nodes during a query.
+     *
+     * @param equations variable pairs representing division equations
+     * @param values equation values aligned with equations
+     * @param queries division queries to answer
+     * @return one answer per query, or -1.0 for impossible queries
+     */
   public double[] evaluateEquations(List<List<String>> equations, double[] values, List<List<String>> queries) {
     Map<String, Map<String, Double>> graph = buildGraph(equations, values); // <source, <target, value>>
 

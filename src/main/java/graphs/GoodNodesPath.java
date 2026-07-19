@@ -4,68 +4,71 @@ import java.util.*;
 
 
 /**
- * Tree Path with Limited "Good" Nodes
+ * Problem: Root-to-Leaf Paths with Limited Good Nodes
  *
- * Problem Statement:
- * You are given a tree (acyclic connected undirected graph) with n nodes. Each node
- * is either "good" (1) or "bad" (0). Count the number of root-to-leaf paths such that
- * the number of "good" nodes in the path does not exceed a threshold maxGoodNodes.
+ * Given a rooted tree where each node is marked good or bad, count root-to-leaf
+ * paths that contain at most a given number of good nodes. Edges are one-indexed,
+ * while the good-node array stores node labels in zero-indexed order.
+ *
+ * Source: GeeksforGeeks - https://www.geeksforgeeks.org/problems/root-to-leaf-paths-having-k-good-nodes/1
+ * Pattern:  Tree | DFS | Path-state pruning
  *
  * Example:
- * goodNodes = [0, 1, 0, 1, 1, 1]
- * edges = [[1, 2], [1, 5], [1, 6], [2, 3], [2, 4]]
- * maxGoodNodes = 1
- * Output: 2
- * Explanation: Only the paths [1-5] and [1-6] have at most 1 good node.
+ *   Input:  good = [0,1,0,1,1,1], edges = [[1,2],[1,5],[1,6],[2,3],[2,4]], maxGood = 1
+ *   Output: 3
+ *   Why:    paths 1-2-3, 1-5, and 1-6 stay within one good node; path
+ *           1-2-4 has two good nodes and is pruned.
  *
- * Approach:
- * 1. Build an adjacency list to represent the tree.
- * 2. Use DFS traversal starting from the root. At each node, update the running count of "good" nodes.
- * 3. If we reach a leaf node with a good node count within the allowed threshold, count this path.
- * 4. Avoid revisiting the parent node to prevent cycles.
- *
- * Algorithm: DFS/Backtracking on Tree.
- * Time Complexity: O(N) since each node is visited once.
- * Space Complexity: O(N) due to recursion stack and adjacency list.
- *
- * LeetCode Link: https://www.geeksforgeeks.org/problems/root-to-leaf-paths-having-k-good-nodes/1 (similar)
- *
- * Follow-up:
- * - How do you modify the method for trees with millions of nodes? (Use iterative DFS or BFS)
- * - How would you count such paths but with maxGoodNodes distinct "good" types per path? (Add HashSet/Map for types)
+ * Follow-ups:
+ *   1. Handle a tree with millions of nodes?
+ *      Use iterative DFS and compressed adjacency arrays to avoid recursion overhead.
+ *   2. Count paths with exactly k good nodes?
+ *      Change the leaf check from at most k to equal k.
+ *   3. Allow updates to node labels?
+ *      Use tree decomposition or Euler-tour structures if many online queries are needed.
  */
 public class GoodNodesPath {
 
-  public static void main(String[] args) {
-    int[] goodNodes = {0, 1, 0, 1, 1, 1}; // 0-based node array
-    int[][] edges = {{1, 2}, {1, 5}, {1, 6}, {2, 3}, {2, 4}};
-    int maxGoodNodes = 1;
 
-    GoodNodesPath solution = new GoodNodesPath();
-    int result = solution.countValidPaths(goodNodes, edges, maxGoodNodes);
-    System.out.println("Valid paths count: " + result);
-  }
 
+    public static void main(String[] args) {
+        GoodNodesPath solver = new GoodNodesPath();
+        int[][][] edgeCases = {
+            {{1, 2}, {1, 5}, {1, 6}, {2, 3}, {2, 4}},
+            {}
+        };
+        int[][] goodCases = {{0, 1, 0, 1, 1, 1}, {1}};
+        int[] limits = {1, 1};
+        int[] expected = {3, 0};
+
+        for (int i = 0; i < edgeCases.length; i++) {
+            int output = solver.countValidPaths(goodCases[i], edgeCases[i], limits[i]);
+            System.out.printf("good=%s edges=%s maxGood=%d  ->  %d  expected=%d%n",
+                Arrays.toString(goodCases[i]), Arrays.deepToString(edgeCases[i]), limits[i], output, expected[i]);
+        }
+    }
   private List<List<Integer>> adjacencyList;
   private int[] nodesGoodOrBad;
-
-  /**
-   * Counts the number of root-to-leaf paths in the tree with at most maxGoodNodes good nodes.
-   *
-   * Steps:
-   * 1. Prepare an adjacency list for the undirected tree.
-   * 2. Start DFS at the root (node 1 as per problem), marking parent to avoid revisiting.
-   * 3. At each node, increase the count if it's 'good'.
-   * 4. If leaf node (other than the root), return 1 (valid path) if count <= maxGoodNodes.
-   *
-   * Time: O(N) - N is number of nodes.
-   * Space: O(N) - adjacency list + call stack.
-   *
-   * @param goodNodes Array marking each node as good(1) or bad(0), 0-indexed.
-   * @param edges     2D array denoting bidirectional edges (1-indexed).
-   * @param maxGoodNodes Maximum allowed good nodes in a root-to-leaf path.
-   * @return Number of valid paths.
-   */
+    /**
+     * Intuition: the tree is searched from node 1 while tracking how many good nodes
+     * have appeared on the current root-to-node path. Once that count exceeds the
+     * allowed maximum, every deeper path from that node is invalid and can be pruned.
+     * Leaf nodes reached within the limit count as valid root-to-leaf paths.
+     *
+     * Algorithm:
+     *   1. Build the undirected adjacency list from the edges.
+     *   2. DFS from node 1, carrying the current number of good nodes.
+     *   3. Stop a branch when the good-node count exceeds maxGoodNodes.
+     *   4. Count leaf nodes whose path stayed within the limit.
+     *
+     * Time:  O(n) - each tree edge is traversed a constant number of times.
+     * Space: O(n) - adjacency storage plus recursion stack.
+     *
+     * @param goodNodes array marking whether each node is good
+     * @param edges undirected tree edges
+     * @param maxGoodNodes maximum good nodes allowed on a root-to-leaf path
+     * @return number of valid root-to-leaf paths
+     */
   public int countValidPaths(int[] goodNodes, int[][] edges, int maxGoodNodes) {
     int n = goodNodes.length;
     if (n == 0) {
