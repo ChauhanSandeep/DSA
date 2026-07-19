@@ -258,19 +258,68 @@
   }
 
   // --------------------------------------------------------------------------
+  // Local server persistence (preferred when serve.py is running).
+  // POST /api/grade → server updates state.json atomically and returns the
+  // new SM-2 state so the toast can show the accurate next-review date.
+  // --------------------------------------------------------------------------
+  async function persistViaServer(task, grade) {
+    if (location.protocol !== "http:" && location.protocol !== "https:") {
+      return null;
+    }
+    try {
+      const res = await fetch("/api/grade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task, grade }),
+      });
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      if (err && err.message && err.message.includes("Failed to fetch")) return null;
+      throw err;
+    }
+  }
+
+  // --------------------------------------------------------------------------
   // Grading (problem pages).
   // --------------------------------------------------------------------------
   async function grade(task, gradeName) {
+    // Prefer the local server if reachable — one round-trip, no browser
+    // permission dance, state.json written atomically by Python.
+    let serverResult = null;
+    try {
+      serverResult = await persistViaServer(task, gradeName);
+    } catch (err) {
+      toast(`Server error: ${err.message}`, "error", 4500);
+      return;
+    }
+
+    if (serverResult && serverResult.ok) {
+      const nextDueStr = new Date(serverResult.sm2.nextDue).toLocaleDateString(undefined, {
+        weekday: "short", year: "numeric", month: "short", day: "numeric",
+      });
+      toast(`Saved · next review ${nextDueStr}`, "success");
+      // Keep localStorage clear so the pending banner doesn't misfire.
+      const pending = loadPending();
+      if (pending[task]) { delete pending[task]; savePending(pending); }
+      renderPendingBanner();
+      return;
+    }
+
+    // ---- Fallback: no server, use in-page state + File System Access API ----
     const merged = getMergedState();
     const problem = merged.problems[task];
     if (!problem) {
-      toast(`Unknown problem: ${task}`, "error");
+      toast(`Unknown problem: ${task}. Start serve.py or reload after rebuild.`, "error", 4500);
       return;
     }
 
     const today = new Date();
     const newSm2 = applySm2(problem.sm2 || {}, gradeName, today);
-
     const history = Array.isArray(problem.history) ? problem.history.slice() : [];
     history.push({ date: isoDate(today), grade: gradeName });
 
@@ -282,19 +331,18 @@
       weekday: "short", year: "numeric", month: "short", day: "numeric",
     });
 
-    // Try FS Access API first — one-click persistence.
     try {
       await persistAllToStateFile();
-      toast(`Saved · next review ${nextDueStr}`, "success");
+      toast(`Saved (via file system) · next review ${nextDueStr}`, "success");
       renderPendingBanner();
       return;
     } catch (err) {
-      // Fell through: keep the change in localStorage, tell the user how to export.
       toast(
         `Recorded locally · next review ${nextDueStr}. ` +
-        `Use "Save all" on the dashboard to write state.json.`,
+        `Run \`python Tracking/scripts/serve.py\` for one-click saves, ` +
+        `or use "Save all" on the dashboard.`,
         "info",
-        4500
+        6000
       );
       renderPendingBanner();
     }

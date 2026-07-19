@@ -120,11 +120,15 @@ Tracking/
 │  ├─ scrape_neetcode.py                # one-shot NeetCode taxonomy scraper
 │  ├─ sync.py                           # repo ↔ state.json sync
 │  ├─ curate_core.py                    # anchor selection + core.md ↔ pinned flags
+│  ├─ backfill_qa.py                    # one-shot Q/A backfill from legacy sheet + Javadoc
 │  ├─ build.py                          # generate site/ from data + Javadocs
+│  ├─ serve.py                          # local dev server; POST /api/grade writes state.json
 │  ├─ queue_issue.py                    # markdown body for weekly-nudge issue
 │  ├─ review_log.py                     # diff-based grade log for study-log issue
 │  ├─ report.py                         # CLI coverage + queue preview
 │  └─ _queue.py                         # shared queue-picker (with pinned backfill)
+├─ vendor/
+│  └─ prism/                            # pinned Prism.js + github-light/dark themes
 ├─ site-src/                            # tracked source assets (copied to site/assets)
 │  ├─ styles.css
 │  └─ app.js
@@ -132,7 +136,7 @@ Tracking/
    ├─ index.html
    ├─ problems/<Task>.html
    ├─ patterns/<Pattern>.html
-   └─ assets/{app.js, styles.css}
+   └─ assets/{app.js, styles.css, prism/}
 ```
 
 Related workflows under `.github/workflows/`:
@@ -149,10 +153,23 @@ python Tracking/scripts/sync.py           # refresh state.json from repo
 python Tracking/scripts/curate_core.py    # (only when the anchor set changes)
 python Tracking/scripts/build.py          # regenerate site/
 
-# Saturday morning
-open Tracking/site/index.html             # queue of 6, grade with 1/2/3/4 keys
-git commit -am "weekend review"           # state.json updates flow into git
+# Saturday morning — start the local dev server and grade
+python Tracking/scripts/serve.py          # http://127.0.0.1:8787 (default port)
+open http://127.0.0.1:8787/index.html     # queue of 6, keys 1/2/3/4 to grade
+
+# When done, commit progress
+git commit -am "weekend review"           # state.json changes flow into git
 ```
+
+`serve.py` writes to `Tracking/data/state.json` atomically on each grade
+(no browser file-picker prompts, no permission dance) and re-runs
+`build.py` in the background so the dashboard reflects your new
+`nextDue` on the next reload. Kill with `Ctrl+C`.
+
+If you'd rather open the site directly via `file://` (no server), the
+grading UI still works — it falls back to the File System Access API
+in Chrome/Edge, or to a "download JSON" flow elsewhere. But the server
+path is meaningfully lower friction and is the recommended workflow.
 
 ---
 
