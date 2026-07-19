@@ -4,62 +4,76 @@ import java.util.Arrays;
 
 
 /**
- * -------------------------------------------------------------
  * Problem: Maximum Number of Events That Can Be Attended II
- * -------------------------------------------------------------
- * You are given an array `events`, where each event is represented as [startDay, endDay, value].
- * You can attend at most `k` events, and attending an event requires you to be available for all the days
- * from its start to end. Your task is to select events (up to k) such that the total value is maximized,
- * and no two attended events overlap.
+ *
+ * Given events [startDay, endDay, value], attend at most k non-overlapping events
+ * and maximize total value. Attending an event occupies every day in its interval,
+ * so the next chosen event must start after the current one ends.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/ (Hard)
+ * Rating:   2041 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Weighted interval scheduling | Binary search
  *
  * Example:
- * Input: events = [
- *  [1,2,4],
- *  [3,4,3],
- *  [2,3,1]],
- * k = 2
- * Output: 7
- * Explanation: Attend event [1,2,4] and [3,4,3] for a total value of 7.
+ *   Input:  events = [[1,2,4],[3,4,3],[2,3,1]], k = 2
+ *   Output: 7
+ *   Why:    take [1,2,4] and [3,4,3]; they do not overlap and total 4 + 3 = 7.
  *
- * Leetcode Link: https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/
+ * Follow-ups:
+ *   1. Can this be written bottom-up?
+ *      Sort by end day and fill dp over event prefix and remaining picks.
+ *   2. How do you optimize repeated next-event searches?
+ *      Precompute next non-overlapping indices with binary search after sorting.
+ *   3. What if k is unbounded?
+ *      It becomes classic weighted interval scheduling with one dimension of DP.
+ *   4. What if events can touch on the same day?
+ *      Change the binary-search condition from start >= end + 1 to start >= end.
  *
- * -------------------------------------------------------------
- * Follow-up Questions:
- * -------------------------------------------------------------
- * 1. Can we do this in bottom-up DP (tabulation) instead of recursion + memoization?
- *    → Yes. It's more iterative, usually easier to debug, and better stack-wise.
- * 2. What if each event has a cost instead of value and we want to **minimize** total cost?
- *    → Similar approach but maximize becomes minimize, and base case logic needs tweaks.
- * 3. Can this be solved with Segment Trees?
- *    → Yes, in O(N log N) using event processing + range max queries. See: LC hard variants.
- * LeetCode Contest Rating: 2041
+ * Related: Maximum Number of Events That Can Be Attended (1353), Non-overlapping Intervals (435).
  */
+
 public class MaxEvents2 {
 
   public static void main(String[] args) {
-    int[][] events = {{1, 2, 4}, {3, 4, 3}, {2, 3, 1}};
-    int k = 2;
-    System.out.println("Max value: " + new MaxEvents2().getMaxEventValue(events, k));
+    MaxEvents2 solver = new MaxEvents2();
+    int[][][] inputs = { {{1, 2, 4}, {3, 4, 3}, {2, 3, 1}}, {} };
+    int[] kValues = {2, 2};
+    int[] expected = {7, 0};
+
+    for (int i = 0; i < inputs.length; i++) {
+      int[][] copy = new int[inputs[i].length][];
+      for (int row = 0; row < inputs[i].length; row++) {
+        copy[row] = inputs[i][row].clone();
+      }
+      int got = solver.getMaxEventValue(copy, kValues[i]);
+      System.out.printf("events=%s k=%d -> %d  expected=%d%n",
+          Arrays.deepToString(inputs[i]), kValues[i], got, expected[i]);
+    }
   }
 
   private int[][] memoTable;
   private int eventCount;
 
-  /**
-   * Solves the problem using recursive DP with memoization and binary search.
+    /**
+   * Intuition: at each sorted event, the only meaningful choice is take it or
+   * skip it. Taking it earns its value and jumps to the first event starting
+   * after its end; skipping moves to the next event with the same remaining slots.
+   * Memoization keeps those overlapping states from being recomputed.
    *
-   * Steps:
-   * 1. Sort the events by start time for binary search applicability.
-   * 2. For each event:
-   *      - Either attend it → add its value and jump to the next non-overlapping event.
-   *      - Or skip it → move to the next event without using a slot.
-   * 3. Use memoization to store intermediate results.
+   * Algorithm:
+   *   1. Return 0 for empty input or k = 0.
+   *   2. Sort events by start day, then end day, and create a memo table.
+   *   3. Recursively compare skipping the current event versus attending it.
+   *   4. Use binary search to jump to the next non-overlapping event.
    *
-   * Time Complexity: O((N * K) + N log N)
-   * - N*K for memoization.
-   * - log N for binary search at each step.
-   * Space Complexity: O(N * K) for the memoization table.
+   * Time:  O(n * k * log n) - each state does a binary search for the next event.
+   * Space: O(n * k) - memoTable stores one value per index and remaining event count.
+   *
+   * @param events events as [startDay, endDay, value]
+   * @param k maximum number of events that may be attended
+   * @return maximum total value from at most k non-overlapping events
    */
+
   public int getMaxEventValue(int[][] events, int k) {
     if (events == null || events.length == 0 || k == 0) {
         return 0;
@@ -80,14 +94,7 @@ public class MaxEvents2 {
     return memoTable[0][k]; // Start from first event with k slots available
   }
 
-  /**
-   * Recursive method to compute maximum value using top-down memoization.
-   *
-   * @param events    Sorted list of events.
-   * @param allowedEvents Number of events we can still attend.
-   * @param index     Current index in event list.
-   * @return Maximum value obtainable from current state.
-   */
+  /** Returns the best value from index with allowedEvents picks left. */
   private int computeMaxRec(int[][] events, int allowedEvents, int index) {
     // Base cases
       if (index >= eventCount || allowedEvents == 0) {
@@ -167,10 +174,7 @@ public class MaxEvents2 {
         return dp[numEvents][k];
     }
 
-    /**
-     * Binary search to find the last event that ends before the given start day.
-     * Used in bottom-up approach where events are sorted by end time.
-     */
+    /** Finds the prefix length ending before startDay for bottom-up DP. */
     private int findLastNonOverlappingEvent(int[][] events, int currentIdx, int startDay) {
         int left = 0;
         int right = currentIdx;
@@ -193,13 +197,7 @@ public class MaxEvents2 {
         return result;
     }
 
-  /**
-   * Finds index of the next event that starts after given day using binary search.
-   *
-   * @param events     Sorted list of events.
-   * @param targetDay  Day to start searching for.
-   * @return Index of the next non-overlapping event.
-   */
+  /** Finds the first event whose start day is at least targetDay. */
   private int findNextAvailableEvent(int[][] events, int targetDay) {
     int left = 0, right = eventCount;
     while (left < right) {

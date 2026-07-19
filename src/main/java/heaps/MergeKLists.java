@@ -2,57 +2,59 @@ package heaps;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.Arrays;
 
 // Private inner class for ListNode
 
 /**
  * Problem: Merge K Sorted Linked Lists
  *
- * Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/
+ * Given an array of sorted linked-list heads, merge all nodes into one sorted
+ * linked list. The heap solution repeatedly chooses the smallest current head
+ * among the k lists and advances only that list.
  *
- * Problem Statement:
- * Given an array of `k` sorted linked lists, merge all the lists into one sorted linked list and return its head.
+ * Leetcode: https://leetcode.com/problems/merge-k-sorted-lists/ (Hard)
+ * Rating:   acceptance 60.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | K-way merge | Divide and conquer alternative
  *
  * Example:
- * Input:
- *   [
- *     1 → 3 → 5 → 7,
- *     2 → 4 → 6 → 8,
- *     0 → 9 → 10 → 11
- *   ]
- * Output:
- *   0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11
+ *   Input:  lists = [[1,4,5],[1,3,4],[2,6]]
+ *   Output: [1,1,2,3,4,4,5,6]
+ *   Why:    repeatedly taking the smallest available list head preserves sorted order.
  *
- * 🔄 Follow-up Questions:
- * 1. Can you do it using Divide and Conquer instead of a heap?
- *    🔗 https://leetcode.com/problems/merge-k-sorted-lists/discuss/10527/A-java-solution-based-on-divide-and-conquer
- * 2. Can you merge them in-place without extra memory?
- *    - Not always, as linked list nodes are immutable in Leetcode.
- * 3. What changes if the lists are streaming?
- *    - Use a real-time stream merge with a size-limited min-heap.
- * 4. How would you merge k sorted arrays instead of lists?
- *    - Similar heap approach, but use indices for each array to track progress.
- * 5. What if k is very large and lists are huge, causing memory issues?
- *    - Use external sorting or merge in a tournament fashion to reduce memory, but heap is efficient for n total nodes.
- *      Relevant problem: https://leetcode.com/problems/merge-sorted-array/
- * 6. How to merge without extra space?
- *    - Not possible efficiently without modifying lists, but divide and conquer can be done recursively with O(log k) space.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can you avoid the heap?
+ *      Merge lists by divide and conquer for the same O(n log k) time.
+ *   2. What if lists are streamed from disk?
+ *      Keep only one current node or record per stream in the heap.
+ *   3. How do you merge descending lists?
+ *      Reverse the comparator or normalize each list direction first.
+ *   4. What if k is huge but most lists are empty?
+ *      Only offer non-null heads, so heap size is the number of active lists.
+ *
+ * Related: Merge Two Sorted Lists (21), Merge Sorted Array (88).
  */
+
 public class MergeKLists {
 
-  /**
-   * ✅ Approach 1: Merge K Sorted Lists using Min-Heap
+    /**
+   * Intuition: each list is already sorted, so the next node in the merged output
+   * must be the smallest among the current heads. A min heap keeps those active
+   * heads ordered and only needs the successor of the node just removed.
    *
-   * 🧠 Steps:
-   * 1. Insert the head of each non-null list into the min-heap.
-   * 2. Extract the node with the smallest value and append it to the result.
-   * 3. If that node has a `next`, push it into the heap.
-   * 4. Repeat until heap is empty.
+   * Algorithm:
+   *   1. Return null for a null or empty array of lists.
+   *   2. Offer every non-null list head into a min heap by node value.
+   *   3. Poll the smallest node, append it to the output tail, and advance the tail.
+   *   4. If that node has a next node, offer it into the heap.
    *
-   * ⏱ Time Complexity: O(N log K), where N = total number of nodes, K = number of lists.
-   * 🧠 Space Complexity: O(K), to store K nodes in the heap at a time.
+   * Time:  O(n log k) - each of n nodes is offered and polled from a heap of k lists.
+   * Space: O(k) - the heap stores at most one active node per list.
+   *
+   * @param lists array of sorted linked-list heads
+   * @return head of the merged sorted linked list
    */
+
   public static ListNode mergeKSortedLists(ListNode[] lists) {
       if (lists == null || lists.length == 0) {
           return null;
@@ -158,20 +160,28 @@ public class MergeKLists {
   }
 
   public static void main(String[] args) {
-    ListNode[] inputLists = new ListNode[3];
+    ListNode[] firstInput = new ListNode[3];
+    firstInput[0] = new ListNode(1, new ListNode(4, new ListNode(5)));
+    firstInput[1] = new ListNode(1, new ListNode(3, new ListNode(4)));
+    firstInput[2] = new ListNode(2, new ListNode(6));
+    ListNode firstGot = mergeKSortedLists(firstInput);
+    StringBuilder firstOut = new StringBuilder("[");
+    for (ListNode node = firstGot; node != null; node = node.next) {
+      if (firstOut.length() > 1) firstOut.append(", ");
+      firstOut.append(node.val);
+    }
+    firstOut.append("]");
+    System.out.printf("lists=%s -> %s  expected=%s%n",
+        Arrays.toString(new String[]{"[1, 4, 5]", "[1, 3, 4]", "[2, 6]"}),
+        firstOut, "[1, 1, 2, 3, 4, 4, 5, 6]");
 
-    inputLists[0] = new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(7))));
-    inputLists[1] = new ListNode(2, new ListNode(4, new ListNode(6, new ListNode(8))));
-    inputLists[2] = new ListNode(0, new ListNode(9, new ListNode(10, new ListNode(11))));
-
-    System.out.println("🔹 Merged List using Min-Heap:");
-    printList(mergeKSortedLists(inputLists));
-
-    System.out.println("\n🔹 Merged List using Divide & Conquer:");
-    printList(mergeKSortedListsOptimized(inputLists));
+    ListNode[] emptyInput = new ListNode[0];
+    ListNode emptyGot = mergeKSortedLists(emptyInput);
+    System.out.printf("lists=%s -> %s  expected=%s%n",
+        Arrays.toString(new String[]{}), emptyGot, "null");
   }
 
-  // Private inner class for ListNode
+  /** Basic singly linked-list node used by the demos and merge methods. */
   private static class ListNode {
     int val;
     ListNode next;

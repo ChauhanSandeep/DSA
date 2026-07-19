@@ -3,42 +3,69 @@ package heaps;
 import java.util.*;
 
 /**
- * 786. K-th Smallest Prime Fraction
+ * Problem: K-th Smallest Prime Fraction
  *
- * Problem: Given a sorted array of prime numbers and integer k, return the k-th
- * smallest fraction formed by arr[i]/arr[j] where i < j.
+ * Given a sorted array that starts with 1 and then primes, return the kth
+ * smallest fraction arr[i] / arr[j] with i < j. Fractions are compared by their
+ * numeric value, but the answer must return the numerator and denominator.
+ *
+ * Leetcode: https://leetcode.com/problems/k-th-smallest-prime-fraction/ (Medium)
+ * Rating:   2169 (zerotrac Elo)
+ * Pattern:  Heap | K-way merge of fraction rows | Binary search alternative
  *
  * Example:
- * Input: arr = [1,2,3,5], k = 3
- * Output: [2,5]
- * Explanation: Fractions are [1/5, 1/3, 2/5, 1/2, 3/5, 2/3]. The 3rd smallest is 2/5.
+ *   Input:  arr = [1,2,3,5], k = 3
+ *   Output: [2,5]
+ *   Why:    sorted fractions begin 1/5, 1/3, 2/5, so the 3rd is 2/5.
  *
- * LeetCode: https://leetcode.com/problems/k-th-smallest-prime-fraction
+ * Follow-ups:
+ *   1. How do you avoid floating-point comparison?
+ *      Compare a/b and c/d by cross multiplication a*d versus c*b.
+ *   2. What if k is close to the number of all fractions?
+ *      Binary search on fraction value can count candidates without storing them all.
+ *   3. How do you list the first k fractions, not just the kth?
+ *      Keep polling the heap and append each removed fraction.
+ *   4. What if arr contains non-prime sorted positives?
+ *      The heap ordering still works because only sorted positive values are needed.
  *
- * Follow-up questions:
- * Q: What if k is very large relative to n^2?
- * A: Binary search on fraction values is more efficient than heap approaches.
- *
- * Q: How to find all fractions smaller than a given value?
- * A: Use two-pointer technique on the sorted array.
- *
- * Q: Can we optimize space usage for large arrays?
- * A: Use binary search approach which uses O(1) extra space.
- * LeetCode Contest Rating: 2169
+ * Related: Kth Smallest Element in a Sorted Matrix (378), Find K Pairs with Smallest Sums (373).
  */
+
 public class KthSmallestPrimeFraction {
 
-    /**
-     * Priority queue approach using min-heap.
+    public static void main(String[] args) {
+        KthSmallestPrimeFraction solver = new KthSmallestPrimeFraction();
+        int[][] inputs = { {1, 2, 3, 5}, {1, 7} };
+        int[] kValues = {3, 1};
+        int[][] expected = { {2, 5}, {1, 7} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.kthSmallestPrimeFraction(inputs[i], kValues[i]);
+            System.out.printf("arr=%s k=%d -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), kValues[i],
+                Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
+
+        /**
+     * Intuition: for a fixed numerator arr[i], denominators from right to left
+     * produce increasing fractions. Seed each numerator row with its smallest
+     * fraction, then repeatedly poll the global smallest and advance that row.
      *
      * Algorithm:
-     * - Use min-heap to store fractions with their indices
-     * - Start with smallest fractions: arr[i]/arr[n-1] for all i
-     * - Extract k-th smallest, adding next fraction from same numerator
+     *   1. Seed the min heap with arr[i] / arr[n - 1] for every numerator i.
+     *   2. Poll k - 1 fractions from the heap.
+     *   3. After each poll, offer the same numerator with the next smaller denominator.
+     *   4. Poll once more and return that numerator and denominator.
      *
-     * Time Complexity: O(k log n)
-     * Space Complexity: O(n)
+     * Time:  O(k log n) - each extracted fraction does one heap poll and maybe one offer.
+     * Space: O(n) - the heap stores one active fraction per numerator row.
+     *
+     * @param arr sorted array containing 1 and prime numbers
+     * @param k one-based rank among all valid fractions
+     * @return numerator and denominator of the kth smallest fraction
      */
+
     public int[] kthSmallestPrimeFraction(int[] arr, int k) {
         int n = arr.length;
 
@@ -93,7 +120,7 @@ public class KthSmallestPrimeFraction {
         return new int[]{};
     }
 
-    // Count fractions <= target and find the largest such fraction
+    /** Counts fractions at most target and records the largest one seen. */
     private FractionCount countFractions(int[] arr, double target) {
         int count = 0;
         int bestNum = 0, bestDen = 1;
@@ -123,7 +150,7 @@ public class KthSmallestPrimeFraction {
         return new FractionCount(count, bestNum, bestDen);
     }
 
-    // Helper class for binary search result
+    /** Stores count and best fraction found during binary search counting. */
     private static class FractionCount {
         int count;
         int numerator;
@@ -188,7 +215,7 @@ public class KthSmallestPrimeFraction {
         return new int[]{result.numerator, result.denominator};
     }
 
-    // Fraction class for brute force approach
+    /** Comparable fraction value used by the brute force approach. */
     private static class Fraction implements Comparable<Fraction> {
         int numerator;
         int denominator;
@@ -250,7 +277,7 @@ public class KthSmallestPrimeFraction {
         return new int[]{result.numerator, result.denominator};
     }
 
-    // Enhanced fraction node with indices
+    /** Fraction value with numerator and denominator indices. */
     private static class FractionNode {
         int numerator;
         int denominator;

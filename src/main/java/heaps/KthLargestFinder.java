@@ -1,46 +1,74 @@
 package heaps;
 
 import java.util.PriorityQueue;
+import java.util.Arrays;
 
 
 /**
- * 🔹 Problem 1: Kth Largest Element in an Array
- * LeetCode Link: https://leetcode.com/problems/kth-largest-element-in-an-array/
+ * Problem: Kth Largest Element in an Array
  *
- * Given an integer array `nums` and an integer `k`, return the kᵗʰ largest element in the array.
- * Note that it is the kᵗʰ largest element in **sorted order**, not the kᵗʰ distinct element.
+ * Given an integer array nums and an integer k, return the kth largest value in
+ * sorted order. Duplicates count as separate elements, so this is not asking for
+ * the kth distinct value.
  *
- * 🔹 Example:
- * Input: nums = [3,2,1,5,6,4], k = 2
- * Output: 5
+ * Leetcode: https://leetcode.com/problems/kth-largest-element-in-an-array/ (Medium)
+ * Rating:   acceptance 69.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Heap | Size-k min heap | QuickSelect alternative
  *
- * 🔹 Follow-ups:
- * - Can you do this with average O(n) time instead of O(n log k)? → Use QuickSelect [Leetcode #215]
- * - What if numbers are huge or streamed in chunks? → Use Min-Heap [Leetcode #703]
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  nums = [3,2,1,5,6,4], k = 2
+ *   Output: 5
+ *   Why:    sorted descending is [6,5,4,3,2,1], so the 2nd largest value is 5.
+ *
+ * Follow-ups:
+ *   1. Can you get average O(n) time?
+ *      Use QuickSelect and target index nums.length - k in ascending order.
+ *   2. How do you solve this for an infinite stream?
+ *      Maintain a size-k min heap and report its root after each update.
+ *   3. What if k changes across many queries?
+ *      Sort once, or maintain an order-statistics tree for dynamic data.
+ *   4. What if values are distributed across machines?
+ *      Keep local top-k heaps and merge those candidates with one final heap.
+ *
+ * Related: Kth Largest Element in a Stream (703), Top K Frequent Elements (347).
  */
+
 public class KthLargestFinder {
 
   public static void main(String[] args) {
-    int k = 3;
-    int[] inputArray = {3, 2, 3, 1, 2, 4, 5, 5, 6};
+    int[][] inputs = { {3, 2, 1, 5, 6, 4}, {1} };
+    int[] kValues = {2, 1};
+    int[] expected = {5, 1};
 
-    System.out.println("Kth Largest Using MinHeap: " + findKthLargestUsingMinHeap(inputArray, k));
-    System.out.println("Kth Largest Using QuickSelect: " + findKthLargestUsingQuickSelect(inputArray.clone(), k));
+    for (int i = 0; i < inputs.length; i++) {
+      int heapGot = findKthLargestUsingMinHeap(inputs[i].clone(), kValues[i]);
+      int quickGot = findKthLargestUsingQuickSelect(inputs[i].clone(), kValues[i]);
+      System.out.printf("minHeap nums=%s k=%d -> %d  expected=%d%n",
+          Arrays.toString(inputs[i]), kValues[i], heapGot, expected[i]);
+      System.out.printf("quickSelect nums=%s k=%d -> %d  expected=%d%n",
+          Arrays.toString(inputs[i]), kValues[i], quickGot, expected[i]);
+    }
   }
 
-  /**
-   * 🔸 Method: MinHeap
-   * Uses a min-heap of size k to maintain the top-k largest elements seen so far.
-   * The root of the min-heap will be the kth largest element.
+    /**
+   * Intuition: the kth largest is the smallest value among the best k values seen
+   * so far. A min heap of size k keeps exactly those candidates, and its root is
+   * always the current answer after all smaller extras have been evicted.
    *
-   * ✅ Time Complexity: O(n log k)
-   * ✅ Space Complexity: O(k)
+   * Algorithm:
+   *   1. Validate input and return -1 for invalid requests.
+   *   2. Offer each number into a min heap.
+   *   3. If the heap grows beyond k, poll the smallest value.
+   *   4. Return the heap root after all numbers are processed.
    *
-   * @param inputArray The array of integers.
-   * @param k The 'kth' largest element to find.
-   * @return The kth largest element.
+   * Time:  O(n log k) - each number may be inserted and one value may be polled.
+   * Space: O(k) - the heap keeps only k largest candidates.
+   *
+   * @param inputArray array of integers
+   * @param k rank to find among largest values
+   * @return kth largest value, or -1 for invalid input
    */
+
   public static int findKthLargestUsingMinHeap(int[] inputArray, int k) {
     if (!isValidInput(inputArray, k)) {
       return -1;
@@ -82,7 +110,7 @@ public class KthLargestFinder {
     return quickSelect(nums, 0, nums.length - 1, targetIndex);
   }
 
-  // QuickSelect to find element at the target index (0-based)
+  /** Runs iterative QuickSelect until targetIndex is placed correctly. */
   private static int quickSelect(int[] nums, int left, int right, int targetIndex) {
     while (left <= right) {
       int pivotIndex = partition(nums, left, right);  // Always chooses right as pivot
@@ -100,7 +128,7 @@ public class KthLargestFinder {
     return -1; // Should never hit this line if input is valid
   }
 
-  // Lomuto partition scheme with last element as pivot
+  /** Partitions nums with the last element as the pivot. */
   private static int partition(int[] nums, int left, int right) {
     int pivot = nums[right];
     int storeIndex = left;
