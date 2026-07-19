@@ -168,6 +168,7 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
         {back}
         <a href="{{root}}index.html">Queue</a>
         <a href="{{root}}patterns/index.html">Patterns</a>
+        <a href="{{root}}tags/index.html">Tags</a>
         <button class="theme-toggle" aria-label="Toggle color theme" data-action="toggle-theme">
           {SUN_ICON}{MOON_ICON}
         </button>
@@ -186,17 +187,48 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
 """
 
 
-def badges_for_problem(problem: dict) -> str:
+def badges_for_problem(problem: dict, root: str = "") -> str:
+    """Render badges for a single problem. `root` is the relative prefix that
+    lets links (e.g. `tags/easy.html`) resolve correctly regardless of the
+    depth of the page rendering them. Pass "" from index/patterns/index/etc.
+    Pass "../" from a page one directory deep (problems/*, patterns/*, tags/*).
+    """
     parts = []
+
     diff = problem.get("difficulty", "Unknown")
-    parts.append(f'<span class="badge {DIFFICULTY_CLASS.get(diff, "diff-unknown")}">{esc(diff)}</span>')
+    diff_slug = diff.lower() if diff in DIFFICULTY_CLASS else "unknown"
+    if diff != "Unknown":
+        parts.append(
+            f'<a class="badge {DIFFICULTY_CLASS.get(diff, "diff-unknown")}" '
+            f'href="{root}tags/{esc(diff_slug)}.html" title="All {esc(diff)} problems">'
+            f'{esc(diff)}</a>'
+        )
+    else:
+        parts.append(
+            f'<span class="badge {DIFFICULTY_CLASS.get(diff, "diff-unknown")}">{esc(diff)}</span>'
+        )
+
     if problem.get("isNC150"):
-        parts.append('<span class="badge nc150">NC150</span>')
+        parts.append(
+            f'<a class="badge nc150" href="{root}tags/nc150.html" '
+            'title="All NeetCode 150 problems">NC150</a>'
+        )
     if problem.get("isBlind75"):
-        parts.append('<span class="badge blind75">Blind 75</span>')
+        parts.append(
+            f'<a class="badge blind75" href="{root}tags/blind75.html" '
+            'title="All Blind 75 problems">Blind 75</a>'
+        )
     if problem.get("flags", {}).get("pinned"):
-        parts.append('<span class="badge pinned" title="Core anchor">📌 Core</span>')
-    parts.append(f'<span class="badge pattern">{esc(problem.get("pattern", "Uncategorized"))}</span>')
+        parts.append(
+            f'<a class="badge pinned" href="{root}tags/core.html" '
+            'title="Core anchor set">📌 Core</a>'
+        )
+
+    pattern = problem.get("pattern", "Uncategorized")
+    parts.append(
+        f'<a class="badge pattern" href="{root}patterns/{esc(pattern_slug(pattern))}.html" '
+        f'title="All problems in {esc(pattern)}">{esc(pattern)}</a>'
+    )
     return "".join(parts)
 
 
@@ -279,7 +311,7 @@ def render_dashboard(state: dict, today: date) -> str:
           <div class="meta">{esc(task)} · next due {esc(format_next_due(problem["sm2"].get("nextDue")))} {done_meta}</div>
           {preview_html}
         </div>
-        <div class="badges">{badges_for_problem(problem)}</div>
+        <div class="badges">{badges_for_problem(problem, root="")}</div>
       </div>""")
         queue_html = "\n".join(queue_html_parts)
     else:
@@ -658,7 +690,7 @@ def render_problem_page(problem: dict, today: date) -> str:
     <div class="problem-header" data-task="{esc(task)}">
       <div class="title">{esc(problem.get("problemName") or task)}</div>
       <div class="meta">
-        {badges_for_problem(problem)}
+        {badges_for_problem(problem, root="../")}
       </div>
       <div class="meta" style="margin-top:8px">{" · ".join(meta_bits)}</div>
     </div>
@@ -738,7 +770,16 @@ def format_last_reviewed(sm2: dict, today: date) -> tuple[str, str]:
     return (f"{emoji} {pretty}", last)
 
 
-def render_pattern_page(pattern: str, entries: list[dict]) -> str:
+def _render_expandable_list(title: str, entries: list[dict], root: str = "../",
+                             back_link: str = "index.html",
+                             subtitle: str | None = None) -> str:
+    """Shared renderer for pattern pages and tag pages.
+
+    Emits an expandable-list layout with sort chips + Expand/Collapse-all.
+    `root` is the prefix used for links inside the entries (badges, problem
+    pages). Every caller lives one directory deep under site/, so root="../"
+    is the correct default.
+    """
     today = date.today()
     entries_sorted = sorted(
         entries,
@@ -792,9 +833,9 @@ def render_pattern_page(pattern: str, entries: list[dict]) -> str:
         <summary>
           <span class="pattern-item-chevron">▸</span>
           <span class="pattern-item-title">
-            <a href="../problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a>
+            <a href="{root}problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a>
           </span>
-          <span class="pattern-item-badges">{badges_for_problem(entry)}</span>
+          <span class="pattern-item-badges">{badges_for_problem(entry, root=root)}</span>
           <span class="pattern-item-meta">
             <span class="pattern-item-due">next: {esc(next_due_pretty)}</span>
             <span class="pattern-item-last">last: {esc(last_label)}</span>
@@ -802,12 +843,15 @@ def render_pattern_page(pattern: str, entries: list[dict]) -> str:
         </summary>
         <div class="pattern-item-body">
           {body_content}
-          <a class="pattern-item-open" href="../problems/{esc(entry['task'])}.html">Open full page →</a>
+          <a class="pattern-item-open" href="{root}problems/{esc(entry['task'])}.html">Open full page →</a>
         </div>
       </details>""")
 
+    subtitle_html = f'<div class="dim" style="margin:-8px 0 16px">{esc(subtitle)}</div>' if subtitle else ""
+
     body = f"""
-    <h2>{esc(pattern)} — {len(entries_sorted)} problems</h2>
+    <h2>{esc(title)} — {len(entries_sorted)} problems</h2>
+    {subtitle_html}
 
     <div class="pattern-list-controls">
       <div class="sort-controls">
@@ -824,7 +868,15 @@ def render_pattern_page(pattern: str, entries: list[dict]) -> str:
 
     <div class="pattern-list">{"".join(items)}</div>
     """
-    return base_layout(pattern, body, back_link="index.html").replace("{root}", "../")
+    return base_layout(title, body, back_link=back_link).replace("{root}", root)
+
+
+def render_pattern_page(pattern: str, entries: list[dict]) -> str:
+    return _render_expandable_list(pattern, entries)
+
+
+def render_tag_page(title: str, entries: list[dict], subtitle: str | None = None) -> str:
+    return _render_expandable_list(title, entries, subtitle=subtitle)
 
 
 def pattern_slug(pattern: str) -> str:
@@ -841,6 +893,7 @@ def prepare_site_dir() -> None:
         shutil.rmtree(SITE_DIR)
     (SITE_DIR / "problems").mkdir(parents=True)
     (SITE_DIR / "patterns").mkdir(parents=True)
+    (SITE_DIR / "tags").mkdir(parents=True)
     (SITE_DIR / "assets").mkdir(parents=True)
 
 
@@ -890,9 +943,63 @@ def build() -> int:
             render_pattern_page(pattern, entries),
         )
 
+    # Tag pages: difficulty, NC150, Blind75, core anchors
+    all_entries = list(state["problems"].values())
+    tag_definitions = [
+        ("easy",    "Easy problems",
+         lambda e: e.get("difficulty") == "Easy",
+         "All Easy-difficulty problems tracked in the repo."),
+        ("medium",  "Medium problems",
+         lambda e: e.get("difficulty") == "Medium",
+         "All Medium-difficulty problems tracked in the repo."),
+        ("hard",    "Hard problems",
+         lambda e: e.get("difficulty") == "Hard",
+         "All Hard-difficulty problems tracked in the repo."),
+        ("nc150",   "NeetCode 150",
+         lambda e: bool(e.get("isNC150")),
+         "The canonical NeetCode 150 subset of your tracked problems."),
+        ("blind75", "Blind 75",
+         lambda e: bool(e.get("isBlind75")),
+         "The Blind 75 subset — the tightest interview-anchor list."),
+        ("core",    "Core anchors",
+         lambda e: bool(e.get("flags", {}).get("pinned")),
+         "Your curated ~50 anchor problems (see Tracking/core.md)."),
+    ]
+    tags_written: list[tuple[str, str, int]] = []
+    for slug, title, predicate, subtitle in tag_definitions:
+        matching = [e for e in all_entries if predicate(e)]
+        if not matching:
+            continue
+        write(
+            SITE_DIR / "tags" / f"{slug}.html",
+            render_tag_page(title, matching, subtitle=subtitle),
+        )
+        tags_written.append((slug, title, len(matching)))
+
+    # tags/index.html — hub page linking to each tag list
+    tag_hub_rows = "".join(
+        f'<div class="pattern-card">'
+        f'<a href="{esc(slug)}.html">{esc(title)}</a>'
+        f'<div class="count">{count} problems</div>'
+        f'</div>'
+        for slug, title, count in tags_written
+    )
+    tag_hub_body = f"""
+    <h2>Tag pages</h2>
+    <p class="dim" style="margin-top:-4px">Cross-cutting problem lists —
+      by difficulty, curated set membership, or anchor status.</p>
+    <div class="pattern-grid">{tag_hub_rows}</div>
+    """
+    write(
+        SITE_DIR / "tags" / "index.html",
+        base_layout("Tags", tag_hub_body, back_link="../index.html")
+            .replace("{root}", "../"),
+    )
+
     print(f"Built site → {SITE_DIR.relative_to(REPO_ROOT)}")
     print(f"  problems: {len(state['problems'])}")
     print(f"  patterns: {len(by_pattern)}")
+    print(f"  tag pages: {len(tags_written)}")
     print(f"  open: file://{SITE_DIR}/index.html")
     return 0
 

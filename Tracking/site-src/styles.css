@@ -71,7 +71,7 @@
   --radius:      5px;
   --radius-lg:   8px;
   --gap:         16px;
-  --page-max:    960px;
+  --page-max:    1280px;
   --top-space:   4rem;
 
   --font-header: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -160,7 +160,7 @@ a:hover { color: var(--accent-2); text-decoration: underline; }
 .container {
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: var(--top-space) 24px 96px;
+  padding: var(--top-space) clamp(20px, 4vw, 48px) 96px;
 }
 
 
@@ -379,7 +379,15 @@ h2 {
   letter-spacing: 0.02em;
   white-space: nowrap;
   line-height: 1.4;
+  text-decoration: none;
+  transition: transform 0.08s ease, filter 0.12s ease, box-shadow 0.12s ease;
 }
+a.badge:hover {
+  text-decoration: none;
+  filter: brightness(1.15);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--fg-muted) 20%, transparent);
+}
+a.badge { cursor: pointer; }
 .badge.diff-easy    { background: color-mix(in srgb, var(--diff-easy) 15%, transparent);    color: var(--diff-easy); }
 .badge.diff-medium  { background: color-mix(in srgb, var(--diff-medium) 15%, transparent);  color: var(--diff-medium); }
 .badge.diff-hard    { background: color-mix(in srgb, var(--diff-hard) 15%, transparent);    color: var(--diff-hard); }
