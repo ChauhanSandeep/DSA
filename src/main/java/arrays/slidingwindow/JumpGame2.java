@@ -6,39 +6,46 @@ import java.util.List;
 
 
 /**
- * Leetcode Problem: Jump Game II
- * Link: https://leetcode.com/problems/jump-game-ii/
+ * Problem: Jump Game II
  *
- * Problem Statement:
- * Given an array of non-negative integers `nums` where each element represents your maximum jump length at that position,
- * return the minimum number of jumps required to reach the last index.
- * You can assume that you can always reach the last index.
+ * Each nums[i] is the maximum jump length from index i. Return the minimum
+ * number of jumps needed to reach the last index; the original problem assumes
+ * the last index is reachable.
+ *
+ * Leetcode: https://leetcode.com/problems/jump-game-ii/ (Medium)
+ * Rating:   acceptance 41.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | BFS layers | Farthest jump window
  *
  * Example:
- * Input: nums = [2, 3, 1, 1, 4]
- * Output: 2
- * Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+ *   Input:  nums = [2,3,1,1,4]
+ *   Output: 2
+ *   Why:    jump from index 0 to 1, then from index 1 to the last index.
  *
- * Follow-up Questions:
- * 1. What if we want to print the actual jump path?
- *    → Use a tracking array to record indices from where we jumped.
+ * Follow-ups:
+ *   1. Return the actual jump path?
+ *      Track the best index inside each current jump window.
+ *   2. What if the end may be unreachable?
+ *      Return -1 when the farthest reach cannot move beyond the current index.
+ *   3. What if jumps have costs?
+ *      Use shortest-path or DP instead of unweighted greedy layers.
  *
- * 2. Can we solve this using DP?
- *    → Yes, but it will be O(n²) time and less optimal than greedy.
- *
- * 3. What if `nums[i]` can be negative?
- *    → The original problem assumes non-negative inputs. With negatives, we need a different problem model (e.g., graph BFS/DFS).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Jump Game (55), Minimum Number of Taps to Open to Water a Garden (1326).
  */
 public class JumpGame2 {
 
   public static void main(String[] args) {
-    int[] nums = {2, 3, 1, 1, 4};
-    Result result = calculateMinJumpsWithPath(nums);
+    JumpGame2 solver = new JumpGame2();
+    int[][] inputs = {{2, 3, 1, 1, 4}, {2, 3, 0, 1, 4}, {0}};
+    int[] expected = {2, 2, 0};
 
-    System.out.println("Minimum jumps to reach the end: " + result.jumpCount);
-    System.out.println("Jump path (indices): " + result.jumpPath);
+    for (int i = 0; i < inputs.length; i++) {
+      int got = solver.minJumpsGreedy(inputs[i]);
+      System.out.printf("nums=%s -> %d  expected=%d%n",
+          Arrays.toString(inputs[i]), got, expected[i]);
+    }
   }
+
+
 
   /**
    * Computes minimum jumps using bottom-up DP
@@ -70,16 +77,20 @@ public class JumpGame2 {
   }
 
   /**
-   * - The approach keeps track of the farthest reachable index in the current jump window.
-   * - Whenever the current index reaches the end of this window, a jump is made, and the window
-   * is extended to the farthest reachable index calculated so far.
-   * - This ensures that the number of jumps is minimized by always jumping to the farthest reachable index.
+   * Intuition: treat all indexes reachable with the same number of jumps as one
+   * BFS layer. currentReachable is the end of the current layer; maxReachable is
+   * the farthest index reachable by taking one more jump from this layer.
    *
-   * Time Complexity: O(n), where n is the size of the input array.
-   * Space Complexity: O(1), as we use only a few extra variables.
+   * Algorithm:
+   *   1. Scan indexes before the last one, extending maxReachable with i + nums[i].
+   *   2. When i reaches currentReachable, take one jump and move the layer end to maxReachable.
+   *   3. Return -1 if a layer cannot extend; otherwise return jumpsTaken.
    *
-   * @param nums An array of non-negative integers representing maximum jump lengths.
-   * @return The minimum number of jumps needed to reach the last index.
+   * Time:  O(n) - one pass over the array.
+   * Space: O(1) - only jump-window boundaries are stored.
+   *
+   * @param nums maximum jump length from each index
+   * @return minimum jumps to reach the last index, or -1 if unreachable
    */
   public int minJumpsGreedy(int[] nums) {
     int jumpsTaken = 0;

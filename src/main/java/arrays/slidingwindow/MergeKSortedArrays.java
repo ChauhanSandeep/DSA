@@ -4,52 +4,67 @@ import java.util.*;
 
 
 /**
- * Problem: Merge K Sorted Arrays.
- * Given K sorted arrays of integers, merge them into a single sorted array.
+ * Problem: Merge K Sorted Arrays
  *
- * Leetcode Link: https://leetcode.com/problems/merge-k-sorted-lists/ (conceptually similar)
+ * Given k individually sorted integer arrays, merge all values into one sorted
+ * array. This is the array version of the classic merge k sorted lists problem.
+ *
+ * Leetcode: https://leetcode.com/problems/merge-k-sorted-lists/ (Hard, analogous)
+ * Rating:   no direct array problem rating
+ * Pattern:  Heap | K-way merge | Priority queue
  *
  * Example:
- * Input:
- *   arr1 = [1, 3, 5, 7]
- *   arr2 = [2, 4, 6, 8]
- *   arr3 = [0, 9, 10, 11]
- * Output:
- *   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+ *   Input:  [[1,3,5,7],[2,4,6,8],[0,9,10,11]]
+ *   Output: [0,1,2,3,4,5,6,7,8,9,10,11]
+ *   Why:    the heap always exposes the smallest current head among the k arrays.
  *
- * Follow-up Questions:
- * 1. Can you do it without a heap? → Yes, by using divide and conquer (merge 2 arrays at a time)
- *    🔗 https://leetcode.com/problems/merge-k-sorted-lists/discuss/10527/A-java-solution-based-on-divide-and-conquer
- * 2. Can you merge arrays in-place? → Only possible if you control the original arrays.
- * 3. What if arrays are streaming in real-time? → Use a sliding window and a heap for real-time merging.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can this be done without a heap?
+ *      Merge arrays pairwise with divide and conquer.
+ *   2. What if arrays are streams?
+ *      Keep one current value per stream in the heap and pull lazily.
+ *   3. What if the result must be written in place?
+ *      Only possible with spare capacity or by merging from the end for two arrays at a time.
+ *
+ * Related: Merge k Sorted Lists (23), Merge Sorted Array (88).
  */
 public class MergeKSortedArrays {
 
   public static void main(String[] args) {
-    int[] arr1 = {1, 3, 5, 7};
-    int[] arr2 = {2, 4, 6, 8};
-    int[] arr3 = {0, 9, 10, 11};
+    List<List<int[]>> inputs = Arrays.asList(
+        Arrays.asList(new int[]{1, 3, 5, 7}, new int[]{2, 4, 6, 8}, new int[]{0, 9, 10, 11}),
+        Arrays.asList(new int[]{}, new int[]{1}),
+        Collections.emptyList()
+    );
+    int[][] expected = {
+        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+        {1},
+        {}
+    };
 
-    int[] merged = mergeKSortedArrays(Arrays.asList(arr1, arr2, arr3));
-    System.out.println("Merged Array: " + Arrays.toString(merged));
+    for (int i = 0; i < inputs.size(); i++) {
+      int[] got = mergeKSortedArrays(inputs.get(i));
+      System.out.printf("arrays=%s -> %s  expected=%s%n",
+          Arrays.deepToString(inputs.get(i).toArray(new int[0][])),
+          Arrays.toString(got), Arrays.toString(expected[i]));
+    }
   }
 
   /**
-   * Merges K sorted arrays into one sorted array using a Min Heap.
+   * Intuition: each sorted array contributes only its current smallest unused
+   * value. A min heap over those current heads repeatedly reveals the next global
+   * value, then advances only the array that supplied it.
    *
-   * ✅ Steps:
-   * 1. Add the first element of each array to the min heap.
-   * 2. Pop the smallest element from the heap and add it to the result.
-   * 3. If the array of the popped element has more elements, push the next element into the heap.
-   * 4. Repeat until the heap is empty.
+   * Algorithm:
+   *   1. Push the first element of every non-empty array into the min heap.
+   *   2. Pop the smallest heap entry, append its value to result, and advance that array.
+   *   3. Push the next value from the same array until the heap is empty.
    *
-   * 🧠 Algorithm: Min Heap (Priority Queue)
-   * ⏱ Time Complexity: O(N log K), where N is total number of elements and K is number of arrays.
-   * 🧠 Space Complexity: O(K) for the heap.
+   * Time:  O(N log k) - N total elements, with heap size at most k.
+   * Space: O(k) - the heap stores one entry per non-empty array.
    *
-   * @param arrays List of sorted integer arrays to be merged.
-   * @return A single sorted array containing all elements.
+   * @param arrays list of sorted integer arrays
+   * @return one sorted array containing all values
    */
   public static int[] mergeKSortedArrays(List<int[]> arrays) {
     if (arrays == null || arrays.isEmpty()) {

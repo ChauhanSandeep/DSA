@@ -9,46 +9,60 @@ import java.util.TreeMap;
 /**
  * Problem: Sliding Window Maximum
  *
- * Given an integer array `nums` and an integer `k`, find the maximum value in each
- * sliding window of size `k` moving from left to right.
+ * Given nums and window size k, return the maximum value in every contiguous
+ * window as it slides one step at a time from left to right.
+ *
+ * Leetcode: https://leetcode.com/problems/sliding-window-maximum/ (Hard)
+ * Rating:   acceptance 47.4% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Sliding window | Monotonic deque
  *
  * Example:
- * Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
- * Output: [3,3,5,5,6,7]
+ *   Input:  nums = [1,3,-1,-3,5,3,6,7], k = 3
+ *   Output: [3,3,5,5,6,7]
+ *   Why:    the deque keeps only useful candidates, so its front is each window max.
  *
- * LeetCode Link: https://leetcode.com/problems/sliding-window-maximum/
+ * Follow-ups:
+ *   1. Can this support a stream?
+ *      Keep the same monotonic deque and evict indices as they leave the window.
+ *   2. Can this be parallelized?
+ *      Use block prefix/suffix maxima and combine overlapping blocks.
+ *   3. What if we need both min and max?
+ *      Maintain two monotonic deques, one decreasing and one increasing.
  *
- * Follow-up Questions:
- * - Can you do this in O(n) time? (Deque-based solution)
- * - Can you solve it in parallel using multiple threads? (Divide-and-conquer approach)
- * - How would you adapt this to streams? (Use monotonic queue or Segment Tree)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Minimum Window Substring (76), Constrained Subsequence Sum (1425).
  */
 public class MaxSlidingWindow {
 
   public static void main(String[] args) {
-    int[] nums = {1, 3, -1, -3, 5, 3, 6, 7};
-    int k = 3;
-    int[] maxValues = getMaxInSlidingWindow(nums, k);
-    System.out.println("Sliding Window Maximum: " + Arrays.toString(maxValues));
+    int[][] nums = {{1, 3, -1, -3, 5, 3, 6, 7}, {1}, {9, 11}};
+    int[] windowSizes = {3, 1, 2};
+    int[][] expected = {{3, 3, 5, 5, 6, 7}, {1}, {11}};
+
+    for (int i = 0; i < nums.length; i++) {
+      int[] got = getMaxInSlidingWindow(nums[i], windowSizes[i]);
+      System.out.printf("nums=%s k=%d -> %s  expected=%s%n",
+          Arrays.toString(nums[i]), windowSizes[i], Arrays.toString(got), Arrays.toString(expected[i]));
+    }
   }
 
+
+
   /**
-   * Returns an array representing the maximum value of every contiguous subarray of size `k`.
+   * Intuition: in a window, any smaller value to the left of a newer larger value
+   * can never become maximum again before it leaves. The deque stores only useful
+   * candidate indices in decreasing value order, so the front is always the max.
    *
-   * Steps:
-   * 1. Use a Deque to store indices of elements in the current window.
-   * 2. Remove indices from the first of the deque if they are out of the current window (i - k).
-   * 3. Remove indices from the end of the deque while the current element is greater than the elements at those indices, as they cannot be the maximum if the current element is greater.
-   * 4. Maintain a decreasing order in the deque — remove all elements smaller than the current.
-   * 5. The front of the deque always holds the index of the maximum element for the current window.
+   * Algorithm:
+   *   1. Remove deque indices that have fallen out of the current window.
+   *   2. Remove smaller-or-equal values from the back before adding i.
+   *   3. Once the first window is formed, write nums[deque front] to result.
    *
-   * Time Complexity: O(n) — each element is added/removed from deque at most once.
-   * Space Complexity: O(k) — deque holds at most `k` indices at a time.
+   * Time:  O(n) - each index is inserted and removed at most once.
+   * Space: O(k) - the deque holds candidates from the current window.
    *
-   * @param nums Input integer array
-   * @param k    Size of the sliding window
-   * @return Array of maximums for each sliding window
+   * @param nums input array
+   * @param k sliding window size
+   * @return maximum value for every window
    */
   public static int[] getMaxInSlidingWindow(int[] nums, int k) {
     if (nums == null || nums.length == 0 || k <= 0) {

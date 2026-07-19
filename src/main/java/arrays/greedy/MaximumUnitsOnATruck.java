@@ -5,70 +5,65 @@ import java.util.*;
 /**
  * Problem: Maximum Units on a Truck
  *
- * You are assigned to put some amount of boxes onto one truck. You are given a 2D array
- * boxTypes, where boxTypes[i] = [numberOfBoxesi, numberOfUnitsPerBoxi]:
- * - numberOfBoxesi is the number of boxes of type i
- * - numberOfUnitsPerBoxi is the number of units in each box of type i
+ * Each box type gives a number of boxes and units per box. Load at most
+ * truckSize boxes so the total units on the truck is as large as possible.
  *
- * You are also given an integer truckSize, which is the maximum number of boxes that
- * can be put on the truck. You can choose any boxes to put on the truck as long as
- * the number of boxes does not exceed truckSize.
- *
- * Return the maximum total number of units that can be put on the truck.
+ * Leetcode: https://leetcode.com/problems/maximum-units-on-a-truck/ (Easy)
+ * Rating:   acceptance 74.3% (Easy) - contest rating 1310
+ * Pattern:  Greedy | Sorting by value density
  *
  * Example:
- * Input: boxTypes = [[1,3],[2,2],[3,1]], truckSize = 4
- * Output: 8
- * Explanation:
- * - 1 box of first type (3 units each) = 3 units
- * - 2 boxes of second type (2 units each) = 4 units
- * - 1 box of third type (1 unit each) = 1 unit
- * Total = 3 + 4 + 1 = 8 units using 4 boxes
+ *   Input:  boxTypes = [[1,3],[2,2],[3,1]], truckSize = 4
+ *   Output: 8
+ *   Why:    take the 3-unit box, both 2-unit boxes, and one 1-unit box.
  *
- * Input: boxTypes = [[5,10],[2,5],[4,7],[3,9]], truckSize = 10
- * Output: 91
- * Explanation: Take all 5 boxes of type [5,10] (50 units), all 3 boxes of type [3,9] (27 units),
- * and 2 boxes of type [4,7] (14 units) = 91 units using 10 boxes
+ * Follow-ups:
+ *   1. What if boxes also have weights?
+ *      This becomes 0/1 or bounded knapsack instead of a pure greedy count.
+ *   2. What if boxes can be split fractionally?
+ *      Sort by units per box and take fractional capacity like fractional knapsack.
+ *   3. What if units per box are in a small fixed range?
+ *      Counting sort or buckets can reduce sorting to linear time.
  *
- * LeetCode: https://leetcode.com/problems/maximum-units-on-a-truck
- *
- * Follow-up Questions:
- * 1. Q: What if boxes had weight constraints in addition to count constraints?
- *    A: Would become a more complex knapsack problem requiring dynamic programming.
- *
- * 2. Q: How would you handle fractional boxes (can take part of a box)?
- *    A: This becomes the classic fractional knapsack problem with same greedy approach.
- *
- * 3. Q: What if different box types had different loading costs?
- *    A: Would need to consider cost-benefit ratio instead of just units per box.
- *
- * 4. Q: How would you optimize for very large datasets?
- *    A: Current O(n log n) solution is optimal. Could use counting sort if units are small range.
- *
- * Related Problems:
- * - Fractional Knapsack: Classic greedy algorithm problem
- * - Maximum Bags With Full Capacity of Rocks: https://leetcode.com/problems/maximum-bags-with-full-capacity-of-rocks/
- * - Assign Cookies: https://leetcode.com/problems/assign-cookies/
- * LeetCode Contest Rating: 1310
+ * Related: Assign Cookies (455), Maximum Bags With Full Capacity of Rocks (2279).
  */
 public class MaximumUnitsOnATruck {
 
+    public static void main(String[] args) {
+        MaximumUnitsOnATruck solver = new MaximumUnitsOnATruck();
+        int[][][] boxTypes = {
+            {{1, 3}, {2, 2}, {3, 1}},
+            {{5, 10}, {2, 5}, {4, 7}, {3, 9}},
+            {}
+        };
+        int[] truckSizes = {4, 10, 3};
+        int[] expected = {8, 91, 0};
+
+        for (int i = 0; i < boxTypes.length; i++) {
+            int[][] input = Arrays.stream(boxTypes[i]).map(int[]::clone).toArray(int[][]::new);
+            int got = solver.maximumUnits(input, truckSizes[i]);
+            System.out.printf("boxTypes=%s truckSize=%d -> %d  expected=%d%n",
+                Arrays.deepToString(boxTypes[i]), truckSizes[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds maximum units using greedy approach with sorting by units per box.
+     * Intuition: every box consumes exactly one truck slot, so only units per box
+     * matters. Loading higher-unit boxes first can never hurt; replacing any lower
+     * unit box with a higher-unit box increases or preserves the total.
      *
      * Algorithm:
-     * 1. Sort box types by units per box in descending order (most valuable first)
-     * 2. Greedily take as many boxes as possible from each type, starting with highest value
-     * 3. For each box type, take min(available boxes, remaining truck capacity)
-     * 4. Update total units and remaining truck capacity
-     * 5. Stop when truck is full or no more boxes available
+     *   1. Sort boxTypes by units per box in descending order.
+     *   2. Visit each type and take as many boxes as remainingCapacity allows.
+     *   3. Add boxesToTake * unitsPerBox and stop once the truck is full.
      *
-     * Time Complexity: O(n log n) where n is number of box types (dominated by sorting)
-     * Space Complexity: O(1) if sorting in-place, O(n) if using additional space for sorting
+     * Time:  O(n log n) - sorting dominates the scan over box types.
+     * Space: O(1) - aside from sort implementation details, only counters are used.
      *
-     * @param boxTypes 2D array where boxTypes[i] = [numberOfBoxes, unitsPerBox]
-     * @param truckSize maximum number of boxes truck can carry
-     * @return maximum total units that can be loaded on truck
+     * @param boxTypes boxTypes[i] = [numberOfBoxes, unitsPerBox]
+     * @param truckSize maximum number of boxes the truck can carry
+     * @return maximum units that can be loaded
      */
     public int maximumUnits(int[][] boxTypes, int truckSize) {
         if (boxTypes == null || boxTypes.length == 0 || truckSize <= 0) {

@@ -1,35 +1,47 @@
 package arrays.slidingwindow;
 
+import java.util.Arrays;
+
 /**
- * Leetcode Problem: Jump Game
- * Link: https://leetcode.com/problems/jump-game/
+ * Problem: Jump Game
  *
- * Problem Statement:
- * You are given an array of non-negative integers `nums`. Each element represents your maximum jump length at that position.
- * Starting at index 0, determine if you can reach the last index.
+ * Each nums[i] is the farthest jump length available from index i. Starting at
+ * index 0, decide whether any sequence of jumps can reach the last index.
+ *
+ * Leetcode: https://leetcode.com/problems/jump-game/ (Medium)
+ * Rating:   acceptance 39.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Farthest reachable index
  *
  * Example:
- * Input: nums = [2, 3, 1, 1, 4]
- * Output: true
- * Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+ *   Input:  nums = [2,3,1,1,4]
+ *   Output: true
+ *   Why:    jump from index 0 to 1, then from index 1 to the last index.
  *
- * Follow-up Questions:
- * 1. What if we also want to return the minimum number of jumps to reach the end?
- *    → See Leetcode: https://leetcode.com/problems/jump-game-ii/
+ * Follow-ups:
+ *   1. Return the minimum number of jumps?
+ *      Use the windowed greedy solution from Jump Game II.
+ *   2. Return one valid path?
+ *      Track the index that extends reach whenever a jump window closes.
+ *   3. What if negative jumps are allowed?
+ *      Model indices as graph nodes and use BFS/DFS with visited tracking.
  *
- * 2. Can we find all possible paths to reach the end?
- *    → Brute-force backtracking or BFS-style search, but not feasible for large inputs.
- *
- * 3. What if some elements are negative?
- *    → The original problem assumes non-negative integers. If negatives are allowed, it becomes a different problem (may require graph traversal or DP with memoization).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Jump Game II (45), Jump Game III (1306), Jump Game VII (1871).
  */
 public class JumpGame {
 
   public static void main(String[] args) {
-    int[] nums = {2, 3, 1, 1, 4};
-    System.out.println("Can jump to the end? " + canJumpGreedy(nums));
+    JumpGame solver = new JumpGame();
+    int[][] inputs = {{2, 3, 1, 1, 4}, {3, 2, 1, 0, 4}, {0}};
+    boolean[] expected = {true, false, true};
+
+    for (int i = 0; i < inputs.length; i++) {
+      boolean got = solver.canJump(inputs[i]);
+      System.out.printf("nums=%s -> %s  expected=%s%n",
+          Arrays.toString(inputs[i]), got, expected[i]);
+    }
   }
+
+
 
   /**
    * Brute-force Dynamic Programming approach.
@@ -61,23 +73,20 @@ public class JumpGame {
   }
 
   /**
-   * Determines if the last index can be reached using a greedy approach tracking the maximum reachable index.
-   * This is the optimal O(n) solution.
+   * Intuition: while scanning left to right, maxReachable is the farthest index
+   * any reachable position has offered so far. If the scan ever steps beyond it,
+   * that index and everything after it are unreachable.
    *
-   * Step-by-step explanation:
-   * 1. Initialize maxReach to 0.
-   * 2. Iterate through the array from 0 to n-1.
-   * 3. If current index i > maxReach, return false (cannot reach here).
-   * 4. Update maxReach = max(maxReach, i + nums[i]).
-   * 5. If maxReach >= n-1, return true.
-   * 6. After loop, return true if maxReach >= n-1, else false.
+   * Algorithm:
+   *   1. Start maxReachable at 0.
+   *   2. Scan each index; return false if i is beyond maxReachable.
+   *   3. Update maxReachable with i + nums[i] and return true once it reaches the end.
    *
-   * Algorithm: Greedy
-   * Time Complexity: O(n) - Single pass through the array.
-   * Space Complexity: O(1) - Constant space.
+   * Time:  O(n) - at most one pass over nums.
+   * Space: O(1) - only the farthest reachable index is stored.
    *
-   * @param nums the array of maximum jump lengths
-   * @return true if last index is reachable, false otherwise
+   * @param nums maximum jump length from each index
+   * @return true if the last index is reachable
    */
   public boolean canJump(int[] nums) {
     int length = nums.length;

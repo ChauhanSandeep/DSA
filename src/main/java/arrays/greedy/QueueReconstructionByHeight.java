@@ -4,59 +4,70 @@ import java.util.*;
 
 
 /**
- * Problem Statement:
- * You are given an array of people, people, which are the attributes of some people in a queue (not necessarily in order). 
- * Each people[i] = [hi, ki] represents the ith person of height hi with exactly ki other people in front (on left side of array) 
- * who have a height greater than or equal to hi
- * 
- * Reconstruct and return the queue that is represented by the input array people. The returned queue should be formatted as an array queue, 
- * where queue[j] = [hj, kj] is the attributes of the jth person in the queue (queue[0] is the person at the front of the queue).
+ * Problem: Queue Reconstruction by Height
+ *
+ * Each person is [height, k], where k is the number of people in front with
+ * height at least that person's height. Reconstruct a queue satisfying every
+ * person's k value.
+ *
+ * Leetcode: https://leetcode.com/problems/queue-reconstruction-by-height/ (Medium)
+ * Rating:   acceptance 75.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Sorting | Indexed insertion
  *
  * Example:
- * Input: people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
- * Output: [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
- * Explanation: Person with height 5 and k=0 is first, followed by height 7 k=0, and so on, satisfying all k conditions.
+ *   Input:  people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
+ *   Output: [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+ *   Why:    after taller people are placed first, inserting each shorter person
+ *           at index k creates exactly k taller-or-equal people before them.
  *
- * LeetCode Link: https://leetcode.com/problems/queue-reconstruction-by-height/
+ * Follow-ups:
+ *   1. What if k counts people behind instead of in front?
+ *      Mirror the insertion direction or transform k relative to the final length.
+ *   2. What if the input may be invalid?
+ *      Validate each insertion index and re-count the final queue constraints.
+ *   3. Can insertion be faster than O(n^2)?
+ *      Use an order-statistics tree or Fenwick tree over empty slots.
  *
- * Follow-up Questions:
- * 1. How would you reconstruct if k represented people behind instead of in front?
- *    - Reverse the logic: sort by height ascending and insert from the end or adjust indices accordingly.
- * 2. What if we need to minimize the total height difference between adjacent people after reconstruction?
- *    - The reconstruction is unique based on constraints; if multiple possible, we'd need additional sorting or DP.
- * 3. How to handle if the input may not form a valid queue (invalid k values)?
- *    - Add validation during insertion to check if k is feasible, but problem assumes valid input.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Count of Smaller Numbers After Self (315), Insert Interval (57).
  */
 public class QueueReconstructionByHeight {
 
   public static void main(String[] args) {
-    int[][] people = {{7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2}};
-    int[][] reconstructedQueue = reconstructQueue(people);
-    System.out.println(Arrays.deepToString(reconstructedQueue)); // Expected: [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+    int[][][] inputs = {
+        {{7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2}},
+        {{1, 0}}
+    };
+    int[][][] expected = {
+        {{5, 0}, {7, 0}, {5, 2}, {6, 1}, {4, 4}, {7, 1}},
+        {{1, 0}}
+    };
+
+    for (int i = 0; i < inputs.length; i++) {
+      int[][] input = Arrays.stream(inputs[i]).map(int[]::clone).toArray(int[][]::new);
+      int[][] got = reconstructQueue(input);
+      System.out.printf("people=%s -> %s  expected=%s%n",
+          Arrays.deepToString(inputs[i]), Arrays.deepToString(got), Arrays.deepToString(expected[i]));
+    }
   }
 
+
+
   /**
-   * Reconstructs the queue by sorting people by height descending and k ascending, then inserting at k index.
-   * This is the optimal greedy approach.
-   * 
-   * Intuition:
-   * If you process the people from tallest to shortest, you can ensure that when you place a person P, 
-   * all the people already in the queue are guaranteed to be taller than or equal to P. 
-   * 
-   * Step-by-step explanation:
-   * 1. Sort the people array: first by height in descending order, then by k in ascending order for ties.
-   * 2. Initialize an empty list for the result.
-   * 3. For each person in the sorted array, insert them at index equal to their k value in the result list. This works because:
-   *    - Taller people are placed first, so when we insert a shorter person at index k, there are already k taller or equal-height people in front of them.
-   * 4. Convert the list back to a 2D array and return.
+   * Intuition: place taller people first because shorter people do not affect any
+   * taller person's k count. Once all taller-or-equal people are already in the
+   * list, inserting a person at index k creates exactly k qualifying people in
+   * front of that person.
    *
-   * Algorithm: Greedy Sort and Insert
-   * Time Complexity: O(n^2) - Due to insertions in list (worst-case O(n) per insertion), but acceptable for n <= 1100.
-   * Space Complexity: O(n) - For the result list.
+   * Algorithm:
+   *   1. Sort by height descending, and by k ascending for equal heights.
+   *   2. Insert each person into the queue list at index person[1].
+   *   3. Convert the list back to a 2D array.
    *
-   * @param people the input array of [height, k] pairs
-   * @return the reconstructed queue as 2D array
+   * Time:  O(n^2) - list insertion can shift O(n) people for each person.
+   * Space: O(n) - the reconstructed queue list stores all people.
+   *
+   * @param people array of [height, k] pairs
+   * @return reconstructed queue satisfying every k constraint
    */
   public static int[][] reconstructQueue(int[][] people) {
     if (people == null || people.length == 0) {

@@ -3,38 +3,64 @@ package arrays.slidingwindow;
 import java.util.*;
 
 /**
- * Find All Lonely Numbers In The Array
+ * Problem: Find All Lonely Numbers in the Array
  *
- * Problem: A number is lonely if it appears exactly once and neither x+1 nor x-1 appears.
- * Return all lonely numbers in any order.
+ * A number is lonely when it appears exactly once and neither neighboring value
+ * x - 1 nor x + 1 appears anywhere in the array. Return all lonely values in any
+ * order.
  *
- * Example: nums = [10,6,5,8] -> Output: [10,8]
- * 10 appears once, 9 and 11 don't appear. 8 appears once, 7 and 9 don't appear.
+ * Leetcode: https://leetcode.com/problems/find-all-lonely-numbers-in-the-array/ (Medium)
+ * Rating:   acceptance 60.2% (Medium) - contest rating 1276
+ * Pattern:  Hash map | Frequency counting | Neighbor lookup
  *
- * LeetCode: https://leetcode.com/problems/find-all-lonely-numbers-in-the-array
+ * Example:
+ *   Input:  nums = [10,6,5,8]
+ *   Output: [10,8]
+ *   Why:    10 and 8 each appear once, and neither has an adjacent value present.
  *
- * Follow-up Questions:
- * - How to find numbers that appear exactly k times with no neighbors? (Modify frequency check)
- * - What if we want lonely numbers within distance d? (Check range [x-d, x+d])
- * - Can we solve without using extra space? (Sorting approach possible but O(n log n))
- * LeetCode Contest Rating: 1276
+ * Follow-ups:
+ *   1. Find values appearing exactly k times with no neighbors?
+ *      Replace the frequency check with freq == k.
+ *   2. What if loneliness means no value within distance d?
+ *      Check the range [x - d, x + d], or sort and inspect neighbors.
+ *   3. Can this be solved with less extra space?
+ *      Sort in place and scan adjacent values, trading O(n log n) time for O(1) space.
  */
 public class FindAllLonelyNumbersInTheArray {
 
+    public static void main(String[] args) {
+        FindAllLonelyNumbersInTheArray solver = new FindAllLonelyNumbersInTheArray();
+        int[][] inputs = {{10, 6, 5, 8}, {1, 3, 5, 3}, {1, 2, 3}};
+        List<List<Integer>> expected = Arrays.asList(
+            Arrays.asList(8, 10),
+            Arrays.asList(1, 5),
+            Collections.emptyList()
+        );
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = solver.findLonely(inputs[i]);
+            Collections.sort(got);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected.get(i));
+        }
+    }
+
+
     /**
-     * Finds all lonely numbers in the array.
+     * Intuition: loneliness depends on global facts: the value's own frequency
+     * and whether neighboring values exist anywhere. A frequency map answers all
+     * three questions in constant time per distinct value.
      *
      * Algorithm:
-     * 1. Count frequency of each number using map
-     * 2. For each number that appears exactly once
-     * 3. Check if neither x-1 nor x+1 exists in the map
-     * 4. Add to result if condition satisfied
+     *   1. Count each value in frequencyMap.
+     *   2. Visit each distinct value and keep only values with frequency one.
+     *   3. Add the value when neither num - 1 nor num + 1 exists in the map.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(n) for frequency map and result list
+     * Time:  O(n) - build the map and scan its keys.
+     * Space: O(n) - the map may store every value.
      *
-     * @param nums input array of integers
-     * @return list of all lonely numbers
+     * @param nums input array
+     * @return all lonely values in any order
      */
     public List<Integer> findLonely(int[] nums) {
         List<Integer> result = new ArrayList<>();

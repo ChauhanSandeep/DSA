@@ -1,63 +1,72 @@
 package arrays.greedy;
 
+import java.util.Arrays;
+
 
 /**
- * LeetCode Problem 1326: Minimum Number of Taps to Open to Water a Garden
- * https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/
+ * Problem: Minimum Number of Taps to Open to Water a Garden
  *
- * Problem Statement:
- * You are given an integer n representing the length of a one-dimensional garden [0, n], and an integer array ranges of length n + 1 where ranges[i] (0-indexed)
- * means the i-th tap can water the area [i - ranges[i], i + ranges[i]] if opened (interval bounds are clipped to [0, n]).
- * Return the minimum number of taps you need to open to water the entire garden. If it's impossible to water the garden, return -1.
+ * A garden is the line segment [0, n]. Tap i waters an interval centered at i
+ * with radius ranges[i]. Open the fewest taps needed to cover the whole segment,
+ * or return -1 when a gap cannot be covered.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/ (Hard)
+ * Rating:   acceptance 53.1% (Hard) - contest rating 1885
+ * Pattern:  Greedy | Interval covering | Jump Game II transform
  *
  * Example:
- * Input: n = 5, ranges = [3,4,1,1,0,0]
- * Output: 1
- * Explanation:
- * - Tap at position 0 waters [0,3].
- * - Tap at position 1 waters [0,5] (fully covers [0,5]).
- * - Tap at position 2 waters [1,3], and so on.
- * By opening only the tap at position 1, the whole garden [0,5] is watered.
+ *   Input:  n = 5, ranges = [3,4,1,1,0,0]
+ *   Output: 1
+ *   Why:    tap 1 covers [0,5], so one tap waters the entire garden.
  *
- * Follow-up Questions (FAANG interview style):
- * 1. What if the intervals are given unsorted or as random events?
- *    - You could generalize to interval covering problems, map to "minimum number of intervals to cover a line" (see LeetCode 452, 435).
- * 2. How would you efficiently update taps' locations or ranges frequently?
- *    - Data structures like segment trees, interval trees, or advanced greedy with update queries can help.
- * 3. Can you design for a 2D garden (or arbitrary-shaped domains)?
- *    - The problem generalizes to disk/rectangle covering; NP-hard in higher dimensions, often solved via approximation or greedy heuristics.
- * 4. How would you return the list of taps used in the optimal solution?
- *    - This requires tracking selections during the greedy decision (e.g., store indices while jumping).
- * Related Problems:
- * - Jump Game II (LeetCode 45): https://leetcode.com/problems/jump-game-ii/
- * - Minimum Number of Arrows to Burst Balloons (LeetCode 452): https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
- * LeetCode Contest Rating: 1885
+ * Follow-ups:
+ *   1. Return the actual taps used?
+ *      Track which interval provides each greedy extension.
+ *   2. What if intervals arrive online?
+ *      Use a priority queue of active intervals ordered by farthest right endpoint.
+ *   3. What if the garden is two-dimensional?
+ *      General disk or rectangle cover is much harder and often NP-hard.
+ *
+ * Related: Jump Game II (45), Video Stitching (1024).
  */
 public class MinTaps {
 
   public static void main(String[] args) {
-    int target = 5;
-    int[] ranges = {4, 3, 1, 2, 0, 0};
-    int taps = new MinTaps().minTapsToWaterGarden(target, ranges);
-    System.out.println("Minimum taps required: " + taps);
+    MinTaps solver = new MinTaps();
+    int[] gardenLengths = {5, 3, 7};
+    int[][] ranges = {
+        {3, 4, 1, 1, 0, 0},
+        {0, 0, 0, 0},
+        {1, 2, 1, 0, 2, 1, 0, 1}
+    };
+    int[] expected = {1, -1, 3};
+
+    for (int i = 0; i < ranges.length; i++) {
+      int got = solver.minTapsToWaterGarden(gardenLengths[i], ranges[i]);
+      System.out.printf("n=%d ranges=%s -> %d  expected=%d%n",
+          gardenLengths[i], Arrays.toString(ranges[i]), got, expected[i]);
+    }
   }
 
+
+
   /**
-   * Main solution method - Greedy (Interval Jump).
+   * Intuition: each tap is an interval, and covering [0, n] is the same shape as
+   * Jump Game II. For every left boundary, remember the farthest right endpoint.
+   * Then scan left to right, opening a tap only when the current committed
+   * coverage ends.
    *
-   * Algorithm Overview:
-   * 1. For each tap position, compute its reachable interval in the garden.
-   * 2. For each garden point, store the farthest right it can be watered from any tap starting at or before that point.
-   * 3. Use a greedy "jump" technique (similar to Jump Game II):
-   *    - At each point, if we've reached the end of the current watering range, open the tap that extends coverage furthest.
-   *    - If we can't extend coverage, return -1.
+   * Algorithm:
+   *   1. Convert each tap into an interval and store the best right endpoint in coverage[left].
+   *   2. Scan garden points, updating currentReachable with the best interval seen so far.
+   *   3. When i reaches maxReachable, open one tap and extend to currentReachable.
    *
-   * Time Complexity: O(n)
-   * Space Complexity: O(n)
+   * Time:  O(n) - one pass builds coverage and one pass chooses taps.
+   * Space: O(n) - coverage stores one farthest endpoint per garden position.
    *
-   * @param gardenLength the length of the garden
-   * @param ranges the watering ranges for each tap
-   * @return minimum number of taps to open, or -1 if impossible
+   * @param gardenLength the length n of the garden segment [0, n]
+   * @param ranges ranges[i] is the watering radius of tap i
+   * @return minimum taps to open, or -1 if the garden cannot be fully watered
    */
   public int minTapsToWaterGarden(int gardenLength, int[] ranges) {
 

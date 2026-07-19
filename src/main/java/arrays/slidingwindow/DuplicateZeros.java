@@ -3,76 +3,62 @@ package arrays.slidingwindow;
 import java.util.Arrays;
 
 /**
- * LeetCode Problem 1089: Duplicate Zeros
+ * Problem: Duplicate Zeros
  *
- * Problem Statement:
- * Given a fixed-length integer array arr, duplicate each occurrence of zero, shifting the
- * remaining elements to the right. Note that elements beyond the length of the original
- * array are not written. Do the above modifications to the input array in-place and do
- * not return anything.
+ * In a fixed-length array, duplicate every zero and shift following values to
+ * the right. Values that would move beyond the array length are discarded, and
+ * the modification must happen in place.
  *
- * Example 1:
- * Input: arr = [1,0,2,3,0,4,5,0]
- * Output: [1,0,0,2,3,0,0,4]
- * Explanation: After calling your function, the input array is modified to [1,0,0,2,3,0,0,4].
- * The first 0 at index 1 is duplicated, pushing elements right. The second 0 at index 4 is
- * also duplicated. The elements 5 and 0 at the end are pushed beyond the array length and
- * are discarded.
+ * Leetcode: https://leetcode.com/problems/duplicate-zeros/ (Easy)
+ * Rating:   acceptance 52.4% (Easy) - contest rating 1263
+ * Pattern:  Two pointers | Reverse write | In-place array editing
  *
- * Example 2:
- * Input: arr = [1,2,3]
- * Output: [1,2,3]
- * Explanation: No zeros to duplicate, array remains unchanged.
+ * Example:
+ *   Input:  arr = [1,0,2,3,0,4,5,0]
+ *   Output: [1,0,0,2,3,0,0,4]
+ *   Why:    each zero consumes one extra virtual slot, so the final values are
+ *           copied backward into the original fixed-length array.
  *
- * Constraints:
- * 1 <= arr.length <= 10^4
- * 0 <= arr[i] <= 9
+ * Follow-ups:
+ *   1. Duplicate a different target value?
+ *      Count that target and use the same backward write logic.
+ *   2. What if the array may grow?
+ *      Use a dynamic list or allocate a new result array.
+ *   3. Duplicate zeros k times?
+ *      Add k extra virtual slots per zero and write k + 1 copies backward.
  *
- * LeetCode Link: https://leetcode.com/problems/duplicate-zeros/
- *
- * Follow-up Questions:
- * 1. Q: How would you solve this if you needed to duplicate any specific value, not just zeros?
- *    A: Generalize the solution by parameterizing the target value. The two-pass algorithm
- *    remains the same: count occurrences of the target value in the first pass, then fill
- *    the array backward in the second pass, duplicating the target value when encountered.
- *
- * 2. Q: What if the array can grow dynamically and we don't need to discard elements?
- *    A: Use a simple forward iteration with ArrayList or similar dynamic structure. When a
- *    zero is found, insert another zero. This becomes O(n^2) for array shifting but O(n)
- *    with ArrayList. Related: https://leetcode.com/problems/insert-interval/
- *
- * 3. Q: How would you optimize if zeros are very sparse (few zeros in a large array)?
- *    A: The current optimal solution is already efficient for sparse zeros since we only
- *    process elements once. However, you could maintain a list of zero indices and only
- *    shift segments between zeros, potentially improving cache locality.
- *
- * 4. Q: Can you solve this with a single pass instead of two passes?
- *    A: A true single-pass solution is challenging because we need to know the final position
- *    of each element before moving it. However, you could use extra space with a temporary
- *    array for a single-pass solution, which violates the O(1) space constraint.
- *
- * 5. Q: How would you handle the case where we need to duplicate zeros k times instead of once?
- *    A: Modify the counting logic to multiply zero count by k, and in the backward pass,
- *    insert k copies of zero instead of 2. The algorithm structure remains the same.
- * LeetCode Contest Rating: 1263
+ * Related: Move Zeroes (283), Remove Duplicates from Sorted Array (26).
  */
 public class DuplicateZeros {
 
+    public static void main(String[] args) {
+        DuplicateZeros solver = new DuplicateZeros();
+        int[][] inputs = {{1, 0, 2, 3, 0, 4, 5, 0}, {1, 2, 3}, {0, 0, 1}};
+        int[][] expected = {{1, 0, 0, 2, 3, 0, 0, 4}, {1, 2, 3}, {0, 0, 0}};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = inputs[i].clone();
+            solver.duplicateZeros(got);
+            System.out.printf("arr=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
+
+
     /**
-     * Duplicates zeros in array in-place without changing length.
+     * Intuition: duplicating zeros expands the array in a virtual copy, but only
+     * the first arr.length positions survive. Writing from right to left avoids
+     * overwriting values that still need to be copied.
      *
-     * Steps:
-     * 1. Count total zeros to compute virtual length (arrLength + zeroCount).
-     * 2. Set writeIndex = virtualLength - 1, readIndex = arrLength - 1.
-     * 3. Move both indices backward:
-     *    - If arr[readIndex] is non-zero → copy it once (if within bounds).
-     *    - If arr[readIndex] is zero → write it twice (if within bounds).
-     * 4. Continue until readIndex < 0 or writeIndex < 0.
+     * Algorithm:
+     *   1. Count zeros to know the final virtual writeIndex.
+     *   2. Move readIndex from the real end and writeIndex from the virtual end.
+     *   3. Copy non-zero values once and zero values twice when the write index is in bounds.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(1)
+     * Time:  O(n) - one count pass and one backward write pass.
+     * Space: O(1) - the array is modified in place.
      *
-     * @param arr input array to modify in-place
+     * @param arr fixed-length array modified in place
      */
     public void duplicateZeros(int[] arr) {
         int arrLength = arr.length;

@@ -8,54 +8,60 @@ import java.util.Set;
 
 
 /**
- * LeetCode: https://leetcode.com/problems/minimum-deletions-to-make-character-frequencies-unique/
+ * Problem: Minimum Deletions to Make Character Frequencies Unique
  *
- * Problem:
- * Given a string, return the minimum number of characters to delete so that no two characters
- * have the same frequency.
+ * Given a lowercase string, delete the fewest characters so every remaining
+ * character has a distinct non-zero frequency. Characters may be reduced to zero
+ * frequency by deleting all of their occurrences.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-deletions-to-make-character-frequencies-unique/ (Medium)
+ * Rating:   acceptance 62.5% (Medium) - contest rating 1510
+ * Pattern:  Greedy | Frequency counting | Descending caps
  *
  * Example:
- * Input: "aabbcc"
- * Output: 2
- * Explanation: Delete one 'a' and one 'b' to make frequencies [2,1,1]
+ *   Input:  s = "aaabbbcc"
+ *   Output: 2
+ *   Why:    reduce frequencies [3,3,2] to [3,2,1] by deleting two characters.
  *
- * Follow-up Questions:
- * - Q: Can we do better than sorting?
- *   A: You can use a priority queue or bucket sort, but time complexity will still be O(N).
- * LeetCode Contest Rating: 1510
+ * Follow-ups:
+ *   1. What if the alphabet is very large?
+ *      Count with a hash map, then apply the same greedy frequency reduction.
+ *   2. Can this avoid sorting?
+ *      Use a set of used frequencies and decrement conflicts until each is unique.
+ *   3. What if deletion costs differ by character?
+ *      Greedy by frequency is no longer enough; model weighted choices with DP or a heap.
+ *
+ * Related: Remove Duplicate Letters (316), Minimum Deletions to Make String Balanced (1653).
  */
 public class MinimumDeletionsToMakeFrequenciesUnique {
 
   public static void main(String[] args) {
-    String input = "aabbcc";
-    int result = minDeletions(input);
-    System.out.println("Minimum deletions: " + result);  // Output: 2
+    String[] inputs = {"aaabbbcc", "aab"};
+    int[] expected = {2, 0};
+
+    for (int i = 0; i < inputs.length; i++) {
+      int got = minDeletions(inputs[i]);
+      System.out.printf("s=%s -> %d  expected=%d%n", inputs[i], got, expected[i]);
+    }
   }
 
+
+
   /**
-   * Finds minimum deletions using greedy approach with frequency sorting.
+   * Intuition: after frequencies are sorted high to low, each next character only
+   * needs to fit below the previous kept frequency. Keeping it as high as allowed
+   * minimizes deletions now and leaves the most room for smaller frequencies.
    *
    * Algorithm:
-   * 1. Count frequency of each character in string
-   * 2. Sort frequencies in descending order (process highest first)
-   * 3. Track previously assigned frequency to ensure uniqueness
-   * 4. For each frequency:
-   *    - If >= previous, reduce to (previous - 1)
-   *    - Count deletions = original - reduced
-   *    - Update previous for next iteration
-   * 5. Handle edge case: frequency can't go below 0
+   *   1. Count character frequencies and collect the non-zero counts.
+   *   2. Sort frequencies descending.
+   *   3. Reduce any frequency that conflicts with maxAllowedFreq and count the deletions.
    *
-   * Key insight: Process from highest to lowest frequency. If current frequency
-   * equals or exceeds previous, reduce it to (previous - 1) to maintain uniqueness.
-   * This greedy choice minimizes deletions because we preserve higher frequencies.
+   * Time:  O(n + k log k) - count n characters, then sort k non-zero frequencies.
+   * Space: O(k) - stores the non-zero frequencies, with k at most 26 here.
    *
-   * Time Complexity: O(N + K log K) where N is string length and K is unique characters.
-   * Counting is O(N), sorting frequencies is O(K log K) where K ≤ 26.
-   *
-   * Space Complexity: O(K) for frequency array, where K ≤ 26 for lowercase letters.
-   *
-   * @param input input string of lowercase letters
-   * @return minimum number of deletions to make all frequencies unique
+   * @param input lowercase string
+   * @return minimum deletions needed so all non-zero frequencies are unique
    */
   public static int minDeletions(String input) {
     // Here input = "aaabbcc"
