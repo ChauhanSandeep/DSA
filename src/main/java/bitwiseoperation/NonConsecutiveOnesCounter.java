@@ -1,72 +1,65 @@
 package bitwiseoperation;
 
 /**
- * Non-negative Integers without Consecutive Ones
+ * Problem: Non-negative Integers Without Consecutive Ones
  *
- * Problem Statement:
- * Given a positive integer n, return the number of integers in the range [0, n] whose binary
- * representations do not contain consecutive ones (i.e., no "11" pattern exists).
+ * Given a positive integer n, count the integers in the range [0, n] whose
+ * binary representations do not contain the substring "11". The dynamic program
+ * counts valid binary strings by ending bit and then subtracts valid strings that
+ * would exceed n.
+ *
+ * Leetcode: https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/ (Hard)
+ * Rating:   acceptance 42.9% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Bit manipulation | Digit DP | Fibonacci bit counts
  *
  * Example:
- * Input: n = 5
- * Output: 5
- * Explanation: Here are the non-negative integers <= 5 with their binary representations:
- * 0 : 0     (valid - no consecutive ones)
- * 1 : 1     (valid - single 1)
- * 2 : 10    (valid - no consecutive ones)
- * 3 : 11    (invalid - has consecutive ones "11")
- * 4 : 100   (valid - no consecutive ones)
- * 5 : 101   (valid - no consecutive ones)
- * Among them, only integer 3 violates the rule, so answer is 5.
+ *   Input:  n = 5
+ *   Output: 5
+ *   Why:    0, 1, 2, 4, and 5 have no consecutive 1 bits; only 3 is excluded.
  *
- * Input: n = 1
- * Output: 2
- * Explanation: Valid numbers are 0 (binary: 0) and 1 (binary: 1)
+ * Follow-ups:
+ *   1. How would you list the valid numbers instead of counting them?
+ *      Backtrack over bits with a previous-bit state, pruning any branch that creates "11".
+ *   2. How would you answer many queries quickly?
+ *      Precompute Fibonacci-style bit counts once and reuse them for every query.
+ *   3. What if the forbidden pattern is "101" instead of "11"?
+ *      Use digit DP with automaton state for the longest matched suffix of the pattern.
+ *   4. How would this change for 64-bit inputs?
+ *      Extend the DP arrays to 64 positions and scan the long's bits.
  *
- * LeetCode Link: https://leetcode.com/problems/non-negative-integers-without-consecutive-ones
- *
- * Follow-up Questions:
- * 1. What if we need to find the actual numbers instead of just count?
- *    Answer: Modify DP to track actual valid numbers instead of just counting them.
- * 2. How would you handle negative numbers in the range?
- *    Answer: Extend algorithm to handle two's complement representation with sign bit considerations.
- * 3. What about consecutive zeros restriction instead of ones?
- *    Answer: Similar DP approach but with different state transitions for handling "00" patterns.
- * 4. How to optimize space for very large n values?
- *    Answer: Use rolling arrays since we only need previous few Fibonacci values.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Count Binary Strings Without Consecutive 1s.
  */
 public class NonConsecutiveOnesCounter {
 
     public static void main(String[] args) {
-        System.out.println(findCountWithoutConsecutiveOnes(10)); // Expected Output: 8
+        int[] inputs = {1, 5, 10};
+        int[] expected = {2, 5, 8};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = findCountWithoutConsecutiveOnes(inputs[i]);
+            System.out.printf("num=%d -> %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
     }
 
     /**
-     * Returns the count of non-negative integers less than or equal to `num`
-     * whose binary representation does **not** contain consecutive 1s.
+     * Intuition: valid binary strings without consecutive 1s follow the same
+     * recurrence as Fibonacci numbers. A valid string ending in 0 can follow any
+     * shorter valid string, while a valid string ending in 1 can only follow a
+     * shorter string ending in 0. The original code first counts all valid strings
+     * with the same bit length as num, then scans num's reversed binary form and
+     * subtracts valid strings that are structurally larger than num.
      *
-     * 🔹 Intuition:
-     * We're counting valid binary numbers ≤ num that avoid "11".
-     * Rather than generate each number, we:
-     * - Use DP to precompute how many valid binary numbers exist for each bit length.
-     * - Traverse the binary representation of `num`, deciding which branches of the binary "decision tree" are valid.
+     * Algorithm:
+     *   1. Reverse num's binary representation so index 0 is the least significant bit.
+     *   2. Fill dpZeroEnd and dpOneEnd for each bit length using the no-consecutive-1s recurrence.
+     *   3. Start from all valid strings of num's bit length.
+     *   4. Scan adjacent bits from most significant toward least, subtracting over-large branches and stopping at "11".
      *
-     * Approach:
-     * 1. Precompute:
-     *    - Use DP to fill arrays:
-     *      - `dpZeroEnd[i]`: valid binary strings of length i+1 ending in '0'
-     *      - `dpOneEnd[i]`: valid binary strings of length i+1 ending in '1'
-     *    - This is based on the Fibonacci recurrence:
-     *      `dpZeroEnd[i] = dpZeroEnd[i-1] + dpOneEnd[i-1]`, `dpOneEnd[i] = dpZeroEnd[i-1]`
-     * 2. Traverse the bits of `num` (from most to least significant):
-     *    - If you encounter "00" at index `i` and `i+1`: `num` is valid, but we must subtract counts of valid numbers
-     *      that would have had '1' at `i` (which were counted in total).
-     *    - If you encounter "11": `num` itself is invalid → break early, return result so far
-     * 3. If traversal completes without hitting "11", `num` itself is valid → include it in the result
+     * Time:  O(log n) - the work is proportional to the number of bits in num.
+     * Space: O(log n) - two arrays store counts for each bit position.
      *
-     * Time Complexity: O(log n) — Proportional to the number of bits in `num`. Operations on size of binary representation are logarithmic.
-     * Space Complexity: O(log n) — for the DP arrays
+     * @param num positive upper bound for the range [0, num]
+     * @return count of integers whose binary representation has no consecutive 1s
      */
     public static int findCountWithoutConsecutiveOnes(int num) {
         // Convert number to binary and reverse for easier indexing from LSB to MSB

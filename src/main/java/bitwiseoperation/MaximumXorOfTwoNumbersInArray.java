@@ -1,5 +1,7 @@
 package bitwiseoperation;
 
+import java.util.Arrays;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,65 +9,65 @@ import java.util.Set;
 /**
  * Problem: Maximum XOR of Two Numbers in an Array
  *
- * Given an integer array nums, return the maximum result of nums[i] XOR nums[j],
- * where 0 <= i <= j < n.
+ * Given an integer array nums, return the maximum value of nums[i] XOR nums[j]
+ * across two numbers in the array. A binary trie makes it cheap to look for the
+ * opposite bit at each position.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/ (Medium)
+ * Rating:   acceptance 53.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Bit manipulation | Binary trie | Opposite-bit greedy walk
  *
  * Example:
- * Input: nums = [3,10,5,25,2,8]
- * Output: 28
- * Explanation: The maximum result is 5 XOR 25 = 28.
- * Binary: 5 = 00101, 25 = 11001, XOR = 11100 = 28
+ *   Input:  nums = [3,10,5,25,2,8]
+ *   Output: 28
+ *   Why:    5 ^ 25 = 28, and choosing opposite high bits greedily finds that value.
  *
- * Constraints:
- * - 1 <= nums.length <= 2 * 10^5
- * - 0 <= nums[i] <= 2^31 - 1
+ * Follow-ups:
+ *   1. How would you return the pair of numbers too?
+ *      Store a representative number at each trie leaf and return it with the query number.
+ *   2. How would you support maximum-XOR queries with an upper bound?
+ *      Sort nums and queries by bound, inserting only eligible numbers into the trie.
+ *   3. Can the trie depth be reduced?
+ *      Start at the highest set bit seen in the input instead of always scanning 32 bits.
+ *   4. How would you process a stream of numbers?
+ *      Query the trie before inserting the new number, then update the running maximum.
  *
- * LeetCode Problem: https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array
- *
- * Follow-up Questions:
- *
- * 1. What if you need to find the actual pair of numbers instead of just the XOR value?
- *    Answer: Store the original number at each leaf node in the Trie. During traversal,
- *    return both the XOR value and the leaf number that achieved it.
- *
- * 2. How would you handle queries for maximum XOR with a specific number not in array?
- *    Answer: Build the Trie once with all array elements. For each query number, traverse
- *    the Trie choosing opposite bits. Time: O(N) build + O(log MAX) per query.
- *    Related problem: https://leetcode.com/problems/maximum-xor-with-an-element-from-array/
- *
- * 3. What if you need to find maximum XOR for all pairs and return top k results?
- *    Answer: Use a max heap to store XOR values. For each element, find its maximum XOR
- *    and add to heap. Keep heap size at k by removing minimum when size exceeds k.
- *
- * 4. Can you optimize space if numbers have many leading zeros?
- *    Answer: Find the most significant bit position across all numbers and only build
- *    Trie for those relevant bits. This reduces Trie depth from 32 to actual bit length.
- *
- * 5. How would you solve this in a streaming scenario where numbers arrive one by one?
- *    Answer: Maintain the Trie and update maximum XOR as each number arrives. Insert new
- *    number into Trie, compute its max XOR with existing numbers, update global maximum.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Maximum XOR With an Element From Array (1707).
  */
 public class MaximumXorOfTwoNumbersInArray {
 
+    public static void main(String[] args) {
+        MaximumXorOfTwoNumbersInArray solver = new MaximumXorOfTwoNumbersInArray();
+
+        int[][] inputs = {
+            {3, 10, 5, 25, 2, 8},
+            {0},
+            {2, 4}
+        };
+        int[] expected = {28, 0, 6};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.findMaximumXOR(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
     /**
-     * Finds maximum XOR using Trie (prefix tree) for efficient bit matching.
+     * Intuition: to maximize XOR, each bit wants to meet its opposite bit, and
+     * the most significant wins matter first. The trie stores every number as a
+     * path of 32 bits. For each query number, the original code walks from bit 31
+     * to bit 0, choosing the opposite child when it exists and setting that bit in
+     * xorValue; otherwise it follows the same-bit child because no better choice exists.
      *
      * Algorithm:
-     * 1. Build a binary Trie where each path represents a number's bit pattern
-     * 2. For each number, traverse Trie trying to take opposite bit at each level
-     * 3. Taking opposite bit maximizes XOR (0^1=1, 1^0=1 gives 1)
-     * 4. Track maximum XOR value found across all numbers
+     *   1. Return 0 when fewer than two numbers are available.
+     *   2. Insert every number into the binary trie using bits 31 down to 0.
+     *   3. For each number, walk the trie preferring the opposite bit at each level.
+     *   4. Keep the largest xorValue found across all trie walks.
      *
-     * Key insight: To maximize XOR, we want bits to be as different as possible.
-     * Starting from MSB, we greedily choose the opposite bit if available. Trie
-     * allows O(32) lookup for each number instead of O(N) comparison.
-     *
-     * Time Complexity: O(N * 32) = O(N) where N is array length. We insert N numbers
-     * into Trie (each takes 32 operations), then query N times (each takes 32 operations).
-     *
-     * Space Complexity: O(N * 32) = O(N) for Trie nodes. In worst case where all numbers
-     * have completely different bit patterns, we create 32*N nodes.
+     * Time:  O(32 * n) - each number is inserted once and queried once across 32 bits.
+     * Space: O(32 * n) - the trie can allocate a node per bit per number in the worst case.
      *
      * @param nums array of non-negative integers
      * @return maximum XOR value achievable by any pair
@@ -93,7 +95,7 @@ public class MaximumXorOfTwoNumbersInArray {
         return maxXor;
     }
 
-    // Insert number into Trie starting from MSB
+    /** Inserts a number into the trie from bit 31 down to bit 0. */
     private void insertIntoTrie(TrieNode root, int num) {
         TrieNode current = root;
 
@@ -108,7 +110,7 @@ public class MaximumXorOfTwoNumbersInArray {
         }
     }
 
-    // Find maximum XOR by traversing Trie and choosing opposite bits
+    /** Finds the best XOR for one number by preferring opposite trie bits. */
     private int findMaxXorInTrie(TrieNode root, int num) {
         TrieNode current = root;
         int xorValue = 0;
@@ -176,7 +178,7 @@ public class MaximumXorOfTwoNumbersInArray {
         return maxXor;
     }
 
-    // Trie node with two children (for bits 0 and 1)
+    /** Trie node with one child slot for bit 0 and one child slot for bit 1. */
     private static class TrieNode {
         TrieNode[] children = new TrieNode[2];
     }

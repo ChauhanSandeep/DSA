@@ -1,69 +1,71 @@
 package bitwiseoperation;
 
+import java.util.Arrays;
+
 /**
- * 🔍 Problem Statement:
- * Given an array of integers, find the maximum AND value of any two elements.
+ * Problem: Find Pair With Maximum Bitwise AND
+ *
+ * Given an array of integers, return the largest value obtainable as
+ * nums[i] & nums[j] for two different indices. The pair itself does not need to
+ * be returned.
+ *
+ * Leetcode: Not available (practice variant)
+ * Rating:   N/A (custom practice problem)
+ * Pattern:  Bit manipulation | Greedy high-bit feasibility | Pair AND
  *
  * Example:
- * Input: [5, 8, 7, 2]
- * Output: 5
- * Explanation: The maximum AND is obtained from (5 & 7) = 5.
+ *   Input:  nums = [5, 8, 7, 2]
+ *   Output: 5
+ *   Why:    5 & 7 keeps bits 0101, while the 8-bit cannot be shared by any pair.
  *
- * Similar Problem:
- * - Not a direct LeetCode problem, but a variation can be found here:
- *   https://www.geeksforgeeks.org/find-pair-max-bitwise-and/
+ * Follow-ups:
+ *   1. How would you return the actual pair of indices?
+ *      Track two indices while counting numbers that contain the candidate pattern.
+ *   2. How would you find a maximum AND triplet instead of a pair?
+ *      Run the same bit-feasibility test but require at least three matching numbers.
+ *   3. What changes when negative numbers are allowed?
+ *      Decide signed versus unsigned ordering first, then handle the sign bit explicitly.
+ *   4. How would you answer many queries over changing arrays?
+ *      Maintain counts in a binary trie or segment tree keyed by high-bit prefixes.
  *
- * Follow-up Questions:
- * 1. What if you need to find the actual pair of indices instead of just the value?
- *    Answer: Store indices along with values during the filtering process. Return
- *    the indices of any two elements that match the maximum pattern found.
- *
- * 2. How would you extend this to find triplets with maximum bitwise AND?
- *    Answer: Similar bit-by-bit approach but require at least 3 elements matching
- *    the pattern at each step. Time complexity becomes O(N * log(MAX)).
- *
- * 3. What if you need to find k pairs with maximum bitwise AND values?
- *    Answer: After finding maximum AND value, iterate through array to find all
- *    pairs matching this value. If fewer than k pairs exist, continue with next
- *    lower AND value.
- *
- * 4. How would you solve if array can contain negative numbers?
- *    Answer: Handle sign bit separately. Negative numbers in two's complement have
- *    MSB as 1. Consider pairs of negatives separately from pairs of positives.
- *
- * 5. Can you optimize for sparse arrays where most elements are very different?
- *    Answer: Use hash map to group elements by their MSB positions. Only check
- *    pairs within groups that share same high-order bits.
+ * Related: Maximum XOR of Two Numbers in an Array (421).
  */
 public class FindPairMaxBitwiseAnd {
 
     public static void main(String[] args) {
-        int[] input = {5, 8, 7, 2};
-        int maxAndValue = new FindPairMaxBitwiseAnd().maxBitwiseAnd(input);
-        System.out.println("Maximum AND Value: " + maxAndValue);
+        FindPairMaxBitwiseAnd solver = new FindPairMaxBitwiseAnd();
+
+        int[][] inputs = {
+            {5, 8, 7, 2},
+            {1},
+            {12, 4, 8, 6}
+        };
+        int[] expected = {5, 0, 8};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.maxBitwiseAnd(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
     }
 
     /**
-     * Finds maximum bitwise AND value using bit-by-bit pattern matching.
+     * Intuition: higher bits are worth more than all lower bits combined, so the
+     * original code greedily asks whether each bit can be kept in the answer. A
+     * candidate pattern is feasible only when at least two numbers contain every
+     * bit already chosen plus the current bit. If two numbers match that pattern,
+     * their AND can preserve it; otherwise this bit cannot be part of the maximum.
      *
      * Algorithm:
-     * 1. Start from MSB (most significant bit) and work towards LSB
-     * 2. At each bit position, check if at least 2 elements have that bit set
-     * 3. If yes, add that bit to result pattern and filter elements
-     * 4. Keep only elements that match the current pattern
-     * 5. Continue until all 32 bits are processed
+     *   1. Return 0 when fewer than two numbers are available.
+     *   2. Scan bit positions from 31 down to 0 and add the current bit to result as pattern.
+     *   3. Count numbers whose set bits include every bit in pattern.
+     *   4. Keep pattern as the result only when at least two numbers match it.
      *
-     * Key insight: For maximum AND, we want to set as many high-order bits as
-     * possible. If at least 2 elements share a bit pattern, that pattern can be
-     * part of the result. We greedily select bits from MSB to LSB.
+     * Time:  O(32 * n) - the code scans all numbers once for each of the 32 bit positions.
+     * Space: O(1) - only masks and counters are stored.
      *
-     * Time Complexity: O(N * log(MAX)) where N is array length and MAX is maximum
-     * element value. We iterate through 32 bits (log MAX) and for each bit, scan
-     * through remaining candidates.
-     *
-     * Space Complexity: O(1) as we only use a few variables regardless of input size.
-     *
-     * @param nums array of positive integers
+     * @param nums array of integers
      * @return maximum bitwise AND value achievable by any pair
      */
     public int maxBitwiseAnd(int[] nums) {

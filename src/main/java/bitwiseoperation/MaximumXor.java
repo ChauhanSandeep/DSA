@@ -1,53 +1,74 @@
 package bitwiseoperation;
 
+import java.util.Arrays;
+
 import java.util.HashSet;
 
 /**
- * Problem: Find the Maximum XOR of Any Two Numbers in an Array
+ * Problem: Maximum XOR of Two Numbers in an Array
  *
- * Given an array of non-negative integers, find the maximum result of `ai XOR aj`, where i ≠ j.
+ * Given an array of non-negative integers, return the largest value obtainable
+ * by XORing any two numbers from the array. The implementation builds the answer
+ * greedily from the highest relevant bit to the lowest bit.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/ (Medium)
+ * Rating:   acceptance 53.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Bit manipulation | Prefix masks | Greedy XOR construction
  *
  * Example:
- * Input: arr = [5, 8, 2]
- * Output: 13
- * Explanation: 5 ^ 8 = 13 is the maximum possible XOR.
+ *   Input:  arr = [5, 8, 2]
+ *   Output: 13
+ *   Why:    5 ^ 8 = 13, and no other pair can produce a larger XOR value.
  *
- * LeetCode: Similar to https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/
+ * Follow-ups:
+ *   1. How would you return the actual pair too?
+ *      Store representative numbers for prefixes and reconstruct the two prefixes that prove a bit.
+ *   2. How would you answer maximum-XOR queries against a fixed array?
+ *      Build a binary trie once, then greedily walk opposite bits for each query.
+ *   3. What if the array contains very large unsigned values?
+ *      Use a wider type and define unsigned comparison for the highest bit.
+ *   4. How would you handle a stream of incoming numbers?
+ *      Insert each number into a trie and update the best XOR against prior numbers online.
  *
- * Follow-up Questions (FAANG-style):
- * 1. How would you return the actual pair (numbers) that yields the max XOR?
- *    - Store prefixes and check corresponding values that produce newMax during iteration.
- * 2. How can this be adapted for subarrays or contiguous segments?
- *    - Use Trie of prefixes for efficient range queries.
- * 3. What if the array contains negatives or is very large?
- *    - Use unsigned masks, take care with Java's sign extension, optimize with Trie or BitSet.
- * 4. How do you handle streaming data to maintain maximum XOR in real time?
- *    - Use online Trie insertions and maintain max as stream arrives.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Maximum XOR With an Element From Array (1707).
  */
 public class MaximumXor {
 
     public static void main(String[] args) {
-        int[] arr = {5, 8, 2};
-        MaximumXor instance = new MaximumXor();
-        System.out.println(instance.findMaximumXor(arr)); // Expected: 13
+        MaximumXor solver = new MaximumXor();
+
+        int[][] inputs = {
+            {5, 8, 2},
+            {0},
+            {3, 10, 5, 25, 2, 8}
+        };
+        int[] expected = {13, 0, 28};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.findMaximumXor(inputs[i]);
+            System.out.printf("arr=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
     }
 
     /**
-     * Finds the maximum XOR value of any two numbers in the array.
+     * Intuition: XOR is maximized by making high bits differ first. The code keeps
+     * a mask for the bits already being considered and stores every number's
+     * prefix under that mask. If candidate is achievable, then for some prefix p
+     * there must be another prefix equal to candidate ^ p, because p ^ other is
+     * the desired XOR. When such prefixes exist, the current bit can stay set.
      *
-     * Steps of Solution:
-     * - Iteratively build a bitmask for the current bit position, from most significant to least.
-     * - For each bit position, store all left-prefixes (i.e., arr[i] & mask) in a set.
-     * - Try to "greedily" set the current bit in the maxXorValue and check if two prefixes exist that would produce newMax.
-     * - Update maxXorValue if possible and continue to next bit position.
+     * Algorithm:
+     *   1. Find the highest set bit present in the input array.
+     *   2. Grow mask from that bit down to 0 and collect all num & mask prefixes.
+     *   3. Try setting the current bit in maxXorValue as candidate.
+     *   4. Keep candidate when two stored prefixes can XOR to it.
      *
-     * Algorithm: Bit Manipulation, Set-based Prefix Lookup
-     * Time Complexity: O(n * logM), where n = array length, M = max element value
-     * Space Complexity: O(n) for prefix set
+     * Time:  O(n * b) - b is the highest bit index scanned, and each bit scans all numbers.
+     * Space: O(n) - the prefix set can store one prefix per number.
      *
-     * @param arr Input array of integers
-     * @return Maximum XOR value achievable by any two distinct elements
+     * @param arr input array of non-negative integers
+     * @return maximum XOR value achievable by two array elements
      */
     public int findMaximumXor(int[] arr) {
         int maxXorValue = 0;
@@ -79,12 +100,7 @@ public class MaximumXor {
         return maxXorValue;
     }
 
-    /**
-     * Finds the index of the highest set bit among all numbers in the array.
-     *
-     * @param arr The input array
-     * @return Index of most significant bit (0-based, from right)
-     */
+    /** Returns the highest set-bit index among all numbers in the array. */
     private int findHighestBit(int[] arr) {
         int max = 0;
         for (int num : arr) {

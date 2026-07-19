@@ -4,62 +4,78 @@ import java.util.Arrays;
 
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/maximum-good-people-based-on-statements/
+ * Problem: Maximum Good People Based on Statements
  *
- * Problem Statement:
- * You are given a 2D array `statements` of size n x n representing statements made by people about others.
- * Each `statements[i][j]` can be:
- * - 0: i says j is bad
- * - 1: i says j is good
- * - 2: i made no statement about j
+ * Each person is either good or bad. Good people always tell the truth, while
+ * bad people may say anything. Given statements about who is good or bad,
+ * return the largest number of people who can consistently be good.
  *
- * A person can either be good or bad. Good people always tell the truth, but bad people can lie or tell the truth.
- * Return the maximum number of people who can be good based on the given statements.
+ * Leetcode: https://leetcode.com/problems/maximum-good-people-based-on-statements/ (Hard)
+ * Rating:   1980 (zerotrac Elo)
+ * Pattern:  Bit manipulation | Subset enumeration | Truth consistency check
  *
  * Example:
- * Input: statements = [
- * [2,1,2],
- * [1,2,2],
- * [2,0,2]]
+ *   Input:  statements = [[2,1,2],[1,2,2],[2,0,2]]
+ *   Output: 2
+ *   Why:    People 0 and 1 can both be good because they only support each other;
+ *           making person 2 good would force person 1 to be bad.
  *
- * Output: 2
- * Explanation:
- * - Person 0 states that person 1 is good.
- * - Person 1 states that person 0 is good.
- * - Person 2 states that person 1 is bad.
- *
- * Follow-up Questions (for interviews):
- * - What if the size of `statements` is very large (say > 25)?
- *   Brute-force is not feasible, need constraint propagation or SAT solvers.
- * - Can we avoid using strings and work directly with bits?
- *   Yes, you can optimize memory and speed using bitwise operations on integers.
- * LeetCode Contest Rating: 1980
+ * Follow-ups:
+ *   1. What if n grows beyond the subset-enumeration limit?
+ *      Model the statements as SAT constraints or use branch-and-bound with propagation.
+ *   2. Can partial assignments be pruned earlier?
+ *      While assigning people, reject a branch as soon as a good person's known statement is contradicted.
+ *   3. How would you return one optimal group, not just its size?
+ *      Store the mask whenever it improves maxGoodPeople, then decode its set bits.
+ *   4. What if bad people are required to always lie?
+ *      Add the opposite constraints for bad speakers; the problem becomes stricter.
  */
 public class MaxGoodPeople {
 
   public static void main(String[] args) {
-    int[][] statements = {
-        {2, 1, 2},
-        {1, 2, 2},
-        {2, 0, 2}
+    MaxGoodPeople solver = new MaxGoodPeople();
+
+    int[][][] cases = {
+        {
+            {2, 1, 2},
+            {1, 2, 2},
+            {2, 0, 2}
+        },
+        {
+            {2}
+        },
+        {
+            {2, 0},
+            {0, 2}
+        }
     };
-    System.out.println(new MaxGoodPeople().maximumGood(statements));  // Output: 2
+    int[] expected = {2, 1, 1};
+
+    for (int i = 0; i < cases.length; i++) {
+      int output = solver.maximumGood(cases[i]);
+      System.out.printf("statements=%s -> %d  expected=%d%n",
+          Arrays.deepToString(cases[i]), output, expected[i]);
+    }
   }
 
   /**
-   * Finds the maximum number of people that can be good based on statements made.
+   * Intuition: every possible set of good people can be encoded as a bitmask:
+   * bit i is 1 when person i is assumed good. For a chosen mask, only good
+   * people must be truthful, so the validation step checks statements made by
+   * set bits and ignores statements from unset bits. Enumerating all masks then
+   * lets the code keep the valid mask with the most set bits.
    *
    * Algorithm:
-   * - Iterate over all possible combinations of people (2^n subsets).
-   * - Represent each combination as a bitmask, where 1 indicates "good".
-   * - For each combination, validate it by ensuring all "good" people only tell the truth.
-   * - Keep track of the combination with the highest count of good people.
+   *   1. Return 0 for a null or empty statements matrix.
+   *   2. Enumerate all masks from 0 to 2^n - 1.
+   *   3. Validate each mask by checking every statement made by assumed-good people.
+   *   4. Count set bits in valid masks and keep the maximum count.
    *
-   * Time Complexity: O(2^n * n^2) — for every subset, we check each person’s statement about others.
-   * Space Complexity: O(1) — constant extra space apart from input.
+   * Time:  O(2^n * n^2) - every mask may check every pair of people.
+   * Space: O(1) - aside from the input, only counters and the current mask are stored.
    *
-   * @param statements 2D array where statements[i][j] indicates what person i says about person j.
-   * @return Maximum number of good people possible.
+   * @param statements matrix where 0 means bad, 1 means good, and 2 means no statement
+   * @return maximum possible number of good people
    */
   public int maximumGood(int[][] statements) {
     if (statements == null || statements.length == 0) return 0;
@@ -77,16 +93,7 @@ public class MaxGoodPeople {
     return maxGoodPeople;
   }
 
-  /**
-   * Validates whether the current combination (bitmask) is logically consistent.
-   * Steps:
-   * - For each person i assumed to be good (bit i is set in mask):
-   * - Check their statements about others.
-   * - If they claim someone is good (1), ensure that person is also marked as good in the mask.
-   * - If they claim someone is bad (0), ensure that person is marked as bad (not good) in the mask.
-   *    - If any contradiction is found, return false.
-   *
-   */
+  /** Returns true when every assumed-good person's statements match the mask. */
   private boolean isValidConfiguration(int mask, int[][] statements, int n) {
     for (int i = 0; i < n; i++) {
       // ((mask >> i) & 1) checks if the i-th bit (from the right, 0-based) in the integer mask is set to 1.
