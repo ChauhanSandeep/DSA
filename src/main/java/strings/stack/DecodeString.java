@@ -5,65 +5,60 @@ import java.util.*;
 /**
  * Problem: Decode String
  *
- * Given an encoded string, return its decoded string. The encoding rule is: k[encoded_string],
- * where the encoded_string inside the square brackets is being repeated exactly k times.
- * Note that k is guaranteed to be a positive integer.
+ * Decode strings encoded as k[encoded_string], where the bracketed substring is
+ * repeated exactly k times. Encodings may be nested, and the input is assumed to
+ * be valid.
  *
- * You may assume that the input string is always valid; No extra white spaces, square brackets
- * are well-formed, etc. Furthermore, you may assume that the original data does not contain any
- * digits and that digits are only for those repeat numbers, k.
+ * Leetcode: https://leetcode.com/problems/decode-string/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Stack | Nested state | String building
  *
  * Example:
- * Input: s = "3[a2[c]]"
- * Output: "accaccacc"
- * Explanation:
- * - First decode inner "2[c]" = "cc"
- * - Then decode "3[acc]" = "accaccacc"
+ *   Input:  s = "3[a2[c]]"
+ *   Output: "accaccacc"
+ *   Why:    2[c] becomes cc, then 3[acc] repeats that decoded block three times.
  *
- * Input: s = "2[abc]3[cd]ef"
- * Output: "abcabccdcdcdef"
- * Explanation: "2[abc]" = "abcabc", "3[cd]" = "cdcdcd", plus "ef" = "abcabccdcdcdef"
+ * Follow-ups:
+ *   1. Validate malformed input?
+ *      Track bracket balance and require digits only before opening brackets.
+ *   2. Avoid materializing huge decoded strings?
+ *      Stream decoded segments or build an iterator over repeated ranges.
+ *   3. Support escape characters inside brackets?
+ *      Add tokenization so escaped brackets are treated as literal characters.
  *
- * LeetCode: https://leetcode.com/problems/decode-string/description/
- *
- * Follow-up Questions:
- * 1. Q: What if the string contains nested brackets with very deep nesting?
- *    A: Stack approach handles arbitrary nesting depth efficiently, limited only by memory.
- *
- * 2. Q: How would you handle invalid input like mismatched brackets?
- *    A: Add validation to check bracket matching and proper digit placement.
- *
- * 3. Q: What about memory optimization for very large decoded strings?
- *    A: Consider streaming approach or lazy evaluation for extremely large outputs.
- *
- * 4. Q: How would you modify this for case-sensitive encoding patterns?
- *    A: Current solution already handles case-sensitive strings correctly.
- *
- * Related Problems:
- * - Valid Parentheses: https://leetcode.com/problems/valid-parentheses/
- * - Basic Calculator: https://leetcode.com/problems/basic-calculator/
- * - Remove Duplicate Letters: https://leetcode.com/problems/remove-duplicate-letters/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Parentheses (20), Basic Calculator (224), Remove Duplicate Letters (316).
  */
 public class DecodeString {
 
+    public static void main(String[] args) {
+        DecodeString solver = new DecodeString();
+        String[] inputs = {"3[a2[c]]", "2[abc]3[cd]ef", "abc3[cd]xyz"};
+        String[] expected = {"accaccacc", "abcabccdcdcdef", "abccdcdcdxyz"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.decodeString(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Decodes the string using two stacks to handle nested encoding.
+     * Intuition: when an opening bracket starts a nested expression, the current
+     * repeat count and already-built prefix must wait until the bracket closes. Two
+     * stacks store that paused state, so closing a bracket can repeat the inner
+     * string and attach it back to the prefix.
      *
      * Algorithm:
-     * 1. Use two stacks: one for numbers, one for strings
-     * 2. Iterate through each character:
-     *    - If digit: build the current number
-     *    - If '[': push current number and string to stacks, reset both
-     *    - If ']': pop from stacks, repeat current string, and prepend popped string
-     *    - If letter: append to current string
-     * 3. Return the final decoded string
+     *   1. Return an empty string for null or empty input.
+     *   2. Scan characters, building multi-digit repeat counts as needed.
+     *   3. On '[', push the current count and prefix, then reset both for the nested segment.
+     *   4. On ']', pop the saved state, repeat the current segment, and continue building.
      *
-     * Time Complexity: O(maxK * n) where maxK is max value of k and n is length of decoded string
-     * Space Complexity: O(m + n) where m is number of nested brackets and n is length of decoded string
+     * Time:  O(L) - proportional to the length of the decoded output plus input scan.
+     * Space: O(L + d) - output builders plus stacks for nesting depth d.
      *
-     * @param str the encoded string to decode
-     * @return the decoded string
+     * @param str encoded string to decode
+     * @return decoded string
      */
     public String decodeString(String str) {
         if (str == null || str.isEmpty()) {
@@ -135,7 +130,7 @@ public class DecodeString {
         return decodeHelper(str, index);
     }
 
-    // Helper method for recursive decoding
+    /** Recursively decodes one bracket-bounded segment starting at index[0]. */
     private String decodeHelper(String str, int[] index) {
         StringBuilder result = new StringBuilder();
 

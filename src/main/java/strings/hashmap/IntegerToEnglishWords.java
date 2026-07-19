@@ -3,29 +3,31 @@ package strings.hashmap;
 import java.util.*;
 
 /**
- * 273. Integer to English Words
+ * Problem: Integer to English Words
  *
- * Problem: Convert a non-negative integer to its English words representation.
+ * Convert a non-negative integer to its English words representation using the
+ * usual billion, million, thousand, hundred, tens, and ones groupings.
+ *
+ * Leetcode: https://leetcode.com/problems/integer-to-english-words/ (Hard)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Recursion | Three-digit chunks | Scale words
  *
  * Example:
- * Input: num = 123
- * Output: "One Hundred Twenty Three"
+ *   Input:  num = 12345
+ *   Output: "Twelve Thousand Three Hundred Forty Five"
+ *   Why:    12 is converted before the Thousand scale, then 345 is converted as the final chunk.
  *
- * Input: num = 12345
- * Output: "Twelve Thousand Three Hundred Forty Five"
+ * Follow-ups:
+ *   1. Support negative numbers?
+ *      Prefix "Negative" and convert the absolute value carefully around Integer.MIN_VALUE.
+ *   2. Support British English with "and"?
+ *      Add locale-specific rules inside the hundreds conversion.
+ *   3. Convert words back to numbers?
+ *      Parse tokens with a running chunk total and scale multipliers.
+ *   4. Add ordinal words?
+ *      Convert the cardinal phrase, then transform the final word to its ordinal form.
  *
- * LeetCode: https://leetcode.com/problems/integer-to-english-words
- *
- * Follow-up questions:
- * Q: How to handle different number systems (British vs American)?
- * A: Extend with locale-specific word mappings and rules.
- *
- * Q: Can we support other languages?
- * A: Create pluggable language interfaces with different grammar rules.
- *
- * Q: How to handle ordinal numbers (1st, 2nd, 3rd)?
- * A: Add ordinal conversion methods with appropriate suffix rules.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Integer to Roman (12), Roman to Integer (13).
  */
 public class IntegerToEnglishWords {
 
@@ -44,22 +46,39 @@ public class IntegerToEnglishWords {
         "", "Thousand", "Million", "Billion"
     };
 
-    public static void main(String args[]) {
-        IntegerToEnglishWords obj = new IntegerToEnglishWords();
-        System.out.println(obj.numberToWords(1234567891)); // "One Billion Two Hundred Thirty Four Million Five Hundred Sixty Seven Thousand Eight Hundred Ninety One"
+    public static void main(String[] args) {
+        IntegerToEnglishWords solver = new IntegerToEnglishWords();
+        int[] inputs = {0, 123, 12345, 1234567891};
+        String[] expected = {
+            "Zero",
+            "One Hundred Twenty Three",
+            "Twelve Thousand Three Hundred Forty Five",
+            "One Billion Two Hundred Thirty Four Million Five Hundred Sixty Seven Thousand Eight Hundred Ninety One"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.numberToWords(inputs[i]);
+            System.out.printf("num=%d -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
+
     /**
-     * Recursive divide-and-conquer approach.
+     * Intuition: English number names are recursive around powers of 1000. Convert
+     * the largest scale chunk first, append its scale word, then convert the
+     * remainder with the same rules.
      *
-     * Algorithm: Hierarchical decomposition
-     * - Handle special case of zero
-     * - Recursively process groups of three digits
-     * - Combine with appropriate scale words (thousand, million, billion)
-     * - Use helper for converting hundreds
+     * Algorithm:
+     *   1. Return "Zero" for the special value 0.
+     *   2. Delegate to the recursive helper and trim trailing spaces.
+     *   3. The helper handles values below 20, below 100, and below 1000 directly.
+     *   4. For larger values, choose the largest 1000-power divisor and recurse on quotient and remainder.
      *
-     * Time Complexity: O(log n) where n is the input number
-     * Space Complexity: O(log n) for recursion stack
+     * Time:  O(log n) - the number of three-digit chunks is logarithmic in num.
+     * Space: O(log n) - recursion depth follows the number of scale chunks.
+     *
+     * @param num non-negative integer to convert
+     * @return English words representation of num
      */
     public String numberToWords(int num) {
         if (num == 0) return "Zero";
@@ -67,6 +86,7 @@ public class IntegerToEnglishWords {
         return numberToWordsHelper(num).trim();
     }
 
+    /** Converts a number chunk recursively and leaves a trailing space for joining. */
     private String numberToWordsHelper(int num) {
         if (num == 0) return "";
         else if (num < 20) return ONES[num] + " ";
@@ -113,7 +133,7 @@ public class IntegerToEnglishWords {
         return String.join(" ", result);
     }
 
-    // Convert number less than 1000 to words
+    /** Converts a number below 1000 into English words. */
     private String convertHundreds(int num) {
         StringBuilder sb = new StringBuilder();
 
@@ -240,6 +260,7 @@ public class IntegerToEnglishWords {
         return result.toString().trim();
     }
 
+    /** Appends the recursive English-words conversion into the provided builder. */
     private void convertOptimized(int num, StringBuilder sb) {
         if (num == 0) return;
 
@@ -307,6 +328,7 @@ public class IntegerToEnglishWords {
         return convertToOrdinal(cardinal, num);
     }
 
+    /** Converts the final word of a cardinal phrase into its ordinal form. */
     private String convertToOrdinal(String cardinal, int num) {
         String[] parts = cardinal.split(" ");
         String lastWord = parts[parts.length - 1];
@@ -318,6 +340,7 @@ public class IntegerToEnglishWords {
         return String.join(" ", parts);
     }
 
+    /** Converts one English number word to its ordinal spelling. */
     private String convertWordToOrdinal(String word, int lastTwoDigits) {
         // Handle teens specially (11th, 12th, 13th, not 11st, 12nd, 13rd)
         if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {

@@ -4,43 +4,61 @@ import java.util.Arrays;
 
 
 /**
+ * Problem: Largest Number
  *
- * Given an array of non-negative integers, arrange them such that they form the largest number.
+ * Given non-negative integers, arrange them so their concatenation forms the
+ * largest possible decimal number. Return the result as a string because it may
+ * be larger than any numeric type.
  *
- * ### Example:
- * Input: [3, 30, 34, 5, 9]
- * Output: "9534330"
+ * Leetcode: https://leetcode.com/problems/largest-number/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Sorting | Custom comparator | Concatenation order
  *
- *  https://leetcode.com/problems/largest-number/
- * 
- * ### Follow-up:
- * - Can you modify this to return the k-th largest number instead of the largest overall?
- * - What if the input is a stream of numbers?
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  nums = [3,30,34,5,9]
+ *   Output: "9534330"
+ *   Why:    the comparator places x before y exactly when xy is larger than yx.
+ *
+ * Follow-ups:
+ *   1. Return the k-th largest concatenation?
+ *      This becomes permutation ranking/search and is much harder than one sort.
+ *   2. Handle a stream of numbers?
+ *      Maintain a balanced structure ordered by the same comparator, then emit in order.
+ *   3. Prove the comparator is safe for sorting?
+ *      Show that choosing the better pair order locally gives the best global concatenation.
+ *
+ * Related: Create Maximum Number (321), Largest Divisible Subset (368).
  */
 public class LargestNumber {
 
-  public static void main(String[] args) {
-    int[] nums = {3, 30, 34, 5, 9};
-    String largest = largestNumber(nums);
-    System.out.println("Largest number is: " + largest);
-  }
+    public static void main(String[] args) {
+        int[][] inputs = { {3, 30, 34, 5, 9}, {0, 0}, {10, 2} };
+        String[] expected = {"9534330", "0", "210"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = largestNumber(inputs[i]);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                java.util.Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
 
   /**
-   * Forms the largest number possible by rearranging integers.
+   * Intuition: for any two numbers a and b, only two relative orders matter: ab
+   * or ba. Put a before b when ab is larger; sorting all numbers by that rule
+   * creates the lexicographically largest concatenation.
    *
-   * ### Approach:
-   * 1. Convert integers to strings.
-   * 2. Sort using a custom comparator: for strings a and b, compare (b + a) vs (a + b).
-   *    - This ensures that when combined, the number is maximized.
-   * 3. Concatenate the sorted strings.
-   * 4. Handle edge case: when all numbers are zero, return "0".
+   * Algorithm:
+   *   1. Return "0" for null or empty input.
+   *   2. Convert each number to a string.
+   *   3. Sort strings by comparing (b + a) against (a + b).
+   *   4. If the largest string is "0", return "0"; otherwise concatenate all strings.
    *
-   * ### Time Complexity: O(n log n) — due to sorting.
-   * ### Space Complexity: O(n) — to store string representations.
+   * Time:  O(n log n) - sorting n string numbers dominates.
+   * Space: O(n) - string representations and the output builder are stored.
    *
-   * @param nums Array of non-negative integers.
-   * @return The largest number in string format.
+   * @param nums non-negative integers to arrange
+   * @return largest concatenated number as a string
    */
   public static String largestNumber(int[] nums) {
     if (nums == null || nums.length == 0) {

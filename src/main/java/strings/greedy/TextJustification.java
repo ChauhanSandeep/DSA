@@ -3,50 +3,77 @@ package strings.greedy;
 import java.util.*;
 
 /**
- * 68. Text Justification
+ * Problem: Text Justification
  *
- * Problem: Given an array of strings words and a width maxWidth, format the text
- * such that each line has exactly maxWidth characters and is fully justified.
- * Pack as many words as possible in each line and pad with spaces.
+ * Pack words into lines of exactly maxWidth characters. Each non-last line is
+ * fully justified by spreading spaces as evenly as possible, with extra spaces
+ * placed in left gaps; the last line is left-justified.
+ *
+ * Leetcode: https://leetcode.com/problems/text-justification/ (Hard)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Line packing | Even space distribution
  *
  * Example:
- * Input: words = ["This","is","an","example","of","text","justification."], maxWidth = 16
- * Output: [
- *   "This    is    an",
- *   "example  of text",
- *   "justification.  "
- * ]
+ *   Input:  words = ["This","is","an","example","of","text","justification."], maxWidth = 16
+ *   Output: ["This    is    an", "example  of text", "justification.  "]
+ *   Why:    every line has width 16, and middle-line spaces are left-biased when uneven.
  *
- * LeetCode: https://leetcode.com/problems/text-justification
+ * Follow-ups:
+ *   1. Support streaming input?
+ *      Emit each completed line as soon as adding the next word would exceed maxWidth.
+ *   2. Handle display width instead of character count?
+ *      Replace String.length() with a width function for Unicode and tabs.
+ *   3. Add right or center justification modes?
+ *      Reuse greedy packing and swap only the line-formatting strategy.
+ *   4. Minimize raggedness instead of fully justifying greedily?
+ *      Use dynamic programming over line breaks, as in word wrap.
  *
- * Follow-up questions:
- * Q: How to handle different languages with varying character widths?
- * A: Implement character width calculation and adjust spacing algorithms.
- *
- * Q: Can we support rich text formatting (bold, italic, etc.)?
- * A: Extend to handle markup tags and formatting metadata.
- *
- * Q: How to optimize for very large documents?
- * A: Use streaming approach and parallel processing for independent sections.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Word Wrap, Reorder Data in Log Files (937).
  */
 public class TextJustification {
-    // Helper method to repeat spaces (Java 8 compatible)
+
+    public static void main(String[] args) {
+        TextJustification solver = new TextJustification();
+        String[][] inputs = {
+            {"This", "is", "an", "example", "of", "text", "justification."},
+            {"single"}
+        };
+        int[] widths = {16, 10};
+        String[][] expected = {
+            {"This    is    an", "example  of text", "justification.  "},
+            {"single    "}
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            java.util.List<String> got = solver.fullJustifyEnhanced(inputs[i], widths[i]);
+            System.out.printf("words=%s maxWidth=%d -> %s  expected=%s%n",
+                java.util.Arrays.toString(inputs[i]), widths[i], got, java.util.Arrays.toString(expected[i]));
+        }
+    }
+
+    /** Returns a string containing count spaces. */
     private static String repeatSpace(int count) {
         return new String(new char[count]).replace('\0', ' ');
     }
 
     /**
-     * Standard greedy approach - optimal solution.
+     * Intuition: each line can be decided greedily because using fewer words than
+     * fit cannot help later lines under full justification. After choosing the words
+     * for a line, the only remaining decision is how to distribute the required
+     * spaces between its gaps.
      *
-     * Algorithm: Line-by-line greedy packing
-     * - For each line, pack maximum words that fit within maxWidth
-     * - Distribute extra spaces evenly between words (left-biased)
-     * - Handle last line separately (left-justified only)
-     * - Special case for single word lines
+     * Algorithm:
+     *   1. Starting at index, determine how many words fit in the current line.
+     *   2. Format that line as either last-line left justification or middle-line full justification.
+     *   3. Add the line to the result and advance index by the line word count.
+     *   4. Repeat until every word is assigned to a line.
      *
-     * Time Complexity: O(n) where n is total characters in all words
-     * Space Complexity: O(maxWidth) for line construction
+     * Time:  O(n + c) - each word is packed once and line construction writes output characters.
+     * Space: O(c) - the returned lines dominate auxiliary storage.
+     *
+     * @param words words to place into justified lines
+     * @param maxWidth required width of every output line
+     * @return justified text lines
      */
     public List<String> fullJustify(String[] words, int maxWidth) {
         List<String> result = new ArrayList<>();
@@ -66,7 +93,7 @@ public class TextJustification {
         return result;
     }
 
-    // Helper to determine which words fit in current line
+    /** Determines how many words fit in the current line. */
     private LineInfo getWordsForLine(String[] words, int start, int maxWidth) {
         int totalLength = words[start].length();
         int wordCount = 1;
@@ -87,7 +114,7 @@ public class TextJustification {
         return new LineInfo(wordCount, totalLength);
     }
 
-    // Format a single line with appropriate spacing
+    /** Formats one line according to last-line and single-word rules. */
     private String formatLine(LineInfo lineInfo, int maxWidth, boolean isLastLine) {
         if (lineInfo.wordCount == 1 || isLastLine) {
             return formatLastLine(lineInfo, maxWidth);
@@ -96,7 +123,7 @@ public class TextJustification {
         }
     }
 
-    // Format last line or single word line (left-justified)
+    /** Formats a last or single-word line with right padding. */
     private String formatLastLine(LineInfo lineInfo, int maxWidth) {
         StringBuilder line = new StringBuilder();
 
@@ -113,7 +140,7 @@ public class TextJustification {
         return line.toString();
     }
 
-    // Format middle line with even space distribution
+    /** Formats a middle line by distributing spaces across gaps. */
     private String formatMiddleLine(LineInfo lineInfo, int maxWidth) {
         StringBuilder line = new StringBuilder();
 

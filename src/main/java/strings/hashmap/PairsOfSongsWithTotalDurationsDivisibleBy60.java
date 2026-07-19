@@ -4,48 +4,61 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * LeetCode 1010. Pairs of Songs With Total Durations Divisible by 60
+ * Problem: Pairs of Songs With Total Durations Divisible by 60
  *
- * You are given a list of songs where the ith song has a duration of time[i] seconds.
- * Return the number of pairs of songs for which their total duration in seconds is divisible by 60.
- * Formally, we want the number of indices i, j such that i < j with (time[i] + time[j]) % 60 == 0.
+ * Given song durations, count pairs of indices i < j whose total duration is a
+ * multiple of 60. Only each duration's remainder modulo 60 matters.
  *
- * Example 1:
- * Input: time = [30,20,150,100,40]
- * Output: 3
- * Explanation: Three pairs have a total duration divisible by 60: (30, 150), (20, 100), (20, 40)
+ * Leetcode: https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/ (Medium)
+ * Rating:   acceptance 53.5% (Medium), contest rating 1377
+ * Pattern:  Hash map | Remainder complements | One-pass counting
  *
- * Example 2:
- * Input: time = [60,60,60]
- * Output: 3
- * Explanation: All three pairs have a total duration of 120, which is divisible by 60.
+ * Example:
+ *   Input:  time = [30,20,150,100,40]
+ *   Output: 3
+ *   Why:    pairs (30,150), (20,100), and (20,40) have sums divisible by 60.
  *
- * LeetCode Link: https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/
+ * Follow-ups:
+ *   1. Make the divisor configurable?
+ *      Replace 60 with k and store k remainder buckets.
+ *   2. Return the actual index pairs?
+ *      Store lists of previous indices for each remainder instead of just counts.
+ *   3. Count triplets divisible by 60?
+ *      Track pair-remainder counts before adding each new duration.
  *
- * Follow-up Questions:
- * - How would you modify for divisible by any number k? (Replace 60 with k throughout algorithm)
- * - Can you optimize for very large arrays with limited time ranges? (Use array instead of HashMap)
- * - How would you find actual pairs instead of just count? (Store indices along with remainders)
- * - What if we need triplets instead of pairs? (Extend to three nested loops or more complex logic)
- * LeetCode Contest Rating: 1377
+ * Related: Subarray Sums Divisible by K (974), Two Sum (1).
  */
 public class PairsOfSongsWithTotalDurationsDivisibleBy60 {
 
+    public static void main(String[] args) {
+        PairsOfSongsWithTotalDurationsDivisibleBy60 solver = new PairsOfSongsWithTotalDurationsDivisibleBy60();
+        int[][] inputs = { {30, 20, 150, 100, 40}, {60, 60, 60}, {10} };
+        int[] expected = {3, 3, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.numPairsDivisibleBy60(inputs[i]);
+            System.out.printf("time=%s -> %d  expected=%d%n",
+                java.util.Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Counts pairs of songs with total duration divisible by 60.
+     * Intuition: a duration with remainder r pairs only with earlier durations whose
+     * remainder is (60 - r) mod 60. Count complements seen so far before recording
+     * the current song, which naturally enforces i < j.
      *
      * Algorithm:
-     * 1. For each song, calculate remainder when divided by 60
-     * 2. For remainder r, we need to find songs with remainder (60-r) or 0 if r=0
-     * 3. Use HashMap to count frequency of each remainder
-     * 4. For each song, add count of complementary remainders seen so far
-     * 5. Update remainder count after processing each song
+     *   1. Return 0 when fewer than two durations are available.
+     *   2. For each duration, compute its remainder modulo 60 and complement remainder.
+     *   3. Add the number of previously seen complement remainders to pairCount.
+     *   4. Record the current remainder for future songs.
      *
-     * Time Complexity: O(n) where n is number of songs
-     * Space Complexity: O(1) - at most 60 different remainders
+     * Time:  O(n) - one pass through the durations.
+     * Space: O(1) - at most 60 remainder counts are stored.
      *
-     * @param time Array of song durations in seconds
-     * @return Number of pairs with total duration divisible by 60
+     * @param time song durations in seconds
+     * @return number of pairs whose total duration is divisible by 60
      */
     public int numPairsDivisibleBy60(int[] time) {
         if (time == null || time.length < 2) {

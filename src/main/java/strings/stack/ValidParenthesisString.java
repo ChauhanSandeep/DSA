@@ -1,63 +1,61 @@
 package strings.stack;
 
 /**
- * LeetCode 678. Valid Parenthesis String
+ * Problem: Valid Parenthesis String
  *
- * Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid.
- * The following rules define a valid string:
- * - Any left parenthesis '(' must have a corresponding right parenthesis ')'.
- * - Any right parenthesis ')' must have a corresponding left parenthesis '('.
- * - Left parenthesis '(' must go before the corresponding right parenthesis ')'.
- * - '*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+ * Given a string containing '(', ')', and '*', decide whether '*' characters can
+ * be assigned as '(', ')', or empty so the final parentheses string is valid.
  *
- * Example 1:
- * Input: s = "()"
- * Output: true
+ * Leetcode: https://leetcode.com/problems/valid-parenthesis-string/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Range of open counts | Wildcard balancing
  *
- * Example 2:
- * Input: s = "(*)"
- * Output: true
+ * Example:
+ *   Input:  s = "(*))"
+ *   Output: true
+ *   Why:    treating '*' as '(' gives "(())", which is balanced.
  *
- * Example 3:
- * Input: s = "(*))"
- * Output: true
+ * Follow-ups:
+ *   1. Return one valid assignment of each '*'
+ *      Track choices with stacks or backtracking once the greedy says a solution exists.
+ *   2. Support multiple bracket types?
+ *      Greedy ranges are not enough; use stack or DP state per bracket type.
+ *   3. Count all valid assignments?
+ *      Use dynamic programming over index and open-parenthesis count.
  *
- * LeetCode Link: https://leetcode.com/problems/valid-parenthesis-string/
- *
- * Follow-up Questions:
- * - How would you handle multiple types of brackets with wildcards? (Extend tracking for each bracket type)
- * - Can you solve this using dynamic programming? (DP approach with state: position and open count)
- * - How would you find the actual assignment of '*' characters? (Backtracking with assignment tracking)
- * - What if '*' could represent more than one character? (Modify the range expansion logic)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Parentheses (20), Generate Parentheses (22), Decode String (394).
  */
 public class ValidParenthesisString {
 
+    public static void main(String[] args) {
+        ValidParenthesisString solver = new ValidParenthesisString();
+        String[] inputs = {"()", "(*)", "(*))", ")("};
+        boolean[] expected = {true, true, true, false};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.checkValidString(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Validates parenthesis string with wildcards using range tracking approach.
-     *
-     * The idea is that we maintain a range of possible open parentheses counts as we iterate through the string.
-     * At each step, we update the range based on the current character:
-     * - '(' : increment both min and max (must add one open)
-     * - ')' : decrement both min and max, ensure min >= 0 (close one open)
-     * - '*' : decrement min (use as ')'), increment max (use as '(')
-     *
-     * If at any point maxOpen < 0, it means we can't balance the string, so we return false.
-     * At the end, we check if 0 is within the range [minOpen, maxOpen].
+     * Intuition: after reading a prefix, '*' choices create a range of possible open
+     * parenthesis counts rather than one exact count. minOpenParCount is the fewest
+     * opens we might have, and maxOpenParCount is the most. The string remains
+     * viable while that range can still include a non-negative count.
      *
      * Algorithm:
-     * 1. Track range of possible open parentheses count: [minOpen, maxOpen]
-     * 2. For '(': increment both min and max (must add one open)
-     * 3. For ')': decrement both min and max, ensure min >= 0 (close one open)
-     * 4. For '*': decrement min (use as ')'), increment max (use as '(')
-     * 5. If maxOpen < 0 at any point, impossible to balance
-     * 6. At end, check if 0 is within range [minOpen, maxOpen]
+     *   1. Return true for null input as the restored original code does.
+     *   2. Scan each character while maintaining minimum and maximum possible open counts.
+     *   3. Update the range for '(', ')', and '*' according to their possible meanings.
+     *   4. If maxOpenParCount becomes negative, return false; otherwise accept when zero remains reachable.
      *
-     * Time Complexity: O(n) where n is length of string
-     * Space Complexity: O(1) - only uses constant extra space
+     * Time:  O(n) - one pass over the string.
+     * Space: O(1) - only two counters are stored.
      *
-     * @param input String containing '(', ')', and '*' characters
-     * @return true if string can be made valid, false otherwise
+     * @param input string containing parentheses and wildcard stars
+     * @return true if some assignment of '*' makes the string valid
      */
     public boolean checkValidString(String input) {
         if (input == null) {

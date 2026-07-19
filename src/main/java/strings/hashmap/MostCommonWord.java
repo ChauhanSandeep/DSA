@@ -3,50 +3,64 @@ package strings.hashmap;
 import java.util.*;
 
 /**
- * LeetCode 819. Most Common Word
+ * Problem: Most Common Word
  *
- * Given a string paragraph and a string array of the banned words banned,
- * return the most frequent word that is not banned. It is guaranteed there is
- * at least one word that is not banned, and that the answer is unique.
+ * Given a paragraph and a list of banned words, return the lowercase word that
+ * appears most often while not being banned. Punctuation separates words and the
+ * answer is guaranteed to be unique.
  *
- * Example 1:
- * Input: paragraph = "Bob hit a ball, the hit BALL flew far after it was hit.",
- * banned = ["hit"]
- * Output: "ball"
- * Explanation: "hit" occurs 3 times, but it's banned. "ball" occurs twice and
- * is not banned.
+ * Leetcode: https://leetcode.com/problems/most-common-word/ (Easy)
+ * Rating:   acceptance 44.4% (Easy), contest rating 1298
+ * Pattern:  Hash set | Frequency map | Text normalization
  *
- * LeetCode Link: https://leetcode.com/problems/most-common-word/
+ * Example:
+ *   Input:  paragraph = "Bob hit a ball, the hit BALL flew far after it was hit.", banned = ["hit"]
+ *   Output: "ball"
+ *   Why:    hit is ignored, and ball appears twice while every other allowed word appears once.
  *
- * Follow-up Questions:
- * - How would you handle case-sensitive comparison? (Remove toLowerCase()
- * calls)
- * - Can you optimize for very long paragraphs with few unique words? (Use
- * StringBuilder for word building)
- * - How would you extend to return top k most common words? (Use priority
- * queue)
- * - What if banned words can contain punctuation? (Apply same normalization to
- * banned words)
- * LeetCode Contest Rating: 1298
+ * Follow-ups:
+ *   1. Return the top k allowed words?
+ *      Count the same frequencies, then use a heap or sort by count.
+ *   2. Process a very large paragraph stream?
+ *      Tokenize character by character and update counts incrementally.
+ *   3. Preserve case sensitivity?
+ *      Remove lowercase normalization from both paragraph words and banned words.
+ *
+ * Related: Top K Frequent Words (692), Word Pattern (290).
  */
 public class MostCommonWord {
 
+    public static void main(String[] args) {
+        MostCommonWord solver = new MostCommonWord();
+        String[] paragraphs = {"Bob hit a ball, the hit BALL flew far after it was hit.", "a."};
+        String[][] banned = { {"hit"}, {} };
+        String[] expected = {"ball", "a"};
+
+        for (int i = 0; i < paragraphs.length; i++) {
+            String got = solver.mostCommonWord(paragraphs[i], banned[i]);
+            System.out.printf("paragraph=%s banned=%s -> %s  expected=%s%n",
+                paragraphs[i], java.util.Arrays.toString(banned[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds the most frequent non-banned word in the paragraph.
+     * Intuition: banned lookup should be constant time, and punctuation should not
+     * affect word identity. Normalize the paragraph to lowercase words, skip banned
+     * words, and keep the best frequency while counting.
      *
      * Algorithm:
-     * 1. Convert banned array to HashSet for O(1) lookup
-     * 2. Split paragraph by non-alphabetic characters using regex
-     * 3. Process each word: convert to lowercase and check if not banned
-     * 4. Count word frequencies using HashMap
-     * 5. Find word with maximum frequency
+     *   1. Return an empty string for null or empty paragraph input.
+     *   2. Put lowercase banned words into a HashSet.
+     *   3. Split the lowercase paragraph on non-letter characters.
+     *   4. Count each allowed word and update the best word whenever its count increases past maxCount.
      *
-     * Time Complexity: O(n + m) where n is paragraph length, m is banned array size
-     * Space Complexity: O(n + m) for word storage and banned set
+     * Time:  O(n + m) - n paragraph characters plus m banned words.
+     * Space: O(n + m) - stored word counts and banned words.
      *
-     * @param paragraph Input text containing words and punctuation
-     * @param banned    Array of words that should be ignored
-     * @return Most frequent word that is not banned
+     * @param paragraph text containing words and punctuation
+     * @param banned words to ignore while counting
+     * @return most frequent non-banned lowercase word
      */
     public String mostCommonWord(String paragraph, String[] banned) {
         if (paragraph == null || paragraph.isEmpty()) {

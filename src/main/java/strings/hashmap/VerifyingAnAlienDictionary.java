@@ -1,51 +1,63 @@
 package strings.hashmap;
 
 /**
- * LeetCode 953. Verifying an Alien Dictionary
+ * Problem: Verifying an Alien Dictionary
  *
- * In an alien language, surprisingly, they also use English lowercase letters, but possibly
- * in a different order. The order of the alphabet is some permutation of lowercase letters.
+ * Given words written in an alien alphabet order, decide whether the list is
+ * sorted lexicographically according to that custom order.
  *
- * Given a sequence of words written in the alien language, and the order of the alphabet,
- * return true if and only if the given words are sorted lexicographically in this alien language.
+ * Leetcode: https://leetcode.com/problems/verifying-an-alien-dictionary/ (Easy)
+ * Rating:   acceptance 55.4% (Easy), contest rating 1300
+ * Pattern:  Hashing | Custom order array | Adjacent word comparison
  *
- * Example 1:
- * Input: words = ["hello","leetcode"], order = "hlabcdefgijkmnopqrstuvwxyz"
- * Output: true
- * Explanation: As 'h' comes before 'l' in this language, then the sequence is sorted.
+ * Example:
+ *   Input:  words = ["hello","leetcode"], order = "hlabcdefgijkmnopqrstuvwxyz"
+ *   Output: true
+ *   Why:    h comes before l in the alien order, so hello is before leetcode.
  *
- * Example 2:
- * Input: words = ["word","world","row"], order = "worldabcefghijkmnpqstuvxyz"
- * Output: false
- * Explanation: As 'd' comes after 'l' in this language, then words[0] > words[1], hence the sequence is unsorted.
+ * Follow-ups:
+ *   1. Sort the words using the alien order?
+ *      Reuse the same rank array inside a custom comparator.
+ *   2. Support uppercase or extra symbols?
+ *      Build a map from character to rank instead of a 26-entry array.
+ *   3. Validate the alien order itself?
+ *      Ensure it contains each supported character exactly once.
  *
- * LeetCode Link: https://leetcode.com/problems/verifying-an-alien-dictionary/
- *
- * Follow-up Questions:
- * - How would you optimize for very long word lists? (Early termination on first violation)
- * - Can you handle case-insensitive comparison? (Convert to lowercase before processing)
- * - How would you extend to support numbers and special characters? (Expand character mapping)
- * - What if we need to sort the words instead of just verify? (Use custom comparator with same logic)
- * LeetCode Contest Rating: 1300
+ * Related: Alien Dictionary (269), Lexicographical Numbers (386).
  */
 public class VerifyingAnAlienDictionary {
 
+    public static void main(String[] args) {
+        VerifyingAnAlienDictionary solver = new VerifyingAnAlienDictionary();
+        String[][] words = { {"hello", "leetcode"}, {"word", "world", "row"}, {"apple", "app"} };
+        String[] orders = {"hlabcdefgijkmnopqrstuvwxyz", "worldabcefghijkmnpqstuvxyz", "abcdefghijklmnopqrstuvwxyz"};
+        boolean[] expected = {true, false, false};
+
+        for (int i = 0; i < words.length; i++) {
+            boolean got = solver.isAlienSorted(words[i], orders[i]);
+            System.out.printf("words=%s order=%s -> %s  expected=%s%n",
+                java.util.Arrays.toString(words[i]), orders[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Verifies if words are sorted according to alien dictionary order.
+     * Intuition: a list is sorted if every adjacent pair is sorted. Converting the
+     * alien alphabet into ranks lets each character comparison behave like normal
+     * lexicographic comparison, but with custom numeric priorities.
      *
      * Algorithm:
-     * 1. Create mapping from each character to its order index in alien alphabet
-     * 2. Compare each adjacent pair of words using alien order
-     * 3. For each pair, compare character by character using alien order
-     * 4. If first word is lexicographically larger, return false
-     * 5. If all pairs are in correct order, return true
+     *   1. Return true for null, empty, or single-word input.
+     *   2. Build charOrder where each letter maps to its alien rank.
+     *   3. Compare every adjacent word pair with the helper.
+     *   4. Return false on the first inversion; otherwise return true.
      *
-     * Time Complexity: O(n * m) where n is number of words, m is average word length
-     * Space Complexity: O(1) - fixed size array for character mapping (26 letters)
+     * Time:  O(n * m) - adjacent comparisons scan up to the average word length.
+     * Space: O(1) - the order array has 26 entries.
      *
-     * @param words Array of words to verify ordering
-     * @param order String representing alien alphabet order
-     * @return true if words are sorted in alien dictionary order, false otherwise
+     * @param words words to verify
+     * @param order alien alphabet order
+     * @return true if words are sorted according to order
      */
     public boolean isAlienSorted(String[] words, String order) {
         if (words == null || words.length <= 1) {
@@ -69,7 +81,7 @@ public class VerifyingAnAlienDictionary {
         return true;
     }
 
-    // Helper method to check if two words are in correct order
+    /** Returns whether word1 is lexicographically no greater than word2 under charOrder. */
     private boolean isInOrder(String word1, String word2, int[] charOrder) {
         int minLength = Math.min(word1.length(), word2.length());
 

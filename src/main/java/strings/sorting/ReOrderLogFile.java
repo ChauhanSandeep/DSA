@@ -5,60 +5,67 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/reorder-data-in-log-files/
+ * Problem: Reorder Data in Log Files
  *
- * Problem Statement:
- * You are given an array of logs. Each log is a space-delimited string where the first word is an identifier.
- * There are two types of logs:
- *   1. Letter-logs: All words after the identifier consist of lowercase English letters.
- *   2. Digit-logs: All words after the identifier consist of digits.
+ * Reorder logs so all letter-logs come before digit-logs. Letter-logs are sorted
+ * by content and then identifier, while digit-logs keep their original relative
+ * order.
  *
- * Your task is to reorder these logs as follows:
- *   - All letter-logs come before digit-logs.
- *   - Letter-logs are sorted lexicographically by content. If content is the same, sort by identifier.
- *   - Digit-logs should retain their original relative order.
+ * Leetcode: https://leetcode.com/problems/reorder-data-in-log-files/ (Easy)
+ * Rating:   acceptance 56.8% (Easy), contest rating 1387
+ * Pattern:  Sorting | Stable partition | Custom comparator
  *
  * Example:
- * Input:  ["a1 9 2 3 1", "g1 act car", "zo4 4 7", "ab1 off key dog", "a8 act zoo", "a2 act car"]
- * Output: ["a2 act car", "g1 act car", "a8 act zoo", "ab1 off key dog", "a1 9 2 3 1", "zo4 4 7"]
+ *   Input:  logs = ["a1 9 2 3 1", "g1 act car", "zo4 4 7", "ab1 off key dog", "a8 act zoo", "a2 act car"]
+ *   Output: ["a2 act car", "g1 act car", "a8 act zoo", "ab1 off key dog", "a1 9 2 3 1", "zo4 4 7"]
+ *   Why:    letter contents sort first, ties use identifiers, and digit logs remain in input order.
  *
- * LeetCode: https://leetcode.com/problems/reorder-data-in-log-files/
+ * Follow-ups:
+ *   1. Reorder in place?
+ *      Hard with stable digit-log order; usually extra storage or stable partitioning is used.
+ *   2. Scale to logs on disk?
+ *      External-sort letter logs and append digit logs in streaming order.
+ *   3. Support mixed-case letter logs?
+ *      Normalize or define a case-aware comparator for contents and identifiers.
  *
- * Follow-up Questions:
- * 1. Can you perform this in-place?
- * — Not easily without auxiliary space because sorting of letter-logs is required.
- * 2. How would you scale this for streaming logs?
- * — Use a priority queue or external merge sort with file buffers.
- * LeetCode Contest Rating: 1387
+ * Related: Custom Sort String (791), Sort Characters By Frequency (451).
  */
 public class ReOrderLogFile {
 
     public static void main(String[] args) {
-        String[] logs = {
-            "a1 9 2 3 1", "g1 act car", "zo4 4 7",
-            "ab1 off key dog", "a8 act zoo", "a2 act car"
+        String[][] inputs = {
+            {"a1 9 2 3 1", "g1 act car", "zo4 4 7", "ab1 off key dog", "a8 act zoo", "a2 act car"},
+            {"dig1 8 1 5 1", "let1 art can", "dig2 3 6", "let2 own kit dig", "let3 art zero"}
+        };
+        String[][] expected = {
+            {"a2 act car", "g1 act car", "a8 act zoo", "ab1 off key dog", "a1 9 2 3 1", "zo4 4 7"},
+            {"let1 art can", "let3 art zero", "let2 own kit dig", "dig1 8 1 5 1", "dig2 3 6"}
         };
 
-        String[] result = reorderLogFiles(logs);
-        System.out.println(Arrays.toString(result));
+        for (int i = 0; i < inputs.length; i++) {
+            String[] got = reorderLogFiles(inputs[i]);
+            System.out.printf("logs=%s -> %s  expected=%s%n",
+                java.util.Arrays.toString(inputs[i]), java.util.Arrays.toString(got), java.util.Arrays.toString(expected[i]));
+        }
     }
 
+
     /**
-     * Reorders the logs with letter-logs first (sorted by content and identifier),
-     * followed by digit-logs (in original order).
+     * Intuition: digit-logs do not need sorting, but letter-logs do. Separating the
+     * two types makes the rules direct: sort only the letter list by content then
+     * identifier, then append the untouched digit list.
      *
-     * Steps:
-     * 1. Separate letter-logs and digit-logs.
-     * 2. Sort letter-logs:
-     *    - First by log content.
-     *    - If contents are equal, by identifier.
-     * 3. Append digit-logs at the end.
+     * Algorithm:
+     *   1. Return logs directly when the input is null or empty.
+     *   2. Split logs into letterLogs and digitLogs using the first character after the identifier.
+     *   3. Sort letterLogs by content, breaking ties by identifier.
+     *   4. Append digitLogs after letterLogs and return the combined array.
      *
-     * Time Complexity: O(N log N) where N = number of letter-logs (due to sorting)
-     * Space Complexity: O(N) to store separate letter and digit logs
+     * Time:  O(n log n) - sorting the letter logs dominates.
+     * Space: O(n) - separate lists store the reordered logs.
      *
-     * @param logs Array of log strings
-     * @return Reordered log array
+     * @param logs input log strings
+     * @return logs reordered by the problem rules
      */
     public static String[] reorderLogFiles(String[] logs) {
         if (logs == null || logs.length == 0) return logs;
@@ -97,12 +104,7 @@ public class ReOrderLogFile {
         return letterLogs.toArray(new String[0]); // This converts List to String array
     }
 
-    /**
-     * Checks whether a given log is a digit-log.
-     *
-     * @param log The log string
-     * @return true if it's a digit-log; false if it's a letter-log
-     */
+    /** Returns true when the log content starts with a digit. */
     private static boolean isDigitLog(String log) {
         String[] parts = log.split(" ", 2);
         return Character.isDigit(parts[1].charAt(0));

@@ -8,47 +8,45 @@ import java.util.Set;
 
 
 /**
- * 205. Isomorphic Strings
+ * Problem: Isomorphic Strings
  *
- * Problem Statement:
- * Given two strings s and t, determine if they are isomorphic.
- * Two strings s and t are isomorphic if the characters in s can be replaced to get t.
- * All occurrences of a character must be replaced with another character while
- * preserving the order of characters. No two characters may map to the same character,
- * but a character may map to itself.
+ * Two strings are isomorphic when every character in the first string can be
+ * replaced by exactly one character in the second string, and no two source
+ * characters map to the same target character.
+ *
+ * Leetcode: https://leetcode.com/problems/isomorphic-strings/ (Easy)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Hash map | Bijection | Last-seen positions
  *
  * Example:
- * Input: s = "egg", t = "add"
- * Output: true
- * Explanation: 'e' maps to 'a' and 'g' maps to 'd'. The mapping is consistent.
+ *   Input:  s = "egg", t = "add"
+ *   Output: true
+ *   Why:    e maps to a and g maps to d consistently, with no target reused by another source.
  *
- * Input: s = "foo", t = "bar"
- * Output: false
- * Explanation: 'o' would need to map to both 'a' and 'r', which violates the one-to-one rule.
+ * Follow-ups:
+ *   1. Return the actual mapping?
+ *      Build and return the source-to-target map after validation.
+ *   2. Support Unicode?
+ *      Use HashMaps instead of fixed ASCII arrays.
+ *   3. Compare many strings by pattern?
+ *      Convert each string to a canonical first-seen-index signature.
  *
- * Input: s = "paper", t = "title"
- * Output: true
- * Explanation: 'p'→'t', 'a'→'i', 'e'→'l', 'r'→'e'. Each character maps consistently.
- *
- * LeetCode Link: https://leetcode.com/problems/isomorphic-strings/
- *
- * Follow-up Questions:
- * 1. What if we need to find the actual character mapping?
- *    Answer: Return the HashMap instead of boolean, containing the mapping from s to t.
- * 2. How would you handle Unicode characters or larger character sets?
- *    Answer: HashMap approach scales naturally; array approach needs larger arrays.
- * 3. What if we need to check isomorphism for multiple string pairs efficiently?
- *    Answer: Precompute canonical forms or use efficient hashing techniques.
- * 4. How to extend this to check isomorphism among multiple strings simultaneously?
- *    Answer: Build equivalence classes and ensure all strings have same pattern structure.
- *
- * Related Problems:
- * - 290. Word Pattern: https://leetcode.com/problems/word-pattern/
- * - 242. Valid Anagram: https://leetcode.com/problems/valid-anagram/
- * - 49. Group Anagrams: https://leetcode.com/problems/group-anagrams/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Word Pattern (290), Valid Anagram (242), Group Anagrams (49).
  */
 public class IsomorphicStrings {
+
+    public static void main(String[] args) {
+        IsomorphicStrings solver = new IsomorphicStrings();
+        String[] sources = {"egg", "foo", "paper", "badc"};
+        String[] targets = {"add", "bar", "title", "baba"};
+        boolean[] expected = {true, false, true, false};
+
+        for (int i = 0; i < sources.length; i++) {
+            boolean got = solver.isIsomorphicArray(sources[i], targets[i]);
+            System.out.printf("s=%s t=%s -> %s  expected=%s%n", sources[i], targets[i], got, expected[i]);
+        }
+    }
+
 
     /**
      * Approach using single HashMap with value validation.
@@ -94,24 +92,23 @@ public class IsomorphicStrings {
     }
 
     /**
-     * Optimized approach using arrays for ASCII characters.
-     * This version uses fixed-size arrays for better performance with ASCII characters.
+     * Intuition: two strings are isomorphic if every aligned character pair has the
+     * same history. Recording the last position where each source and target
+     * character appeared turns the bijection check into one equality comparison per
+     * index.
      *
-     * Intuition to solve:
-     * 1. Each character in s must map to one character in t.
-     * 2. Each character in t must map to one character in s.
-     * 3. If we see a character pair (s[i], t[i]) again, the mapping must be consistent.
-     *    Means that if s[i] was seen before, it must map to the same t[i] as before.
-     * 4. If a character in s maps to multiple characters in t or vice versa, return false.
-     * 5. Use two arrays to track last seen positions of characters in s and t.
-     * 6. If the last seen positions don't match for a character pair, return false.
-     * 7. If we finish checking all character pairs without conflicts, return true.
-     * 8. This approach is efficient for ASCII characters due to fixed-size arrays.
+     * Algorithm:
+     *   1. Return true only for equal null references when either string is null or lengths differ.
+     *   2. Keep two arrays of last-seen positions for source and target characters.
+     *   3. For each index, the two current characters must have matching last-seen positions.
+     *   4. Store i + 1 for both characters and continue until all pairs are checked.
      *
-     * Time Complexity: O(n) - single pass through strings
-     * Space Complexity: O(1) - fixed-size arrays (constant space)
+     * Time:  O(n) - one pass over both strings.
+     * Space: O(1) - fixed arrays of size 256 are used for ASCII characters.
      *
-     * This approach is most efficient for ASCII characters.
+     * @param s source string
+     * @param t target string
+     * @return true if s and t are isomorphic
      */
     public boolean isIsomorphicArray(String s, String t) {
         if (s == null || t == null || s.length() != t.length()) {
