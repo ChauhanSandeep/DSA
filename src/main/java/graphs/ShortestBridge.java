@@ -4,52 +4,52 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Arrays;
 
 /**
- * Shortest Bridge - Leetcode 934 (Extended to N islands)
- * Problem Link: https://leetcode.com/problems/shortest-bridge/
+ * Problem: Shortest Bridge
  *
- * --- Problem Statement ---
- * You are given an n x n binary matrix grid where 1 represents land and 0 represents water.
- * There are one or more islands (groups of connected 1s). You may flip 0s to 1s to connect islands.
- * Return the smallest number of 0s that must be flipped to connect any two islands.
+ * Given a binary grid with islands made of 4-directionally connected 1s, flip the
+ * fewest 0s to connect two different islands. This implementation labels all
+ * islands and returns the shortest bridge between any pair.
  *
- * --- Example ---
- * Input: grid = [[0,1],[1,0]]
- * Output: 1
- * Explanation: We can flip one 0 to connect the two islands.
+ * Leetcode: https://leetcode.com/problems/shortest-bridge/
+ * Rating:   1826 (zerotrac Elo)
+ * Pattern:  Graph | Grid DFS + multi-source BFS | Island boundary expansion
  *
- * --- Follow-Up Questions ---
- * Q: How does the algorithm change for more than 2 islands?
- * A: Label each island with a unique ID (2, 3, 4, ...) in-place using DFS.
- *    Then run BFS separately from each island's boundary. BFS stops when it
- *    reaches any cell belonging to a *different* island. Return the global minimum.
+ * Example:
+ *   Input:  grid = [[0,1],[1,0]]
+ *   Output: 1
+ *   Why:    flipping either water cell joins the two diagonal islands through a
+ *           4-directional connection.
  *
- * Q: Can the islands be diagonally connected?
- * A: No. Only 4-directionally connected land forms an island.
+ * Follow-ups:
+ *   1. The grid has more than two islands and you need the globally shortest bridge?
+ *      Label every island and run BFS from each boundary, as this implementation does.
+ *   2. Return which water cells to flip?
+ *      Store parent pointers during BFS and reconstruct the path when another island is reached.
+ *   3. Bridges have different construction costs per water cell?
+ *      Replace BFS with Dijkstra over water-cell costs.
+ *
+ * Related: Number of Islands (200), Pacific Atlantic Water Flow (417), Making A Large Island (827).
  */
 public class ShortestBridge {
+
+    public static void main(String[] args) {
+        ShortestBridge solver = new ShortestBridge();
+        int[][][] inputs = {{{0, 1}, {1, 0}}, {{0, 1, 0}, {0, 0, 0}, {0, 0, 1}}};
+        int[] expected = {1, 2};
+        for (int i = 0; i < inputs.length; i++) {
+            String input = Arrays.deepToString(inputs[i]);
+            int output = solver.findShortestBridge(inputs[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n", input, output, expected[i]);
+        }
+    }
 
     private static final int[][] DIRECTION_OFFSETS = {
         {-1, 0}, {1, 0}, {0, -1}, {0, 1} // Up, Down, Left, Right
     };
 
-    public static void main(String[] args) {
-        // Two islands
-        int[][] grid1 = {
-            {0, 1},
-            {1, 0}
-        };
-        System.out.println("Shortest Bridge (2 islands): " + new ShortestBridge().findShortestBridge(grid1)); // 1
-
-        // Three islands
-        int[][] grid2 = {
-            {1, 0, 0, 0, 1},
-            {0, 0, 0, 0, 0},
-            {0, 0, 1, 0, 0}
-        };
-        System.out.println("Shortest Bridge (3 islands): " + new ShortestBridge().findShortestBridge(grid2)); // 2
-    }
 
     /**
      * Finds the minimum number of 0 → 1 flips required to connect any two islands.

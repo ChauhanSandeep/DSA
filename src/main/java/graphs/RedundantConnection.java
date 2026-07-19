@@ -3,41 +3,44 @@ package graphs;
 import java.util.*;
 
 /**
- * In this problem, a tree is an undirected graph that is connected and has no cycles.
- * You are given a graph that started as a tree with n nodes labeled from 1 to n,
- * with one additional edge added. The added edge has two different vertices chosen from 1 to n,
- * and was not an edge that already existed.
+ * Problem: Redundant Connection
  *
- * The graph is represented as an array edges of length n where edges[i] = [ai, bi] indicates that
- * there is an undirected edge between nodes ai and bi in the graph.
+ * An undirected graph started as a tree, then one extra edge was added. Return
+ * the edge that can be removed to make the graph a tree again; if several edges
+ * could work, return the one that appears last in the input.
  *
- * Return an edge that can be removed so that the resulting graph is a tree of n nodes.
- * If there are multiple answers, return the answer that occurs last in the input.
+ * Leetcode: https://leetcode.com/problems/redundant-connection/
+ * Rating:   acceptance 67.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Union-Find | Cycle detection
  *
- * Example 1:
- * Input: edges = [[1,2],[1,3],[2,3]]
- * Output: [2,3]
+ * Example:
+ *   Input:  edges = [[1,2],[2,3],[3,4],[1,4],[1,5]]
+ *   Output: [1,4]
+ *   Why:    adding [1,4] closes the cycle 1-2-3-4-1, while [1,5] remains needed
+ *           to keep node 5 connected.
  *
- * Example 2:
- * Input: edges = [[1,2],[2,3],[3,4],[1,4],[1,5]]
- * Output: [1,4]
+ * Follow-ups:
+ *   1. Return all redundant edges if more than one extra edge exists?
+ *      Keep collecting every edge whose endpoints are already connected.
+ *   2. Handle edge deletions as well as additions?
+ *      Use a dynamic connectivity data structure or rebuild Union-Find in batches.
+ *   3. Need the full cycle instead of just the edge?
+ *      Run DFS from one endpoint before adding the edge and record the path.
  *
- * LeetCode: https://leetcode.com/problems/redundant-connection/
+ * Related: Redundant Connection II (685), Graph Valid Tree (261), Number of Provinces (547).
  *
- * Follow-up Questions:
- * 1. How would you handle the case where multiple edges can be removed to form a tree?
- *    - The problem guarantees exactly one redundant edge, but if there were multiple, we'd need to return all of them.
- * 2. What if the graph is very large (e.g., 10^5 nodes and edges)?
- *    - The Union-Find solution with path compression and union by rank is efficient (near O(1) per operation).
- * 3. How would you modify the solution to return all possible redundant edges?
- *    - We could collect all edges that form cycles during the union process.
- *
- * Related Problems:
- * - Redundant Connection II (https://leetcode.com/problems/redundant-connection-ii/)
- * - Graph Valid Tree (https://leetcode.com/problems/graph-valid-tree/)
- * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class RedundantConnection {
+
+    public static void main(String[] args) {
+        RedundantConnection solver = new RedundantConnection();
+        int[][][] inputs = {{{1, 2}, {1, 3}, {2, 3}}, {{1, 2}, {2, 3}, {3, 4}, {1, 4}, {1, 5}}};
+        int[][] expected = {{2, 3}, {1, 4}};
+        for (int i = 0; i < inputs.length; i++) {
+            int[] output = solver.findRedundantConnection(inputs[i]);
+            System.out.printf("edges=%s -> %s  expected=%s%n", Arrays.deepToString(inputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
     /**
      * Finds the redundant connection in the given edges using Union-Find.
      *

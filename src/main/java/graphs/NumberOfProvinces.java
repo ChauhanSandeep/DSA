@@ -3,41 +3,44 @@ package graphs;
 import java.util.*;
 
 /**
- * There are n cities. Some of them are connected, while some are not. If city a is connected directly with city b,
- * and city b is connected directly with city c, then city a is connected indirectly with city c.
+ * Problem: Number of Provinces
  *
- * A province is a group of directly or indirectly connected cities and no other cities outside the group.
+ * Given an n by n connection matrix for cities, count how many disconnected
+ * groups of cities exist. If city A reaches city B through any chain of direct
+ * connections, both cities belong to the same province.
  *
- * You are given an n x n matrix isConnected where isConnected[i][j] = 1 if the ith city and the jth city are directly
- * connected, and isConnected[i][j] = 0 otherwise.
+ * Leetcode: https://leetcode.com/problems/number-of-provinces/
+ * Rating:   acceptance 70.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Connected components | DFS and Union-Find
  *
- * Return the total number of provinces.
+ * Example:
+ *   Input:  isConnected = [[1,1,0],[1,1,0],[0,0,1]]
+ *   Output: 2
+ *   Why:    cities 0 and 1 reach each other, while city 2 is alone, so there are
+ *           exactly two connected groups.
  *
- * Example 1:
- * Input: isConnected = [[1,1,0],[1,1,0],[0,0,1]]
- * Output: 2
+ * Follow-ups:
+ *   1. The matrix is too large but the graph is sparse?
+ *      Store only existing edges in an adjacency list and traverse that list.
+ *   2. Connections arrive as a stream?
+ *      Use Union-Find and report the current component count after each union.
+ *   3. Need the largest province size as well?
+ *      Track component sizes in Union-Find or count nodes during each traversal.
  *
- * Example 2:
- * Input: isConnected = [[1,0,0],[0,1,0],[0,0,1]]
- * Output: 3
+ * Related: Number of Islands (200), Friend Circles (547), Graph Valid Tree (261).
  *
- * LeetCode: https://leetcode.com/problems/number-of-provinces/
- *
- * Follow-up Questions:
- * 1. How would you handle very large graphs (e.g., n = 1000)?
- *    - The union-find solution is efficient with O(n²) time complexity, but for very large n,
- *      we might need to optimize further or use a more space-efficient representation.
- * 2. What if the graph is sparse (few connections)?
- *    - For sparse graphs, an adjacency list representation would be more space-efficient.
- * 3. How would you find the largest province?
- *    - We could modify the solution to track the size of each connected component.
- *
- * Related Problems:
- * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
- * - Friend Circles (same as this problem)
- * LeetCode Contest Rating: Not available (not a contest problem)
  */
 public class NumberOfProvinces {
+
+    public static void main(String[] args) {
+        NumberOfProvinces solver = new NumberOfProvinces();
+        int[][][] inputs = {{{1, 1, 0}, {1, 1, 0}, {0, 0, 1}}, {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}};
+        int[] expected = {2, 3};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.findCircleNum(inputs[i]);
+            System.out.printf("isConnected=%s -> %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
      * Finds the number of provinces using DFS.
      *

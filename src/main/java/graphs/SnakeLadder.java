@@ -5,38 +5,42 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * **Snake and Ladder - Minimum Dice Rolls to Reach 100**
+ * Problem: Snake and Ladder Minimum Dice Rolls
  *
- * ### **Problem Statement:**
- * Given a **Snake and Ladder board** (1 to 100), determine the **minimum number of dice rolls**
- * required to reach **square 100** starting from square **1**.
+ * On a classic board numbered 1 through 100, ladders move you upward and snakes
+ * move you downward after a dice roll. Starting at square 1, return the minimum
+ * number of dice rolls needed to reach square 100.
  *
- * ### **Approach:**
- * - **Breadth-First Search (BFS)** is used to explore the shortest path.
- * - The board is represented as a `moves[]` array where:
- *   - `moves[i] = j` means there's a **ladder** (jump to `j`) or a **snake** (fall to `j`).
- *   - `moves[i] = -1` means normal progression (`i` remains `i`).
- * - We use a queue to process positions level by level.
- * - If we reach position **100**, we return the number of rolls taken.
+ * Pattern:  Graph | BFS on board positions | Unweighted shortest path
  *
- * ### **Complexity Analysis:**
- * - **Time Complexity:** `O(100) = O(1)`, since we process at most **100** board positions.
- * - **Space Complexity:** `O(100) = O(1)`, as we store board state in an array.
+ * Example:
+ *   Input:  ladders = [[2,100]], snakes = []
+ *   Output: 1
+ *   Why:    rolling a 1 reaches square 2, then the ladder immediately moves the
+ *           player to square 100.
  *
- * **LeetCode Reference:** (No exact match, but inspired by similar shortest path problems)
+ * Follow-ups:
+ *   1. The board size is not fixed at 100?
+ *      Pass the target square as a parameter and size the arrays from it.
+ *   2. The dice has a different number of sides?
+ *      Replace the 1..6 transition loop with 1..diceSides.
+ *   3. Return the chosen dice rolls?
+ *      Store parent square and die roll for each visited square.
+ *
+ * Related: Snakes and Ladders (909), Minimum Jumps to Reach Home (1654).
  */
 public class SnakeLadder {
 
     public static void main(String[] args) {
-        int[][] ladders = {
-            {2, 15}, {5, 7}, {9, 27}, {18, 29}, {25, 35}
-        };
-        int[][] snakes = {
-            {17, 4}, {20, 6}, {34, 12}, {24, 16}, {32, 30}
-        };
-        int minRolls = findMinDiceRolls(ladders, snakes);
-        System.out.println("Minimum dice rolls to reach 100: " + minRolls);
+        int[][][] ladders = {{{2, 100}}, {}};
+        int[][][] snakes = {{}, {}};
+        int[] expected = {1, 17};
+        for (int i = 0; i < ladders.length; i++) {
+            int output = findMinDiceRolls(ladders[i], snakes[i]);
+            System.out.printf("ladders=%s snakes=%s -> %d  expected=%d%n", Arrays.deepToString(ladders[i]), Arrays.deepToString(snakes[i]), output, expected[i]);
+        }
     }
+
 
     /**
      * **Finds the minimum dice rolls to reach square 100 in Snake and Ladder game.**

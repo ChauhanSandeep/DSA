@@ -3,31 +3,42 @@ package graphs;
 import java.util.*;
 
 /**
- * Problem: Shortest Path with Useful Extra Edges
+ * Problem: Useful Extra Edges
  *
- * Statement:
- * Given a weighted directed graph with `n` vertices, find the shortest path from `source` to `destination`.
- * Additionally, you are given a list of bidirectional "extra edges" that can be optionally added.
- * Using these edges may reduce the shortest path.
+ * Given a weighted directed graph and optional bidirectional extra edges, find the
+ * shortest path from source to destination when you may use at most one extra
+ * edge. Return -1 if the destination is unreachable.
+ *
+ * Source: InterviewBit: Useful Extra Edges
+ * Pattern:  Graph | Dijkstra | Try one optional shortcut edge
  *
  * Example:
- * Input:
- * n = 3, edges = [[1, 2, 1], [2, 3, 2]], extraEdges = [[1, 3, 2]]
- * source = 1, destination = 3
- * Output: 2
- * Explanation: Direct extra edge 1 → 3 with weight 2 gives shortest path.
+ *   Input:  edges = [[1,2,1],[2,3,2]], extraEdges = [[1,3,2]], source = 1, destination = 3
+ *   Output: 2
+ *   Why:    the optional edge from 1 to 3 costs 2, which beats the normal path
+ *           1 -> 2 -> 3 with total cost 3.
  *
- * InterviewBit Link:  https://www.interviewbit.com/problems/useful-extra-edges
- *
- * Follow-up Questions (FAANG-style):
- * 1. How would you handle negative weights?
- *    - Use Bellman-Ford or Johnson’s algorithm instead of Dijkstra.
- * 2. What if there are multiple extra edges and you can use more than one?
- *    - This problem would reduce to standard shortest path with all edges included.
- * 3. Can you solve it with A* search if we need paths repeatedly?
- *    - Yes, A* is more efficient when heuristic is available (like Euclidean distance in grid graphs).
+ * Follow-ups:
+ *   1. Extra edges can be used more than once?
+ *      Add all extra edges to the graph and run one normal shortest-path search.
+ *   2. Edge weights can be negative?
+ *      Use Bellman-Ford or Johnson's algorithm instead of Dijkstra.
+ *   3. Return which extra edge was used?
+ *      Store the best candidate edge while comparing shortcut distances.
  */
 public class UsefulExtraEdges {
+
+    public static void main(String[] args) {
+        UsefulExtraEdges solver = new UsefulExtraEdges();
+        List<List<List<Integer>>> edgesCases = Arrays.asList(Arrays.asList(Arrays.asList(1, 2, 1), Arrays.asList(2, 3, 2)), Arrays.asList(Arrays.asList(1, 2, 5)));
+        List<List<List<Integer>>> extraCases = Arrays.asList(Arrays.asList(Arrays.asList(1, 3, 2)), Collections.emptyList());
+        int[] vertices = {3, 2};
+        int[] expected = {2, 5};
+        for (int i = 0; i < edgesCases.size(); i++) {
+            int output = solver.findShortestPath(vertices[i], edgesCases.get(i), 1, vertices[i], extraCases.get(i));
+            System.out.printf("edges=%s extraEdges=%s -> %d  expected=%d%n", edgesCases.get(i), extraCases.get(i), output, expected[i]);
+        }
+    }
 
     /**
      * Finds the shortest path between source and destination considering extra bidirectional edges.
@@ -159,18 +170,5 @@ public class UsefulExtraEdges {
     /**
      * Driver method for testing.
      */
-    public static void main(String[] args) {
-        List<List<Integer>> inputEdges = Arrays.asList(
-            Arrays.asList(1, 2, 1),
-            Arrays.asList(2, 3, 2)
-        );
 
-        List<List<Integer>> extraEdges = Arrays.asList(
-            Arrays.asList(1, 3, 2)
-        );
-
-        UsefulExtraEdges solver = new UsefulExtraEdges();
-        int result = solver.findShortestPath(3, inputEdges, 1, 3, extraEdges);
-        System.out.println("Shortest Path: " + result); // Expected: 2
-    }
 }

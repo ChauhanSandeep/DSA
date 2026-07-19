@@ -4,33 +4,40 @@ import java.util.*;
 
 
 /**
- * Problem: Find the smallest multiple of a given number that consists only of digits 0 and 1.
+ * Problem: Smallest Multiple With Digits 0 and 1
  *
- * Given a number `num`, the task is to find the smallest number that is a multiple of `num`
- * and contains only the digits 0 and 1.
+ * Given a positive integer num, find the smallest positive multiple of num whose
+ * decimal representation contains only digits 0 and 1. Return the number as a
+ * string because it can be much larger than Java integer ranges.
+ *
+ * Source: InterviewBit: Smallest Multiple With 0 and 1
+ * Pattern:  Graph | BFS over remainders | Parent reconstruction
  *
  * Example:
- * Input: num = 55
- * Output: "110"
- * Explanation: 110 is divisible by 55 and contains only 0s and 1s.
+ *   Input:  num = 55
+ *   Output: "110"
+ *   Why:    110 is divisible by 55, contains only digits 0 and 1, and the BFS
+ *           explores shorter strings before longer ones.
  *
- * Related Link: [YouTube Explanation](https://www.youtube.com/watch?v=Om47LiGTy8o)
- *
- * Follow-up Questions:
- * 1. **Can we find smallest multiple with only digits 1 and 2, or any other custom digits?**
- *    - Yes, we can generalize this approach by changing the digits used in BFS transitions.
- * 2. **Can we solve this without backtracking using parent maps?**
- *    - We can, but it will either require storing full strings (higher space) or be less optimal.
- * 3. **Is this applicable to languages like Python or functional programming?**
- *    - Yes, BFS logic remains same; data structures and syntax vary.
+ * Follow-ups:
+ *   1. Use a custom digit set such as {1, 2}?
+ *      Change the outgoing transitions to append those digits in sorted order.
+ *   2. Return only the length of the number?
+ *      BFS over remainders can stop at remainder 0 without reconstructing parents.
+ *   3. num is very large?
+ *      The remainder graph has num states, so memory becomes the main bottleneck.
  */
 public class SmallestMultiple {
 
   public static void main(String[] args) {
-    int num = 7;
-    String smallestMultiple = findSmallestMultiple(num);
-    System.out.println("Smallest multiple of " + num + " using only 0s and 1s: " + smallestMultiple);
+    int[] inputs = {1, 3, 7};
+    String[] expected = {"1", "111", "1001"};
+    for (int i = 0; i < inputs.length; i++) {
+      String output = findSmallestMultiple(inputs[i]);
+      System.out.printf("num=%d -> %s  expected=%s%n", inputs[i], output, expected[i]);
+    }
   }
+
 
   /**
    * Uses Breadth-First Search to find the smallest number made of only 0s and 1s that is divisible by `num`.

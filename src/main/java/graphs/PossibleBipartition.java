@@ -3,38 +3,45 @@ package graphs;
 import java.util.*;
 
 /**
- * We want to split a group of n people (labeled from 1 to n) into two groups of any size.
- * Each person may dislike some other people, and they should not go into the same group.
+ * Problem: Possible Bipartition
  *
- * Given the integer n and the array dislikes where dislikes[i] = [ai, bi] indicates that
- * the person labeled ai does not like the person labeled bi, return true if it is possible
- * to split everyone into two groups in this way.
+ * Split people labeled 1 through n into two groups so no dislike pair lands in
+ * the same group. Return whether such a split is possible for all connected
+ * dislike components.
  *
- * Example 1:
- * Input: n = 4, dislikes = [[1,2],[1,3],[2,4]]
- * Output: true
- * Explanation: group1 [1,4] and group2 [2,3]
+ * Leetcode: https://leetcode.com/problems/possible-bipartition/
+ * Rating:   1795 (zerotrac Elo)
+ * Pattern:  Graph | Bipartite coloring | BFS and Union-Find
  *
- * Example 2:
- * Input: n = 3, dislikes = [[1,2],[1,3],[2,3]]
- * Output: false
+ * Example:
+ *   Input:  n = 3, dislikes = [[1,2],[1,3],[2,3]]
+ *   Output: false
+ *   Why:    person 1 forces 2 and 3 into the opposite group, but 2 and 3 also
+ *           dislike each other, so they cannot share that group.
  *
- * LeetCode: https://leetcode.com/problems/possible-bipartition/
+ * Follow-ups:
+ *   1. Return the two actual groups?
+ *      Keep the color array and collect people by color after all components pass.
+ *   2. Split into k groups instead of two?
+ *      That becomes general graph coloring, which is much harder than bipartite checking.
+ *   3. Process dislikes online?
+ *      Maintain parity-aware Union-Find and reject the first contradiction.
  *
- * Follow-up Questions:
- * 1. How would you modify the solution if we needed to split into k groups instead of 2?
- *    - We would need to use graph coloring with k colors and ensure no two adjacent nodes have the same color.
- * 2. What if the graph is very large (e.g., 10^5 nodes)?
- *    - We would need to use BFS/DFS with an adjacency list for efficiency.
- * 3. How would you find the actual groups if the partition is possible?
- *    - We could track the color assignments during BFS/DFS to reconstruct the groups.
+ * Related: Is Graph Bipartite? (785), Flower Planting With No Adjacent (1042).
  *
- * Related Problems:
- * - Is Graph Bipartite? (https://leetcode.com/problems/is-graph-bipartite/)
- * - Flower Planting With No Adjacent (https://leetcode.com/problems/flower-planting-with-no-adjacent/)
- * LeetCode Contest Rating: 1795
  */
 public class PossibleBipartition {
+
+    public static void main(String[] args) {
+        PossibleBipartition solver = new PossibleBipartition();
+        int[] people = {4, 3};
+        int[][][] dislikes = {{{1, 2}, {1, 3}, {2, 4}}, {{1, 2}, {1, 3}, {2, 3}}};
+        boolean[] expected = {true, false};
+        for (int i = 0; i < people.length; i++) {
+            boolean output = solver.possibleBipartition(people[i], dislikes[i]);
+            System.out.printf("n=%d dislikes=%s -> %b  expected=%b%n", people[i], Arrays.deepToString(dislikes[i]), output, expected[i]);
+        }
+    }
     /**
      * Checks if the given graph is bipartite using BFS.
      *

@@ -1,26 +1,45 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
  * Problem: Satisfiability of Equality Equations
  *
- * You are given an array of strings equations that represent relationships between variables.
- * Each string equations[i] has length 4 and takes one of two different forms: "a==b" or "a!=b".
- * Here, a and b are lowercase letters (not necessarily different) that represent one-letter variable names.
+ * Each equation says two lowercase variables are equal or not equal. Decide
+ * whether there is any assignment of values to variables that satisfies all
+ * equations at the same time.
  *
- * Return true if it is possible to assign integers to variable names so as to satisfy all the given equations, or false otherwise.
+ * Leetcode: https://leetcode.com/problems/satisfiability-of-equality-equations/
+ * Rating:   1638 (zerotrac Elo)
+ * Pattern:  Graph | Union-Find | Equality components before inequality checks
  *
  * Example:
- * Input: ["a==b","b!=a"]
- * Output: false
- * Explanation: If we assign say, a = 1 and b = 1, then the first equation is satisfied, but not the second.
+ *   Input:  equations = ["a==b","b!=a"]
+ *   Output: false
+ *   Why:    the equality forces a and b into the same group, but the inequality
+ *           then demands that the same two variables be different.
  *
- * LeetCode: https://leetcode.com/problems/satisfiability-of-equality-equations
+ * Follow-ups:
+ *   1. Support more than 26 variable names?
+ *      Map each variable string to a compact integer id before using Union-Find.
+ *   2. Return one contradictory equation?
+ *      After unioning equalities, return the first inequality whose endpoints share a root.
+ *   3. Add constraints like a < b?
+ *      Use graph ordering or difference constraints instead of plain Union-Find.
  *
- * Time Complexity: O(n) where n is the number of equations
- * Space Complexity: O(1) since we have a fixed number of letters (26)
- * LeetCode Contest Rating: 1638
+ * Related: Evaluate Division (399), Possible Bipartition (886), Sentence Similarity II (737).
  */
 public class SatisfiabilityOfEqualityEquations {
+
+    public static void main(String[] args) {
+        SatisfiabilityOfEqualityEquations solver = new SatisfiabilityOfEqualityEquations();
+        String[][] inputs = {{"a==b", "b!=a"}, {"b==a", "a==b"}};
+        boolean[] expected = {false, true};
+        for (int i = 0; i < inputs.length; i++) {
+            boolean output = solver.equationsPossible(inputs[i]);
+            System.out.printf("equations=%s -> %b  expected=%b%n", Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
     private int[] parent;
 
     public boolean equationsPossible(String[] equations) {

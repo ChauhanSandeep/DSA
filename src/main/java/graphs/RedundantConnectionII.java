@@ -1,44 +1,46 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
- * In this problem, a rooted tree is a directed graph such that, there is exactly one node (the root)
- * for which all other nodes are descendants of this node, plus every node has exactly one parent,
- * except for the root node which has no parents.
+ * Problem: Redundant Connection II
  *
- * The given input is a directed graph that started as a rooted tree with n nodes (with distinct values
- * from 1 to n), with one additional directed edge added. The added edge has two different vertices
- * chosen from 1 to n, and was not an edge that already existed.
+ * A rooted directed tree had one extra directed edge added. Return the edge to
+ * remove so the graph becomes a rooted tree again; if multiple removals work,
+ * return the one that appears last in the input.
  *
- * The resulting graph is given as a 2D-array of edges. Each element of edges is a pair [ui, vi]
- * which represents a directed edge connecting nodes ui and vi, where ui is the parent of child vi.
+ * Leetcode: https://leetcode.com/problems/redundant-connection-ii/
+ * Rating:   acceptance 36.4% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Union-Find | Directed tree repair
  *
- * Return an edge that can be removed so that the resulting graph is a rooted tree of n nodes.
- * If there are multiple answers, return the answer that occurs last in the given 2D-array.
+ * Example:
+ *   Input:  edges = [[1,2],[2,3],[3,4],[4,1],[1,5]]
+ *   Output: [4,1]
+ *   Why:    no node has two parents, so the only problem is the directed cycle
+ *           1 -> 2 -> 3 -> 4 -> 1, closed by [4,1].
  *
- * Example 1:
- * Input: edges = [[1,2],[1,3],[2,3]]
- * Output: [2,3]
+ * Follow-ups:
+ *   1. Return the corrected tree edges too?
+ *      Skip the chosen edge and return every other input edge in order.
+ *   2. Multiple extra edges were added?
+ *      This single-edge case split is not enough; use validation after candidate removals.
+ *   3. Need to support online edge insertions?
+ *      Track indegree plus dynamic directed-cycle detection, which is harder than static Union-Find.
  *
- * Example 2:
- * Input: edges = [[1,2],[2,3],[3,4],[4,1],[1,5]]
- * Output: [4,1]
- *
- * LeetCode: https://leetcode.com/problems/redundant-connection-ii/
- *
- * Follow-up Questions:
- * 1. How would you handle the case where multiple edges can be removed to form a valid tree?
- *    - The problem guarantees exactly one redundant edge, but if there were multiple, we'd need to return all of them.
- * 2. What if the graph is very large (e.g., 10^5 nodes and edges)?
- *    - The Union-Find solution with path compression and union by rank is efficient (near O(1) per operation).
- * 3. How would you modify the solution to return all possible redundant edges?
- *    - We could collect all edges that cause a cycle or a node to have two parents.
- *
- * Related Problems:
- * - Redundant Connection (https://leetcode.com/problems/redundant-connection/)
- * - Graph Valid Tree (https://leetcode.com/problems/graph-valid-tree/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Redundant Connection (684), Course Schedule (207), Graph Valid Tree (261).
  */
 public class RedundantConnectionII {
+
+    public static void main(String[] args) {
+        RedundantConnectionII solver = new RedundantConnectionII();
+        int[][][] inputs = {{{1, 2}, {1, 3}, {2, 3}}, {{1, 2}, {2, 3}, {3, 4}, {4, 1}, {1, 5}}};
+        int[][] expected = {{2, 3}, {4, 1}};
+        for (int i = 0; i < inputs.length; i++) {
+            String input = Arrays.deepToString(inputs[i]);
+            int[] output = solver.findRedundantDirectedConnection(inputs[i]);
+            System.out.printf("edges=%s -> %s  expected=%s%n", input, Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
     /**
      * Finds the redundant directed connection in the given edges using Union-Find.
      *

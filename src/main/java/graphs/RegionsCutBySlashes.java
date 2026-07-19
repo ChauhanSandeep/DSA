@@ -1,43 +1,46 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
- * In a N x N grid composed of 1 x 1 squares, each 1 x 1 square consists of a '/', '\', or blank space ' '.
- * These characters divide the square into contiguous regions.
+ * Problem: Regions Cut By Slashes
  *
- * Return the number of regions.
+ * A grid cell can contain '/', '\\', or a blank space. Slashes split cells into
+ * smaller pieces, and connected open pieces form regions. Return how many regions
+ * the whole grid contains.
  *
- * Example 1:
- * Input: [" /",
- *         "/ "]
- * Output: 2
- * Explanation: The 2x2 grid is as follows:
- *   | |
- *  -+-+-
- *   |/|
- *  -+-+-
- *   | |
+ * Leetcode: https://leetcode.com/problems/regions-cut-by-slashes/
+ * Rating:   2136 (zerotrac Elo)
+ * Pattern:  Graph | Union-Find | Split each cell into triangles
  *
- * Example 2:
- * Input: [" /",
- *         "  "]
- * Output: 1
+ * Example:
+ *   Input:  grid = [" /", "/ "]
+ *   Output: 2
+ *   Why:    the two slashes meet in a way that separates the open space into two
+ *           connected areas.
  *
- * LeetCode: https://leetcode.com/problems/regions-cut-by-slashes/
+ * Follow-ups:
+ *   1. Return the area of each region?
+ *      Track component sizes in the DSU or count cells after a scaled-grid flood fill.
+ *   2. Support more divider shapes inside a cell?
+ *      Change how each cell is split and which subparts are unioned.
+ *   3. Handle a very large sparse grid?
+ *      Store only cells containing dividers and use boundary compression.
  *
- * Follow-up Questions:
- * 1. How would you handle larger grids (e.g., 1000x1000)?
- *    - The Union-Find solution is efficient with O(α(n)) per operation, making it suitable for large grids.
- * 2. What if we needed to find the area of each region?
- *    - We could modify the solution to track the size of each connected component.
- * 3. How would you handle diagonal slashes or other types of dividers?
- *    - The solution can be extended by adjusting the cell division and union logic.
+ * Related: Number of Islands (200), Surrounded Regions (130), Making A Large Island (827).
  *
- * Related Problems:
- * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
- * - Number of Provinces (https://leetcode.com/problems/number-of-provinces/)
- * LeetCode Contest Rating: 2136
  */
 public class RegionsCutBySlashes {
+
+    public static void main(String[] args) {
+        RegionsCutBySlashes solver = new RegionsCutBySlashes();
+        String[][] inputs = {{" /", "/ "}, {" /", "  "}};
+        int[] expected = {2, 1};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.regionsBySlashes(inputs[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
      * Calculates the number of regions formed by the slashes in the grid.
      *

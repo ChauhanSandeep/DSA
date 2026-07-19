@@ -2,26 +2,65 @@ package graphs;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
 
 /**
- * // This is the robot's control interface.
- * // You should not implement it, or speculate about its implementation
- * interface Robot {
- *     // Returns true if the cell in front is open and robot moves into the cell.
- *     // Returns false if the cell in front is blocked and robot stays in the current cell.
- *     public boolean move();
+ * Problem: Robot Room Cleaner
  *
- *     // Robot will stay in the same cell after calling turnLeft/turnRight.
- *     // Each turn will be 90 degrees.
- *     public void turnLeft();
- *     public void turnRight();
+ * A robot starts in an unknown room and exposes only four operations: move,
+ * turnLeft, turnRight, and clean. Clean every reachable open cell without knowing
+ * the room layout in advance.
  *
- *     // Clean the current cell.
- *     public void clean();
- * }
+ * Leetcode: https://leetcode.com/problems/robot-room-cleaner/
+ * Rating:   acceptance 78.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Backtracking DFS | Unknown grid exploration
+ *
+ * Example:
+ *   Input:  hidden room with start inside a small open area and some blocked cells
+ *   Output: every reachable open cell is cleaned
+ *   Why:    DFS tries each direction from every discovered cell, records relative
+ *           coordinates, and physically returns to the parent cell after exploring a branch.
+ *
+ * Follow-ups:
+ *   1. Minimize robot movement while cleaning?
+ *      This becomes an online exploration problem; exact optimality is not available without the map.
+ *   2. The robot has limited battery?
+ *      Track distance back to the start and stop exploring paths that cannot safely return.
+ *   3. Multiple robots clean together?
+ *      Share the visited set and assign frontier cells, but avoid collisions with coordination.
+ *
+ * Related: Number of Islands (200), Shortest Path in a Grid with Obstacles Elimination (1293).
  */
-
 public class RobotRoomCleaner {
+
+    public static void main(String[] args) {
+        RobotRoomCleaner solver = new RobotRoomCleaner();
+        class MockRobot extends Robot {
+            private final int[][] room;
+            private final Set<String> cleanedCells = new HashSet<>();
+            private int row;
+            private int col;
+            private int direction;
+            MockRobot(int[][] room) { solver.super(); this.room = room; }
+            @Override public boolean move() {
+                int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+                int nextRow = row + dirs[direction][0];
+                int nextCol = col + dirs[direction][1];
+                if (nextRow < 0 || nextCol < 0 || nextRow >= room.length || nextCol >= room[0].length || room[nextRow][nextCol] == 0) return false;
+                row = nextRow; col = nextCol; return true;
+            }
+            @Override public void turnRight() { direction = (direction + 1) % 4; }
+            @Override public void clean() { cleanedCells.add(row + "," + col); }
+            int cleanedCount() { return cleanedCells.size(); }
+        }
+        int[][][] rooms = {{{1, 1}, {0, 1}}, {{1}}};
+        int[] expected = {3, 1};
+        for (int i = 0; i < rooms.length; i++) {
+            MockRobot robot = new MockRobot(rooms[i]);
+            solver.cleanRoom(robot);
+            System.out.printf("room=%s -> %d  expected=%d%n", Arrays.deepToString(rooms[i]), robot.cleanedCount(), expected[i]);
+        }
+    }
     // Directions: up, right, down, left (clockwise order)
     private static final int[][] DIRECTIONS = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 

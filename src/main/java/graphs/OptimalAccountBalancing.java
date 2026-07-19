@@ -4,45 +4,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 
 /**
- * Optimal Account Balancing (Splitwise Problem)
- * LeetCode: https://leetcode.com/problems/optimal-account-balancing/
+ * Problem: Optimal Account Balancing
  *
- * --- Problem Description ---
- * You are given an array of transactions where transactions[i] = [from_i, to_i, amount_i]
- * indicates that the person with ID = from_i gave amount_i $ to the person with ID = to_i.
+ * Given a list of money transfers between people, settle everyone so each
+ * person's final net balance becomes zero. Return the fewest new transactions
+ * needed, not the actual list of payments.
  *
- * Return the minimum number of transactions required to settle the debt.
+ * Leetcode: https://leetcode.com/problems/optimal-account-balancing/
+ * Rating:   acceptance 50.6% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Backtracking | Debt netting with memoization
  *
  * Example:
- * Input: transactions = [[0,1,10],[2,0,5]]
- * Output: 2
- * Explanation:
- * Person #0 gave person #1 $10.
- * Person #2 gave person #0 $5.
- * Two transactions are needed. One way to settle the debt is person
- * #1 pays person #0 $5
- * #1 pays person #2 $5
+ *   Input:  transactions = [[0,1,10],[2,0,5]]
+ *   Output: 2
+ *   Why:    person 0 is owed 5 overall, person 1 owes 10, and person 2 is owed 5,
+ *           so person 1 must pay two different creditors.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you handle real-time updates to transactions during settlement?
- *    Answer: Use incremental algorithms with cached intermediate results and delta updates.
- * 2. What if we need to minimize total money transferred instead of number of transactions?
- *    Answer: Modify DP to track monetary amounts and use weighted optimization criteria.
- * 3. How to scale this for thousands of people with complex debt relationships?
- *    Answer: Use graph clustering, approximation algorithms, or distributed computing approaches.
- * 4. What if some people have credit limits or can only participate in certain transactions?
- *    Answer: Add constraint satisfaction with feasibility checks in the backtracking process.
- *
- * Related Problems:
- * - LeetCode 322: Coin Change (DP optimization)
- * - LeetCode 698: Partition to K Equal Sum Subsets (Subset partitioning)
- * - LeetCode 473: Matchsticks to Square (Backtracking with pruning)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the actual settlement transactions?
+ *      Store the chosen pair at each recursive step and replay the best branch.
+ *   2. Minimize total transferred amount instead of transaction count?
+ *      Net balances already minimize total money; the optimization target changes the search state.
+ *   3. Add per-person limits on who can pay whom?
+ *      Treat each attempted settlement as a constrained edge and skip infeasible pairs.
+ *   4. Scale to thousands of people?
+ *      Exact search is exponential; use greedy matching or min-cost flow approximations.
  */
 public class OptimalAccountBalancing {
+
+    public static void main(String[] args) {
+        OptimalAccountBalancing solver = new OptimalAccountBalancing();
+        int[][][] inputs = {{{0, 1, 10}, {2, 0, 5}}, {{0, 1, 10}, {1, 0, 10}}, {}};
+        int[] expected = {2, 0, 0};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.minTransfers(inputs[i]);
+            System.out.printf("transactions=%s -> %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     // Memoization cache for overlapping subproblems
     private Map<String, Integer> memo = new HashMap<>();
 
@@ -166,15 +168,5 @@ public class OptimalAccountBalancing {
         return (balance1 > 0 && balance2 < 0) || (balance1 < 0 && balance2 > 0);
     }
 
-    public static void main(String[] args) {
-        int[][] transactions = {
-            {0, 1, 10}, // [from, to, amount]
-            {1, 0, 1},
-            {1, 2, 5},
-            {2, 0, 5}
-        };
-        int minTransfers = new OptimalAccountBalancing().minTransfers(transactions);
-        System.out.println("Minimum Transactions: " + minTransfers);
-    }
 
 }

@@ -5,41 +5,40 @@ import java.util.*;
 /**
  * Problem: Sliding Puzzle
  *
- * On a 2x3 board, there are 5 tiles labeled from 1 to 5, and an empty square represented by 0.
- * A move consists of choosing 0 and a 4-directionally adjacent number and swapping it.
- * The state of the board is solved if and only if the board is [[1,2,3],[4,5,0]].
- * Given the puzzle board, return the least number of moves required so that the state of the board is solved.
- * If it is impossible for the state of the board to be solved, return -1.
+ * On a 2 by 3 board, tiles 1 through 5 and blank 0 can be swapped with the
+ * blank's four-directional neighbor. Return the fewest moves needed to reach
+ * [[1,2,3],[4,5,0]], or -1 if the board cannot be solved.
+ *
+ * Leetcode: https://leetcode.com/problems/sliding-puzzle/
+ * Rating:   1815 (zerotrac Elo)
+ * Pattern:  Graph | BFS over board states | Permutation reachability
  *
  * Example:
- * Input: board = [
- *      [1,2,3],
- *      [4,0,5]
- * ]
- * Output: 1
- * Explanation: Swap the 0 and the 5 in one move.
- * Result board : [
- *      [1,2,3],
- *      [4,5,0]
- * ]
+ *   Input:  board = [[1,2,3],[4,0,5]]
+ *   Output: 1
+ *   Why:    swapping the blank with tile 5 immediately produces the target board.
  *
- * LeetCode: https://leetcode.com/problems/sliding-puzzle
+ * Follow-ups:
+ *   1. Return the move sequence?
+ *      Store parent state and swapped tile for each BFS discovery.
+ *   2. Solve a 4 by 4 puzzle?
+ *      Use A* with Manhattan distance; plain BFS is too large.
+ *   3. Precompute answers for all 2 by 3 states?
+ *      Run BFS once from the target and store distance for every reachable permutation.
  *
- * Follow-up Questions:
- * 1. How would you handle a larger board (e.g., 4x4)?
- *    Answer: Same BFS approach works, but state space grows exponentially. Consider A* with Manhattan distance.
- *
- * 2. What if we need to find the actual sequence of moves?
- *    Answer: Store parent pointers in BFS to reconstruct the path.
- *
- * 3. How would you determine if a puzzle is solvable before starting BFS?
- *    Answer: Count inversions in the puzzle. For 2x3 board, even inversions mean solvable.
- *    Related: https://leetcode.com/problems/shortest-path-to-get-all-keys/
- *
- * @author Sandeep
- * LeetCode Contest Rating: 1815
+ * Related: Shortest Path to Get All Keys (864), Open the Lock (752).
  */
 public class SlidingPuzzle {
+
+    public static void main(String[] args) {
+        SlidingPuzzle solver = new SlidingPuzzle();
+        int[][][] boards = {{{1, 2, 3}, {4, 0, 5}}, {{1, 2, 3}, {5, 4, 0}}};
+        int[] expected = {1, -1};
+        for (int i = 0; i < boards.length; i++) {
+            int output = solver.slidingPuzzle(boards[i]);
+            System.out.printf("board=%s -> %d  expected=%d%n", Arrays.deepToString(boards[i]), output, expected[i]);
+        }
+    }
 
     private static final String TARGET = "123450";
     private static final int ROWS = 2;

@@ -4,37 +4,43 @@ import java.util.*;
 
 /**
  * Problem: Word Ladder II
- * LeetCode: https://leetcode.com/problems/word-ladder-ii/
  *
- * Problem Statement:
- * Given two words, beginWord and endWord, and a dictionary's word list, find all shortest transformation
- * sequences from beginWord to endWord, such that:
- * 1. Only one letter can be changed at a time.
- * 2. Each transformed word must exist in the word list.
+ * Find all shortest transformation sequences from beginWord to endWord. Each step
+ * may change one letter, and every intermediate word must exist in the dictionary.
+ *
+ * Leetcode: https://leetcode.com/problems/word-ladder-ii/
+ * Rating:   acceptance 27.9% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Bidirectional BFS + DFS | Shortest-path DAG reconstruction
  *
  * Example:
- * Input:
- *   beginWord = "hit"
- *   endWord = "cog"
- *   wordList = ["hot","dot","dog","lot","log","cog"]
- * Output:
- * [
- *   ["hit","hot","dot","dog","cog"],
- *   ["hit","hot","lot","log","cog"]
- * ]
+ *   Input:  beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+ *   Output: [[hit,hot,dot,dog,cog],[hit,hot,lot,log,cog]]
+ *   Why:    both sequences use five words, and no shorter valid transformation
+ *           reaches cog.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you optimize for very large word dictionaries (millions of words)?
- *    Answer: Use bidirectional BFS, trie data structures, or parallel processing for independent word transformations.
- * 2. What if we need to find paths with specific constraints (e.g., avoid certain words)?
- *    Answer: Add constraint checking during BFS expansion and modify predecessor tracking accordingly.
- * 3. How to handle weighted transformations where some letter changes cost more?
- *    Answer: Replace BFS with Dijkstra's algorithm using priority queue for weighted shortest paths.
- * 4. What if words can have different lengths with insertion/deletion operations?
- *    Answer: Extend to edit distance problem using dynamic programming with 3D state space.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return only the number of shortest ladders?
+ *      Count paths in the BFS DAG with dynamic programming instead of materializing lists.
+ *   2. Handle a dictionary with millions of words?
+ *      Use wildcard buckets or bidirectional BFS with indexed neighbor generation.
+ *   3. Weighted transformations?
+ *      Replace BFS with Dijkstra and build a shortest-path DAG from equal best distances.
+ *
+ * Related: Word Ladder (127), Minimum Genetic Mutation (433), Open the Lock (752).
  */
 public class WordLadder2 {
+
+  public static void main(String[] args) {
+    WordLadder2 solver = new WordLadder2();
+    List<String> words = Arrays.asList("hot", "dot", "dog", "lot", "log", "cog");
+    List<List<String>> output = solver.findLadders("hit", "cog", words);
+    output.sort(Comparator.comparing(Object::toString));
+    List<List<String>> expected = Arrays.asList(Arrays.asList("hit", "hot", "dot", "dog", "cog"), Arrays.asList("hit", "hot", "lot", "log", "cog"));
+    expected.sort(Comparator.comparing(Object::toString));
+    System.out.printf("begin=%s end=%s words=%s -> %s  expected=%s%n", "hit", "cog", words, output, expected);
+    List<List<String>> noPath = solver.findLadders("hit", "cog", Arrays.asList("hot", "dot", "dog"));
+    System.out.printf("begin=%s end=%s words=%s -> %s  expected=%s%n", "hit", "cog", Arrays.asList("hot", "dot", "dog"), noPath, Collections.emptyList());
+  }
 
   /**
    * Main method to find all shortest transformation sequences from beginWord to endWord.

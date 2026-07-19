@@ -1,36 +1,47 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
- * Alice and Bob have an undirected graph of n nodes and 3 types of edges:
- * - Type 1: Can be traversed by Alice only.
- * - Type 2: Can be traversed by Bob only.
- * - Type 3: Can by traversed by both Alice and Bob.
+ * Problem: Remove Max Number of Edges to Keep Graph Fully Traversable
  *
- * Given the edges, return the maximum number of edges you can remove so that after removing the edges,
- * the graph can still be fully traversed by both Alice and Bob. If it's impossible for the graph to be
- * fully traversed by both Alice and Bob, return -1.
+ * Alice and Bob share an undirected graph with three edge types: Alice-only,
+ * Bob-only, and shared. Remove as many edges as possible while still allowing
+ * both Alice and Bob to traverse every node in their own usable graph.
  *
- * Example 1:
- * Input: n = 4, edges = [[3,1,2],[3,2,3],[1,1,3],[1,2,4],[1,1,2],[2,3,4]]
- * Output: 2
- * Explanation: If we remove the 2 edges [1,1,2] and [1,1,3], then both Alice and Bob can still traverse the graph.
+ * Leetcode: https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/
+ * Rating:   2132 (zerotrac Elo)
+ * Pattern:  Graph | Union-Find | Greedy shared-edge reuse
  *
- * LeetCode: https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/
+ * Example:
+ *   Input:  n = 4, edges = [[3,1,2],[3,2,3],[1,1,3],[1,2,4],[1,1,2],[2,3,4]]
+ *   Output: 2
+ *   Why:    the shared edges connect most of both graphs, then one Alice-only and
+ *           one Bob-only edge finish connectivity; the two leftover Alice edges are removable.
  *
- * Follow-up Questions:
- * 1. How would you handle the case where there are more types of users with different edge access?
- *    - We could extend the solution to handle k different users by maintaining k separate Union-Find structures.
- * 2. What if the graph is very large (e.g., 100,000 nodes)?
- *    - The Union-Find with path compression and union by rank is efficient enough (near O(1) per operation).
- * 3. How would you modify the solution to find the specific edges to remove?
- *    - We could track which edges are included in the MSTs for both Alice and Bob.
+ * Follow-ups:
+ *   1. Return the exact edges removed?
+ *      Add every edge whose union fails to a removable list, then validate connectivity.
+ *   2. More than two users have different edge access?
+ *      Keep one Union-Find per user and greedily process edges usable by the most users first.
+ *   3. Edge removals have different profits?
+ *      This becomes a weighted optimization problem, not just counting failed unions.
  *
- * Related Problems:
- * - Redundant Connection (https://leetcode.com/problems/redundant-connection/)
- * - Graph Valid Tree (https://leetcode.com/problems/graph-valid-tree/)
- * LeetCode Contest Rating: 2132
+ * Related: Redundant Connection (684), Graph Valid Tree (261), Most Stones Removed (947).
  */
 public class RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable {
+
+    public static void main(String[] args) {
+        RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable solver = new RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable();
+        int[] nodes = {4, 4};
+        int[][][] edges = {{{3, 1, 2}, {3, 2, 3}, {1, 1, 3}, {1, 2, 4}, {1, 1, 2}, {2, 3, 4}}, {{3, 1, 2}, {3, 2, 3}, {1, 1, 4}, {2, 1, 4}}};
+        int[] expected = {2, 0};
+        for (int i = 0; i < nodes.length; i++) {
+            String input = Arrays.deepToString(edges[i]);
+            int output = solver.maxNumEdgesToRemove(nodes[i], edges[i]);
+            System.out.printf("n=%d edges=%s -> %d  expected=%d%n", nodes[i], input, output, expected[i]);
+        }
+    }
     /**
      * Calculates the maximum number of edges that can be removed while keeping the graph fully traversable.
      *

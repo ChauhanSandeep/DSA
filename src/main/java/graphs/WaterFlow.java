@@ -4,52 +4,47 @@ import java.util.*;
 
 
 /**
+ * Problem: Pacific Atlantic Water Flow
+ *
+ * Water can flow from a cell to a 4-directional neighbor with height less than or
+ * equal to the current cell. Count how many cells can flow to both the Pacific
+ * ocean on the top/left edges and the Atlantic ocean on the bottom/right edges.
+ *
  * Leetcode: https://leetcode.com/problems/pacific-atlantic-water-flow/
+ * Rating:   acceptance 61.2% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Reverse multi-source BFS | Ocean reachability intersection
  *
- * --- Problem Statement ---
- * Given an m x n matrix of non-negative integers representing the height of each cell in a island,
- * the "Pacific ocean" touches the left and top edges, while the "Atlantic ocean" touches the right and bottom edges.
- * Water can only flow from a cell to another one directly adjacent (up/down/left/right) with an equal or lower height.
- * Return the list of grid coordinates where water can flow to **both** the Pacific and Atlantic ocean.
+ * Example:
+ *   Input:  heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+ *   Output: 7
+ *   Why:    seven cells can reach both oceans; reverse BFS finds cells that each
+ *           ocean can reach by moving uphill, then counts the intersection.
  *
- * --- Example ---
- * Input:
- * heights = [
- *   [1,2,2,3,5],
- *   [3,2,3,4,4],
- *   [2,4,5,3,1],
- *   [6,7,1,4,5],
- *   [5,1,1,2,4]
- * ]
- * Output: Coordinates count = 7 (full list of coordinates not returned here)
+ * Follow-ups:
+ *   1. Return the actual coordinates instead of a count?
+ *      Add every intersection cell to a list rather than incrementing a counter.
+ *   2. Use DFS instead of BFS?
+ *      Start DFS from the same ocean borders and follow non-decreasing heights.
+ *   3. Support many ocean-edge queries?
+ *      Precompute reachability from each queried boundary set and reuse intersections.
  *
- * --- Explanation ---
- * Water can flow from any higher or same-height cell to a lower or same-height neighbor.
- * We reverse the problem: instead of checking whether each cell can reach both oceans, we perform BFS/DFS
- * from the Pacific and Atlantic boundaries and mark the reachable cells. The intersection gives the result.
- *
- * --- Follow-Up Questions ---
- * Q: Can you return the actual list of coordinates instead of just count?
- * A: Yes, return `List<List<Integer>>` instead of count. See: https://leetcode.com/problems/pacific-atlantic-water-flow/
- *
- * Q: Can we use DFS instead of BFS?
- * A: Yes, DFS is also valid and easier to write recursively.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Surrounded Regions (130), Number of Islands (200), Shortest Bridge (934).
  */
 public class WaterFlow {
+
+  public static void main(String[] args) {
+    WaterFlow solver = new WaterFlow();
+    int[][][] inputs = {{{1}}, {{1, 1}}};
+    int[] expected = {1, 2};
+    for (int i = 0; i < inputs.length; i++) {
+      int output = solver.countPacificAtlanticReachableCells(inputs[i]);
+      System.out.printf("heights=%s -> %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+    }
+  }
 
   private int numRows, numCols;
   private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-  public static void main(String[] args) {
-    int[][] heights = {
-        {1, 2, 2, 3, 5},
-        {3, 2, 3, 4, 4},
-        {2, 4, 5, 3, 1},
-        {6, 7, 1, 4, 5},
-        {5, 1, 1, 2, 4}};
-    System.out.println(new WaterFlow().countPacificAtlanticReachableCells(heights)); // Output: 7
-  }
 
   /**
    * Returns the number of grid cells where water can flow to both Pacific and Atlantic oceans.

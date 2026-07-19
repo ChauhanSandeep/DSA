@@ -6,26 +6,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Arrays;
 
 /**
- * 1466. Reorder Routes to Make All Paths Lead to the City Zero  (Medium)
+ * Problem: Reorder Routes to Make All Paths Lead to the City Zero
  *
- * Problem: There are n cities numbered 0..n-1 and n-1 one-way roads. The
- * underlying undirected structure forms a tree. Return the minimum number of
- * roads that must be reversed so that EVERY city can reach city 0.
+ * There are n cities and n - 1 one-way roads whose undirected shape is a tree.
+ * Reverse the fewest roads so every city can eventually travel to city 0.
  *
- * Input:  n = 6, connections = [[0,1],[1,3],[2,3],[4,0],[4,5]]
- * Output: 3
- * Explanation: Reverse 0→1, 1→3, 4→5 so every city can reach city 0.
+ * Leetcode: https://leetcode.com/problems/reorder-routes-to-make-all-paths-lead-to-the-city-zero/
+ * Rating:   1634 (zerotrac Elo)
+ * Pattern:  Graph | Tree BFS | Count edges pointing away from root
  *
- * Constraints:
- *   2 <= n <= 5 * 10^4
- *   connections.length == n - 1
- *   The underlying graph (ignoring directions) is a tree.
+ * Example:
+ *   Input:  n = 6, connections = [[0,1],[1,3],[2,3],[4,0],[4,5]]
+ *   Output: 3
+ *   Why:    roads 0->1, 1->3, and 4->5 point away from city 0 during a traversal
+ *           rooted at 0, so those three directions must be reversed.
  *
- * LeetCode: https://leetcode.com/problems/reorder-routes-to-make-all-paths-lead-to-the-city-zero
+ * Follow-ups:
+ *   1. Return which roads to reverse?
+ *      Store the original edge whenever the traversal pays cost 1.
+ *   2. The graph is not guaranteed to be a tree?
+ *      Run shortest path on edge-reversal costs or first validate connectivity and cycles.
+ *   3. Need every city to reach a different root?
+ *      Re-root the traversal at that target and count outward-pointing original edges.
+ *
+ * Related: Minimum Edge Reversals So Every Node Is Reachable (2858), All Paths Lead to Destination (1059).
  */
 public class ReorderRoutesToMakeAllPathsLeadToCityZero {
+
+    public static void main(String[] args) {
+        ReorderRoutesToMakeAllPathsLeadToCityZero solver = new ReorderRoutesToMakeAllPathsLeadToCityZero();
+        int[] nodes = {6, 3};
+        int[][][] connections = {{{0, 1}, {1, 3}, {2, 3}, {4, 0}, {4, 5}}, {{1, 0}, {2, 0}}};
+        int[] expected = {3, 0};
+        for (int i = 0; i < nodes.length; i++) {
+            int output = solver.minReorder(nodes[i], connections[i]);
+            System.out.printf("nodes=%d connections=%s -> %d  expected=%d%n", nodes[i], Arrays.deepToString(connections[i]), output, expected[i]);
+        }
+    }
 
     /**
      * Insight:
@@ -83,10 +103,4 @@ public class ReorderRoutesToMakeAllPathsLeadToCityZero {
         return result;
     }
 
-    public static void main(String[] args) {
-        ReorderRoutesToMakeAllPathsLeadToCityZero solver = new ReorderRoutesToMakeAllPathsLeadToCityZero();
-        System.out.println(solver.minReorder(6, new int[][]{{0,1},{1,3},{2,3},{4,0},{4,5}})); // 3
-        System.out.println(solver.minReorder(5, new int[][]{{1,0},{1,2},{3,2},{3,4}}));       // 2
-        System.out.println(solver.minReorder(3, new int[][]{{1,0},{2,0}}));                   // 0
-    }
 }

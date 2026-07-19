@@ -3,46 +3,45 @@ package graphs;
 import java.util.*;
 
 /**
- * Starting with an undirected graph (the "original graph") with nodes labeled 0 to N-1,
- * subdivisions are made to some of the edges.
+ * Problem: Reachable Nodes In Subdivided Graph
  *
- * The graph is given as follows: edges[i] is a list of integer pairs (i, j, n) such that
- * (i, j) is an edge of the original graph, and n is the total number of new nodes on that edge.
+ * Each original edge [u, v, cnt] is replaced by cnt new nodes placed between u
+ * and v. Starting at original node 0 with maxMoves moves, count both original and
+ * inserted nodes that can be reached.
  *
- * Then, the edge (i, j) is deleted from the original graph, n new nodes (x_1, x_2, ..., x_n)
- * are added to the original graph, and n+1 new edges (i, x_1), (x_1, x_2), (x_2, x_3), ..., (x_n, j) are added.
+ * Leetcode: https://leetcode.com/problems/reachable-nodes-in-subdivided-graph/
+ * Rating:   2328 (zerotrac Elo)
+ * Pattern:  Graph | Dijkstra | Count partial edge coverage
  *
- * You will start at node 0, and you can move along the edges of the graph. At each step,
- * you can move to any adjacent node. You can visit each node at most once.
+ * Example:
+ *   Input:  edges = [[0,1,10],[0,2,1],[1,2,2]], maxMoves = 6, n = 3
+ *   Output: 13
+ *   Why:    all three original nodes are reachable; along the subdivided edges,
+ *           the two directions together cover 10 + 1 + 2 inserted nodes.
  *
- * Return how many nodes you can reach in at most M moves.
+ * Follow-ups:
+ *   1. Return which inserted nodes are reachable too?
+ *      Store per-edge coverage from each endpoint and expand only that many labels.
+ *   2. Edge traversal costs are not one per segment?
+ *      Run Dijkstra on weighted segments or keep the edge as a weighted interval.
+ *   3. Multiple starting nodes share the same move budget?
+ *      Seed Dijkstra with all starts at distance 0 and count coverage from best distances.
  *
- * Example 1:
- * Input: edges = [[0,1,10],[0,2,1],[1,2,2]], M = 6, N = 3
- * Output: 13
- * Explanation: The nodes that are reachable in the final graph after M = 6 moves are:
- * 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13
- *
- * Example 2:
- * Input: edges = [[0,1,4],[1,2,6],[0,2,8],[1,3,1]], M = 10, N = 4
- * Output: 23
- *
- * LeetCode: https://leetcode.com/problems/reachable-nodes-in-subdivided-graph/
- *
- * Follow-up Questions:
- * 1. How would you modify the solution if edges could have different weights?
- *    - The Dijkstra's algorithm already handles different edge weights.
- * 2. What if the graph is very large (e.g., 10^5 nodes and edges)?
- *    - The solution uses an adjacency list and priority queue for efficiency.
- * 3. How would you find the actual path that visits the maximum number of nodes?
- *    - We could modify the solution to track the path taken during the BFS/Dijkstra's.
- *
- * Related Problems:
- * - Network Delay Time (https://leetcode.com/problems/network-delay-time/)
- * - Cheapest Flights Within K Stops (https://leetcode.com/problems/cheapest-flights-within-k-stops/)
- * LeetCode Contest Rating: 2328
+ * Related: Network Delay Time (743), Path With Minimum Effort (1631), Swim in Rising Water (778).
  */
 public class ReachableNodesInSubdividedGraph {
+
+    public static void main(String[] args) {
+        ReachableNodesInSubdividedGraph solver = new ReachableNodesInSubdividedGraph();
+        int[][][] edges = {{{0, 1, 0}}, {}};
+        int[] moves = {1, 0};
+        int[] nodes = {2, 1};
+        int[] expected = {2, 1};
+        for (int i = 0; i < edges.length; i++) {
+            int output = solver.reachableNodes(edges[i], moves[i], nodes[i]);
+            System.out.printf("edges=%s M=%d N=%d -> %d  expected=%d%n", Arrays.deepToString(edges[i]), moves[i], nodes[i], output, expected[i]);
+        }
+    }
     /**
      * Calculates the number of nodes reachable in at most M moves.
      *

@@ -1,31 +1,46 @@
 package graphs;
 
 import java.util.PriorityQueue;
+import java.util.Arrays;
 
 /**
  * Problem: Swim in Rising Water
  *
- * You are given an n x n integer matrix grid where each value grid[i][j] represents the elevation at that point (i, j).
- * The rain starts to fall. At time t, the depth of the water everywhere is t. You can swim from a square to another 4-directionally adjacent square if and only if the elevation of both squares individually are at most t.
+ * Each grid value is an elevation. At time t, water level t lets you enter any
+ * cell with elevation at most t. Return the earliest time you can move from the
+ * top-left cell to the bottom-right cell.
  *
- * Return the least time until you can reach the bottom right square (n-1, n-1) if you start at the top left square (0, 0).
+ * Leetcode: https://leetcode.com/problems/swim-in-rising-water/
+ * Rating:   2097 (zerotrac Elo)
+ * Pattern:  Graph | Dijkstra/minimax path | Priority queue
  *
  * Example:
- * Input: grid = [[0,2],[1,3]]
- * Output: 3
- * Explanation:
- * At time 0, you are in grid location (0, 0).
- * You cannot go anywhere else because 4-directionally adjacent neighbors have a higher elevation than t = 0.
- * You cannot reach point (1, 1) until time 3.
- * When the depth of water is 3, we can swim anywhere inside the grid.
+ *   Input:  grid = [[0,2],[1,3]]
+ *   Output: 3
+ *   Why:    the destination elevation is 3, so no path can arrive before time 3,
+ *           and at time 3 all four cells are reachable.
  *
- * LeetCode: https://leetcode.com/problems/swim-in-rising-water
+ * Follow-ups:
+ *   1. Solve with binary search instead?
+ *      Binary search time t and flood-fill cells with elevation at most t.
+ *   2. Return the path that achieves the time?
+ *      Store parent pointers when pushing cells into the priority queue.
+ *   3. Many start/end queries on the same grid?
+ *      Build a minimum spanning tree and answer minimax path queries on it.
  *
- * Time Complexity: O(n^2 * log n) where n is the size of the grid
- * Space Complexity: O(n^2) for the priority queue and visited set
- * LeetCode Contest Rating: 2097
+ * Related: Path With Minimum Effort (1631), Reachable Nodes in Subdivided Graph (882).
  */
 public class SwimInRisingWater {
+
+    public static void main(String[] args) {
+        SwimInRisingWater solver = new SwimInRisingWater();
+        int[][][] grids = {{{0, 2}, {1, 3}}, {{0}}};
+        int[] expected = {3, 0};
+        for (int i = 0; i < grids.length; i++) {
+            int output = solver.swimInWater(grids[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n", Arrays.deepToString(grids[i]), output, expected[i]);
+        }
+    }
     // Directions for 4-directional movement
     private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 

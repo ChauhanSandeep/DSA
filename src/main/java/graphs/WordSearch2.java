@@ -4,47 +4,49 @@ import java.util.*;
 
 /**
  * Problem: Word Search II
- * https://leetcode.com/problems/word-search-ii/
  *
- * Given a 2D board and a list of words from the dictionary, find all words that
- * can be formed by sequentially adjacent letters (horizontally or vertically). Each cell
- * may be used only once per word.
+ * Given a board of letters and a dictionary, return all words that can be formed
+ * by walking through horizontally or vertically adjacent cells. A cell may be used
+ * at most once for a single word.
+ *
+ * Leetcode: https://leetcode.com/problems/word-search-ii/
+ * Rating:   acceptance 38.7% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Trie + backtracking DFS | Prefix pruning
  *
  * Example:
- * Input:
- *   board = [
- *     ['o','a','a','n'],
- *     ['e','t','a','e'],
- *     ['i','h','k','r'],
- *     ['i','f','l','v']
- *   ]
- *   words = ["oath","pea","eat","rain"]
- * Output:
- *   ["oath","eat"]
+ *   Input:  board = [[o,a,a,n],[e,t,a,e],[i,h,k,r],[i,f,l,v]], words = [oath,pea,eat,rain]
+ *   Output: [oath, eat]
+ *   Why:    oath and eat have adjacent paths on the board, while pea and rain do
+ *           not match any non-reusing path.
  *
  * Follow-ups:
- * - How would you handle a dynamic dictionary (add/remove at runtime)?
- * - Can this be parallelized using multiple threads on rows/regions?
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   1. The dictionary changes frequently?
+ *      Keep a mutable trie and update only added or removed words.
+ *   2. Return coordinates for each found word?
+ *      Carry the current coordinate path during DFS and copy it at word terminals.
+ *   3. Parallelize the search?
+ *      Split starting cells across workers, but synchronize result de-duplication and trie pruning.
+ *
+ * Related: Word Search (79), Word Ladder II (126), Design Add and Search Words (211).
  */
 public class WordSearch2 {
+
+    public static void main(String[] args) {
+        WordSearch2 solver = new WordSearch2();
+        char[][] board = {{'o', 'a', 'a', 'n'}, {'e', 't', 'a', 'e'}, {'i', 'h', 'k', 'r'}, {'i', 'f', 'l', 'v'}};
+        String[][] words = {{"oath", "pea", "eat", "rain"}, {"xyz"}};
+        List<List<String>> expected = Arrays.asList(Arrays.asList("eat", "oath"), Collections.emptyList());
+        for (int i = 0; i < words.length; i++) {
+            List<String> output = solver.findWords(board, words[i]);
+            Collections.sort(output);
+            System.out.printf("words=%s -> %s  expected=%s%n", Arrays.toString(words[i]), output, expected.get(i));
+        }
+    }
 
     private List<String> matchedWords;
     private char[][] board;
     private int rows, cols;
 
-    public static void main(String[] args) {
-        char[][] board = {
-            {'o', 'a', 'a', 'n'},
-            {'e', 't', 'a', 'e'},
-            {'i', 'h', 'k', 'r'},
-            {'i', 'f', 'l', 'v'}
-        };
-
-        String[] words = {"oath", "pea", "eat", "rain"};
-        List<String> result = new WordSearch2().findWords(board, words);
-        System.out.println("Words found: " + result); // ["oath", "eat"]
-    }
 
     /**
      * Main API to find all valid words from the board using DFS + Trie.
