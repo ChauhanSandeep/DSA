@@ -3,45 +3,56 @@ package stacksandqueues.monotonicstack;
 import java.util.*;
 
 /**
- * 84. Largest Rectangle in Histogram
+ * Problem: Largest Rectangle in Histogram
  *
- * Problem: Given array of integers heights representing histogram bar heights
- * where width of each bar is 1, return the area of the largest rectangle.
+ * Given histogram bar heights with width 1, return the largest rectangle area
+ * formed by adjacent bars. The height of any chosen rectangle is limited by the
+ * shortest bar inside its width.
+ *
+ * Leetcode: https://leetcode.com/problems/largest-rectangle-in-histogram/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Monotonic increasing stack | Sentinel flush
  *
  * Example:
- * Input: heights = [2,1,5,6,2,3]
- * Output: 10
- * Explanation: Rectangle with height 5 and width 2 has area = 10.
+ *   Input:  heights = [2,1,5,6,2,3]
+ *   Output: 10
+ *   Why:    bars 5 and 6 form width 2 with limiting height 5, so area 10.
  *
- * LeetCode: https://leetcode.com/problems/largest-rectangle-in-histogram
+ * Follow-ups:
+ *   1. Precompute left and right boundaries instead?
+ *      Use two monotonic stack passes to find previous and next smaller indices.
+ *   2. How do equal heights affect width?
+ *      The primary method keeps equal heights until a strictly smaller bar flushes them.
+ *   3. Extend to maximal rectangle in a matrix?
+ *      Build column heights row by row and run this method for each row.
+ *   4. Support range queries for many histograms?
+ *      Use divide and conquer with a segment tree for range minimum indices.
  *
- * Follow-up questions:
- * Q: How to handle very large arrays efficiently?
- * A: Use divide-and-conquer or optimize stack operations with careful indexing.
- *
- * Q: Can we find all rectangles above a certain area threshold?
- * A: Modify stack algorithm to collect all valid rectangles during traversal.
- *
- * Q: How to extend to 2D maximum rectangle problem?
- * A: Use this as subroutine, treating each row as histogram base.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Maximal Rectangle (85), Trapping Rain Water (42), Sum of Subarray Minimums (907).
  */
+
 public class LargestRectangleInHistogram {
 
-    /**
-     * Monotonic stack approach - optimal solution.
+        /**
+     * Intuition: an increasing stack delays area calculation while bars can
+     * still extend to the right. When a shorter currentHeight appears, every
+     * taller popped bar has just found its right boundary; the new stack top is
+     * its left boundary.
      *
-     * Algorithm: Stack-based scanning
-     * - Use a stack to maintain indices of histogram bars in increasing order of height.
-     * - For each bar, pop from stack until current bar is taller than stack top.
-     * - For the popped bar, calculate area with it as the smallest bar:
-     *   - Width = current index - previous smaller index - 1 (Bars in between are taller or of equal height as the popped bar)
-     *   - Area = height * width
-     * - Update maxArea if current area is larger.
+     * Algorithm:
+     *   1. Scan every bar plus one sentinel height 0 at the end.
+     *   2. While currentHeight is smaller than the height at the stack top, pop a barIndex.
+     *   3. Use the new stack top as previousSmallerIndex, or -1 if empty.
+     *   4. Compute barHeight * (currentIndex - previousSmallerIndex - 1) and update maxArea.
+     *   5. Push currentIndex and continue.
      *
-     * Time Complexity: O(n) - each element pushed/popped once
-     * Space Complexity: O(n) for stack storage
+     * Time:  O(n) - each index is pushed once and popped at most once.
+     * Space: O(n) - the stack can hold all indices in increasing-height order.
+     *
+     * @param heights histogram bar heights
+     * @return largest rectangle area in the histogram
      */
+
     public int largestRectangleArea(int[] heights) {
         Stack<Integer> monotonicStack = new Stack<>(); // Monotonic increasing stack
         int maxArea = 0;
@@ -108,5 +119,17 @@ public class LargestRectangleInHistogram {
         }
 
         return maxArea;
+    }
+
+    public static void main(String[] args) {
+        LargestRectangleInHistogram solver = new LargestRectangleInHistogram();
+        int[][] inputs = { {2, 1, 5, 6, 2, 3}, {2, 4}, {} };
+        int[] expected = { 10, 4, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.largestRectangleArea(inputs[i]);
+            System.out.printf("heights=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 }

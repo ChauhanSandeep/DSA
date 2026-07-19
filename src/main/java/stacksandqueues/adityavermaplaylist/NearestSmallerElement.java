@@ -3,40 +3,54 @@ package stacksandqueues.adityavermaplaylist;
 import java.util.*;
 
 /**
- * Given an array of integers, for each element, find the nearest smaller element to its right.
- * If no such element exists, output -1 for that element.
+ * Problem: Nearest Smaller Element to the Right
+ *
+ * For every number in an array, return the closest smaller value that appears
+ * after it. If no smaller value exists on the right, return -1 for that
+ * position.
+ *
+ * Leetcode: not available (classic stack pattern)
+ * Pattern:  Stack | Monotonic increasing stack | Next smaller element
  *
  * Example:
- * Input:  [4, 5, 2, 10, 8]
- * Output: [2, 2, -1, 8, -1]
+ *   Input:  nums = [4,5,2,10,8]
+ *   Output: [2,2,-1,8,-1]
+ *   Why:    10 sees 8 immediately to its right, while 2 and 8 have no smaller value after them.
+ *
+ * Follow-ups:
+ *   1. Return nearest smaller indices instead of values?
+ *      Store indices on the stack and read nums[stack.peek()] only for comparisons.
+ *   2. Find nearest smaller to the left?
+ *      Traverse from left to right with the same >= pop condition.
+ *   3. Treat equal values as valid answers?
+ *      Change the pop condition from >= to > so equal values remain candidates.
+ *   4. Use this for histogram widths?
+ *      Record boundary indices instead of values and combine with previous smaller indices.
+ *
+ * Related: Largest Rectangle in Histogram (84), Sum of Subarray Minimums (907).
  */
+
 public class NearestSmallerElement {
 
-    /**
-     * Finds the nearest smaller elements to the right for each element in the array.
+        /**
+     * Intuition: scanning from right to left makes the stack contain only values
+     * to the current element's right. Any value greater than or equal to the
+     * current value is useless as a smaller answer, so after popping those, the
+     * top is the closest smaller value that survived.
      *
-     * Intuition:
-     * - We want the closest smaller element *on the right* for each element.
-     * - A stack helps us maintain a decreasing sequence when traversing from right to left.
+     * Algorithm:
+     *   1. Scan nums from right to left.
+     *   2. Pop stack values while they are greater than or equal to currentElement.
+     *   3. Record -1 if the stack is empty, otherwise record stack.peek().
+     *   4. Push currentElement as a candidate for elements to its left.
      *
-     * Approach:
-     * - Traverse the array from end to start (right to left).
-     * - Use a stack to keep potential candidates for nearest smaller elements.
-     * - For each element:
-     *    - Pop elements from the stack that are greater than or equal to current.
-     *    - If stack is empty after popping, no smaller element exists → put -1.
-     *    - Else, the top of stack is the nearest smaller element.
-     *    - Push current element onto the stack for future elements.
+     * Time:  O(n) - each value is pushed once and popped at most once.
+     * Space: O(n) - the result array and stack can each grow to n values.
      *
-     * Time Complexity: O(n)
-     * - Each element is pushed and popped at most once from the stack.
-     *
-     * Space Complexity: O(n)
-     * - Stack and result array both consume O(n) space.
-     *
-     * @param nums Input array of integers
-     * @return Array containing nearest smaller elements to the right for each position
+     * @param nums input array of integers
+     * @return nearest smaller value to the right for each position
      */
+
     public int[] findNearestSmallerElementsToRight(int[] nums) {
         int length = nums.length;
         int[] result = new int[length];
@@ -61,12 +75,15 @@ public class NearestSmallerElement {
         return result;
     }
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         NearestSmallerElement solver = new NearestSmallerElement();
+        int[][] inputs = { {4, 5, 2, 10, 8}, {1, 1, 1}, {} };
+        int[][] expected = { {2, 2, -1, 8, -1}, {-1, -1, -1}, {} };
 
-        int[] inputArray = {4, 5, 2, 10, 8};
-        int[] outputArray = solver.findNearestSmallerElementsToRight(inputArray);
-
-        System.out.println("Nearest smaller elements to the right: " + Arrays.toString(outputArray));
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.findNearestSmallerElementsToRight(inputs[i]);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
     }
 }

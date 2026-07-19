@@ -3,73 +3,57 @@ package stacksandqueues.adityavermaplaylist;
 import java.util.*;
 
 /**
- * Next Greater Element II
+ * Problem: Next Greater Element II
  *
- * Given a circular integer array nums, return the next greater number for every element
- * in nums. The next greater number of an element x is the first greater number to its
- * traversing order next in the array, which means you could search circularly to find
- * its next greater number. If it doesn't exist, return -1 for this element.
+ * Given a circular integer array, return the next greater value for every
+ * position. Searching may wrap from the end of the array back to the start; if
+ * no greater value exists, the answer for that position is -1.
  *
- * In a circular array, the element after nums[nums.length - 1] is nums[0], allowing
- * wraparound searching for next greater elements.
- *
- * Example:
- * Input: nums = [1,2,1]
- * Output: [2,-1,2]
- * Explanation:
- * - For first 1: next greater is 2 (at index 1)
- * - For 2: no element greater than 2 exists, so -1
- * - For second 1: wrapping around, next greater is 2 (at index 1)
+ * Leetcode: https://leetcode.com/problems/next-greater-element-ii/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Circular array | Monotonic decreasing stack
  *
  * Example:
- * Input: nums = [1,2,3,4,3]
- * Output: [2,3,4,-1,4]
+ *   Input:  nums = [1,2,1]
+ *   Output: [2,-1,2]
+ *   Why:    the last 1 wraps around and finds 2, while 2 is the maximum value.
  *
- * LeetCode: https://leetcode.com/problems/next-greater-element-ii/description/
+ * Follow-ups:
+ *   1. What if the array wraps k times?
+ *      Iterate k * n positions with modulo indexing, but answers still settle on the first greater value.
+ *   2. Return next greater indices instead of values?
+ *      Store stack.peek() directly in result before converting to values if needed.
+ *   3. Find next smaller in a circular array?
+ *      Reverse the comparison and maintain candidates that are smaller than current.
+ *   4. Can you avoid physically duplicating the array?
+ *      Yes, the original code uses modulo indices to simulate the second pass.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we need to find next smaller element instead of next greater?
- *    Answer: Use same monotonic stack approach but maintain increasing order instead of decreasing.
- * 2. How to handle k-circular arrays (wrapping k times instead of just once)?
- *    Answer: Modify loop to iterate k*n times with same modulo logic.
- * 3. What if we need both next greater and previous greater elements?
- *    Answer: Run algorithm twice - once left-to-right for next, once right-to-left for previous.
- * 4. How to optimize space when array is very large?
- *    Answer: Process in chunks if memory-constrained, or use index-based stack instead of value-based.
- *
- * Related Problems:
- * - LeetCode 496: Next Greater Element I
- * - LeetCode 739: Daily Temperatures (Similar monotonic stack pattern)
- * - LeetCode 84: Largest Rectangle in Histogram (Advanced monotonic stack)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Next Greater Element I (496), Daily Temperatures (739), Online Stock Span (901).
  */
+
 public class NextGreaterElementII {
 
-    /**
-     * Implementation using index-based stack for better memory usage.
-     * Stores indices instead of values to reduce memory footprint when values are large.
+        /**
+     * Intuition: in a circular array, each element can look through the suffix
+     * after it and then the prefix before it. Scanning 2 * size positions from
+     * right to left lets the stack hold exactly those future circular candidates;
+     * after removing candidates no larger than nums[adjustedIndex], the stack top
+     * is the next greater value.
      *
-     * Algorithm: Monotonic Decreasing Stack + Double Traversal
-     * Core insight: Use stack to maintain potential candidates in decreasing order.
-     * Process array twice (2n iterations) to handle circular nature - elements at
-     * beginning can be next greater for elements at end.
+     * Algorithm:
+     *   1. Fill result with -1 and scan i from 2 * size - 1 down to 0.
+     *   2. Convert i to adjustedIndex with i % size.
+     *   3. Pop indices whose values are <= nums[adjustedIndex].
+     *   4. During the real pass (i < size), record nums[stack.peek()] when present.
+     *   5. Push adjustedIndex as a candidate for earlier circular positions.
      *
-     * Key mechanics:
-     * 1. Traverse from right to left twice (total 2n-1 to 0 iterations)
-     * 2. For each position, pop stack elements ≤ current element (they can't help future elements)
-     * 3. After popping, stack top (if exists) is next greater element for current position
-     * 4. Push current element as potential candidate for positions to its left
-     * 5. Use modulo (i % n) to handle circular indexing
-     *
-     * Why right-to-left: When processing position i, stack contains all valid candidates
-     * from positions to the right of i, maintaining decreasing order for efficient lookup.
-     *
-     * Time Complexity: O(n) - each element pushed/popped from stack at most once
-     * Space Complexity: O(n) - stack can contain up to n elements
+     * Time:  O(n) - each circular index is pushed and popped a constant number of times.
+     * Space: O(n) - result and stack store up to n indices.
      *
      * @param nums circular integer array
-     * @return array containing next greater element for each position, or -1 if none exists
+     * @return next greater value for each position, or -1 if none exists
      */
+
     public int[] nextGreaterElementsIndexBased(int[] nums) {
         int size = nums.length;
         int[] result = new int[size];
@@ -175,4 +159,16 @@ public class NextGreaterElementII {
         return result;
     }
 
+
+    public static void main(String[] args) {
+        NextGreaterElementII solver = new NextGreaterElementII();
+        int[][] inputs = { {1, 2, 1}, {1, 2, 3, 4, 3}, {5, 5, 5} };
+        int[][] expected = { {2, -1, 2}, {2, 3, 4, -1, 4}, {-1, -1, -1} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.nextGreaterElementsIndexBased(inputs[i]);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
 }

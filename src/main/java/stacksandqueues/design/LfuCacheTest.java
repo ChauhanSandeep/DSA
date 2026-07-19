@@ -1,5 +1,6 @@
 package stacksandqueues.design;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -8,41 +9,32 @@ import java.util.Map;
 /**
  * Problem: LFU Cache
  *
- * Design and implement a data structure for Least Frequently Used (LFU) cache.
- * The LFUCache should support the following operations: get and put.
- * - get(key) - Get the value (will always be positive) of the key if the key exists in the cache,
- *              otherwise return -1.
- * - put(key, value) - Set or insert the value if the key is not already present. When the cache
- *                     reaches its capacity, it should invalidate the least frequently used item before
- *                     inserting a new item. For this problem, when there is a tie (i.e., two or more keys
- *                     with the same frequency), the least recently used key would be evicted.
+ * Design a cache with get and put in constant time on average. When full, evict
+ * the least frequently used key; if multiple keys share the same frequency,
+ * evict the least recently used key among that frequency bucket.
+ *
+ * Leetcode: https://leetcode.com/problems/lfu-cache/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Design | Hash maps | Frequency buckets with LRU tie-break
  *
  * Example:
- * Input:
- *   LFUCache cache = new LFUCache(2);
- *   cache.put(1, 1);
- *   cache.put(2, 2);
- *   cache.get(1);       // returns 1
- *   cache.put(3, 3);    // evicts key 2
- *   cache.get(2);       // returns -1 (not found)
- *   cache.get(3);       // returns 3
- *   cache.put(4, 4);    // evicts key 1
- *   cache.get(1);       // returns -1 (not found)
- *   cache.get(3);       // returns 3
- *   cache.get(4);       // returns 4
+ *   Input:  capacity 2, put(1,1), put(2,2), get(1), put(3,3), get(2), get(3)
+ *   Output: [1,-1,3]
+ *   Why:    get(1) raises key 1's frequency, so put(3,3) evicts less-frequent key 2.
  *
- * Leetcode Link:
- * https://leetcode.com/problems/lfu-cache/
+ * Follow-ups:
+ *   1. Replace LinkedHashSet with a custom doubly linked list?
+ *      Keep one list per frequency and store node pointers for O(1) removals.
+ *   2. Add TTL expiration?
+ *      Track expiry timestamps and lazily purge expired keys before normal LFU eviction.
+ *   3. Make it thread-safe?
+ *      Guard all maps and frequency buckets with one lock or use carefully ordered striped locks.
+ *   4. Support weighted cache entries?
+ *      Evict repeatedly or by score until enough capacity weight is available.
  *
- * Follow-Up Questions:
- * - Can you implement LFU cache using a double linked list instead of LinkedHashSet?
- *   (Yes, it can give O(1) performance with more control over recency)
- * - What would you change if frequency updates were batched or delayed?
- *   (Use a lazy update mechanism and sync when accessed)
- * - What if frequent inserts and gets happen in high-concurrency systems?
- *   (Consider using ConcurrentHashMap + locking strategies or `java.util.concurrent` data structures)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: LRU Cache (146), All Oone Data Structure (432), Design In-Memory File System (588).
  */
+
 class LFUCache {
   private final int capacity; // Maximum capacity of the cache
   private int minFrequency; // Minimum frequency of any key in the cache
@@ -61,19 +53,25 @@ class LFUCache {
     this.frequencyToKeysMap = new HashMap<>();
   }
 
-  /**
-   * Inserts or updates a key-value pair in the cache.
-   * If the cache exceeds its capacity, evicts the least frequently used item.
+    /**
+   * Intuition: a new key always starts at frequency 1, while an existing key is
+   * an access and must move to the next frequency bucket. If the cache is full,
+   * minFrequency identifies the lowest bucket, and LinkedHashSet iteration gives
+   * the least recently used key inside that bucket.
    *
-   * Steps:
-   * - If capacity is 0, return immediately.
-   * - If key exists, update its value and frequency.
-   * - If capacity is reached, evict the least frequently used and least recently used key.
-   * - Insert new key with frequency 1 and reset minFrequency.
+   * Algorithm:
+   *   1. Return immediately when capacity is 0.
+   *   2. If key exists, update its value and call incrementFrequency.
+   *   3. If full, evictLeastFrequentKey from the minFrequency bucket.
+   *   4. Insert the new key with frequency 1 and set minFrequency to 1.
    *
-   * Time Complexity: O(1)
-   * Space Complexity: O(capacity)
+   * Time:  O(1) - hash maps and LinkedHashSet updates are constant time on average.
+   * Space: O(capacity) - each key appears in the maps and one frequency bucket.
+   *
+   * @param key cache key
+   * @param value value to insert or update
    */
+
   public void put(int key, int value) {
       if (capacity == 0) {
           return;
@@ -98,20 +96,23 @@ class LFUCache {
     minFrequency = 1;
   }
 
-  /**
-   * Retrieves the value for the given key if it exists and updates its frequency.
+    /**
+   * Intuition: reading a present key is also a use, so the key must move from
+   * its current frequency bucket to the next one before its value is returned.
+   * Missing keys do not affect cache state.
    *
-   * Steps:
-   * - If key doesn't exist, return -1.
-   * - Otherwise:
-   *    - Update the frequency of the key.
-   *    - Return the value associated with the key.
-   *    - If the key is accessed, it becomes the most recently used for its frequency.
-   *    - If the frequency set becomes empty and was the minimum frequency, increment minFrequency.
+   * Algorithm:
+   *   1. Return -1 if keyToValueMap does not contain key.
+   *   2. Call incrementFrequency to move the key to its next frequency bucket.
+   *   3. Return the stored value.
    *
-   * Time Complexity: O(1)
-   * Space Complexity: O(1)
+   * Time:  O(1) - map lookup and frequency movement are constant time on average.
+   * Space: O(1) - no extra storage grows with the operation.
+   *
+   * @param key key to read
+   * @return value for key, or -1 if absent
    */
+
   public int get(int key) {
     if (!keyToValueMap.containsKey(key)) {
       return -1;
@@ -121,18 +122,8 @@ class LFUCache {
     return keyToValueMap.get(key);
   }
 
-  /**
-   * Updates the frequency count for a key and moves it to the new frequency bucket.
-   *
-   * Steps:
-   * - Retrieve current frequency and increment it.
-   * - Remove the key from its current frequency set.
-   * - update minFrequency if applicable.
-   * - Add the key to the new frequency bucket.
-   *
-   * Time Complexity: O(1)
-   * Space Complexity: O(1)
-   */
+    /** Moves a key from its current frequency bucket to the next bucket. */
+
   private void incrementFrequency(int key) {
     int currentFreq = keyToFrequencyMap.get(key);
     int updatedFreq = currentFreq + 1;
@@ -155,13 +146,8 @@ class LFUCache {
     frequencyToKeysMap.computeIfAbsent(updatedFreq, unused -> new LinkedHashSet<>()).add(key);
   }
 
-  /**
-   * Evicts the least frequently used key from the cache.
-   * If there's a tie, the least recently used key is evicted (based on LinkedHashSet insertion order).
-   *
-   * Time Complexity: O(1)
-   * Space Complexity: O(1)
-   */
+    /** Removes the least recently used key from the current minimum-frequency bucket. */
+
   private void evictLeastFrequentKey() {
     LinkedHashSet<Integer> keysWithMinFreq = frequencyToKeysMap.get(minFrequency);
     int keyToRemove = keysWithMinFreq.stream().findFirst().get(); // Get the least recently used key
@@ -181,20 +167,23 @@ class LFUCache {
  * Driver code to test LFU Cache implementation.
  */
 public class LfuCacheTest {
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     LFUCache cache = new LFUCache(2);
-
     cache.put(1, 1);
     cache.put(2, 2);
-    System.out.println(cache.get(1)); // returns 1
+    int first = cache.get(1);
+    cache.put(3, 3);
+    int second = cache.get(2);
+    int third = cache.get(3);
+    cache.put(4, 4);
+    int fourth = cache.get(1);
+    int fifth = cache.get(3);
+    int sixth = cache.get(4);
 
-    cache.put(3, 3); // evicts key 2
-    System.out.println(cache.get(2)); // returns -1
-    System.out.println(cache.get(3)); // returns 3
-
-    cache.put(4, 4); // evicts key 1
-    System.out.println(cache.get(1)); // returns -1
-    System.out.println(cache.get(3)); // returns 3
-    System.out.println(cache.get(4)); // returns 4
+    int[] got = { first, second, third, fourth, fifth, sixth };
+    int[] expected = { 1, -1, 3, -1, 3, 4 };
+    System.out.printf("ops=%s -> %s  expected=%s%n",
+        "put(1),put(2),get(1),put(3),get(2),get(3),put(4),get(1),get(3),get(4)",
+        Arrays.toString(got), Arrays.toString(expected));
   }
 }

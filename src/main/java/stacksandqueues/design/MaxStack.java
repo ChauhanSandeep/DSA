@@ -5,55 +5,50 @@ import java.util.*;
 /**
  * Problem: Max Stack
  *
- * Design a max stack data structure that supports the stack operations and supports finding the
- * stack's maximum element.
+ * Design a stack that supports normal stack operations plus peekMax and popMax.
+ * If multiple entries share the maximum value, popMax removes the one closest
+ * to the top of the stack.
  *
- * Implement the MaxStack class:
- * - MaxStack() Initializes the stack object.
- * - void push(int x) Pushes element x onto the stack.
- * - int pop() Removes the element on top of the stack and returns it.
- * - int top() Gets the element on the top of the stack without removing it.
- * - int peekMax() Retrieves the maximum element in the stack without removing it.
- * - int popMax() Retrieves and removes the maximum element in the stack.
+ * Leetcode: https://leetcode.com/problems/max-stack/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Design | Stack with max tracking | TreeMap with linked list
  *
  * Example:
- * Input: ["MaxStack", "push", "push", "push", "top", "popMax", "top", "peekMax", "pop", "top"]
- *        [[], [5], [1], [5], [], [], [], [], [], []]
- * Output: [null, null, null, null, 5, 5, 1, 5, 1, 5]
+ *   Input:  push 5, push 1, push 5, top, popMax, top, peekMax, pop, top
+ *   Output: [5,5,1,5,1,5]
+ *   Why:    popMax removes the topmost 5, leaving 1 on top and another 5 as the max.
  *
- * LeetCode: https://leetcode.com/problems/max-stack
+ * Follow-ups:
+ *   1. Optimize popMax from O(n)?
+ *      Use a TreeMap from value to nodes plus a doubly linked list for stack order.
+ *   2. Support peekMin and popMin too?
+ *      Add a second ordered map keyed by value or use one TreeMap for both extremes.
+ *   3. Make duplicate maximum removal deterministic?
+ *      Store nodes in insertion order per value and remove the last node for topmost max.
+ *   4. Make it thread-safe?
+ *      Synchronize operations that update both stack order and max indexes.
  *
- * Follow-up Questions:
- * 1. How would you optimize for frequent popMax operations?
- *    Answer: Use TreeMap with doubly linked list for O(log n) popMax instead of O(n).
- *
- * 2. What if we need to support getMin operation as well?
- *    Answer: Maintain separate min stack or extend current approach to track both max and min.
- *
- * 3. How would you handle concurrent access to the stack?
- *    Answer: Add synchronization using locks or use concurrent data structures.
- *    Related: https://leetcode.com/problems/min-stack/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Min Stack (155), LRU Cache (146), All Oone Data Structure (432).
  */
+
 public class MaxStack {
 
-    /**
-     * Simple implementation using single stack with pairs.
-     * Each element stores (value, maxSoFar).
+        /**
+     * Intuition: store each pushed value together with the maximum seen up to
+     * that stack depth. Then peekMax is just reading the top pair, while popMax
+     * temporarily removes values above the topmost maximum and pushes them back
+     * so their max-so-far values are rebuilt correctly.
      *
      * Algorithm:
-     * 1. Use a single stack to store pairs of (value, currentMax).
-     * 2. On push, determine the new max and store it with the value.
-     * 3. On pop, simply pop from the stack.
-     * 4. On top, return the value from the top pair.
-     * 5. On peekMax, return the max from the top pair.
-     * 6. On popMax, use a temporary stack to hold elements until max is found,
-     *   then restore elements back to the main stack.
+     *   1. On push, store x and max(x, previous max) as a pair.
+     *   2. pop, peek, and peekMax read directly from the top pair.
+     *   3. popMax moves pairs to a temporary stack until maxVal is on top.
+     *   4. Remove maxVal, then push saved values back through push.
      *
-     * Time Complexities:
-     * - push, pop, top, peekMax: O(1)
-     * - popMax: O(n) in worst case
+     * Time:  O(1) for push/pop/peek/peekMax, O(n) for popMax - popMax may scan the stack.
+     * Space: O(n) - each value stores its max-so-far and popMax may use a temporary stack.
      */
+
     static class MaxStackSimple implements MaxStackInterface {
         private Stack<int[]> stack; // [value, max_so_far]
 
@@ -260,7 +255,7 @@ public class MaxStack {
                return maxValue;
         }
 
-        // Helper: Remove a node from doubly linked list
+        /** Removes a node from the doubly linked list. */
         private void removeNode(Node node) {
             node.previous.next = node.next;
             node.next.previous = node.previous;
@@ -274,5 +269,24 @@ public class MaxStack {
         int peek();
         int peekMax();
         int popMax();
+    }
+
+    public static void main(String[] args) {
+        MaxStackInterface stack = new MaxStackSimple();
+        stack.push(5);
+        stack.push(1);
+        stack.push(5);
+        int first = stack.peek();
+        int second = stack.popMax();
+        int third = stack.peek();
+        int fourth = stack.peekMax();
+        int fifth = stack.pop();
+        int sixth = stack.peek();
+
+        int[] got = { first, second, third, fourth, fifth, sixth };
+        int[] expected = { 5, 5, 1, 5, 1, 5 };
+        System.out.printf("ops=%s -> %s  expected=%s%n",
+            "push(5),push(1),push(5),top,popMax,top,peekMax,pop,top",
+            Arrays.toString(got), Arrays.toString(expected));
     }
 }

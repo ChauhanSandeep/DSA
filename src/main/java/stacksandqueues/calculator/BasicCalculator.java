@@ -3,50 +3,56 @@ package stacksandqueues.calculator;
 import java.util.*;
 
 /**
- * 224. Basic Calculator
+ * Problem: Basic Calculator
  *
- * Problem: Implement a basic calculator to evaluate a simple expression string
- * containing non-negative integers, +, -, (, ), and spaces.
+ * Evaluate a valid expression containing non-negative integers, plus, minus,
+ * parentheses, and spaces. Parentheses may nest, and unary signs are represented
+ * by the current sign carried into a subexpression.
+ *
+ * Leetcode: https://leetcode.com/problems/basic-calculator/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Expression parsing | Parentheses state
  *
  * Example:
- * Input: s = "1 + 1"
- * Output: 2
+ *   Input:  s = "(1+(4+5+2)-3)+(6+8)"
+ *   Output: 23
+ *   Why:    the first parentheses evaluate to 9 and the second to 14, giving 23.
  *
- * Input: s = " 2-1 + 2 "
- * Output: 3
+ * Follow-ups:
+ *   1. Add multiplication and division?
+ *      Track precedence with a number stack, or use a recursive descent parser.
+ *   2. Support variables like x + y?
+ *      Tokenize identifiers and resolve them from a symbol table during evaluation.
+ *   3. Return an abstract syntax tree instead of a value?
+ *      Parse operators and parentheses into expression nodes before evaluation.
+ *   4. Handle invalid expressions?
+ *      Add token validation, parenthesis balance checks, and explicit parse errors.
  *
- * Input: s = "(1+(4+5+2)-3)+(6+8)"
- * Output: 23
- *
- * LeetCode: https://leetcode.com/problems/basic-calculator
- *
- * Follow-up questions:
- * Q: What about multiplication and division?
- * A: Need to handle operator precedence, use two stacks or convert to postfix.
- *
- * Q: How to handle negative numbers?
- * A: Current solution handles unary minus, extend parsing for explicit negative numbers.
- *
- * Q: Can we solve without using stack?
- * A: Yes, use recursion for parentheses or convert to postfix notation first.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Basic Calculator II (227), Basic Calculator III (772), Parse Lisp Expression (736).
  */
+
 public class BasicCalculator {
 
-    /**
-     * Evaluates a basic mathematical expression with +, -, parentheses.
+        /**
+     * Intuition: outside a parenthesis, result is the completed total and number
+     * is the value currently being read. When a new parenthesis starts, the code
+     * saves the old result and sign on the stack, evaluates the inside from zero,
+     * then folds that subexpression back into the saved context.
      *
-     * Algorithm: Stack-based evaluation
-     * - Use stack to store intermediate results and signs before parentheses
-     * - Process character by character:
-     *   - Numbers: accumulate digits, apply when reaching operator/end
-     *   - '+'/'-': apply previous operation, update sign
-     *   - '(': push current result and sign to stack, reset for sub-expression
-     *   - ')': complete sub-expression, pop and apply to previous result
+     * Algorithm:
+     *   1. Scan characters, accumulating multi-digit numbers.
+     *   2. On '+' or '-', add sign * number to result and update sign.
+     *   3. On '(', push result then sign, and reset for the subexpression.
+     *   4. On ')', finish the subexpression and combine it with the saved sign and result.
+     *   5. Add the final pending number and return result.
      *
-     * Time Complexity: O(n) where n is length of string
-     * Space Complexity: O(n) for the stack in worst case (nested parentheses)
+     * Time:  O(n) - each character is processed once.
+     * Space: O(n) - nested parentheses can push result and sign pairs onto the stack.
+     *
+     * @param s expression containing integers, '+', '-', parentheses, and spaces
+     * @return evaluated integer result
      */
+
     public int calculate(String s) {
         Stack<Integer> stack = new Stack<>();
         int result = 0;
@@ -101,7 +107,7 @@ public class BasicCalculator {
         return parseExpression(s, new int[]{0});
     }
 
-    // Recursive helper with index tracking
+    /** Recursively evaluates an expression while index tracks the current position. */
     private int parseExpression(String s, int[] index) {
         int result = 0;
         int number = 0;
@@ -184,5 +190,16 @@ public class BasicCalculator {
             result += n;
         }
         return result;
+    }
+
+    public static void main(String[] args) {
+        BasicCalculator solver = new BasicCalculator();
+        String[] inputs = { "1 + 1", " 2-1 + 2 ", "(1+(4+5+2)-3)+(6+8)" };
+        int[] expected = { 2, 3, 23 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.calculate(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 }

@@ -4,28 +4,65 @@ import java.util.Stack;
 
 /**
  * Problem: Basic Calculator II
- * LeetCode Link: https://leetcode.com/problems/basic-calculator-ii/
  *
- * Given a string `s` representing a mathematical expression with integers and operators (+, -, *, /),
- * evaluate the expression and return the result. The operators follow standard precedence rules:
- * multiplication and division take precedence over addition and subtraction.
+ * Evaluate a string expression containing non-negative integers, spaces, and
+ * the operators +, -, *, and /. Multiplication and division must happen before
+ * addition and subtraction, and integer division truncates toward zero.
  *
- * Algorithm:
- * - Use a stack to handle operations in the correct order.
- * - Traverse the string while processing numbers and operators.
- * - Apply multiplication and division immediately, while addition and subtraction are deferred.
+ * Leetcode: https://leetcode.com/problems/basic-calculator-ii/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Expression parsing | Operator precedence
  *
- * Time Complexity: O(N), where N is the length of the input string.
- * Space Complexity: O(N), for storing numbers in the stack.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  s = "3+2*2"
+ *   Output: 7
+ *   Why:    multiplication is applied first, so the expression is 3 + 4.
+ *
+ * Follow-ups:
+ *   1. Add parentheses?
+ *      Recurse on subexpressions or use two stacks for values and operators.
+ *   2. Support unary negative numbers cleanly?
+ *      Tokenize first and treat a sign after an operator or '(' as part of the number.
+ *   3. Add exponentiation?
+ *      Introduce a higher-precedence, right-associative operator level.
+ *   4. Evaluate many expressions quickly?
+ *      Parse to an AST or bytecode once, then evaluate repeatedly.
+ *
+ * Related: Basic Calculator (224), Basic Calculator III (772), Evaluate Reverse Polish Notation (150).
  */
+
 public class BasicCalculator2 {
 
-    public static void main(String[] args) {
-        String expression = "13+2*2";
-        System.out.println("Result: " + new BasicCalculator2().calculate(expression));
+        public static void main(String[] args) {
+        BasicCalculator2 solver = new BasicCalculator2();
+        String[] inputs = { "3+2*2", " 3/2 ", "14-3/2" };
+        int[] expected = { 7, 1, 13 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.calculate(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 
+    /**
+     * Intuition: addition and subtraction can wait because they only affect the
+     * final sum, but multiplication and division must immediately modify the
+     * previous number. The stack stores signed terms that are safe to add once
+     * all high-precedence work has been applied.
+     *
+     * Algorithm:
+     *   1. Return 0 for a null or empty expression.
+     *   2. Scan characters, building currentNumber from consecutive digits.
+     *   3. When an operator or the end is reached, apply lastOperator to numberStack.
+     *   4. Save the current operator as lastOperator and reset currentNumber.
+     *   5. Sum numberStack to produce the final value.
+     *
+     * Time:  O(n) - each character and each stack entry is processed once.
+     * Space: O(n) - the stack can hold one signed term per number.
+     *
+     * @param expression expression containing integers, spaces, '+', '-', '*', and '/'
+     * @return evaluated integer result
+     */
     public int calculate(String expression) {
         if (expression == null || expression.isEmpty()) {
             return 0; // Handle edge case of empty input
