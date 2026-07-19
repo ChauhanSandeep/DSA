@@ -7,3 +7,6 @@ resources/
 # Tracked snapshot (if any) is committed selectively; ignore the working copy
 # to keep diffs clean.
 site/
+
+# Python bytecode cache from importing sibling scripts.
+scripts/__pycache__/

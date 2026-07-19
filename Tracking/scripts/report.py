@@ -29,6 +29,9 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _queue import pick_queue, coming_saturday, DIFFICULTY_RANK  # noqa: E402
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "Tracking" / "data"
@@ -37,9 +40,7 @@ STATE_JSON = DATA_DIR / "state.json"
 EXTRAS_JSON = DATA_DIR / "extras.json"
 JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
 
-# For queue preview
 QUEUE_SIZE = 6
-DIFFICULTY_RANK = {"Hard": 3, "Medium": 2, "Easy": 1, "Unknown": 0}
 
 
 def load_json(path: Path) -> dict:
@@ -168,34 +169,27 @@ def stagger_section(state: dict, today: date) -> None:
 
 
 def queue_preview_section(state: dict, today: date) -> None:
-    entries = list(state["problems"].values())
-
-    # Compute the coming Saturday (or today if today is Saturday).
-    weekday = today.weekday()  # Mon=0..Sun=6, Sat=5
-    days_to_saturday = (5 - weekday) % 7
-    review_day = today + timedelta(days=days_to_saturday)
-
-    due = [
-        entry for entry in entries
-        if parse_date(entry["sm2"]["nextDue"]) and
-        parse_date(entry["sm2"]["nextDue"]) <= review_day and
-        not entry["flags"].get("skip", False)
-    ]
-    due.sort(key=lambda e: (
-        e["sm2"]["nextDue"] or "",
-        -DIFFICULTY_RANK.get(e.get("difficulty", "Unknown"), 0),
-        e["sm2"].get("easeFactor", 2.5),
-    ))
-    queue = due[:QUEUE_SIZE]
+    review_day = coming_saturday(today)
+    queue = pick_queue(state, review_day, QUEUE_SIZE)
+    due_count = sum(
+        1 for e in state["problems"].values()
+        if e.get("sm2", {}).get("nextDue")
+        and date.fromisoformat(e["sm2"]["nextDue"]) <= review_day
+        and not e.get("flags", {}).get("skip")
+    )
 
     print_header(f"Queue preview for {review_day.isoformat()} "
                  f"({review_day.strftime('%A')})")
-    print(f"  {len(due)} problems due · picking top {QUEUE_SIZE}\n")
+    print(f"  {due_count} problems due · picking top {QUEUE_SIZE}"
+          f"{' (backfilled from pinned anchors)' if due_count < QUEUE_SIZE else ''}\n")
     for entry in queue:
         pattern = entry["pattern"][:24]
         diff = entry.get("difficulty", "Unknown")
-        marker = "★" if entry.get("isNC150") else " "
-        print(f"  {marker} {entry['task']:35s}  {diff:6s}  {pattern}")
+        markers = []
+        if entry.get("isNC150"): markers.append("★")
+        if entry.get("flags", {}).get("pinned"): markers.append("📌")
+        marker_str = "".join(markers) or " "
+        print(f"  {marker_str:3s} {entry['task']:35s}  {diff:6s}  {pattern}")
 
 
 # ---------------------------------------------------------------------------

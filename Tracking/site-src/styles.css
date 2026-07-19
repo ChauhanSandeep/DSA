@@ -148,6 +148,7 @@ h2 {
 .badge.diff-unknown { background: rgba(107,114,128,0.15); color: var(--diff-unknown); }
 .badge.nc150        { background: var(--nc150-bg);        color: var(--nc150-fg); }
 .badge.blind75      { background: var(--blind-bg);        color: var(--blind-fg); }
+.badge.pinned       { background: rgba(240,192,96,0.15); color: var(--grade-hint); }
 .badge.pattern      { background: #1f2430; color: var(--fg-muted); }
 
 /* --- Stats row ---------------------------------------------------------- */

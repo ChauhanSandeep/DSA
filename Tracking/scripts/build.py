@@ -36,6 +36,10 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+# Local module — lives beside this file.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _queue import pick_queue, coming_saturday, DIFFICULTY_RANK  # noqa: E402
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "Tracking" / "data"
@@ -46,7 +50,6 @@ STATE_JSON = DATA_DIR / "state.json"
 NEETCODE_JSON = DATA_DIR / "neetcode.json"
 
 QUEUE_SIZE = 6
-DIFFICULTY_RANK = {"Hard": 3, "Medium": 2, "Easy": 1, "Unknown": 0}
 DIFFICULTY_CLASS = {
     "Easy": "diff-easy",
     "Medium": "diff-medium",
@@ -146,6 +149,8 @@ def badges_for_problem(problem: dict) -> str:
         parts.append('<span class="badge nc150">NC150</span>')
     if problem.get("isBlind75"):
         parts.append('<span class="badge blind75">Blind 75</span>')
+    if problem.get("flags", {}).get("pinned"):
+        parts.append('<span class="badge pinned" title="Core anchor">📌 Core</span>')
     parts.append(f'<span class="badge pattern">{esc(problem.get("pattern", "Uncategorized"))}</span>')
     return "".join(parts)
 
@@ -170,39 +175,12 @@ def format_next_due(iso: str | None) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Queue picker (same shape as report.py but exposed here for the dashboard)
-# ---------------------------------------------------------------------------
-
-def coming_saturday(today: date) -> date:
-    days_to_saturday = (5 - today.weekday()) % 7
-    return today + timedelta(days=days_to_saturday)
-
-
-def pick_queue(state: dict, target: date, size: int = QUEUE_SIZE) -> list[dict]:
-    due = []
-    for entry in state["problems"].values():
-        next_due = entry["sm2"].get("nextDue")
-        if not next_due:
-            continue
-        if entry.get("flags", {}).get("skip"):
-            continue
-        if date.fromisoformat(next_due) <= target:
-            due.append(entry)
-    due.sort(key=lambda e: (
-        e["sm2"]["nextDue"],
-        -DIFFICULTY_RANK.get(e.get("difficulty", "Unknown"), 0),
-        e["sm2"].get("easeFactor", 2.5),
-    ))
-    return due[:size]
-
-
-# ---------------------------------------------------------------------------
 # Page renderers
 # ---------------------------------------------------------------------------
 
 def render_dashboard(state: dict, today: date) -> str:
     review_day = coming_saturday(today)
-    queue = pick_queue(state, review_day)
+    queue = pick_queue(state, review_day, QUEUE_SIZE)
     all_problems = list(state["problems"].values())
 
     total = len(all_problems)

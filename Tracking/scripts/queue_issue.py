@@ -22,44 +22,19 @@ import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _queue import pick_queue, coming_saturday, count_due  # noqa: E402
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 STATE_JSON = REPO_ROOT / "Tracking" / "data" / "state.json"
 
 QUEUE_SIZE = 6
-DIFFICULTY_RANK = {"Hard": 3, "Medium": 2, "Easy": 1, "Unknown": 0}
 GITHUB_BLOB = "https://github.com/ChauhanSandeep/DSA/blob/master/"
 
 
-def coming_saturday(today: date) -> date:
-    days_to_saturday = (5 - today.weekday()) % 7
-    return today + timedelta(days=days_to_saturday)
-
-
-def pick_queue(state: dict, target: date, size: int) -> list[dict]:
-    due = []
-    for entry in state["problems"].values():
-        next_due_str = entry.get("sm2", {}).get("nextDue")
-        if not next_due_str:
-            continue
-        if entry.get("flags", {}).get("skip"):
-            continue
-        if date.fromisoformat(next_due_str) <= target:
-            due.append(entry)
-    due.sort(key=lambda e: (
-        e["sm2"]["nextDue"],
-        -DIFFICULTY_RANK.get(e.get("difficulty", "Unknown"), 0),
-        e["sm2"].get("easeFactor", 2.5),
-    ))
-    return due[:size]
-
-
 def format_body(state: dict, review_day: date, queue: list[dict]) -> str:
-    total_due = sum(
-        1 for entry in state["problems"].values()
-        if entry.get("sm2", {}).get("nextDue")
-        and date.fromisoformat(entry["sm2"]["nextDue"]) <= review_day
-    )
+    total_due = count_due(state, review_day)
     lines: list[str] = []
     lines.append(f"# Weekend review — {review_day.strftime('%A, %d %b %Y')}")
     lines.append("")

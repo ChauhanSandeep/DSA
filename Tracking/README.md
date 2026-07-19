@@ -20,7 +20,7 @@ in this repository.
 | SM-2 state per problem                   | `Tracking/data/state.json` — mutable, checked into git                |
 | Repo problems outside NeetCode           | `Tracking/data/extras.json`                                           |
 | Class-name → Leetcode URL overrides      | `Tracking/data/manual-map.json`                                       |
-| Curated anchor set (~40-60)              | `Tracking/core.md`                                                    |
+| Curated anchor set (~50 problems)        | `Tracking/core.md` (regenerable via `curate_core.py`)                 |
 | Generated study dashboard                | `Tracking/site/` (build artifact — safe to regenerate anytime)        |
 
 The legacy Google Sheet export (`Tracking/Problems.html`) is retained as
@@ -117,42 +117,53 @@ Tracking/
 │  ├─ extras.json                       # repo problems outside NC
 │  └─ manual-map.json                   # class-name → Leetcode URL overrides
 ├─ scripts/
-│  ├─ scrape_neetcode.py                # one-shot scraper
+│  ├─ scrape_neetcode.py                # one-shot NeetCode taxonomy scraper
 │  ├─ sync.py                           # repo ↔ state.json sync
+│  ├─ curate_core.py                    # anchor selection + core.md ↔ pinned flags
 │  ├─ build.py                          # generate site/ from data + Javadocs
-│  └─ report.py                         # coverage report
+│  ├─ queue_issue.py                    # markdown body for weekly-nudge issue
+│  ├─ review_log.py                     # diff-based grade log for study-log issue
+│  ├─ report.py                         # CLI coverage + queue preview
+│  └─ _queue.py                         # shared queue-picker (with pinned backfill)
+├─ site-src/                            # tracked source assets (copied to site/assets)
+│  ├─ styles.css
+│  └─ app.js
 └─ site/                                # generated — safe to delete + rebuild
    ├─ index.html
    ├─ problems/<Task>.html
    ├─ patterns/<Pattern>.html
-   ├─ log.html
-   └─ assets/{app.js, prism.js, styles.css}
+   └─ assets/{app.js, styles.css}
 ```
+
+Related workflows under `.github/workflows/`:
+- `weekly-review-nudge.yml` — Saturday cron; opens the weekend-review issue.
+- `log-review.yml` — on push to `state.json`; comments on the study-log issue.
 
 ---
 
-## Usage (target, once built)
+## Usage (once built)
 
 ```
 # One-time / after any repo change
-python Tracking/scripts/sync.py       # updates state.json, extras.json
-python Tracking/scripts/build.py      # regenerates site/
+python Tracking/scripts/sync.py           # refresh state.json from repo
+python Tracking/scripts/curate_core.py    # (only when the anchor set changes)
+python Tracking/scripts/build.py          # regenerate site/
 
 # Saturday morning
-open Tracking/site/index.html         # queue of 6, grade with 1/2/3/4 keys
-git commit -am "weekend review"       # state.json updates flow into git
+open Tracking/site/index.html             # queue of 6, grade with 1/2/3/4 keys
+git commit -am "weekend review"           # state.json updates flow into git
 ```
 
 ---
 
 ## Roll-out phases
 
-1. **Phase 0** — commit this README (locked decisions).
-2. **Phase 1** — data layer: `neetcode.json` (frozen), `sync.py`, coverage `report.py`.
-3. **Phase 2** — static site MVP: queue + per-problem pages + SM-2 grading.
-4. **Phase 3** — GitHub Actions for weekly nudge and review log.
-5. **Phase 4** — curate `core.md` anchor set (40-60 problems).
-6. **Phase 5** — polish (dark mode, streak, search).
+1. **Phase 0** — commit this README (locked decisions). ✅
+2. **Phase 1** — data layer: `neetcode.json` (frozen), `sync.py`, coverage `report.py`. ✅
+3. **Phase 2** — static site MVP: queue + per-problem pages + SM-2 grading. ✅
+4. **Phase 3** — GitHub Actions for weekly nudge and review log. ✅
+5. **Phase 4** — curate `core.md` anchor set (~50 problems) + queue backfill. ✅
+6. **Phase 5** — polish (dark mode already done, streak, search, sqlite migration if it grows).
 
 The detailed plan (with schemas, effort, and risks) lives outside the repo
 in the session workspace and is discussed conversationally when needed.
