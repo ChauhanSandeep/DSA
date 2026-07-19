@@ -1,47 +1,67 @@
 package dailybytes.string;
 
+import java.util.Arrays;
+
 /**
- * ✅ Problem: Add Binary
+ * Problem: Add Binary
  *
- * Given two binary strings, return their sum (also a binary string).
- * The input strings are guaranteed to contain only '0' or '1'.
+ * Given two binary strings, return their sum as another binary string. The code
+ * adds from right to left just like grade-school addition, carrying whenever a
+ * column reaches two.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/add-binary/
+ * Leetcode: https://leetcode.com/problems/add-binary/ (Easy)
+ * Rating:   acceptance 58.3% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Two pointers | Carry simulation
  *
- * 🧠 Example:
- * Input: a = "11", b = "1"
- * Output: "100"
+ * Example:
+ *   Input:  a = "11", b = "1"
+ *   Output: "100"
+ *   Why:    3 plus 1 equals 4, whose binary representation is 100.
  *
- * 🔍 Follow-up:
- * 1. What if inputs are very large (millions of bits)? ➤ Use streaming or chunking
- * 2. What if inputs are mutable char arrays? ➤ Do in-place with reverse traversal
- * 3. What if base is not binary but k-ary (base-k)? ➤ Generalize logic with modular arithmetic
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Add numbers with millions of bits?
+ *      Stream from the end in chunks and write output in reverse blocks.
+ *   2. Generalize to base k strings?
+ *      Replace division and modulo by 2 with division and modulo by k.
+ *   3. Add many binary strings at once?
+ *      Accumulate each column's total and carry across all strings.
+ *   4. Return the result in-place in a mutable buffer?
+ *      Fill from the end if capacity is available, otherwise append and reverse.
+ *
+ * Related: Plus One (66), Add Strings (415), Add Two Numbers (2).
  */
 public class AddBinary {
 
     public static void main(String[] args) {
-        System.out.println("The sum of binary is " + addBinary("100", "1"));     // Expected: 101
-        System.out.println("The sum of binary is " + addBinary("11", "1"));      // Expected: 100
-        System.out.println("The sum of binary is " + addBinary("1", "0"));       // Expected: 1
-        System.out.println("The sum of binary is " + addBinary("11", "11"));     // Expected: 110
-        System.out.println("The sum of binary is " + addBinary("", ""));         // Expected: 0
+        String[][] inputs = { { "100", "1" }, { "11", "1" }, { "0", "0" }, { "11", "11" } };
+        String[] expected = { "101", "100", "0", "110" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String output = addBinary(inputs[i][0], inputs[i][1]);
+            System.out.printf("binary=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
     }
 
     /**
-     * ✅ Adds two binary strings and returns their binary sum.
+     * Intuition: binary addition is decimal column addition with a smaller base.
+     * Start at the least significant characters of a and b, add the two bits plus
+     * carry, append the output bit, and carry the overflow into the next column.
+     * The builder is reversed at the end because bits are produced from right to
+     * left.
      *
-     * 🔧 Approach:
-     * - Traverse both strings from end to start
-     * - Add digit-wise along with carry
-     * - Use StringBuilder (reversed) for efficient append
+     * Algorithm:
+     *   1. Handle null and empty input shortcuts.
+     *   2. Walk indexA and indexB from the end while either string or carry remains.
+     *   3. Add bitA, bitB, and carry; append sum % 2 and update carry = sum / 2.
+     *   4. Reverse result to return the most significant bit first.
      *
-     * Time Complexity: O(max(n, m))
-     * Space Complexity: O(max(n, m)) for result string
+     * Time:  O(max(n, m)) - one pass over the longer string.
+     * Space: O(max(n, m)) - the output builder stores the resulting bits.
      *
-     * @param a Binary string a
-     * @param b Binary string b
-     * @return Binary string representing the sum of a and b
+     * @param a first binary string
+     * @param b second binary string
+     * @return binary string representing a + b
      */
     public static String addBinary(String a, String b) {
         if (a == null || b == null) return "0";
