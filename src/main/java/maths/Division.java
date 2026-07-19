@@ -3,47 +3,66 @@ package maths;
 import java.util.HashMap;
 
 /**
- * Problem: Convert a fraction to its decimal representation.
- * 
- * Given two integers (numerator and denominator), return their division result as a string.
- * If the fractional part is repeating, enclose the repeating sequence in parentheses.
- * 
- * Examples:
- *  - fractionToDecimal(2, 1)     → "2"
- *  - fractionToDecimal(2, 3)     → "0.(6)"
- *  - fractionToDecimal(4, 333)   → "0.(012)"
- *  - fractionToDecimal(1, 5)     → "0.2"
- *  - fractionToDecimal(-1, -2147483648) → "0.0000000004656612873077392578125"
- * 
- * Approach:
- *  - Handle sign and convert numbers to long to prevent overflow.
- *  - Compute the integral part using integer division.
- *  - If there’s a remainder, compute the fractional part using a HashMap to detect cycles.
- * 
- * Time Complexity: O(N) - N is the length of the repeating sequence (worst case).
- * Space Complexity: O(N) - To store remainders in a HashMap.
- * 
- * LeetCode Link: https://leetcode.com/problems/fraction-to-recurring-decimal/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Problem: Fraction to Recurring Decimal
+ *
+ * Given a numerator and denominator, return the decimal representation of the
+ * fraction as a string. If the fractional part repeats, wrap the repeating
+ * cycle in parentheses.
+ *
+ * Leetcode: https://leetcode.com/problems/fraction-to-recurring-decimal/ (Medium)
+ * Rating:   acceptance 31.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Long division | Remainder cycle detection
+ *
+ * Example:
+ *   Input:  numerator = 4, denominator = 333
+ *   Output: "0.(012)"
+ *   Why:    long division repeats the remainder sequence that emits 012 forever.
+ *
+ * Follow-ups:
+ *   1. How would you cap the output to k decimal places?
+ *      Run the same long division for at most k emitted fractional digits.
+ *   2. How would you support arbitrary precision integer inputs?
+ *      Replace long arithmetic with BigInteger-style string arithmetic.
+ *   3. How would you return the repeating part separately?
+ *      Keep the cycle start index and split the final string around it.
+ *
+ * Related: Divide Two Integers (29), Multiply Strings (43).
  */
+
 public class Division {
     public static void main(String[] args) {
-        Division division = new Division();
-        System.out.println(division.fractionToDecimal(2, 1));      // "2"
-        System.out.println(division.fractionToDecimal(2, 3));      // "0.(6)"
-        System.out.println(division.fractionToDecimal(4, 333));    // "0.(012)"
-        System.out.println(division.fractionToDecimal(1, 5));      // "0.2"
-        System.out.println(division.fractionToDecimal(-1, -2147483648)); // "0.0000000004656612873077392578125"
+        Division solver = new Division();
+        int[][] inputs = { {2, 1}, {2, 3}, {4, 333}, {-50, 8} };
+        String[] expected = { "2", "0.(6)", "0.(012)", "-6.25" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.fractionToDecimal(inputs[i][0], inputs[i][1]);
+            System.out.printf("numerator=%d denominator=%d -> %s  expected=%s%n",
+                inputs[i][0], inputs[i][1], got, expected[i]);
+        }
     }
 
-    /**
-     * Converts a fraction to a decimal string representation.
-     * If the decimal part is repeating, it encloses the repeating sequence in parentheses.
+        /**
+     * Intuition: decimal expansion is just long division. The integer part is
+     * numerator / denominator, and every fractional digit is determined by the
+     * current remainder multiplied by 10. If the same remainder appears again,
+     * the exact same future digits will repeat from that earlier position.
      *
-     * @param numerator   the numerator of the fraction
-     * @param denominator the denominator of the fraction
-     * @return the decimal representation of the fraction as a string
+     * Algorithm:
+     *   1. Handle zero numerator, append the sign, and convert operands to long.
+     *   2. Append the integral part and stop if the remainder is zero.
+     *   3. Store each remainder with the output index where its digit cycle starts.
+     *   4. Repeatedly multiply the remainder by 10, append the digit, and update it.
+     *   5. When a remainder repeats, insert parentheses around the repeating suffix.
+     *
+     * Time:  O(k) - k fractional digits are emitted before termination or repeat.
+     * Space: O(k) - each distinct fractional remainder is stored once.
+     *
+     * @param numerator numerator of the fraction
+     * @param denominator denominator of the fraction
+     * @return decimal string, with a repeating cycle in parentheses when needed
      */
+
     public String fractionToDecimal(int numerator, int denominator) {
         if (numerator == 0) return "0"; // If numerator is zero, the result is always "0"
 

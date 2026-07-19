@@ -7,30 +7,43 @@ import java.util.List;
 /**
  * Problem: Consecutive Numbers Sum
  *
- * Given an integer n, return the number of ways you can write n as the sum of consecutive positive integers.
+ * Given a positive integer n, count how many ways it can be written as a sum
+ * of one or more consecutive positive integers. Each representation is defined
+ * by its length and starting value.
+ *
+ * Leetcode: https://leetcode.com/problems/consecutive-numbers-sum/ (Hard)
+ * Rating:   1694 (zerotrac Elo)
+ * Pattern:  Math | Arithmetic series | Divisibility by sequence length
  *
  * Example:
- * Input: n = 9
- * Output: 3
- * Explanation: 9 = 9 = 4 + 5 = 2 + 3 + 4
+ *   Input:  n = 9
+ *   Output: 3
+ *   Why:    9 can be written as 9, 4 + 5, and 2 + 3 + 4.
  *
- * LeetCode: https://leetcode.com/problems/consecutive-numbers-sum
+ * Follow-ups:
+ *   1. What if negative integers are allowed in the sequence?
+ *      The count can become unbounded unless a minimum start or length cap is imposed.
+ *   2. What if the common difference can be any positive d?
+ *      Replace k * (k - 1) / 2 with d * k * (k - 1) / 2 and test divisibility.
+ *   3. How would you return the actual sequences?
+ *      Use the same valid k test, then materialize start = numerator / k through start + k - 1.
  *
- * Follow-up Questions:
- * 1. What if we allow negative integers in the consecutive sequence?
- *    Answer: Problem becomes more complex as we need to handle different cases for negative ranges.
- *
- * 2. How would you modify for non-consecutive arithmetic progressions?
- *    Answer: Generalize to arithmetic sequences with any common difference, not just 1.
- *
- * 3. What if we need to find the actual sequences instead of just counting?
- *    Answer: Modify algorithm to store and return the actual consecutive number sequences.
- *    Related: https://leetcode.com/problems/sum-of-consecutive-numbers/
- *
- * @author Sandeep
- * LeetCode Contest Rating: 1694
+ * Related: Arithmetic Slices (413), Sum of Square Numbers (633).
  */
+
 public class ConsecutiveNumbersSum {
+
+    public static void main(String[] args) {
+        ConsecutiveNumbersSum solver = new ConsecutiveNumbersSum();
+        int[] inputs = { 1, 9, 15, 0 };
+        int[] expected = { 1, 3, 4, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.consecutiveNumbersSum(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
 
     /**
      * Brute force approach for small values and verification.
@@ -60,36 +73,26 @@ public class ConsecutiveNumbersSum {
         return count;
     }
 
-   /**
-    * Counts ways to represent n as sum of consecutive integers using mathematical approach.
-    * Step-by-step:
-    *  1. Mathematical derivation:
-    *     - Let the consecutive integers be: x, x+1, x+2, ..., x+(k-1)
-    *     - Sum formula: k*x + k*(k-1)/2 = n
-    *     - Rearranging: k*x = n - k*(k-1)/2
-    *     - For valid representation: x must be a positive integer
-    *  2. For each possible length k (starting from 1):
-    *     a. Calculate: numerator = n - k*(k-1)/2
-    *     b. Validate that 
-    *       - numerator > 0 
-    *       - numerator is divisible by k
-    *     c. If yes, we found a valid way to represent n
-    *  3. Loop continues while k*(k-1)/2 < n (ensures numerator stays positive)
-    *  4. Count all valid representations.
+      /**
+    * Intuition: a run of k consecutive numbers is determined by its first
+    * value. If that first value is x, then the sum is k * x plus the fixed
+    * staircase 0 + 1 + ... + (k - 1). For each possible k, the original code
+    * checks whether the remaining numerator divides evenly by k, which means x
+    * is a positive integer.
     *
-    * Key Insight:
-    * For k consecutive integers starting at x:
-    * Sum = k*x + (0 + 1 + 2 + ... + (k-1)) = k*x + k*(k-1)/2 = n
-    * So: x = (n - k*(k-1)/2) / k
-    * For x to be a positive integer: n - k*(k-1)/2 must be divisible by k and > 0.
+    * Algorithm:
+    *   1. Return 0 for non-positive num.
+    *   2. Try every length k while k * (k - 1) / 2 is still below num.
+    *   3. Compute numerator = num - k * (k - 1) / 2.
+    *   4. Count the length when numerator is positive and divisible by k.
     *
-    * Algorithm: Mathematical iteration.
-    * Time Complexity: O(sqrt(n)), loop runs until k*(k+1)/2 > n, which gives k ≈ sqrt(2n).
-    * Space Complexity: O(1), only constant extra space.
+    * Time:  O(sqrt(n)) - the triangular prefix grows quadratically in k.
+    * Space: O(1) - only counters and the current numerator are stored.
     *
-    * @param n Input positive integer
-    * @return Number of ways to write n as sum of consecutive positive integers
+    * @param num input integer to represent as consecutive positive integers
+    * @return number of valid consecutive-sum representations
     */
+
     public int consecutiveNumbersSum(int num) {
         if (num <= 0) return 0;
 

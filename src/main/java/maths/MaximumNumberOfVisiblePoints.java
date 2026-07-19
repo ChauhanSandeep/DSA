@@ -3,46 +3,82 @@ package maths;
 import java.util.*;
 
 /**
- * 1610. Maximum Number of Visible Points
+ * Problem: Maximum Number of Visible Points
  *
- * Problem: You are given an array points where points[i] = [xi, yi] represents a point
- * in the 2D plane, and an integer angle. Your location is at the origin (0, 0).
- * Return the maximum number of points you can see by rotating your vision by angle degrees.
+ * Given points, a viewing angle, and your location, return the maximum number
+ * of points visible inside any cone of that angle. Points at your exact
+ * location are always visible regardless of rotation.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-number-of-visible-points/ (Hard)
+ * Rating:   2147 (zerotrac Elo)
+ * Pattern:  Math | Polar angles | Sorting and sliding window
  *
  * Example:
- * Input: points = [[2,1],[2,2],[3,3]], location = [1,1], angle = 90
- * Output: 3
- * Explanation: All points are visible within 90 degrees from any direction.
+ *   Input:  points = [[2,1],[2,2],[3,3]], angle = 90, location = [1,1]
+ *   Output: 3
+ *   Why:    from [1,1], all three point angles fit within a 90-degree rotation.
  *
- * LeetCode: https://leetcode.com/problems/maximum-number-of-visible-points
+ * Follow-ups:
+ *   1. How do you handle wraparound near 0 and 360 degrees?
+ *      Duplicate sorted angles with +360 and slide over the expanded list.
+ *   2. How would you return the visible points, not just the count?
+ *      Track the best window boundaries and map those angles back to coordinates.
+ *   3. How would you reduce floating-point risk?
+ *      Use careful epsilon comparisons or compare rational direction vectors when possible.
  *
- * Follow-up questions:
- * Q: What if angle is very large (>= 360 degrees)?
- * A: All points become visible, return total count.
- *
- * Q: How to handle precision errors in floating point calculations?
- * A: Use epsilon for comparisons and consider using rational arithmetic.
- *
- * Q: Can we optimize for very large number of points?
- * A: Use spatial data structures or approximation algorithms for massive datasets.
- * LeetCode Contest Rating: 2147
+ * Related: Max Points on a Line (149), Erect the Fence (587).
  */
+
 public class MaximumNumberOfVisiblePoints {
+
+    public static void main(String[] args) {
+        MaximumNumberOfVisiblePoints solver = new MaximumNumberOfVisiblePoints();
+        int[][][] rawPoints = {
+            { {2, 1}, {2, 2}, {3, 3} },
+            { {1, 1}, {1, 1} }
+        };
+        int[] angles = { 90, 13 };
+        int[][] rawLocations = { {1, 1}, {1, 1} };
+        int[] expected = { 3, 2 };
+
+        for (int i = 0; i < rawPoints.length; i++) {
+            List<List<Integer>> points = new ArrayList<>();
+            for (int[] point : rawPoints[i]) {
+                points.add(Arrays.asList(point[0], point[1]));
+            }
+            List<Integer> location = Arrays.asList(rawLocations[i][0], rawLocations[i][1]);
+            int got = solver.visiblePointsCount(points, angles[i], location);
+            System.out.printf("points=%s angle=%d location=%s -> %d  expected=%d%n",
+                Arrays.deepToString(rawPoints[i]), angles[i], location, got, expected[i]);
+        }
+    }
+
 
     private static final double EPS = 1e-9;
 
-    /**
-     * Sliding window approach using polar angles.
+        /**
+     * Intuition: rotation only changes which angular interval is selected. Convert
+     * every non-local point to its polar angle from location, sort those angles,
+     * then find the largest group whose first and last angles differ by at most
+     * the viewing angle. Duplicating angles with +360 turns circular wraparound
+     * into a normal linear window.
      *
-     * Algorithm: Polar coordinate conversion + sliding window
-     * - Convert all points to polar angles relative to location
-     * - Handle points at same location separately (always visible)
-     * - Sort angles and use sliding window to find max points in angle range
-     * - Handle wraparound by duplicating angles with +2π
+     * Algorithm:
+     *   1. Return all points immediately when angle is at least 360.
+     *   2. Count points equal to location and convert every other point to degrees.
+     *   3. Sort the angles and append a +360 copy of each original angle.
+     *   4. Slide a window while the angle span stays within angle + EPS.
+     *   5. Add sameLocation to the best window size.
      *
-     * Time Complexity: O(n log n) for sorting
-     * Space Complexity: O(n) for angle array
+     * Time:  O(n log n) - sorting the polar angles dominates.
+     * Space: O(n) - angles and their wraparound copies are stored.
+     *
+     * @param points coordinates of candidate points
+     * @param angle viewing angle in degrees
+     * @param location observer location [x, y]
+     * @return maximum visible point count over all rotations
      */
+
     public int visiblePointsCount(List<List<Integer>> points, int angle, List<Integer> location) {
         if (angle >= 360) {
             return points.size();

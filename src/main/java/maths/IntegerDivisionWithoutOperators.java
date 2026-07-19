@@ -3,76 +3,44 @@ package maths;
 /**
  * Problem: Divide Two Integers
  *
- * Given two integers dividend and divisor, divide two integers without using
- * multiplication,
- * division, and mod operator. The integer division should truncate toward zero,
- * which means
- * losing its fractional part. For example, 8.345 would be truncated to 8, and
- * -2.7335 would
- * be truncated to -2.
+ * Divide dividend by divisor without using multiplication, division, or the
+ * modulo operator. The quotient must truncate toward zero and clamp the single
+ * overflowing case to Integer.MAX_VALUE.
  *
- * Return the quotient after dividing dividend by divisor.
+ * Leetcode: https://leetcode.com/problems/divide-two-integers/ (Medium)
+ * Rating:   acceptance 20.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Bit manipulation | Exponential subtraction
  *
- * Note: Assume we are dealing with an environment that could only store
- * integers within the
- * 32-bit signed integer range: [−2^31, 2^31 − 1]. For this problem, if the
- * quotient is strictly
- * greater than 2^31 - 1, then return 2^31 - 1, and if the quotient is strictly
- * less than -2^31,
- * then return -2^31.
+ * Example:
+ *   Input:  dividend = 10, divisor = 3
+ *   Output: 3
+ *   Why:    3 fits into 10 three times, and integer division drops the remainder 1.
  *
- * Example 1:
- * Input: dividend = 10, divisor = 3
- * Output: 3
- * Explanation: 10/3 = 3.33333.. which truncates to 3.
- * Step-by-step using bit manipulation:
- * - 3 * 2^0 = 3 ≤ 10, subtract: 10 - 3 = 7, quotient += 1
- * - 3 * 2^1 = 6 ≤ 7, subtract: 7 - 6 = 1, quotient += 2
- * - 3 * 2^0 = 3 > 1, cannot subtract
- * - Final quotient: 1 + 2 = 3
+ * Follow-ups:
+ *   1. How would you also return the remainder?
+ *      Return the leftover dividend after subtracting the chosen divisor multiples.
+ *   2. How would you produce decimal digits?
+ *      Continue long division by scaling the remainder by 10 each step.
+ *   3. How would you optimize division by powers of two?
+ *      Detect a power-of-two divisor and use shifts with the same sign handling.
  *
- * LeetCode Problem: https://leetcode.com/problems/divide-two-integers/
- *
- * Follow-up Questions:
- *
- * 1. What if we need to return the remainder as well?
- * Answer: Track the remaining dividend after all subtractions. The final value
- * of
- * dividend after the algorithm completes is the remainder. Return both quotient
- * and
- * remainder as a pair or array.
- *
- * 2. How would you handle division with decimal precision (not just
- * truncation)?
- * Answer: After finding the integer quotient, continue the division algorithm
- * with
- * the remainder scaled by 10 repeatedly to get decimal places. Use long to
- * avoid
- * overflow during scaling. Track desired precision level.
- *
- * 3. Can we optimize for specific divisor values (powers of 2)?
- * Answer: Yes! If divisor is a power of 2, division can be done with a single
- * right
- * shift operation. For example, dividing by 4 (2^2) is equivalent to right
- * shift by 2.
- * Check if divisor is power of 2: (divisor & (divisor - 1)) == 0
- *
- * 4. What if we're allowed to use multiplication but not division/mod?
- * Answer: Use binary search approach. Search for quotient q such that q *
- * divisor <= dividend
- * but (q+1) * divisor > dividend. Time complexity would be O(log(dividend) *
- * log(quotient)).
- * Related: https://leetcode.com/problems/divide-chocolate/
- *
- * 5. How would you handle very large numbers beyond 64-bit integers?
- * Answer: Implement division using strings or BigInteger-like structures.
- * Process digit
- * by digit similar to long division taught in elementary school. This becomes a
- * string
- * manipulation problem with carry handling.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Fraction to Recurring Decimal (166), Pow(x, n) (50).
  */
+
 public class IntegerDivisionWithoutOperators {
+
+    public static void main(String[] args) {
+        IntegerDivisionWithoutOperators solver = new IntegerDivisionWithoutOperators();
+        int[][] inputs = { {10, 3}, {7, -3}, {Integer.MIN_VALUE, -1}, {43, 8} };
+        int[] expected = { 3, -2, Integer.MAX_VALUE, 5 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.divideUsingBitManipulation(inputs[i][0], inputs[i][1]);
+            System.out.printf("dividend=%d divisor=%d -> %d  expected=%d%n",
+                inputs[i][0], inputs[i][1], got, expected[i]);
+        }
+    }
+
 
     /**
      * Simple version using only subtraction (very slow but easiest to understand).
@@ -194,29 +162,27 @@ public class IntegerDivisionWithoutOperators {
         return isNegative ? -quotient : quotient;
     }
 
-    /**
-     * Division using bit manipulation (shifts).
+        /**
+     * Intuition: repeated subtraction is too slow, so subtract the largest
+     * doubled divisor that still fits. The original code works in negative
+     * space because Integer.MIN_VALUE has no positive counterpart, then applies
+     * the sign at the end.
      *
      * Algorithm:
-     * - Use bit manipulation to double the divisor until it exceeds the dividend.
-     * - Keep track of how many times we've doubled (this forms the quotient).
-     * - When we can no longer double, subtract the largest found multiple from the
-     * dividend
-     * and continue the process until the dividend is less than the divisor.
+     *   1. Clamp Integer.MIN_VALUE / -1 to Integer.MAX_VALUE.
+     *   2. Record the result sign and convert both operands to negative values.
+     *   3. While the divisor still fits, double currentDivisor and currentQuotient with shifts.
+     *   4. Subtract that largest multiple and add its quotient contribution.
+     *   5. Apply the recorded sign to the quotient.
      *
-     * Implementation Note: Works with negative numbers to avoid Integer.MIN_VALUE
-     * overflow.
-     * Since Integer.MIN_VALUE cannot be converted to positive (abs would overflow),
-     * we convert both to negative and work in negative space.
+     * Time:  O(log^2 n) - each outer pass removes a large multiple, with inner doubling.
+     * Space: O(1) - only scalar counters and current multiples are stored.
      *
-     * Time Complexity: O(log²(dividend)) - each iteration reduces dividend by at
-     * least half
-     * Space Complexity: O(1)
-     *
-     * @param dividend the number to be divided
-     * @param divisor  the number to divide by
-     * @return the quotient after division
+     * @param dividend number to divide
+     * @param divisor number to divide by
+     * @return quotient truncated toward zero, clamped on overflow
      */
+
     public int divideUsingBitManipulation(int dividend, int divisor) {
         // Handle overflow case
         if (dividend == Integer.MIN_VALUE && divisor == -1) {
