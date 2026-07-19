@@ -4,58 +4,69 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Letter Combinations of a Phone Number
+ * Problem: Letter Combinations of a Phone Number
  *
- * Problem:
- * Given a string containing digits from 2-9 inclusive, return all possible letter combinations
- * that the number could represent. A mapping of digits to letters (just like on telephone buttons).
+ * Given a string of digits from 2 through 9, return every letter string those
+ * digits could represent on a phone keypad. The output may be in any order, but
+ * the usual keypad order is easiest to read and verify.
+ *
+ * Leetcode: https://leetcode.com/problems/letter-combinations-of-a-phone-number/ (Medium)
+ * Rating:   acceptance 66.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Recursion | Backtracking | One character choice per digit
  *
  * Example:
- * Input: digits = "23"
- * Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+ *   Input:  digits = "23"
+ *   Output: [ad, ae, af, bd, be, bf, cd, ce, cf]
+ *   Why:    digit 2 contributes a, b, or c, and digit 3 contributes d, e, or f,
+ *           so every first-letter choice is paired with every second-letter choice.
  *
- * Example:
- * Input: digits = "2"
- * Output: ["a","b","c"]
+ * Follow-ups:
+ *   1. How would you support digits 0 and 1?
+ *      Define whether they map to empty choices, themselves, or invalid input before recursing.
+ *   2. How would you count combinations without building them?
+ *      Multiply the number of mapped letters for each digit.
+ *   3. How can this be generated iteratively?
+ *      Use a queue and expand all current strings for one digit at a time.
+ *   4. How would you stream combinations lazily?
+ *      Treat each digit as a wheel in a mixed-radix counter and emit one string per advance.
  *
- * Constraints:
- * - 0 <= digits.length <= 4
- * - digits[i] is a digit in the range ['2', '9']
- *
- * LeetCode: https://leetcode.com/problems/letter-combinations-of-a-phone-number/
- *
- * Follow-up Questions:
- * Q1: How would you handle digit '0' and '1' which don't have letters on phone keypads?
- * A1: Map them to empty strings or skip them during iteration, adjusting the mapping array.
- *
- * Q2: What if we want to generate combinations with a specific prefix or suffix?
- * A2: Initialize the StringBuilder with the prefix before starting backtracking.
- *
- * Q3: Can we optimize memory if we only need to count combinations, not list them?
- * A3: Yes - just multiply the number of letters for each digit (e.g., "23" has 3*3=9 combinations).
- *
- * Q4: How would you implement this iteratively using a queue (BFS approach)?
- * A4: Start with empty string in queue, for each digit expand all strings by appending each possible letter.
- *
- * Q5: What if digits can repeat and we want unique combinations only?
- * A5: Use a Set to store results instead of List, or sort and deduplicate afterwards.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Generate Parentheses (22), Combinations (77), Subsets (78).
  */
 public class LetterCombination {
 
     public static void main(String[] args) {
-        System.out.println("All letter combinations for '23': " + letterCombinations("23"));
-        System.out.println("All letter combinations for '222': " + letterCombinations("222"));
+        String[] inputs = { "", "2", "23" };
+        String[] expected = {
+            "[]",
+            "[a, b, c]",
+            "[ad, ae, af, bd, be, bf, cd, ce, cf]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<String> got = letterCombinations(inputs[i]);
+            System.out.printf("digits=\"%s\" -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
     /**
-     * Returns all possible letter combinations for a given digit string.
+     * Intuition: this is the Cartesian product of the keypad choices. Each
+     * recursion level fills one character position for the digit at currentIndex.
+     * When currentIndex reaches the end, currentCombination contains one letter
+     * for every digit and can be copied into result. Removing the last character
+     * after each recursive call restores the prefix before trying the next letter.
      *
-     * Time Complexity: O(4^N * N) - 4^N combinations, N characters per combination
-     * Space Complexity: O(N) - recursion depth
+     * Algorithm:
+     *   1. Return an empty list for null or empty input.
+     *   2. Build the digitToLetters keypad array.
+     *   3. Backtrack from currentIndex 0 with an empty currentCombination.
+     *   4. For each mapped letter, choose it, recurse to the next digit, then un-choose it.
      *
-     * @param digits String containing digits from 2-9
-     * @return List of all possible letter combinations
+     * Time:  O(4^n * n) - there can be up to 4 choices per digit, and copying
+     *        each finished string costs n characters.
+     * Space: O(n) - the recursion stack and currentCombination grow with the number of digits.
+     *
+     * @param digits string containing digits from 2 through 9
+     * @return all letter combinations represented by the digits
      */
     public static List<String> letterCombinations(String digits) {
         List<String> result = new ArrayList<>();
@@ -70,27 +81,7 @@ public class LetterCombination {
         return result;
     }
 
-    /**
-     * Recursive backtracking helper to generate all letter combinations.
-     *
-     * Algorithm:
-     * 1. Base case: If processed all digits, add current combination to result
-     * 2. Get letters corresponding to current digit
-     * 3. For each letter, append it and recurse to next digit
-     * 4. Backtrack by removing last appended letter
-     *
-     * Key Insight: Each digit adds one layer to the recursion tree, with branching
-     * factor equal to the number of letters for that digit (3 or 4).
-     *
-     * Time Complexity: O(4^N * N) where N is length of digits (4^N combinations, N to build each)
-     * Space Complexity: O(N) for recursion depth
-     *
-     * @param digits Input string of digits (2-9)
-     * @param digitToLetters Mapping array from digit to corresponding letters
-     * @param currentIndex Current position being processed in digits string
-     * @param currentCombination StringBuilder holding current combination being built
-     * @param result List storing all valid letter combinations
-     */
+    /** Fills one keypad letter per digit until the buffer is a complete combination. */
     private static void backtrack(String digits, String[] digitToLetters, int currentIndex,
         StringBuilder currentCombination, List<String> result) {
         // Base case: processed all digits

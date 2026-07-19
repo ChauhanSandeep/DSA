@@ -3,55 +3,57 @@ package Recursion;
 import java.util.*;
 
 /**
- * Combination Sum II
+ * Problem: Combination Sum II
  *
- * Problem:
- * Given a collection of candidate numbers and a target number, find all unique combinations
- * where the candidate numbers sum to target. Each number in candidates may only be used once.
+ * Given candidate numbers that may contain duplicates and a target, return all
+ * unique combinations that add up to target. Each array element may be used at
+ * most once, even when another element has the same value.
+ *
+ * Leetcode: https://leetcode.com/problems/combination-sum-ii/ (Medium)
+ * Rating:   acceptance 59.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Recursion | Backtracking | Sort-to-dedupe with one-use choices
  *
  * Example:
- * Input: candidates = [10,1,2,7,6,1,5], target = 8
- * Output: [[1,1,6],[1,2,5],[1,7],[2,6]]
- * Explanation: These are the only unique combinations that sum to 8.
+ *   Input:  candidates = [10,1,2,7,6,1,5], target = 8
+ *   Output: [[1,1,6], [1,2,5], [1,7], [2,6]]
+ *   Why:    each listed group uses array entries once and sums to 8; sorting
+ *           lets equal sibling choices be skipped so duplicates are emitted once.
  *
- * Constraints:
- * - 1 <= candidates.length <= 100
- * - 1 <= candidates[i] <= 50
- * - 1 <= target <= 30
- * - The input array may contain duplicates
+ * Follow-ups:
+ *   1. How is this different from Combination Sum I?
+ *      After choosing a value, recurse from the next index instead of the same index.
+ *   2. Can dynamic programming list all combinations more cleanly?
+ *      DP can count or test reachability, but generating deduplicated lists is usually messier.
+ *   3. How would you return only combinations with minimum length?
+ *      Track the best length seen and keep only results matching that length.
+ *   4. How do you handle a huge input with a small target?
+ *      Sort, drop values above target, and stop a loop once the candidate exceeds the remainder.
  *
- * LeetCode: https://leetcode.com/problems/combination-sum-ii/
- *
- * Follow-up Questions:
- * Q1: How does this differ from Combination Sum I?
- * A1: In Sum I, each number can be reused unlimited times. In Sum II, each can be used at most once.
- *
- * Q2: Why is sorting necessary for this problem?
- * A2: Sorting groups duplicate values together, making it easier to skip duplicates and avoid duplicate combinations.
- *
- * Q3: What if we want to find combinations with the minimum number of elements?
- * A3: Track combination size and update result only when a smaller size is found, or sort final results by size.
- *
- * Q4: Can we use dynamic programming instead of backtracking?
- * A4: DP can count combinations but won't efficiently generate all actual combinations due to state complexity.
- *
- * Q5: How would you optimize if the array is very large but target is small?
- * A5: Pre-filter candidates to include only those <= target, and prune branches early when target becomes negative.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Combination Sum (39), Subsets II (90), Combination Sum III (216).
  */
 public class CombinationSum2 {
 
     /**
-     * Finds all unique combinations that sum to target using backtracking.
-     * 
+     * Intuition: sorting turns duplicates into adjacent choices. The recursion
+     * builds a combination from left to right, and each chosen element recurses
+     * with i + 1 so that exact array position cannot be reused. Duplicate values
+     * are only dangerous when they are sibling choices at the same recursion
+     * level, because they would start identical subtrees; skipping those siblings
+     * still allows duplicates at deeper levels, such as [1,1,6].
+     *
      * Algorithm:
-     * 1. Sort candidates to group duplicates and enable early termination
-     * 2. Use backtracking to explore combinations
-     * 3. Skip duplicates at same recursion level to avoid duplicate combinations
-     * 4. Each element used at most once (pass i+1 in recursive call)
-     * 
-     * Time Complexity: O(2^n) - explore all subsets with pruning
-     * Space Complexity: O(k) - recursion depth where k = target/min(candidates)
+     *   1. Sort candidates so duplicates are adjacent and larger values can stop a loop.
+     *   2. From index, try each remaining position as the next chosen value.
+     *   3. Break when candidates[i] is larger than target.
+     *   4. Skip duplicate sibling values, then choose, recurse from i + 1, and un-choose.
+     *
+     * Time:  O(2^n * n) - the subset tree can be exponential, and copying an
+     *        answer may touch up to n values.
+     * Space: O(n) - the recursion stack and current combination can grow to the input length.
+     *
+     * @param candidates values that may contain duplicates and may be used once each
+     * @param target target sum to form
+     * @return all unique combinations that add up to target
      */
     public List<List<Integer>> combinationSum2(int[] candidates, int target) {
         List<List<Integer>> result = new ArrayList<>();
@@ -62,7 +64,7 @@ public class CombinationSum2 {
         return result;
     }
 
-    // Explores all combinations using backtracking with duplicate skipping
+    /** Explores all combinations using backtracking with duplicate skipping. */
     private void backtrack(int[] candidates, int target, int index, 
                           List<Integer> curr, List<List<Integer>> result) {
         if (target == 0) {
@@ -81,6 +83,25 @@ public class CombinationSum2 {
             curr.add(candidates[i]);
             backtrack(candidates, target - candidates[i], i + 1, curr, result);
             curr.remove(curr.size() - 1);
+        }
+    }
+
+    public static void main(String[] args) {
+        CombinationSum2 solver = new CombinationSum2();
+
+        int[][] candidates = { {10, 1, 2, 7, 6, 1, 5}, {1}, {2, 5, 2, 1, 2} };
+        int[] targets = { 8, 2, 5 };
+        String[] expected = {
+            "[[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]",
+            "[]",
+            "[[1, 2, 2], [5]]"
+        };
+
+        for (int i = 0; i < candidates.length; i++) {
+            int[] input = candidates[i].clone();
+            List<List<Integer>> got = solver.combinationSum2(input, targets[i]);
+            System.out.printf("candidates=%s target=%d -> %s  expected=%s%n",
+                Arrays.toString(candidates[i]), targets[i], got, expected[i]);
         }
     }
 }

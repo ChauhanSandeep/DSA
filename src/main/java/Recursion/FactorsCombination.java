@@ -4,59 +4,68 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Factor Combinations
+ * Problem: Factor Combinations
  *
- * Numbers can be regarded as product of its factors. Write a function that takes an integer n
- * and returns all possible combinations of its factors (excluding 1 and n itself).
+ * Given an integer n, return all ways to write it as a product of factors bigger
+ * than 1 and smaller than n itself. Each combination is listed in nondecreasing
+ * order so the same factorization is not repeated in a different order.
+ *
+ * Leetcode: https://leetcode.com/problems/factor-combinations/ (Medium)
+ * Rating:   acceptance 50.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Recursion | Backtracking | Nondecreasing factor choices
  *
  * Example:
- * Input: n = 12
- * Output: [[2,6],[2,2,3],[3,4]]
- * Explanation: 2*6 = 12, 2*2*3 = 12, 3*4 = 12
+ *   Input:  n = 12
+ *   Output: [[2,2,3], [2,6], [3,4]]
+ *   Why:    these are exactly the non-trivial products of factors greater than 1
+ *           that multiply to 12, with permutations like [6,2] left out.
  *
- * Example:
- * Input: n = 8
- * Output: [[2,4],[2,2,2]]
+ * Follow-ups:
+ *   1. How do you avoid duplicates such as [2,6] and [6,2]?
+ *      Pass the previous factor as the minimum allowed next factor.
+ *   2. How would you speed up factor discovery?
+ *      Try divisors only through sqrt(remaining) and pair each divisor with its quotient.
+ *   3. How would you count factorizations without listing them?
+ *      Memoize count(remaining, minFactor) and sum counts from valid next factors.
+ *   4. What changes if the trivial factorization [n] should be included?
+ *      Add it separately or allow a one-element current factor list to be recorded.
  *
- * Constraints:
- * - 1 <= n <= 10^7
- * - Output should not contain duplicate combinations
- * - Factors should be in non-decreasing order within each combination
- *
- * LeetCode: https://leetcode.com/problems/factor-combinations/
- *
- * Follow-up Questions:
- * Q1: How do you avoid duplicate factor combinations like [2,3] and [3,2]?
- * A1: Only consider factors >= previous factor (maintain non-decreasing order in recursion).
- *
- * Q2: What if we want to include trivial factorization [n] itself?
- * A2: Remove the condition `currentChain.size() > 1` in the base case.
- *
- * Q3: How would you optimize for very large numbers?
- * A3: Only iterate up to sqrt(n) for factors, then compute complementary factor n/i.
- *
- * Q4: What if we want factors in descending order instead?
- * A4: Change the iteration order and comparison to maintain descending order throughout.
- *
- * Q5: How can we find just the number of factorizations without listing them?
- * A5: Use dynamic programming with memoization counting ways to factorize each number.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Combination Sum (39), Combination Sum II (40).
  */
 public class FactorsCombination {
     public static void main(String[] args) {
-        int number = 12;
-        List<List<Integer>> factors = getFactorCombinations(number);
-        System.out.println("Factor combinations of " + number + ": " + factors);
+        int[] inputs = { 1, 12, 16 };
+        String[] expected = {
+            "[]",
+            "[[2, 2, 3], [2, 6], [3, 4]]",
+            "[[2, 2, 2, 2], [2, 2, 4], [2, 8], [4, 4]]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Integer>> got = getFactorCombinations(inputs[i]);
+            System.out.printf("n=%d -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
     /**
-     * Finds all unique factor combinations of a given number (excluding 1 and n itself).
+     * Intuition: view a factorization as a sorted product built one factor at a
+     * time. A recursive call owns the remainingTarget and the smallest factor it
+     * is still allowed to use. Passing the chosen factor back as minFactor keeps
+     * combinations nondecreasing, so [2,6] can appear but [6,2] cannot be reached
+     * as a duplicate branch.
      *
-     * Time Complexity: O(2^log n)
-     * Space Complexity: O(log n)
+     * Algorithm:
+     *   1. Start the search with minFactor = 2 and an empty currentFactors list.
+     *   2. If remainingTarget becomes 1, record currentFactors only when it has multiple factors.
+     *   3. Try every factor from minFactor through remainingTarget.
+     *   4. When factor divides remainingTarget, choose it, recurse on the quotient, and un-choose it.
      *
-     * @param targetNumber The number to factorize
-     * @return List of all unique factor combinations
+     * Time:  O(n * b) - each partial factor chain may scan up to the remaining
+     *        number for its next divisor.
+     * Space: O(log n) - the deepest chain repeatedly divides by at least 2.
+     *
+     * @param targetNumber number to factorize
+     * @return all non-trivial factor combinations in nondecreasing order
      */
     public static List<List<Integer>> getFactorCombinations(int targetNumber) {
         List<List<Integer>> result = new ArrayList<>();
@@ -65,27 +74,7 @@ public class FactorsCombination {
         return result;
     }
 
-    /**
-     * Recursive backtracking function to generate all factor combinations.
-     *
-     * Algorithm:
-     * 1. Base case: When remaining number is 1 and we have multiple factors, add to result
-     * 2. Try all factors from minFactor to remaining number
-     * 3. If a number is a factor, add it and recurse with quotient
-     * 4. Backtrack by removing the added factor
-     *
-     * Key Insight: Start from minFactor (not 2 each time) to maintain non-decreasing order
-     * and avoid duplicates like [2,3] and [3,2].
-     *
-     * Time Complexity: O(2^log n)
-     * - Time complexity is not 2^n because the depth is not n. It's divided in each step by factors.
-     * Space Complexity: O(log n) - recursion depth limited by number of prime factors
-     *
-     * @param remainingTarget The number still to be factorized
-     * @param minFactor Smallest factor to consider (maintains non-decreasing order)
-     * @param currentFactors Current list of factors being built
-     * @param result List storing all valid factor combinations
-     */
+    /** Builds sorted factor chains whose product equals the original number. */
     private static void backtrack(int remainingTarget, int minFactor, List<Integer> currentFactors, List<List<Integer>> result) {
         // Base case: fully factorized and has more than one factor (exclude trivial [n])
         if (remainingTarget == 1 && currentFactors.size() > 1) {
