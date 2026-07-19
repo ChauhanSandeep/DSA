@@ -1,37 +1,8 @@
 /**
- * Problem: String Manipulation - Insert Character at Position
+ * Small utility driver for checking string insertion behavior.
  *
- * Demonstrates basic string manipulation by inserting a character at a specified position.
- * This is a utility class for testing string operations and demonstrating proper Java practices.
- *
- * 📝 Example:
- * Input: str = "0.123456", index = 2, char = '('
- * Output: "0.(123456"
- *
- * 🎯 Constraints:
- * - String is not null
- * - Index is within valid range [0, string.length]
- *
- * 💡 Follow-up Questions with Answers:
- * 1. Q: How would you insert multiple characters at different positions efficiently?
- *    A: Use StringBuilder and insert characters from right to left to avoid index shifting.
- *       Or build from left to right keeping track of cumulative offset.
- *
- * 2. Q: What if you need to insert the same character at multiple positions?
- *    A: Sort positions in descending order and insert from right to left, or use StringBuilder
- *       with a single pass, inserting as you go.
- *
- * 3. Q: How would you optimize for many insert operations?
- *    A: Use StringBuilder which has O(1) amortized insert complexity compared to O(n) for String
- *       concatenation. For bulk operations, collect all changes and apply once.
- *
- * 4. Q: What if the string is very large (millions of characters)?
- *    A: Consider rope data structure or gap buffer for efficient insertions at arbitrary positions.
- *       StringBuilder still works but may require memory reallocation.
- *
- * 5. Q: How would you handle Unicode characters and surrogate pairs?
- *    A: Use codePointAt() and offsetByCodePoints() instead of charAt() and character indices
- *       to properly handle multi-byte Unicode characters.
+ * The reusable method inserts one character at a requested index, while the
+ * main method prints a few examples in a quick revision-friendly format.
  */
 public class Testing {
     
@@ -39,7 +10,16 @@ public class Testing {
     private static final String DEFAULT_DECIMAL_NUMBER = "0.123456";
 
     public static void main(String[] args) {
-        testStringManipulation();
+        String[] inputs = { DEFAULT_DECIMAL_NUMBER, "", "abc" };
+        int[] indices = { DEFAULT_INSERT_POSITION, 0, 3 };
+        char[] characters = { '(', '#', '!' };
+        String[] expected = { "0.(123456", "#", "abc!" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String output = insertCharacterAt(inputs[i], indices[i], characters[i]);
+            System.out.printf("str=%s index=%d char=%c -> %s  expected=%s%n",
+                inputs[i], indices[i], characters[i], output, expected[i]);
+        }
     }
 
     /**
@@ -53,15 +33,18 @@ public class Testing {
     }
 
     /**
-     * Inserts a character at the specified index in the given string.
+     * Intuition: a String cannot be opened up and changed in place. Inserting one
+     * character means choosing a valid split point, keeping the prefix before the
+     * split, placing the new character, then keeping the suffix after the split.
+     * The validation protects the two substring calls from invalid boundaries.
      *
      * Algorithm:
-     * 1. Validate input parameters
-     * 2. Split string at insertion point using substring
-     * 3. Concatenate parts with new character
+     * 1. Reject a null str because there is no valid insertion point.
+     * 2. Reject any index outside the inclusive range [0, str.length()].
+     * 3. Return prefix + character + suffix using substring around index.
      *
-     * Time Complexity: O(n) where n is string length (due to substring operations)
-     * Space Complexity: O(n) for creating new string
+     * Time:  O(n) - substring and concatenation copy the input characters into the result.
+     * Space: O(n) - the returned string stores the original characters plus one new character.
      *
      * @param str The input string
      * @param index The position where character should be inserted (0-based)
