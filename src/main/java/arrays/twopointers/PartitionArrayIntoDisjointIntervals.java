@@ -1,62 +1,64 @@
 package arrays.twopointers;
 
+import java.util.Arrays;
+
 /**
- * 915. Partition Array into Disjoint Intervals
+ * Problem: Partition Array into Disjoint Intervals
  *
- * Problem Statement:
- * Given an integer array nums, partition it into two (contiguous) subarrays left and right so that:
- * 1. Every element in left is less than or equal to every element in right
- * 2. left and right are non-empty
- * 3. left has the smallest possible size
+ * Split nums into non-empty left and right parts so every value in left is less
+ * than or equal to every value in right. Return the smallest possible length of
+ * left; the problem guarantees that a valid split exists.
  *
- * Return the length of left after such a partitioning.
- * It is guaranteed that such a partitioning exists.
+ * Leetcode: https://leetcode.com/problems/partition-array-into-disjoint-intervals/ (Medium)
+ * Rating:   zerotrac 1501 (Q2, weekly-contest-104)
+ * Pattern:  Array | Prefix/suffix extrema | Greedy boundary extension
  *
  * Example:
- * Input: nums = [5,0,3,8,6]
- * Output: 3
- * Explanation: left = [5,0,3], right = [8,6]
- * The maximum in left is 5, minimum in right is 6. Since 5 <= 6, this partition is valid.
+ *   Input:  nums = [5,0,3,8,6]
+ *   Output: 3
+ *   Why:    max([5,0,3]) = 5 and min([8,6]) = 6, so every left value is <= every right value.
  *
- * Input: nums = [1,1,1,0,6,12]
- * Output: 4
- * Explanation: left = [1,1,1,0], right = [6,12]
+ * Follow-ups:
+ *   1. Partition into k valid intervals?
+ *      Use dynamic programming or repeated boundary checks with prefix/suffix extrema.
+ *   2. Require strict inequality instead of <=?
+ *      Change the boundary test to max(left) < min(right), which may make some inputs invalid.
+ *   3. Return the largest valid left partition?
+ *      Scan candidate boundaries from right to left or keep all valid boundaries.
  *
- * LeetCode Link: https://leetcode.com/problems/partition-array-into-disjoint-intervals/
- *
- * Follow-up Questions:
- * 1. What if we want to partition into k disjoint intervals instead of 2?
- *    Answer: Use dynamic programming with k states, tracking min/max at each partition boundary.
- * 2. How to handle the case where we want strictly less than instead of less than equal?
- *    Answer: Change condition from max(left) <= min(right) to max(left) < min(right).
- * 3. What if we want to maximize the size of left instead of minimizing?
- *    Answer: Iterate from right to left and find the last valid partition point.
- * 4. How would you handle duplicate elements more efficiently?
- *    Answer: Use coordinate compression or segment trees for range min/max queries.
- *
- * Related Problems:
- * - 768. Max Chunks To Make Sorted II: https://leetcode.com/problems/max-chunks-to-make-sorted-ii/
- * - 1043. Partition Array for Maximum Sum: https://leetcode.com/problems/partition-array-for-maximum-sum/
- * - 132. Palindrome Partitioning II: https://leetcode.com/problems/palindrome-partitioning-ii/
- * LeetCode Contest Rating: 1501
+ * Related: Max Chunks To Make Sorted II (768), Partition Labels (763).
  */
 public class PartitionArrayIntoDisjointIntervals {
 
+public static void main(String[] args) {
+    PartitionArrayIntoDisjointIntervals solver = new PartitionArrayIntoDisjointIntervals();
+    int[][] inputs = { {5, 0, 3, 8, 6}, {1, 1, 1, 0, 6, 12} };
+    int[] expected = { 3, 4 };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int got = solver.partitionDisjoint(inputs[i]);
+        System.out.printf("nums=%s -> %d  expected=%d%n",
+            Arrays.toString(inputs[i]), got, expected[i]);
+    }
+}
+
     /**
-     * Finds smallest partition index using prefix max and suffix min arrays.
-     *
-     * Algorithm:
-     * 1. Build prefix maximum array: maxLeft[i] = max of elements [0...i]
-     * 2. Build suffix minimum array: minRight[i] = min of elements [i...n-1]
-     * 3. Find smallest index i where maxLeft[i] ≤ minRight[i+1]
-     * 4. Return i+1 (partition after index i)
-     *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(n) for prefix and suffix arrays
-     *
-     * @param nums input array to partition
-     * @return smallest valid partition index
-     */
+ * Intuition: a split after i is valid exactly when the largest value on the
+ * left side is not greater than the smallest value on the right side. Prefix
+ * maxima and suffix minima make that test O(1) for every boundary.
+ *
+ * Algorithm:
+ *   1. Build maxLeft where maxLeft[i] is the maximum over nums[0..i].
+ *   2. Build minRight where minRight[i] is the minimum over nums[i..end].
+ *   3. Scan boundaries from left to right.
+ *   4. Return i + 1 at the first boundary with maxLeft[i] <= minRight[i + 1].
+ *
+ * Time:  O(n) - three linear passes over nums.
+ * Space: O(n) - prefix and suffix arrays store one value per index.
+ *
+ * @param nums input array to partition
+ * @return smallest valid left-part length
+ */
     public int partitionDisjoint(int[] nums) {
         int size = nums.length;
 

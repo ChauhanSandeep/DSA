@@ -3,76 +3,62 @@ package arrays.twopointers;
 import java.util.*;
 
 /**
- * Problem: Trapping Rain Water
+ * Problem: Trapping Rain Water (Alternative Implementations)
  *
- * Given n non-negative integers representing an elevation map where the width of
- * each bar is 1, compute how much water it can trap after raining.
+ * Given bar heights with width 1, compute the total water trapped after rain.
+ * This file keeps both the two-pointer and monotonic-stack one-dimensional
+ * implementations.
+ *
+ * Leetcode: https://leetcode.com/problems/trapping-rain-water/ (Hard)
+ * Rating:   acceptance 67.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Monotonic stack boundaries
  *
  * Example:
- * Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
- * Output: 6
- * Explanation: The elevation map (represented by array height) traps 6 units of rain water.
+ *   Input:  height = [0,1,0,2,1,0,1,3,2,1,2,1]
+ *   Output: 6
+ *   Why:    each trapped unit is bounded by a taller bar on both sides.
  *
- * Visual:
- *        █
- *    █   ██ █
- *  █ ██ ███████
- *  Water trapped: 6 units (shown as spaces between bars)
+ * Follow-ups:
+ *   1. Which approach is easier to extend to per-index water?
+ *      The two-pointer method can store each contribution as it processes a side.
+ *   2. Which approach exposes basin boundaries?
+ *      The stack method naturally identifies left and right boundaries when popping.
+ *   3. How does the 2D version change?
+ *      Use a min-heap over border cells instead of one-dimensional pointers.
  *
- * Constraints:
- * - n == height.length
- * - 1 <= n <= 2 * 10^4
- * - 0 <= height[i] <= 10^5
- *
- * LeetCode Problem: https://leetcode.com/problems/trapping-rain-water
- *
- * Follow-up Questions:
- *
- * 1. What if you need to find which positions trap water, not just total volume?
- *    Answer: Store boolean array or list of positions during calculation. Mark index
- *    as trapping water whenever we add to trapped water count. Return positions array.
- *
- * 2. How would you handle 2D elevation map (trapping water on a surface)?
- *    Answer: Use priority queue starting from borders, process cells inward like
- *    Dijkstra's algorithm. Water level at each cell determined by minimum border height.
- *    Related problem: https://leetcode.com/problems/trapping-rain-water-ii/
- *
- * 3. What if bars have different widths instead of uniform width 1?
- *    Answer: Modify water calculation to multiply trapped height by bar width. Track
- *    widths in separate array. Formula becomes: water += width[i] * (minHeight - height[i]).
- *
- * 4. Can you modify to find maximum water that can be trapped by removing k bars?
- *    Answer: Dynamic programming with state (position, bars_removed, water_trapped).
- *    Try removing or keeping each bar, tracking optimal removal strategy.
- *
- * 5. How would you handle continuous rainfall that fills tank over time?
- *    Answer: Add time dimension. Calculate fill rate based on rainfall intensity.
- *    Simulate water level rising, accounting for overflow and drainage dynamics.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Trapping Rain Water II (407), Container With Most Water (11).
  */
 public class TrappingRainWaterII {
+
+public static void main(String[] args) {
+    TrappingRainWaterII solver = new TrappingRainWaterII();
+    int[][] inputs = { {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}, {2, 0, 2} };
+    int[] expected = { 6, 2 };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int got = solver.trap(inputs[i]);
+        System.out.printf("height=%s -> %d  expected=%d%n",
+            Arrays.toString(inputs[i]), got, expected[i]);
+    }
+}
     /**
-     * Calculates trapped rain water using optimal two-pointer approach.
-     *
-     * Algorithm:
-     * 1. Initialize two pointers at both ends of array
-     * 2. Track maximum heights seen from left and right
-     * 3. Move pointer with smaller height inward:
-     *    - If current height < max height, water can be trapped
-     *    - Water trapped = max height - current height
-     *    - Update max height if current is taller
-     * 4. Continue until pointers meet
-     *
-     * Key insight: Water level at any position is determined by minimum of
-     * maximum heights on both sides. By moving from the smaller side, we ensure
-     * that side's max is the limiting factor for water at current position.
-     *
-     * Time Complexity: O(N) where N is array length. Single pass with two pointers.
-     * Space Complexity: O(1) using only constant extra variables.
-     *
-     * @param height array of non-negative integers representing elevation map
-     * @return total units of water that can be trapped
-     */
+ * Intuition: water at the lower side can be decided immediately because the
+ * opposite side is already at least as tall. Keep the best boundary height
+ * seen from each side, add trapped water when the current bar is below that
+ * boundary, and move inward.
+ *
+ * Algorithm:
+ *   1. Return 0 when fewer than three bars are present.
+ *   2. Start left and right at the ends with leftMax and rightMax at 0.
+ *   3. Process the side with the smaller current height.
+ *   4. Update that side's max or add trapped water, then move the pointer inward.
+ *
+ * Time:  O(n) - each bar is processed at most once.
+ * Space: O(1) - only pointers, maxima, and the total are stored.
+ *
+ * @param height elevation map bar heights
+ * @return total trapped rain water
+ */
     public int trap(int[] height) {
         if (height == null || height.length < 3) {
             return 0;  // Need at least 3 bars to trap water

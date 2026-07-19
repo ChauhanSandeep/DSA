@@ -5,56 +5,63 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Problem Statement:
- * Given an array A containing N integers, find the maximum sum of a strictly increasing triplet (Ai + Aj + Ak)
- * such that 0 <= i < j < k < N and Ai < Aj < Ak. If no such triplet exists, return 0.
+ * Problem: Maximum Sum Increasing Triplet
+ *
+ * Given an array, find the maximum sum Ai + Aj + Ak with i < j < k and
+ * Ai < Aj < Ak. Return 0 when no strictly increasing triplet exists.
+ *
+ * Source: https://www.interviewbit.com/problems/maximum-sum-triplet/
+ * Pattern:  Array | Ordered set | Prefix predecessor plus suffix maximum
  *
  * Example:
- * Input: A = [2, 5, 3, 1, 4, 9]
- * Output: 16
- * Explanation: Possible triplets include 2 + 5 + 9 = 16 or 3 + 4 + 9 = 16. The maximum sum is 16.
+ *   Input:  nums = [2,5,3,1,4,9]
+ *   Output: 16
+ *   Why:    both 2 + 5 + 9 and 3 + 4 + 9 are valid, and no valid triplet sums higher.
  *
- * InterviewBit Link: https://www.interviewbit.com/problems/maximum-sum-triplet/
+ * Follow-ups:
+ *   1. Return the triplet values too?
+ *      Store the chosen left, middle, and right values when maxSum improves.
+ *   2. Find the kth largest increasing triplet sum?
+ *      Generate candidates with a priority queue, but the state space grows quickly.
+ *   3. Handle online updates to the array?
+ *      Use segment trees or Fenwick trees over compressed values for prefix/suffix queries.
  *
- * Follow-up Questions:
- * 1. How would you modify this to find the maximum sum without the strictly increasing condition?
- *    - Sort the array and sum the three largest elements, handling negatives by checking combinations.
- * 2. What if we need to find the kth largest such triplet sum?
- *    - Use a priority queue to track top sums while generating valid triplets, but complexity increases.
- * 3. How to handle very large arrays (n=10^6) efficiently?
- *    - The O(n log n) approach scales well; for larger, parallelize or approximate if exact not needed.
- *    Relevant problem: https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Increasing Triplet Subsequence (334), Maximum Sum of 3 Non-Overlapping Subarrays (689).
  */
 public class MaximumSumIncreasingTriplet {
 
-  public static void main(String[] args) {
-    List<Integer> input = Stream.of(2, 5, 3, 1, 4, 9).collect(Collectors.toList());
-    int result = new MaximumSumIncreasingTriplet().findMaxTripletSum(input);
-    System.out.println("Maximum Sum Triplet: " + result); // Output: 16
+public static void main(String[] args) {
+  MaximumSumIncreasingTriplet solver = new MaximumSumIncreasingTriplet();
+  List<List<Integer>> inputs = Arrays.asList(
+      Arrays.asList(2, 5, 3, 1, 4, 9),
+      Arrays.asList(5, 4, 3)
+  );
+  int[] expected = { 16, 0 };
+
+  for (int i = 0; i < inputs.size(); i++) {
+    int got = solver.findMaxTripletSum(inputs.get(i));
+    System.out.printf("nums=%s -> %d  expected=%d%n", inputs.get(i), got, expected[i]);
   }
+}
 
   /**
-   * Finds the maximum sum of a strictly increasing triplet using suffix maximum and TreeSet for efficient queries.
-   * This is the optimal approach for O(n log n) time.
-   *
-   * Step-by-step explanation:
-   * 1. Compute a rightMax array where rightMax[i] is the maximum value from i to n-1.
-   * 2. Initialize a TreeSet to keep track of elements seen so far (left of current j).
-   * 3. For each possible j from 0 to n-2:
-   *    - Check if there is a maxRight > A[j] from j+1 to n-1 using rightMax[j+1].
-   *    - Query the TreeSet for the largest value strictly less than A[j] (maxLeft).
-   *    - If both exist, compute sum maxLeft + A[j] + maxRight and update the answer.
-   *    - Add A[j] to the TreeSet.
-   * 4. Return the maximum sum found, or 0 if none.
-   *
-   * Algorithm: Suffix Maximum + Ordered Set (TreeSet)
-   * Time Complexity: O(n log n) - Due to n insertions and queries on TreeSet.
-   * Space Complexity: O(n) - For suffix array and TreeSet.
-   *
-   * @param list the input array of integers
-   * @return the maximum sum of strictly increasing triplet, or 0 if none exists
-   */
+ * Intuition: choose each index as the middle value Aj. The best right side is
+ * simply the maximum value after it, while the best left side must be the
+ * largest seen value that is still smaller than Aj. A TreeSet gives that left
+ * predecessor while maxRight gives the right candidate.
+ *
+ * Algorithm:
+ *   1. Build maxRight so maxRight[i] is the maximum value from i to the end.
+ *   2. Keep sortedPrefixSet for values to the left of the current index.
+ *   3. For each middle value, require maxRight[i + 1] > currentElement.
+ *   4. Query lower(currentElement), update maxSum, then add currentElement to the set.
+ *
+ * Time:  O(n log n) - each index performs one TreeSet query and insertion.
+ * Space: O(n) - maxRight and sortedPrefixSet can each grow linearly.
+ *
+ * @param list input values
+ * @return maximum increasing triplet sum, or 0 if no such triplet exists
+ */
   public int findMaxTripletSum(List<Integer> list) {
     int length = list.size();
     if (length < 3) return 0;

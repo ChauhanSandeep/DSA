@@ -3,40 +3,43 @@ package arrays.twopointers;
 import java.util.*;
 
 /**
- * Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]]
- * such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+ * Problem: 3Sum
  *
- * Notice that the solution set must not contain duplicate triplets.
+ * Given an integer array, return all unique triplets whose values sum to zero.
+ * This file also keeps a generalized method that accepts any target sum.
  *
- * Example 1:
- * Input: nums = [-1,0,1,2,-1,-4]
- * Output: [[-1,-1,2],[-1,0,1]]
+ * Leetcode: https://leetcode.com/problems/3sum/ (Medium)
+ * Rating:   acceptance 39.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Sorting | Fixed value plus two pointers
  *
- * Example 2:
- * Input: nums = [0,1,1]
- * Output: []
+ * Example:
+ *   Input:  nums = [-1,0,1,2,-1,-4]
+ *   Output: [[-1,-1,2], [-1,0,1]]
+ *   Why:    these are the only unique triplets whose values add to 0.
  *
- * Example 3:
- * Input: nums = [0,0,0]
- * Output: [[0,0,0]]
+ * Follow-ups:
+ *   1. Find triplets for an arbitrary target?
+ *      Use threeSumGeneral(nums, targetSum), which fixes one value and scans for the remainder.
+ *   2. Extend to 4Sum?
+ *      Add another fixed loop or use the recursive k-sum pattern.
+ *   3. Return indices instead of values?
+ *      Track original indices before sorting and add duplicate handling for equal values.
  *
- * LeetCode: https://leetcode.com/problems/3sum/
- *
- * Follow-up Questions:
- * 1. How would you modify your solution to find triplets that sum to a target other than 0?
- *    - We can generalize the solution to accept a target sum as a parameter.
- * 2. What if we need to find all unique quadruplets that sum to zero?
- *    - We can extend the solution to handle 4Sum by adding an additional loop.
- * 3. How would you optimize the solution for very large input arrays?
- *    - We can use a hash map for O(n²) time complexity with O(n) space.
- *
- * Related Problems:
- * - 3Sum Closest (https://leetcode.com/problems/3sum-closest/)
- * - 4Sum (https://leetcode.com/problems/4sum/)
- * - Two Sum (https://leetcode.com/problems/two-sum/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Two Sum (1), 3Sum Closest (16), 4Sum (18).
  */
 public class ThreeSum {
+
+public static void main(String[] args) {
+    ThreeSum solver = new ThreeSum();
+    int[][] inputs = { {-1, 0, 1, 2, -1, -4}, {0, 1, 1} };
+    String[] expected = { "[[-1, -1, 2], [-1, 0, 1]]", "[]" };
+
+    for (int i = 0; i < inputs.length; i++) {
+        List<List<Integer>> got = solver.threeSumGeneral(inputs[i].clone(), 0);
+        System.out.printf("nums=%s -> %s  expected=%s%n",
+            Arrays.toString(inputs[i]), got, expected[i]);
+    }
+}
 
     /**
      * Finds all unique triplets by fixing the last element.
@@ -101,23 +104,24 @@ public class ThreeSum {
     }
 
     /**
-     * General solution to find all unique triplets that sum to a target value.
-     *
-     * Steps:
-     * 1. Return empty list if input is null or has fewer than 3 elements.
-     * 2. Sort the array.
-     * 3. For each unique first element:
-     *    a. Use two pointers to find pairs that sum to (targetSum - firstNum).
-     *    b. Add triplets and skip duplicates.
-     * 4. Return all unique triplets.
-     *
-     * Time Complexity: O(n²)
-     * Space Complexity: O(1) or O(n) depending on sorting algorithm
-     *
-     * @param nums The input array of integers
-     * @param targetSum The target sum
-     * @return A list of all unique triplets that sum to the target
-     */
+ * Intuition: after sorting, fix one value and the remaining problem is Two
+ * Sum II on the suffix. Moving leftPointer right increases the pair sum;
+ * moving rightPointer left decreases it. Skipping equal values prevents the
+ * same triplet from being emitted more than once.
+ *
+ * Algorithm:
+ *   1. Return an empty list for null or too-short input.
+ *   2. Sort nums so duplicates are adjacent and two pointers are valid.
+ *   3. For each unique firstIndex, set requiredSum = targetSum - nums[firstIndex].
+ *   4. Scan the suffix with leftPointer and rightPointer, adding matches and skipping duplicates.
+ *
+ * Time:  O(n^2) - each fixed firstIndex runs one linear two-pointer scan.
+ * Space: O(1) - excluding the output list and sorting implementation storage.
+ *
+ * @param nums input array, sorted in place by this method
+ * @param targetSum desired triplet sum
+ * @return unique triplets whose values sum to targetSum
+ */
     public List<List<Integer>> threeSumGeneral(int[] nums, int targetSum) {
         List<List<Integer>> triplets = new ArrayList<>();
         if (nums == null || nums.length < 3) {

@@ -6,54 +6,63 @@ import java.util.Map;
 
 
 /**
- * Problem: Find a continuous subarray that sums to a given target value.
+ * Problem: Find a Subarray with a Given Sum
  *
- * ✅ Given an array of integers and a target sum, return the start and end indices of a
- *    continuous subarray whose elements sum up to the target.
+ * Return the start and end indices of a continuous subarray whose sum equals a
+ * target. Positive-only arrays can use a sliding window; arrays with negative
+ * values need prefix sums and a hash map.
  *
- * ✅ Handles both cases:
- *    1. All elements are positive → use Sliding Window
- *    2. Elements may be positive or negative → use Prefix Sum with HashMap
- *
- * 🔗 LeetCode Link: https://leetcode.com/problems/subarray-sum-equals-k/ (for HashMap version)
+ * Leetcode: Similar to https://leetcode.com/problems/subarray-sum-equals-k/ (Medium)
+ * Pattern:  Array | Sliding window | Prefix sum hash map
  *
  * Example:
- * Input: arr = [1, 2, 3, 7, 5], target = 12
- * Output: [1, 3] (because 2 + 3 + 7 = 12)
+ *   Input:  nums = [1,2,3,7,5], targetSum = 12
+ *   Output: [1,3]
+ *   Why:    nums[1] + nums[2] + nums[3] = 2 + 3 + 7 = 12.
  *
- * Follow-up Questions:
- * - Q: What if multiple subarrays sum to the target?
- *   A: You can return the first one or all of them (depending on requirement).
- * - Q: What if you need the subarray elements instead of indices?
- *   A: Extract sublist using indices returned.
- * - Q: How do we count all such subarrays?
- *   A: Use a variation of the prefix sum hashmap with count. (Leetcode: https://leetcode.com/problems/subarray-sum-equals-k/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Count all subarrays with the target sum?
+ *      Store prefix-sum frequencies instead of first indices.
+ *   2. Return all matching ranges?
+ *      Store a list of indices for each prefix sum and emit every compatible range.
+ *   3. Find the shortest matching subarray?
+ *      Keep the latest useful prefix indices and minimize length when a match appears.
+ *
+ * Related: Subarray Sum Equals K (560), Minimum Size Subarray Sum (209).
  */
 public class SumSubarrayFinder {
 
-  public static void main(String[] args) {
-    int[] inputArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int target = 12;
+public static void main(String[] args) {
+  int[] positiveInput = {1, 2, 3, 7, 5};
+  int[] anyInput = {10, 2, -2, -20, 10};
 
-    System.out.println(
-        "For positive elements only: " + Arrays.toString(findSubarrayWithSumPositive(inputArray, target)));
+  int[] positiveGot = findSubarrayWithSumPositive(positiveInput, 12);
+  System.out.printf("nums=%s target=12 -> %s  expected=%s%n",
+      Arrays.toString(positiveInput), Arrays.toString(positiveGot), Arrays.toString(new int[]{1, 3}));
 
-    System.out.println(
-        "For any elements (including negatives): " + Arrays.toString(findSubarrayWithSumAny(inputArray, target)));
-  }
+  int[] anyGot = findSubarrayWithSumAny(anyInput, -10);
+  System.out.printf("nums=%s target=-10 -> %s  expected=%s%n",
+      Arrays.toString(anyInput), Arrays.toString(anyGot), Arrays.toString(new int[]{0, 3}));
+}
 
   /**
-   * Finds a subarray whose sum equals the target assuming all array elements are positive.
-   *
-   * ✅ Algorithm: Sliding Window (Two Pointer)
-   * ✅ Time Complexity: O(N)
-   * ✅ Space Complexity: O(1)
-   *
-   * @param nums  array of positive integers
-   * @param targetSum  the sum to search for
-   * @return an array of two integers representing start and end indices (0-based), or [-1, -1] if not found
-   */
+ * Intuition: with all positive values, expanding the right end only increases
+ * currentSum, and moving start right only decreases it. That monotonic behavior
+ * makes a sliding window sufficient to find a target-sum range.
+ *
+ * Algorithm:
+ *   1. Reject null or empty input.
+ *   2. Expand end, adding nums[end] to currentSum.
+ *   3. While currentSum is too large, subtract nums[start] and advance start.
+ *   4. Return [start, end] when currentSum equals targetSum, else [-1, -1].
+ *
+ * Time:  O(n) - start and end each move forward at most n times.
+ * Space: O(1) - only the window sum and indices are stored.
+ *
+ * @param nums array of positive integers
+ * @param targetSum target subarray sum
+ * @return start and end indices, or [-1, -1] if no subarray matches
+ */
   public static int[] findSubarrayWithSumPositive(int[] nums, int targetSum) {
     if (nums == null || nums.length == 0) {
       throw new IllegalArgumentException("Input array must not be null or empty.");

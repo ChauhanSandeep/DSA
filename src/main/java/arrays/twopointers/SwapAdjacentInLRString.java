@@ -3,57 +3,63 @@ package arrays.twopointers;
 import java.util.*;
 
 /**
- * Problem Statement:
- * In a string composed of 'L', 'R', and 'X' characters, like "RXXLRXRXL", a move consists of either
- * replacing one occurrence of "XL" with "LX", or replacing one occurrence of "RX" with "XR".
- * Given the starting string start and the ending string end,
- * return True if and only if there exists a sequence of moves to transform start to end.
+ * Problem: Swap Adjacent in LR String
+ *
+ * In strings made of L, R, and X, moves replace XL with LX or RX with XR. Return
+ * whether start can transform into end under those movement constraints.
+ *
+ * Leetcode: https://leetcode.com/problems/swap-adjacent-in-lr-string/ (Medium)
+ * Rating:   zerotrac 1939 (Q3, weekly-contest-70)
+ * Pattern:  String | Two pointers | Direction-constrained movement
  *
  * Example:
- * Input: start = "RXXLRXRXL", end = "XRLXXRRLX"
- * Output: true
- * Explanation: We can transform start to end following these steps:
- * RXXLRXRXL -> XRXLRXRXL -> XRLXRXRXL -> XRLXXRRXL -> XRLXXRRLX
- * The sequence of 'L' and 'R' remains the same, but their positions are adjusted by moving 'L' left and 'R' right through 'X's.
+ *   Input:  start = "RXXLRXRXL", end = "XRLXXRRLX"
+ *   Output: true
+ *   Why:    the L/R order is unchanged; each R only moves right and each L only moves left.
  *
- * LeetCode Link: https://leetcode.com/problems/swap-adjacent-in-lr-string/
+ * Follow-ups:
+ *   1. Compute the minimum number of swaps?
+ *      Sum the movement distances of matching L/R pieces after validating constraints.
+ *   2. What if L and R could move both directions?
+ *      Then only character counts would matter, because directional constraints disappear.
+ *   3. Support more piece types with different directions?
+ *      Validate the non-X sequence and apply a direction rule for each piece type.
  *
- * Follow-up Questions:
- * 1. What if 'L' could also move right or 'R' left? - This would allow reordering, so we'd need to check if the multisets of characters are equal, but positions wouldn't matter as much. However, in this problem, order is fixed.
- * 2. How would you handle if swaps could happen over multiple 'X's at once? - That might require modeling as a graph or sliding window, but here swaps are only adjacent.
- * 3. Can we compute the minimum number of swaps? - Yes, by calculating the total distance each 'L' or 'R' needs to move, but ensuring no crossings.
- * Relevant follow-up problem: https://leetcode.com/problems/move-pieces-to-obtain-a-string/ (similar movement constraints).
- * LeetCode Contest Rating: 1939
+ * Related: Move Pieces to Obtain a String (2337), Transform String (777).
  */
 public class SwapAdjacentInLRString {
 
+public static void main(String[] args) {
+  SwapAdjacentInLRString solver = new SwapAdjacentInLRString();
+  String[][] cases = { {"RXXLRXRXL", "XRLXXRRLX"}, {"X", "R"} };
+  boolean[] expected = { true, false };
+
+  for (int i = 0; i < cases.length; i++) {
+    boolean got = solver.canTransform(cases[i][0], cases[i][1]);
+    System.out.printf("start=%s end=%s -> %s  expected=%s%n",
+        cases[i][0], cases[i][1], got, expected[i]);
+  }
+}
+
   /**
-   * Determines if the start string can be transformed into the end string using the allowed moves.
-   *
-   * Step-by-step Explanation:
-   * 1. First, remove all 'X' from both strings and check if the resulting sequences of 'L' and 'R' are identical. If not, transformation is impossible.
-   * 2. Use two pointers to traverse both strings, skipping 'X' characters.
-   * 3. For each non-'X' character:
-   *    - If it's 'R', ensure its position in start is <= position in end (can only move right).
-   *    - If it's 'L', ensure its position in start is >= position in end (can only move left).
-   * 4. If all matching characters satisfy the conditions and both pointers reach the end, return true.
-   *
-   * Logic Summary:
-   * 1. Use two pointers to skip over 'X' in both `source` and `target`.
-   * 2. When comparing non-'X' characters:
-   *    - They must be the same.
-   *    - 'R' can only move to the right (i.e., its index must increase).
-   *    - 'L' can only move to the left (i.e., its index must decrease).
-   * 3. If all characters satisfy the above rules, return true.
-   *
-   * Algorithm: Two-pointer technique with position checks.
-   * Time Complexity: O(n), where n is the length of the strings (single pass).
-   * Space Complexity: O(1), no extra space beyond variables.
-   *
-   * @param start the starting string
-   * @param end the ending string
-   * @return true if transformation is possible, false otherwise
-   */
+ * Intuition: X is empty space, so removing X must leave the same sequence of
+ * L and R pieces. After that, only direction matters: R can move right but not
+ * left, and L can move left but not right. Two pointers compare the next real
+ * piece in each string and enforce those index rules.
+ *
+ * Algorithm:
+ *   1. Return false for different lengths or different non-X sequences.
+ *   2. Move startIndex and endIndex forward, skipping X in both strings.
+ *   3. Compare the next non-X characters and reject mismatches.
+ *   4. Reject L moving right or R moving left; otherwise advance both pointers.
+ *
+ * Time:  O(n) - each pointer scans its string once.
+ * Space: O(1) - aside from removeX results used by the original code path.
+ *
+ * @param start starting configuration
+ * @param end desired ending configuration
+ * @return true when start can transform into end
+ */
   public boolean canTransform(String start, String end) {
     // Quick check for length mismatch, though constraints ensure same length
     if (start.length() != end.length()) {

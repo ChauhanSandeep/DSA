@@ -5,67 +5,66 @@ import java.util.*;
 /**
  * Problem: Remove Element
  *
- * Given an integer array nums and an integer val, remove all occurrences of val in nums
- * in-place. The order of the elements may be changed. Return the number of elements in
- * nums which are not equal to val.
+ * Given an array and a value, remove every occurrence of that value in place.
+ * Return the number of remaining values; elements beyond the returned length do
+ * not matter.
  *
- * Consider the number of elements in nums which are not equal to val be k, to get accepted,
- * you need to do the following things:
- * - Change the array nums such that the first k elements of nums contain the elements
- *   which are not equal to val. The remaining elements of nums are not important as well
- *   as the size of nums.
- * - Return k.
+ * Leetcode: https://leetcode.com/problems/remove-element/ (Easy)
+ * Rating:   acceptance 62.1% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Filtered prefix write
  *
  * Example:
- * Input: nums = [3,2,2,3], val = 3
- * Output: 2, nums = [2,2,_,_]
- * Explanation: Your function should return k = 2, with the first two elements of nums being 2.
- * It does not matter what you leave beyond the returned k.
+ *   Input:  nums = [3,2,2,3], val = 3
+ *   Output: 2, nums = [2,2,_,_]
+ *   Why:    both 3s are skipped and the two 2s are written to the front.
  *
- * Input: nums = [0,1,2,2,3,0,4,2], val = 2
- * Output: 5, nums = [0,1,3,0,4,_,_,_]
- * Explanation: The first 5 elements contain all non-2 values: [0,1,3,0,4]
+ * Follow-ups:
+ *   1. What if order does not need to be preserved and val is common?
+ *      Swap matches with the end to reduce writes.
+ *   2. Remove multiple values at once?
+ *      Store banned values in a set and keep the same writeIndex scan.
+ *   3. Return removed indices too?
+ *      Collect indices whenever currentElement == val before skipping it.
  *
- * LeetCode: https://leetcode.com/problems/remove-element
- *
- * Follow-up Questions:
- * 1. Q: What if the order of remaining elements must be preserved?
- *    A: Current solution already preserves relative order of non-val elements.
- *
- * 2. Q: How would you optimize when most elements equal val?
- *    A: Use swap-from-end approach to avoid unnecessary writes.
- *
- * 3. Q: What if you needed to remove multiple different values?
- *    A: Could use HashSet to check if element should be removed, same two-pointer approach.
- *
- * 4. Q: How would you handle very large arrays where val is rare?
- *    A: Current O(n) solution is optimal, but could add early termination if tracking remaining val count.
- *
- * Related Problems:
- * - Remove Duplicates from Sorted Array: https://leetcode.com/problems/remove-duplicates-from-sorted-array/
- * - Move Zeroes: https://leetcode.com/problems/move-zeroes/
- * - Remove Duplicates from Sorted Array II: https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Remove Duplicates from Sorted Array (26), Move Zeroes (283).
  */
 public class RemoveElement {
 
+public static void main(String[] args) {
+    RemoveElement solver = new RemoveElement();
+    int[][] inputs = { {3, 2, 2, 3}, {0, 1, 2, 2, 3, 0, 4, 2} };
+    int[] vals = { 3, 2 };
+    int[] expectedLengths = { 2, 5 };
+    int[][] expectedPrefixes = { {2, 2}, {0, 1, 3, 0, 4} };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int[] nums = inputs[i].clone();
+        int gotLength = solver.removeElement(nums, vals[i]);
+        int[] gotPrefix = Arrays.copyOf(nums, gotLength);
+        System.out.printf("nums=%s val=%d -> len=%d prefix=%s  expected=len=%d prefix=%s%n",
+            Arrays.toString(inputs[i]), vals[i], gotLength, Arrays.toString(gotPrefix),
+            expectedLengths[i], Arrays.toString(expectedPrefixes[i]));
+    }
+}
+
     /**
-     * Removes all occurrences of val using two-pointer technique.
-     *
-     * Algorithm:
-     * 1. Use writeIndex to track position for next valid element
-     * 2. Iterate through array with enhanced for loop
-     * 3. When element != val, place it at writeIndex and increment writeIndex
-     * 4. When element == val, skip it (don't write, don't increment writeIndex)
-     * 5. Return writeIndex as count of remaining valid elements
-     *
-     * Time Complexity: O(n) where n is length of array
-     * Space Complexity: O(1) using constant extra space
-     *
-     * @param nums array to remove elements from
-     * @param val value to remove from array
-     * @return number of elements remaining after removal
-     */
+ * Intuition: this is a stable filter written into the same array. writeIndex
+ * always marks the next slot in the kept prefix. Values equal to val are
+ * ignored; every other value is copied forward and expands the prefix.
+ *
+ * Algorithm:
+ *   1. Return 0 when nums is null.
+ *   2. Start writeIndex at 0.
+ *   3. Scan each currentElement in nums.
+ *   4. Copy non-val elements to nums[writeIndex] and advance writeIndex.
+ *
+ * Time:  O(n) - each element is inspected once.
+ * Space: O(1) - filtering happens in the original array.
+ *
+ * @param nums array to filter in place
+ * @param val value to remove
+ * @return number of values not equal to val
+ */
     public int removeElement(int[] nums, int val) {
         if (nums == null) {
             return 0;

@@ -1,49 +1,63 @@
 package arrays.twopointers;
 
+import java.util.Arrays;
+
 /**
- * LeetCode Problem: Trapping Rain Water
- * https://leetcode.com/problems/trapping-rain-water/
+ * Problem: Trapping Rain Water
  *
- * Problem Statement:
- * Given n non-negative integers representing an elevation map where the width of each bar is 1,
- * compute how much water it is able to trap after raining.
+ * Given bar heights with width 1, compute how much water is trapped after rain.
+ * Water above an index is limited by the shorter maximum wall seen on its left
+ * and right.
  *
- * Intuition:
- * Water can be trapped at index `i` if there is a taller bar on both the left and the right.
- * The amount of water trapped is determined by the shorter of the two bars minus the current height.
+ * Leetcode: https://leetcode.com/problems/trapping-rain-water/ (Hard)
+ * Rating:   acceptance 67.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Running boundary maxima
  *
- * 🧪 Example:
- * Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
- * Output: 6
+ * Example:
+ *   Input:  height = [0,1,0,2,1,0,1,3,2,1,2,1]
+ *   Output: 6
+ *   Why:    the bounded valleys across the elevation map hold 6 total units.
  *
- * Explanation:
- * The bars trap 1 unit of water at index 2, 1 at 4, 2 at 5, 1 at 6, and 1 at 10 — total = 6 units.
+ * Follow-ups:
+ *   1. Return water trapped at each index?
+ *      Store per-index contributions while processing or use prefix/suffix maxima arrays.
+ *   2. Handle bars with variable widths?
+ *      Multiply each trapped height by that bar's width.
+ *   3. Extend to a 2D height map?
+ *      Use a min-heap from the border cells, as in Trapping Rain Water II.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/trapping-rain-water/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Container With Most Water (11), Trapping Rain Water II (407).
  */
 public class TrappingRainWater {
-  public static void main(String[] args) {
-    int[] heights = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
-    System.out.println("Max water that can be trapped is " + trap(heights));
+public static void main(String[] args) {
+  int[][] inputs = { {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}, {4, 2, 0, 3, 2, 5} };
+  int[] expected = { 6, 9 };
+
+  for (int i = 0; i < inputs.length; i++) {
+    int got = trap(inputs[i]);
+    System.out.printf("height=%s -> %d  expected=%d%n",
+        Arrays.toString(inputs[i]), got, expected[i]);
   }
+}
 
   /**
-   * Calculates the total water that can be trapped between bars of varying heights.
-   *
-   * 💡 Approach:
-   * - Use two pointers (`left` and `right`) to scan from both ends.
-   * - Maintain the `leftMax` and `rightMax` heights seen so far.
-   * - At each step, calculate how much water can be trapped at the current bar
-   *   based on the min of `leftMax` and `rightMax`.
-   * - Move the pointer pointing to the shorter bar inward.
-   *
-   * Time Complexity: O(n) – Single pass through the array
-   * Space Complexity: O(1) – Constant extra space
-   *
-   * @param height Array representing elevation map
-   * @return Total amount of trapped water
-   */
+ * Intuition: the lower side determines the water level because the opposite
+ * side already has a boundary at least that high. Process the lower side,
+ * update its running max, or add the difference between that max and the
+ * current bar.
+ *
+ * Algorithm:
+ *   1. Return 0 for null or empty height.
+ *   2. Start left and right at the ends with leftMax and rightMax at 0.
+ *   3. Process the side with the smaller current height.
+ *   4. Update that side's max or add trapped water, then move that pointer inward.
+ *
+ * Time:  O(n) - each pointer moves inward across the array once.
+ * Space: O(1) - only boundary maxima, pointers, and total water are kept.
+ *
+ * @param height elevation map bar heights
+ * @return total trapped rain water
+ */
   public static int trap(int[] height) {
     // Edge case: no bars or only one bar means no water can be trapped
       if (height == null || height.length == 0) {

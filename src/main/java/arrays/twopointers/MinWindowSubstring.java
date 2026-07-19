@@ -5,61 +5,64 @@ import java.util.Map;
 
 
 /**
- * Problem Statement:
- * Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that 
- * every character in t (including duplicates) is included in the window.
- * If there is no such substring, return the empty string "". The testcases will be generated such that the answer is unique.
+ * Problem: Minimum Window Substring
+ *
+ * Given strings source and target, return the smallest substring of source that
+ * contains every character of target with the required duplicate counts. Return
+ * the empty string when no valid window exists.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-window-substring/ (Hard)
+ * Rating:   acceptance 48.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Sliding window | Frequency debt
  *
  * Example:
- * Input: s = "ADOBECODEBANC", t = "ABC"
- * Output: "BANC"
- * Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+ *   Input:  source = "ADOBECODEBANC", target = "ABC"
+ *   Output: "BANC"
+ *   Why:    BANC contains A, B, and C, and every shorter substring misses one of them.
  *
- * LeetCode Link: https://leetcode.com/problems/minimum-window-substring/
+ * Follow-ups:
+ *   1. Return all minimum windows?
+ *      Keep collecting windows whose length equals the best length after each shrink.
+ *   2. Require exactly the characters of target and no extras?
+ *      Use a fixed-size permutation window instead of a variable-size cover window.
+ *   3. Support full Unicode efficiently?
+ *      Use a map keyed by code point rather than fixed ASCII arrays.
  *
- * Follow-up Questions:
- * 1. Could you find an algorithm that runs in O(m + n) time?
- *    - Yes, the sliding window approach below achieves O(m + n) by using frequency maps and two pointers, visiting each character at most twice.
- * 2. What if we need to find all minimum windows instead of just one?
- *    - Modify the algorithm to collect all windows of the minimum length found, instead of just the first one.
- * 3. How would you handle if the window must contain exactly the characters in t, no extras?
- *    - That's a different problem (permutation in string); use similar sliding window but ensure window size == t.length().
- *      Relevant problem: https://leetcode.com/problems/permutation-in-string/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Permutation in String (567), Minimum Size Subarray Sum (209).
  */
 public class MinWindowSubstring {
 
-  public static void main(String[] args) {
-    String source = "ADOBECODEBANC";
-    String target = "ABC";
-    String result = new MinWindowSubstring().minWindow(source, target);
-    System.out.println("Min Window Substring: " + result);  // Expected: "BANC"
+public static void main(String[] args) {
+  MinWindowSubstring solver = new MinWindowSubstring();
+  String[][] cases = { {"ADOBECODEBANC", "ABC"}, {"a", "aa"} };
+  String[] expected = { "BANC", "" };
+
+  for (int i = 0; i < cases.length; i++) {
+    String got = solver.minWindow(cases[i][0], cases[i][1]);
+    System.out.printf("source=%s target=%s -> %s  expected=%s%n",
+        cases[i][0], cases[i][1], got, expected[i]);
   }
+}
 
   /**
-   * Finds the minimum window substring using sliding window with frequency counts.
-   * This is the optimal O(m + n) approach.
-   *
-   * Step-by-step explanation:
-   * 1. If target is empty, return "" (edge case).
-   * 2. Create frequency maps: targetFreq for target'source characters, windowFreq for current window.
-   * 3. Initialize two pointers left and right, and counters for matchedChars (matched required counts) and requiredChars (unique in target).
-   * 4. Expand right: Add source[right] to windowFreq; if it matches targetFreq and windowFreq count == targetFreq count, increment matchedChars.
-   * 5. When matchedChars == requiredChars (valid window), try to minimize by moving left:
-   *    - Update result if current window is smaller.
-   *    - Remove source[left] from windowFreq; if it drops below targetFreq, decrement matchedChars.
-   *    - Increment left.
-   * 6. Continue until right reaches end.
-   * 7. Return the substring if found, else "".
-   *
-   * Algorithm: Sliding Window
-   * Time Complexity: O(m + n) - Each character visited at most twice (by left and right).
-   * Space Complexity: O(1) - Maps size up to 52 (assuming English letters), constant.
-   *
-   * @param source the source string
-   * @param target the target string
-   * @return the minimum window substring or "" if none
-   */
+ * Intuition: targetFreq describes the debt the window must pay. Expanding right
+ * adds characters until every required character is paid in full. Once valid,
+ * moving left tries to remove unnecessary characters while preserving the debt
+ * condition, recording the smallest valid range seen.
+ *
+ * Algorithm:
+ *   1. Build targetFreq and count requiredChars.
+ *   2. Expand right, updating windowFreq and matchedChars when a debt is paid.
+ *   3. While all debts are paid, update the best window and remove source[left].
+ *   4. Return the best substring, or "" if no valid range was recorded.
+ *
+ * Time:  O(m + n) - each source character enters and leaves the window at most once.
+ * Space: O(1) - the maps are bounded by the character alphabet used by the strings.
+ *
+ * @param source string to search inside
+ * @param target characters and counts that must be covered
+ * @return shortest covering substring, or the empty string if none exists
+ */
   public String minWindow(String source, String target) {
     if (target.isEmpty()) {
       return "";

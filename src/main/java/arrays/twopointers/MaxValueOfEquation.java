@@ -3,44 +3,68 @@ package arrays.twopointers;
 import java.util.*;
 
 /**
- * 1499. Max Value of Equation
+ * Problem: Max Value of Equation
  *
- * Problem: Given an array points where points[i] = [xi, yi], and integer k,
- * find the maximum value of yi + yj + |xi - xj| where |xi - xj| <= k.
- * Since xi < xj, this becomes yi + yj + xj - xi.
+ * Given points sorted by x-coordinate, find the maximum value of
+ * yi + yj + |xi - xj| for pairs with |xi - xj| <= k. Since xi < xj,
+ * the equation becomes (yi - xi) + (yj + xj).
+ *
+ * Leetcode: https://leetcode.com/problems/max-value-of-equation/ (Hard)
+ * Rating:   zerotrac 2456 (Q4, weekly-contest-195)
+ * Pattern:  Array | Sliding window | Heap or monotonic deque maximum
  *
  * Example:
- * Input: points = [[1,3],[2,0],[5,10],[6,-10]], k = 1
- * Output: 4
- * Explanation: First two points: 3 + 0 + |2 - 1| = 4
+ *   Input:  points = [[1,3],[2,0],[5,10],[6,-10]], k = 1
+ *   Output: 4
+ *   Why:    points [1,3] and [2,0] are within distance 1 and give 3 + 0 + 1 = 4.
  *
- * LeetCode: https://leetcode.com/problems/max-value-of-equation
+ * Follow-ups:
+ *   1. Can this be O(n) instead of O(n log n)?
+ *      Use the monotonic deque method that keeps candidates by decreasing yi - xi.
+ *   2. What if points are not sorted by x?
+ *      Sort by x first, then apply the same sliding-window candidate structure.
+ *   3. How do you handle very large coordinate values?
+ *      Use long for equation arithmetic to avoid integer overflow.
  *
- * Follow-up questions:
- * Q: What if k is very large relative to coordinate range?
- * A: All pairs become valid, use simpler O(n²) approach or optimize differently.
- *
- * Q: How to handle negative coordinates or very large ranges?
- * A: Algorithm works the same, just be careful with integer overflow.
- *
- * Q: Can we optimize for sparse point distributions?
- * A: Use coordinate compression or spatial data structures like KD-trees.
- * LeetCode Contest Rating: 2456
+ * Related: Sliding Window Maximum (239), Constrained Subsequence Sum (1425).
  */
 public class MaxValueOfEquation {
 
+public static void main(String[] args) {
+    MaxValueOfEquation solver = new MaxValueOfEquation();
+    int[][][] points = {
+        {{1, 3}, {2, 0}, {5, 10}, {6, -10}},
+        {{0, 0}, {3, 0}, {9, 2}}
+    };
+    int[] kValues = { 1, 3 };
+    int[] expected = { 4, 3 };
+
+    for (int i = 0; i < points.length; i++) {
+        int got = solver.findMaxValueOfEquation(points[i], kValues[i]);
+        System.out.printf("points=%s k=%d -> %d  expected=%d%n",
+            Arrays.deepToString(points[i]), kValues[i], got, expected[i]);
+    }
+}
+
     /**
-     * Priority Queue (Max Heap) approach using sliding window.
-     *
-     * Algorithm: Sliding window with heap optimization
-     * - Rewrite equation as: (yi - xi) + (yj + xj) for i < j
-     * - Use max heap to track maximum (yi - xi) values
-     * - For each point j, find maximum valid (yi - xi) where xi >= xj - k
-     * - Remove invalid points from heap and calculate max value
-     *
-     * Time Complexity: O(n log n) where n is number of points
-     * Space Complexity: O(n) for the priority queue
-     */
+ * Intuition: for a current point (xj, yj), the only prior contribution that
+ * matters is the largest yi - xi among points still within distance k. A max
+ * heap keeps those candidates; before using it, remove candidates whose x is
+ * too far from xj.
+ *
+ * Algorithm:
+ *   1. Keep a max heap of prior points as [yi - xi, xi].
+ *   2. For each point, remove heap entries with x - xi > k.
+ *   3. If a valid candidate remains, combine its best yi - xi with y + x.
+ *   4. Push the current point as a candidate for future points.
+ *
+ * Time:  O(n log n) - each point is pushed and may be popped from the heap.
+ * Space: O(n) - the heap can hold many valid candidate points.
+ *
+ * @param points points sorted by increasing x-coordinate
+ * @param k maximum allowed x-distance between the chosen pair
+ * @return maximum equation value among valid point pairs
+ */
     public int findMaxValueOfEquation(int[][] points, int k) {
         // Max heap storing [yi - xi, xi] ordered by yi - xi descending
         PriorityQueue<int[]> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b[0], a[0]));

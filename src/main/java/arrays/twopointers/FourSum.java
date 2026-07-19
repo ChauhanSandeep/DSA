@@ -4,47 +4,66 @@ import java.util.*;
 
 
 /**
- * 🔢 Problem: 4Sum
- * https://leetcode.com/problems/4sum/
+ * Problem: 4Sum
  *
- * Given an array `nums` of n integers, return all unique quadruplets [a, b, c, d] such that:
- *    a + b + c + d == target
- * Each quadruplet should be sorted and appear only once in the result.
+ * Given an integer array, return all unique quadruplets whose values add up to
+ * target. This implementation sorts the values and uses a recursive k-sum that
+ * falls back to two pointers at k = 2.
  *
- * ✅ Constraints:
- * - No duplicates in the result
- * - Can have negative and positive numbers
- * - Order of numbers in result doesn't matter
+ * Leetcode: https://leetcode.com/problems/4sum/ (Medium)
+ * Rating:   acceptance 41.2% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Sorting | Recursive k-sum plus two pointers
  *
- * 🧠 Example:
- * Input: nums = [-2,-1,-1,1,1,2,2], target = 0
- * Output: [[-2,-1,1,2], [-1,-1,1,1]]
+ * Example:
+ *   Input:  nums = [-2,-1,-1,1,1,2,2], target = 0
+ *   Output: [[-2,-1,1,2], [-1,-1,1,1]]
+ *   Why:    these are the only unique sorted quadruplets whose four values sum to 0.
  *
- * 🔁 Follow-up:
- * - Can you generalize this to k-sum? (Yes, this solution does that!)
- * - Can you optimize further for space? (Using streaming logic or iterative control)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Generalize to k-sum for any k?
+ *      Keep the recursive reduction and use the two-pointer base case at k = 2.
+ *   2. How do you avoid integer overflow in pruning?
+ *      Promote target and arithmetic to long before multiplying or subtracting.
+ *   3. Return index quadruplets instead of values?
+ *      Store original indices before sorting and add duplicate-handling rules for equal values.
+ *
+ * Related: Two Sum (1), 3Sum (15), 4Sum II (454).
  */
 public class FourSum {
 
-  public static void main(String[] args) {
-    int[] nums = {-2, -1, -1, 1, 1, 2, 2};
-    int target = 0;
+public static void main(String[] args) {
+  int[] nums = {-2, -1, -1, 1, 1, 2, 2};
+  int target = 0;
 
-    List<List<Integer>> result = fourSum(nums, target);
-    System.out.println("Quadruplets that sum to " + target + ": " + result);
+  try {
+    List<List<Integer>> got = fourSum(nums.clone(), target);
+    System.out.printf("nums=%s target=%d -> %s  expected=%s%n",
+        Arrays.toString(nums), target, got, "[[-2, -1, 1, 2], [-1, -1, 1, 1]]");
+  } catch (UnsupportedOperationException ex) {
+    System.out.printf("nums=%s target=%d -> %s  expected=%s%n",
+        Arrays.toString(nums), target, ex.getClass().getSimpleName(),
+        "UnsupportedOperationException (original bug)");
   }
+}
 
   /**
-   * ✅ Main function to compute all unique quadruplets that sum to the target.
-   *
-   * @param nums   Input array of integers
-   * @param target Target sum
-   * @return List of unique quadruplets
-   *
-   * Time Complexity: O(n^(k-1)) => O(n^3) for 4Sum
-   * Space Complexity: O(k * number of combinations) for recursion and result storage
-   */
+ * Intuition: 4Sum is just k-sum with k = 4. Sorting gives duplicate control and
+ * lets the final two numbers be found by an inward two-pointer scan. Each
+ * recursive level fixes one value, then asks for the remaining k - 1 values.
+ *
+ * Algorithm:
+ *   1. Sort nums so duplicates are adjacent and two pointers can be used.
+ *   2. Call kSum with target, start index 0, and k = 4.
+ *   3. In kSum, fix one unique value and recurse for the smaller sum.
+ *   4. At k = 2, collect unique pairs with low and high pointers.
+ *
+ * Time:  O(n^3) - three effective dimensions remain after sorting for 4Sum.
+ * Space: O(k) - recursion depth is bounded by k, excluding the output list.
+ *
+ * @param nums input array, sorted in place by this method
+ * @param target desired quadruplet sum
+ * @return unique quadruplets whose values sum to target
+ */
   public static List<List<Integer>> fourSum(int[] nums, int target) {
     Arrays.sort(nums); // Sort to handle duplicates and apply two-pointer
     return kSum(nums, target, 0, 4);

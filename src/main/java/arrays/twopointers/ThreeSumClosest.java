@@ -5,51 +5,61 @@ import java.util.Arrays;
 /**
  * Problem: 3Sum Closest
  *
- * Given an integer array nums of length n and an integer target,
- * find three integers in nums such that the sum is closest to target.
- * Return the sum of the three integers. You may assume that each input would have exactly one solution.
+ * Given an integer array and a target, return the sum of three values whose sum
+ * is closest to the target. The input is guaranteed to have exactly one answer.
  *
- * Leetcode link: https://leetcode.com/problems/3sum-closest/
+ * Leetcode: https://leetcode.com/problems/3sum-closest/ (Medium)
+ * Rating:   acceptance 49.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Sorting | Fixed value plus two pointers
  *
  * Example:
- * Input: nums = [-1, 2, 1, -4], target = 1
- * Output: 2
- * Explanation: The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+ *   Input:  nums = [-1,2,1,-4], target = 1
+ *   Output: 2
+ *   Why:    -1 + 2 + 1 = 2, which is closer to 1 than any other triplet sum.
  *
- * Follow-up:
- * - What if you need to find the closest sum of 4 integers (4Sum Closest)?
- *   - Approach: Similar two-pointer technique, with an extra outer loop for the fourth number.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the triplet values too?
+ *      Store the three values whenever closestSum improves.
+ *   2. Find the closest 4Sum?
+ *      Add another fixed loop before the two-pointer scan.
+ *   3. Return all triplets tied for closest?
+ *      Track the best difference and collect triplets whose difference equals it.
+ *
+ * Related: 3Sum (15), 4Sum (18), Two Sum Less Than K (1099).
  */
 public class ThreeSumClosest {
 
-    /**
-     * Main driver for testing.
-     */
     public static void main(String[] args) {
-        int[] nums = {-1, 2, 1, -4};
-        int target = 1;
-        System.out.println("Three sum closest to target is " + threeSumClosest(nums, target));
+    int[][] inputs = { {-1, 2, 1, -4}, {0, 0, 0} };
+    int[] targets = { 1, 1 };
+    int[] expected = { 2, 0 };
+
+    for (int i = 0; i < inputs.length; i++) {
+        int got = threeSumClosest(inputs[i].clone(), targets[i]);
+        System.out.printf("nums=%s target=%d -> %d  expected=%d%n",
+            Arrays.toString(inputs[i]), targets[i], got, expected[i]);
     }
+}
 
     /**
-     * Finds the sum of three integers in the array closest to the target.
-     *
-     * Steps:
-     * 1. Sort the array to use two pointers efficiently.
-     * 2. Iterate through each element (i) as the first number.
-     * 3. Use two pointers (left, right) to find the closest pair for the fixed number.
-     * 4. Track the minimum difference and update result if closer to target.
-     *
-     * Algorithm:
-     * - Sort + Two-pointer technique.
-     * - Time Complexity: O(n^2), due to outer loop and inner two-pointer traversal.
-     * - Space Complexity: O(1), since no extra data structures are used.
-     *
-     * @param nums   The input array.
-     * @param target The target sum to approach.
-     * @return The closest sum of three integers to the target.
-     */
+ * Intuition: sorting makes each fixed first value pair with a controllable
+ * two-pointer search. If currentSum is too small, moving left right is the
+ * only way to increase it; if too large, moving right left is the only way to
+ * decrease it. Track the smallest absolute difference seen.
+ *
+ * Algorithm:
+ *   1. Sort nums.
+ *   2. Fix each fixedIndex as the first triplet value.
+ *   3. Scan the suffix with left and right pointers.
+ *   4. Return on exact target, otherwise update closestSum and move the pointer that improves direction.
+ *
+ * Time:  O(n^2) - each fixed value runs a linear two-pointer scan.
+ * Space: O(1) - excluding sorting implementation storage.
+ *
+ * @param nums input values
+ * @param target sum to approach
+ * @return triplet sum closest to target
+ */
     public static int threeSumClosest(int[] nums, int target) {
         // Sort the array to use the two-pointer approach.
         Arrays.sort(nums);

@@ -1,34 +1,46 @@
 package arrays.twopointers;
 
+import java.util.Arrays;
+
 /**
  * Problem: Median of Two Sorted Arrays
  *
- * You are given two sorted arrays `nums1` and `nums2` of sizes m and n.
- * Find the median of the combined sorted array in O(log(min(m, n))) time.
+ * Given two sorted arrays, return the median of their combined sorted order.
+ * The optimal method finds a valid left/right partition without fully merging
+ * the arrays.
  *
- * Leetcode Link:
- * https://leetcode.com/problems/median-of-two-sorted-arrays/
+ * Leetcode: https://leetcode.com/problems/median-of-two-sorted-arrays/ (Hard)
+ * Rating:   acceptance 47.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | Partition | Two sorted arrays
  *
  * Example:
- * Input: nums1 = [1, 2], nums2 = [3, 4]
- * Output: 2.5
- * Explanation: Combined array = [1, 2, 3, 4], median = (2 + 3) / 2
+ *   Input:  nums1 = [1,2], nums2 = [3,4]
+ *   Output: 2.5
+ *   Why:    combined order is [1,2,3,4], so the median is (2 + 3) / 2.
  *
- * Follow-up Questions:
- * - What if the arrays are unsorted? (Sort before applying logic)
- * - Can this be done without merging? (Yes, use binary search on partition)
- * - Can you extend this to k sorted arrays? (Use min-heap)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Find the kth element instead of the median?
+ *      Use the same partition idea or recursively discard k / 2 elements.
+ *   2. Extend to many sorted arrays?
+ *      Use a min heap for merging or binary search on value counts.
+ *   3. What if one array is streamed?
+ *      Maintain two heaps, or buffer enough data to support partitioning.
+ *
+ * Related: Kth Smallest Element in a Sorted Matrix (378), Merge k Sorted Lists (23).
  */
 public class MedianArrays {
 
-  public static void main(String[] args) {
-    int[] nums1 = {1, 2};
-    int[] nums2 = {3, 4};
+public static void main(String[] args) {
+  int[][] nums1Cases = { {1, 2}, {1, 3} };
+  int[][] nums2Cases = { {3, 4}, {2} };
+  double[] expected = { 2.5, 2.0 };
 
-    System.out.println("Two-Pointer Median: " + findMedianByMerging(nums1, nums2));
-    System.out.println("Binary Search Median: " + findMedianBinarySearch(nums1, nums2));
+  for (int i = 0; i < nums1Cases.length; i++) {
+    double got = findMedianBinarySearch(nums1Cases[i], nums2Cases[i]);
+    System.out.printf("nums1=%s nums2=%s -> %.1f  expected=%.1f%n",
+        Arrays.toString(nums1Cases[i]), Arrays.toString(nums2Cases[i]), got, expected[i]);
   }
+}
 
   /**
    * Approach 1: Two-pointer Merge Technique
@@ -76,24 +88,24 @@ public class MedianArrays {
   }
 
   /**
-   * Approach 2: Binary Search Partitioning
-   * Perform binary search on the smaller array to find a partition where:
-   *   maxLeft1 <= minRight2 && maxLeft2 <= minRight1
-   *   This ensures the left partition contains all elements less than or equal to the right partition.
-   *   Once the correct partition is found, compute the median based on the total length (even/odd).
-   *
-   * Steps:
-   * 1. Perform binary search on nums1 to find the correct split.
-   * 2. Use INT_MIN/INT_MAX for out-of-bound values.
-   * 3. Check partition condition; compute median accordingly.
-   *
-   * Time Complexity: O(log(min(m, n)))
-   * Space Complexity: O(1)
-   *
-   * @param nums1 First sorted array
-   * @param nums2 Second sorted array
-   * @return Median of the merged array
-   */
+ * Intuition: a median partition puts half the combined elements on the left and
+ * half on the right. Binary search the cut in the smaller array; the other cut
+ * is forced. When both left maxima are <= both right minima, the median is at
+ * the boundary of those partitions.
+ *
+ * Algorithm:
+ *   1. Ensure nums1 is the shorter array.
+ *   2. Binary search cut1, deriving cut2 from the combined midpoint.
+ *   3. Use sentinel min/max values when a cut is at an array boundary.
+ *   4. Move the search toward a valid partition, then compute odd/even median.
+ *
+ * Time:  O(log(min(m, n))) - binary search runs on the smaller array.
+ * Space: O(1) - only partition indices and boundary values are stored.
+ *
+ * @param nums1 first sorted array
+ * @param nums2 second sorted array
+ * @return median of the combined sorted values
+ */
   public static double findMedianBinarySearch(int[] nums1, int[] nums2) {
     // Always binary search on the smaller array
       if (nums1.length > nums2.length) {
