@@ -125,12 +125,12 @@ We deliberately split documentation between the **class** and the **method**:
 
 | Section       | Required | Purpose                                                        |
 | ------------- | -------- | ------------------------------------------------------------- |
-| `Problem`     | yes      | One-line title + 2-4 line plain-English summary.              |
-| `Leetcode`    | if any   | Full URL.                                                     |
+| `Problem`     | yes      | One-line title + 2-8 line plain-English summary.              |
+| `Link`    | if any       | Full Leetcode/GeeksForGeeks/InterviewBit URL.                  |
 | `Rating`      | if any   | Granular difficulty — see rating convention below.           |
 | `Pattern`     | yes      | Topic tags + the algorithmic pattern, `A \| B \| C`.          |
 | `Example`     | yes      | **One** small, tricky input/output, PLUS a one-line reason why that output is correct (a `Why:` line). Edge cases live in `main`, not here. |
-| `Follow-ups`  | yes      | 2-4 genuinely hard interview variations, each with a one-line answer. |
+| `Follow-ups`  | yes      | 2-4 genuinely hard interview followups that can be asked in FAANG interviews, each with a one-line answer. |
 | `Related`     | optional | Sibling problems by number/name.                             |
 | approach table| optional | Only when there are 2 solutions; compare Method/Time/Space.   |
 
@@ -158,22 +158,22 @@ Every non-trivial method (anything beyond a 3-line helper):
 1. **Intuition** — build the mental model from scratch for a reader who has
    forgotten this problem (or is seeing it for the first time). Explain WHY this
    approach is chosen, the key insight / "aha" that makes it work, and briefly
-   why it is correct — in plain, concrete language. Aim for roughly 4-8 lines:
-   rich enough to actually re-teach the idea, but tight, no rambling. If two
+   why it is correct — in plain, concrete language with first principles thinkging.
+   Aim for roughly 4-12 lines: rich enough to actually re-teach the idea, but tight, no rambling. If two
    solutions coexist, name which is the interview default here.
-2. **Algorithm** — numbered steps that match the `// --- Step N` banners in code.
+3. **Algorithm** — numbered steps that match the `// --- Step N` banners in code.
    Each step is a full, readable sentence a rusty reader can follow without
-   re-deriving it — not a cryptic fragment. When a step is non-obvious, fold in
+   re-deriving it from first principles — not a cryptic fragment. When a step is non-obvious, fold in
    the small "why" for that step. Do NOT write a step as an arrow template like
    `Select -> recurse -> un-select`; describe it in plain words ("add the
    candidate, recurse on the rest, then remove it before trying the next"). The
    arrow label belongs on the code line as an inline anchor, not in prose steps.
-3. **Time** / **Space** — one line each. The **Time** line MUST include a short,
+4. **Time** / **Space** — one line each. The **Time** line MUST include a short,
    plain-English reason for *why* it is that complexity, written for someone who
    finds Big-O hard. Not a proof — one clause. E.g.
    `Time: O(n log n) - we sort once (n log n), then a single linear scan.`
    or `Time: O(2^n * n) - there are 2^n subsets and copying each costs up to O(n).`
-4. `@param` / `@return`.
+5. `@param` / `@return`.
 
 **Private / helper methods** get a **concise one-line Javadoc stating only their
 purpose** — what the method is for, in a single sentence. No `@param`, no
@@ -186,7 +186,7 @@ purpose** — what the method is for, in a single sentence. No `@param`, no
   obvious lines. The code already says *what*; comments say *why*.
 - Use a well-known template label ONLY when the algorithm genuinely follows that
   pattern — e.g. the backtracking `select -> work -> un-select`, or
-  `select -> mark(*) -> work -> unmark(*)` for graph traversals. These are recall
+  `select -> mark(*) -> work -> add(*)` for graph traversals. These are recall
   anchors, not required decoration: if the code is a plain loop, a direct formula,
   or does not truly choose-then-undo, do NOT force a template label onto it. When
   in doubt, leave it out.
@@ -194,8 +194,9 @@ purpose** — what the method is for, in a single sentence. No `@param`, no
 ### Multiple solutions
 
 - Default to **one** solution — the one you would write in an interview.
+- This default should be on the basis of what interviewer expects, time allowed in interview, length and complexity of the solution.
 - Add a **second** only for a genuinely different idiomatic approach worth
-  comparing, or a brute force worth keeping as a stepping stone. **Hard cap: 2.**
+  comparing, or a brute force worth keeping as a stepping stone. **Hard cap: 3.**
 - The recommended/optimal method keeps the canonical name and appears **last**
   (most memorable); the alternative takes a suffix (`...Iterative`, `...Brute`,
   `...DP`). Each method carries its own full Javadoc.
