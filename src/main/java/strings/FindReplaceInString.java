@@ -3,59 +3,64 @@ package strings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/find-and-replace-in-string/
+ * Problem: Find And Replace in String
  *
- * Problem Statement:
- * Given a string `s`, an array of indices, and corresponding arrays of source and target strings,
- * perform multiple find-and-replace operations on the string.
+ * Apply multiple replacements to the original string. A replacement applies only
+ * when its source matches at its index, and all replacements are simultaneous.
  *
- * Each operation replaces `source[i]` with `target[i]` at position `indices[i]` *only if*
- * the substring of `s` starting at `indices[i]` matches `source[i]` exactly.
- *
- * The replacements must be done **simultaneously**, meaning no index shifting from earlier replacements
- * should affect later ones. Therefore, the operations should be sorted in descending order of indices.
+ * Leetcode: https://leetcode.com/problems/find-and-replace-in-string/ (Medium)
+ * Rating:   zerotrac 1461 (Q2, weekly-84)
+ * Pattern:  String | Sort operations | Simultaneous replacement
  *
  * Example:
- * Input: s = "abcd", indices = [0,2], sources = ["a","cd"], targets = ["eee","fff"]
- * Output: "eeebfff"
- * Explanation:
- * - Replace "a" at index 0 with "eee" → "eeebcd"
- * - Replace "cd" at index 2 with "fff" → "eeebfff"
+ *   Input:  s = "abcd", indices = [0,2], sources = ["a","cd"], targets = ["eee","fff"]
+ *   Output: "eeebfff"
+ *   Why:    both sources match the original string at their requested indices.
  *
- * LeetCode: https://leetcode.com/problems/find-and-replace-in-string/
- *
- * Follow-up questions:
- * 2. How would you optimize for very large strings?
- * — Consider using a character array or buffer pool.
- * 3. Can this be solved in linear time?
- * — Yes, with a mark-and-swap approach using a mapping array.
- *    Follow-up: https://leetcode.com/problems/find-and-replace-in-string/solutions/205982/java-c-python-o-n/
- * LeetCode Contest Rating: 1461
+ * Follow-ups:
+ *   1. Linear time? Mark valid operations by start index and build once left to right.
+ *   2. Overlaps? Define priority or reject overlapping operations.
+ *   3. Huge strings? Append unchanged ranges and replacements into one builder.
  */
 public class FindReplaceInString {
 
   public static void main(String[] args) {
     FindReplaceInString solver = new FindReplaceInString();
-    System.out.println(solver.findReplaceString("abcd", new int[]{0, 2}, new String[]{"a", "cd"},
-        new String[]{"eee", "fff"})); // "eeebfff"
-    System.out.println(solver.findReplaceString("abcd", new int[]{0, 2}, new String[]{"ab", "ec"},
-        new String[]{"eee", "fff"})); // "abcd"
+    String[] inputs = {"abcd", "abcd"};
+    int[][] indices = {{0, 2}, {0, 2}};
+    String[][] sources = {{"a", "cd"}, {"ab", "ec"}};
+    String[][] targets = {{"eee", "fff"}, {"eee", "fff"}};
+    String[] expected = {"eeebfff", "eeecd"};
+    for (int i = 0; i < inputs.length; i++) {
+      String got = solver.findReplaceString(inputs[i], indices[i], sources[i], targets[i]);
+      System.out.printf("s=%s indices=%s -> %s  expected=%s%n", inputs[i], Arrays.toString(indices[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Performs simultaneous find-and-replace operations on the string.
+
+    /**
+   * Intuition: applying replacements from left to right shifts later indices.
+   * Sorting by descending index makes every edit occur to the right of all edits
+   * still waiting, so original indices remain usable.
    *
-   * Steps:
-   * - Pair each index with its original position to track corresponding source and target.
-   * - Sort these pairs in descending order to avoid index shift issues while replacing.
-   * - For each valid match, replace the substring using StringBuilder.
+   * Algorithm:
+   *   1. Package each index, source, and target into an operation.
+   *   2. Sort operations by descending index.
+   *   3. Validate each source against the original string.
+   *   4. Replace matching ranges in the builder.
    *
-   * Algorithm: Greedy Replacement in Descending Index Order
-   * Time Complexity: O(N log N + M) where N = length of indices, M = length of input string `str`
-   * Space Complexity: O(M) due to use of StringBuilder
+   * Time:  O(k log k + n) - operations are sorted and applied to the builder.
+   * Space: O(k + n) - stores operations and the mutable result.
+   *
+   * @param str original string
+   * @param indices replacement start indices
+   * @param sources source strings to match
+   * @param targets replacement strings
+   * @return string after all valid simultaneous replacements
    */
   public String findReplaceString(String str, int[] indices, String[] sources, String[] targets) {
     List<ReplacementOp> operations = new ArrayList<>();

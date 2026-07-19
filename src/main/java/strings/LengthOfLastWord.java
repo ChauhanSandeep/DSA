@@ -1,31 +1,50 @@
 package strings;
 
 /**
- * LeetCode 58. Length of Last Word
+ * Problem: Length of Last Word
  *
- * Given a string s consisting of words and spaces, return the length of the last word in the string.
- * A word is a maximal substring consisting of non-space characters only.
+ * Given a string of words and spaces, return the length of the last word. A word
+ * is a maximal run of non-space characters.
  *
- * Example 1:
- * Input: s = "Hello World"
- * Output: 5
- * Explanation: The last word is "World" with length 5.
+ * Leetcode: https://leetcode.com/problems/length-of-last-word/ (Easy)
+ * Rating:   acceptance 59.3% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Reverse scan | Ignore trailing spaces
  *
- * LeetCode Link: https://leetcode.com/problems/length-of-last-word/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  s = " fly me to the moon "
+ *   Output: 4
+ *   Why:    trailing spaces are skipped and the last word is "moon".
+ *
+ * Follow-ups:
+ *   1. Unicode whitespace? Use Character.isWhitespace.
+ *   2. Return the word? Save the end index and return the substring.
+ *   3. Stream input? Track current word length and last completed word length.
  */
 public class LengthOfLastWord {
 
-    /**
-     * Finds length of last word by iterating from end of string.
+    public static void main(String[] args) {
+        LengthOfLastWord solver = new LengthOfLastWord();
+        String[] inputs = {"Hello World", " fly me to the moon ", "a"};
+        int[] expected = {5, 4, 1};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.lengthOfLastWord(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: only the suffix matters. Walk backward over trailing spaces,
+     * then count the final run of non-space characters.
      *
      * Algorithm:
-     * 1. Start from end of string and skip trailing spaces
-     * 2. Count characters until we hit a space or reach beginning
-     * 3. Return the count of non-space characters found
+     *   1. Start at the last index.
+     *   2. Skip trailing spaces.
+     *   3. Count characters until a space or the beginning is reached.
+     *   4. Return the count.
      *
-     * Time Complexity: O(n) in worst case, O(k) average where k is last word length
-     * Space Complexity: O(1) - only uses constant extra space
+     * Time:  O(n) - the scan may cross the string once.
+     * Space: O(1) - only counters are used.
      */
     public int lengthOfLastWord(String s) {
         int end = s.length() - 1;

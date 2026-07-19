@@ -1,54 +1,56 @@
 package strings;
 
 /**
- * LeetCode Problem: Count and Say
- * https://leetcode.com/problems/count-and-say/
+ * Problem: Count and Say
  *
- * 🔹 Problem Statement:
- * Given an integer `n`, generate the nth term of the "Count and Say" sequence.
+ * Generate the nth count-and-say term. Each term describes the previous term by
+ * writing the count and digit for every run of equal adjacent digits.
  *
- * The "Count and Say" sequence is a series of strings where each term is generated
- * by reading aloud the digits of the previous term and counting the number of digits in groups of the same digit.
+ * Leetcode: https://leetcode.com/problems/count-and-say/ (Medium)
+ * Rating:   acceptance 63.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Run-length encoding | Iterative generation
  *
- * 🔸 Example:
- * Input: n = 4
- * Output: "1211"
- * Explanation:
- * - Term 1: "1"
- * - Term 2: "11"        (one 1)
- * - Term 3: "21"        (two 1s)
- * - Term 4: "1211"      (one 2, one 1)
+ * Example:
+ *   Input:  n = 4
+ *   Output: "1211"
+ *   Why:    term 3 is "21", read as one 2 and one 1.
  *
- * Follow-up Questions:
- * - How would you optimize memory if you don't need to store full intermediate sequences?
- * Answer: You can use a single StringBuilder to build the next sequence without storing all previous terms.
- * - Can this be generated without string builders using character arrays?
- * Answer: Yes, by using a character array and managing indices.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Reduce memory? Keep only the current and next term.
+ *   2. Reduce allocations? Reuse StringBuilder capacity between rounds.
+ *   3. Arbitrary seed? Start from the seed and apply the same encoding step.
+ *
+ * Related: String Compression (443).
  */
 public class CountAndSay {
 
   public static void main(String[] args) {
     CountAndSay solver = new CountAndSay();
-    System.out.println(solver.countAndSay(4));  // Output: "1211"
+    int[] inputs = {1, 4, 5};
+    String[] expected = {"1", "1211", "111221"};
+    for (int i = 0; i < inputs.length; i++) {
+      String got = solver.countAndSay(inputs[i]);
+      System.out.printf("n=%d -> %s  expected=%s%n", inputs[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Generates the nth term in the "Count and Say" sequence.
+
+    /**
+   * Intuition: each term is the run-length encoding of the previous term. Keep
+   * only the current term, generate the next encoded term, and repeat until the
+   * requested position is reached.
    *
-   * @param n The sequence term to generate.
-   * @return The nth term as a string.
+   * Algorithm:
+   *   1. Return an empty string for non-positive n.
+   *   2. Start from the base term "1".
+   *   3. Generate the next term n - 1 times.
+   *   4. Return the final term.
    *
-   * Steps:
-   * - Start with base string "1".
-   * - Traverse the string and count consecutive characters.
-   * - Append count followed by the digit.
-   * - Repeat until reaching the nth term.
+   * Time:  O(n*m) - n rounds scan the current term of length m.
+   * Space: O(m) - builders hold the current and next term.
    *
-   * ⏱ Time Complexity: O(N * M), where:
-   *     - N = input `n`
-   *     - M = average length of each generated term (which grows approximately ~2x each time)
-   * 🧠 Space Complexity: O(M), space used to build each term.
+   * @param n one-based term index
+   * @return nth count-and-say term
    */
   public String countAndSay(int n) {
       if (n <= 0) {
@@ -65,6 +67,7 @@ public class CountAndSay {
   }
 
   // Generates the next sequence based on the previous sequence.
+  /** Builds the next count-and-say term from the current term. */
   private StringBuilder generateNextSequence(StringBuilder sequence) {
     StringBuilder nextSequence = new StringBuilder();
 

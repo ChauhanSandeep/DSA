@@ -4,85 +4,52 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Longest Substring Without Repeating Characters
+ * Problem: Longest Substring Without Repeating Characters
  *
- * Given a string s, find the length of the longest substring without repeating
- * characters.
- * A substring is a contiguous sequence of characters within a string.
+ * Return the length of the longest contiguous substring whose characters are all
+ * distinct. Substrings are contiguous; subsequences do not count.
  *
- * The solution must find the maximum length of any contiguous subsequence where
- * each
- * character appears at most once. This is different from subsequences which
- * don't need
- * to be contiguous.
+ * Leetcode: https://leetcode.com/problems/longest-substring-without-repeating-characters/ (Medium)
+ * Rating:   acceptance 39.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Sliding window | Last-seen map
  *
  * Example:
- * Input: s = "abcabcbb"
- * Output: 3
- * Explanation: The longest substring without repeating characters is "abc",
- * with length 3.
+ *   Input:  input = "pwwkew"
+ *   Output: 3
+ *   Why:    "wke" is the longest valid substring; "pwke" is not contiguous.
  *
- * Example:
- * Input: s = "pwwkew"
- * Output: 3
- * Explanation: The longest substring is "wke" with length 3. Note that "pwke"
- * is a
- * subsequence (not substring) and therefore doesn't count.
+ * Follow-ups:
+ *   1. Return the substring? Track best start and best length.
+ *   2. Fixed alphabet? Replace the map with an int array of last indices.
+ *   3. At most k distinct? Track frequencies and shrink while distinct count exceeds k.
  *
- * LeetCode:
- * https://leetcode.com/problems/longest-substring-without-repeating-characters/
- *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we need to return the actual substring instead of just the length?
- * Answer: Track starting index and length of best window, then return
- * s.substring(start, start + length).
- * 2. How would you handle Unicode characters or very large character sets?
- * Answer: Use HashMap instead of fixed array, or implement with character
- * encoding considerations.
- * 3. What if the string is extremely long (billions of characters) and doesn't
- * fit in memory?
- * Answer: Use streaming approach with buffered reading and sliding window over
- * chunks.
- * 4. How to modify this for "at most k distinct characters" or "exactly k
- * distinct characters"?
- * Answer: Modify condition to check distinct character count instead of
- * duplicates.
- *
- * Related Problems:
- * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
- * - LeetCode 340: Longest Substring with At Most K Distinct Characters
- * - LeetCode 424: Longest Repeating Character Replacement
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Longest Repeating Character Replacement (424).
  */
 public class LongestSubstringWithoutRepeatingCharacters {
 
   public static void main(String[] args) {
-    String input = "abababcdefababcdab";
-    int length = lengthOfLongestUniqueSubstring(input);
-    System.out.println("Length of longest substring with unique characters: " + length);
+    String[] inputs = {"abcabcbb", "bbbbb", "pwwkew", ""};
+    int[] expected = {3, 1, 3, 0};
+    for (int i = 0; i < inputs.length; i++) {
+      int got = lengthOfLongestUniqueSubstring(inputs[i]);
+      System.out.printf("input=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Finds the length of the longest substring with all unique characters.
-   * Steps:
-   * 1. Use a sliding window defined by two pointers (start, end).
-   * 2. Expand the end pointer to include new characters.
-   * 3. If a duplicate character is found, move the start pointer to one position
-   * after the last occurrence of that character to maintain uniqueness.
-   * 4. Track the maximum length of the window during the process.
-   * Key insights:
-   * - Sliding window efficiently finds longest unique substring in O(n) time.
-   * - HashMap tracks last seen indices of characters for quick duplicate checks.
-   * - Each character is processed at most twice (once by end, once by start),
-   * ensuring linear complexity.
+
+    /**
+   * Intuition: keep a window with no duplicate characters. When the current
+   * character was already seen inside the window, jump the start just past that
+   * previous position and continue expanding.
    *
-   * Time Complexity: O(n) — Each character is processed at most twice.
-   * Space Complexity: O(min(m, n)) — HashMap stores characters in the current
-   * window,
-   * where m is the character set size and n is the string length.
+   * Algorithm:
+   *   1. Return 0 for null or empty input.
+   *   2. Expand the end pointer one character at a time.
+   *   3. Move start after a repeated character's last index when needed.
+   *   4. Update last-seen index and maximum window length.
    *
-   * @param input Input string
-   * @return Length of longest substring with all distinct characters
+   * Time:  O(n) - every character is processed once by the end pointer.
+   * Space: O(min(n, m)) - the map stores seen characters.
    */
   public static int lengthOfLongestUniqueSubstring(String input) {
     if (input == null || input.isEmpty())

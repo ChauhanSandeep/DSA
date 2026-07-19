@@ -5,55 +5,51 @@ import java.util.Set;
 
 
 /**
- * Problem: Generate all unique permutations of a given string.
+ * Problem: Permutations II
  *
- * Leetcode: https://leetcode.com/problems/permutations-ii/
+ * Generate every unique permutation of a string that may contain duplicate
+ * characters. This file keeps both swap-based and prefix-based backtracking.
+ *
+ * Leetcode: https://leetcode.com/problems/permutations-ii/ (Medium)
+ * Pattern:  Backtracking | Deduplication | Set of permutations
  *
  * Example:
- * Input: "ABC"
- * Output: ["ABC", "ACB", "BAC", "BCA", "CAB", "CBA"]
+ *   Input:  input = "AAB"
+ *   Output: ["AAB", "ABA", "BAA"]
+ *   Why:    duplicate A characters make several swap paths produce the same strings.
  *
- * Intuition:
- * - We can fix each character at one position and recursively permute the rest.
- * - For uniqueness, we use a Set to avoid duplicates.
+ * Follow-ups:
+ *   1. Avoid a result set for dedupe? Sort and skip equal choices at each depth.
+ *   2. Stream results? Use a callback or iterator instead of storing all permutations.
+ *   3. Lexicographic order? Sort input and choose candidates in order.
  *
- * ✅ Constraints:
- * - The string may contain duplicate characters.
- * - The output must contain unique permutations only.
- *
- * 📌 Follow-up Questions (FAANG-style):
- * 1. How would you solve this for a list of characters instead of a string?
- *    - Use a character array, backtracking with a visited boolean[].
- *    - Related: https://leetcode.com/problems/permutations/
- *
- * 2. What if the input string is very large?
- *    - Avoid storing all permutations; yield one at a time using a generator or iterator pattern.
- *
- * 3. Can you sort permutations lexicographically without using a Set?
- *    - Yes. Sort the string initially and skip duplicates during backtracking.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Permutations (46), Next Permutation (31).
  */
 public class PermutationII {
 
   public static void main(String[] args) {
-    String input = "ABC";
-    System.out.println("Using swap-based method: " + generateAllUniquePermutations(input));
-    System.out.println("Using prefix-based method: " + generateAllUniquePermutationsWithPrefix(input));
+    String[] inputs = {"ABC", "AAB"};
+    int[] expected = {6, 3};
+    for (int i = 0; i < inputs.length; i++) {
+      Set<String> got = generateAllUniquePermutations(inputs[i]);
+      System.out.printf("input=%s -> count=%d values=%s  expected=%d%n", inputs[i], got.size(), got, expected[i]);
+    }
   }
 
-  /**
-   * Generates all unique permutations of a given string using backtracking and character swapping.
+
+    /**
+   * Intuition: fix one position at a time by swapping each suffix character into
+   * it, then recurse on the next position. A set removes duplicate permutations
+   * created by equal input characters.
    *
-   * Steps:
-   * - Fix one character at a time by swapping.
-   * - Recur to permute the rest of the string.
-   * - Use a Set to ensure uniqueness.
+   * Algorithm:
+   *   1. Create a set for completed permutations.
+   *   2. Start swap-based backtracking at index 0.
+   *   3. Swap each suffix candidate into the fixed position and recurse.
+   *   4. Add every completed string to the set.
    *
-   * Time Complexity: O(N * N!) → N! permutations, each takes O(N) to construct.
-   * Space Complexity: O(N!) → for storing all permutations.
-   *
-   * @param input input string
-   * @return set of unique permutations
+   * Time:  O(n*n!) - each completed permutation costs O(n) to store.
+   * Space: O(n*n!) - all unique permutations are returned.
    */
   public static Set<String> generateAllUniquePermutations(String input) {
     Set<String> uniquePermutations = new HashSet<>();

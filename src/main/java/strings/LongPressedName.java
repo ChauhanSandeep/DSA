@@ -1,35 +1,52 @@
 package strings;
 
 /**
- * LeetCode 925. Long Pressed Name
+ * Problem: Long Pressed Name
  *
- * Your friend is typing his name into a keyboard. Sometimes, when typing a character c,
- * the key might get long pressed, and the character will be typed 1 or more times.
- * Find out if the typed string could be a result of the name being typed with some
+ * Decide whether typed could be produced from name when any key may be long
+ * pressed, causing extra copies of the same character.
+ *
+ * Leetcode: https://leetcode.com/problems/long-pressed-name/ (Easy)
+ * Rating:   zerotrac 1271 (Q1, weekly-107)
+ * Pattern:  String | Two pointers | Run validation
  *
  * Example:
- * Input: name = "alex", typed = "aaleex"
- * Output: true
- * Explanation: 'a' and 'e' in 'alex' were long pressed.
+ *   Input:  name = "alex", typed = "aaleex"
+ *   Output: true
+ *   Why:    the extra 'a' and 'e' can be explained as long presses.
  *
- * LeetCode Link: https://leetcode.com/problems/long-pressed-name/
- * LeetCode Contest Rating: 1271
+ * Follow-ups:
+ *   1. Run-length approach? Compare character runs and require typed counts >= name counts.
+ *   2. Unicode support? Iterate over code points and compare runs.
+ *   3. Failure location? Return the first typed index that cannot be matched.
  */
 public class LongPressedName {
 
-    /**
-     * Checks if typed string could be result of long pressing name.
+    public static void main(String[] args) {
+        LongPressedName solver = new LongPressedName();
+        String[] names = {"alex", "saeed", "leelee"};
+        String[] typed = {"aaleex", "ssaaedd", "lleeelee"};
+        boolean[] expected = {true, false, true};
+        for (int i = 0; i < names.length; i++) {
+            boolean got = solver.isLongPressedName(names[i], typed[i]);
+            System.out.printf("name=%s typed=%s -> %s  expected=%s%n", names[i], typed[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: typed can either match the next needed character in name or be
+     * an extra copy of the previously matched name character. Two pointers track
+     * those two possibilities directly.
      *
      * Algorithm:
-     * 1. Use two pointers to traverse name and typed.
-     * 2. If characters match, move both pointers.
-     * 3. If they don't match, check if typed char matches previous name char (
-     * long press). If not, return false.
-     * 4. After traversing name, ensure any remaining typed chars match last name char
-     * (long press).
+     *   1. Walk name and typed with separate indices.
+     *   2. Advance both indices on an exact match.
+     *   3. Otherwise require typed to repeat the previous name character.
+     *   4. Verify any leftover typed characters repeat the final name character.
      *
-     * Time Complexity: O(n + m) where n, m are lengths of name, typed
-     * Space Complexity: O(1) - only uses constant extra space
+     * Time:  O(n + m) - both strings are scanned once.
+     * Space: O(1) - only indices and characters are stored.
      */
     public boolean isLongPressedName(String name, String typed) {
         int nameIndex = 0;

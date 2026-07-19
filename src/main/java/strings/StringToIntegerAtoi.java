@@ -3,50 +3,53 @@ package strings;
 import java.util.*;
 
 /**
- * Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer.
+ * Problem: String to Integer (atoi)
  *
- * The algorithm for myAtoi(string s) is as follows:
- * 1. Read in and ignore any leading whitespace.
- * 2. Check if the next character (if not already at the end of the string) is '-' or '+'.
- * 3. Read in next the characters until the next non-digit character or the end of the input is reached.
- * 4. Convert these digits into an integer (i.e., "123" -> 123, "0032" -> 32).
- * 5. If the integer is out of the 32-bit signed integer range [-2^31, 2^31 - 1],
- *    clamp the integer so that it remains in the range.
+ * Convert a string to a 32-bit signed integer by parsing the numeric prefix and
+ * clamping overflow. This class also contains related number parsing helpers.
  *
- * Example 1:
- * Input: s = "42"
- * Output: 42
+ * Leetcode: https://leetcode.com/problems/string-to-integer-atoi/ (Medium)
+ * Rating:   acceptance 21.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Parser state | Overflow-safe accumulation
  *
- * Example 2:
- * Input: s = "   -42"
- * Output: -42
+ * Example:
+ *   Input:  s = "4193 with words"
+ *   Output: 4193
+ *   Why:    parsing stops at the first space after the digits.
  *
- * Example 3:
- * Input: s = "4193 with words"
- * Output: 4193
+ * Follow-ups:
+ *   1. Arbitrary radix? Use Character.digit and radix-specific overflow checks.
+ *   2. Full numeric validation? Track sign, dot, exponent, and digit states.
+ *   3. Localized formats? Normalize locale-specific separators before parsing.
  *
- * LeetCode: https://leetcode.com/problems/string-to-integer-atoi/
- *
- * Follow-up Questions:
- * 1. How would you handle non-ASCII whitespace characters?
- *    - We can use Character.isWhitespace() to handle all Unicode whitespace.
- * 2. What if we need to parse numbers in different bases (e.g., hexadecimal)?
- *    - We can extend the solution to handle different number bases.
- * 3. How would you handle localized number formats (e.g., commas as thousand separators)?
- *    - We would need to preprocess the string to handle locale-specific formats.
- *
- * Related Problems:
- * - Integer to Roman (https://leetcode.com/problems/integer-to-roman/)
- * - Valid Number (https://leetcode.com/problems/valid-number/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Number (65), Integer to Roman (12), Roman to Integer (13).
  */
 public class StringToIntegerAtoi {
 
-    /**
-     * Converts a string to a 32-bit signed integer.
+    public static void main(String[] args) {
+        StringToIntegerAtoi solver = new StringToIntegerAtoi();
+        String[] inputs = {"42", "   -42", "4193 with words", "words and 987", "-91283472332"};
+        int[] expected = {42, -42, 4193, 0, Integer.MIN_VALUE};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.myAtoi(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: parse the numeric prefix only. Keep the magnitude positive and
+     * check the int boundary before appending the next digit, so overflow is
+     * detected before it happens.
      *
-     * @param s The input string
-     * @return The converted 32-bit signed integer
+     * Algorithm:
+     *   1. Return 0 for null or empty input, then skip whitespace.
+     *   2. Read one optional sign.
+     *   3. Consume digits while checking overflow.
+     *   4. Return the signed result or the correct clamp.
+     *
+     * Time:  O(n) - at most one prefix of the string is scanned.
+     * Space: O(1) - only parser state is stored.
      */
     public int myAtoi(String s) {
         if (s == null || s.isEmpty()) {

@@ -1,53 +1,52 @@
 package strings;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/string-to-integer-atoi/
+ * Problem: String to Integer (atoi)
  *
- * Problem Statement:
- * Implement the `atoi` function that converts a string to an integer, replicating the behavior of the C `atoi` function.
+ * Convert a string to a 32-bit signed integer by skipping leading spaces,
+ * reading one optional sign, consuming digits, and clamping overflow.
  *
- * The function must handle:
- * - Leading whitespace
- * - Optional '+' or '-' sign
- * - Consecutive digits
- * - Characters after the number (ignored)
- * - Integer overflow or underflow
+ * Leetcode: https://leetcode.com/problems/string-to-integer-atoi/ (Medium)
+ * Rating:   acceptance 21.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Parsing | Overflow-safe accumulation
  *
  * Example:
- * Input: "   -42"
- * Output: -42
+ *   Input:  input = "   -42"
+ *   Output: -42
+ *   Why:    spaces are ignored, '-' sets the sign, and parsing stops after digits.
  *
- * Follow-up Questions:
- * 1. How would you handle locale-specific number formats (e.g., commas, currency symbols)?
- *    - Use `NumberFormat` class in Java with appropriate locale.
- * 2. How would you handle floating point inputs like "3.14"?
- *    - Use `Double.parseDouble()` or write a custom parser to handle decimal point.
- * 3. Can you support scientific notation like "1.2e3"?
- *    - Not with this implementation; would require a separate parser or regex-based tokenizer.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Unicode whitespace? Use Character.isWhitespace instead of only ' '.
+ *   2. Floating-point input? Add parser states for dot and exponent.
+ *   3. Different bases? Use Character.digit and radix-specific overflow checks.
+ *
+ * Related: Valid Number (65).
  */
-
 public class AtoI {
 
   public static void main(String[] args) {
-    System.out.println(aToI("42"));                 // 42
-    System.out.println(aToI("   -42"));             // -42
-    System.out.println(aToI("4193 with words"));    // 4193
-    System.out.println(aToI("words and 987"));      // 0
-    System.out.println(aToI("-91283472332"));       // Integer.MIN_VALUE
+    String[] inputs = {"42", "   -42", "4193 with words", "words and 987", "-91283472332"};
+    int[] expected = {42, -42, 4193, 0, Integer.MIN_VALUE};
+    for (int i = 0; i < inputs.length; i++) {
+      int got = aToI(inputs[i]);
+      System.out.printf("input=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Converts a string to a 32-bit signed integer (similar to C's atoi).
+
+    /**
+   * Intuition: parse only the prefix that atoi accepts. After whitespace and an
+   * optional sign, each digit is appended to the running value only after checking
+   * that the append will not overflow a 32-bit signed integer.
    *
-   * Steps:
-   * - Trim leading whitespaces
-   * - Parse optional '+' or '-' sign
-   * - Parse digits until non-digit encountered
-   * - Clamp result to Integer range if overflow/underflow occurs
+   * Algorithm:
+   *   1. Return 0 for null or empty input.
+   *   2. Skip leading spaces and read one optional sign.
+   *   3. Consume digits until a non-digit appears, checking overflow before append.
+   *   4. Return the signed value or the correct clamp on overflow.
    *
-   * Time Complexity: O(N), where N is length of input string
-   * Space Complexity: O(1), uses constant extra space
+   * Time:  O(n) - the parser scans at most one prefix of the string.
+   * Space: O(1) - only parser state and the running value are stored.
    */
   public static int aToI(String input) {
       if (input == null || input.isEmpty()) {

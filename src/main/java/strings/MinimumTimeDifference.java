@@ -3,49 +3,54 @@ package strings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 /**
- * LeetCode 539. Minimum Time Difference
+ * Problem: Minimum Time Difference
  *
- * Given a list of 24-hour clock time points in "HH:MM" format, return the minimum
- * minutes difference between any two time-points in the list.
+ * Given 24-hour time points in HH:MM format, return the smallest difference in
+ * minutes between any two points, including the wraparound gap across midnight.
  *
- * Example 1:
- * Input: timePoints = ["23:59","00:00"]
- * Output: 1
- * Explanation: The difference between "23:59" and "00:00" is 1 minute.
+ * Leetcode: https://leetcode.com/problems/minimum-time-difference/ (Medium)
+ * Rating:   acceptance 62.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Time conversion | Sorting circular gaps
  *
- * Example 2:
- * Input: timePoints = ["00:00","23:59","00:00"]
- * Output: 0
- * Explanation: There are duplicate time points, so minimum difference is 0.
+ * Example:
+ *   Input:  timePoints = ["23:59", "00:00"]
+ *   Output: 1
+ *   Why:    00:00 is one minute after 23:59 on a circular clock.
  *
- * LeetCode Link: https://leetcode.com/problems/minimum-time-difference/
- *
- * Follow-up Questions:
- * - How would you handle different time formats? (Parse format and convert to minutes)
- * - Can you optimize for very large input with limited time range? (Use boolean array for O(1) lookup)
- * - How would you extend to handle time zones? (Convert all times to UTC before processing)
- * - What if we need k smallest differences instead of just minimum? (Use priority queue or sorting)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Better than sorting? Use a fixed 1440-slot boolean bucket.
+ *   2. Include seconds? Convert to seconds and use an 86400-slot bucket.
+ *   3. Time zones? Normalize all times before converting to minutes.
  */
 public class MinimumTimeDifference {
 
-    /**
-     * Finds minimum time difference by converting to minutes and sorting.
+    public static void main(String[] args) {
+        MinimumTimeDifference solver = new MinimumTimeDifference();
+        List<List<String>> inputs = Arrays.asList(Arrays.asList("23:59", "00:00"), Arrays.asList("00:00", "23:59", "00:00"), Arrays.asList("01:01", "02:01", "03:00"));
+        int[] expected = {1, 0, 59};
+        for (int i = 0; i < inputs.size(); i++) {
+            int got = solver.findMinDifference(inputs.get(i));
+            System.out.printf("timePoints=%s -> %d  expected=%d%n", inputs.get(i), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: clock times are points on a 1440-minute circle. After sorting,
+     * the minimum gap must be between adjacent points, including the wraparound
+     * pair from the last time back to the first.
      *
      * Algorithm:
-     * 1. Convert all time points to minutes since 00:00
-     * 2. Sort the minutes array
-     * 3. Check consecutive differences in sorted array
-     * 4. Handle circular case by adding first time + 24 hours to end
-     * 5. Return minimum difference found
+     *   1. Return 0 for too few points or more than 1440 points.
+     *   2. Convert each HH:MM time to minutes.
+     *   3. Sort minutes and append first + 1440 for wraparound.
+     *   4. Return the minimum adjacent difference.
      *
-     * Time Complexity: O(n log n) where n is number of time points
-     * Space Complexity: O(n) for storing converted minutes
-     *
-     * @param timePoints List of time strings in "HH:MM" format
-     * @return Minimum difference in minutes between any two time points
+     * Time:  O(n log n) - sorting dominates.
+     * Space: O(n) - stores converted minutes.
      */
     public int findMinDifference(List<String> timePoints) {
         if (timePoints == null || timePoints.size() < 2) {
@@ -80,6 +85,7 @@ public class MinimumTimeDifference {
     }
 
     // Helper method to convert "HH:MM" to total minutes
+    /** Converts an HH:MM timestamp into minutes since midnight. */
     private int convertToMinutes(String timePoint) {
         String[] parts = timePoint.split(":");
         int hours = Integer.parseInt(parts[0]);

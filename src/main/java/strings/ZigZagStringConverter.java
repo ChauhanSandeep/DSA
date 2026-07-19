@@ -7,94 +7,52 @@ import java.util.List;
 /**
  * Problem: ZigZag Conversion
  *
- * The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this:
- * (you may want to display this pattern in a fixed font for better legibility)
+ * Convert a string into a zigzag pattern for a row count and read rows from top
+ * to bottom. This file includes row-builder and direct-position variants.
  *
- * P   A   H   N
- * A P L S I I G
- * Y   I   R
+ * Leetcode: https://leetcode.com/problems/zigzag-conversion/ (Medium)
+ * Rating:   acceptance 54.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  String | Row builders | Mathematical cycle
  *
- * And then read line by line: "PAHNAPLSIIGYIR"
+ * Example:
+ *   Input:  inputString = "PAYPALISHIRING", numRows = 4
+ *   Output: "PINALSIGYAHRPI"
+ *   Why:    the 4-row zigzag is read one complete row at a time.
  *
- * Write the code that will take a string and make this conversion given a number of rows.
+ * Follow-ups:
+ *   1. Very large strings? Use the direct-position formula.
+ *   2. Convert back? Split by row lengths, then replay the row path.
+ *   3. Custom pattern? Replace boundary flips with configurable row deltas.
  *
- * Example 1:
- * Input: s = "PAYPALISHIRING", numRows = 3
- * Output: "PAHNAPLSIIGYIR"
- *
- * Example 2:
- * Input: s = "PAYPALISHIRING", numRows = 4
- * Output: "PINALSIGYAHRPI"
- * Explanation:
- * P     I    N
- * A   L S  I G
- * Y A   H R
- * P     I
- *
- * Example 3:
- * Input: s = "A", numRows = 1
- * Output: "A"
- *
- * LeetCode: https://leetcode.com/problems/zigzag-conversion/
- *
- * Follow-up Questions (FAANG-style):
- * 1. What if we need to handle very large strings that don't fit in memory?
- *    - Use streaming approach, process characters on-the-fly without storing intermediate rows.
- * 2. How would you optimize for space if numRows is very large?
- *    - Use mathematical formula to directly calculate character positions instead of row arrays.
- * 3. What if we need to convert back from zigzag to original string?
- *    - Store original indices during zigzag creation, then use inverse mapping.
- * 4. How to handle Unicode characters or multi-byte characters?
- *    - Process as char array or use proper Unicode-aware string handling.
- * 5. What if we need to support different zigzag patterns (diagonal, spiral)?
- *    - Abstract the direction pattern into configurable movement vectors.
- * 6. How to optimize for multiple conversions with same numRows?
- *    - Precompute the cyclic pattern and reuse for different strings.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Text Justification (68).
  */
 public class ZigZagStringConverter {
 
   public static void main(String[] args) {
     ZigZagStringConverter converter = new ZigZagStringConverter();
-
-    String testString = "PAYPALISHIRING";
-
-    // Test basic cases
-    System.out.println("ZigZag (3 rows): " + converter.convertToZigZag(testString, 3)); // Expected: PAHNAPLSIIGYIR
-    System.out.println("ZigZag (4 rows): " + converter.convertToZigZag(testString, 4)); // Expected: PINALSIGYAHRPI
-    System.out.println("ZigZag (1 row): " + converter.convertToZigZag(testString, 1));  // Expected: PAYPALISHIRING
-
-    // Test edge cases
-    System.out.println("ZigZag (single char): " + converter.convertToZigZag("A", 3));    // Expected: A
-    System.out.println("ZigZag (empty): " + converter.convertToZigZag("", 3));           // Expected: ""
-
-    // Test optimized version
-    System.out.println("Optimized ZigZag: " + converter.convertToZigZagOptimized(testString, 3));
+    String[] inputs = {"PAYPALISHIRING", "PAYPALISHIRING", "A", ""};
+    int[] rows = {3, 4, 3, 3};
+    String[] expected = {"PAHNAPLSIIGYIR", "PINALSIGYAHRPI", "A", ""};
+    for (int i = 0; i < inputs.length; i++) {
+      String got = converter.convertToZigZagOptimized(inputs[i], rows[i]);
+      System.out.printf("input=%s rows=%d -> %s  expected=%s%n", inputs[i], rows[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Converts string into zigzag pattern and reads row-wise.
+
+    /**
+   * Intuition: follow the visual zigzag path through row indices. Append each
+   * character to its current row, flip direction at the first and last rows, and
+   * read all row builders in order at the end.
    *
-   * Algorithm: Row-by-Row Construction with Direction Tracking
-   * Steps:
-   * 1. Create array of StringBuilder for each row
-   * 2. Traverse string character by character
-   * 3. Place each character in current row
-   * 4. Update row index based on zigzag direction (down/up)
-   * 5. Change direction at boundaries (first/last row)
-   * 6. Concatenate all rows to form result
+   * Algorithm:
+   *   1. Return input for null, empty, or one-row cases.
+   *   2. Create builders for rows that can receive characters.
+   *   3. Append each character and update direction at boundaries.
+   *   4. Concatenate the row builders.
    *
-   * Pattern Analysis:
-   * - Characters move vertically down until last row
-   * - Then move diagonally up until first row
-   * - This creates a cyclic pattern of length 2*numRows - 2
-   *
-   * Time Complexity: O(n) where n is string length
-   * Space Complexity: O(n) for storing characters in row arrays
-   *
-   * @param inputString the string to convert
-   * @param numRows number of rows in zigzag pattern
-   * @return converted string read row-wise
+   * Time:  O(n) - every character is processed once.
+   * Space: O(n) - row builders store the output.
    */
   public String convertToZigZag(String inputString, int numRows) {
     if (inputString == null || inputString.isEmpty() || numRows == 1) {
@@ -178,13 +136,7 @@ public class ZigZagStringConverter {
     return result.toString();
   }
 
-  /**
-   * Checks if the row is a middle row (not first or last).
-   *
-   * @param row current row index
-   * @param numRows total number of rows
-   * @return true if middle row, false otherwise
-   */
+    /** Returns true for rows that have diagonal characters in each zigzag cycle. */
   private boolean isMiddleRow(int row, int numRows) {
     return row != 0 && row != numRows - 1;
   }

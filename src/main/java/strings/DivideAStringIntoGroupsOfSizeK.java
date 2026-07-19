@@ -5,62 +5,58 @@ import java.util.*;
 /**
  * Problem: Divide a String Into Groups of Size k
  *
- * Given a string s, an integer k, and a character fill, divide the string s into groups of size k
- * using the following procedure:
- * - The first group consists of the first k characters of the string
- * - The second group consists of the next k characters of the string, and so on
- * - Each character can be part of exactly one group
- * - For the last group, if the string does not have k characters remaining,
- *   the character fill is used to complete the group
+ * Split a string into consecutive groups of exactly k characters. Pad only the
+ * final group with the fill character when it is shorter than k.
+ *
+ * Leetcode: https://leetcode.com/problems/divide-a-string-into-groups-of-size-k/ (Easy)
+ * Rating:   zerotrac 1273 (Q1, weekly-276)
+ * Pattern:  String | Chunking | Padding
  *
  * Example:
- * Input: s = "abcdefghi", k = 3, fill = "x"
- * Output: ["abc","def","ghi"]
- * Explanation: The first 3 groups contain 3 characters each. No padding needed.
+ *   Input:  s = "abcdefgh", k = 3, fill = 'x'
+ *   Output: ["abc", "def", "ghx"]
+ *   Why:    the last group has two characters, so one fill character is appended.
  *
- * Input: s = "abcdefgh", k = 3, fill = "x"
- * Output: ["abc","def","ghx"]
- * Explanation: The last group has only 2 characters, so we pad with 1 'x'.
+ * Follow-ups:
+ *   1. Stream groups? Emit each completed group instead of storing all of them.
+ *   2. Unicode code points? Iterate by code point instead of char index.
+ *   3. Invalid k? Reject k <= 0 before computing group count.
  *
- * LeetCode: https://leetcode.com/problems/divide-a-string-into-groups-of-size-k/
- *
- * Follow-up Questions:
- * 1. Q: What if k is larger than the string length?
- *    A: The entire string becomes one group, padded with fill characters to reach size k.
- *
- * 2. Q: What if k is 1?
- *    A: Each character becomes its own group, no padding needed unless empty string.
- *
- * 3. Q: How would you handle Unicode characters or multi-byte strings?
- *    A: Current solution works with Unicode as Java strings handle it properly.
- *
- * 4. Q: What about memory optimization for very large strings?
- *    A: Could use streaming approach to process groups one at a time instead of storing all.
- *
- * Related Problems:
- * - String Compression: https://leetcode.com/problems/string-compression/
- * - Split Array into Consecutive Subsequences: https://leetcode.com/problems/split-array-into-consecutive-subsequences/
- * LeetCode Contest Rating: 1273
+ * Related: String Compression (443).
  */
 public class DivideAStringIntoGroupsOfSizeK {
 
-    /**
-     * Divides string into groups of size k using substring extraction and padding.
+    public static void main(String[] args) {
+        DivideAStringIntoGroupsOfSizeK solver = new DivideAStringIntoGroupsOfSizeK();
+        String[] inputs = {"abcdefghi", "abcdefgh", ""};
+        int[] sizes = {3, 3, 3};
+        char[] fills = {'x', 'x', 'x'};
+        String[][] expected = {{"abc", "def", "ghi"}, {"abc", "def", "ghx"}, {}};
+        for (int i = 0; i < inputs.length; i++) {
+            String[] got = solver.divideString(inputs[i], sizes[i], fills[i]);
+            System.out.printf("s=%s k=%d fill=%c -> %s  expected=%s%n", inputs[i], sizes[i], fills[i], Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
+
+
+        /**
+     * Intuition: groups are fixed-width chunks. Ceiling division gives the number
+     * of chunks, and only the last chunk can be short, so padding is needed only
+     * after extracting that final substring.
      *
      * Algorithm:
-     * 1. Calculate total number of groups needed using ceiling division
-     * 2. Iterate through string in steps of k characters
-     * 3. Extract substring of size k (or remaining characters)
-     * 4. Pad the last group with fill character if necessary
-     * 5. Add each group to result array
+     *   1. Return an empty array for null or empty input.
+     *   2. Compute group count with ceiling division.
+     *   3. Extract each substring window of up to k characters.
+     *   4. Pad short groups with fill and store them.
      *
-     * Time Complexity: O(n) where n is length of string
-     * Space Complexity: O(n) for storing the result groups
+     * Time:  O(n) - every input character is copied once.
+     * Space: O(n) - returned groups store the divided string.
      *
-     * @param input the input string to divide
-     * @param k the size of each group
-     * @param fill the character used to pad the last group if needed
-     * @return array of strings where each string has exactly k characters
+     * @param input string to divide
+     * @param k group size
+     * @param fill padding character for the final group
+     * @return groups of exactly k characters
      */
     public String[] divideString(String input, int k, char fill) {
         if (input == null || input.isEmpty()) {
@@ -93,6 +89,7 @@ public class DivideAStringIntoGroupsOfSizeK {
     }
 
     // Helper method to pad string with fill character to reach target length
+    /** Pads a string with fill until it reaches the target length. */
     private String padWithFillCharacter(String str, int targetLength, char fill) {
         StringBuilder padded = new StringBuilder(str);
         while (padded.length() < targetLength) {
