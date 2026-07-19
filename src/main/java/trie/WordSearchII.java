@@ -3,44 +3,55 @@ package trie;
 import java.util.*;
 
 /**
- * 212. Word Search II
+ * Problem: Word Search II
  *
- * Problem: Given an m x n board of characters and a list of strings words,
- * return all words on the board. Each word must be constructed from letters
- * of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.
- * The same letter cell may not be used more than once in a word.
+ * Given a board of letters and a list of words, return all words that can be
+ * formed by walking horizontally or vertically adjacent cells. A cell may be
+ * used at most once in a single word path.
+ *
+ * Leetcode: https://leetcode.com/problems/word-search-ii/ (Hard)
+ * Rating:   acceptance 38.7% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Trie | Board DFS backtracking | Prefix pruning
  *
  * Example:
- * Input: board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]],
- *        words = ["oath","pea","eat","rain"]
- * Output: ["eat","oath"]
+ *   Input:  board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath", "pea", "eat", "rain"]
+ *   Output: ["eat", "oath"]
+ *   Why:    paths exist for "oath" and "eat", while "pea" has no starting p-cell and
+ *           "rain" cannot be connected through adjacent unused cells.
  *
- * LeetCode: https://leetcode.com/problems/word-search-ii
+ * Follow-ups:
+ *   1. Avoid returning duplicate words when the board has many paths to the same word?
+ *      Clear the terminal word after it is found, as this solution does.
+ *   2. Speed up search for a huge dictionary?
+ *      Store the dictionary in a trie and stop DFS as soon as the board path is not a prefix.
+ *   3. Support diagonal movement or a 3D board?
+ *      Replace the direction array with the allowed neighbor offsets.
+ *   4. Support adding words between searches?
+ *      Keep a reusable trie and update terminal nodes for inserted or removed words.
  *
- * Follow-up questions:
- * Q: How to optimize for very large dictionaries?
- * A: Use trie pruning, parallel processing, and advanced string matching algorithms.
- *
- * Q: Can we handle dynamic word additions/removals during search?
- * A: Implement persistent trie structures or incremental update mechanisms.
- *
- * Q: How to extend to 3D grids or different movement patterns?
- * A: Generalize direction vectors and neighbor calculation logic.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Word Search (79), Implement Trie (Prefix Tree) (208), Design Add and Search Words Data Structure (211).
  */
 public class WordSearchII {
 
     /**
-     * Trie + DFS backtracking approach - optimal solution.
+     * Intuition: searching the board separately for every dictionary word repeats
+     * the same prefix checks. A trie lets one board path stand for all words with
+     * that prefix: if the next board character has no child edge, no dictionary
+     * word can be completed from that path. A terminal trie node stores the full
+     * word, and clearing it after reporting prevents duplicate results.
      *
-     * Algorithm: Trie-based backtracking
-     * - Build trie from word list for efficient prefix matching
-     * - For each cell, start DFS if it matches trie root children
-     * - Use backtracking to explore all paths while avoiding revisits
-     * - Prune trie nodes when words are found to avoid duplicates
+     * Algorithm:
+     *   1. Build a trie from all dictionary words.
+     *   2. Start DFS from every board cell.
+     *   3. Stop a DFS path when it leaves the board, revisits a cell, or misses a trie edge.
+     *   4. Add terminal words, clear them to avoid duplicates, and backtrack the board cell.
      *
-     * Time Complexity: O(m*n*4^L) where m,n are board dimensions, L is max word length
-     * Space Complexity: O(W*L) where W is number of words, L is average word length
+     * Time:  O(W*L + M*N*4^L) - trie construction reads the dictionary, then each board path can branch four ways up to max word length.
+     * Space: O(W*L + L) - the trie stores dictionary characters and recursion holds one path.
+     *
+     * @param board letter grid searched in four directions
+     * @param words dictionary words to find on the board
+     * @return words from the dictionary that can be formed on the board
      */
     public List<String> findWords(char[][] board, String[] words) {
         List<String> result = new ArrayList<>();
@@ -62,6 +73,7 @@ public class WordSearchII {
         return result;
     }
 
+    /** Searches from one board cell while the path still matches a trie prefix. */
     private void dfs(char[][] board, int row, int col, TrieNode node, List<String> result) {
         if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
             return;
@@ -93,6 +105,7 @@ public class WordSearchII {
         board[row][col] = c;
     }
 
+    /** Builds a trie whose terminal nodes store complete dictionary words. */
     private TrieNode buildTrie(String[] words) {
         TrieNode root = new TrieNode();
 
@@ -136,6 +149,7 @@ public class WordSearchII {
         return result;
     }
 
+    /** DFS variant that stops exploring once a trie branch has no remaining words. */
     private void dfsOptimized(char[][] board, int row, int col, OptimizedTrieNode node, List<String> result) {
         if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
             return;
@@ -173,6 +187,7 @@ public class WordSearchII {
         }
     }
 
+    /** Builds the optimized trie and counts how many words pass through each node. */
     private OptimizedTrieNode buildOptimizedTrie(String[] words) {
         OptimizedTrieNode root = new OptimizedTrieNode();
 
@@ -246,6 +261,7 @@ public class WordSearchII {
         return new ArrayList<>(new HashSet<>(result));
     }
 
+    /** Returns a row-by-row copy of the board for isolated thread searches. */
     private char[][] deepCopyBoard(char[][] board) {
         char[][] copy = new char[board.length][board[0].length];
         for (int i = 0; i < board.length; i++) {
@@ -273,6 +289,7 @@ public class WordSearchII {
         return result;
     }
 
+    /** Iteratively explores board paths from one starting cell. */
     private void iterativeDFS(char[][] board, int startRow, int startCol, TrieNode root, List<String> result) {
         Stack<DFSState> stack = new Stack<>();
         stack.push(new DFSState(startRow, startCol, root, new HashSet<>()));
@@ -345,6 +362,7 @@ public class WordSearchII {
         return result;
     }
 
+    /** DFS that matches literal edges or wildcard pattern edges. */
     private void dfsWildcard(char[][] board, int row, int col, WildcardTrieNode node,
                            String path, List<String> result) {
         if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
@@ -380,6 +398,7 @@ public class WordSearchII {
         board[row][col] = c;
     }
 
+    /** Builds a trie for wildcard-enabled patterns. */
     private WildcardTrieNode buildWildcardTrie(String[] patterns) {
         WildcardTrieNode root = new WildcardTrieNode();
 
@@ -425,6 +444,7 @@ public class WordSearchII {
         return result;
     }
 
+    /** Searches adjacent cells in a 3D board while following trie prefixes. */
     private void dfs3D(char[][][] board, int x, int y, int z, TrieNode node, List<String> result) {
         if (x < 0 || x >= board.length || y < 0 || y >= board[0].length ||
             z < 0 || z >= board[0][0].length) {
@@ -484,6 +504,7 @@ public class WordSearchII {
             removeWordHelper(root, word, 0);
         }
 
+        /** Removes a word recursively and reports whether this branch can be pruned. */
         private boolean removeWordHelper(DynamicTrieNode node, String word, int index) {
             if (index == word.length()) {
                 if (!node.isActive) return false;
@@ -505,6 +526,7 @@ public class WordSearchII {
             return false;
         }
 
+        /** Returns true when a dynamic trie node still has any child branch. */
         private boolean hasActiveChildren(DynamicTrieNode node) {
             for (DynamicTrieNode child : node.children) {
                 if (child != null) return true;
@@ -524,6 +546,7 @@ public class WordSearchII {
             return result;
         }
 
+        /** Searches the current board using the active dynamic trie contents. */
         private void dfsForDynamic(char[][] board, int row, int col, DynamicTrieNode node, List<String> result) {
             if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
                 return;
@@ -586,6 +609,7 @@ public class WordSearchII {
             );
         }
 
+        /** Counts distinct prefixes as a simple trie-size estimate. */
         private static int calculateTrieSize(String[] words) {
             Set<String> prefixes = new HashSet<>();
             for (String word : words) {
@@ -596,6 +620,7 @@ public class WordSearchII {
             return prefixes.size();
         }
 
+        /** Estimates search complexity from board size and maximum word length. */
         private static long calculateSearchComplexity(char[][] board, String[] words) {
             long complexity = 0;
             int m = board.length, n = board[0].length;
@@ -643,4 +668,28 @@ public class WordSearchII {
                                executionTimeMs, trieSize, getTrieEfficiency());
         }
     }
+
+    public static void main(String[] args) {
+        WordSearchII solver = new WordSearchII();
+
+        char[][] boardOne = {
+            {'o', 'a', 'a', 'n'},
+            {'e', 't', 'a', 'e'},
+            {'i', 'h', 'k', 'r'},
+            {'i', 'f', 'l', 'v'}
+        };
+        String[] wordsOne = {"oath", "pea", "eat", "rain"};
+        List<String> gotOne = solver.findWords(boardOne, wordsOne);
+        Collections.sort(gotOne);
+        System.out.printf("board=%s words=%s -> %s  expected=%s%n",
+            Arrays.deepToString(boardOne), Arrays.toString(wordsOne), gotOne, "[eat, oath]");
+
+        char[][] boardTwo = {{'a'}};
+        String[] wordsTwo = {"a", "aa"};
+        List<String> gotTwo = solver.findWords(boardTwo, wordsTwo);
+        Collections.sort(gotTwo);
+        System.out.printf("board=%s words=%s -> %s  expected=%s%n",
+            Arrays.deepToString(boardTwo), Arrays.toString(wordsTwo), gotTwo, "[a]");
+    }
+
 }
