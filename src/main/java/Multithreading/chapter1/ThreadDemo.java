@@ -1,17 +1,11 @@
 package Multithreading.chapter1;
 
 /**
- * Demonstrates different ways to create and execute threads in Java.
- * 
- * - Using a class that implements Runnable (`WorkerRunnable`).
- * - Using a class that extends Thread (`WorkerThread`).
- * - Using an anonymous inner class (`AnonymousRunnable`).
- * - Using a lambda expression (`LambdaRunnable`).
- * 
- * Each thread sleeps for 1 second between iterations and prints a message.
- * 
- * Time Complexity: O(1) per iteration (constant time operations inside loop).
- * Space Complexity: O(1) (constant space usage per thread).
+ * Demonstrates four basic Java thread creation styles.
+ *
+ * The main method starts a Runnable implementation, a Thread subclass, an
+ * anonymous Runnable, and a lambda Runnable. The example does not share mutable
+ * state; it focuses on thread construction and scheduling rather than locking.
  */
 public class ThreadDemo {
     public static void main(String[] args) {
@@ -34,10 +28,7 @@ public class ThreadDemo {
         thread4.start();
     }
 
-    /**
-     * A utility method to execute a simple thread task.
-     * @param threadName The name of the thread (for logging purposes).
-     */
+    /** Runs the repeated print-and-sleep task used by the inline thread demos. */
     private static void executeThreadTask(String threadName) {
         try {
             for (int i = 0; i < 10; i++) {
@@ -50,9 +41,7 @@ public class ThreadDemo {
     }
 }
 
-/**
- * A thread worker implementing Runnable interface.
- */
+/** Runnable-based worker used by ThreadDemo. */
 class WorkerRunnable implements Runnable {
     @Override
     public void run() {
@@ -71,9 +60,7 @@ class WorkerRunnable implements Runnable {
     }
 }
 
-/**
- * A thread worker extending the Thread class.
- */
+/** Thread subclass worker used by ThreadDemo. */
 class WorkerThread extends Thread {
     @Override
     public void run() {

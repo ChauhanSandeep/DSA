@@ -3,19 +3,12 @@ package Multithreading.chapter1;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Demonstrates the use of AtomicInteger in a multithreaded environment.
+ * Demonstrates lock-free shared-state updates with AtomicInteger.
  *
- * ### Key Concepts:
- * - AtomicInteger provides thread-safe operations without explicit synchronization.
- * - Supports atomic increments, lazy setting, and compare-and-swap operations.
- *
- * ### Example Usage:
- * 1. Two threads increment the counter concurrently.
- * 2. Demonstrates various atomic operations (`set()`, `lazySet()`, `compareAndSet()`, `weakCompareAndSet()`).
- *
- * ### Why AtomicInteger?
- * - Ensures atomicity without locking.
- * - Prevents race conditions in multi-threaded scenarios.
+ * The class starts two threads that increment the same counter, then shows
+ * set, lazySet, compareAndSet, and weakCompareAndSet on that counter.
+ * AtomicInteger supplies atomic read-modify-write operations and visibility
+ * guarantees without synchronized blocks or explicit locks.
  */
 public class AtomicVariableExample {
 
@@ -45,18 +38,14 @@ public class AtomicVariableExample {
         performAtomicOperations();
     }
 
-    /**
-     * Increments the counter 1000 times in a thread-safe manner.
-     */
+    /** Increments the shared AtomicInteger with atomic get-and-increment calls. */
     private static void incrementCounter() {
         for (int i = 0; i < 1000; i++) {
             counter.getAndIncrement(); // Atomically increments and returns the previous value
         }
     }
 
-    /**
-     * Demonstrates various AtomicInteger operations.
-     */
+    /** Demonstrates direct writes and compare-and-set operations on the counter. */
     private static void performAtomicOperations() {
         // Set a new value
         counter.set(10000);

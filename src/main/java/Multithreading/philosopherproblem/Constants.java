@@ -3,12 +3,10 @@ package Multithreading.philosopherproblem;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Holds constants used in the Dining Philosophers problem simulation.
- * This class ensures that configurations are centralized and easily modifiable.
+ * Central configuration for the Dining Philosophers simulation.
  *
- * Problem: Dining Philosophers Problem (Concurrency Control)
- *
- * @author [Your Name]
+ * The values define the number of philosopher tasks, the number of shared
+ * chopstick locks, and how long the App main method lets the simulation run.
  */
 public final class Constants {
 

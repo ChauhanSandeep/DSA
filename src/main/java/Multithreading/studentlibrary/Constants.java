@@ -1,12 +1,10 @@
 package Multithreading.studentlibrary;
 
 /**
- * Defines global constants for the Student Library simulation.
+ * Central configuration for the student-library simulation.
  *
- * These constants configure the number of students, books, and other parameters
- * used throughout the simulation.
- *
- * @author [Your Name]
+ * The constants define how many Student tasks and Book resources are created,
+ * plus how long each student keeps choosing books before leaving.
  */
 public class Constants {
 

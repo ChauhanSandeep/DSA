@@ -3,29 +3,24 @@ package Multithreading.chapter1;
 import java.util.concurrent.*;
 
 /**
- * Demonstrates different types of thread pools available in Java's Executor Framework.
+ * Demonstrates ExecutorService variants from Java's executor framework.
  *
- * <p> Thread Pool Types Covered:
- * 1. Single Thread Executor - Executes tasks sequentially using a single worker thread.
- * 2. Fixed Thread Pool - Uses a fixed number of threads to execute tasks concurrently.
- * 3. Cached Thread Pool - Creates new threads as needed and reuses idle threads.
- * 4. Scheduled Thread Pool - Schedules tasks for execution at fixed intervals or with a delay.
- *
- * <p> Ensures proper shutdown of executors to prevent resource leaks.
+ * The class keeps separate methods for a single-thread executor, fixed thread
+ * pool, cached thread pool, and scheduled executor. Each demo submits WorkerTask
+ * instances and uses shutdown/awaitTermination so worker threads do not leak.
  */
 public class ThreadPoolExample {
 
     public static void main(String[] args) {
+        System.out.println("Single thread executor:");
         executeSingleThreadPool();
-//        executeFixedThreadPool();
-//        executeCachedThreadPool();
-//        executeScheduledThreadPool();
+        System.out.println("Fixed thread pool:");
+        executeFixedThreadPool();
+        System.out.println("Cached thread pool:");
+        executeCachedThreadPool();
     }
 
-    /**
-     * Executes tasks using a Single Thread Executor.
-     * Ensures that tasks execute sequentially in a single-threaded environment.
-     */
+    /** Executes tasks sequentially on one executor worker thread. */
     public static void executeSingleThreadPool() {
         ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
@@ -37,10 +32,7 @@ public class ThreadPoolExample {
         shutdownExecutor(singleThreadExecutor);
     }
 
-    /**
-     * Executes tasks using a Fixed Thread Pool with 5 worker threads.
-     * Ideal for executing a predictable number of tasks in parallel.
-     */
+    /** Executes tasks concurrently on a fixed-size pool. */
     public static void executeFixedThreadPool() {
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
 
@@ -51,10 +43,7 @@ public class ThreadPoolExample {
         shutdownExecutor(fixedThreadPool);
     }
 
-    /**
-     * Executes tasks using a Cached Thread Pool.
-     * Suitable for handling many short-lived asynchronous tasks.
-     */
+    /** Executes tasks on a cached pool that can create and reuse workers. */
     public static void executeCachedThreadPool() {
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 
@@ -65,10 +54,7 @@ public class ThreadPoolExample {
         shutdownExecutor(cachedThreadPool);
     }
 
-    /**
-     * Executes tasks using a Scheduled Thread Pool.
-     * Schedules periodic execution of a task with a fixed delay.
-     */
+    /** Schedules a periodic task on a ScheduledExecutorService. */
     public static void executeScheduledThreadPool() {
         ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
 
@@ -80,11 +66,7 @@ public class ThreadPoolExample {
         shutdownExecutor(scheduledExecutor);
     }
 
-    /**
-     * Properly shuts down an executor service to prevent resource leaks.
-     *
-     * @param executorService the executor to shut down
-     */
+    /** Shuts down an executor and interrupts remaining tasks if they overrun. */
     private static void shutdownExecutor(ExecutorService executorService) {
         executorService.shutdown();
         try {
@@ -99,9 +81,7 @@ public class ThreadPoolExample {
     }
 }
 
-/**
- * Represents a worker task that prints task execution details.
- */
+/** Worker task that prints which executor thread is running it. */
 class WorkerTask implements Runnable {
     private final int taskId;
 

@@ -3,20 +3,11 @@ package Multithreading.chapter1;
 import java.util.concurrent.Semaphore;
 
 /**
- * Demonstrates the usage of Semaphores for controlling thread access to resources.
- * 
- * **Concept of Semaphores:**
- * - A semaphore controls access to a shared resource by maintaining a set number of permits.
- * - `Semaphore(1, true)` creates a **mutex** (mutual exclusion), allowing only one thread at a time.
- * - `Semaphore(2, true)` allows **two** threads to access a resource concurrently.
- * 
- * **Key Features:**
- * - Demonstrates semaphore usage with one and two permits.
- * - Ensures fairness (`true` in constructor) to grant permits in the order of requests.
- * - Simulates sender and receiver tasks acquiring and releasing semaphore permits.
- * 
- * **Time Complexity:** O(N) per thread (since each prints N times)  
- * **Space Complexity:** O(1) (constant extra space usage)
+ * Demonstrates fair Semaphore permits as a concurrency throttle.
+ *
+ * The first demo uses one fair permit as a mutex so only one task prints at a
+ * time. The second demo uses two fair permits so two tasks may enter the
+ * critical section concurrently while the third waits for a release.
  */
 public class SemaphoreExample {
     public static void main(String[] args) {
@@ -50,9 +41,7 @@ public class SemaphoreExample {
     }
 }
 
-/**
- * Task representing a sender that prints messages while holding a semaphore permit.
- */
+/** Sender task that prints messages while holding one semaphore permit. */
 class SenderTask implements Runnable {
     private final Semaphore semaphore;
 
@@ -77,9 +66,7 @@ class SenderTask implements Runnable {
     }
 }
 
-/**
- * Task representing a receiver that prints messages while holding a semaphore permit.
- */
+/** Receiver task that prints messages while holding one semaphore permit. */
 class ReceiverTask implements Runnable {
     private final Semaphore semaphore;
 

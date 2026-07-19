@@ -5,36 +5,30 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Represents a chopstick used by philosophers in the Dining Philosophers problem.
- * Each chopstick can be picked up or put down using locking mechanisms to avoid race conditions.
+ * Represents one lock-protected chopstick in the Dining Philosophers problem.
  *
- * Problem: Dining Philosophers Problem (Concurrency Control)
- * Algorithm: Used a tryLock() mechanism to prevent deadlock by setting a timeout.
- *
- * @author [Your Name]
+ * Each chopstick owns a ReentrantLock. pickUp uses timed tryLock so a philosopher
+ * can give up instead of blocking forever, while putDown releases the same lock
+ * after eating or after a failed second chopstick attempt.
  */
 public class Chopstick {
 
     private final Lock chopstickLock;  // Ensures mutual exclusion
     private final int chopstickId;     // Unique identifier for each chopstick
 
-    /**
-     * Constructor to initialize the chopstick with an ID.
-     * @param id Unique ID of the chopstick.
-     */
+    /** Creates a chopstick with a display id and its own ReentrantLock. */
     public Chopstick(int id) {
         this.chopstickId = id;
         this.chopstickLock = new ReentrantLock();
     }
 
     /**
-     * Attempts to pick up the chopstick.
-     * Uses tryLock() with a timeout to avoid deadlock.
+     * Attempts to acquire this chopstick with timed tryLock.
      *
-     * @param philosopher The philosopher attempting to pick up the chopstick.
-     * @param state LEFT or RIGHT chopstick
-     * @return true if the philosopher successfully picks up the chopstick, false otherwise.
-     * @throws InterruptedException If the thread is interrupted while waiting.
+     * @param philosopher philosopher attempting to pick up the chopstick
+     * @param state left-or-right label printed for the philosopher
+     * @return true when the lock is acquired before the timeout
+     * @throws InterruptedException if interrupted while waiting for the lock
      */
     public boolean pickUp(Philosopher philosopher, State state) throws InterruptedException {
         if (chopstickLock.tryLock(10, TimeUnit.MILLISECONDS)) {
@@ -45,11 +39,10 @@ public class Chopstick {
     }
 
     /**
-     * Releases the chopstick after use.
-     * Unlocks the chopstick to allow other philosophers to use it.
+     * Releases this chopstick's lock after a philosopher is done with it.
      *
-     * @param philosopher The philosopher putting down the chopstick.
-     * @param state LEFT or RIGHT chopstick
+     * @param philosopher philosopher releasing the chopstick
+     * @param state left-or-right label printed for the philosopher
      */
     public void putDown(Philosopher philosopher, State state) {
         chopstickLock.unlock();

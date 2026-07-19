@@ -5,23 +5,38 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Demonstrates the usage of BlockingQueue with a Producer-Consumer model.
+ * Demonstrates a producer-consumer handoff with a BlockingQueue.
  *
- * Producer (`ProducerWorker`) adds numbers to the queue.
- * Consumer (`ConsumerWorker`) takes numbers from the queue.
- *
- * Uses an `ArrayBlockingQueue` with a fixed size of 10.
- * Ensures proper exception handling and modern Java best practices.
+ * ProducerWorker uses put, so it blocks when the fixed-size ArrayBlockingQueue
+ * is full. ConsumerWorker uses take, so it blocks when the queue is empty. The
+ * queue itself provides the thread-safe coordination; no explicit synchronized
+ * block is needed around producer or consumer access.
  */
 public class BlockingQueueExample {
 
     public static void main(String[] args) {
-        new BlockingQueueExample().startProcessing();
+        BlockingQueueExample demo = new BlockingQueueExample();
+        BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(10);
+
+        Thread producerThread = new Thread(demo.new ProducerWorker(queue), "Producer");
+        Thread consumerThread = new Thread(demo.new ConsumerWorker(queue), "Consumer");
+
+        producerThread.start();
+        consumerThread.start();
+
+        try {
+            TimeUnit.SECONDS.sleep(3);
+            producerThread.interrupt();
+            consumerThread.interrupt();
+            producerThread.join();
+            consumerThread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Demo interrupted.");
+        }
     }
 
-    /**
-     * Initializes and starts Producer and Consumer threads.
-     */
+    /** Initializes and starts the unbounded producer-consumer demo. */
     private void startProcessing() {
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(10);
 
@@ -32,9 +47,7 @@ public class BlockingQueueExample {
         consumerThread.start();
     }
 
-    /**
-     * Producer thread that adds numbers to the BlockingQueue.
-     */
+    /** Producer that blocks on queue.put when the queue is full. */
     class ProducerWorker implements Runnable {
         private final BlockingQueue<Integer> queue;
         private int currentValue = 0;
@@ -59,9 +72,7 @@ public class BlockingQueueExample {
         }
     }
 
-    /**
-     * Consumer thread that retrieves numbers from the BlockingQueue.
-     */
+    /** Consumer that blocks on queue.take when the queue is empty. */
     class ConsumerWorker implements Runnable {
         private final BlockingQueue<Integer> queue;
 

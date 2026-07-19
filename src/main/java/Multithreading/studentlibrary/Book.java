@@ -5,34 +5,28 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Represents a book in a library that can be read by students in a concurrent environment.
- * Ensures thread safety using a ReentrantLock to prevent multiple students from reading the same book at the same time.
+ * Represents a shared library book protected by a ReentrantLock.
  *
- * Problem: Concurrency control in resource-sharing environments.
- * Solution: Uses explicit locking via ReentrantLock to ensure mutual exclusion.
- *
- * @author [Your Name]
+ * Students may choose the same Book concurrently, but read locks the book before
+ * printing and sleeping. The finally block releases the lock so another waiting
+ * student can read the book even if the current thread is interrupted.
  */
 public class Book {
 
     private final int bookId;
     private final Lock bookLock;
 
-    /**
-     * Initializes a book with a unique ID.
-     *
-     * @param id The unique identifier for the book.
-     */
+    /** Creates a book with a display id and its own lock. */
     public Book(int id) {
         this.bookId = id;
         this.bookLock = new ReentrantLock();
     }
 
     /**
-     * Allows a student to read the book while ensuring proper synchronization.
+     * Lets one student read this book while holding the book lock.
      *
-     * @param student The student attempting to read the book.
-     * @throws InterruptedException If the thread is interrupted while reading.
+     * @param student student attempting to read the book
+     * @throws InterruptedException if interrupted during the simulated read
      */
     public void read(Student student) throws InterruptedException {
         bookLock.lock();

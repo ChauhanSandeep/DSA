@@ -3,21 +3,12 @@ package Multithreading.concurrentcollections;
 import java.util.concurrent.*;
 
 /**
- * Demonstrates the usage of CyclicBarrier to synchronize multiple threads.
+ * Demonstrates reusable rendezvous synchronization with CyclicBarrier.
  *
- * CyclicBarrier allows multiple threads to wait until they all reach a common barrier point.
- * Once the required number of threads reach the barrier, they are released simultaneously.
- *
- * - The program creates a fixed thread pool of size 5.
- * - The first batch of 5 worker threads is executed.
- * - After the barrier resets, another batch of 5 workers executes.
- *
- * Key Features:
- * - CyclicBarrier is reusable after all threads reach the barrier.
- * - A completion task is executed once all threads reach the barrier.
- *
- * Time Complexity: O(n) where n = total number of worker threads.
- * Space Complexity: O(1) (constant space apart from thread storage).
+ * Worker tasks pause at a shared barrier until THREAD_COUNT workers have arrived.
+ * When the last worker arrives, the barrier action prints a message and the
+ * waiting workers are released together. The same barrier is then reused for a
+ * second batch of workers.
  */
 public class CyclicBarrierExample {
 
@@ -58,9 +49,7 @@ public class CyclicBarrierExample {
         }
     }
 
-    /**
-     * Worker class that simulates a task reaching a CyclicBarrier.
-     */
+    /** Worker that waits at the CyclicBarrier after simulating work. */
     static class Worker implements Runnable {
         private final int workerId;
         private final CyclicBarrier cyclicBarrier;
