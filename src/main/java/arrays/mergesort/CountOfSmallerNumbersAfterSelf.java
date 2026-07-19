@@ -3,42 +3,66 @@ package arrays.mergesort;
 import java.util.*;
 
 /**
- * 315. Count of Smaller Numbers After Self
+ * Problem: Count of Smaller Numbers After Self
  *
- * Problem: Given an integer array nums, return an integer array counts where
- * counts[i] is the number of smaller elements to the right of nums[i].
+ * For each index in an array, count how many values to its right are strictly
+ * smaller than nums[index]. Return those counts in the original index order.
+ * Duplicate values are not smaller than each other, so equality must not increase
+ * any count.
+ *
+ * Leetcode: https://leetcode.com/problems/count-of-smaller-numbers-after-self/
+ * Rating:   acceptance 43.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | Merge sort | Count right-half values crossing left values
  *
  * Example:
- * Input: nums = [5,2,6,1]
- * Output: [2,1,1,0]
- * Explanation: For 5: numbers 2,1 are smaller. For 2: number 1 is smaller.
- * For 6: number 1 is smaller. For 1: no smaller numbers.
+ *   Input:  [5,2,6,1]
+ *   Output: [2,1,1,0]
+ *   Why:    5 has 2 and 1 after it, 2 has 1 after it, 6 has 1 after it, and 1
+ *           has no smaller value to its right.
  *
- * LeetCode: https://leetcode.com/problems/count-of-smaller-numbers-after-self
+ * Follow-ups:
+ *   1. What if numbers are updated and queried repeatedly?
+ *      Use a Fenwick tree or segment tree with coordinate compression.
+ *   2. What if you need counts of smaller-or-equal values?
+ *      Change the merge comparison so equal right-half values are counted too.
+ *   3. What if the input is too large for recursion depth?
+ *      Use an iterative bottom-up merge sort with the same indexed counting.
  *
- * Follow-up questions:
- * Q: Can we optimize for arrays with many duplicates?
- * A: Use coordinate compression and handle duplicates efficiently in data structures.
- *
- * Q: What if we need to support dynamic updates?
- * A: Use persistent data structures or segment trees with lazy propagation.
- *
- * Q: How to handle very large numbers or floating point values?
- * A: Use discretization/coordinate compression to map to smaller integer range.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Reverse Pairs (493), Count of Range Sum (327).
  */
 public class CountOfSmallerNumbersAfterSelf {
 
+    public static void main(String[] args) {
+        CountOfSmallerNumbersAfterSelf solver = new CountOfSmallerNumbersAfterSelf();
+        int[][] inputs = {{5, 2, 6, 1}, {-1}, {-1, -1}};
+        List<List<Integer>> expected = Arrays.asList(
+            Arrays.asList(2, 1, 1, 0),
+            Collections.singletonList(0),
+            Arrays.asList(0, 0)
+        );
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = solver.countSmallerBIT(inputs[i]);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected.get(i));
+        }
+    }
+
+
     /**
-     * Merge Sort approach with index tracking.
+     * Intuition (interview default): merge sort gives us sorted halves while still
+     * knowing which original index each value came from. When the right-half value
+     * is smaller during merge, it moves before remaining left-half values; that is
+     * exactly evidence that this right-side value is smaller and originally after
+     * those left-side values. For any left value we finally write, the number of
+     * right values already moved ahead of it is added to that value's original
+     * answer slot. Equal values stay on the left first so they are not counted.
      *
-     * Algorithm: Modified merge sort
-     * - During merge process, count inversions for each element
-     * - Maintain original indices to update correct positions in result
-     * - When merging, count elements from right array that are smaller
+     * Time:  O(n log n) - each merge level scans all pairs once across log n levels.
+     * Space: O(n) - indexed pairs, counts, and merge buffers all grow linearly.
      *
-     * Time Complexity: O(n log n)
-     * Space Complexity: O(n) for auxiliary arrays
+     * @param nums input values
+     * @return counts of smaller values after each index
      */
     public List<Integer> countSmaller(int[] nums) {
         int n = nums.length;

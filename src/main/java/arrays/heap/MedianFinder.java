@@ -4,33 +4,37 @@ import java.util.Collections;
 import java.util.PriorityQueue;
 
 /**
- * Find median in a stream of incoming integers.
- * What is median?
- * - Median is the middle value in an ordered integer list.
- * - If the size of the list is even, there is no middle value. So the median is the mean of the two middle values.
- * - For example, [2,3,4], the median is 3.
- * - For example, [2,3], the median is (2 + 3) / 2 = 2.5.
+ * Problem: Find Median from Data Stream
  *
- * Problem Statement:
- * The median is the middle value in an ordered integer list. If the size of the list is even,
- * there is no middle value, and the median is the mean of the two middle values.
+ * Design a data structure that accepts numbers one at a time and can return the
+ * median of all numbers seen so far. For an odd count, the median is the middle
+ * value after sorting; for an even count, it is the average of the two middle values.
  *
- * Design a data structure that supports the following two operations:
- * - void addNum(int num) - Add a integer number from the data stream to the data structure.
- * - double findMedian() - Return the median of all elements so far.
+ * Leetcode: https://leetcode.com/problems/find-median-from-data-stream/
+ * Rating:   acceptance 54.7% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Design | Heap | Two balanced halves
  *
- * LeetCode: https://leetcode.com/problems/find-median-from-data-stream/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  addNum(1), addNum(2), findMedian(), addNum(3), findMedian()
+ *   Output: 1.5, 2.0
+ *   Why:    [1,2] has two middle values 1 and 2, while [1,2,3] has middle value 2.
+ *
+ * Follow-ups:
+ *   1. What if numbers can be deleted too?
+ *      Use two heaps with lazy deletion maps to discard removed values at the top.
+ *   2. What if you need the 90th percentile instead of the median?
+ *      Keep two partitions sized according to the desired percentile.
+ *   3. What if the stream is distributed across machines?
+ *      Use mergeable sketches or partition summaries rather than raw heaps.
  */
 public class MedianFinder {
-
     public static void main(String[] args) {
         MedianFinder medianFinder = new MedianFinder();
         medianFinder.addNum(1);
         medianFinder.addNum(2);
-        System.out.println(medianFinder.findMedian()); // Output: 1.5
+        System.out.printf("stream=[1, 2] -> %.1f  expected=1.5%n", medianFinder.findMedian());
         medianFinder.addNum(3);
-        System.out.println(medianFinder.findMedian()); // Output: 2.0
+        System.out.printf("stream=[1, 2, 3] -> %.1f  expected=2.0%n", medianFinder.findMedian());
     }
 
     private final PriorityQueue<Integer> maxHeap; // Stores smaller half (max at top)
@@ -61,21 +65,17 @@ public class MedianFinder {
     }
 
     /**
-     * Adds a number into the data structure while maintaining median accessibility.
+     * Intuition: the median only needs the values around the middle, not the whole
+     * sorted order. Keep the smaller half in a max-heap and the larger half in a
+     * min-heap. By moving the largest lower value into the min heap after every
+     * insert, all lower values stay less than or equal to all upper values. Then,
+     * if the min heap becomes larger, move its smallest value back so the lower
+     * heap either has the same size or one extra value.
      *
-     * Balanced Heap Insertion with Size Maintenance:
-     * Step 1: Add number to max heap first (smaller half)
-     * Step 2: Move largest element from max heap to min heap to maintain ordering
-     * Step 3: Balance heap sizes if min heap becomes larger than max heap
-     * Step 4: Maintain invariant that max heap size - min heap size ∈ {0, 1}
-     * Step 5: Ensure max heap top ≤ min heap top for correct partitioning
+     * Time:  O(log n) - each insertion performs a constant number of heap operations.
+     * Space: O(n) - all streamed numbers are stored across the two heaps.
      *
-     * Time Complexity: O(log n) where n is current number of elements
-     * - O(log n) for each heap insertion/removal operation
-     * - Constant number of heap operations per addNum call
-     * Space Complexity: O(1) auxiliary space per call
-     *
-     * @param num the integer number to add to the data structure
+     * @param num number to add to the data stream
      */
     public void addNum(int num) {
         // Step 1: Always add to max heap first
@@ -93,18 +93,16 @@ public class MedianFinder {
     }
 
     /**
-     * Returns the median of all elements added so far.
+     * Intuition: the heap sizes encode whether the stream length is odd or even.
+     * If the max heap has one extra value, its top is the exact middle. If the
+     * heaps are equal size, the two middle values are the tops of the two heaps,
+     * because every max-heap value is less than or equal to every min-heap
+     * value. Averaging those two tops gives the median without sorting the stream.
      *
-     * Algorithm: Median Calculation from Heap Tops
-     * Step 1: Check if heaps have equal size (even total count)
-     * Step 2: If equal size, median = average of both heap tops
-     * Step 3: If unequal size, median = top of larger heap (max heap by invariant)
-     * Step 4: Handle precision by using double arithmetic
+     * Time:  O(1) - peeking at heap tops does not depend on stream size.
+     * Space: O(1) - finding the median allocates no additional storage.
      *
-     * Time Complexity: O(1) - constant time access to heap tops
-     * Space Complexity: O(1) - no additional space used
-     *
-     * @return the median value as a double
+     * @return median of all numbers added so far
      */
     public double findMedian() {
         // Check heap size equality

@@ -3,31 +3,43 @@ package arrays.heap;
 import java.util.*;
 
 /**
- * Twitter.java (LeetCode 355 - Design Twitter)
+ * Problem: Design Twitter
  *
- * Problem: Design a simplified Twitter with:
- * - postTweet(userId, tweetId): Create a tweet
- * - getNewsFeed(userId): Get 10 most recent tweets from user + followees
- * - follow(followerId, followeeId): Follow a user
- * - unfollow(followerId, followeeId): Unfollow a user
- * 
- * Leetcode Link: https://leetcode.com/problems/design-twitter/
+ * Build a small Twitter-like service. Users can post tweets, follow or unfollow
+ * other users, and ask for a news feed containing up to the 10 most recent tweet
+ * ids from themselves and the people they follow.
  *
- * Key Insights of Your Approach:
- * 1. Store tweets as [tweetId, timestamp] pairs per user → O(1) post
- * 2. Use global timestamp counter for ordering → simple & effective
- * 3. K-way merge with PriorityQueue → O(k log m) where k=10, m=followees
- * 4. Track tweet index to iterate backwards through each user's timeline
+ * Leetcode: https://leetcode.com/problems/design-twitter/
+ * Rating:   acceptance 45.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Design | Heap | K-way merge of timelines
  *
- * Time Complexity:
- * - postTweet(): O(1)
- * - follow/unfollow(): O(1)
- * - getNewsFeed(): O(m + k log m) where m=followees, k=10 tweets
+ * Example:
+ *   Input:  postTweet(1,5), getNewsFeed(1), follow(1,2), postTweet(2,6), getNewsFeed(1)
+ *   Output: [5], [6,5]
+ *   Why:    user 1 first sees only their own tweet, then sees user 2's newer tweet
+ *           before their older tweet after following user 2.
  *
- * Space Complexity: O(T + F) where T=total tweets, F=total follow relationships
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. What if each user has millions of tweets?
+ *      Store timelines append-only and read only the last needed suffix for feed merging.
+ *   2. What if the feed must include likes or ranking features?
+ *      Replace pure timestamp ordering with a scoring function and cached candidate sets.
+ *   3. What if getNewsFeed must be extremely fast?
+ *      Fan out tweets into precomputed feeds on write, trading post cost for read speed.
  */
 class Twitter {
+
+    public static void main(String[] args) {
+        Twitter twitter = new Twitter();
+        twitter.postTweet(1, 5);
+        System.out.printf("feed(user=1) -> %s  expected=[5]%n", twitter.getNewsFeed(1));
+        twitter.follow(1, 2);
+        twitter.postTweet(2, 6);
+        System.out.printf("feed(user=1) -> %s  expected=[6, 5]%n", twitter.getNewsFeed(1));
+        twitter.unfollow(1, 2);
+        System.out.printf("feed(user=1) -> %s  expected=[5]%n", twitter.getNewsFeed(1));
+    }
+
     Map<Integer, Set<Integer>> userFollowerMap; // followerId → set of followeeIds
     Map<Integer, List<int[]>> userTweetMap; // userId → list of [tweetId, timestamp]
     int time = 0; // Global timestamp counter
@@ -44,15 +56,18 @@ class Twitter {
     }
 
     /**
-     * Steps:
-     * 1. Gather all tweet lists from user + followees
-     * 2. Use a max-heap (PriorityQueue) to perform k-way merge
-     * 3. Extract top 10 most recent tweets based on timestamp
-     * 4. Maintain indices to track current position in each user's tweet list
-     * 5. Return list of tweetIds
-     * 
-     * @param userId
-     * @return
+     * Intuition: each user's timeline is already sorted by time because tweets are
+     * appended in posting order. The news feed is therefore the same as merging the
+     * latest ends of several sorted lists: the user's own list plus each followee's
+     * list. A max-heap keeps the newest available tweet at the top. Whenever we take
+     * one tweet from a timeline, we push the previous tweet from that same timeline,
+     * stopping after at most 10 feed items.
+     *
+     * Time:  O((f + 10) log f) - f timelines are seeded, and at most 10 heap pops are performed.
+     * Space: O(f) - the heap holds at most one candidate from each followed timeline plus the user.
+     *
+     * @param userId id of the user requesting a feed
+     * @return up to 10 most recent tweet ids visible to the user
      */
     public List<Integer> getNewsFeed(int userId) {
         Set<Integer> followees = userFollowerMap.get(userId);

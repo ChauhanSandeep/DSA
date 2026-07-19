@@ -7,61 +7,60 @@ import java.util.stream.Collectors;
 
 
 /**
- * 136. Single Number
+ * Problem: Single Number
  *
- * Problem Statement:
- * Given a non-empty array of integers nums, every element appears exactly twice
- * except for one element that appears only once. Find that single element.
- * You must implement a solution with a linear runtime complexity and use only
- * constant extra space.
+ * Given a non-empty array where every value appears exactly twice except one
+ * value that appears once, return the single value. The intended solution should
+ * run in linear time and use constant extra space.
+ *
+ * Leetcode: https://leetcode.com/problems/single-number/
+ * Rating:   acceptance 78.0% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | XOR | Pair cancellation
  *
  * Example:
- * Input: nums = [2,2,1]
- * Output: 1
- * Explanation: All numbers except 1 appear exactly twice.
+ *   Input:  [4,1,2,1,2]
+ *   Output: 4
+ *   Why:    the two 1s cancel each other, the two 2s cancel each other, and 4 is
+ *           the only value without a matching pair.
  *
- * Input: nums = [4,1,2,1,2]
- * Output: 4
- * Explanation: All numbers except 4 appear exactly twice.
+ * Follow-ups:
+ *   1. What if every other value appears three times?
+ *      Count bits modulo 3 or use a bit-state machine.
+ *   2. What if exactly two values appear once?
+ *      XOR all values, split by one set bit, and XOR each group separately.
+ *   3. What if extra space is allowed and clarity matters more?
+ *      Count frequencies with a HashMap and return the value with count 1.
  *
- * Input: nums = [1]
- * Output: 1
- * Explanation: Single element array returns that element.
- *
- * LeetCode Link: https://leetcode.com/problems/single-number/
- *
- * Follow-up Questions:
- * 1. What if every element appears three times except one that appears once?
- *    Answer: Use bit manipulation with counters for each bit position or state machines.
- *    Related: https://leetcode.com/problems/single-number-ii/
- * 2. What if there are exactly two elements that appear once and others appear twice?
- *    Answer: Use XOR to get combined result, then use bit manipulation to separate the two numbers.
- *    Related: https://leetcode.com/problems/single-number-iii/
- * 3. How would you solve this if extra space was allowed?
- *    Answer: Use HashSet or HashMap to track element frequencies.
- *
- * Related Problems:
- * - 137. Single Number II: https://leetcode.com/problems/single-number-ii/
- * - 260. Single Number III: https://leetcode.com/problems/single-number-iii/
- * - 540. Single Element in a Sorted Array: https://leetcode.com/problems/single-element-in-a-sorted-array/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Single Number II (137), Single Number III (260).
  */
 public class SingleNumber {
 
+    public static void main(String[] args) {
+        SingleNumber solver = new SingleNumber();
+        int[][] inputs = {{2, 2, 1}, {4, 1, 2, 1, 2}, {1}};
+        int[] expected = {1, 4, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.singleNumber(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds single number using XOR bit manipulation.
+     * Intuition (interview default): XOR is perfect for pairs because a value xored
+     * with itself becomes zero, and zero xored with a value leaves that value. XOR
+     * is also order-independent, so we can fold the whole array into one running
+     * value. Every duplicated number cancels out with its twin, leaving only the
+     * number that appeared once. That gives the required linear time and constant
+     * extra space.
      *
-     * Algorithm:
-     * 1. XOR all elements together
-     * 2. Identical numbers cancel out (a ^ a = 0)
-     * 3. Zero doesn't affect other numbers (0 ^ a = a)
-     * 4. Result is the single number that doesn't have a pair
+     * Time:  O(n) - each number participates in one XOR operation.
+     * Space: O(1) - only the running XOR value is stored.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
-     *
-     * @param nums array where every element appears twice except one
-     * @return the element that appears exactly once
+     * @param nums array where every value appears twice except one
+     * @return value that appears exactly once
      */
     public int singleNumber(int[] nums) {
         int result = 0;

@@ -3,14 +3,30 @@ package arrays.simulation;
 import java.util.Arrays;
 
 /**
- * Problem: Game of Life (Conway's Game of Life)
+ * Problem: Game of Life
  *
- * Given a m x n board representing current state of each cell (1 = live, 0 = dead),
- * update the board to its next state using the given rules. The transformation must happen in-place.
+ * Given a board of live and dead cells, update it in place to the next generation
+ * using Conway's Game of Life rules. Every cell's next state depends on the
+ * original states of its eight neighbors, so updates cannot destroy old state
+ * before neighboring cells have been evaluated.
  *
- * LeetCode Link:
- * https://leetcode.com/problems/game-of-life/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Leetcode: https://leetcode.com/problems/game-of-life/
+ * Rating:   acceptance 72.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Matrix | Simulation | In-place transitional states
+ *
+ * Example:
+ *   Input:  [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]
+ *   Output: [[0,0,0],[1,0,1],[0,1,1],[0,1,0]]
+ *   Why:    each cell is updated from the original live-neighbor counts, including
+ *           births for dead cells with exactly three live neighbors.
+ *
+ * Follow-ups:
+ *   1. What if the board is infinite but sparse?
+ *      Store only live cells in a set and count neighbors around those cells.
+ *   2. What if many generations are requested?
+ *      Detect repeated board states or use sparse updates when the live set is small.
+ *   3. What if the board is too large for memory?
+ *      Process tiles with halo borders so neighbor counts remain correct.
  */
 public class GameOfLife {
 
@@ -19,26 +35,37 @@ public class GameOfLife {
     private static final int LIVE = 1;
     private static final int LIVE_TO_DEAD = 2;   // was LIVE, now DEAD
     private static final int DEAD_TO_LIVE = -1;  // was DEAD, now LIVE
-
     public static void main(String[] args) {
-        int[][] board = {
-            {0, 1, 0},
-            {0, 0, 1},
-            {1, 1, 1},
-            {0, 0, 0}
+        GameOfLife solver = new GameOfLife();
+        int[][][] inputs = {
+            {{0, 1, 0}, {0, 0, 1}, {1, 1, 1}, {0, 0, 0}},
+            {{1, 1}, {1, 0}}
+        };
+        String[] expected = {
+            "[[0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 1, 0]]",
+            "[[1, 1], [1, 1]]"
         };
 
-        new GameOfLife().gameOfLife(board);
-        System.out.println(Arrays.deepToString(board));
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] board = Arrays.stream(inputs[i]).map(int[]::clone).toArray(int[][]::new);
+            solver.gameOfLife(board);
+            System.out.printf("board=%s -> %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), Arrays.deepToString(board), expected[i]);
+        }
     }
 
     /**
-     * Updates the board to the next generation in-place using transitional states.
+     * Intuition: every cell must be judged using the old board, but the problem
+     * asks us to write the next board in place. The trick is to use transitional
+     * values that remember both states: a live cell that will die is marked 2, and
+     * a dead cell that will become live is marked -1. During neighbor counting,
+     * values 1 and 2 both mean the cell was originally live. A second pass then
+     * collapses the transitional values into final 0 or 1 states.
      *
-     * Time Complexity: O(m * n)
-     * Space Complexity: O(1)
+     * Time:  O(rows * cols) - each cell checks a fixed set of eight neighbors.
+     * Space: O(1) - the board itself stores transitional states.
      *
-     * @param board m x n input grid
+     * @param board grid of 0 dead cells and 1 live cells, modified in place
      */
     public void gameOfLife(int[][] board) {
         if (board == null || board.length == 0) return;

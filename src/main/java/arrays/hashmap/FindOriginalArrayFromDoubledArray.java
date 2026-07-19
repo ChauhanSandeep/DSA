@@ -3,40 +3,60 @@ package arrays.hashmap;
 import java.util.*;
 
 /**
- * Find Original Array From Doubled Array
+ * Problem: Find Original Array From Doubled Array
  *
- * Problem: Given an array of integers, determine if it's a doubled array.
- * An original array is transformed into a doubled array changed by appending twice the value of
- * every element in original, and then randomly shuffling the resulting array.
+ * A changed array was made by taking an original array, appending twice every
+ * original value, and shuffling the result. Reconstruct one valid original array,
+ * or return an empty array when the changed array cannot be paired this way.
  *
- * Example: changed = [1,3,4,2,6,8] -> Output: [1,3,4]
- * Original array [1,3,4] becomes [1,3,4,2,6,8] when doubled.
+ * Leetcode: https://leetcode.com/problems/find-original-array-from-doubled-array/
+ * Rating:   1557 (zerotrac Elo, Q2, biweekly-contest-61)
+ * Pattern:  Arrays | Hash map | Sort and consume pairs
  *
- * LeetCode: https://leetcode.com/problems/find-original-array-from-doubled-array
+ * Example:
+ *   Input:  [1,3,4,2,6,8]
+ *   Output: [1,3,4]
+ *   Why:    1 pairs with 2, 3 pairs with 6, and 4 pairs with 8, using every
+ *           value in the changed array exactly once.
  *
- * Follow-up Questions:
- * - What if elements can be tripled instead? (Check for x*3 instead of x*2)
- * - How to handle negative numbers? (Current solution handles them correctly)
- * - What if multiple original arrays are possible? (Problem guarantees unique solution)
- * LeetCode Contest Rating: 1557
+ * Follow-ups:
+ *   1. What if values may be negative too?
+ *      Process keys by absolute value so -2 is paired before -4.
+ *   2. What if each value was tripled instead of doubled?
+ *      Pair x with 3*x using the same frequency-consumption idea.
+ *   3. What if you only need to validate, not return the original?
+ *      Keep the same counts but avoid storing the result array.
+ *
+ * Related: Array of Doubled Pairs (954).
  */
 public class FindOriginalArrayFromDoubledArray {
 
+    public static void main(String[] args) {
+        FindOriginalArrayFromDoubledArray solver = new FindOriginalArrayFromDoubledArray();
+        int[][] inputs = {{1, 3, 4, 2, 6, 8}, {0, 0, 0}, {2, 4, 4, 8}};
+        String[] expected = {"[1, 3, 4]", "[]", "[2, 4]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.findOriginalArray(inputs[i].clone());
+            System.out.printf("changed=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), expected[i]);
+        }
+    }
+
+
     /**
-     * Reconstructs original array from doubled array.
+     * Intuition (interview default): once the numbers are sorted, the smallest
+     * unused value cannot be the double of any later positive value, so it must be
+     * an original value that needs a matching double. A frequency map lets us skip
+     * values that were already consumed by an earlier pair. Zeros still need even
+     * counts because each zero pairs with another zero. If any needed double is
+     * missing, no shuffle of the same numbers can form a valid doubled array.
      *
-     * Algorithm:
-     * 1. Check if array length is odd (impossible to be doubled)
-     * 2. Count frequency of each element
-     * 3. Process elements in sorted order
-     * 4. For each element x, check if 2x exists with sufficient frequency
-     * 5. Add x to result and decrease frequency of both x and 2x
+     * Time:  O(n log n) - sorting dominates the linear pairing pass.
+     * Space: O(n) - the frequency map and original list may each hold proportional data.
      *
-     * Time Complexity: O(n log n) due to sorting
-     * Space Complexity: O(n) for frequency map and result
-     *
-     * @param changed the doubled array
-     * @return original array or empty array if not possible
+     * @param changed shuffled doubled array with non-negative values
+     * @return reconstructed original array, or an empty array when pairing is impossible
      */
     public int[] findOriginalArray(int[] changed) {
         int length = changed.length;

@@ -1,28 +1,33 @@
 package arrays.mergesort;
 
-/**
- * 493. Reverse Pairs
+
+
+import java.util.Arrays;/**
+ * Problem: Reverse Pairs
  *
- * Given an integer array nums, return the number of reverse pairs in the array.
+ * Given an integer array, count pairs (i, j) such that i < j and nums[i] is
+ * greater than twice nums[j]. The pair relation depends on both order and value,
+ * so simply sorting the whole array would lose the original left-before-right rule.
  *
- * A reverse pair is a pair (i, j) where:
- * - 0 <= i < j < nums.length
- * - nums[i] > 2 * nums[j]
+ * Leetcode: https://leetcode.com/problems/reverse-pairs/
+ * Rating:   acceptance 34.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | Merge sort | Count cross pairs before merging
  *
- * Example 2:
- * Input: nums = [2,4,3,5,1]
- * Output: 3
+ * Example:
+ *   Input:  [2,4,3,5,1]
+ *   Output: 3
+ *   Why:    the valid pairs are (4,1), (3,1), and (5,1), each with the left value
+ *           greater than twice the right value.
  *
- * LeetCode: https://leetcode.com/problems/reverse-pairs/
+ * Follow-ups:
+ *   1. What if the condition is nums[i] > k * nums[j]?
+ *      Keep the same merge-sort count and replace 2 with k using long arithmetic.
+ *   2. What if values are updated between queries?
+ *      Use a segment tree or binary indexed tree with coordinate compression.
+ *   3. What if you need to list the pairs, not just count them?
+ *      The output can be quadratic, so emit pairs during the cross-count scan.
  *
- * Approach:
- * Use merge sort. When both halves are sorted, we can count cross-half reverse pairs
- * in linear time using a two-pointer scan.
- *
- * Time Complexity: O(n log n)
- * Space Complexity: O(n)
- *
- * @author Sandeep Chauhan
+ * Related: Count of Smaller Numbers After Self (315), Inversion Count.
  */
 public class ReversePairs {
   public int reversePairs(int[] nums) {
@@ -88,17 +93,15 @@ public class ReversePairs {
       nums[index] = buffer[index];
     }
   }
+    public static void main(String[] args) {
+        ReversePairs solver = new ReversePairs();
+        int[][] inputs = {{1, 3, 2, 3, 1}, {2, 4, 3, 5, 1}, {1, 2, 3, 4}};
+        int[] expected = {2, 3, 0};
 
-  public static void main(String[] args) {
-    ReversePairs solver = new ReversePairs();
-
-    // Example 1 -> 2
-    System.out.println(solver.reversePairs(new int[]{1, 3, 2, 3, 1}));
-
-    // Example 2 -> 3
-    System.out.println(solver.reversePairs(new int[]{2, 4, 3, 5, 1}));
-
-    // No reverse pairs -> 0
-    System.out.println(solver.reversePairs(new int[]{1, 2, 3, 4}));
-  }
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.reversePairs(inputs[i].clone());
+            System.out.printf("nums=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 }
