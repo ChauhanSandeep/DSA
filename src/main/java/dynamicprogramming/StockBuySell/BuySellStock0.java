@@ -1,67 +1,60 @@
 package dynamicprogramming.stockbuysell;
 
+import java.util.Arrays;
+
 /**
- * Best Time to Buy and Sell Stock I
+ * Problem: Best Time to Buy and Sell Stock
  *
- * Problem Statement:
- * You are given an array prices where prices[i] is the price of a given stock on the ith day.
- * You want to maximize your profit by choosing a single day to buy one stock and choosing
- * a different day in the future to sell that stock. Return the maximum profit you can achieve
- * from this transaction. If you cannot achieve any profit, return 0.
+ * Choose one buy day and one later sell day to maximize profit. If no profitable transaction exists, return 0.
+ *
+ * Leetcode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock/ (Easy)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Greedy | Prefix minimum | One-pass scan
  *
  * Example:
- * Input: prices = [7,1,5,3,6,4]
- * Output: 5
- * Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
- * Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+ *   Input:  prices = [7, 1, 5, 3, 6, 4]
+ *   Output: 5
+ *   Why:    buying at 1 and selling later at 6 gives the best profit.
  *
- * LeetCode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if you can make multiple transactions?
- *  - LeetCode 122: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/
- * 2. What if you can make at most 2 transactions?
- *  - LeetCode 123: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
- * 3. What if you can make at most k transactions?
- *  - LeetCode 188: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
- * 4. What if there's a cooldown period after selling?
- *  - LeetCode 309: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/
- * 5. What if there's a transaction fee?
- *  - LeetCode 714: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/
- * 6. How to find the actual buy and sell days?
- *  - Track indices during computation
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Stock II (122), Stock III (123), Stock IV (188).
  */
 public class BuySellStock0 {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     BuySellStock0 solution = new BuySellStock0();
-    int[] stockPrices = {10, 22, 5, 75, 65, 80};
-
-    int maxProfit = solution.maxProfit(stockPrices);
-    System.out.println("Maximum Profit: " + maxProfit); // Output: 75
-
-    int maxProfitOptimized = solution.maxProfit(stockPrices);
-    System.out.println("Optimized Maximum Profit: " + maxProfitOptimized); // Output: 75
+    int[][] priceCases = { {7, 1, 5, 3, 6, 4}, {7, 6, 4, 3, 1}, {5} };
+    int[] expected = {5, 0, 0};
+    for (int i = 0; i < priceCases.length; i++) {
+      int got = solution.maxProfit(priceCases[i]);
+      System.out.printf("prices=%s -> %d  expected=%d%n", Arrays.toString(priceCases[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Finds maximum profit from single buy-sell transaction using greedy approach
+    /**
+   * Intuition: if today is the sell day, the best buy is the minimum price seen so far. Maintaining that minimum lets each price test its best sale profit in one pass.
    *
-   * Algorithm: Single Pass Greedy Algorithm
-   * Steps:
-   * 1. Track minimum price encountered so far as potential buy point
-   * 2. For each price, calculate profit if we sell at current price
-   * 3. Update maximum profit if current profit is better
-   * 4. Continue until all prices are processed
+   * Algorithm:
+   *   1. Return 0 when no transaction is possible.
+   *   2. Track minimumPriceSeenSoFar.
+   *   3. For each price, update the minimum.
+   *   4. Compute selling-today profit and update the best.
+   *   5. Return maximumProfitAchievable.
    *
-   * Time Complexity: O(n) where n is number of days
-   * Space Complexity: O(1) - only using constant extra space
+   * Time:  O(n) - one scan.
+   * Space: O(1) - stores two integers.
    *
-   * @param stockPrices array of stock prices for each day
-   * @return maximum profit achievable from single transaction, 0 if no profit possible
+   * @param stockPrices daily prices
+   * @return best single-transaction profit
    */
-  public int maxProfit(int[] stockPrices) {
+public int maxProfit(int[] stockPrices) {
     // Handle edge cases: null array or insufficient days for transaction
     if (stockPrices == null || stockPrices.length < 2) {
       return 0;

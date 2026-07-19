@@ -1,47 +1,41 @@
 package dynamicprogramming.knapsackunbounded;
 
+import java.util.Arrays;
+
 /**
- * Coin Change II - Number of Ways to Make Change
+ * Problem: Coin Change II
  *
- * Problem Statement:
- * You are given an integer array coins representing coins of different denominations and an integer amount
- * representing a total amount of money. Return the number of combinations that make up that amount.
- * If that amount of money cannot be made up by any combination of the coins, return 0.
- * You may assume that you have an infinite number of each kind of coin.
+ * Count combinations that form a target amount when every coin denomination can be used unlimited times. Different orders of the same coins count as one combination.
+ *
+ * Leetcode: https://leetcode.com/problems/coin-change-ii/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Unbounded knapsack | Combination counting
  *
  * Example:
- * Input: amount = 4, coins = [1,2,3]
- * Output: 4
- * Explanation: there are four ways to make up the amount:
- * 4=1+1+1+1
- * 4=1+1+2
- * 4=2+2
- * 4=1+3
+ *   Input:  amount = 4, coins = [1, 2, 3]
+ *   Output: 4
+ *   Why:    the combinations are [1,1,1,1], [1,1,2], [2,2], and [1,3].
  *
- * LeetCode: https://leetcode.com/problems/coin-change-2/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. Q: What if we need to find the minimum number of coins to make the amount?
- *    A: Use DP with dp[i] = min(dp[i], dp[i-coin] + 1) for each coin. (LeetCode 322)
- *
- * 2. Q: What if we need to return the actual combinations instead of just the count?
- *    A: Use backtracking with memoization to generate all valid combinations.
- *
- * 3. Q: What if coins have limited quantities?
- *    A: Transform to 0/1 knapsack by treating each coin quantity as separate items.
- *
- * 4. Q: How would you handle very large amounts efficiently?
- *    A: Use space-optimized 1D DP array and consider mathematical approaches for specific coin systems.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Coin Change (322), Combination Sum IV (377).
  */
 public class CoinChange2 {
 
-  public static void main(String[] args) {
-    int[] coinDenominations = new int[]{1, 2, 5, 10, 20, 50, 100};
-    int targetAmount = 6;
-    System.out.printf("Number of ways to make amount %d is %d%n", targetAmount,
-        countCombinationsOptimized(coinDenominations, targetAmount));
-    System.out.printf("Using recursive approach: %d%n", countCombinationsRecursive(coinDenominations, targetAmount));
+    public static void main(String[] args) {
+    int[][] coinCases = { {1, 2, 5}, {2}, {1} };
+    int[] amounts = {5, 3, 0};
+    int[] expected = {4, 0, 1};
+    for (int i = 0; i < coinCases.length; i++) {
+      int got = countCombinationsOptimized(coinCases[i], amounts[i]);
+      System.out.printf("coins=%s amount=%d -> %d  expected=%d%n", Arrays.toString(coinCases[i]), amounts[i], got, expected[i]);
+    }
   }
 
   /**
@@ -87,25 +81,24 @@ public class CoinChange2 {
     return waysIncludingCurrentCoin + waysExcludingCurrentCoin;
   }
 
-  /**
-   * Dynamic Programming solution to count coin combinations
+    /**
+   * Intuition: dp[coinIndex][currentAmount] counts combinations for currentAmount using the first coinIndex coins. Skipping the current coin uses the row above; taking it stays in the same row at currentAmount - coin value because supply is unlimited.
    *
-   * Steps:
-   * 1. Create 2D DP table where dp[i][j] represents ways to make amount j using first i coins
-   * 2. Initialize base case: dp[i][0] = 1 (one way to make amount 0 - use no coins)
-   * 3. For each coin and each amount, decide whether to include the coin
-   * 4. If coin value <= current amount: dp[i][j] = dp[i-1][j] + dp[i][j-coin_value]
-   * 5. Otherwise: dp[i][j] = dp[i-1][j]
+   * Algorithm:
+   *   1. Reject invalid inputs.
+   *   2. Create dp[numberOfCoins + 1][targetAmount + 1].
+   *   3. Set every dp[coinIndex][0] to 1.
+   *   4. Fill coinIndex from 1..numberOfCoins and currentAmount from 1..targetAmount.
+   *   5. Use skip plus take counts when the coin fits; otherwise copy skip.
    *
-   * Algorithm: Dynamic Programming (Bottom-up)
-   * Time Complexity: O(coins.length * targetAmount)
-   * Space Complexity: O(coins.length * targetAmount)
+   * Time:  O(numberOfCoins * targetAmount) - each cell is filled once.
+   * Space: O(numberOfCoins * targetAmount) - stores the full table.
    *
-   * @param coinDenominations array of available coin denominations
-   * @param targetAmount the target sum to achieve
-   * @return number of ways to make the target amount
+   * @param coinDenominations available coin denominations
+   * @param targetAmount amount to form
+   * @return number of combinations
    */
-  public static int countCombinationsDP(int[] coinDenominations, int targetAmount) {
+public static int countCombinationsDP(int[] coinDenominations, int targetAmount) {
     if (coinDenominations == null || coinDenominations.length == 0 || targetAmount < 0) {
       return 0;
     }

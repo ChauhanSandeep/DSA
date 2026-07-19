@@ -1,55 +1,59 @@
 package dynamicprogramming.stringmatching;
 
 /**
- * Problem: Wildcard Pattern Matching
- * LeetCode: https://leetcode.com/problems/wildcard-matching/
+ * Problem: Wildcard Matching
  *
- * Given an input string and a pattern, implement wildcard matching with support for:
- * - '?' → matches any single character
- * - '*' → matches any sequence of characters (including the empty sequence)
+ * Match an entire string against a wildcard pattern where '?' matches one character and '*' matches any sequence.
+ *
+ * Leetcode: https://leetcode.com/problems/wildcard-matching/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | String matching | Wildcard operators
  *
  * Example:
- * Input: str = "baaababac", pattern = "ba?a*ac"
- * Output: true
- * Explanation: '?' matches a, '*' matches "bab", so full match is possible.
+ *   Input:  str = "baaababac", pattern = "ba?a*ac"
+ *   Output: true
+ *   Why:    '?' matches one a and '*' absorbs the middle bab segment.
  *
- * Follow-up Questions:
- * - Can you optimize space to O(pattern.length())? (Yes, use rolling arrays)
- * - Can you implement it using recursion + memoization? [LC link: https://leetcode.com/problems/wildcard-matching/]
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Regular Expression Matching (10), Edit Distance (72).
  */
 public class WildcardMatching {
 
-    public static void main(String[] args) {
-        String str = "baaababac";
-        String pattern = "ba?a*ac";
+        public static void main(String[] args) {
         WildcardMatching solver = new WildcardMatching();
-        System.out.println(solver.isMatch(str, pattern)); // Expected: true
+        String[][] inputs = { {"baaababac", "ba?a*ac"}, {"aa", "a"}, {"aa", "*"} };
+        boolean[] expected = {true, false, true};
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.isMatch(inputs[i][0], inputs[i][1]);
+            System.out.printf("str=%s pattern=%s -> %s  expected=%s%n", inputs[i][0], inputs[i][1], got, expected[i]);
+        }
     }
 
-    /**
-     * Dynamic Programming Bottom-Up approach.
-     * Uses a 2D DP table to compute if str matches the pattern.
+        /**
+     * Intuition: dp[strIdx][patternIdx] means the prefixes match. A question mark or exact character consumes one from both; a star either matches empty from the left cell or absorbs the current string character from the cell above.
      *
-     * Steps:
-     * 1. Initialize a DP table where dp[i][j] indicates if str[0...i-1] matches pattern[0...j-1].
-     * 2. Handle the base case where both str and pattern are empty.
-     * 3. Fill the first row for patterns starting with '*' since '*' can match an empty sequence.
-     * 4. Iterate through each character in str and pattern:
-     *   - If the current pattern character is '*', it can match zero characters (dp[i][j-1]) or one/more characters (dp[i-1][j]).
-     *   - If the current pattern character is '?', it matches any single character, or if it matches the current string character, we check the previous state (dp[i-1][j-1]).
-     *   - If the characters do not match and the pattern character is not '?', set dp[i][j] to false.
-     * 5. The final answer is found in dp[str.length()][pattern.length()].
+     * Algorithm:
+     *   1. Handle empty pattern.
+     *   2. Create dp and set dp[0][0] = true.
+     *   3. Initialize leading stars for the empty string.
+     *   4. Fill all string and pattern prefixes.
+     *   5. Return dp[strLen][patternLen].
      *
-     * Time Complexity: O(N * M), where N = str.length, M = pattern.length
-     * Space Complexity: O(N * M)
+     * Time:  O(strLen * patternLen) - each state is filled once.
+     * Space: O(strLen * patternLen) - stores the table.
      *
-     * @param str     The input string
-     * @param pattern The wildcard pattern
-     * @return True if the pattern matches the string, false otherwise
+     * @param str input string
+     * @param pattern wildcard pattern
+     * @return true if the whole string matches
      */
-    public boolean isMatch(String str, String pattern) {
+public boolean isMatch(String str, String pattern) {
         int strLen = str.length();
         int patternLen = pattern.length();
 

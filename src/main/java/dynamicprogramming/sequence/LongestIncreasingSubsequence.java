@@ -5,62 +5,57 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Problem: Longest Increasing Subsequence
  *
- * Given an integer array nums, return the length of the longest strictly increasing subsequence.
- * A subsequence is a sequence that can be derived from an array by deleting some or no elements 
- * without changing the order of the remaining elements.
+ * Return the length of the longest strictly increasing subsequence. A subsequence preserves order but may delete elements.
  *
- * Example 1:
- * Input: nums = [10,9,2,5,3,7,101,18]
- * Output: 4
- * Explanation:
- * The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
- * Other valid subsequences: [2,5,7,101], [2,3,7,18], etc.
+ * Leetcode: https://leetcode.com/problems/longest-increasing-subsequence/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Patience sorting | Binary search
  *
+ * Example:
+ *   Input:  nums = [10, 9, 2, 5, 3, 7, 101, 18]
+ *   Output: 4
+ *   Why:    [2, 3, 7, 101] is one increasing subsequence of length 4.
  *
- * LeetCode link: https://leetcode.com/problems/longest-increasing-subsequence/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - Can you return the actual longest increasing subsequence, not just its length?
- *    → Yes, modify DP to store parent pointers and backtrack from the maximum position.
- *  - How would you handle the longest non-decreasing subsequence (allowing equals)?
- *    → Change comparison from nums[j] < nums[i] to nums[j] <= nums[i].
- *  - What if you need to find all possible LIS of maximum length?
- *    → Use backtracking with DP to enumerate all paths leading to maximum length.
- *  - Can you solve this for 2D LIS (longest increasing path in a matrix)?
- *    → Use DFS with memoization from each cell, checking all four directions.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 354 (Russian Doll Envelopes): https://leetcode.com/problems/russian-doll-envelopes/
- *  - LeetCode 673 (Number of Longest Increasing Subsequence): https://leetcode.com/problems/number-of-longest-increasing-subsequence/
- *  - LeetCode 1048 (Longest String Chain): https://leetcode.com/problems/longest-string-chain/
- *  - LeetCode 646 (Maximum Length of Pair Chain): https://leetcode.com/problems/maximum-length-of-pair-chain/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Number of LIS (673), Russian Doll Envelopes (354).
  */
 public class LongestIncreasingSubsequence {
-    public static void main(String[] args) {
-        int[] arr = {10, 22, 9, 33, 21, 50, 41, 60, 60};
-
-        System.out.println("LIS Length (O(N²) DP): " + findLisUsingDp(arr));
-        System.out.println("LIS Length (O(N log N) Binary Search): " + new LongestIncreasingSubsequence().lengthOfLIS(arr));
+        public static void main(String[] args) {
+        LongestIncreasingSubsequence solver = new LongestIncreasingSubsequence();
+        int[][] inputs = { {10, 9, 2, 5, 3, 7, 101, 18}, {}, {7, 7, 7} };
+        int[] expected = {4, 0, 1};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.lengthOfLIS(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 
-    /**
-     * Approach 1: Dynamic Programming
-     * - For each index `i`, we find the length of the LIS that ends at `i`.
-     * - To do this, we look back at all previous indices `j < i` and:
-     *   → If `nums[j] < nums[i]`, then `nums[i]` can be appended to the LIS ending at `j`.
-     *   → We take the **maximum LIS length among all such `j`** and add 1.
+        /**
+     * Intuition: dp[current] is the LIS length that must end at current. Any previous smaller value can be immediately before current, so dp[previous] + 1 is a candidate and the best candidate becomes dp[current].
      *
-     * Why it works:
-     * - We break down the problem into optimal subproblems: LIS ending at each index.
-     * - Each subproblem depends only on prior computed results (typical DP structure).
-     * - We ensure we explore all increasing subsequences that could end at position `i`.
+     * Algorithm:
+     *   1. Return 0 for null or empty input.
+     *   2. Fill dp with 1.
+     *   3. For each current index, scan all previous indices.
+     *   4. Extend from previous when nums[previous] < nums[current].
+     *   5. Track the maximum dp value.
      *
-     * Time Complexity: O(N²)
-     * Space Complexity: O(N)
+     * Time:  O(n^2) - each pair is checked once.
+     * Space: O(n) - one DP value per index.
+     *
+     * @param nums input array
+     * @return LIS length
      */
-    public static int findLisUsingDp(int[] nums) {
+public static int findLisUsingDp(int[] nums) {
         if (nums == null || nums.length == 0) return 0;
 
         int length = nums.length;

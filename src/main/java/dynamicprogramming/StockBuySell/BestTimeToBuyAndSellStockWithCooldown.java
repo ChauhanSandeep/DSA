@@ -1,75 +1,60 @@
 package dynamicprogramming.stockbuysell;
 
+import java.util.Arrays;
+
 /**
  * Problem: Best Time to Buy and Sell Stock with Cooldown
  *
- * You are given an array prices where prices[i] is the price of a given stock on the ith day.
- * Find the maximum profit you can achieve. You may complete as many transactions as you like
- * (i.e., buy one and sell one share of the stock multiple times) with the following restrictions:
- * - After you sell your stock, you cannot buy stock on the next day (i.e., cooldown one day).
+ * Return the maximum profit from unlimited transactions when selling today prevents buying tomorrow. The cooldown creates separate resting and just-sold states.
  *
- * Example 1:
- * Input: prices = [1,2,3,0,2]
- * Output: 3
- * Explanation: transactions = [buy, sell, cooldown, buy, sell]
+ * Leetcode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Stock state machine | Cooldown constraint
  *
- * Example 2:
- * Input: prices = [1]
- * Output: 0
+ * Example:
+ *   Input:  prices = [1, 2, 3, 0, 2]
+ *   Output: 3
+ *   Why:    buy, sell, cooldown, buy, sell earns 1 + 2.
  *
- * LeetCode Link: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. Q: Can you solve with O(n²) space using 2D DP? A: Yes, dp[i][0/1] for hold/sold states
- * 2. Q: What if cooldown is k days instead of 1? A: Modify state to track cooldown days remaining
- * 3. Q: How to handle transaction fees? A: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/
- * 4. Q: Limited transactions version? A: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
- * 5. Q: Return actual buy/sell days, not just profit? A: Backtrack through DP states to reconstruct path
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Stock II (122), Stock IV (188), Transaction Fee (714).
  */
 public class BestTimeToBuyAndSellStockWithCooldown {
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         BestTimeToBuyAndSellStockWithCooldown solution = new BestTimeToBuyAndSellStockWithCooldown();
-
-        int[] prices1 = {1, 2, 3, 0, 2};
-        System.out.println("Max profit: " + solution.maxProfit(prices1)); // 3
-
-        int[] prices2 = {1};
-        System.out.println("Max profit: " + solution.maxProfit(prices2)); // 0
-
-        int[] prices3 = {10, 20, 15, 30};
-        System.out.println("Max profit: " + solution.maxProfit(prices3)); // 25
+        int[][] priceCases = { {1, 2, 3, 0, 2}, {1}, {10, 20, 15, 30} };
+        int[] expected = {3, 0, 20};
+        for (int i = 0; i < priceCases.length; i++) {
+            int got = solution.maxProfit(priceCases[i]);
+            System.out.printf("prices=%s -> %d  expected=%d%n", Arrays.toString(priceCases[i]), got, expected[i]);
+        }
     }
 
-    /**
-     * Finds maximum profit using state machine DP with three states.
+        /**
+     * Intuition: the day ends in hasStock, noStock, or justSold. hasStock can keep holding or buy from noStock; noStock can rest or finish cooldown; justSold can only come from selling yesterday's held stock.
      *
      * Algorithm:
-     * States represent different positions:
-     * - hasStock: Currently holding a stock
-     * - noStock: Not holding stock and can buy tomorrow
-     * - justSold: Just sold stock, must cooldown tomorrow
+     *   1. Return 0 for null or one-day inputs.
+     *   2. Initialize the three states for day 0.
+     *   3. For each later day, save previous states.
+     *   4. Apply the three original state transitions.
+     *   5. Return the better no-stock ending state.
      *
-     * State transitions:
-     * 1. hasStock[i] = max(hasStock[i-1], noStock[i-1] - prices[i])
-     *    - Keep holding previous stock, or buy today from noStock state
-     * 2. noStock[i] = max(noStock[i-1], justSold[i-1])
-     *    - Continue not having stock, or complete cooldown from justSold
-     * 3. justSold[i] = hasStock[i-1] + prices[i]
-     *    - Sell the stock we were holding
+     * Time:  O(n) - one scan over prices.
+     * Space: O(1) - three states are stored.
      *
-     * Key insight: Must track three states because after selling, we cannot immediately
-     * buy (cooldown). This requires separating "no stock but can buy" from "just sold,
-     * must cooldown".
-     *
-     * Time Complexity: O(N) where N is the number of days. Single pass through prices.
-     * Space Complexity: O(1) using only three variables for current states.
-     *
-     * @param prices array of stock prices per day
-     * @return maximum profit achievable with cooldown constraint
+     * @param prices daily prices
+     * @return maximum profit with cooldown
      */
-    public int maxProfit(int[] prices) {
+public int maxProfit(int[] prices) {
         if (prices == null || prices.length <= 1) {
             return 0;
         }

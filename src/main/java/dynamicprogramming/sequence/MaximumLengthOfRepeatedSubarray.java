@@ -3,44 +3,61 @@ package dynamicprogramming.sequence;
 import java.util.*;
 
 /**
- * 718. Maximum Length of Repeated Subarray
+ * Problem: Maximum Length of Repeated Subarray
  *
- * Problem: Given two integer arrays nums1 and nums2, return the maximum length of a
- * subarray that appears in both arrays.
+ * Return the length of the longest contiguous subarray that appears in both arrays. Mismatches reset the current contiguous match.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-length-of-repeated-subarray/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | String matching | Longest common suffix
  *
  * Example:
- * Input: nums1 = [1,2,3,2,1], nums2 = [3,2,1,4,7]
- * Output: 3
- * Explanation: The repeated subarray is [3,2,1].
+ *   Input:  nums1 = [1,2,3,2,1], nums2 = [3,2,1,4,7]
+ *   Output: 3
+ *   Why:    [3,2,1] appears contiguously in both arrays.
  *
- * LeetCode: https://leetcode.com/problems/maximum-length-of-repeated-subarray
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up questions:
- * Q: Can we optimize space complexity?
- * A: Use 1D DP array since we only need previous row, or use rolling hash.
- *
- * Q: How to find all longest common subarrays?
- * A: Modify DP to track actual subarrays instead of just lengths.
- *
- * Q: What if arrays are very large?
- * A: Use rolling hash with binary search or suffix array approaches.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Longest Common Subsequence (1143).
  */
 public class MaximumLengthOfRepeatedSubarray {
 
-    /**
-     * Dynamic Programming approach using 2D array.
+    public static void main(String[] args) {
+        MaximumLengthOfRepeatedSubarray solution = new MaximumLengthOfRepeatedSubarray();
+        int[][] nums1Cases = { {1, 2, 3, 2, 1}, {0, 0, 0}, {1, 2, 3} };
+        int[][] nums2Cases = { {3, 2, 1, 4, 7}, {0, 0}, {4, 5, 6} };
+        int[] expected = {3, 2, 0};
+        for (int i = 0; i < nums1Cases.length; i++) {
+            int got = solution.findLength(nums1Cases[i], nums2Cases[i]);
+            System.out.printf("nums1=%s nums2=%s -> %d  expected=%d%n", Arrays.toString(nums1Cases[i]), Arrays.toString(nums2Cases[i]), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: dp[i][j] is the length of the common contiguous suffix ending at nums1[i - 1] and nums2[j - 1]. Equal values extend the diagonal suffix; unequal values break contiguity and reset the cell to zero.
      *
-     * Algorithm: Bottom-up DP
-     * - dp[i][j] = length of common subarray ending at nums1[i-1] and nums2[j-1]
-     * - If nums1[i-1] == nums2[j-1]: dp[i][j] = dp[i-1][j-1] + 1
-     * - Otherwise: dp[i][j] = 0 (subarray must be contiguous)
-     * - Track maximum length found during computation
+     * Algorithm:
+     *   1. Create dp[m + 1][n + 1].
+     *   2. Iterate i from 1..m and j from 1..n.
+     *   3. On equal values, set dp[i][j] = dp[i - 1][j - 1] + 1.
+     *   4. Otherwise set dp[i][j] = 0.
+     *   5. Track the maximum cell.
      *
-     * Time Complexity: O(m * n) where m, n are array lengths
-     * Space Complexity: O(m * n) for DP table
+     * Time:  O(m * n) - every pair is compared once.
+     * Space: O(m * n) - stores the table.
+     *
+     * @param nums1 first array
+     * @param nums2 second array
+     * @return longest repeated subarray length
      */
-    public int findLength(int[] nums1, int[] nums2) {
+public int findLength(int[] nums1, int[] nums2) {
         int m = nums1.length, n = nums2.length;
         int[][] dp = new int[m + 1][n + 1];
         int maxLength = 0;
@@ -106,6 +123,7 @@ public class MaximumLengthOfRepeatedSubarray {
     }
 
     // Check if there exists common subarray of given length using rolling hash
+    /** Checks whether a fixed-length common subarray exists. */
     private boolean hasCommonSubarray(int[] nums1, int[] nums2, int length) {
         if (length == 0) return true;
 
@@ -134,6 +152,7 @@ public class MaximumLengthOfRepeatedSubarray {
     }
 
     // Get all rolling hashes of subarrays of given length
+    /** Computes rolling hashes for fixed-length windows. */
     private Set<Long> getRollingHashes(int[] nums, int length, int BASE, int MOD, long basePower) {
         Set<Long> hashes = new HashSet<>();
         if (length > nums.length) return hashes;
@@ -218,6 +237,7 @@ public class MaximumLengthOfRepeatedSubarray {
     }
 
     // Build suffix array using simple O(n^2 log n) algorithm
+    /** Builds a simple suffix array. */
     private int[] buildSuffixArray(List<Integer> arr) {
         int n = arr.size();
         Integer[] suffixes = new Integer[n];
@@ -241,6 +261,7 @@ public class MaximumLengthOfRepeatedSubarray {
     }
 
     // Build Longest Common Prefix array
+    /** Builds adjacent longest-common-prefix lengths. */
     private int[] buildLCPArray(List<Integer> arr, int[] suffixArray) {
         int n = suffixArray.length;
         int[] lcp = new int[n - 1];
@@ -319,6 +340,7 @@ public class MaximumLengthOfRepeatedSubarray {
     }
 
     // Check using multiple hash functions
+    /** Checks fixed-length common subarrays with multiple hashes. */
     private boolean hasCommonSubarrayMultiHash(int[] nums1, int[] nums2, int length) {
         if (length == 0) return true;
 
@@ -340,6 +362,7 @@ public class MaximumLengthOfRepeatedSubarray {
     }
 
     // Get rolling hashes using multiple hash functions
+    /** Computes multiple rolling hashes for fixed-length windows. */
     private Set<List<Long>> getMultiRollingHashes(int[] nums, int length, int[] BASES, int MOD) {
         Set<List<Long>> result = new HashSet<>();
         if (length > nums.length) return result;

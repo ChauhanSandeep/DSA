@@ -1,36 +1,40 @@
 package dynamicprogramming.knapsackunbounded;
 
+import java.util.Arrays;
+
 /**
- * Problem: Rod Cutting Problem (Unbounded Knapsack)
+ * Problem: Rod Cutting
  *
- * Given a rod of length `N` and an array `prices` where `prices[i]` is the price of a rod piece of length `i + 1`,
- * determine the maximum total value obtainable by cutting up the rod and selling the pieces.
- * You can reuse any piece length any number of times.
+ * Given prices for rod pieces of each length, cut a rod to maximize total sale value. Any piece length may be reused, making this unbounded knapsack.
+ *
+ * Leetcode: https://www.geeksforgeeks.org/cutting-a-rod-dp-13/ (Classic DP)
+ * Rating:   not available (not a Leetcode contest problem)
+ * Pattern:  Dynamic programming | Unbounded knapsack | Max profit
  *
  * Example:
- * prices = [1, 5, 8, 9], rodLength = 4
- * Cuts = [2,2] → total = 5 + 5 = 10 (max possible)
+ *   Input:  prices = [1, 5, 8, 9], rodLength = 4
+ *   Output: 10
+ *   Why:    two pieces of length 2 earn 5 + 5, which beats selling length 4 for 9.
  *
- * Output:
- * Maximum Profit: 10
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Leetcode-style link (similar): https://www.geeksforgeeks.org/cutting-a-rod-dp-13/
- *
- * Follow-up Questions:
- * - How would you optimize space?
- *   → Use a 1D DP array instead of 2D.
- *
- * - How would you reconstruct the actual cut sequence?
- *   → Track choices in a separate array (backtracking path).
- *     (Related problem: https://leetcode.com/problems/coin-change/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Coin Change (322), Integer Break (343).
  */
 public class RodCutting {
-  public static void main(String[] args) {
-    int[] prices = {1, 5, 8, 9}; // Prices for rod pieces of length 1, 2, 3, 4
-    int rodLength = prices.length;
-    int maxProfit = computeMaxProfitOptimized(prices, rodLength);
-    System.out.println("Maximum Profit: " + maxProfit);
+    public static void main(String[] args) {
+    int[][] priceCases = { {1, 5, 8, 9}, {3, 5, 8, 9, 10, 17, 17, 20}, {} };
+    int[] rodLengths = {4, 8, 0};
+    int[] expected = {10, 24, 0};
+    for (int i = 0; i < priceCases.length; i++) {
+      int got = computeMaxProfitOptimized(priceCases[i], rodLengths[i]);
+      System.out.printf("prices=%s rodLength=%d -> %d  expected=%d%n", Arrays.toString(priceCases[i]), rodLengths[i], got, expected[i]);
+    }
   }
 
   /**
@@ -83,21 +87,24 @@ public class RodCutting {
     return dp[remainingLength][pieceLength];
   }
 
-  /**
-   * Standard 2D Bottom-Up DP approach for Rod Cutting (Unbounded Knapsack).
+    /**
+   * Intuition: dp[pieceLength][currentRodLength] is the best profit for currentRodLength using piece sizes up to pieceLength. Taking a piece stays on the same row because the same length can be reused; skipping it moves to the previous row.
    *
    * Algorithm:
-   * - dp[i][j] represents the maximum profit using rod pieces up to length i for rod of length j.
-   * - Either take the i-th piece (can be reused) or skip it.
+   *   1. Create dp[rodLength + 1][rodLength + 1].
+   *   2. Iterate pieceLength from 1 through rodLength.
+   *   3. Iterate currentRodLength from 1 through rodLength.
+   *   4. If the piece fits, choose max(take, skip).
+   *   5. Otherwise copy the previous-row value.
    *
-   * Time Complexity: O(N^2)
-   * Space Complexity: O(N^2)
+   * Time:  O(rodLength^2) - every piece length is checked for every rod length.
+   * Space: O(rodLength^2) - stores the full table.
    *
-   * @param prices Array where prices[i] is the price of a rod piece of length i+1
-   * @param rodLength The total length of the rod
-   * @return Maximum achievable profit
+   * @param prices prices for piece lengths 1..n
+   * @param rodLength total rod length
+   * @return maximum profit
    */
-  public static int computeMaxProfit(int[] prices, int rodLength) {
+public static int computeMaxProfit(int[] prices, int rodLength) {
     int[][] dp = new int[rodLength + 1][rodLength + 1]; // dp[pieceLength][currentRodLength]
 
     for (int pieceLength = 1; pieceLength <= rodLength; pieceLength++) {

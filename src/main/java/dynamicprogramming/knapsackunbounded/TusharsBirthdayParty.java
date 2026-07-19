@@ -3,81 +3,60 @@ package dynamicprogramming.knapsackunbounded;
 import java.util.Arrays;
 
 /**
- * Problem Statement:
- * Tushar's Birthday Party
+ * Problem: Tushar's Birthday Party
  *
- * You are given:
- * - `eatingCapacities[]`: Array of friends' eating capacities.
- * - `dishCapacities[]`: Array of dish filling capacities.
- * - `dishCosts[]`: Array of corresponding dish costs.
+ * Each friend has an exact eating capacity. Dishes have capacities and costs, may be ordered unlimited times, and the goal is minimum total cost for all friends.
  *
- * A friend is satisfied if the sum of dish capacities they consume exactly
- * equals their eating capacity.
- * Each dish can be used unlimited times (unbounded). The goal is to minimize
- * the total cost of satisfying all friends.
- *
- * Constraints:
- * - Each friend can be satisfied independently.
- * - Dish capacities and costs are positive integers.
+ * InterviewBit: https://www.interviewbit.com/problems/tushars-birthday-party/
+ * Rating:   not available
+ * Pattern:  Dynamic programming | Unbounded knapsack | Minimum cost fill
  *
  * Example:
- * eatingCapacities = [2, 4]
- * dishCapacities = [1, 2]
- * dishCosts = [3, 5]
- * Output: 11
- * Explanation: For friend 1 → use one dish of capacity 2 (cost = 5),
- * For friend 2 → use two dishes of capacity 2 (cost = 5 + 5 = 10)
- * Total = 5 + 10 = 15. But there could be a cheaper combination with (1+1) etc.
+ *   Input:  friends = [2, 4], dishes = [1, 2], costs = [3, 5]
+ *   Output: 15
+ *   Why:    capacity 2 costs 5 and capacity 4 costs 10, for a total of 15.
  *
- * InterviewBit Link:
- * https://www.interviewbit.com/problems/tushars-birthday-party/
- *
- * Follow-up Questions (FAANG-relevant):
- * 1. What if some dishes are only allowed a limited number of times?
- * → Then it becomes a **Bounded Knapsack** problem.
- *
- * 2. What if each dish has a satisfaction score and we need to maximize it
- * within budget?
- * → Turns into a **Knapsack Maximization** variant with cost as weight.
- *
- * 3. What if some friends are vegetarians and can’t eat certain dishes?
- * → Add filtering logic per friend based on dietary constraints.
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  */
 public class TusharsBirthdayParty {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     TusharsBirthdayParty solution = new TusharsBirthdayParty();
-
-    // Example test case
-    int[] eatingCapacities = { 2, 4, 6 };
-    int[] dishCapacities = { 1, 2, 3 };
-    int[] dishCosts = { 3, 5, 7 };
-
-    int iterativeCost = solution.findMinimumCost(eatingCapacities, dishCapacities, dishCosts);
-    int recursiveCost = solution.findMinimumCostRecursive(eatingCapacities, dishCapacities, dishCosts);
-
-    System.out.println("Iterative DP Cost: " + iterativeCost);
-    System.out.println("Recursive Memoization Cost: " + recursiveCost);
+    int[][] eatingCases = { {2, 4, 6}, {} };
+    int[][] dishCapacityCases = { {1, 2, 3}, {1, 2, 3} };
+    int[][] dishCostCases = { {3, 5, 7}, {3, 5, 7} };
+    int[] expected = {29, 0};
+    for (int i = 0; i < eatingCases.length; i++) {
+      int got = solution.findMinimumCost(eatingCases[i], dishCapacityCases[i], dishCostCases[i]);
+      System.out.printf("friends=%s dishes=%s costs=%s -> %d  expected=%d%n", Arrays.toString(eatingCases[i]), Arrays.toString(dishCapacityCases[i]), Arrays.toString(dishCostCases[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Computes the minimum total cost to satisfy all friends (Iterative DP).
-   * For each friend, we calculate the least cost to fill their eating capacity
-   * using any number of dishes.
+    /**
+   * Intuition: minCostForCapacity[c] is the cheapest exact fill for capacity c using unlimited dishes. After precomputing through the largest friend capacity, each friend contributes one lookup to the total.
    *
-   * Time Complexity: O(F * C * D)
-   * - F = number of friends
-   * - C = maximum eating capacity
-   * - D = number of dishes
+   * Algorithm:
+   *   1. Find maxCapacity.
+   *   2. Compute minimum cost for every capacity up to maxCapacity.
+   *   3. Initialize totalMinCost.
+   *   4. Add the precomputed cost for each friend.
+   *   5. Return the total.
    *
-   * Space Complexity: O(C) for the DP array
+   * Time:  O(maxCapacity * dishCapacities.length + eatingCapacities.length) - precompute plus lookups.
+   * Space: O(maxCapacity) - one cost array.
    *
-   * @param eatingCapacities Array of each friend's eating capacity
-   * @param dishCapacities   Capacity (filling value) of each dish
-   * @param dishCosts        Cost of each dish
-   * @return Minimum total cost to satisfy all friends
+   * @param eatingCapacities friend capacities
+   * @param dishCapacities dish filling values
+   * @param dishCosts dish costs
+   * @return minimum total cost
    */
-  public int findMinimumCost(int[] eatingCapacities, int[] dishCapacities, int[] dishCosts) {
+public int findMinimumCost(int[] eatingCapacities, int[] dishCapacities, int[] dishCosts) {
     // Find the maximum capacity among all friends to build one DP table up to that
     // limit
     int maxCapacity = Arrays.stream(eatingCapacities).max().orElse(0);
@@ -127,33 +106,8 @@ public class TusharsBirthdayParty {
     return totalMinCost;
   }
 
-  /**
-   * Recursive helper to compute minimum cost to reach a target capacity.
-   * 
-   * Intuition:
-   * - Base case: If capacity is 0, cost is 0 (no dishes needed).
-   * - For each dish, try using it and recursively solve for remaining capacity.
-   * - Take minimum across all dish choices.
-   * - Use memoization to avoid recomputing same subproblems.
-   *
-   * Approach:
-   * - If capacity == 0, return 0
-   * - If already computed (memo[capacity] != null), return cached result
-   * - Try each dish: if dishCapacity <= targetCapacity, recurse on (capacity -
-   * dishCapacity)
-   * - Store and return minimum cost found
-   *
-   * Time Complexity: O(C * D) per unique capacity
-   * Space Complexity: O(C) for memo + O(C) recursion depth
-   *
-   * @param targetCapacity The capacity we need to fill
-   * @param dishCapacities Array of dish capacities
-   * @param dishCosts      Array of dish costs
-   * @param memo           Memoization array
-   * @return Minimum cost to reach targetCapacity, or Integer.MAX_VALUE if
-   *         impossible
-   */
-  private int computeMinCostRecursive(int targetCapacity, int[] dishCapacities,
+    /** Returns minimum exact-fill cost for one capacity. */
+private int computeMinCostRecursive(int targetCapacity, int[] dishCapacities,
       int[] dishCosts, Integer[] memo) {
     // Base case: no capacity to fill
     if (targetCapacity == 0) {
@@ -189,20 +143,8 @@ public class TusharsBirthdayParty {
     return minCost;
   }
 
-  /**
-   * Computes the minimum cost to exactly reach every capacity up to maxCapacity.
-   * Uses bottom-up DP approach (Unbounded Knapsack variation).
-   *
-   * Time Complexity: O(C * D)
-   * - C = maxCapacity
-   * - D = number of dishes
-   *
-   * @param maxCapacity    The maximum capacity we need to compute for
-   * @param dishCapacities The filling capacity of each dish
-   * @param dishCosts      The cost of each dish
-   * @return An array where index i stores the minimum cost to reach capacity i
-   */
-  private int[] computeMinCostForAllCapacities(int maxCapacity, int[] dishCapacities, int[] dishCosts) {
+    /** Builds minimum exact-fill costs up to maxCapacity. */
+private int[] computeMinCostForAllCapacities(int maxCapacity, int[] dishCapacities, int[] dishCosts) {
     int[] minCostForCapacity = new int[maxCapacity + 1];
     Arrays.fill(minCostForCapacity, Integer.MAX_VALUE);
     minCostForCapacity[0] = 0; // Base case: 0 cost to fill capacity 0

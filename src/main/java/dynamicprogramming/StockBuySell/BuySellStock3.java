@@ -1,71 +1,60 @@
 package dynamicprogramming.stockbuysell;
 
+import java.util.Arrays;
+
 /**
- * Best Time to Buy and Sell Stock III
+ * Problem: Best Time to Buy and Sell Stock III
  *
- * Problem Statement:
- * You are given an array prices where prices[i] is the price of a given stock on the ith day.
- * Find the maximum profit you can achieve. You may complete at most two transactions.
- * Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the
- * stock before you buy again).
+ * Return the maximum profit from at most two complete transactions. The two transactions cannot overlap.
+ *
+ * Leetcode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Prefix/suffix profit | Two transactions
  *
  * Example:
- * Input: prices = [3,3,5,0,0,3,1,4]
- * Output: 6
- * Explanation: Buy on day 4 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
- * Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
- * Total profit = 3 + 3 = 6.
+ *   Input:  prices = [3, 3, 5, 0, 0, 3, 1, 4]
+ *   Output: 6
+ *   Why:    buy at 0, sell at 3, then buy at 1 and sell at 4.
  *
- * LeetCode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we can make at most k transactions?
- *  - LeetCode 188: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
- * 2. How to optimize space complexity?
- *  - Use state machine DP with O(1) space
- * 3. What if transactions have different fees?
- *  - Extend DP states to include variable fees
- * 4. How to find actual transaction days?
- *  - Track buy/sell decisions during DP computation
- * 5. What if we want to minimize risk while maximizing profit?
- *  - Add risk factor to profit calculation
- * 6. Handle very large price arrays efficiently?
- *  - Use divide and conquer or sliding window optimizations
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Stock I (121), Stock II (122), Stock IV (188).
  */
 public class BuySellStock3 {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     BuySellStock3 solution = new BuySellStock3();
-    int[] stockPrices = {3, 3, 5, 0, 0, 3, 1, 4};
-
-    System.out.println("Two-pass approach result: " + solution.maxProfitWithDays(stockPrices)); // Output: 6
+    int[][] priceCases = { {3, 3, 5, 0, 0, 3, 1, 4}, {1, 2, 3, 4, 5}, {1} };
+    int[] expected = {6, 4, 0};
+    for (int i = 0; i < priceCases.length; i++) {
+      int got = solution.maxProfit(priceCases[i]);
+      System.out.printf("prices=%s -> %d  expected=%d%n", Arrays.toString(priceCases[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Main method: Left-Right DP approach (Most intuitive for interviews).
-   * Step-by-step:
-   *  1. Split problem: max profit = best of (first transaction in [0,i] + second in [i+1,n-1])
-   *  2. First pass (left to right):
-   *     - leftProfit[i] = max profit achievable using prices[0..i] with one transaction
-   *     - Track minimum price seen so far for optimal buying point
-   *  3. Second pass (right to left):
-   *     - rightProfit[i] = max profit achievable using prices[i..n-1] with one transaction
-   *     - Track maximum price seen so far for optimal selling point
-   *  4. Third pass: combine results
-   *     - For each split point i: profit = leftProfit[i] + rightProfit[i+1]
-   *     - Return maximum across all split points
+    /**
+   * Intuition: every two-transaction answer has a split point. leftProfit[i] is the best first transaction ending by i, and rightProfit[i] is the best second transaction starting at i; combining them checks every split.
    *
-   * Key Insight:
-   * Two transactions don't overlap, so we can split the timeline and compute
-   * best single transaction for left and right parts independently. The split
-   * point represents the gap between two transactions.
+   * Algorithm:
+   *   1. Return 0 for invalid inputs.
+   *   2. Build leftProfit with a left-to-right min price scan.
+   *   3. Build rightProfit with a right-to-left max price scan.
+   *   4. Combine leftProfit[i] with rightProfit[i + 1].
+   *   5. Return the maximum combined profit.
    *
-   * Algorithm: Two-pass Dynamic Programming with arrays.
-   * Time Complexity: O(n), three linear passes through array.
-   * Space Complexity: O(n) for leftProfit and rightProfit arrays.
+   * Time:  O(n) - three linear passes.
+   * Space: O(n) - two profit arrays.
+   *
+   * @param prices daily prices
+   * @return maximum profit from at most two transactions
    */
-  public int maxProfit(int[] prices) {
+public int maxProfit(int[] prices) {
       if (prices == null || prices.length < 2) {
           return 0;
       }

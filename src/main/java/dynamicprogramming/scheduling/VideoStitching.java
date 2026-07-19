@@ -3,70 +3,49 @@ package dynamicprogramming.scheduling;
 import java.util.Arrays;
 
 /**
- * Problem: Video Stitching (LeetCode #1024)
+ * Problem: Video Stitching
  *
- * Problem Statement:
- * You are given a series of video clips from a sporting event that lasted time seconds.
- * These video clips can be overlapping with each other and have varying lengths.
- * Each video clip is described as an array clips where clips[i] = [starti, endi] indicates
- * that the ith clip started at starti and ended at endi.
+ * Given video clips as intervals, return the minimum number needed to cover [0, targetTime], or -1 if coverage is impossible.
  *
- * We can cut these clips into segments freely. For example, a clip [0, 7] can be cut into
- * segments [0, 1] + [1, 3] + [3, 7].
+ * Leetcode: https://leetcode.com/problems/video-stitching/ (Medium)
+ * Rating:   contest Elo 1746
+ * Pattern:  Greedy | Interval covering | Farthest reach
  *
- * Return the minimum number of clips needed so that we can cut the clips into segments that
- * cover the entire sporting event [0, time]. If the task is impossible, return -1.
+ * Example:
+ *   Input:  clips = [[0,2],[4,6],[8,10],[1,9],[1,5],[5,9]], time = 10
+ *   Output: 3
+ *   Why:    [0,2], [1,9], and [8,10] cover the whole event.
  *
- * Example 1:
- * Input: clips = [[0,2],[4,6],[8,10],[1,9],[1,5],[5,9]], time = 10
- * Output: 3
- * Explanation: We take the clips [0,2], [8,10], [1,9]; a total of 3 clips to cover [0,10].
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Example 2:
- * Input: clips = [[0,1],[1,2]], time = 5
- * Output: -1
- * Explanation: We can't cover [0,5] with only [0,1] and [1,2].
- *
- * Approaches:
- * 1. Greedy Approach (Optimal): O(n log n) time, O(1) space
- *    - Sort clips by start time
- *    - Use a greedy approach to select the clip that extends the current end the farthest
- *
- * 2. Dynamic Programming: O(n * time) time, O(time) space
- *    - dp[i] represents the minimum clips needed to cover time [0, i]
- *    - Initialize dp[0] = 0, others to infinity
- *    - For each time t, update dp[end] using dp[start] + 1 if it's better
- *
- * Time Complexity: O(n log n) for optimal solution
- * Space Complexity: O(1) for optimal solution
- *
- * Follow-up Questions:
- * 1. What if we need to return the actual clips used instead of just the count?
- *    Answer: We can modify the solution to track the selected clips' indices or ranges.
- *
- * 2. How would you handle very large time values (e.g., 10^9)?
- *    Answer: The greedy approach would be more efficient as it doesn't depend on the time value.
- *
- * 3. What if clips can have negative start or end times?
- *    Answer: We would need to adjust the approach to handle negative indices or normalize them.
- *
- * LeetCode: https://leetcode.com/problems/video-stitching/
- * LeetCode Contest Rating: 1746
+ * Related: Jump Game II (45), Minimum Number of Taps (1326).
  */
 public class VideoStitching {
 
-    /**
-     * Greedy Solution (Optimal)
+        /**
+     * Intuition: currentEnd is the covered prefix. Among clips that start within that prefix, choosing the one with farthest end gives the largest possible extension for one clip; if none extends, coverage is impossible.
      *
-     * Approach:
-     * 1. Sort clips by their start time
-     * 2. Use a greedy approach to select the clip that extends the current end the farthest
-     * 3. Keep track of the current end and the farthest end we can reach
+     * Algorithm:
+     *   1. Sort clips by start.
+     *   2. While currentEnd is before targetTime, scan reachable clips.
+     *   3. Track the farthest endpoint.
+     *   4. Return -1 if farthest does not advance.
+     *   5. Commit one clip and move currentEnd to farthest.
      *
-     * Time Complexity: O(n log n) due to sorting where n is the number of clips
-     * Space Complexity: O(1)
+     * Time:  O(n log n) - sorting dominates.
+     * Space: O(1) - only counters are stored.
+     *
+     * @param clips [start, end] clips
+     * @param targetTime target interval end
+     * @return minimum clips or -1
      */
-    public int videoStitching(int[][] clips, int targetTime) {
+public int videoStitching(int[][] clips, int targetTime) {
         // Sort clips by start time
         Arrays.sort(clips, (a, b) -> a[0] - b[0]);
 
@@ -196,27 +175,15 @@ public class VideoStitching {
         return dp[time];
     }
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         VideoStitching solution = new VideoStitching();
-
-        // Test cases
-        int[][] clips1 = {{0,2},{4,6},{8,10},{1,9},{1,5},{5,9}};
-        System.out.println("Test 1: " + solution.videoStitching(clips1, 10));  // Expected: 3
-
-        int[][] clips2 = {{0,1},{1,2}};
-        System.out.println("Test 2: " + solution.videoStitching(clips2, 5));   // Expected: -1
-
-        int[][] clips3 = {{0,4},{2,8}};
-        System.out.println("Test 3: " + solution.videoStitching(clips3, 5));   // Expected: 2
-
-        // Test DP solution
-        System.out.println("\nDP Solution:");
-        System.out.println("Test 1: " + solution.videoStitchingDP(clips1, 10));  // Expected: 3
-        System.out.println("Test 2: " + solution.videoStitchingDP(clips2, 5));   // Expected: -1
-
-        // Test optimized solution
-        System.out.println("\nOptimized Solution:");
-        System.out.println("Test 1: " + solution.videoStitchingOptimized(clips1, 10));  // Expected: 3
-        System.out.println("Test 2: " + solution.videoStitchingOptimized(clips2, 5));   // Expected: -1
+        int[][][] clipCases = { {{0, 2}, {4, 6}, {8, 10}, {1, 9}, {1, 5}, {5, 9}}, {{0, 1}, {1, 2}}, {{0, 4}, {2, 8}} };
+        int[] targetTimes = {10, 5, 5};
+        int[] expected = {3, -1, 2};
+        for (int i = 0; i < clipCases.length; i++) {
+            int[][] input = Arrays.stream(clipCases[i]).map(int[]::clone).toArray(int[][]::new);
+            int got = solution.videoStitching(input, targetTimes[i]);
+            System.out.printf("clips=%s time=%d -> %d  expected=%d%n", Arrays.deepToString(clipCases[i]), targetTimes[i], got, expected[i]);
+        }
     }
 }

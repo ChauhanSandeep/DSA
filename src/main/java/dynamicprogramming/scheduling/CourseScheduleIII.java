@@ -4,99 +4,60 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
- * Problem: Course Schedule III (LeetCode 630)
+ * Problem: Course Schedule III
  *
- * Problem Statement:
- * There are n different online courses numbered from 1 to n. You are given an
- * array 'courses' where
- * courses[i] = [durationi, lastDayi] indicate that the ith course should be
- * taken continuously for
- * durationi days and must be finished before or on lastDayi. You will start on
- * day 1. Return the
- * maximum number of courses that you can take.
+ * Choose the maximum number of sequential courses where each course has a duration and must finish by its last day.
  *
- * Example 1:
- * Input: courses = [[100, 200], [200, 1300], [1000, 1250], [2000, 3200]]
- * Output: 3
- * Explanation:
- * - Take the 1st course first, 100 days to finish on day 100.
- * - Take the 3rd course next, 1000 days to finish on day 1100.
- * - Take the 2nd course last, 200 days to finish on day 1300.
- * - The 4th course cannot be taken now since you will finish it on day 3300
- * which is beyond the last day.
+ * Leetcode: https://leetcode.com/problems/course-schedule-iii/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Greedy | Scheduling by deadline | Max-heap replacement
  *
- * Approach:
- * This problem can be solved using a greedy approach with a max-heap. The key
- * insight is to prioritize
- * courses with earlier deadlines and to replace longer duration courses with
- * shorter ones when necessary.
+ * Example:
+ *   Input:  courses = [[100,200],[200,1300],[1000,1250],[2000,3200]]
+ *   Output: 3
+ *   Why:    replacing the longest chosen course keeps total time small enough for deadlines.
  *
- * Steps to solve:
- * 1. Sort the courses by their end times (lastDayi). This allows us to consider
- * courses in the order
- * of their deadlines.
- * 2. Use a max-heap to keep track of the durations of the courses we've taken
- * so far.
- * 3. Iterate through each course, and for each course:
- * a. Add the current course's duration to our current time.
- * b. Add the duration to the max-heap.
- * c. If the current time exceeds the course's deadline, remove the course with
- * the longest duration
- * from the heap and subtract its duration from the current time.
- * 4. The size of the heap at the end will be the maximum number of courses that
- * can be taken.
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Time Complexity: O(n log n) - Sorting takes O(n log n) and each heap
- * operation takes O(log n)
- * Space Complexity: O(n) - For the heap which can store up to n elements
- *
- * Follow-up Questions:
- * 1. What if each course has a weight/priority and we want to maximize the
- * total weight instead of count?
- * Answer: We would need to modify the approach to consider weights when
- * deciding which course to replace.
- * This would require a more complex dynamic programming solution.
- *
- * 2. What if we can take multiple courses in parallel?
- * Answer: The problem would become similar to the interval scheduling problem
- * where we want to find
- * the maximum number of non-overlapping intervals.
- *
- * 3. What if some courses have prerequisites?
- * Answer: We would first need to perform a topological sort to determine a
- * valid course order before
- * applying the greedy approach.
- *
- * LeetCode: https://leetcode.com/problems/course-schedule-iii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Maximum Profit in Job Scheduling (1235).
  */
 public class CourseScheduleIII {
 
-    /**
-     * Calculates the maximum number of courses that can be taken.
+    public static void main(String[] args) {
+        CourseScheduleIII solution = new CourseScheduleIII();
+        int[][][] courseCases = { {{100, 200}, {200, 1300}, {1000, 1250}, {2000, 3200}}, {{1, 2}}, {} };
+        int[] expected = {3, 1, 0};
+        for (int i = 0; i < courseCases.length; i++) {
+            int[][] input = Arrays.stream(courseCases[i]).map(int[]::clone).toArray(int[][]::new);
+            int got = solution.scheduleCourse(input);
+            System.out.printf("courses=%s -> %d  expected=%d%n", Arrays.deepToString(courseCases[i]), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: after sorting by deadline, the selected courses should have the smallest total duration for their count. If adding a course misses a deadline, removing the longest selected duration frees the most time while losing one course.
      *
-     * Steps to solve:
-     * 1. Sort the courses by their end times to consider courses with earlier
-     * deadlines first.
-     * 2. Use a max-heap to keep track of the durations of the courses taken so far.
-     * 3. Maintain a running total of the current time taken by the selected
-     * courses.
-     * 4. For each course:
-     * a. Add the current course's duration to the total time.
-     * b. Add the duration to the max-heap.
-     * c. If the total time exceeds the current course's deadline, remove the
-     * longest course from the heap
-     * and subtract its duration from the total time.
-     * 5. The size of the heap at the end represents the maximum number of courses
-     * that can be taken.
+     * Algorithm:
+     *   1. Sort courses by deadline.
+     *   2. Store selected durations in a max-heap.
+     *   3. Add each duration to currentTime and the heap.
+     *   4. If the deadline is missed, remove the longest selected duration.
+     *   5. Return the heap size.
      *
-     * Time complexity: O(n log n)
-     * - sorting the courses takes O(n log n)
-     * - each insertion and deletion from the max-heap takes O(log n)
-     * and we do this for each of the n courses.
-     * Space complexity: O(n) for the max-heap
+     * Time:  O(n log n) - sorting and heap operations.
+     * Space: O(n) - heap of selected durations.
+     *
+     * @param courses [duration, lastDay] pairs
+     * @return maximum courses completed on time
      */
-    public int scheduleCourse(int[][] courses) {
+public int scheduleCourse(int[][] courses) {
         // Sort courses by their end times (lastDayi)
         Arrays.sort(courses, (a, b) -> {
             if (a[1] == b[1]) {

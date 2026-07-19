@@ -4,70 +4,62 @@ import java.util.*;
 
 
 /**
- * Maximum Profit in Job Scheduling
+ * Problem: Maximum Profit in Job Scheduling
  *
- * Problem Statement:
- * We have n jobs, where every job is scheduled to be done from startTime[i] to endTime[i],
- * obtaining a profit of profit[i]. You're given the startTime, endTime and profit arrays,
- * return the maximum profit you can take such that there are no two jobs in the subset with overlapping time range.
- * If you choose a job that ends at time X you will be able to start another job that starts at time X.
+ * Choose non-overlapping jobs with maximum total profit. A job ending at time x is compatible with one starting at time x.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-profit-in-job-scheduling/ (Hard)
+ * Rating:   contest Elo 2023
+ * Pattern:  Dynamic programming | Weighted interval scheduling | Binary search
  *
  * Example:
- * Input:
- * startTime = [1, 2, 3, 3],
- * endTime =   [3, 4, 5, 6],
- * profit =    [50,10,40,70]
- * Output: 120
- * Explanation: The subset chosen is the first and fourth job.
- * Time range [1-3]+[3-6], we get profit of 120 = 50 + 70.
+ *   Input:  start = [1,2,3,3], end = [3,4,5,6], profit = [50,10,40,70]
+ *   Output: 120
+ *   Why:    jobs [1,3] and [3,6] do not overlap and earn 50 + 70.
  *
- * LeetCode: https://leetcode.com/problems/maximum-profit-in-job-scheduling/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we want to find the actual jobs selected?
- *  - Maintain a parent array during DP to backtrack
- * 2. What if jobs have different priorities?
- *  - Modify profit calculation to include priority weights
- * 3. How to handle real-time job scheduling?
- *  - Use segment trees or interval trees for dynamic updates
- * 4. Memory optimization for large datasets?
- *  - Use space-optimized DP or coordinate compression
- * LeetCode Contest Rating: 2023
+ * Related: Non-overlapping Intervals (435), Course Schedule III (630).
  */
 public class MaximumProfitJobScheduling {
 
-  public static void main(String[] args) {
-    int[] startTime = {1, 2, 3, 3};
-    int[] endTime = {3, 4, 5, 6};
-    int[] profit = {50, 10, 40, 70};
-
+    public static void main(String[] args) {
     MaximumProfitJobScheduling scheduler = new MaximumProfitJobScheduling();
-    int maxProfit = scheduler.jobScheduling(startTime, endTime, profit);
-    System.out.println("Maximum Profit: " + maxProfit);  // Output: 120
-
-    int optimizedProfit = scheduler.jobScheduling(startTime, endTime, profit);
-    System.out.println("Optimized Maximum Profit: " + optimizedProfit);  // Output: 120
+    int[][] startCases = { {1, 2, 3, 3}, {1, 2, 3, 4, 6}, {} };
+    int[][] endCases = { {3, 4, 5, 6}, {3, 5, 10, 6, 9}, {} };
+    int[][] profitCases = { {50, 10, 40, 70}, {20, 20, 100, 70, 60}, {} };
+    int[] expected = {120, 150, 0};
+    for (int i = 0; i < startCases.length; i++) {
+      int got = scheduler.jobScheduling(startCases[i], endCases[i], profitCases[i]);
+      System.out.printf("start=%s end=%s profit=%s -> %d  expected=%d%n", Arrays.toString(startCases[i]), Arrays.toString(endCases[i]), Arrays.toString(profitCases[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Finds maximum profit from non-overlapping jobs using Dynamic Programming with Binary Search
+    /**
+   * Intuition: after sorting jobs by endTime, maxProfitUpToJob[i] is the best profit using jobs through i. For each job, compare skipping it with taking it plus the best previous non-overlapping job found by binary search.
    *
-   * Algorithm: Dynamic Programming with Binary Search
-   * Steps:
-   * 1. Create job objects and sort by end time for processing in chronological order
-   * 2. Use DP where dp[i] represents maximum profit achievable up to job i
-   * 3. For each job, choose max between including current job or excluding it
-   * 4. Use binary search to efficiently find latest non-overlapping job
+   * Algorithm:
+   *   1. Build and sort JobSchedule objects by end time.
+   *   2. Initialize the first DP value.
+   *   3. For each job, compute include profit.
+   *   4. Binary-search the previous compatible job and add its DP value.
+   *   5. Store max(exclude, include).
    *
-   * Time Complexity: O(n log n) - sorting + binary search for each job
-   * Space Complexity: O(n) - for jobs list and DP array
+   * Time:  O(n log n) - sorting plus one binary search per job.
+   * Space: O(n) - jobs and DP array.
    *
-   * @param startTime array of job start times
-   * @param endTime array of job end times
-   * @param profit array of job profits
-   * @return maximum profit achievable from non-overlapping jobs
+   * @param startTime job starts
+   * @param endTime job ends
+   * @param profit job profits
+   * @return maximum non-overlapping profit
    */
-  public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
     int numberOfJobs = startTime.length;
 
     // Edge case: no jobs available
@@ -130,11 +122,8 @@ public class MaximumProfitJobScheduling {
     return maxProfitForwardRecursive(jobs, 0, memo);
   }
 
-  /**
-   * Computes {@code memo[index]} from the prefix {@code 0 .. index}, then recurses with {@code index + 1}.
-   * Entry is {@code (jobs, 0)} so the stack traces indices {@code 0, 1, ..., n} forward only.
-   */
-  private int maxProfitForwardRecursive(List<JobSchedule> jobs, int index, int[] memo) {
+    /** Fills job-scheduling memo values forward. */
+private int maxProfitForwardRecursive(List<JobSchedule> jobs, int index, int[] memo) {
     int n = jobs.size();
     if (index >= n) {
       return memo[n - 1];
@@ -151,15 +140,8 @@ public class MaximumProfitJobScheduling {
     return maxProfitForwardRecursive(jobs, index + 1, memo);
   }
 
-  /**
-   * Uses binary search to find the latest job that doesn't overlap with current job.
-   * This finds non overlapping job on the left side of currentJobIndex.
-   *
-   * @param jobs sorted list of jobs by end time
-   * @param currentJobIndex index of current job being processed
-   * @return index of latest non-overlapping job, or -1 if none exists
-   */
-  private int findPreviousNonOverlappingJob(List<JobSchedule> jobs, int currentJobIndex) {
+    /** Finds the latest compatible job before the current job. */
+private int findPreviousNonOverlappingJob(List<JobSchedule> jobs, int currentJobIndex) {
     int left = 0;
     int right = currentJobIndex - 1;
     int latestValidJobIndex = -1;

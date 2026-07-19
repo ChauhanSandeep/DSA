@@ -3,90 +3,57 @@ package dynamicprogramming.stringmatching;
 /**
  * Problem: Regular Expression Matching
  *
- * Given an input string s and a pattern p, implement regular expression matching with support for '.' and '*' where:
- * - '.' Matches any single character
- * - '*' Matches zero or more of the preceding element
+ * Match an entire string against a pattern containing normal characters, '.' for any one character, and '*' for zero or more of the previous element.
  *
- * The matching should cover the entire input string (not partial).
+ * Leetcode: https://leetcode.com/problems/regular-expression-matching/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | String matching | Regex operators
  *
- * Example 1:
- * Input: s = "aa", p = "a"
- * Output: false
- * Explanation: "a" does not match the entire string "aa"
+ * Example:
+ *   Input:  str = "aa", pattern = "a*"
+ *   Output: true
+ *   Why:    '*' repeats the preceding 'a' enough times to cover the full string.
  *
- * Example 2:
- * Input: s = "aa", p = "a*"
- * Output: true
- * Explanation: '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes "aa"
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Example 3:
- * Input: s = "ab", p = ".*"
- * Output: true
- * Explanation: ".*" means "zero or more (*) of any character (.)"
- *
- * LeetCode Link: https://leetcode.com/problems/regular-expression-matching/
- *
- * Follow-up Questions:
- *
- * 1. How would you extend this to support '+' (one or more of preceding element)?
- *    Answer: Add a case for '+' similar to '*' but require at least one match of the
- *    preceding character before considering it matched. Check firstMatch && dp[i+1][j+2].
- *
- * 2. What if you need to support '?' (zero or one of preceding element)?
- *    Answer: For '?', check dp[i][j+2] (zero occurrences) or (firstMatch && dp[i+1][j+2])
- *    (one occurrence). Similar logic to '*' but without the repetition case.
- *
- * 3. How would you handle case-insensitive matching?
- *    Answer: Convert both string and pattern to lowercase before matching, or modify
- *    character comparison to use case-insensitive comparison like Character.toLowerCase().
- *
- * 4. Can you optimize space to O(n) instead of O(m*n)?
- *    Answer: Yes, use rolling array technique. Since we only need the previous row to
- *    compute current row, maintain two 1D arrays and alternate between them.
- *
- * 5. How would you support character classes like [a-z] or [0-9]?
- *    Answer: Parse the pattern to identify character classes and modify the matching logic
- *    to check if current character belongs to the specified class range.
- *    Related problem: https://leetcode.com/problems/wildcard-matching/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Wildcard Matching (44), Edit Distance (72).
  */
 public class RegularExpressionMatching {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     RegularExpressionMatching matcher = new RegularExpressionMatching();
-    System.out.println(matcher.isMatch("mississippi", "mis*is*p*."));  // false
-    System.out.println(matcher.isMatch("mississippi", "mis*is*ip*.")); // true
-    System.out.println(matcher.isMatch("aa", "a"));                    // false
-    System.out.println(matcher.isMatch("aa", "a*"));                   // true
-    System.out.println(matcher.isMatch("ab", ".*"));                   // true
+    String[][] inputs = { {"aa", "a"}, {"aa", "a*"}, {"ab", ".*"}, {"", "c*"} };
+    boolean[] expected = {false, true, true, true};
+    for (int i = 0; i < inputs.length; i++) {
+      boolean got = matcher.isMatch(inputs[i][0], inputs[i][1]);
+      System.out.printf("str=%s pattern=%s -> %s  expected=%s%n", inputs[i][0], inputs[i][1], got, expected[i]);
+    }
   }
 
-  /**
-   * Determines if string matches pattern using bottom-up dynamic programming.
+    /**
+   * Intuition: dp[strIndex][patternIndex] means the two prefixes fully match. Normal characters and dot consume one from both sides. Star either deletes the preceding pattern element or consumes one matching string character while staying on the same pattern prefix.
    *
    * Algorithm:
-   * 1. Create DP table where dp[i][j] = true if s[0..i-1] matches p[0..j-1]
-   * 2. Initialize dp[0][0] = true (empty string matches empty pattern)
-   * 3. Handle patterns starting with * (a* can match empty string)
-   * 4. For each cell, check:
-   *    - If pattern char is letter or '.': must match current character
-   *    - If pattern char is '*': can match zero or more of preceding element
-   * 5. Result is in dp[m][n]
+   *   1. Create dp and set dp[0][0] = true.
+   *   2. Initialize empty-string matches for a*, a*b*, and similar prefixes.
+   *   3. Iterate string and pattern prefixes.
+   *   4. For star, combine zero-occurrence and one-or-more transitions.
+   *   5. For normal or dot, copy the diagonal state when characters match.
    *
-   * Key insight: '*' has two choices:
-   * - Match zero occurrences: ignore current pattern char and '*', use dp[i][j-2]
-   * - Match one or more: if current chars match, move in string, keep pattern at '*'
+   * Time:  O(stringLength * patternLength) - every cell is computed once.
+   * Space: O(stringLength * patternLength) - stores the table.
    *
-   * Time Complexity: O(M * N) where M is length of string and N is length of pattern.
-   * Each cell is computed once with constant time operations.
-   *
-   * Space Complexity: O(M * N) for the DP table.
-   *
-   * @param str input string to match
-   * @param pattern pattern with '.' and '*' support
-   * @return true if entire string matches pattern
+   * @param str input string
+   * @param pattern regex pattern
+   * @return true if the whole string matches
    */
-  public boolean isMatch(String str, String pattern) {
+public boolean isMatch(String str, String pattern) {
     int stringLength = str.length();
     int patternLength = pattern.length();
     boolean[][] dp = new boolean[stringLength + 1][patternLength + 1];
@@ -131,6 +98,7 @@ public class RegularExpressionMatching {
   }
 
   // Helper method to check if character matches pattern character
+  /** Checks whether a string character matches one pattern character. */
   private boolean charMatches(char sChar, char pChar) {
     return pChar == '.' || sChar == pChar;
   }
