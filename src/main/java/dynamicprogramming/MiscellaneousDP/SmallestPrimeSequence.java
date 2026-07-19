@@ -6,34 +6,45 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
- * Problem: Smallest Prime Sequence
+ * Problem: Smallest Sequence With Given Primes
  *
- * Given three prime numbers `first`, `second`, and `third`, and an integer `k`,
- * find the first `k` smallest numbers that have only these three as their prime factors (no others).
+ * Given three prime numbers and k, return the first k positive numbers whose only
+ * prime factors come from those primes. The sequence starts with 1 by convention.
+ *
+ * Source: InterviewBit - Smallest Sequence With Given Primes
+ * Pattern:  Dynamic programming | Multiple pointers | Generated sorted sequence
  *
  * Example:
- * Input: first = 2, second = 5, third = 11, k = 5
- * Output: [1, 2, 4, 5, 8]
- * Explanation: The sequence starts from 1, then multiplies by prime factors to generate next smallest numbers.
+ *   Input:  first = 2, second = 5, third = 11, k = 5
+ *   Output: [1,2,4,5,8]
+ *   Why:    after 1, the smallest numbers generated only by multiplying by 2, 5,
+ *           or 11 are 2, 4, 5, and 8.
  *
- * Interviewbit: https://www.interviewbit.com/problems/smallest-sequence-with-given-primes/
+ * Follow-ups:
+ *   1. Generalize to many primes?
+ *      Use one pointer per prime, or a heap when the number of primes is large.
+ *   2. Avoid duplicates such as 10 from both 2*5 and 5*2?
+ *      Advance every pointer that produced the chosen next value.
+ *   3. What if the values can overflow int?
+ *      Compute candidates in long and decide whether to cap, throw, or return longs.
  *
- * Follow-up Questions (FAANG-style):
- * 1. How would you generalize this for N primes instead of 3?
- *    - Use an array of pointers and heap to pick the next min, same as Super Ugly Number.
- * 2. How to ensure avoid duplicates in the sequence?
- *    - Always increment indexes only if next candidate equals the result (see below).
- * 3. Can you generate the numbers in O(1) space?
- *    - No, you need O(k) to hold and generate sequence for unique factors.
- * 4. What if k is extremely large?
- *    - Use streaming/online heap approach, possibly outputting numbers on the fly.
+ * Related: Ugly Number II (264), Super Ugly Number (313).
  */
 public class SmallestPrimeSequence {
 
     public static void main(String[] args) {
-        int[] result = new SmallestPrimeSequence().findSmallestSequence(2, 5, 11, 5);
-        System.out.println(Arrays.toString(result)); // Output: [1, 2, 4, 5, 8]
+        SmallestPrimeSequence solver = new SmallestPrimeSequence();
+        int[][] inputs = {{2, 5, 11, 0}, {2, 5, 11, 5}, {3, 5, 7, 6}};
+        String[] expected = {"[]", "[1, 2, 4, 5, 8]", "[1, 3, 5, 7, 9, 15]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] input = inputs[i];
+            int[] got = solver.findSmallestSequence(input[0], input[1], input[2], input[3]);
+            System.out.printf("primes=[%d,%d,%d] k=%d -> %s  expected=%s%n",
+                input[0], input[1], input[2], input[3], Arrays.toString(got), expected[i]);
+        }
     }
+
 
     /**
      * Solves using Min-Heap to always pick the smallest candidate.
@@ -77,24 +88,26 @@ public class SmallestPrimeSequence {
     }
 
     /**
-     * Finds the first `k` smallest numbers that only have `first`, `second`, and `third` as prime factors.
+     * Intuition (interview default): result[index] is the sorted sequence built so
+     * far. For each prime, a pointer marks the earliest result value whose product
+     * with that prime has not yet been consumed. The next sequence value is the
+     * smallest of those three products. Advancing every pointer that matches the
+     * chosen value keeps duplicates out while preserving sorted order.
      *
-     * Steps of Solution:
-     * - Start with 1 (by convention, first element in such sequences).
-     * - For every iteration, select the next smallest by multiplying every element by prime and taking min.
-     * - Move (increment) each pointer whose prime times result equals minimum generated.
-     * - Avoid duplicates by incrementing all pointers that lead to current min.
+     * Algorithm:
+     *   1. Start result[0] at 1 and keep one pointer per prime factor.
+     *   2. At each index, compute the three candidate products.
+     *   3. Store the smallest candidate as the next sequence value.
+     *   4. Advance every pointer whose product matched that value to skip duplicates.
      *
-     * Example Walkthrough for first=2, second=5, third=11, k=5:
-     * i	  Next candidates	            NextMin	 Update	    New pointers
-     * 0		2*1=2,  5*1=5, 11*1=11	    2	       Add 2	    firstIndex++ (now 1)
-     * 1		2*2=4,  5*1=5, 11*1=11	    4	       Add 4	    firstIndex++ (now 2)
-     * 2		2*4=8,  5*1=5, 11*1=11	    5	       Add 5	    secondIndex++ (now 1)
-     * 3		2*4=8,  5*2=10, 11*1=11	    8	       Add 8	    firstIndex++ (now 3)
-     * 4		2*5=10, 5*2=10, 11*1=11	    10	     Add 10	    firstIndex++, secondIndex++
+     * Time:  O(k) - each output value is produced once with constant candidate work.
+     * Space: O(k) - the output array is also the DP state needed for future products.
      *
-     * Time Complexity: O(k) to generate k numbers
-     * Space Complexity: O(k) to store k results
+     * @param first first allowed prime factor
+     * @param second second allowed prime factor
+     * @param third third allowed prime factor
+     * @param k number of sequence values to return
+     * @return the first k values in ascending order
      */
     public int[] findSmallestSequence(int first, int second, int third, int k) {
         if (k <= 0) return new int[0];

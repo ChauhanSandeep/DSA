@@ -1,39 +1,67 @@
 package dynamicprogramming.MiscellaneousDP;
 
 /**
- * LeetCode Problem: Champagne Tower
- * Link: https://leetcode.com/problems/champagne-tower/
+ * Problem: Champagne Tower
  *
- * Problem Statement:
- * - A stack of glasses is arranged in a pyramid shape.
- * - If a glass overflows, the excess champagne splits equally into the two glasses below it.
- * - Given the amount of poured champagne, determine how much is in a specific glass.
+ * Champagne is poured into the top glass of a triangular tower. Every glass can
+ * hold one cup; any extra splits evenly into the two glasses directly below it.
+ * Return how full one requested glass is after the pour settles.
  *
- * Approach:
- * - **Dynamic Programming (DP) Table**:
- *   - Use a 2D DP array where `dp[row][col]` stores the amount of champagne in a given glass.
- *   - If a glass contains more than 1 unit, the excess overflows evenly into the two glasses below.
- *   - We only need to process glasses up to `glassRow` since overflow doesn’t affect higher levels.
+ * Leetcode: https://leetcode.com/problems/champagne-tower/
+ * Rating:   1856 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Simulation DP | Flow propagation
  *
- * Time Complexity: **O(glassRow²)** (Only need to fill up to `glassRow`)
- * Space Complexity: **O(glassRow²)** (DP table of size `glassRow × glassRow`)
- * LeetCode Contest Rating: 1856
+ * Example:
+ *   Input:  poured = 2, query_row = 1, query_glass = 1
+ *   Output: 0.5
+ *   Why:    the top glass keeps one cup and the one extra cup splits equally into
+ *           the two glasses below, so the right glass in row 1 has half a cup.
+ *
+ * Follow-ups:
+ *   1. Can space be reduced to one row?
+ *      Yes, update a 1-D row array from right to left so overflow is not reused early.
+ *   2. What if glasses have different capacities?
+ *      Replace the fixed 1.0 cap with capacity[row][col] in the overflow transition.
+ *   3. What if many queries are asked after the same pour?
+ *      Precompute the tower up to the largest requested row and answer each query in O(1).
+ *
+ * Related: Pascal's Triangle (118), Pour Water (755).
  */
 public class ChampagneTower {
 
     public static void main(String[] args) {
         ChampagneTower solver = new ChampagneTower();
-        double result = solver.champagneTower(3, 3, 1);
-        System.out.println("Champagne in glass (3,1): " + result);
+        int[][] inputs = {{1, 1, 1}, {2, 1, 1}, {100000009, 33, 17}};
+        double[] expected = {0.0, 0.5, 1.0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            double got = solver.champagneTower(inputs[i][0], inputs[i][1], inputs[i][2]);
+            System.out.printf("poured=%d row=%d col=%d -> %.1f  expected=%.1f%n",
+                inputs[i][0], inputs[i][1], inputs[i][2], got, expected[i]);
+        }
     }
 
+
     /**
-     * Computes the amount of champagne in a specific glass after pouring a given amount.
+     * Intuition: each dp[row][col] cell stores how much champagne ever reaches that
+     * glass, not just how much it keeps. If a glass receives more than one cup, the
+     * extra amount is the only part that can affect lower rows, and it splits evenly
+     * to the two children. Because every glass only sends liquid downward, processing
+     * rows from top to bottom guarantees all smaller subproblems are settled before
+     * they feed the next row.
      *
-     * @param poured    Amount of champagne poured
-     * @param glassRow  Target row of the glass
-     * @param glassCol  Target column in the row
-     * @return Amount of champagne in the given glass (max 1.0)
+     * Algorithm:
+     *   1. Allocate dp through glassRow and put all poured champagne in dp[0][0].
+     *   2. For each row above the query row, split only the excess above one cup to the two children.
+     *   3. Return the queried cell capped at one full glass.
+     *
+     * Time:  O(r^2) - we fill the triangular table through the requested row.
+     * Space: O(r^2) - the DP table stores all glasses up to the requested row.
+     *
+     * @param poured amount poured into the top glass
+     * @param glassRow requested row index
+     * @param glassCol requested column index within the row
+     * @return amount in the requested glass, capped at 1.0
      */
     public double champagneTower(int poured, int glassRow, int glassCol) {
         // DP table to track champagne flow

@@ -3,43 +3,53 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * 1125. Smallest Sufficient Team
+ * Problem: Smallest Sufficient Team
  *
- * Problem: Given an array of required skills and people with their skills,
- * return any sufficient team of the smallest possible size such that the team
- * collectively has all the required skills.
+ * Given required skills and each person's skills, return any smallest team whose
+ * combined skills cover every required skill. People are identified by their input
+ * indices.
+ *
+ * Leetcode: https://leetcode.com/problems/smallest-sufficient-team/
+ * Rating:   2251 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Bitmask DP | Set cover
  *
  * Example:
- * Input: req_skills = ["java","nodejs","reactjs"], people = [["java"],["nodejs"],["nodejs","reactjs"]]
- * Output: [0,2]
- * Explanation: Person 0 has "java", person 2 has "nodejs" and "reactjs"
+ *   Input:  req_skills = ["java","nodejs","reactjs"], people = [["java"],["nodejs"],["nodejs","reactjs"]]
+ *   Output: [0,2]
+ *   Why:    person 0 covers java and person 2 covers both nodejs and reactjs, so two people cover all skills.
  *
- * LeetCode: https://leetcode.com/problems/smallest-sufficient-team
+ * Follow-ups:
+ *   1. Return all minimum teams?
+ *      Store lists of parents for equal-size transitions and backtrack all optimal paths.
+ *   2. What if there are more than 31 required skills?
+ *      Use long masks up to 63 skills, or BitSet/string states beyond that.
+ *   3. What if people have costs and we minimize total cost?
+ *      Replace team size with cost in the DP comparison while keeping the same mask transition.
  *
- * Follow-up questions:
- * Q: What if skills have different priorities or weights?
- * A: Extend DP state to include weighted costs and modify transitions.
- *
- * Q: How to handle very large skill sets efficiently?
- * A: Use bit manipulation optimizations and pruning strategies.
- *
- * Q: Can we find multiple optimal teams or teams within size constraints?
- * A: Modify DP to track all optimal solutions or add size constraints.
- * LeetCode Contest Rating: 2251
+ * Related: Stickers to Spell Word (691), Word Break (139).
  */
 public class SmallestSufficientTeam {
 
     /**
-     * Bitmask DP approach - optimal solution for reasonable skill counts.
+     * Intuition: a bitmask is a compact DP state for covered skills; bit i is 1
+     * when skill i is already covered. dp[mask] stores the smallest team size known
+     * for that exact coverage. Adding one person moves from mask to mask | personMask.
+     * Since every transition only adds skills, we can relax all masks and remember
+     * the parent mask plus the person used, then walk backward from the full mask to
+     * reconstruct one minimum team.
      *
-     * Algorithm: Dynamic Programming with Bitmasks
-     * - Use bitmask to represent skill coverage (bit i = 1 if skill i is covered)
-     * - dp[mask] = minimum team size to cover skills represented by mask
-     * - For each person, try adding them to existing teams
-     * - Track parent information to reconstruct actual team
+     * Algorithm:
+     *   1. Map each required skill to a bit position and convert every person to a skill mask.
+     *   2. Initialize dp[0] = 0 and all other masks as unreachable.
+     *   3. For every reachable mask, try adding each person and relax the new mask with one more teammate.
+     *   4. Reconstruct one team by following parent and usedPerson from targetMask back to 0.
      *
-     * Time Complexity: O(2^m * n) where m is skills count, n is people count
-     * Space Complexity: O(2^m) for DP array
+     * Time:  O(n*2^m) - for n people and m skills, every mask may try every person.
+     * Space: O(2^m) - DP, parent, and used-person arrays store one entry per skill mask.
+     *
+     * @param req_skills required skill names
+     * @param people people[i] lists skills held by person i
+     * @return indices of one smallest sufficient team
      */
     public int[] smallestSufficientTeam(String[] req_skills, List<List<String>> people) {
         int m = req_skills.length;
@@ -624,6 +634,39 @@ public class SmallestSufficientTeam {
 
         public boolean isMandatory(int person) {
             return mandatoryPeople.contains(person);
+        }
+    }
+
+    public static void main(String[] args) {
+        SmallestSufficientTeam solver = new SmallestSufficientTeam();
+
+        String[][] skillsCases = {
+            {},
+            {"java", "nodejs", "reactjs"},
+            {"algorithms", "math", "java", "reactjs", "csharp", "aws"}
+        };
+        List<List<List<String>>> peopleCases = Arrays.asList(
+            new ArrayList<List<String>>(),
+            Arrays.asList(
+                Arrays.asList("java"),
+                Arrays.asList("nodejs"),
+                Arrays.asList("nodejs", "reactjs")
+            ),
+            Arrays.asList(
+                Arrays.asList("algorithms", "math", "java"),
+                Arrays.asList("algorithms", "math", "reactjs"),
+                Arrays.asList("java", "csharp", "aws"),
+                Arrays.asList("reactjs", "csharp"),
+                Arrays.asList("csharp", "math"),
+                Arrays.asList("aws", "java")
+            )
+        );
+        String[] expected = {"[]", "[2, 0]", "[2, 1]"};
+
+        for (int i = 0; i < skillsCases.length; i++) {
+            int[] got = solver.smallestSufficientTeam(skillsCases[i], peopleCases.get(i));
+            System.out.printf("req_skills=%s -> %s  expected=%s%n",
+                Arrays.toString(skillsCases[i]), Arrays.toString(got), expected[i]);
         }
     }
 }

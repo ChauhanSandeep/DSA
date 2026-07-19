@@ -4,62 +4,51 @@ import java.util.*;
 
 
 /**
- * ConcatenatedWords.java
+ * Problem: Concatenated Words
  *
- * Problem Statement:
- * Given an array of strings words (without duplicates), return all the concatenated words in the given list of words.
- * A concatenated word is defined as a string that is comprised entirely of at least two shorter words
- * (not necessarily distinct) in the given array.
+ * Given a list of unique words, return all words that can be built by joining at
+ * least two shorter words from the same list. A shorter word may be reused.
  *
- * Example 1:
- * Input: words = ["cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"]
- * Output: ["catsdogcats","dogcatsdog","ratcatdogcat"]
- * Explanation:
- * "catsdogcats" can be concatenated by "cats", "dog" and "cats"
- * "dogcatsdog" can be concatenated by "dog", "cats" and "dog"
- * "ratcatdogcat" can be concatenated by "rat", "cat", "dog" and "cat"
+ * Leetcode: https://leetcode.com/problems/concatenated-words/
+ * Rating:   acceptance 49.9% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming | Word break | Hash set lookup
  *
- * Example 2:
- * Input: words = ["cat","dog","catdog"]
- * Output: ["catdog"]
- * Explanation:
- * "catdog" can be concatenated by "cat" and "dog"
+ * Example:
+ *   Input:  words = ["cat","cats","dog","catsdog"]
+ *   Output: ["catsdog"]
+ *   Why:    "catsdog" is exactly "cats" + "dog", and both pieces are shorter words in the list.
  *
- * LeetCode link: https://leetcode.com/problems/concatenated-words/
+ * Follow-ups:
+ *   1. Return the component words for each concatenated word?
+ *      Store split parents in the word-break DP and reconstruct the path.
+ *   2. What if the dictionary changes often?
+ *      Use a trie or incremental index so insertions do not require rebuilding all lookup state.
+ *   3. What if many words share long prefixes?
+ *      A trie can avoid allocating every substring during the DP check.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - How would you modify the solution if words could be used multiple times to form a concatenated word?
- *    → The current solution already handles this case since we check all possible splits and words can repeat.
- *  - What if you need to return the actual composition of concatenated words, not just identify them?
- *    → Modify the DP approach to store the split points or component words in a separate structure during the recursion.
- *  - Can you optimize for the case where most words are very short or very long?
- *    → Sort words by length first to process shorter words before longer ones, allowing early termination.
- *  - How would you handle the problem if words could contain uppercase letters or special characters?
- *    → Modify the Trie structure to handle a larger character set or use a HashMap-based Trie instead of array-based.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 139 (Word Break): https://leetcode.com/problems/word-break/
- *  - LeetCode 140 (Word Break II): https://leetcode.com/problems/word-break-ii/
- *  - LeetCode 820 (Short Encoding of Words): https://leetcode.com/problems/short-encoding-of-words/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Word Break (139), Word Break II (140), Short Encoding of Words (820).
  */
 public class ConcatenatedWords {
 
   /**
-   * Main method: Finds all concatenated words using Dynamic Programming with HashSet.
-   * Step-by-step:
-   *  1. Sort words by length to process shorter words first (optimization).
-   *  2. Build a HashSet of all words for O(1) lookup.
-   *  3. For each word, check if it can be formed by concatenating at least 2 other words.
-   *  4. Use dynamic programming (word break pattern) to check if word can be split.
-   *  5. Add valid concatenated words to result list.
-   *  6. After checking each word, add it to the set for use in forming longer words.
-   *
-   * Algorithm: Dynamic Programming with HashSet (Word Break pattern).
-   * Time Complexity: O(n * L^2), where n is the number of words and L is the maximum word length.
-   *                  For each word, we check all possible splits (O(L^2) using DP).
-   * Space Complexity: O(n * L), for storing all words in the HashSet and recursion stack.
-   */
+     * Intuition: for one word, this is the Word Break problem: dp[end] means the
+     * prefix word[0..end) can be formed from dictionary words. Sorting words by
+     * length lets us build the dictionary gradually, so when a word is checked, the
+     * set contains only shorter words and the word cannot accidentally use itself.
+     * Building prefixes from left to right means every split reads an already known
+     * smaller prefix state.
+     *
+     * Algorithm:
+     *   1. Sort words by length so shorter building blocks enter wordSet first.
+     *   2. For each word, run word-break DP against the current wordSet.
+     *   3. Add the word to result if dp[length] is true, then insert it into wordSet for later words.
+     *
+     * Time:  O(n*L^2) - each of n words checks O(L^2) prefix splits and substrings.
+     * Space: O(n*L) - the set stores all words, and each check uses an O(L) DP array.
+     *
+     * @param words unique dictionary words
+     * @return all concatenated words in the input order after length sorting
+     */
   public List<String> findAllConcatenatedWordsInADict(String[] words) {
     List<String> result = new ArrayList<>();
     Set<String> wordSet = new HashSet<>();
@@ -166,4 +155,18 @@ public class ConcatenatedWords {
     memo[startIndex] = false;
     return false;
   }
+
+    public static void main(String[] args) {
+        ConcatenatedWords solver = new ConcatenatedWords();
+        String[][] inputs = {
+            {"cat", "dog"},
+            {"cat", "cats", "catsdogcats", "dog", "dogcatsdog", "hippopotamuses", "rat", "ratcatdogcat"}
+        };
+        String[] expected = {"[]", "[dogcatsdog, catsdogcats, ratcatdogcat]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<String> got = solver.findAllConcatenatedWordsInADict(inputs[i].clone());
+            System.out.printf("words=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 }

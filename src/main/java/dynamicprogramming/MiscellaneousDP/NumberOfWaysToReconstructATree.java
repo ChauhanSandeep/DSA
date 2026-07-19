@@ -3,51 +3,53 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * You are given an array pairs, where pairs[i] = [xi, yi], and:
- * - There are no duplicates, and xi < yi
- * - The pairs are unordered, meaning [x, y] and [y, x] are considered the same
+ * Problem: Number Of Ways To Reconstruct A Tree
  *
- * A tree is a valid tree if it follows these rules:
- * 1. The tree has exactly one root node
- * 2. Each node has exactly one parent except the root node which has no parent
- * 3. The given pairs must appear as edges in the tree
+ * Given ancestor-descendant pairs from a rooted tree, decide whether no tree, one
+ * tree, or multiple trees can explain those relationships. Return 0, 1, or 2.
  *
- * Return the number of different valid trees you can form with the given pairs.
- * Since the answer may be large, return it modulo 10^9 + 7.
+ * Leetcode: https://leetcode.com/problems/number-of-ways-to-reconstruct-a-tree/
+ * Rating:   3018 (zerotrac Elo)
+ * Pattern:  Graph | Tree reconstruction | Degree ordering
  *
- * Example 1:
- * Input: pairs = [[1,2],[2,3]]
- * Output: 1
- * Explanation: The tree [1,2,3] is the only valid tree.
+ * Example:
+ *   Input:  pairs = [[1,2],[2,3],[1,3]]
+ *   Output: 2
+ *   Why:    node 1 or node 3 can be placed above the other while preserving all
+ *           ancestor relationships, so the reconstruction is not unique.
  *
- * Example 2:
- * Input: pairs = [[1,2],[2,3],[1,3]]
- * Output: 2
- * Explanation: The trees [1,2,3] and [1,3,2] are both valid.
+ * Follow-ups:
+ *   1. Return the actual tree when it is unique?
+ *      Store the chosen parent for each node while validating containment.
+ *   2. What if the input pairs are directed?
+ *      Use indegree and ancestor-set checks instead of symmetric adjacency.
+ *   3. What if all valid trees must be enumerated?
+ *      Backtrack over same-degree interchangeable parent choices; output may be exponential.
  *
- * LeetCode: https://leetcode.com/problems/number-of-ways-to-reconstruct-a-tree/
- *
- * Follow-up Questions:
- * 1. How would you modify the solution if the tree was required to be a binary tree?
- *    - We would need to ensure no node has more than 2 children.
- * 2. What if we needed to return all possible valid trees instead of just counting them?
- *    - We would need to modify the solution to track and construct all valid trees.
- * 3. How would you handle very large inputs (e.g., 1000+ nodes)?
- *    - The current solution is O(n^2) which might be too slow for very large inputs.
- *
- * Related Problems:
- * - Reconstruct Itinerary (https://leetcode.com/problems/reconstruct-itinerary/)
- * - Minimum Height Trees (https://leetcode.com/problems/minimum-height-trees/)
- * LeetCode Contest Rating: 3018
+ * Related: Validate Binary Tree Nodes (1361), Minimum Height Trees (310).
  */
 public class NumberOfWaysToReconstructATree {
     private static final int MOD = 1000000007;
 
     /**
-     * Counts the number of ways to reconstruct a valid tree from the given pairs.
+     * Intuition: a root must be connected to every other node because every node is
+     * either its ancestor or descendant. For any other node, its parent must be a
+     * neighbour with at least as many relationships, and all of the node's other
+     * neighbours must also be neighbours of that parent. Equal-degree parent and
+     * child choices mean the tree can be rearranged without changing the pair set,
+     * which is exactly the multiple-reconstruction case.
      *
-     * @param pairs Array of pairs representing edges
-     * @return Number of valid trees modulo 10^9 + 7
+     * Algorithm:
+     *   1. Build adjacency sets and degrees from every pair.
+     *   2. Sort nodes by descending degree and require the first node to connect to all others.
+     *   3. For each remaining node, choose the earlier adjacent node with minimum degree as parent.
+     *   4. Verify every other neighbor is also a parent neighbor, and mark multiple ways on equal degree.
+     *
+     * Time:  O(n^2) - each node may compare its neighbours against a candidate parent set.
+     * Space: O(n^2) - dense pair input can store a neighbour set for every node pair.
+     *
+     * @param pairs unordered ancestor-descendant pairs
+     * @return 0 if impossible, 1 if unique, or 2 if multiple trees are possible
      */
     public int checkWays(int[][] pairs) {
         // Build adjacency list and degree count
@@ -108,5 +110,20 @@ public class NumberOfWaysToReconstructATree {
         }
 
         return res;
+    }
+
+    public static void main(String[] args) {
+        NumberOfWaysToReconstructATree solver = new NumberOfWaysToReconstructATree();
+        int[][][] inputs = {
+            {{1, 2}, {2, 3}},
+            {{1, 2}, {2, 3}, {2, 4}, {1, 5}}
+        };
+        int[] expected = {1, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.checkWays(inputs[i]);
+            System.out.printf("pairs=%s -> %d  expected=%d%n",
+                java.util.Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
     }
 }

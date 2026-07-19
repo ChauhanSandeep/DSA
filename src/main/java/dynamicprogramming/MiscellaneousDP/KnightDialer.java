@@ -3,32 +3,30 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * 935. Knight Dialer
+ * Problem: Knight Dialer
  *
- * Problem: A chess knight can move as indicated in the chess diagram below.
- * We place our knight on any numbered key of a phone pad, and it makes n-1 hops.
- * How many distinct numbers can you dial in n hops?
+ * A chess knight starts on any digit of a phone keypad and makes n - 1 moves.
+ * Count how many length-n phone numbers can be dialed, modulo 1,000,000,007.
+ *
+ * Leetcode: https://leetcode.com/problems/knight-dialer/
+ * Rating:   1690 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Graph walks | Matrix exponentiation alternative
  *
  * Example:
- * Input: n = 1
- * Output: 10
- * Explanation: We need to dial 1 number, so placing on any key gives 10 possibilities.
+ *   Input:  n = 2
+ *   Output: 20
+ *   Why:    each valid knight move from a starting digit creates one two-digit number,
+ *           and the keypad graph has 20 directed moves total.
  *
- * Input: n = 2
- * Output: 20
+ * Follow-ups:
+ *   1. What if n is extremely large?
+ *      Use matrix exponentiation on the 10 by 10 transition matrix in O(log n).
+ *   2. What if some digits are forbidden?
+ *      Remove those nodes from the transition graph or force their DP counts to zero.
+ *   3. What if the keypad layout changes?
+ *      Rebuild the adjacency list from coordinates and knight offsets.
  *
- * LeetCode: https://leetcode.com/problems/knight-dialer
- *
- * Follow-up questions:
- * Q: What if the phone pad layout is different?
- * A: Modify the adjacency mapping based on the new layout.
- *
- * Q: How to optimize for very large n?
- * A: Use matrix exponentiation to achieve O(log n) complexity.
- *
- * Q: Can we count paths that avoid certain numbers?
- * A: Modify DP state to exclude forbidden positions.
- * LeetCode Contest Rating: 1690
+ * Related: Count Vowels Permutation (1220), Out of Boundary Paths (576).
  */
 public class KnightDialer {
 
@@ -49,15 +47,23 @@ public class KnightDialer {
     };
 
     /**
-     * Dynamic Programming approach with memoization.
+     * Intuition: dp[remainingMoves][currentDigit] means how many valid suffixes
+     * can be dialed from currentDigit with exactly remainingMoves knight moves left.
+     * If no moves remain, that one completed number contributes 1. Otherwise, the
+     * count is the sum of the same question for every digit in MOVES[currentDigit].
+     * Memoization is correct because the future depends only on those two values.
      *
-     * Algorithm: Top-down DP
-     * - For each digit and remaining moves, calculate number of paths
-     * - Use memoization to avoid recalculating same states
-     * - Sum up paths starting from all digits
+     * Algorithm:
+     *   1. Allocate memo[remainingMoves][digit] for top-down reuse.
+     *   2. Start a DFS from every digit with n - 1 moves remaining.
+     *   3. In dfs, return 1 when no moves remain; otherwise sum all legal next digits from MOVES.
+     *   4. Cache each state and sum the ten starting counts modulo MOD.
      *
-     * Time Complexity: O(n) after memoization
-     * Space Complexity: O(n) for memoization table
+     * Time:  O(n) - each remainingMoves/digit state is computed once over a fixed move list.
+     * Space: O(n) - memo stores 10 states for each remaining move.
+     *
+     * @param n number length to dial
+     * @return count of valid numbers modulo 1,000,000,007
      */
     public int knightDialer(int n) {
         Integer[][] memo = new Integer[n + 1][10];
@@ -305,5 +311,16 @@ public class KnightDialer {
         }
 
         return count;
+    }
+
+    public static void main(String[] args) {
+        KnightDialer solver = new KnightDialer();
+        int[] inputs = {1, 2, 3};
+        int[] expected = {10, 20, 46};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.knightDialer(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 }

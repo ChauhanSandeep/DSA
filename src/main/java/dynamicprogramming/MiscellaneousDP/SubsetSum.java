@@ -5,24 +5,40 @@ import java.util.Arrays;
 /**
  * Problem: Subset Sum
  *
- * Problem Statement:
- * Given an array of positive integers and a target sum, determine whether there exists a subset
- * whose sum equals the target.
+ * Given positive integers and a target sum, decide whether some subset adds up
+ * exactly to the target. Each number can be used at most once.
  *
- * Leetcode Equivalent: https://leetcode.com/problems/partition-equal-subset-sum/ (related)
+ * Pattern:  Dynamic programming | 0/1 knapsack | Boolean reachability
  *
- * Relation to 0/1 Knapsack:
- * - This is a special case of 0/1 Knapsack where:
- *     -> Each item’s "value" is same as its "weight".
- *     -> We just need to check if it's **possible** to achieve a sum (not maximize it).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  nums = [3, 34, 4, 12, 5, 2], target = 9
+ *   Output: true
+ *   Why:    the subset [4,5] reaches 9, so at least one valid subset exists.
+ *
+ * Follow-ups:
+ *   1. Return the subset itself?
+ *      Store parent choices or walk backward through the DP table after finding true.
+ *   2. Count how many subsets reach the target?
+ *      Change boolean states into integer counts and add include/exclude counts.
+ *   3. Optimize space?
+ *      Use a 1-D boolean array and scan sums backward for each number.
+ *
+ * Related: Partition Equal Subset Sum (416), Target Sum (494), Coin Change (322).
  */
 public class SubsetSum {
+
     public static void main(String[] args) {
-        int[] arr = {1, 4, 5};
-        int sum = 5;
-        System.out.println(findSubsetSumItr(arr, sum, arr.length));
+        int[][] inputs = {{}, {1, 4, 5}, {3, 34, 4, 12, 5, 2}};
+        int[] targets = {0, 7, 9};
+        boolean[] expected = {true, false, true};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = findSubsetSumItr(inputs[i], targets[i], inputs[i].length);
+            System.out.printf("nums=%s target=%d -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), targets[i], got, expected[i]);
+        }
     }
+
 
     /**
      * Recursive Approach (with memoization):
@@ -68,18 +84,25 @@ public class SubsetSum {
     }
 
     /**
-     * Iterative Tabulation Approach:
+     * Intuition: dp[itemCount][currentSum] answers whether the first itemCount
+     * numbers can make currentSum. For each number, every target sum has two
+     * possibilities: ignore the number, or take it and ask whether the remaining
+     * sum was possible before this number existed. Building the table row by row
+     * enforces the 0/1 rule because each row only reads from the previous row.
      *
-     * Intuition:
-     * dp[elementIndex][currentSum] means: Is it possible to make sum 'currentSum' using the first 'elementIndex' elements?
-     * Build the solution from smaller subproblems.
+     * Algorithm:
+     *   1. Create dp[i][j] for whether the first i elements can make sum j.
+     *   2. Set every dp[i][0] to true because sum 0 needs no elements.
+     *   3. For each element and currentSum, either skip the element or take it if it fits.
+     *   4. Return dp[size][sum].
      *
-     * Approach:
-     * - dp[i][0] = true (sum 0 is always possible)
-     * - Fill dp[elementIndex][currentSum] = dp[elementIndex-1][currentSum] || dp[elementIndex-1][currentSum - arr[elementIndex-1]] if arr[elementIndex-1] <= currentSum
+     * Time:  O(n*target) - every table cell is filled once with O(1) work.
+     * Space: O(n*target) - the table stores reachability for every prefix and sum.
      *
-     * Time Complexity: O(size * sum)
-     * Space Complexity: O(size * sum)
+     * @param arr positive input numbers
+     * @param sum target sum to form
+     * @param size number of prefix elements to consider
+     * @return true if some subset sums to target
      */
     public static boolean findSubsetSumItr(int[] arr, int sum, int size) {
         boolean[][] dp = new boolean[size+1][sum+1]; // dp[i][j] signifies that we can make sum j using first i elements

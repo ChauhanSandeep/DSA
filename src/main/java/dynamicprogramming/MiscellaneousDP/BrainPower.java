@@ -3,49 +3,72 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.Arrays;
 
 /**
- * LeetCode Problem: Solving Questions With Brainpower
- * Link: https://leetcode.com/problems/solving-questions-with-brainpower/
+ * Problem: Solving Questions With Brainpower
  *
- * Problem Statement:
- * Given an array `questions`, where `questions[i] = [points, brainpower]`,
- * you can either:
- *  - Solve the question to gain `points` and then skip `brainpower` questions.
- *  - Skip the question and move to the next.
- * Find the maximum points that can be earned.
+ * Each question gives some points, but solving it forces you to skip the next few
+ * questions. You may also skip any question freely. Return the maximum points you
+ * can collect from left to right.
  *
- * Approach:
- * - Uses **top-down memoization (recursion with caching)**.
- * - `dp[i]` stores the maximum points collectible starting from index `i`.
- * - Recursively compute:
- *    1. Taking the current question and skipping `brainpower` steps.
- *    2. Skipping the current question.
+ * Leetcode: https://leetcode.com/problems/solving-questions-with-brainpower/
+ * Rating:   1709 (zerotrac Elo)
+ * Pattern:  Dynamic programming | 1-D DP | Take-or-skip recurrence
  *
- * Time Complexity: **O(n)** (Each index is computed only once)
- * Space Complexity: **O(n)** (Memoization table `dp`)
- * LeetCode Contest Rating: 1709
+ * Example:
+ *   Input:  questions = [[3,2],[4,3],[4,4],[2,5]]
+ *   Output: 5
+ *   Why:    solving question 0 gives 3 points and jumps to the end, but skipping it
+ *           lets us solve question 1 for 4 and still question 3 for 2 is not reachable;
+ *           the best valid total is 5 from questions 0 and 3 in the original example.
+ *
+ * Follow-ups:
+ *   1. Return which questions were solved, not just the score?
+ *      Store the chosen branch for each index and walk the decisions after DP finishes.
+ *   2. What if each question has a deadline instead of a fixed skip count?
+ *      Sort by deadline and use interval scheduling DP over compatible questions.
+ *   3. What if memory must be constant?
+ *      Use bottom-up DP only when future lookups are bounded; arbitrary brainpower needs O(n).
+ *
+ * Related: House Robber (198), Delete and Earn (740), Maximum Profit in Job Scheduling (1235).
  */
 
 public class BrainPower {
 
     public static void main(String[] args) {
-        int[][] questions = {
-                {1, 1},
-                {2, 2},
-                {3, 3},
-                {4, 4},
-                {5, 5}
-        };
-
         BrainPower solver = new BrainPower();
-        long result = solver.mostPoints(questions);
-        System.out.println("Maximum points: " + result);
+        int[][][] inputs = {
+            {{3, 2}, {4, 3}, {4, 4}, {2, 5}},
+            {{1, 1}},
+            {{21, 5}, {92, 3}, {74, 2}, {39, 4}, {58, 2}}
+        };
+        long[] expected = {5, 1, 92};
+
+        for (int i = 0; i < inputs.length; i++) {
+            long got = solver.mostPoints(inputs[i]);
+            System.out.printf("questions=%s -> %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
     }
 
+
     /**
-     * Wrapper function to initialize memoization table and start solving.
+     * Intuition: dp[index] means the maximum score we can still earn starting at
+     * that question. From one index there are only two honest choices: solve it,
+     * collect its points, and continue after the forced skip, or ignore it and try
+     * the next question. Those future positions are smaller suffix problems, so
+     * memoizing each suffix lets the recursion reuse the same answer whenever it
+     * is reached by different earlier choices.
      *
-     * @param questions 2D array where questions[i] = [points, brainpower]
-     * @return Maximum points that can be earned
+     * Algorithm:
+     *   1. Fill memo with -1 so each starting index is computed once.
+     *   2. From start, return 0 past the end or the cached memo value.
+     *   3. Compare taking questions[start] plus the next legal index with skipping to start + 1.
+     *   4. Store and return the larger value for that start index.
+     *
+     * Time:  O(n) - each question index is solved once, and each solve does O(1) work.
+     * Space: O(n) - the memo array and recursion stack can both grow with the number of questions.
+     *
+     * @param questions questions[i] is [points, brainpower]
+     * @return maximum points that can be earned
      */
     public long mostPoints(int[][] questions) {
         long[] memo = new long[questions.length];

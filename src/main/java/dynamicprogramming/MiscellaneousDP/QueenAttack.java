@@ -5,23 +5,30 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Given a matrix denoting a chessboard with a few queens, compute
- * the number of queens that can attack each cell (i, j).
- * Assume there is no queen at that cell while calculating the count.
+ * Problem: Queen Attack
  *
- * Input
- *  "010",
- *  "100",
- *  "001"
- *  Output:
- *  [
- *    [3, 1, 2],
- *    [1, 3, 3],
- *    [2, 3, 0]
- *  ]
- *  Explanation:
- *  - Cell (0, 0) can be attacked by 3 queens (1 at (1, 0), 1 at (0, 1), and 1 at (2, 2)).
- *  Similarly, for other cells.
+ * Given a board where '1' marks a queen and '0' marks an empty cell, compute how
+ * many queens can attack every cell. A queen attacks horizontally, vertically, and
+ * diagonally until another queen blocks the ray.
+ *
+ * Source: InterviewBit - Queen Attack
+ * Pattern:  Grid | Direction scan | Ray blocking
+ *
+ * Example:
+ *   Input:  board = ["010","100","001"]
+ *   Output: [[3,1,2],[1,3,3],[2,3,0]]
+ *   Why:    cell (0,0) is seen by queens from the right, below, and down-right;
+ *           the same eight-direction scan gives the counts for every cell.
+ *
+ * Follow-ups:
+ *   1. Can this be faster than scanning from every queen?
+ *      Sweep each of the eight directions across the board and accumulate visibility counts.
+ *   2. What if queens do not block each other?
+ *      Count queens sharing each row, column, and diagonal with precomputed frequency maps.
+ *   3. Return attacking queen coordinates for each cell?
+ *      Store lists per cell while scanning rays, though output size can be large.
+ *
+ * Related: Queens That Can Attack the King (1222), N-Queens (51).
  */
 public class QueenAttack {
 
@@ -29,25 +36,40 @@ public class QueenAttack {
   private static final int[] dx = {0, -1, -1, -1, 0, 1, 1, 1};
   private static final int[] dy = {1, 1, 0, -1, -1, -1, 0, 1};
 
-  public static void main(String[] args) {
-    List<String> board = Arrays.asList(
-        "010",
-        "100",
-        "001"
-    );
-    List<List<Integer>> result = new QueenAttack().queenAttack(board);
-    System.out.println(result);
-  }
+    public static void main(String[] args) {
+        QueenAttack solver = new QueenAttack();
+        List<List<String>> inputs = Arrays.asList(
+            Arrays.asList("0"),
+            Arrays.asList("010", "100", "001")
+        );
+        String[] expected = {"[[0]]", "[[3, 1, 2], [1, 3, 3], [2, 3, 0]]"};
+
+        for (int i = 0; i < inputs.size(); i++) {
+            List<List<Integer>> got = solver.queenAttack(inputs.get(i));
+            System.out.printf("board=%s -> %s  expected=%s%n", inputs.get(i), got, expected[i]);
+        }
+    }
+
 
   /**
-   * Approach:
-   * - Use **direction-based traversal** (8 directions) to count attacking queens.
-   * - **Avoid recursion** (uses iterative traversal).
-   * - **Optimized data structures** (`int[][]` instead of nested lists).
-   *
-   * Time Complexity: O(N × M × 8) ≈ O(N × M)
-   * Space Complexity: O(N × M)
-   */
+     * Intuition: each queen sends one attack ray in each of the eight directions.
+     * Every empty cell on that ray gains one attacking queen until another queen is
+     * reached, because that next queen blocks anything beyond it in the same
+     * direction. By adding contributions from each queen into a matrix, each cell's
+     * final count is simply the number of rays that reached it.
+     *
+     * Algorithm:
+     *   1. Allocate attackCount with the same dimensions as board.
+     *   2. For every cell containing a queen, call markAttacks from that position.
+     *   3. markAttacks walks all eight directions, incrementing cells until the ray leaves the board or hits a queen.
+     *   4. Convert the count matrix into List<List<Integer>>.
+     *
+     * Time:  O(q*(rows+cols)) - each queen scans up to a board-length ray in eight directions.
+     * Space: O(rows*cols) - the count matrix stores one answer per cell.
+     *
+     * @param board rows of '0' and '1' characters
+     * @return attack count for every cell
+     */
   public List<List<Integer>> queenAttack(List<String> board) {
     int rows = board.size();
     int cols = board.get(0).length();

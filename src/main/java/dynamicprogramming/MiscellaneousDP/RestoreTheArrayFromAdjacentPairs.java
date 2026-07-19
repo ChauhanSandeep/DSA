@@ -3,29 +3,52 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * Problem: Restore the Array from Adjacent Pairs
+ * Problem: Restore the Array From Adjacent Pairs
  *
- * There is an integer array nums that consists of n unique elements, but you have forgotten it.
- * However, you do remember every pair of adjacent elements in nums.
+ * An unknown array has unique values, and you are given all of its adjacent pairs
+ * in arbitrary order and direction. Reconstruct one valid original array. The
+ * reverse of the original is also acceptable.
  *
- * You are given a 2D integer array adjacentPairs of size n - 1 where each adjacentPairs[i] = [ui, vi]
- * indicates that the elements ui and vi are adjacent in nums.
- *
- * It is guaranteed that every adjacent pair of elements nums[i] and nums[i+1] will exist in adjacentPairs,
- * either as [nums[i], nums[i+1]] or [nums[i+1], nums[i]]. The pairs can appear in any order.
+ * Leetcode: https://leetcode.com/problems/restore-the-array-from-adjacent-pairs/
+ * Rating:   1579 (zerotrac Elo)
+ * Pattern:  Graph | Path reconstruction | Degree-one endpoint
  *
  * Example:
- * Input: adjacentPairs = [[2,1],[3,4],[3,2]]
- * Output: [1,2,3,4]
- * Explanation: The array can be reconstructed as [1,2,3,4] or [4,3,2,1]
+ *   Input:  adjacentPairs = [[2,1],[3,4],[3,2]]
+ *   Output: [1,2,3,4]
+ *   Why:    1 and 4 are endpoints, and following unused neighbours from 1 gives
+ *           1 next to 2, 2 next to 3, and 3 next to 4.
  *
- * LeetCode: https://leetcode.com/problems/restore-the-array-from-adjacent-pairs
+ * Follow-ups:
+ *   1. What if values can repeat?
+ *      The graph no longer identifies positions uniquely; include occurrence ids or extra constraints.
+ *   2. What if the pairs describe several disconnected arrays?
+ *      Start from every degree-one node in each component and reconstruct each path separately.
+ *   3. Can we detect invalid input?
+ *      Verify exactly two endpoints, all degrees are at most two, and the walk visits every node once.
  *
- * Time Complexity: O(n) where n is the number of elements in the original array
- * Space Complexity: O(n) for storing the graph and result
- * LeetCode Contest Rating: 1579
+ * Related: Reconstruct Itinerary (332), Find Center of Star Graph (1791).
  */
 public class RestoreTheArrayFromAdjacentPairs {
+/**
+     * Intuition: the adjacent pairs form a simple path graph. Interior values have
+     * two neighbours, while the two ends have only one. Once we start from either
+     * endpoint, each next value is the neighbour that is not the value we just came
+     * from. Walking that path reconstructs the whole array because every number is
+     * unique and the original structure has no branches.
+     *
+     * Algorithm:
+     *   1. Build an undirected adjacency list and occurrence count from adjacentPairs.
+     *   2. Pick any value with count 1 as the starting endpoint.
+     *   3. Walk the path by taking the unvisited neighbor of the previous result value.
+     *   4. Stop after adjacentPairs.length + 1 values are written.
+     *
+     * Time:  O(n) - each pair and each array value is processed a constant number of times.
+     * Space: O(n) - the graph and result store all n values.
+     *
+     * @param adjacentPairs unordered adjacent pairs from the hidden array
+     * @return one valid restored array
+     */
     public int[] restoreArray(int[][] adjacentPairs) {
         // Build adjacency list
         Map<Integer, List<Integer>> graph = new HashMap<>();
@@ -77,5 +100,20 @@ public class RestoreTheArrayFromAdjacentPairs {
         }
 
         return result;
+    }
+
+    public static void main(String[] args) {
+        RestoreTheArrayFromAdjacentPairs solver = new RestoreTheArrayFromAdjacentPairs();
+        int[][][] inputs = {
+            {{2, 1}, {3, 4}, {3, 2}},
+            {{4, -2}, {1, 4}, {-3, 1}}
+        };
+        String[] expected = {"[1, 2, 3, 4] or reverse", "[-2, 4, 1, -3] or reverse"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.restoreArray(inputs[i]);
+            System.out.printf("adjacentPairs=%s -> %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), Arrays.toString(got), expected[i]);
+        }
     }
 }
