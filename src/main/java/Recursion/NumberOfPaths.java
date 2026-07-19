@@ -4,51 +4,74 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Problem: Find the number of unique paths from the top-left corner (1,1)
- * to the bottom-right corner (m,n) in an m x n grid.
- * - Only **right** and **down** movements are allowed.
+ * Problem: Unique Paths
  *
- * Approach:
- * - **Recursive Backtracking:** Try both right and down moves.
- * - **Memoization (Top-Down Dynamic Programming):** Avoid redundant calculations.
- * - **Mathematical Formula Approach (Optimal)**: Using combinatorics (Binomial Coefficient).
+ * Count how many ways a robot can travel from the top-left cell of an m by n
+ * grid to the bottom-right cell. The robot may only move down or right, so every
+ * path has the same length but a different ordering of those moves.
  *
- * Time Complexity (Recursive): O(2^(m+n)) (Exponential, without memoization)
- * Time Complexity (Optimized DP): O(m * n) (With Memoization)
- * Space Complexity: O(m * n) (For memoization storage)
+ * Leetcode: https://leetcode.com/problems/unique-paths/ (Medium)
+ * Rating:   acceptance 67.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Recursion | Memoization | Grid choices down or right
  *
- * LeetCode Link: https://leetcode.com/problems/unique-paths/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  m = 3, n = 7
+ *   Output: 28
+ *   Why:    every path is a sequence of 2 down moves and 6 right moves, and
+ *           there are 28 positions for the down moves among those 8 steps.
+ *
+ * Follow-ups:
+ *   1. How do you solve this in O(1) extra space?
+ *      Use the combinatorics formula C(m+n-2, m-1) with careful multiplication.
+ *   2. What if some cells are blocked?
+ *      Memoize only valid cells, or use DP where blocked cells contribute 0 paths.
+ *   3. What if diagonal moves are also allowed?
+ *      Add a third recursive branch and memoize the larger state transition.
+ *   4. What if the grid is huge and the answer must be modulo a prime?
+ *      Use factorials and modular inverses for the binomial coefficient.
+ *
+ * Related: Unique Paths II (63), Minimum Path Sum (64), Unique Paths III (980).
  */
 public class NumberOfPaths {
 
     public static void main(String[] args) {
-        System.out.println("Number of unique paths (3x3 grid): " + numberOfPaths(3, 3));
-        System.out.println("Number of unique paths (5x5 grid): " + numberOfPaths(5, 5));
+        int[][] grids = { {0, 5}, {1, 5}, {3, 7} };
+        long[] expected = { 0, 1, 28 };
+
+        for (int i = 0; i < grids.length; i++) {
+            long got = numberOfPaths(grids[i][0], grids[i][1]);
+            System.out.printf("grid=%dx%d -> %d  expected=%d%n",
+                grids[i][0], grids[i][1], got, expected[i]);
+        }
     }
 
     /**
-     * Finds the number of unique paths in an `m x n` grid.
+     * Intuition: from any cell, every complete path begins with exactly one of
+     * two choices: go down or go right. Those choices are disjoint, so the number
+     * of paths from a cell is the sum of the answers from those two neighboring
+     * cells. The base cases give meaning to the edges of the recursion tree:
+     * outside the grid contributes 0, and the destination contributes 1 completed
+     * path. Memoization makes each coordinate's answer get computed once.
      *
-     * @param m Number of rows.
-     * @param n Number of columns.
-     * @return Total number of unique paths.
+     * Algorithm:
+     *   1. Create a memo map for solved grid coordinates.
+     *   2. Start counting from cell (1,1).
+     *   3. Return 0 for out-of-bounds cells and 1 for the destination.
+     *   4. Cache and return down-paths plus right-paths for each remaining cell.
+     *
+     * Time:  O(m*n) - memoization computes each grid cell once.
+     * Space: O(m*n) - the memo table stores one value per cell, plus recursion stack.
+     *
+     * @param m number of rows
+     * @param n number of columns
+     * @return number of unique down/right paths
      */
     public static long numberOfPaths(int m, int n) {
         Map<String, Long> memo = new HashMap<>();
         return countPaths(1, 1, m, n, memo);
     }
 
-    /**
-     * Recursive function to count unique paths using memoization.
-     *
-     * @param i    Current row index.
-     * @param j    Current column index.
-     * @param rows Total rows in the grid.
-     * @param cols Total columns in the grid.
-     * @param memo Cache to store previously computed results.
-     * @return Number of unique paths from (i, j) to (rows, cols).
-     */
+    /** Counts paths from the current cell to the destination, caching repeated cells. */
     private static long countPaths(int i, int j, int rows, int cols, Map<String, Long> memo) {
         if (i > rows || j > cols) return 0;  // Out of bounds
         if (i == rows && j == cols) return 1; // Reached destination
