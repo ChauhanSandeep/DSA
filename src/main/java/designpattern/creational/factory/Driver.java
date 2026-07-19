@@ -1,30 +1,18 @@
 package designpattern.creational.factory;
 
 /**
- * Driver - Client Class for Factory Pattern Demo
+ * Demo client for the Factory pattern.
  *
- * This class demonstrates how clients use the Factory Pattern to create objects.
- * Instead of using 'new PC()' or 'new Server()' directly, the client calls the
- * factory method, which encapsulates the object creation logic.
+ * Intent: show that client code requests computers from ComputerFactory and uses
+ * the shared Computer abstraction. Use this pattern when the caller should not
+ * know which concrete product class is created.
  *
- * Benefits for Client:
- * - Doesn't need to know about concrete classes (PC, Server)
- * - Doesn't need to handle object creation logic
- * - Code is more maintainable and flexible
- * - Can easily work with new computer types without code changes
- *
- * @author Sandeep Chauhan
+ * Participants: Driver is the client, ComputerFactory is the creator, Computer
+ * is the product abstraction, and PC and Server are concrete products.
  */
 public class Driver {
 
-    /**
-     * Main method demonstrating Factory Pattern usage.
-     *
-     * Notice how the client:
-     * 1. Uses the factory method instead of 'new' operator
-     * 2. Works with Computer interface, not concrete classes
-     * 3. Doesn't need to know about PC or Server classes
-     */
+    /** Creates two product types through the factory and prints their configs. */
     public static void main(String[] args) {
         // Create a PC using the factory - client doesn't use 'new PC()'
         Computer pc = ComputerFactory.getComputer("pc","2 GB","500 GB","2.4 GHz");

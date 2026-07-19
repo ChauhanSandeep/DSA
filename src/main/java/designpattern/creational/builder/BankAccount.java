@@ -1,61 +1,16 @@
 package designpattern.creational.builder;
 
 /**
- * Builder Pattern - BankAccount Implementation
+ * Builder pattern example for constructing a bank account.
  *
- * The Builder Pattern is a creational design pattern that provides a flexible solution
- * to construct complex objects step by step. It separates the construction of an object
- * from its representation, allowing the same construction process to create different
- * representations.
+ * Intent: separate object construction from the final object so callers can set
+ * optional values with readable, named steps instead of long constructor lists.
+ * Use it when an object has mandatory and optional fields, many same-typed
+ * parameters, or construction rules that should live in one place.
  *
- * Problem Solved:
- * - Telescoping constructor anti-pattern (many constructor overloads)
- * - Unclear parameter meaning when many parameters have same type
- * - Objects that need to be immutable after creation
- * - Objects with many optional parameters
- *
- * Builder Pattern Structure:
- * 1. **Product** (BankAccount): The complex object being built
- * 2. **Builder** (BankAccount.Builder): Constructs the product step by step
- * 3. **Private Constructor**: Prevents direct instantiation, forces use of builder
- * 4. **Fluent Interface**: Builder methods return 'this' for method chaining
- * 5. **build()**: Finalizes construction and returns the product
- *
- * Key Advantages:
- * - Readability: Clear what each parameter represents (e.g., .owner("John"))
- * - Flexibility: Can set parameters in any order
- * - Optional Parameters: Easy to handle (just don't call the setter)
- * - Immutability: Product object can be made immutable
- * - Validation: Can validate in build() before creating object
- * - Named Parameters: Java doesn't have named parameters, builder simulates this
- *
- * Example Usage:
- * ```java
- * BankAccount account = new BankAccount.Builder(1234L)
- *     .owner("John Doe")
- *     .branch("Main Street")
- *     .balance(10000.0)
- *     .rate(4.5)
- *     .build();
- * ```
- *
- * Comparison with Alternatives:
- * - Telescoping Constructors: Becomes unwieldy with many parameters
- * - JavaBeans Pattern: Mutable objects, can be in inconsistent state
- * - Builder Pattern: Best of both worlds - immutability + readability
- *
- * Real-World Examples:
- * - StringBuilder/StringBuffer in Java
- * - OkHttpClient.Builder for HTTP client configuration
- * - Retrofit.Builder for REST client setup
- * - AlertDialog.Builder in Android
- *
- * Related Patterns:
- * - Abstract Factory: Creates families of objects
- * - Prototype: Creates objects by cloning
- * - Factory Method: Simpler, for single-step creation
- *
- * @author Sandeep Chauhan
+ * Participants: BankAccount is the product, BankAccount.Builder is the builder,
+ * the builder setter methods collect construction state, and build() creates the
+ * finished product through the private constructor.
  */
 public class BankAccount {
 
@@ -66,21 +21,12 @@ public class BankAccount {
     private double balance;        // Current account balance (optional)
     private double interestRate;   // Interest rate percentage (optional)
 
-    /**
-     * Private constructor prevents direct instantiation.
-     * Forces clients to use the Builder to create BankAccount objects.
-     * This ensures objects are always fully constructed before use.
-     */
+    /** Prevents direct construction so callers use the builder. */
     private BankAccount() {
         // Constructor is private - only Builder can create instances
     }
 
-    /**
-     * Returns string representation of the bank account.
-     * Useful for debugging and logging.
-     *
-     * @return String containing all account details
-     */
+    /** Formats all account fields for the demo output. */
     @Override
     public String toString() {
         return "BankAccount{" +
@@ -92,18 +38,7 @@ public class BankAccount {
                 '}';
     }
 
-    /**
-     * Builder - Inner Static Class for Constructing BankAccount Objects
-     *
-     * The Builder provides a fluent interface for constructing BankAccount objects.
-     * It holds the same fields as BankAccount and provides setter methods that
-     * return the builder itself, enabling method chaining.
-     *
-     * Design Decision: Inner Static Class
-     * - Static: Can be instantiated without BankAccount instance
-     * - Inner: Has access to BankAccount's private constructor
-     * - Enables: new BankAccount.Builder(...) syntax
-     */
+    /** Builder that gathers BankAccount fields through a fluent API. */
     public static class Builder {
 
         // Builder holds same fields as product
@@ -113,81 +48,36 @@ public class BankAccount {
         private double balance;
         private double interestRate;
 
-        /**
-         * Constructor for Builder with mandatory parameters.
-         *
-         * Design Decision: Only mandatory fields in constructor
-         * - accountNumber is required for all bank accounts
-         * - Other fields are optional and set via builder methods
-         *
-         * @param accountNumber Unique account number (mandatory)
-         */
+        /** Starts a builder with the mandatory account number. */
         public Builder(long accountNumber) {
             this.accountNumber = accountNumber;
         }
 
-        /**
-         * Sets the account owner name.
-         *
-         * Fluent Interface: Returns 'this' to enable method chaining.
-         * Example: builder.owner("John").branch("NYC").build()
-         *
-         * @param owner Name of the account owner
-         * @return This builder instance for chaining
-         */
+        /** Sets the optional account owner and returns this builder. */
         public Builder owner(String owner){
             this.owner = owner;
             return this; // Enables fluent interface / method chaining
         }
 
-        /**
-         * Sets the bank branch location.
-         *
-         * @param branch Bank branch name or location
-         * @return This builder instance for chaining
-         */
+        /** Sets the optional branch and returns this builder. */
         public Builder branch(String branch){
             this.branch = branch;
             return this;
         }
 
-        /**
-         * Sets the account balance.
-         *
-         * @param balance Initial or current account balance
-         * @return This builder instance for chaining
-         */
+        /** Sets the optional balance and returns this builder. */
         public Builder balance(double balance){
             this.balance = balance;
             return this;
         }
 
-        /**
-         * Sets the interest rate.
-         *
-         * @param interestRate Annual interest rate percentage
-         * @return This builder instance for chaining
-         */
+        /** Sets the optional interest rate and returns this builder. */
         public Builder rate(double interestRate){
             this.interestRate = interestRate;
             return this;
         }
 
-        /**
-         * Builds and returns the final BankAccount object.
-         *
-         * This method:
-         * 1. Creates a new BankAccount instance (using private constructor)
-         * 2. Transfers all values from builder to the account
-         * 3. Returns the fully initialized, immutable account object
-         *
-         * Enhancement Opportunities:
-         * - Add validation (e.g., balance >= 0, interestRate >= 0)
-         * - Throw exception if mandatory fields are missing
-         * - Set default values for optional fields
-         *
-         * @return Fully constructed BankAccount object
-         */
+        /** Creates a BankAccount from the values collected by this builder. */
         public BankAccount build(){
             // Create the actual product using private constructor
             BankAccount account = new BankAccount();
