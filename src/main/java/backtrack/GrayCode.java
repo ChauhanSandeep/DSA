@@ -41,24 +41,21 @@ import java.util.List;
 public class GrayCode {
 
     /**
-     * Intuition: build the n-bit sequence out of the (n-1)-bit one by
-     * "reflecting" it. Take the shorter sequence, write it once with a 0 stuck on
-     * the front, then write it again in reverse with a 1 on the front. Within each
-     * half only the low bits change (they already form a valid Gray sequence), and
-     * at the seam between the halves the mirror image means the low bits are
-     * identical, so only the new leading bit flips - so every neighbour, including
-     * the join, differs by exactly one bit.
+     * Intuition: solve n bits using the answer for n-1 bits - a build-up from the
+     * smallest case. Say you already have a valid Gray sequence on n-1 bits. How
+     * do you add one more bit and keep the "neighbours differ in one bit"
+     * property? Reflect it: write the shorter sequence as-is with a 0 glued to the
+     * front, then write it AGAIN in reverse with a 1 glued to the front. Inside
+     * each half the leading bit is fixed and the low bits were already a Gray
+     * sequence, so those neighbours are fine. The only brand-new adjacency is the
+     * seam where the two halves meet - and because the second half is the mirror
+     * image, the two codes touching at the seam share identical low bits and
+     * differ only in that fresh leading bit. Base case: 0 bits is just {"0"}. Every
+     * neighbour, including the seam, is a single-bit change by construction.
      *
-     * Algorithm:
-     *   1. Recursively build the reflected binary strings for n bits.
-     *   2. First half: copy the previous sequence in order, prefixing each with 0.
-     *   3. Second half: copy the previous sequence in reverse, prefixing each
-     *      with 1 (the reversal is what keeps the seam a single-bit change).
-     *   4. Parse each binary string into its integer value.
-     *
-     * Time:  O(2^n * n) - there are 2^n codes and building/parsing each one is an
-     *        n-character string, so O(n) work per code.
-     * Space: O(2^n * n) for the intermediate strings.
+     * Time:  O(2^n * n) - there are 2^n codes and building or parsing each one
+     *        touches an n-character string, so O(n) work apiece.
+     * Space: O(2^n * n) to hold the intermediate binary strings.
      *
      * @param bitsCount number of bits
      * @return Gray code sequence as integers
@@ -89,20 +86,18 @@ public class GrayCode {
     }
 
     /**
-     * Intuition (interview default): there is a direct formula, so no recursion is
-     * needed. If you count normally in binary, going from one number to the next
-     * can flip several bits at once (a carry ripples through a run of 1s). The
-     * trick rank ^ (rank >> 1) xors each number with itself shifted right by one:
-     * that cancels every bit that matches its higher neighbour and keeps only the
-     * places where bits change, which for consecutive numbers always works out to
-     * a single differing bit. So we can just count 0, 1, 2, ... and convert each.
+     * Intuition (interview default): the reflection idea is neat, but there is a
+     * closed form that drops the recursion entirely. Why not just count
+     * 0, 1, 2, ... in ordinary binary? Because a normal +1 can flip many bits at
+     * once - a carry ripples through a run of trailing 1s (011 -> 100 flips
+     * three). We need each step to flip exactly one bit. The formula
+     * rank ^ (rank >> 1) delivers that: xor-ing a number with itself shifted right
+     * by one keeps a bit only where it differs from its higher neighbour, and for
+     * two consecutive integers that always comes out to a single differing bit. So
+     * we count 0, 1, 2, ... and map each through the formula - a valid Gray
+     * sequence with no bookkeeping at all.
      *
-     * Algorithm:
-     *   1. Reject a negative bit count.
-     *   2. The sequence has 2^n values, so compute that size once.
-     *   3. For each rank from 0 upward, append rank ^ (rank >> 1).
-     *
-     * Time:  O(2^n) - one Gray value per rank, and each is a single O(1) xor/shift.
+     * Time:  O(2^n) - one Gray value per rank, each just an O(1) xor and shift.
      * Space: O(1) extra beyond the output.
      *
      * @param bitsCount number of bits

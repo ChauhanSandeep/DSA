@@ -12,9 +12,11 @@ DSA in months should understand the problem and why the solution works in under 
 minute, without re-solving it themselves.** Optimize for fast recall, not for the
 person typing the code.
 
-The canonical reference implementation of this standard is
-[`src/main/java/backtrack/Subset2.java`](src/main/java/backtrack/Subset2.java) —
-when in doubt, copy its shape exactly.
+The canonical reference implementations of this standard are
+[`src/main/java/backtrack/Subset2.java`](src/main/java/backtrack/Subset2.java)
+and [`src/main/java/backtrack/GrayCode.java`](src/main/java/backtrack/GrayCode.java).
+Match their *spirit* — teach the reader from first principles — not a rigid
+shape: the structure always bends to whatever makes the solution clearest.
 
 ## Repository Overview
 
@@ -116,8 +118,10 @@ We deliberately split documentation between the **class** and the **method**:
 - **Class Javadoc = what the problem is.** Problem statement, link, rating,
   pattern, one tricky example, hard follow-ups, related problems. No intuition,
   no algorithm steps, no complexity — those belong with the code.
-- **Method Javadoc = how this specific solution works.** Intuition, numbered
-  algorithm steps, complexity, `@param` / `@return`.
+- **Method Javadoc = how this specific solution works, taught from first
+  principles.** Build the idea, the key insight, why it is correct, plus
+  complexity and `@param` / `@return`. A numbered algorithm list is optional and
+  only if it adds reasoning beyond the code — see the method-doc section below.
 - **No dry-run traces in comments.** If one line is non-obvious, add a short
   inline comment on that line instead.
 
@@ -151,29 +155,68 @@ priority order, and hardcode the fetched value into the file so the doc is stati
    band. Example: `Rating:   acceptance 61.6% (Medium) - no contest Elo (pre-contest problem)`.
 3. Keep the broad label in parentheses only as a human anchor.
 
-### Method Javadoc — required sections
+### Method Javadoc — teach the solution
 
-Every non-trivial method (anything beyond a 3-line helper):
+The one job of the method doc is this: **a reader who has not touched DSA in
+months should be able to re-derive this solution and explain WHY it works,
+without reading the code.** Optimize every line for that.
 
-1. **Intuition** — build the mental model from scratch for a reader who has
-   forgotten this problem (or is seeing it for the first time). Explain WHY this
-   approach is chosen, the key insight / "aha" that makes it work, and briefly
-   why it is correct — in plain, concrete language with first principles thinkging.
-   Aim for roughly 4-12 lines: rich enough to actually re-teach the idea, but tight, no rambling. If two
-   solutions coexist, name which is the interview default here.
-3. **Algorithm** — numbered steps that match the `// --- Step N` banners in code.
-   Each step is a full, readable sentence a rusty reader can follow without
-   re-deriving it from first principles — not a cryptic fragment. When a step is non-obvious, fold in
-   the small "why" for that step. Do NOT write a step as an arrow template like
-   `Select -> recurse -> un-select`; describe it in plain words ("add the
-   candidate, recurse on the rest, then remove it before trying the next"). The
-   arrow label belongs on the code line as an inline anchor, not in prose steps.
-4. **Time** / **Space** — one line each. The **Time** line MUST include a short,
-   plain-English reason for *why* it is that complexity, written for someone who
-   finds Big-O hard. Not a proof — one clause. E.g.
-   `Time: O(n log n) - we sort once (n log n), then a single linear scan.`
-   or `Time: O(2^n * n) - there are 2^n subsets and copying each costs up to O(n).`
-5. `@param` / `@return`.
+The headings below (Intuition, Algorithm, Time, Space) are a **light scaffold,
+not a form to fill in.** Merge them, reorder them, drop the ones that add
+nothing, and skip the numbered `Algorithm` entirely whenever a single flowing
+explanation teaches better. **Understanding wins; structure serves it, never the
+reverse.**
+
+Build the idea from **first principles** and from **blocks the reader already
+has** — these are tools, use the ones that make *this* solution click:
+
+- **Start from what is obvious.** Name the naive / brute-force idea first, then
+  show concretely why it fails or is too slow. Let the reader feel the problem
+  before seeing the trick.
+- **Introduce the key insight as the fix to that exact pain**, and anchor it to
+  something familiar — a simpler problem or a known primitive ("this is just BFS
+  over states", "same idea as two-sum but on a prefix sum").
+- **Make it click, then make it correct.** Once the idea is clear, say in a line
+  or two *why it is always correct* — the invariant, or why nothing is missed or
+  double-counted. This is often the most valuable sentence in the file.
+- **Reach for a tiny concrete example inline** (a 3-element array, a 2-bit case)
+  when words alone get slippery, instead of piling on abstract sentences.
+
+Length is whatever it takes to teach and no more (often ~4-12 lines). Do not pad
+to hit a shape, and do not force the naive->insight->invariant order when it does
+not help this particular problem — it is one lens, not a required move.
+
+**If you keep a numbered `Algorithm` list**, it must add reasoning the code does
+not already show — a short recipe where each step says *why* it exists. It must
+NOT narrate the code line-by-line ("fill an array with 1s", "loop from the
+left"). That restatement teaches nothing and is the single biggest thing wrong
+with the old docs. When the intuition already makes the steps obvious, drop the
+list.
+
+**Time / Space** — one line each. The **Time** line MUST carry a short,
+plain-English reason for *why* it is that complexity, for someone who finds Big-O
+hard. Not a proof — one clause. E.g.
+`Time: O(n log n) - we sort once (n log n), then a single linear scan.`
+`@param` / `@return` — keep them.
+
+Good vs bad, same solution (maximum subarray sum):
+
+    BAD  (narrates the code, teaches nothing):
+      "Loop through the array keeping a running sum. If the running sum drops
+       below zero, reset it to zero. Track the maximum seen."
+
+    GOOD (builds it from first principles):
+      "Brute force checks every subarray - O(n^2). Key idea: the best subarray
+       ENDING at index i is either nums[i] alone, or nums[i] glued onto the best
+       subarray ending at i-1. So a running prefix that has gone negative is
+       never worth keeping - dropping it can only help the next element - which
+       is exactly why we reset. We carry one number (best sum ending here); the
+       answer is the max of those."
+
+**Self-check before moving on:** having read only your method doc (not the code),
+could a rusty reader explain the approach and why it is correct back to you? If
+not, you described the mechanism instead of teaching it. And is any sentence
+there only to satisfy the format? Delete it.
 
 **Private / helper methods** get a **concise one-line Javadoc stating only their
 purpose** — what the method is for, in a single sentence. No `@param`, no

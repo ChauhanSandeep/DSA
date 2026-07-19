@@ -43,28 +43,22 @@ import java.util.List;
 public class Subset2 {
 
     /**
-     * Intuition: the power set doubles every time you introduce a new value -
-     * every existing subset can either take the new value or skip it. So we build
-     * the answer in rounds: start with just the empty subset, and for each value
-     * copy every subset we already have and append the value to the copy. The
-     * only wrinkle is duplicates: if the same value appears again and we extend
-     * ALL current subsets, we recreate subsets the previous copy of that value
-     * already made. The fix is to remember where last round's new subsets began
-     * and, for a repeated value, extend only those - so each duplicate adds
-     * exactly the genuinely new subsets and nothing already seen.
+     * Intuition: forget duplicates for a moment. The power set has a dead-simple
+     * building rule - introduce one new value and every subset you already have
+     * splits in two: the old subset, and a copy of it with the new value
+     * appended. So from just {} you grow the whole answer one value at a time,
+     * doubling the count each round. Duplicates are the only snag. If the same
+     * value appears twice and you again append it to EVERY existing subset, you
+     * rebuild subsets the first copy already made - a second 2 re-creates {2} on
+     * top of the {2} the first 2 produced. Which subsets are those duplicates?
+     * Exactly the ones that did not already end in this value - i.e. everything
+     * except the batch the previous copy just added. So for a repeat, extend only
+     * that last batch. That is the whole trick, and it makes every subset appear
+     * once and never twice.
      *
-     * Algorithm:
-     *   1. Sort the array so equal values sit next to each other (this is what
-     *      lets us recognise a repeat by comparing with the previous value).
-     *   2. Seed the result with the empty subset.
-     *   3. For each value, copy a range of existing subsets and append the value
-     *      to each copy.
-     *   4. If this value repeats the previous one, start that range at the first
-     *      subset created last round; otherwise extend every existing subset.
-     *
-     * Time:  O(n*2^n) - there are up to 2^n subsets and copying each one to
-     *        extend it costs up to O(n).
-     * Space: O(1) extra beyond the output.
+     * Time:  O(n * 2^n) - the answer holds up to 2^n subsets and copying each one
+     *        to extend it costs up to O(n).
+     * Space: O(1) extra beyond the output list itself.
      *
      * @param nums input array that may contain duplicates
      * @return all unique subsets
@@ -74,10 +68,10 @@ public class Subset2 {
         allSubsets.add(new ArrayList<>());
         if (nums == null || nums.length == 0) return allSubsets;
 
-        // --- Step 1: sort to group duplicates -----------------------------
+        // --- sort so equal values become neighbours ----------------------
         Arrays.sort(nums);
 
-        // --- Step 2 & 3: extend subsets value by value --------------------
+        // --- grow every subset one value at a time ------------------------
         int previousRoundStart = 0;
         for (int i = 0; i < nums.length; i++) {
             // a duplicate must only extend subsets born in the previous round,
@@ -96,29 +90,28 @@ public class Subset2 {
     }
 
     /**
-     * Intuition (interview default): think of building a subset as a walk down a
-     * decision tree - at each index you decide which value to append next, and
-     * every node you pass through is itself a valid subset (that is why we record
-     * on entry, not just at the leaves). The trap is duplicates: once the array
-     * is sorted, equal values are neighbours, and choosing the second, third, ...
-     * copy of a value at the SAME position in the tree would rebuild the exact
-     * subsets the first copy already produced. So at each level we let a value in
-     * only the first time it appears and skip its equal siblings - that single
-     * skip is what turns "all subsets" into "all UNIQUE subsets".
+     * Intuition (interview default): picture building a subset as a walk down a
+     * decision tree - at each step you pick which of the remaining values to
+     * append next. The naive version of this happily produces duplicates, so the
+     * whole game is one targeted fix. Two ideas make it work:
      *
-     * Algorithm:
-     *   1. Sort so duplicates are adjacent (this is what makes the skip check work).
-     *   2. On entering each recursive call, record the current subset - every node
-     *      of the tree is a valid answer, including the empty one.
-     *   3. From the current index, try each remaining value as the next pick, but
-     *      skip a value equal to its left neighbour within this same loop, since
-     *      the first sibling already covered those subsets.
-     *   4. For each kept value, add it, recurse from the next index, then remove
-     *      it before trying the next candidate.
+     * First, every node you pass through IS a valid subset, not just the leaves
+     * (the empty pick, {1}, {1,2}, ...). So we record the current subset the
+     * moment we enter a call, not only at the bottom - that is why the very first
+     * thing each call does is add what we have so far.
      *
-     * Time:  O(n*2^n) - there are 2^n subsets and copying each into the result
+     * Second, the duplicate trap: once the array is sorted, equal values are
+     * neighbours. Within a single level of the tree, choosing the second (or
+     * third) copy of a value as "the next pick" rebuilds the exact subtree the
+     * first copy already explored. So at each level we allow a value in only the
+     * first time it appears and skip its equal siblings. That single skip - "not
+     * the first choice here AND equal to the previous" - is the entire difference
+     * between "all subsets" and "all UNIQUE subsets".
+     *
+     * Time:  O(n * 2^n) - up to 2^n subsets, and copying each into the result
      *        costs O(n).
-     * Space: O(n) recursion depth + current-subset buffer (excluding output).
+     * Space: O(n) for the recursion depth plus the current-subset buffer
+     *        (excluding the output).
      *
      * @param nums input array that may contain duplicates
      * @return all unique subsets
