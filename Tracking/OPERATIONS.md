@@ -60,7 +60,7 @@ That's the whole ritual. No file pickers, no exports.
 
 ## 3. GitHub integration
 
-Two workflows under `.github/workflows/` do all the automation. Both use
+Three workflows under `.github/workflows/` do all the automation. All use
 only the built-in `GITHUB_TOKEN` — no PATs, no secrets.
 
 ### `weekly-review-nudge.yml`
@@ -83,26 +83,55 @@ only the built-in `GITHUB_TOKEN` — no PATs, no secrets.
   *"📓 Study log — DSA reviews"* issue (auto-created on first run).
 - If the push had no grade diff (e.g. sync-only churn), silently exits.
 
+### `deploy-pages.yml`
+
+- Triggers on every push to `master` that changes anything the site
+  renders: `Tracking/data/**`, `Tracking/scripts/**`,
+  `Tracking/site-src/**`, `Tracking/vendor/**`, or `src/main/java/**`.
+- Runs `build.py` on a GitHub runner and publishes the resulting
+  `Tracking/site/` to **GitHub Pages** — a public, read-only view of
+  your queue, Q/A cards, patterns, and syntax-highlighted source.
+- The published dashboard runs in *read-only mode*: it pings
+  `/api/ping` on load, finds no local server, and hides the grade bar
+  + shows a banner reminding you that grading needs `serve.py` locally.
+
 ### One-time GitHub setup
 
 Do these once when you first push these workflows:
 
-1. Push to GitHub: `git push origin master` (already done).
-2. Go to **Settings → Actions → General → Workflow permissions**. Select
-   **"Read and write permissions"**. Save.
-3. Trigger `weekly-review-nudge.yml` manually via
-   **Actions tab → Weekly review nudge → Run workflow → master → Run**.
-4. Verify: check **Issues** — the *"Weekend review …"* issue should
-   appear labeled `review-queue`. Confirms the token works.
+1. Push to GitHub: `git push origin master`.
+2. **Settings → Actions → General → Workflow permissions** → select
+   **"Read and write permissions"**. Save. Needed by nudge + log workflows.
+3. **Settings → Pages → Build and deployment → Source** → set to
+   **"GitHub Actions"**. (No branch selection — the workflow itself
+   uploads the artifact.)
+4. Trigger `weekly-review-nudge.yml` manually via **Actions →
+   Weekly review nudge → Run workflow → master**. Verify the issue
+   appears under **Issues** with label `review-queue`.
+5. Trigger `deploy-pages.yml` manually the same way. Verify a green
+   run, then visit the URL shown on the Pages settings page
+   (`https://<user>.github.io/DSA/`) — the read-only dashboard
+   should load with the banner.
 
-If step 3 fails with a permissions error, revisit step 2.
+If any of these fail with a permissions error, revisit step 2.
 
 ### Ongoing cost
 
-- Workflow runs are on free-tier GitHub Actions and cost ~15 sec/week for
-  the nudge + ~10 sec per state.json push. Effectively free.
+- Workflow runs are on free-tier GitHub Actions and cost <60 sec per
+  push. Effectively free.
 - No secrets to rotate. No PAT to expire. `GITHUB_TOKEN` is
   auto-generated per run.
+- Pages URL is stable; no DNS / cert to maintain.
+
+### Pages vs local — which to use when
+
+| Situation | Where |
+|---|---|
+| Saturday morning grading ritual | Local (`serve.py`) — Pages is read-only |
+| Curious what's in the queue while you're on your phone | Pages |
+| Someone on your team asks about a problem you've solved | Pages (share the deep link) |
+| Reviewing a specific pattern before an interview | Either — Pages has the same content |
+| Editing state.json (renames, migrations) | Local — Pages can't write back |
 
 ---
 

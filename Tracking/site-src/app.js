@@ -397,12 +397,66 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    initReadOnlyMode();
     initProblemPage();
     initDashboard();
     initThemeToggle();
     initQaCard();
     initPatternPage();
   });
+
+  // --------------------------------------------------------------------------
+  // Read-only mode detection.
+  // The site is deployed to GitHub Pages for browse-anywhere access, but
+  // grading is only supported when serve.py is running locally. If we can't
+  // reach /api/ping quickly, mark the body so CSS can hide the grade bar
+  // and any "Save all" affordances, and surface a banner explaining why.
+  // --------------------------------------------------------------------------
+  async function initReadOnlyMode() {
+    // file:// or http(s): both may or may not have serve.py behind them.
+    let reachable = false;
+    if (location.protocol === "http:" || location.protocol === "https:") {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 800);
+        const res = await fetch("/api/ping", {
+          method: "GET",
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        clearTimeout(timer);
+        reachable = res.ok;
+      } catch (_) {
+        reachable = false;
+      }
+    }
+    if (!reachable) {
+      document.body.classList.add("read-only");
+      injectReadOnlyBanner();
+    }
+  }
+
+  function injectReadOnlyBanner() {
+    if (document.getElementById("readonly-banner")) return;
+    const banner = document.createElement("div");
+    banner.id = "readonly-banner";
+    banner.className = "readonly-banner";
+    banner.innerHTML =
+      '<span class="readonly-banner-icon">🔒</span>' +
+      '<span>Read-only view. Grade this weekend\'s queue locally with ' +
+      '<code>python Tracking/scripts/serve.py</code>.</span>';
+    const container = document.querySelector(".container");
+    const header = document.querySelector(".site-header");
+    if (container && header) {
+      header.after(banner);
+    } else if (container) {
+      container.prepend(banner);
+    } else {
+      document.body.prepend(banner);
+    }
+  }
+
+  // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
   // Theme toggle. Persists to localStorage; auto-detect via

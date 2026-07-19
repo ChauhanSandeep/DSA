@@ -712,6 +712,40 @@ code[class*="language-"] {
   z-index: 20;
   animation: slideIn 0.18s ease-out;
 }
+
+/* Read-only mode: no local serve.py reachable. Grade UI hidden. */
+body.read-only .grade-bar,
+body.read-only .pending-banner,
+body.read-only [data-action="save-all"],
+body.read-only [data-action="download-state"] {
+  display: none !important;
+}
+
+.readonly-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: -8px 0 20px;
+  background: color-mix(in srgb, var(--fg-muted) 8%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--fg-body);
+  font-family: var(--font-body);
+}
+.readonly-banner code {
+  background: var(--bg-surface);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--fg-primary);
+}
+.readonly-banner-icon {
+  font-size: 15px;
+  opacity: 0.75;
+}
 @keyframes slideIn {
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }

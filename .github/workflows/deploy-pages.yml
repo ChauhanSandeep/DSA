@@ -1,0 +1,62 @@
+# Builds Tracking/site with build.py and publishes it to GitHub Pages.
+#
+# The Pages deployment is read-only: it's for browsing the queue, Q/A cards,
+# patterns, and syntax-highlighted source from any device. Grading still
+# requires running serve.py locally (see Tracking/OPERATIONS.md).
+#
+# Trigger on any push that could change what the site renders: data,
+# scripts, styles, vendored assets, or the underlying Java source.
+#
+name: Deploy DSA tracker to Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Tracking/data/**"
+      - "Tracking/scripts/**"
+      - "Tracking/site-src/**"
+      - "Tracking/vendor/**"
+      - "src/main/java/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build site
+        run: python Tracking/scripts/build.py
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Tracking/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
