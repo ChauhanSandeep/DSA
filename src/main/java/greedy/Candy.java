@@ -3,45 +3,66 @@ package greedy;
 import java.util.*;
 
 /**
- * 135. Candy
- * 
- * Problem: There are n children standing in a line. Each child is assigned a rating value.
- * Give candies to children subject to the following requirements:
- * - Each child must have at least one candy
- * - Children with higher rating get more candies than their neighbors
- * Return minimum number of candies needed.
- * 
+ * Problem: Candy
+ *
+ * Children stand in a line, each with a rating. Give every child at least one
+ * candy, and give any child with a higher rating than an adjacent child more
+ * candies than that neighbor. Return the minimum total candies needed.
+ *
+ * Leetcode: https://leetcode.com/problems/candy/ (Hard)
+ * Rating:   acceptance 48.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Local constraints | Two passes and slope counting
+ *
  * Example:
- * Input: ratings = [1,0,2]
- * Output: 5
- * Explanation: Give [2,1,2] candies respectively
- * 
- * LeetCode: https://leetcode.com/problems/candy
- * 
- * Follow-up questions:
- * Q: What if we have circular arrangement instead of line?
- * A: Use modified two-pass approach handling wraparound conditions.
- * 
- * Q: How to handle ties in ratings efficiently?
- * A: Group consecutive equal ratings and optimize candy distribution.
- * 
- * Q: Can we solve in O(1) space complexity?
- * A: Use mathematical approach counting peaks and valleys in single pass.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  ratings = [1,3,4,5,2]
+ *   Output: 11
+ *   Why:    candies [1,2,3,4,1] satisfy every neighbor rule, and the peak rating
+ *           5 must beat both sides, so no smaller total can work.
+ *
+ * Follow-ups:
+ *   1. Can this be solved in O(1) extra space?
+ *      Count increasing and decreasing slopes, adding one extra candy when a down slope outgrows its peak.
+ *   2. What if children are arranged in a circle?
+ *      Break at a global minimum rating, then run the line solution from that valley.
+ *   3. What if equal ratings must receive equal candies?
+ *      Compress equal-rating runs and apply the neighbor rule between groups.
+ *   4. What if each child has a maximum candy cap?
+ *      Run the greedy assignment, then validate caps; some inputs become impossible.
+ *
+ * Related: Gas Station (134), Minimum Number of Arrows to Burst Balloons (452).
  */
 public class Candy {
-    
+
+    public static void main(String[] args) {
+        Candy solver = new Candy();
+        int[][] inputs = { {}, {1, 0, 2}, {1, 2, 2}, {1, 3, 4, 5, 2} };
+        int[] expected = {0, 5, 4, 11};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.candy(inputs[i]);
+            System.out.printf("ratings=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Two-pass approach - optimal and intuitive solution.
-     * 
-     * Algorithm: Left-to-right then right-to-left passes
-     * - Initialize all candies to 1 (minimum requirement)
-     * - Left pass: if ratings[i] > ratings[i-1], set candies[i] = candies[i-1] + 1
-     * - Right pass: if ratings[i] > ratings[i+1], set candies[i] = max(candies[i], candies[i+1] + 1)
-     * - This ensures both left and right neighbor constraints are satisfied
-     * 
-     * Time Complexity: O(n) with two passes
-     * Space Complexity: O(n) for candies array
+     * Intuition: the naive "fix both neighbors at once" gets tangled because a
+     * child can be constrained from both sides. Split it into two one-sided
+     * facts. A rising edge left-to-right forces exactly one more candy than the
+     * left neighbor; anything extra is waste. A falling edge is the same fact
+     * seen right-to-left. The exchange argument is local: once a child has enough
+     * for one side, raising it to the minimum the other side needs never breaks a
+     * neighbor rule, so taking the max of the two one-sided requirements is
+     * optimal.
+     *
+     * Algorithm:
+     *   1. Give every child one candy.
+     *   2. Left-to-right: if ratings[i] > ratings[i-1], candies[i] = candies[i-1] + 1.
+     *   3. Right-to-left: if ratings[i] > ratings[i+1], candies[i] = max(candies[i], candies[i+1] + 1).
+     *   4. Sum the candies; each child now satisfies both neighbor rules.
+     *
+     * Time:  O(n) - two linear passes plus one linear sum, each child touched a constant number of times.
+     * Space: O(n) - one candy count stored per child.
      */
     public int candy(int[] ratings) {
         int n = ratings.length;
@@ -68,13 +89,24 @@ public class Candy {
     }
     
     /**
-     * One-pass constant space approach using peak-valley analysis.
-     * 
-     * Algorithm: Mathematical approach with slope analysis
-     * - Track ascending and descending sequences
-     * - For ascending: increment candy count
-     * - For descending: calculate required candies based on slope length
-     * - Handle peaks specially to satisfy both left and right constraints
+     * Intuition (O(1) space): the candy array only ever stores mountain shapes.
+     * In a strictly rising run the cheapest candies are 1, 2, 3, ..., and in a
+     * strictly falling run they are the same staircase reversed. So we can add
+     * slope lengths directly instead of remembering every child. The one shared
+     * child is the peak between an up slope and a down slope: it must be tall
+     * enough for the longer side, so when the old peak already covers the down
+     * slope we subtract the candy the down count would otherwise double-add. Flat
+     * edges impose no order, so they reset the mountain to a single candy.
+     *
+     * Algorithm:
+     *   1. Track running up-slope, down-slope, and peak lengths; start the total at 1.
+     *   2. On an ascending step, extend the up slope and add (up + 1) candies.
+     *   3. On a descending step, extend the down slope and add (down + 1); if the
+     *      peak already covers the down slope, subtract one to avoid double paying.
+     *   4. On an equal step, reset the slopes and add a single candy.
+     *
+     * Time:  O(n) - one scan processes each adjacent pair once.
+     * Space: O(1) - only slope counters and the running total are kept.
      */
     public int candyOptimal(int[] ratings) {
         if (ratings.length <= 1) return ratings.length;

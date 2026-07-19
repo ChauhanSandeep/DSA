@@ -3,52 +3,68 @@ package greedy;
 /**
  * Problem: Minimum Moves to Reach Target Score
  *
- * You are playing a game with integers. You start with the integer 1 and you want to reach the
- * integer target. In one move, you can either:
- * - Increment the current integer by one (i.e., x = x + 1).
- * - Double the current integer (i.e., x = 2 * x).
- * You can use the increment operation any number of times, however, you can only use the double
- * operation at most maxDoubles times. Given the two integers target and maxDoubles, return the
- * minimum number of moves needed to reach target starting with 1.
+ * Start at 1 and reach target. One move can increment the current value by 1,
+ * and at most maxDoubles moves can double the current value. Return the fewest
+ * moves needed.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-moves-to-reach-target-score/ (Medium)
+ * Rating:   1417 (zerotrac Elo)
+ * Pattern:  Greedy | Work backward | Halve whenever it is legal
  *
  * Example:
- * Input: target = 19, maxDoubles = 2
- * Output: 7
- * Explanation: Initially, x = 1. Increment 3 times so x = 4. Double once so x = 8.
- * Increment once so x = 9. Double again so x = 18. Increment once so x = 19.
+ *   Input:  target = 19, maxDoubles = 2
+ *   Output: 7
+ *   Why:    working backward gives 19 -> 18 -> 9 -> 8 -> 4, then three more
+ *           decrements reach 1, for seven reversed moves total.
  *
- * LeetCode: https://leetcode.com/problems/minimum-moves-to-reach-target-score
+ * Follow-ups:
+ *   1. What if multiply by any factor k is allowed?
+ *      Work backward and divide by k when divisible; otherwise decrement toward a divisible value.
+ *   2. What if operations have different costs?
+ *      Use dynamic programming or shortest path on values because move count no longer captures cost.
+ *   3. Return the actual forward operations?
+ *      Record backward operations and reverse them, swapping divide with double and decrement with increment.
+ *   4. What if maxDoubles is unlimited?
+ *      The answer is the number of halving/decrement steps in the binary reduction of target.
  *
- * Follow-up Questions:
- * 1. What if we could also divide by 2 (reverse of doubling)?
- *    Answer: Work backwards from target, using division when possible and subtraction when not.
- *
- * 2. How would you handle the case where we can multiply by any factor k?
- *    Answer: Similar backwards approach, but check all possible factors at each step.
- *
- * 3. What if there were costs associated with different operations?
- *    Answer: Use dynamic programming with cost optimization instead of simple move counting.
- *    Related: https://leetcode.com/problems/2-keys-keyboard/
- * LeetCode Contest Rating: 1417
+ * Related: Broken Calculator (991), 2 Keys Keyboard (650).
  */
 public class MinimumMovesToReachTargetScore {
 
+    public static void main(String[] args) {
+        MinimumMovesToReachTargetScore solver = new MinimumMovesToReachTargetScore();
+        int[] targets = {19, 5, 10, 1};
+        int[] maxDoubles = {2, 0, 4, 3};
+        int[] expected = {7, 4, 4, 0};
+
+        for (int i = 0; i < targets.length; i++) {
+            int got = solver.minMoves(targets[i], maxDoubles[i]);
+            System.out.printf("target=%d maxDoubles=%d -> %d  expected=%d%n",
+                targets[i], maxDoubles[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds minimum moves using greedy backwards approach.
+     * Intuition: choosing when to double is hard in the forward direction because
+     * it changes how many increments are needed later. Work backward instead.
+     * An odd target could not have come from a final double, so it must be
+     * decremented. An even target can be halved while doubles remain, and that is
+     * always at least as good as undoing many increments one by one. Once doubles
+     * are exhausted, only plain decrements remain.
      *
      * Algorithm:
-     * 1. Work backwards from target to 1
-     * 2. If target is even and we have doubles left, divide by 2 (reverse of doubling)
-     * 3. If target is odd or no doubles left, decrement by 1
-     * 4. Count each operation as one move
-     * 5. After using all doubles, remaining distance is target - 1
+     *   1. Work backward from target while target > 1 and doubles remain.
+     *   2. If target is odd, decrement it.
+     *   3. If target is even, divide it by 2 and spend one double.
+     *   4. Add target - 1 for the remaining decrement-only distance to 1.
      *
-     * Time Complexity: O(min(log target, maxDoubles)) - each double halves the target
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(log target) - each useful double halves the remaining target, with at most one odd decrement before it.
+     * Space: O(1) - only counters and the shrinking target are stored.
      *
-     * @param target Target value to reach
-     * @param maxDoubles Maximum number of double operations allowed
-     * @return Minimum number of moves needed
+     * @param target value to reach from 1
+     * @param maxDoubles maximum number of double operations allowed
+     * @return minimum number of moves needed
      */
     public int minMoves(int target, int maxDoubles) {
         if (target == 1) return 0;
@@ -136,7 +152,7 @@ public class MinimumMovesToReachTargetScore {
         return moves;
     }
 
-    // Helper method to decide when to use double in forward approach
+    /** Decides whether the forward simulation should spend a double now. */
     private boolean shouldDouble(int current, int target, int doublesRemaining) {
         if (doublesRemaining == 0) return false;
 

@@ -1,41 +1,75 @@
 package greedy;
 
+import java.util.Arrays;
+
 /**
- * Given two arrays of integers nums1 and nums2, and an integer k, create the maximum number of length k from digits of the two arrays.
- * The relative order of the digits from the same array must be preserved.
- * 
- * Example 1:
- * Input: nums1 = [3,4,6,5], nums2 = [9,1,2,5,8,3], k = 5
- * Output: [9,8,6,5,3]
- * Explanation: The number 98653 is the largest possible number that can be formed by selecting one digit from each array.
- * 
- * Example 2:
- * Input: nums1 = [6,7], nums2 = [6,0,4], k = 5
- * Output: [6,7,6,0,4]
- * 
- * LeetCode: https://leetcode.com/problems/create-maximum-number/
- * 
- * Follow-up Questions:
- * 1. How would you handle negative numbers in the input arrays?
- *    - The problem constraints specify digits 0-9, but if negatives were allowed, we'd need to modify the merge strategy to handle sign comparison.
- * 2. What if k is larger than the sum of lengths of both arrays?
- *    - According to constraints, k is guaranteed to be valid (0 ≤ k ≤ m + n).
- * 3. How would you optimize if one array is significantly larger than the other?
- *    - We already optimize by only considering valid splits between the two arrays.
- * 
- * Related Problems:
- * - Remove K Digits (https://leetcode.com/problems/remove-k-digits/)
- * - Maximum Swap (https://leetcode.com/problems/maximum-swap/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Problem: Create Maximum Number
+ *
+ * Given two arrays of digits and an integer k, pick exactly k digits total while
+ * preserving the relative order of digits chosen from the same array. Return the
+ * lexicographically largest possible k-digit sequence.
+ *
+ * Leetcode: https://leetcode.com/problems/create-maximum-number/ (Hard)
+ * Rating:   acceptance 36.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Monotonic stack | Try every split and lexicographic merge
+ *
+ * Example:
+ *   Input:  nums1 = [3,4,6,5], nums2 = [9,1,2,5,8,3], k = 5
+ *   Output: [9,8,6,5,3]
+ *   Why:    choosing [6,5] from nums1 and [9,8,3] from nums2 lets the merge take
+ *           the larger remaining suffix at every step.
+ *
+ * Follow-ups:
+ *   1. Return the smallest number instead?
+ *      Use the same split loop with an increasing stack and a smaller-suffix merge.
+ *   2. What if there are more than two arrays?
+ *      Distribute k across arrays, then repeatedly merge the best remaining suffix.
+ *   3. What if k is close to m + n?
+ *      Think in terms of dropping only m + n - k digits; the same stack rule decides safe drops.
+ *   4. Stream the arrays instead of storing them?
+ *      Exact suffix comparisons require buffering, so the merge is not purely streaming.
+ *
+ * Related: Remove K Digits (402), Maximum Swap (670), Largest Number (179).
  */
 public class CreateMaximumNumber {
+
+    public static void main(String[] args) {
+        CreateMaximumNumber solver = new CreateMaximumNumber();
+        int[][] nums1 = { {3, 4, 6, 5}, {6, 7}, {3, 9} };
+        int[][] nums2 = { {9, 1, 2, 5, 8, 3}, {6, 0, 4}, {8, 9} };
+        int[] kValues = {5, 5, 3};
+        String[] expected = {"[9, 8, 6, 5, 3]", "[6, 7, 6, 0, 4]", "[9, 8, 9]"};
+
+        for (int i = 0; i < nums1.length; i++) {
+            int[] got = solver.maxNumber(nums1[i], nums2[i], kValues[i]);
+            System.out.printf("nums1=%s nums2=%s k=%d -> %s  expected=%s%n",
+                Arrays.toString(nums1[i]), Arrays.toString(nums2[i]), kValues[i],
+                Arrays.toString(got), expected[i]);
+        }
+    }
+
     /**
-     * Main method to create the maximum number by combining elements from two arrays.
-     * 
-     * @param nums1 First array of digits
-     * @param nums2 Second array of digits
-     * @param k Length of the resulting maximum number
-     * @return The maximum number as an array of digits
+     * Intuition: the hard part is that digits must keep their original order
+     * inside each source array. First remove one uncertainty by trying every
+     * valid split: take i digits from nums1 and k - i from nums2. For one array,
+     * the best subsequence is built by a decreasing stack: drop a smaller kept
+     * digit when a larger later digit can replace it and enough input remains.
+     * Then merge the two subsequences by always taking the lexicographically
+     * larger remaining suffix.
+     *
+     * Algorithm:
+     *   1. Try every valid count i taken from nums1.
+     *   2. Build the maximum length-i subsequence from nums1 and length-(k - i) subsequence from nums2.
+     *   3. Merge those two subsequences by comparing their remaining suffixes.
+     *   4. Keep the best merged candidate seen so far.
+     *
+     * Time:  O(k * (m + n)^2) - up to k splits are tried, and suffix comparisons can rescan candidates.
+     * Space: O(k) - each candidate and the best answer store k digits.
+     *
+     * @param nums1 first array of digits
+     * @param nums2 second array of digits
+     * @param k length of the final sequence
+     * @return lexicographically largest sequence of exactly k digits
      */
     public int[] maxNumber(int[] nums1, int[] nums2, int k) {
         int m = nums1.length, n = nums2.length;
@@ -54,7 +88,7 @@ public class CreateMaximumNumber {
         return result;
     }
     
-    // Helper method to create the maximum number of length k from a single array
+    /** Builds the largest order-preserving subsequence of length k from one array. */
     private int[] maxArray(int[] nums, int k) {
         int n = nums.length;
         int[] result = new int[k];
@@ -72,7 +106,7 @@ public class CreateMaximumNumber {
         return result;
     }
     
-    // Merge two arrays to form the largest possible number
+    /** Merges two subsequences into the largest possible combined sequence. */
     private int[] merge(int[] nums1, int[] nums2) {
         int m = nums1.length, n = nums2.length;
         int[] result = new int[m + n];
@@ -90,7 +124,7 @@ public class CreateMaximumNumber {
         return result;
     }
     
-    // Compare two arrays to determine which one represents a larger number
+    /** Returns whether nums1[i..] is lexicographically greater than nums2[j..]. */
     private boolean greater(int[] nums1, int i, int[] nums2, int j) {
         while (i < nums1.length && j < nums2.length && nums1[i] == nums2[j]) {
             i++;

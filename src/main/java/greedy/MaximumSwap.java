@@ -1,53 +1,66 @@
 package greedy;
 
 /**
- * 🔢 Problem: Maximum Swap
- * ------------------------------------------------------------------------------------
- * Given a non-negative integer `num`, you can swap **at most one pair of digits**
- * to get the maximum possible number. Return that maximum number.
+ * Problem: Maximum Swap
  *
- * Input: 2736
- * Output: 7236   // swap 2 and 7
+ * Given a non-negative integer, swap at most one pair of digits to make the
+ * largest possible number. If the digits are already in the best order, return
+ * the original number unchanged.
  *
- * - Leetcode: https://leetcode.com/problems/maximum-swap/
+ * Leetcode: https://leetcode.com/problems/maximum-swap/ (Medium)
+ * Rating:   acceptance 52.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Rightmost best digit | One beneficial swap
  *
- * FAANG Follow-up Questions + Short Answers:
- * ------------------------------------------------------------------------------------
- * Q1. What if you can do **K swaps** instead of one?
- * Use **backtracking** to try all swap combinations and keep the max result.
+ * Example:
+ *   Input:  num = 98368
+ *   Output: 98863
+ *   Why:    the first improvable digit is 3, and swapping it with the rightmost 8
+ *           makes the earliest possible digit larger.
  *
- * Q2. What if the number is represented as a **string or linked list**?
- * Same logic applies, but manipulate characters or nodes accordingly.
+ * Follow-ups:
+ *   1. Allow at most k swaps?
+ *      Use backtracking with pruning, because the locally best first swap can block a better sequence.
+ *   2. The number arrives as a string?
+ *      Run the same last-index greedy on the character array and return a string.
+ *   3. Return the swap positions instead of the number?
+ *      Store the first pair found by the greedy scan before mutating the digits.
+ *   4. Minimize the number with one swap?
+ *      Mirror the search: find the first digit that can be replaced by a smaller later digit.
  *
- * Q3. Can you solve this using **O(1)** space?
- * Yes, by modifying the digit array in-place using a constant-size index map.
- *
- * Q4. Why doesn't a greedy strategy always work for **K swaps**?
- * Greedy might miss optimal swaps because the best option may involve future decisions. Backtracking required to explore all possibilities.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Create Maximum Number (321), Remove K Digits (402).
  */
 public class MaximumSwap {
 
+    public static void main(String[] args) {
+        MaximumSwap solver = new MaximumSwap();
+        int[] inputs = {2736, 9973, 98368};
+        int[] expected = {7236, 9973, 98863};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.maximumSwap(inputs[i]);
+            System.out.printf("num=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds the maximum number obtainable by swapping at most one pair of digits.
+     * Intuition: a larger digit earlier in the number dominates any improvement
+     * later, so the first digit we can improve is the only place worth swapping.
+     * Remember the last position of each digit. At each current digit, search from
+     * 9 down to currentDigit + 1; the first later digit found gives the largest
+     * possible prefix, and using its rightmost occurrence leaves the suffix best.
      *
-     * Steps:
-     * 1. Convert the number into a digit array (char array).
-     * 2. Record the **last index** of each digit (0 to 9).
-     * 3. Traverse the digits from left to right:
-     *    - For the current digit, check if any larger digit (9 to current+1) occurs after it.
-     *    - If such a digit exists, swap them and return the result.
-     * 4. If no better digit is found, return the number as-is.
+     * Algorithm:
+     *   1. Convert the number to a digit array.
+     *   2. Record the last index where each digit 0 through 9 appears.
+     *   3. Scan left to right and look for a larger digit that appears later.
+     *   4. Swap with the best later digit and return, or return num if no swap helps.
      *
-     * Time Complexity: O(N)
-     * - One pass to record last indices
-     * - One pass to find the first beneficial swap
+     * Time:  O(d) - each of d digits checks at most 10 larger digits.
+     * Space: O(1) - the last-index table always has size 10.
      *
-     * Space Complexity: O(1)
-     * - Fixed-size array of 10 integers (for digit tracking)
-     *
-     * @param num The original input number
-     * @return The maximum number after at most one digit swap
+     * @param num original non-negative number
+     * @return largest number obtainable with at most one digit swap
      */
     public int maximumSwap(int num) {
         // Convert the number to a character array for easy digit swaps
