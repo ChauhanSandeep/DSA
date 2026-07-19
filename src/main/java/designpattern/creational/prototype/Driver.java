@@ -3,42 +3,18 @@ package designpattern.creational.prototype;
 import java.util.List;
 
 /**
- * Driver - Client Class for Prototype Pattern Demo
+ * Demo client for the Prototype pattern.
  *
- * This class demonstrates the Prototype Pattern by showing how to:
- * 1. Create an expensive object once (loading from "database")
- * 2. Clone the object multiple times instead of recreating it
- * 3. Modify clones independently without affecting the original or other clones
+ * Intent: show that expensive seed data can be loaded once, cloned cheaply, and
+ * then customized independently. Use this pattern when constructing similar
+ * objects repeatedly would be slower or more complex than copying a prototype.
  *
- * Key Benefits Demonstrated:
- * - Performance: loadData() called only once, not for each object
- * - Independence: Each clone can be modified without affecting others
- * - Simplicity: Cloning is simpler than recreating complex objects
- *
- * Real-World Scenario:
- * Imagine a company has a list of employees loaded from a database.
- * Multiple departments need this list, but each wants to modify it
- * (add department-specific employees, remove irrelevant ones, etc.).
- * Instead of querying the database multiple times, we:
- * 1. Load once into a prototype object
- * 2. Clone the prototype for each department
- * 3. Each department modifies their own clone
- *
- * @author Sandeep Chauhan
+ * Participants: Driver is the client, Employees is the prototype, loadData()
+ * prepares the source object, and clone() creates independent copies.
  */
 public class Driver {
 
-    /**
-     * Main method demonstrating Prototype Pattern usage.
-     *
-     * Demonstrates:
-     * 1. Creating and initializing a prototype (expensive operation)
-     * 2. Cloning the prototype multiple times (cheap operation)
-     * 3. Modifying clones independently (deep copy ensures independence)
-     *
-     * @param args Command line arguments (not used)
-     * @throws CloneNotSupportedException if cloning fails
-     */
+    /** Clones one loaded Employees prototype and mutates each copy independently. */
     public static void main(String[] args) throws CloneNotSupportedException {
         // Step 1: Create prototype and load expensive data (only done once!)
         System.out.println("Loading employee data from database (expensive operation)...");

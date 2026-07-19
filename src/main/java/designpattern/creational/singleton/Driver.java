@@ -1,32 +1,18 @@
 package designpattern.creational.singleton;
 
 /**
- * Driver - Client Class for Singleton Pattern Demo
+ * Demo client for the Singleton pattern.
  *
- * This class demonstrates the Singleton pattern by showing that multiple calls
- * to getInstance() return the same instance.
+ * Intent: show that repeated calls to getInstance() return the same object. Use
+ * this pattern only when a single shared instance is part of the design, because
+ * it creates global state.
  *
- * Expected Output:
- * "Getting new instance" is printed only once, proving that only one instance
- * is created despite multiple getInstance() calls.
- *
- * Key Demonstration:
- * - singleton1 and singleton2 reference the same object
- * - The instance is created lazily (only when first requested)
- * - Thread-safe creation is ensured by double-checked locking
- *
- * @author Sandeep Chauhan
+ * Participants: Driver is the client and SingletonLazyDoubleCheck is the
+ * singleton that controls construction and access.
  */
 public class Driver {
 
-    /**
-     * Main method demonstrating Singleton pattern behavior.
-     *
-     * Key Observation:
-     * - First getInstance() creates the instance (prints "Getting new instance")
-     * - Second getInstance() returns existing instance (no print statement)
-     * - Both variables reference the exact same object in memory
-     */
+    /** Requests the singleton twice and prints whether both references match. */
     public static void main(String[] args) {
         // First call creates the singleton instance
         SingletonLazyDoubleCheck singleton1 = SingletonLazyDoubleCheck.getInstance();

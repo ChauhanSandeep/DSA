@@ -1,45 +1,22 @@
 package designpattern.creational.abstractfactory;
 
 /**
- * Driver - Client Class for Abstract Factory Pattern Demo
+ * Demo client for the Abstract Factory pattern.
  *
- * This class demonstrates the Abstract Factory Pattern by showing how client code
- * can create different product families (PC, Server) without knowing their concrete
- * classes.
+ * Intent: show that the client asks factories for Computer products instead of
+ * constructing PC or Server directly. Use this pattern when callers should be
+ * insulated from the concrete classes in a product family.
  *
- * Key Demonstration:
- * - Client works with abstract interfaces (ComputerAbstractFactory, Computer)
- * - Client doesn't use 'new PC()' or 'new Server()' directly
- * - Client doesn't know which concrete factory or product class is being used
- * - Easy to switch between product families by changing the factory
- *
- * Pattern Flow:
- * 1. Create concrete factory (PCFactory or ServerFactory)
- * 2. Pass factory to ComputerFactory.getComputer()
- * 3. Factory creates and returns the appropriate product
- * 4. Client uses product through abstract interface (Computer)
- *
- * @author Sandeep Chauhan
+ * Participants: Driver is the client, ComputerFactory is the helper that accepts
+ * an abstract factory, PCFactory and ServerFactory are concrete factories, and
+ * Computer is the product abstraction used by the client.
  */
 public class Driver {
     public static void main(String[] args) {
         testAbstractFactory();
     }
 
-    /**
-     * Demonstrates Abstract Factory Pattern usage.
-     *
-     * Shows:
-     * - Creating different product types using different factories
-     * - Working with products through abstract interface
-     * - Complete isolation from concrete implementations
-     *
-     * Pattern Benefits Shown:
-     * - PCFactory creates PC instances
-     * - ServerFactory creates Server instances
-     * - ComputerFactory doesn't know or care which factory it receives
-     * - Client code works with Computer interface, not concrete classes
-     */
+    /** Runs the abstract factory demo using the original concrete factories. */
     private static void testAbstractFactory() {
         // Create PC using PCFactory
         // Note: Client creates factory but works through abstract interface
