@@ -1,24 +1,58 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
  * Problem: Split Array Largest Sum
  *
- * Given an array nums which consists of non-negative integers and an integer m, you can split the
- * array into m non-empty continuous subarrays. Write an algorithm to minimize the largest sum among these m subarrays.
+ * Split a non-negative array into m non-empty contiguous parts. Return the minimum possible value of the largest part sum.
+ *
+ * Leetcode: https://leetcode.com/problems/split-array-largest-sum/ (Hard)
+ * Rating:   acceptance 60.9% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search on answer | Greedy feasibility | Minimize maximum sum
  *
  * Example:
- * Input: nums = [7,2,5,10,8], m = 2
- * Output: 18
- * Explanation: There are four ways to split the array into two subarrays.
- * The best way is to split it into [7,2,5] and [10,8], where the largest sum among the two subarrays is only 18.
+ *   Input:  nums = [7,2,5,10,8], m = 2
+ *   Output: 18
+ *   Why:    [7,2,5] and [10,8] has largest sum 18, and no better split exists.
  *
- * LeetCode: https://leetcode.com/problems/split-array-largest-sum
+ * Follow-ups:
+ *   1. Return split points? Reconstruct greedily after finding the limit.
+ *   2. Allow negative numbers? Use DP because monotonic greedy feasibility breaks.
+ *   3. Minimize squared sums? Use prefix DP for that objective.
+ *   4. Many m queries? Precompute DP for small n or search per query.
  *
- * Time Complexity: O(n * log(S)) where n is the length of nums and S is the sum of elements in nums
- * Space Complexity: O(1)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Capacity To Ship Packages Within D Days (1011), Allocate Books.
  */
 public class SplitArrayLargestSum {
+
+    public static void main(String[] args) {
+        SplitArrayLargestSum solver = new SplitArrayLargestSum();
+        int[][] inputs = { {7,2,5,10,8}, {1,2,3,4,5}, {1,4,4} };
+        int[] groups = { 2, 2, 3 };
+        int[] expected = { 18, 9, 4 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.splitArray(inputs[i], groups[i]);
+            System.out.printf("nums=%s m=%d -> %d  expected=%d%n", Arrays.toString(inputs[i]), groups[i], got, expected[i]);
+        }
+    }
+
+    /**
+     * Intuition: A candidate largest sum is monotonic: if it can split nums into at most m pieces, any larger sum can too. Greedy creates a new piece only when needed.
+     *
+     * Algorithm:
+     *   1. Set left to max(nums) and right to sum(nums).
+     *   2. Binary search candidate mid.
+     *   3. Greedily test whether max subarray sum mid allows at most m parts.
+     *   4. Keep feasible mid values; otherwise raise left.
+     *
+     * Time:  O(n log S) - each check scans nums across the sum range.
+     * Space: O(1) - only counters and bounds are stored.
+     *
+     * @param nums non-negative integers
+     * @param m number of subarrays
+     * @return minimized largest subarray sum
+     */
     public int splitArray(int[] nums, int m) {
         // The minimum possible largest sum is the maximum element in the array
         // The maximum possible largest sum is the sum of all elements
@@ -46,7 +80,7 @@ public class SplitArrayLargestSum {
         return left;
     }
 
-    // Helper method to check if we can split the array into m subarrays with max sum <= maxSum
+    /** Returns whether nums can split into at most m parts under maxSum. */
     private boolean canSplit(int[] nums, int m, int maxSum) {
         int count = 1;
         int currentSum = 0;

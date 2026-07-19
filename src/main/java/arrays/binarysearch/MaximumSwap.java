@@ -1,71 +1,55 @@
 package arrays.binarysearch;
 
 /**
- * You are given a non-negative integer num. You can swap two digits at most once to get the maximum valued number.
- * Return the maximum valued number you can get.
+ * Problem: Maximum Swap
+ *
+ * Given a non-negative integer, swap at most two digits once to produce the largest possible value. If no improving swap exists, return the number unchanged.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-swap/ (Medium)
+ * Rating:   acceptance 52.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Last digit occurrence | Most significant improvement
  *
  * Example:
- * Input: num = 2736
- * Output: 7236
- * Explanation:
- * - Digits: [2, 7, 3, 6].
- * - By swapping 2 (index 0) with 7 (index 1), we obtain 7236, which is the maximum value achievable with at most one swap.
+ *   Input:  num = 2736
+ *   Output: 7236
+ *   Why:    swapping the leading 2 with the later 7 creates the best prefix.
  *
- * LeetCode link:
- * https://leetcode.com/problems/maximum-swap/
+ * Follow-ups:
+ *   1. Allow k swaps? Use backtracking with pruning or repeated greedy placement.
+ *   2. Second-largest one-swap value? Enumerate swaps and track top distinct values.
+ *   3. Very large number string? Keep the digit-array logic and return a string.
+ *   4. Minimize with one swap? Choose the first improvable digit and smallest later digit.
  *
- * Likely follow-up questions (with brief hints):
- * 1) How would you modify the solution to find the second-largest number obtainable with at most one swap?
- *    - Idea: Enumerate all valid single swaps (O(n^2)), track distinct results, and return the second-largest; or reason about the next-best swap given the optimal one.
- *    - Related problem: "Next Permutation" (https://leetcode.com/problems/next-permutation/).
- *
- * 2) What if you are allowed up to K swaps instead of at most one?
- *    - Idea: This becomes closer to a constrained maximum permutation problem. A common approach is DFS/Backtracking with pruning or a greedy approach over K iterations, but complexity can grow quickly.
- *    - Related problem: variants of "Largest Number" and state-search problems with swap-limited permutations.
- *
- * 3) What if the number is given as a string and may be very large (beyond 32/64-bit ranges)?
- *    - Idea: Keep the same digit-array logic but operate purely on characters/arrays without numeric conversions. Time and space remain O(n).
- *
- * 4) What if you had to minimize the number with at most one swap (no leading zeros allowed)?
- *    - Idea: Similar greedy logic but from left to right, try to swap with the smallest possible digit occurring later, with constraints to avoid leading zeros.
- *    - Related problem: "Smallest Number" with one swap on digits.
+ * Related: Next Permutation (31), Largest Number (179).
  */
 public class MaximumSwap {
 
-    /**
-     * Greedy optimal solution.
+    public static void main(String[] args) {
+        MaximumSwap solver = new MaximumSwap();
+        int[] inputs = { 2736, 9973, 98368 };
+        int[] expected = { 7236, 9973, 98863 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.maximumSwap(inputs[i]);
+            int alt = solver.maximumSwapAlternative(inputs[i]);
+            System.out.printf("num=%d -> greedy=%d alternative=%d  expected=%d%n", inputs[i], got, alt, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: Improving an earlier digit dominates any later improvement. Store each digit's last index, then make the first position that can be upgraded as large as possible.
      *
-     * Core idea:
-     * 1. Convert the integer num into an array of its digits.
-     * 2. Precompute an array lastIndex[10] where lastIndex[d] is the last (rightmost) index of digit d in the digits array.
-     * 3. Traverse the digits from left to right (most significant to least significant):
-     *    - For the current index i and digit digits[i], we attempt to find a larger digit to its right.
-     *    - Specifically, check digits from 9 down to digits[i] + 1:
-     *      - If there exists a digit d (from 9 downwards) such that lastIndex[d] > i, then:
-     *        - Swap digits[i] with digits[lastIndex[d]].
-     *        - Convert the digit array back into an integer and return it immediately.
-     *    - Because we scan from the most significant side and choose the largest possible digit to swap with, the first such swap gives the maximum result.
-     * 4. If no beneficial swap is found for any index, return num unchanged.
+     * Algorithm:
+     *   1. Return num for single-digit input.
+     *   2. Convert to digits and record lastIndex for 0..9.
+     *   3. Scan positions left to right and try larger digits from 9 down.
+     *   4. Swap with a later larger digit and return immediately.
      *
-     * Why this is optimal:
-     * - We always prioritize improving higher (more significant) positions first, which has a greater impact on the numeric value.
-     * - For each position, we swap with the largest possible digit that appears later, ensuring maximal gain at that position.
+     * Time:  O(n) - each digit checks at most ten candidates.
+     * Space: O(n) - the digit array is stored.
      *
-     * Time Complexity:
-     * - O(n) where n is the number of digits (at most ~10 for 32-bit int), since we:
-     *   - Build lastIndex in O(n),
-     *   - Then for each digit, scan at most 10 candidate digits (0–9).
-     *
-     * Space Complexity:
-     * - O(n) for the digit array plus O(1) for the lastIndex array (fixed size 10).
-     *
-     * Edge cases handled:
-     * - num has a single digit (no swap possible, return as is).
-     * - num already forms the maximum possible number (no swap improves it, return as is), e.g., 9973.
-     * - num is 0 or contains repeated digits.
-     *
-     * @param num the non-negative integer whose digits can be swapped at most once
-     * @return the maximum number obtainable by performing at most one swap of two digits
+     * @param num non-negative integer
+     * @return maximum value after at most one swap
      */
     public int maximumSwap(int num) {
         // If num has only one digit, swapping cannot change its value.
@@ -102,7 +86,7 @@ public class MaximumSwap {
         return num;
     }
 
-    // Helper method to swap two characters in an array of digits.
+    /** Swaps two digit characters in place. */
     private void swap(char[] digitsArr, int i, int j) {
         char temp = digitsArr[i];
         digitsArr[i] = digitsArr[j];

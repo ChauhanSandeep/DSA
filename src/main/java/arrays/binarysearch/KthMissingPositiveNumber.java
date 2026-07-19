@@ -1,17 +1,42 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * 1539. Kth Missing Positive Number
+ * Problem: Kth Missing Positive Number
  *
- * Problem Statement:
- * Given a sorted array arr of positive integers (strictly increasing),
- * and an integer k, return the kth positive integer that is missing from this
- * array.
+ * Given a strictly increasing positive array, return the k-th positive integer missing from it. The binary-search method uses the missing count before each index.
  *
- * LeetCode Link: https://leetcode.com/problems/kth-missing-positive-number/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Leetcode: https://leetcode.com/problems/kth-missing-positive-number/ (Easy)
+ * Rating:   zerotrac 1295 (Q1, biweekly-32)
+ * Pattern:  Binary search | Missing count formula | Lower bound
+ *
+ * Example:
+ *   Input:  arr = [2,3,4,7,11], k = 5
+ *   Output: 9
+ *   Why:    the missing positives are [1,5,6,8,9,...].
+ *
+ * Follow-ups:
+ *   1. Unsorted input? Sort first or scan with a set.
+ *   2. Duplicates allowed? Deduplicate or adjust the count formula.
+ *   3. Many k queries? Precompute missing counts and binary search them.
+ *   4. Restrict to [L, R]? Shift the formula by L and cap at R.
+ *
+ * Related: Missing Number (268), First Missing Positive (41).
  */
 public class KthMissingPositiveNumber {
+
+    public static void main(String[] args) {
+        KthMissingPositiveNumber solver = new KthMissingPositiveNumber();
+        int[][] inputs = { {2,3,4,7,11}, {1,2,3,4}, {5,6,7} };
+        int[] kth = { 5, 2, 1 };
+        int[] expected = { 9, 6, 1 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.findKthPositiveBinarySearch(inputs[i], kth[i]);
+            System.out.printf("arr=%s k=%d -> %d  expected=%d%n", Arrays.toString(inputs[i]), kth[i], got, expected[i]);
+        }
+    }
+
 
     /**
      * Linear scan approach.
@@ -37,28 +62,21 @@ public class KthMissingPositiveNumber {
         return current - 1;
     }
 
-    /**
-     * Binary search approach.
+        /**
+     * Intuition: At index i, arr[i] - (i + 1) counts positives missing before arr[i]. Binary search the last index whose missing count is still below k.
      *
-     * Intuition:
-     * For any index i, the count of missing positive numbers before arr[i] is:
-     * missing(i) = arr[i] - (i + 1)
-     * because in a perfect array without gaps, value at index i would be i + 1.
-     * Any extra value beyond (i + 1) represents missing numbers.
+     * Algorithm:
+     *   1. Search the index range with inclusive bounds.
+     *   2. Compute missingCount at mid.
+     *   3. Move left rightward while missingCount < k; otherwise move right leftward.
+     *   4. Return right + k + 1.
      *
-     * We need the first position where missing(i) >= k.
-     * - If missing(mid) < k, kth missing is to the right.
-     * - Else, kth missing is at mid or to the left.
+     * Time:  O(log n) - the missing-count predicate is searched.
+     * Space: O(1) - only indexes are stored.
      *
-     * Steps:
-     * 1. Binary search on index range [0, n - 1].
-     * 2. Compute missingCount at mid using arr[mid] - (mid + 1).
-     * 3. Move left/right bounds based on whether missingCount is < k.
-     * 4. After loop, use right (last index with missingCount < k) to compute
-     * answer.
-     *
-     * Time Complexity: O(log n)
-     * Space Complexity: O(1)
+     * @param arr strictly increasing positive integers
+     * @param k missing positive position
+     * @return k-th missing positive
      */
     public int findKthPositiveBinarySearch(int[] arr, int k) {
         int left = 0;

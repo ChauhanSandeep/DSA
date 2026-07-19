@@ -3,25 +3,43 @@ package arrays.binarysearch;
 import java.util.*;
 
 /**
- * Problem: Design TimeMap with set(key, value, timestamp) and get(key,
- * timestamp)
- * Returns value with largest timestamp_prev <= timestamp, or "" if none exists.
- * Timestamps strictly increasing.
- * 
- * Leetcode: https://leetcode.com/problems/time-based-key-value-store/
+ * Problem: Time Based Key-Value Store
  *
- * Key Requirements:
- * - Multiple values per key over time
- * - get(t) returns most recent value where timestamp_prev ≤ t
- * - O(log n) per operation, O(n) space
- * 
- * Two Approaches:
- * 1. ArrayList-based: Requires timestamps in strictly increasing order
- * (original problem constraint)
- * 2. TreeMap-based: Handles arbitrary timestamp insertion order
- * LeetCode Contest Rating: 1575
+ * Design a key-value store with timestamped writes. A query returns the value written at the greatest timestamp less than or equal to the requested time.
+ *
+ * Leetcode: https://leetcode.com/problems/time-based-key-value-store/ (Medium)
+ * Rating:   zerotrac 1575 (Q2, weekly-121)
+ * Pattern:  Design | Per-key history | Binary search upper bound
+ *
+ * Example:
+ *   Input:  set("foo","bar",1), get("foo",3)
+ *   Output: "bar"
+ *   Why:    timestamp 1 is the latest foo write at or before timestamp 3.
+ *
+ * Follow-ups:
+ *   1. Out-of-order writes? Use a TreeMap per key and floorEntry.
+ *   2. Delete by timestamp? Store tombstones in the history.
+ *   3. Range query? Binary search both timestamp boundaries.
+ *   4. Persistent store? Append writes to a log and index by key.
+ *
+ * Related: Snapshot Array (1146), Design Log Storage System (635).
  */
 public class TimeMap {
+
+    public static void main(String[] args) {
+        TimeMap timeMap = new TimeMap();
+        timeMap.set("foo", "bar", 1);
+        String first = timeMap.get("foo", 1);
+        System.out.printf("ops=[set(foo,bar,1), get(foo,1)] -> \"%s\"  expected=\"bar\"%n", first);
+        String second = timeMap.get("foo", 3);
+        System.out.printf("ops=[get(foo,3)] -> \"%s\"  expected=\"bar\"%n", second);
+        timeMap.set("foo", "bar2", 4);
+        String third = timeMap.get("foo", 4);
+        System.out.printf("ops=[set(foo,bar2,4), get(foo,4)] -> \"%s\"  expected=\"bar2\"%n", third);
+        String missing = timeMap.get("foo", 0);
+        System.out.printf("ops=[get(foo,0)] -> \"%s\"  expected=\"\"%n", missing);
+    }
+
     private Map<String, List<Pair>> map;
     private Map<String, TreeMap<Integer, String>> treeMapStorage;
 
@@ -30,15 +48,19 @@ public class TimeMap {
         treeMapStorage = new HashMap<>();
     }
 
-    /**
-     * Store the key with value at given timestamp.
-     * 
-     * Time complexity: O(1)
-     * Space complexity: O(1)
-     * 
-     * @param key
-     * @param value
-     * @param timestamp
+        /**
+     * Intuition: The original problem inserts timestamps in increasing order for each key. Appending to that key's history preserves sorted order for later binary search.
+     *
+     * Algorithm:
+     *   1. Create the history list if key is new.
+     *   2. Append the timestamp/value pair.
+     *
+     * Time:  O(1) - one map access and append.
+     * Space: O(1) - one new pair is stored.
+     *
+     * @param key lookup key
+     * @param value value to store
+     * @param timestamp write timestamp
      */
     public void set(String key, String value, int timestamp) {
         if (!map.containsKey(key)) {
@@ -47,14 +69,21 @@ public class TimeMap {
         map.get(key).add(new Pair(timestamp, value));
     }
 
-    /**
-     * Retrieve value for key at given timestamp.
-     * Uses binary search to find rightmost timestamp <= target
-     * Note :This works only because timestamps are strictly
-     * increasing order while inserting.
-     * 
-     * Time complexity: O(log n)
-     * Space complexity: O(1)
+        /**
+     * Intuition: For one key, history is sorted by timestamp. The needed value is the rightmost timestamp <= query time, found by upper-bound binary search.
+     *
+     * Algorithm:
+     *   1. Return empty string if key has no history.
+     *   2. Binary search first timestamp greater than the query.
+     *   3. Return empty if no timestamp is <= query.
+     *   4. Otherwise return the value at left - 1.
+     *
+     * Time:  O(log n) - binary search over one key's history.
+     * Space: O(1) - only indexes are stored.
+     *
+     * @param key lookup key
+     * @param timestamp query timestamp
+     * @return latest value at or before timestamp, or empty string
      */
     public String get(String key, int timestamp) {
         List<Pair> history = map.get(key);

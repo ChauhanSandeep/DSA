@@ -1,57 +1,56 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
  * Problem: Find Peak Element
  *
- * A peak element is an element that is strictly greater than its neighbors.
- * Given a 0-indexed integer array nums, find a peak element, and return its index.
- * If the array contains multiple peaks, return the index to any of the peaks.
- * You may imagine that nums[-1] = nums[n] = -∞. In other words, an element is always
- * considered to be strictly greater than a neighbor that is outside the array.
- * You must write an algorithm that runs in O(log n) time.
+ * A peak is greater than its existing neighbors, with virtual negative infinity outside the array. Return any peak index in logarithmic time.
+ *
+ * Leetcode: https://leetcode.com/problems/find-peak-element/ (Medium)
+ * Rating:   acceptance 47.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | Slope direction | Local optimum
  *
  * Example:
- * Input: nums = [1,2,3,1]
- * Output: 2
- * Explanation: 3 is a peak element and your function should return the index number 2.
+ *   Input:  nums = [1,2,3,1]
+ *   Output: 2
+ *   Why:    nums[2] = 3 is greater than both neighbors.
  *
- * LeetCode: https://leetcode.com/problems/find-peak-element
+ * Follow-ups:
+ *   1. Return all peaks? Scan linearly because every index may matter.
+ *   2. Find a 2D peak? Binary search rows or columns and move toward a larger neighbor.
+ *   3. Allow equal adjacent values? Define plateau handling explicitly.
+ *   4. Find the global maximum? Use a linear scan unless extra structure exists.
  *
- * Follow-up Questions:
- * 1. What if we need to find all peak elements?
- *    Answer: Cannot use binary search, need O(n) linear scan to find all peaks.
- *
- * 2. How would you find the global maximum instead of any peak?
- *    Answer: Still O(n) linear scan needed, binary search only works for local peaks.
- *
- * 3. What about finding peaks in a 2D matrix?
- *    Answer: Use divide and conquer, find peak in middle column, then recurse on side with larger neighbor.
- *    Related: https://leetcode.com/problems/find-a-peak-element-ii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Find a Peak Element II (1901).
  */
 public class FindPeakElement {
 
-    /**
-     * Finds a peak element using binary search approach.
-     * Intuition:
-     * - If the array is monotonically increasing, the peak is at the end.
-     * - If it's monotonically decreasing, the peak is at the start.
-     * - While moving towards increasing elements, if you find a dip then the peak is just before dip
-     * - By always moving toward the higher neighbor, you're guaranteed to eventually land on a peak. Either
-     * you find a dip or you reach the end of the array
+    public static void main(String[] args) {
+        FindPeakElement solver = new FindPeakElement();
+        int[][] inputs = { {1,2,3,1}, {1}, {1,2,1,3,5,6,4} };
+        int[] expected = { 2, 0, 5 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.findPeakElement(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: A rising slope to the right must eventually reach a peak; a falling slope means a peak exists at mid or left. Keep the side guaranteed to contain a peak.
      *
      * Algorithm:
-     * 1. Use binary search with left and right pointers
-     * 2. Compare middle element with its right neighbor
-     * 3. If nums[mid] > nums[mid+1], peak exists in left half (including mid)
-     * 4. Otherwise, peak exists in right half
-     * 5. Continue until left == right
+     *   1. Handle null, empty, and single-element inputs as restored.
+     *   2. Binary search while left < right.
+     *   3. Compare nums[mid] with nums[mid + 1].
+     *   4. Move toward the side that must contain a peak and return left.
      *
-     * Time Complexity: O(log n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(log n) - each comparison discards half.
+     * Space: O(1) - only indexes are stored.
      *
-     * @param nums Input array of integers
-     * @return Index of any peak element
+     * @param nums input array
+     * @return index of any peak, or -1 for empty input
      */
     public int findPeakElement(int[] nums) {
         if (nums == null || nums.length == 0) return -1;
@@ -87,7 +86,7 @@ public class FindPeakElement {
         return findPeakHelper(nums, 0, nums.length - 1);
     }
 
-    // Helper method for recursive approach
+    /** Recursively searches a peak inside inclusive bounds. */
     private int findPeakHelper(int[] nums, int left, int right) {
         if (left == right) {
             return left;

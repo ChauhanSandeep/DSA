@@ -1,43 +1,57 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * There is an integer array nums sorted in ascending order (with distinct values).
- * Prior to being passed to your function, nums is possibly rotated at an unknown pivot index k (1 <= k < nums.length)
- * such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed).
+ * Problem: Search in Rotated Sorted Array
  *
- * Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums,
- * or -1 if it is not in nums.
+ * A strictly increasing array may be rotated at an unknown pivot. Return the target index, or -1 if absent, by keeping the half that can still contain target.
  *
- * Example 1:
- * Input: nums = [4,5,6,7,0,1,2], target = 0
- * Output: 4
+ * Leetcode: https://leetcode.com/problems/search-in-rotated-sorted-array/ (Medium)
+ * Rating:   acceptance 45.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | Rotated sorted array | Sorted-half elimination
  *
- * Example 2:
- * Input: nums = [4,5,6,7,0,1,2], target = 3
- * Output: -1
+ * Example:
+ *   Input:  nums = [4,5,6,7,0,1,2], target = 0
+ *   Output: 4
+ *   Why:    0 appears at index 4 after rotation.
  *
- * LeetCode: https://leetcode.com/problems/search-in-rotated-sorted-array/
+ * Follow-ups:
+ *   1. Allow duplicates? Shrink equal ambiguous boundaries.
+ *   2. Find pivot first? Search for the minimum index, then binary search one half.
+ *   3. Return first occurrence? Continue searching after matches.
+ *   4. Array on disk? Cache probed blocks around binary-search positions.
  *
- * Follow-up Questions:
- * 1. What if the array contains duplicates?
- *    - The solution would need to handle duplicates by checking both halves when nums[left] == nums[mid].
- * 2. How would you find the pivot index where the array is rotated?
- *    - We can modify the binary search to find the smallest element's index.
- * 3. What if we need to find the first or last occurrence of the target?
- *    - We would need to continue searching even after finding a match.
- *
- * Related Problems:
- * - Find Minimum in Rotated Sorted Array (https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
- * - Search in Rotated Sorted Array II (https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Find Minimum in Rotated Sorted Array (153), Search in Rotated Sorted Array II (81).
  */
 public class SearchInRotatedSortedArray {
-    /**
-     * Searches for the target in a rotated sorted array.
+
+    public static void main(String[] args) {
+        SearchInRotatedSortedArray solver = new SearchInRotatedSortedArray();
+        int[][] inputs = { {4,5,6,7,0,1,2}, {4,5,6,7,0,1,2}, {1} };
+        int[] targets = { 0, 3, 0 };
+        int[] expected = { 4, -1, -1 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.search(inputs[i], targets[i]);
+            System.out.printf("nums=%s target=%d -> %d  expected=%d%n", Arrays.toString(inputs[i]), targets[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: At least one side of mid is sorted. A range check on that side tells whether target can be there; if not, search the other side.
      *
-     * @param nums The rotated sorted array
-     * @param target The value to search for
-     * @return The index of target, or -1 if not found
+     * Algorithm:
+     *   1. Return -1 for null or empty input.
+     *   2. Binary search with inclusive bounds.
+     *   3. Use nums[left] <= nums[mid] to detect the sorted left half.
+     *   4. Keep the sorted half only when target lies within its range.
+     *
+     * Time:  O(log n) - distinct values allow half elimination.
+     * Space: O(1) - only indexes are stored.
+     *
+     * @param nums rotated sorted array
+     * @param target value to find
+     * @return index of target, or -1
      */
     public int search(int[] nums, int target) {
         if (nums == null || nums.length == 0) {

@@ -6,38 +6,42 @@ import java.util.TreeMap;
 
 
 /**
- * Problem Statement:
- * Implement a SnapshotArray that supports the following interface:
- * - SnapshotArray(int length): Initializes an array-like data structure with the given length. Initially, each element equals 0.
- * - void set(index, val): Sets the element at the given index to be equal to val.
- * - int snap(): Takes a snapshot of the array and returns the snap_id (the snapshot ID, starting from 0).
- * - int get(index, snap_id): Returns the value at the given index at the time we took the snapshot with the given snap_id.
+ * Problem: Snapshot Array
+ *
+ * Design an array-like structure supporting set, snap, and get. Each snapshot freezes logical values so later get calls can retrieve an index's historical value.
+ *
+ * Leetcode: https://leetcode.com/problems/snapshot-array/ (Medium)
+ * Rating:   zerotrac 1771 (Q3, weekly-148)
+ * Pattern:  Design | Sparse histories | TreeMap floor lookup
  *
  * Example:
- * Input: ["SnapshotArray","set","snap","set","get"]
- *        [[3],[0,5],[],[0,6],[0,0]]
- * Output: [null,null,0,null,5]
- * Explanation:
- * SnapshotArray snapshotArr = new SnapshotArray(3);
- * snapshotArr.set(0,5);  // Set array[0] = 5
- * snapshotArr.snap();    // Take snapshot, return snap_id = 0
- * snapshotArr.set(0,6);  // Set array[0] = 6
- * snapshotArr.get(0,0);  // Get value at index 0 with snap_id 0, returns 5
+ *   Input:  set(0,5), snap(), set(0,6), get(0,0)
+ *   Output: 5
+ *   Why:    snapshot 0 was taken before index 0 changed to 6.
  *
- * LeetCode link: https://leetcode.com/problems/snapshot-array/
+ * Follow-ups:
+ *   1. Skip duplicate writes? Check the current snap entry before inserting.
+ *   2. Rollback? Reset active state from stored histories.
+ *   3. Range queries? Use persistent segment trees or range-indexed histories.
+ *   4. Persist to disk? Store append-only logs and lazy indexes.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - What if we need to support rollback to a previous snapshot?
- *    → Maintain reference to old snapshots and restore state from them.
- *  - How would you optimize for arrays where most values don't change between snapshots?
- *    → Current solution already handles this - only stores changes, not entire array.
- *  - Can you support range queries (get values for index range in a snapshot)?
- *    → Extend to store range data structures like segment trees per snapshot.
- *  - What if snapshots need to be persisted to disk?
- *    → Serialize TreeMaps to disk, use lazy loading for get operations.
- * LeetCode Contest Rating: 1771
+ * Related: Time Based Key-Value Store (981).
  */
 public class SnapshotArray {
+
+    public static void main(String[] args) {
+        SnapshotArray snapshotArray = new SnapshotArray(3);
+        snapshotArray.set(0, 5);
+        int firstSnap = snapshotArray.snap();
+        snapshotArray.set(0, 6);
+        int valueAtFirstSnap = snapshotArray.get(0, firstSnap);
+        System.out.printf("ops=[set(0,5), snap(), set(0,6), get(0,%d)] -> %d  expected=5%n", firstSnap, valueAtFirstSnap);
+        SnapshotArray edgeCase = new SnapshotArray(1);
+        int defaultSnap = edgeCase.snap();
+        int defaultValue = edgeCase.get(0, defaultSnap);
+        System.out.printf("ops=[snap(), get(0,%d)] -> %d  expected=0%n", defaultSnap, defaultValue);
+    }
+
     /**
      * Main solution: HashMap + TreeMap for efficient snapshot storage.
      * 
@@ -64,15 +68,13 @@ public class SnapshotArray {
     private Map<Integer, TreeMap<Integer, Integer>> snapshotValues;
     private int snapId;
 
+    /** Initializes empty per-index histories and starts snapshot ids at 0. */
     public SnapshotArray(int length) {
         snapshotValues = new HashMap<>();
         snapId = 0;
     }
 
-    /**
-     * Sets value at index for current snapshot.
-     * Time: O(log m) where m is number of snapshots with changes at this index.
-     */
+        /** Records val for index in the current snapshot id. */
     public void set(int index, int val) {
         // Initialize TreeMap for this index if not exists
         snapshotValues.putIfAbsent(index, new TreeMap<>());
@@ -81,18 +83,12 @@ public class SnapshotArray {
         snapshotValues.get(index).put(snapId, val);
     }
 
-    /**
-     * Takes snapshot and returns snapshot ID.
-     * Time: O(1), just increments counter.
-     */
+        /** Returns the current snapshot id, then advances to the next one. */
     public int snap() {
         return snapId++;
     }
 
-    /**
-     * Gets value at index for given snapshot ID.
-     * Time: O(log m) where m is number of snapshots with changes at this index.
-     */
+        /** Returns the latest value for index whose stored snapshot id is <= snap_id. */
     public int get(int index, int snap_id) {
         // If no changes at this index, return default 0
         if (!snapshotValues.containsKey(index)) {

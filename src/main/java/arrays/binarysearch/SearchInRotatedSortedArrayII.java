@@ -1,43 +1,57 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * There is an integer array nums sorted in non-decreasing order (with duplicate values).
- * The array is rotated at an unknown pivot index k (0 <= k < nums.length) such that the resulting array is
- * [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]].
+ * Problem: Search in Rotated Sorted Array II
  *
- * Given the array nums after the rotation and an integer target, return true if target is in nums,
- * or false if it is not in nums.
+ * A non-decreasing array with duplicates may be rotated. Return whether target exists, shrinking equal ambiguous boundaries when duplicates hide the sorted half.
  *
- * Example 1:
- * Input: nums = [2,5,6,0,0,1,2], target = 0
- * Output: true
+ * Leetcode: https://leetcode.com/problems/search-in-rotated-sorted-array-ii/ (Medium)
+ * Rating:   acceptance 40.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | Rotated sorted array | Duplicate-boundary shrinking
  *
- * Example 2:
- * Input: nums = [2,5,6,0,0,1,2], target = 3
- * Output: false
+ * Example:
+ *   Input:  nums = [2,5,6,0,0,1,2], target = 0
+ *   Output: true
+ *   Why:    0 appears in the rotated lower segment.
  *
- * LeetCode: https://leetcode.com/problems/search-in-rotated-sorted-array-ii/
+ * Follow-ups:
+ *   1. Why can it be O(n)? Equal boundaries may force one-step shrinking.
+ *   2. Return an index? Return mid on match or keep searching for a boundary.
+ *   3. Count occurrences? Explore both sides after a match; worst case is linear.
+ *   4. Find the minimum? Reuse the nums[mid] == nums[right] shrink rule.
  *
- * Follow-up Questions:
- * 1. How would you find the pivot index where the array is rotated?
- *    - We can modify the binary search to find the smallest element's index.
- * 2. What if we need to find the first or last occurrence of the target?
- *    - We would need to continue searching even after finding a match.
- * 3. How would you handle very large arrays that don't fit in memory?
- *    - We could use an external binary search approach that works with file chunks.
- *
- * Related Problems:
- * - Search in Rotated Sorted Array (https://leetcode.com/problems/search-in-rotated-sorted-array/)
- * - Find Minimum in Rotated Sorted Array II (https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Search in Rotated Sorted Array (33), Find Minimum in Rotated Sorted Array II (154).
  */
 public class SearchInRotatedSortedArrayII {
-    /**
-     * Searches for the target in a rotated sorted array with duplicates.
+
+    public static void main(String[] args) {
+        SearchInRotatedSortedArrayII solver = new SearchInRotatedSortedArrayII();
+        int[][] inputs = { {2,5,6,0,0,1,2}, {2,5,6,0,0,1,2}, {1,0,1,1,1} };
+        int[] targets = { 0, 3, 0 };
+        boolean[] expected = { true, false, true };
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.search(inputs[i], targets[i]);
+            System.out.printf("nums=%s target=%d -> %b  expected=%b%n", Arrays.toString(inputs[i]), targets[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: Duplicates can hide which side is sorted. When left, mid, and right are equal, shrink both boundaries; otherwise use rotated sorted-half logic.
      *
-     * @param nums The rotated sorted array with duplicates
-     * @param target The value to search for
-     * @return true if target is found, false otherwise
+     * Algorithm:
+     *   1. Return false for null or empty input.
+     *   2. Binary search with inclusive bounds.
+     *   3. Shrink both ends for equal ambiguous boundaries.
+     *   4. Otherwise keep the half that can contain target.
+     *
+     * Time:  O(n) - duplicates can force one-step shrinking; O(log n) on clear splits.
+     * Space: O(1) - only indexes are stored.
+     *
+     * @param nums rotated sorted array with duplicates
+     * @param target value to search
+     * @return true if target exists
      */
     public boolean search(int[] nums, int target) {
         if (nums == null || nums.length == 0) {
@@ -104,9 +118,7 @@ public class SearchInRotatedSortedArrayII {
         }
     }
 
-    /**
-     * Helper method to perform binary search in a given range.
-     */
+        /** Searches target inside inclusive bounds. */
     private boolean binarySearch(int[] nums, int left, int right, int target) {
         while (left <= right) {
             int mid = left + (right - left) / 2;
@@ -123,10 +135,7 @@ public class SearchInRotatedSortedArrayII {
         return false;
     }
 
-    /**
-     * Finds the pivot index in a rotated sorted array with duplicates.
-     * The pivot is the index of the smallest element.
-     */
+        /** Finds a minimum-value index while shrinking duplicate boundaries. */
     private int findPivotWithDuplicates(int[] nums) {
         int left = 0;
         int right = nums.length - 1;
@@ -170,9 +179,7 @@ public class SearchInRotatedSortedArrayII {
         return last - first + 1;
     }
 
-    /**
-     * Finds the first occurrence of the target in the rotated sorted array.
-     */
+        /** Finds a leftmost target candidate with the restored rotated logic. */
     private int findFirst(int[] nums, int target) {
         int left = 0;
         int right = nums.length - 1;
@@ -206,9 +213,7 @@ public class SearchInRotatedSortedArrayII {
         return result;
     }
 
-    /**
-     * Finds the last occurrence of the target in the rotated sorted array.
-     */
+        /** Finds a rightmost target candidate with the restored rotated logic. */
     private int findLast(int[] nums, int target) {
         int left = 0;
         int right = nums.length - 1;

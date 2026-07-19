@@ -1,59 +1,61 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 import java.util.Collections;
 import java.util.PriorityQueue;
 
 
 /**
- * You are given an integer array nums where the ith bag contains nums[i] balls. You are also given an integer maxOperations.
+ * Problem: Minimum Limit of Balls in a Bag
  *
- * You can perform the following operation at most maxOperations times:
- * - Take any bag of balls and divide it into two new bags with a positive number of balls.
+ * Each operation splits one bag into two positive-size bags. Minimize the final penalty, defined as the maximum number of balls in any bag.
  *
- * Your penalty is the maximum number of balls in a bag. You want to minimize your penalty after the operations.
+ * Leetcode: https://leetcode.com/problems/minimum-limit-of-balls-in-a-bag/ (Medium)
+ * Rating:   zerotrac 1940 (Q3, weekly-228)
+ * Pattern:  Binary search on answer | Split-count feasibility | Minimum feasible penalty
  *
- * Return the minimum possible penalty after performing the operations.
+ * Example:
+ *   Input:  nums = [9], maxOperations = 2
+ *   Output: 3
+ *   Why:    9 can become [3,3,3] using two splits, and penalty below 3 is impossible.
  *
- * Example 1:
- * Input: nums = [9], maxOperations = 2
- * Output: 3
- * Explanation:
- * - Divide the bag with 9 balls into two bags of sizes 6 and 3. [9] -> [6,3].
- * - Divide the bag with 6 balls into two bags of size 3 each. [6,3] -> [3,3,3].
- * The bag with the most number of balls has 3 balls, so your penalty is 3.
+ * Follow-ups:
+ *   1. Return a configuration? Materialize splits after finding the penalty.
+ *   2. Minimize average size? The objective is different and this predicate no longer applies.
+ *   3. Split into more than two bags per operation? Recompute the operations-needed formula.
+ *   4. Online bag additions? Maintain bounds and rerun the feasibility search.
  *
- * Example 2:
- * Input: nums = [2,4,8,2], maxOperations = 4
- * Output: 2
- * Explanation:
- * - Divide the bag with 8 balls into two bags of 4s. [2,4,8,2] -> [2,4,4,4,2].
- * - Divide the bag with 4 balls into two bags of 2s. [2,4,4,4,2] -> [2,2,2,4,4,2].
- * - Divide the bag with 4 balls into two bags of 2s. [2,2,2,4,4,2] -> [2,2,2,2,2,4,2].
- * - Divide the bag with 4 balls into two bags of 2s. [2,2,2,2,2,4,2] -> [2,2,2,2,2,2,2,2].
- * The bag with the most number of balls has 2 balls, so your penalty is 2.
- *
- * LeetCode: https://leetcode.com/problems/minimum-limit-of-balls-in-a-bag/
- *
- * Follow-up Questions:
- * 1. How would you handle very large input sizes (e.g., 10^5 bags)?
- *    - The binary search approach is efficient with O(n log(max(nums))) time complexity.
- * 2. What if we need to minimize the sum of squares of balls in each bag instead of the maximum?
- *    - That would require a different approach, possibly using priority queues to always split the largest bag.
- * 3. How would you modify the solution to also return the final configuration of bags?
- *    - We could track the splits made during the binary search to reconstruct the final configuration.
- *
- * Related Problems:
- * - Koko Eating Bananas (https://leetcode.com/problems/koko-eating-bananas/)
- * - Split Array Largest Sum (https://leetcode.com/problems/split-array-largest-sum/)
- * LeetCode Contest Rating: 1940
+ * Related: Koko Eating Bananas (875), Split Array Largest Sum (410).
  */
 public class MinimumLimitOfBallsInABag {
-    /**
-     * Calculates the minimum possible penalty after performing at most maxOperations operations.
+
+    public static void main(String[] args) {
+        MinimumLimitOfBallsInABag solver = new MinimumLimitOfBallsInABag();
+        int[][] inputs = { {9}, {2,4,8,2}, {7,17} };
+        int[] operations = { 2, 4, 2 };
+        int[] expected = { 3, 2, 7 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.minimumSize(inputs[i], operations[i]);
+            System.out.printf("nums=%s maxOperations=%d -> %d  expected=%d%n", Arrays.toString(inputs[i]), operations[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: Penalty feasibility is monotonic. For a candidate penalty, (num - 1) / penalty gives the splits needed for each bag.
      *
-     * @param nums Array representing number of balls in each bag
-     * @param maxOperations Maximum number of operations allowed
-     * @return Minimum possible maximum number of balls in any bag after operations
+     * Algorithm:
+     *   1. Search penalties from 1 to the largest bag.
+     *   2. Count operations needed for mid.
+     *   3. If feasible, record mid and search smaller penalties.
+     *   4. Otherwise search larger penalties.
+     *
+     * Time:  O(n log M) - each check scans bags across max bag M.
+     * Space: O(1) - only counters and bounds are stored.
+     *
+     * @param nums balls in each bag
+     * @param maxOperations maximum splits
+     * @return minimum possible penalty
      */
     public int minimumSize(int[] nums, int maxOperations) {
         int left = 1;
@@ -81,14 +83,7 @@ public class MinimumLimitOfBallsInABag {
         return result;
     }
 
-    /**
-     * Checks if it's possible to achieve the given penalty with at most maxOperations.
-     *
-     * @param nums Array of balls in each bag
-     * @param maxOperations Maximum allowed operations
-     * @param penalty Target maximum balls in any bag
-     * @return true if possible, false otherwise
-     */
+        /** Returns whether penalty is reachable within maxOperations. */
     private boolean isPossible(int[] nums, int maxOperations, int penalty) {
         int operationsNeeded = 0;
 

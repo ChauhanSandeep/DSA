@@ -1,54 +1,59 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
  * Problem: Single Element in a Sorted Array
  *
- * You are given a sorted array consisting of only integers where every element appears exactly
- * twice, except for one element which appears exactly once.
- * Return the single element that appears only once.
- * Your solution must run in O(log n) time and O(1) space.
+ * In a sorted array, every value appears twice except one value that appears once. Return the single value in logarithmic time and constant space.
+ *
+ * Leetcode: https://leetcode.com/problems/single-element-in-a-sorted-array/ (Medium)
+ * Rating:   acceptance 59.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | Pair parity | Sorted duplicates
  *
  * Example:
- * Input: nums = [1,1,2,3,3,4,4,8,8]
- * Output: 2
- * Explanation: 2 is the single element that appears only once.
+ *   Input:  nums = [1,1,2,3,3,4,4,8,8]
+ *   Output: 2
+ *   Why:    2 is the only value without an equal neighbor.
  *
- * LeetCode: https://leetcode.com/problems/single-element-in-a-sorted-array
+ * Follow-ups:
+ *   1. Unsorted input? XOR all values in linear time.
+ *   2. Others appear three times? Use bit counts modulo 3.
+ *   3. Two single values? XOR all values, split by a set bit, and XOR each group.
+ *   4. Return the index? Return the converged boundary instead of the value.
  *
- * Follow-up Questions:
- * 1. What if every element appears exactly thrice except one that appears once?
- *    Answer: Use bit manipulation with 3-state counting or modify binary search logic.
- *
- * 2. How would you handle the case where multiple elements appear only once?
- *    Answer: XOR all elements to find XOR of all unique elements, then separate using bit manipulation.
- *
- * 3. What if the array is not sorted?
- *    Answer: Use XOR operation to find the single element in O(n) time, O(1) space.
- *    Related: https://leetcode.com/problems/single-number/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Single Number (136), Single Number II (137).
  */
 public class SingleElementInASortedArray {
 
-    /**
-     * Finds single element using binary search with parity analysis.
+    public static void main(String[] args) {
+        SingleElementInASortedArray solver = new SingleElementInASortedArray();
+        int[][] primaryInputs = { {1,2,2,3,3}, {7} };
+        int[] primaryExpected = { 1, 7 };
+        for (int i = 0; i < primaryInputs.length; i++) {
+            int got = solver.singleNonDuplicate(primaryInputs[i]);
+            System.out.printf("method=singleNonDuplicate nums=%s -> %d  expected=%d%n", Arrays.toString(primaryInputs[i]), got, primaryExpected[i]);
+        }
+        int[] xorInput = {1,1,2,3,3,4,4,8,8};
+        int xorGot = solver.singleNonDuplicateXOR(xorInput);
+        System.out.printf("method=singleNonDuplicateXOR nums=%s -> %d  expected=%d%n", Arrays.toString(xorInput), xorGot, 2);
+    }
+
+
+        /**
+     * Intuition: The restored method checks whether mid is isolated, then uses whether mid matches its left neighbor to choose a side. Pair alignment is the intended signal.
      *
      * Algorithm:
-     * 1. Use binary search on the sorted array
-     * 2. Check if middle element is the single element
-     * 3. If not, determine which half contains the single element based on index parity.
-     *  - The half containing odd number of elements must contain the single element.
-     *  - In the other half, elements are perfectly paired.
-     * 4. If mid is even and nums[mid] == nums[mid+1], single element is on right
-     * 5. If mid is even and nums[mid] != nums[mid+1], single element is on left
-     * 6. Apply opposite logic when mid is odd
+     *   1. Search while left < right.
+     *   2. Return nums[mid] if mid differs from both neighbors.
+     *   3. Set isMidMatchingLeft when mid pairs with mid - 1.
+     *   4. Move right to mid - 1 for a left match; otherwise move left to mid + 1.
      *
-     * Time Complexity: O(log n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(log n) - one boundary moves each iteration.
+     * Space: O(1) - only indexes and a boolean are stored.
      *
-     * @param nums Sorted array with one single element
-     * @return The element that appears exactly once
+     * @param nums sorted array with one single value
+     * @return value selected by the restored parity search
      */
     public int singleNonDuplicate(int[] nums) {
         int left = 0;
@@ -96,6 +101,7 @@ public class SingleElementInASortedArray {
         return nums[left];
     }
 
+    /** Returns whether nums[mid] differs from both existing neighbors. */
     private boolean isSingleElement(int[] nums, int mid) {
         return (mid == 0 || nums[mid] != nums[mid - 1]) &&
             (mid == nums.length - 1 || nums[mid] != nums[mid + 1]);

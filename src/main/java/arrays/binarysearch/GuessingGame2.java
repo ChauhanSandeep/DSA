@@ -3,32 +3,42 @@ package arrays.binarysearch;
 /**
  * Problem: Guess Number Higher or Lower II
  *
- * You are tasked to guess a number between 1 and n. Each time you guess a number x, you pay x dollars.
- * Your goal is to find the minimum amount of money required to guarantee a win regardless of what number is chosen.
+ * Guess a number from 1..n, paying x dollars whenever guess x is wrong. Return the minimum money that guarantees a win in the worst case.
+ *
+ * Leetcode: https://leetcode.com/problems/guess-number-higher-or-lower-ii/ (Medium)
+ * Rating:   acceptance 53.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Interval DP | Minimax | Worst-case optimization
  *
  * Example:
- *   Input: n = 10
+ *   Input:  n = 10
  *   Output: 16
+ *   Why:    the optimal decision tree has worst-case paid guesses totaling 16.
  *
- * Leetcode: https://leetcode.com/problems/guess-number-higher-or-lower-ii/
+ * Follow-ups:
+ *   1. Recover the strategy? Store the best pivot for each interval.
+ *   2. Different guess costs? Replace pivot with cost[pivot] in the recurrence.
+ *   3. Minimize expected cost? Use probabilities and expected-value DP.
+ *   4. Many n queries? Build the DP table up to the maximum n once.
  *
- * Follow-up questions:
- * 1️⃣ How does this relate to the minimax approach?
- *     - It uses a variation of the minimax algorithm, ensuring the worst-case cost is minimized.
- * 2️⃣ Can you optimize further?
- *     - Since the decision range is continuous and costs accumulate, space optimization can be done by reusing a smaller matrix, but the time complexity remains.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Guess Number Higher or Lower (374), Predict the Winner (486).
  */
 public class GuessingGame2 {
+
+    public static void main(String[] args) {
+        GuessingGame2 solver = new GuessingGame2();
+        int[] inputs = { 1, 2, 10 };
+        int[] expected = { 0, 1, 16 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.getMinimumMoneyAmountIterative(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
 
     /**
      * Main method to run and test the minimum cost computation.
      */
-    public static void main(String[] args) {
-        GuessingGame2 game = new GuessingGame2();
-        int result = game.getMinimumMoneyAmountIterative(10);
-        System.out.println("Minimum money to guarantee a win for n=10: " + result);
-    }
+
 
     /**
      * Public method to initiate the recursive guessing game.
@@ -88,26 +98,20 @@ public class GuessingGame2 {
         return minCost;
     }
 
-    /**
-     * Iterative approach to determine the minimum amount of money required to guarantee a win.
-     *
-     * Steps:
-     *  1. Initialize a DP table where dp[left][right] stores the minimum cost to guarantee a win in the range [left, right].
-     *  2. Use bottom-up dynamic programming:
-     *     - For each possible range length (from 2 to n), compute the minimum cost.
-     *     - For each possible pivot in the range, compute the cost as:
-     *          pivot + max(cost of guessing left subrange, cost of guessing right subrange)
-     *     - Choose the pivot that results in the minimal cost.
-     *  3. The final answer is dp[1][n].
+        /**
+     * Intuition: For interval [left, right], choosing pivot costs pivot plus the worse remaining side. The best guaranteed cost minimizes that worst-case choice over all pivots.
      *
      * Algorithm:
-     *  - Bottom-up dynamic programming with a minimax strategy.
+     *   1. Let dp[left][right] store minimum guaranteed cost.
+     *   2. Fill intervals by increasing length.
+     *   3. Try each pivot from midpoint through right.
+     *   4. Store the minimum worst-case cost and return dp[1][n].
      *
-     * Time Complexity: O(n³) — triple nested loop: range length, start index, and pivot index.
-     * Space Complexity: O(n²) — 2D DP array to store minimal costs.
+     * Time:  O(n^3) - length, left, and pivot loops are nested.
+     * Space: O(n^2) - all interval costs are stored.
      *
-     * @param n The upper bound of the guessing range.
-     * @return The minimum money required to guarantee a win.
+     * @param n upper bound of the range
+     * @return minimum money needed to guarantee a win
      */
     public int getMinimumMoneyAmountIterative(int n) {
         int[][] dp = new int[n + 1][n + 1];
