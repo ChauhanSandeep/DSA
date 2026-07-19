@@ -328,6 +328,7 @@
     initDashboard();
     initThemeToggle();
     initQaCard();
+    initPatternPage();
   });
 
   // --------------------------------------------------------------------------
@@ -411,6 +412,62 @@
         toggleSolution();
       }
     });
+  }
+
+  // --------------------------------------------------------------------------
+  // Pattern page: sort by data attribute + expand/collapse-all.
+  // --------------------------------------------------------------------------
+  function initPatternPage() {
+    const list = document.querySelector(".pattern-list");
+    if (!list) return;
+
+    const items = Array.from(list.querySelectorAll(".pattern-item"));
+    let currentSort = { key: "due", order: "asc" };
+
+    function sortBy(key, order) {
+      const attr = "data-" + key;
+      items.sort((a, b) => {
+        const va = (a.getAttribute(attr) || "").toLowerCase();
+        const vb = (b.getAttribute(attr) || "").toLowerCase();
+        if (va < vb) return order === "asc" ? -1 : 1;
+        if (va > vb) return order === "asc" ? 1 : -1;
+        return 0;
+      });
+      const frag = document.createDocumentFragment();
+      items.forEach((el) => frag.appendChild(el));
+      list.appendChild(frag);
+      currentSort = { key, order };
+      updateSortButtons();
+    }
+
+    function updateSortButtons() {
+      document.querySelectorAll(".sort-controls .chip[data-sort]").forEach((btn) => {
+        const key = btn.getAttribute("data-sort");
+        btn.classList.toggle("active", key === currentSort.key);
+      });
+    }
+
+    document.querySelectorAll(".sort-controls .chip[data-sort]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-sort");
+        // Toggle order if already active; otherwise use the button's default.
+        let order = btn.getAttribute("data-order") || "asc";
+        if (currentSort.key === key) {
+          order = currentSort.order === "asc" ? "desc" : "asc";
+        }
+        sortBy(key, order);
+      });
+    });
+
+    const expandBtn = document.querySelector("[data-action='expand-all']");
+    const collapseBtn = document.querySelector("[data-action='collapse-all']");
+    if (expandBtn) expandBtn.addEventListener("click", () =>
+      items.forEach((el) => (el.open = true)));
+    if (collapseBtn) collapseBtn.addEventListener("click", () =>
+      items.forEach((el) => (el.open = false)));
+
+    // Apply the initial sort so the DOM matches the "active" chip.
+    sortBy(currentSort.key, currentSort.order);
   }
 
   // Expose a small debug surface (visible in DevTools console).

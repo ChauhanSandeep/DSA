@@ -277,6 +277,9 @@ def render_dashboard(state: dict, today: date) -> str:
 
     body = f"""
     {pending_banner}
+
+    {render_motivation_stack(state, today)}
+
     {stats}
 
     <h2>Queue for {esc(review_day_str)}</h2>
@@ -333,6 +336,179 @@ def render_dashboard(state: dict, today: date) -> str:
     body_with_state = body + inline
     html_doc = base_layout(f"Weekend review — {review_day_str}", body_with_state)
     return html_doc.replace("{root}", "")
+
+
+def compute_anchor_health(state: dict, today: date) -> dict:
+    anchors = [e for e in state["problems"].values() if e.get("flags", {}).get("pinned")]
+    total = len(anchors)
+    cutoff = today - timedelta(days=90)
+    touched = 0
+    most_recent_days = None
+    for entry in anchors:
+        last = entry["sm2"].get("lastReviewed")
+        if not last:
+            continue
+        last_d = date.fromisoformat(last)
+        delta = (today - last_d).days
+        if last_d >= cutoff:
+            touched += 1
+        if most_recent_days is None or delta < most_recent_days:
+            most_recent_days = delta
+    pct = int((touched / total) * 100) if total else 0
+    return {
+        "touched": touched,
+        "total": total,
+        "pct": pct,
+        "most_recent_days": most_recent_days,
+    }
+
+
+def compute_pattern_warmth(state: dict, today: date) -> list[dict]:
+    by_pattern: dict[str, list[dict]] = defaultdict(list)
+    for entry in state["problems"].values():
+        by_pattern[entry.get("pattern", "Uncategorized")].append(entry)
+
+    result: list[dict] = []
+    for pattern, entries in by_pattern.items():
+        min_days = None
+        reviewed_count = 0
+        for entry in entries:
+            last = entry["sm2"].get("lastReviewed")
+            if not last:
+                continue
+            reviewed_count += 1
+            delta = (today - date.fromisoformat(last)).days
+            if min_days is None or delta < min_days:
+                min_days = delta
+        result.append({
+            "pattern": pattern,
+            "count": len(entries),
+            "min_days": min_days,
+            "reviewed": reviewed_count,
+        })
+    result.sort(key=lambda p: (p["min_days"] is None, p["min_days"] or 0))
+    return result
+
+
+def warmth_class(min_days) -> str:
+    if min_days is None: return "warmth-cold"
+    if min_days <= 14:   return "warmth-hot"
+    if min_days <= 45:   return "warmth-warm"
+    if min_days <= 90:   return "warmth-lukewarm"
+    return "warmth-cold"
+
+
+def compute_weekly_dots(state: dict, today: date, weeks: int = 12) -> dict:
+    grades_by_date: dict[str, int] = defaultdict(int)
+    for entry in state["problems"].values():
+        for h in entry.get("history", []) or []:
+            d = h.get("date")
+            if d:
+                grades_by_date[d] = grades_by_date.get(d, 0) + 1
+
+    weekday = today.weekday()
+    if weekday <= 5:
+        current_saturday = today + timedelta(days=(5 - weekday))
+    else:
+        current_saturday = today + timedelta(days=6)
+
+    dots: list[dict] = []
+    for i in range(weeks):
+        end = current_saturday - timedelta(weeks=i)
+        start = end - timedelta(days=6)
+        active_count = 0
+        for offset in range(7):
+            d = start + timedelta(days=offset)
+            active_count += grades_by_date.get(d.isoformat(), 0)
+        dots.append({
+            "end": end.isoformat(),
+            "label": end.strftime("%d %b"),
+            "active": active_count > 0,
+            "count": active_count,
+        })
+    dots.reverse()
+
+    streak = 0
+    for dot in reversed(dots):
+        if dot["active"]:
+            streak += 1
+        else:
+            break
+    total_grades = sum(d["count"] for d in dots)
+    return {"dots": dots, "streak": streak, "total_grades_12w": total_grades}
+
+
+def render_motivation_stack(state: dict, today: date) -> str:
+    health = compute_anchor_health(state, today)
+    warmth = compute_pattern_warmth(state, today)
+    dots = compute_weekly_dots(state, today)
+
+    if health["total"] == 0:
+        anchor_line = '<div class="dim">No anchors pinned yet. Run <code>curate_core.py</code> to seed the core set.</div>'
+    else:
+        oldest_hint = ""
+        if health["most_recent_days"] is not None:
+            oldest_hint = f' · last review {health["most_recent_days"]} day(s) ago'
+        anchor_line = (
+            f'<div class="motiv-value">'
+            f'{health["touched"]} <span class="motiv-of">of {health["total"]}</span>'
+            f' <span class="motiv-hint">core anchors reviewed in last 90 days{oldest_hint}</span>'
+            f'</div>'
+            f'<div class="progress-track">'
+            f'<div class="progress-fill" style="width:{health["pct"]}%"></div>'
+            f'</div>'
+        )
+
+    warmth_tiles = []
+    for w in warmth:
+        cls = warmth_class(w["min_days"])
+        if w["min_days"] is None:
+            recency = "never"
+        elif w["min_days"] == 0:
+            recency = "today"
+        elif w["min_days"] == 1:
+            recency = "1d ago"
+        else:
+            recency = f"{w['min_days']}d ago"
+        warmth_tiles.append(
+            f'<div class="warmth-tile {cls}" title="{esc(w["pattern"])} — {w["reviewed"]}/{w["count"]} reviewed">'
+            f'<div class="warmth-name">{esc(w["pattern"])}</div>'
+            f'<div class="warmth-recency">{esc(recency)}</div>'
+            f'</div>'
+        )
+
+    dot_html_parts = []
+    for dot in dots["dots"]:
+        active_cls = "on" if dot["active"] else "off"
+        tooltip = f'{dot["label"]} — {dot["count"]} grade(s)' if dot["active"] else f'{dot["label"]} — no reviews'
+        dot_html_parts.append(f'<div class="week-dot {active_cls}" title="{esc(tooltip)}"></div>')
+
+    if dots["streak"] == 0:
+        streak_hint = "No active streak — pick something up this Saturday."
+    elif dots["streak"] == 1:
+        streak_hint = "1 week active — momentum building."
+    else:
+        streak_hint = f'{dots["streak"]}-week streak · {dots["total_grades_12w"]} grades in the last 12 weeks'
+
+    return f"""
+    <section class="motiv-stack">
+      <div class="motiv-panel">
+        <div class="motiv-label">Anchor health</div>
+        {anchor_line}
+      </div>
+
+      <div class="motiv-panel">
+        <div class="motiv-label">Pattern warmth</div>
+        <div class="warmth-grid">{"".join(warmth_tiles)}</div>
+      </div>
+
+      <div class="motiv-panel">
+        <div class="motiv-label">Last 12 weeks</div>
+        <div class="week-dots">{"".join(dot_html_parts)}</div>
+        <div class="motiv-hint">{esc(streak_hint)}</div>
+      </div>
+    </section>
+    """
 
 
 def render_qa_card(problem: dict) -> str:
@@ -483,33 +659,117 @@ def render_pattern_index(state: dict) -> str:
     return base_layout("Patterns", body, back_link="../index.html").replace("{root}", "../")
 
 
+GRADE_EMOJI = {
+    "trivial": "⭐",
+    "solved":  "✅",
+    "hint":    "🟡",
+    "blank":   "🔴",
+}
+
+
+def format_last_reviewed(sm2: dict, today: date) -> tuple[str, str]:
+    """Return (label, sort_value). sort_value is '9999-12-31' for never
+    so unreviewed items sort last when ascending."""
+    last = sm2.get("lastReviewed")
+    if not last:
+        return ("never", "0000-00-00")
+    last_d = date.fromisoformat(last)
+    delta = (today - last_d).days
+    grade = sm2.get("lastGrade")
+    emoji = GRADE_EMOJI.get(grade, "•")
+    if delta == 0:   pretty = "today"
+    elif delta == 1: pretty = "yesterday"
+    elif delta < 7:  pretty = f"{delta}d ago"
+    elif delta < 30: pretty = f"{delta // 7}w ago"
+    else:            pretty = last
+    return (f"{emoji} {pretty}", last)
+
+
 def render_pattern_page(pattern: str, entries: list[dict]) -> str:
+    today = date.today()
     entries_sorted = sorted(
         entries,
         key=lambda e: (
             not e.get("isNC150"),
             not e.get("isBlind75"),
-            DIFFICULTY_RANK.get(e.get("difficulty", "Unknown"), 0),
+            -DIFFICULTY_RANK.get(e.get("difficulty", "Unknown"), 0),
             e["task"],
         ),
     )
-    rows = []
+
+    items = []
     for entry in entries_sorted:
-        rows.append(f"""
-      <tr>
-        <td><a href="../problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a></td>
-        <td>{badges_for_problem(entry)}</td>
-        <td class="mono">{esc(format_next_due(entry["sm2"].get("nextDue")))}</td>
-        <td class="mono right">{entry["sm2"].get("repetitions", 0)}× · EF {entry["sm2"].get("easeFactor", 2.5):.2f}</td>
-      </tr>""")
+        qa = entry.get("qa") or {}
+        next_due_iso = entry["sm2"].get("nextDue") or "9999-12-31"
+        last_label, last_sort = format_last_reviewed(entry["sm2"], today)
+        next_due_pretty = format_next_due(entry["sm2"].get("nextDue"))
+
+        problem_html = ""
+        if qa.get("problem"):
+            problem_html = (
+                '<div class="qa-mini-section">'
+                '<div class="qa-mini-label">Problem</div>'
+                f'<div class="qa-mini-body">{esc(qa["problem"])}</div>'
+                '</div>'
+            )
+        answer_html = ""
+        if qa.get("answer"):
+            answer_html = (
+                '<div class="qa-mini-section">'
+                '<div class="qa-mini-label">Answer</div>'
+                f'<div class="qa-mini-body">{esc(qa["answer"])}</div>'
+                '</div>'
+            )
+        complexity_html = ""
+        if qa.get("complexity"):
+            complexity_html = (
+                '<div class="qa-mini-section">'
+                f'<div class="qa-complexity">{esc(qa["complexity"])}</div>'
+                '</div>'
+            )
+        body_content = problem_html + answer_html + complexity_html
+        if not body_content:
+            body_content = '<div class="dim">No summary yet — open the full page.</div>'
+
+        items.append(f"""
+      <details class="pattern-item"
+               data-name="{esc((entry.get('problemName') or entry['task']).lower())}"
+               data-due="{esc(next_due_iso)}"
+               data-last="{esc(last_sort)}">
+        <summary>
+          <span class="pattern-item-chevron">▸</span>
+          <span class="pattern-item-title">
+            <a href="../problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a>
+          </span>
+          <span class="pattern-item-badges">{badges_for_problem(entry)}</span>
+          <span class="pattern-item-meta">
+            <span class="pattern-item-due">next: {esc(next_due_pretty)}</span>
+            <span class="pattern-item-last">last: {esc(last_label)}</span>
+          </span>
+        </summary>
+        <div class="pattern-item-body">
+          {body_content}
+          <a class="pattern-item-open" href="../problems/{esc(entry['task'])}.html">Open full page →</a>
+        </div>
+      </details>""")
+
     body = f"""
     <h2>{esc(pattern)} — {len(entries_sorted)} problems</h2>
-    <table class="problems-table">
-      <thead>
-        <tr><th>Problem</th><th>Meta</th><th>Next due</th><th>SM-2</th></tr>
-      </thead>
-      <tbody>{"".join(rows)}</tbody>
-    </table>
+
+    <div class="pattern-list-controls">
+      <div class="sort-controls">
+        <span class="dim">Sort:</span>
+        <button class="chip" data-sort="due" data-order="asc">Next due ↑</button>
+        <button class="chip" data-sort="last" data-order="desc">Last reviewed ↓</button>
+        <button class="chip" data-sort="name" data-order="asc">Name A–Z</button>
+      </div>
+      <div class="expand-controls">
+        <button class="chip" data-action="expand-all">Expand all</button>
+        <button class="chip" data-action="collapse-all">Collapse all</button>
+      </div>
+    </div>
+
+    <div class="pattern-list">{"".join(items)}</div>
     """
     return base_layout(pattern, body, back_link="index.html").replace("{root}", "../")
 
