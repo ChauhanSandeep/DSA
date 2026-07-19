@@ -1,5 +1,6 @@
 package codingassessment.doubletsolution;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,84 +10,57 @@ import java.util.Set;
 /**
  * Problem: Word Ladder (Doublets)
  *
- * Given a start word, an end word, and a dictionary of valid words, find the minimum number
- * of transformations needed to convert the start word to the end word. Each transformation
- * changes exactly one letter, and intermediate words must be in the dictionary.
+ * Given a begin word, an end word, and a dictionary, find the shortest chain
+ * that changes one letter at a time until it reaches the end word. Every
+ * intermediate word must appear in the dictionary. This assessment variant
+ * returns -1 when the end word cannot be reached.
  *
- * 🔗 LeetCode: https://leetcode.com/problems/word-ladder/
+ * Leetcode: https://leetcode.com/problems/word-ladder/ (Hard)
+ * Rating:   acceptance 46.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Breadth-first search | Implicit word graph
  *
- * 📝 Example:
- * Input: beginWord = "APE", endWord = "MAN", 
- *        wordList = ["APE", "APT", "OPT", "OAT", "MAT", "MAN"]
- * Output: 6
- * Explanation: APE → APT → OPT → OAT → MAT → MAN (5 transformations)
+ * Example:
+ *   Input:  beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+ *   Output: 5
+ *   Why:    hit, hot, dot, dog, cog is the shortest chain; BFS counts words in
+ *           the chain, not just the four letter changes.
  *
- * Input: beginWord = "hit", endWord = "cog",
- *        wordList = ["hot","dot","dog","lot","log","cog"]
- * Output: 5
- * Explanation: hit → hot → dot → dog → cog
+ * Follow-ups:
+ *   1. Speed up lookups for a very large dictionary?
+ *      Precompute wildcard buckets such as h*t and look up neighbors by pattern.
+ *   2. Return one actual shortest sequence?
+ *      Keep a parent pointer for each newly visited word and rebuild the path at the end.
+ *   3. Return all shortest sequences?
+ *      Run level-order BFS with parent lists, then backtrack only along shortest-level edges.
+ *   4. Reduce the search radius on hard cases?
+ *      Use bidirectional BFS from beginWord and endWord and stop when the frontiers meet.
  *
- * 🎯 Constraints:
- * - 1 <= beginWord.length <= 10
- * - endWord.length == beginWord.length
- * - 1 <= wordList.length <= 5000
- * - All words consist of lowercase English letters
- * - beginWord != endWord
- * - All words in wordList are unique
- *
- * 💡 Follow-up Questions with Answers:
- * 1. Q: How would you optimize for very long word lists?
- *    A: Use bidirectional BFS (search from both ends). Build adjacency list once by grouping
- *       words by pattern (e.g., h*t, *ot). Use trie for efficient pattern matching.
- *
- * 2. Q: What if you need to return the actual transformation sequence, not just length?
- *    A: Maintain parent map during BFS to track path. Backtrack from endWord to beginWord
- *       using parent pointers to reconstruct sequence.
- *
- * 3. Q: How would you handle multiple shortest paths?
- *    A: Use BFS to find distance, then use DFS/backtracking from endWord maintaining same
- *       distance constraint to find all paths. Can also use BFS with parent list per node.
- *
- * 4. Q: What if transformations have different costs (not all cost 1)?
- *    A: Use Dijkstra's algorithm with priority queue instead of BFS. Maintain distance map
- *       with minimum cost to reach each word.
- *
- * 5. Q: How would you handle case-insensitive or words of different lengths?
- *    A: Normalize to lowercase. For different lengths, modify transformation rules to allow
- *       insertion/deletion (edit distance problem). Use dynamic programming or Dijkstra's.
- *
- * Related Problems:
- * - Word Ladder II (LeetCode #126) - Return all shortest transformation sequences
- * - Minimum Genetic Mutation (LeetCode #433)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Word Ladder II (126), Minimum Genetic Mutation (433), Open the Lock (752).
  */
 class DoubletsSolution {
     
     /**
-     * Finds minimum transformations using BFS to explore word transformation graph.
+     * Intuition: the naive way compares every word with every other word to build
+     * the graph first, but that spends most of its time proving non-neighbors.
+     * Instead, treat the graph as implicit: a word's neighbors are exactly the
+     * dictionary words reachable by changing one position to one lowercase letter.
+     * This is then plain BFS on an unweighted graph, the same building block used
+     * for shortest paths by number of edges. Processing the queue level by level
+     * means all chains of length k are exhausted before any chain of length k + 1.
      *
      * Algorithm:
-     * 1. Build word set from dictionary for O(1) lookup
-     * 2. Use BFS queue starting with beginWord
-     * 3. For each word, try all 26 letter substitutions at each position
-     * 4. If transformed word in dictionary and not visited, add to queue
-     * 5. Process level by level, incrementing transformation count
-     * 6. Return count when endWord reached, or -1 if unreachable
+     *   1. Put the wordList into a HashSet for O(1) dictionary checks.
+     *   2. BFS from beginWord, keeping visitedWords so each word is queued once.
+     *   3. For every queued word, try all 26 replacements at every position.
+     *   4. Return transformationCount when endWord is dequeued, or -1 if BFS ends.
      *
-     * Key insight: This is shortest path problem in unweighted graph where nodes are words
-     * and edges exist between words differing by one letter. BFS guarantees shortest path.
+     * Time:  O(n*m^2) - up to n words are visited; each tries 26*m mutations and builds m-char strings.
+     * Space: O(n*m) - the dictionary, visited set, and queue can store n words of length m.
      *
-     * Time Complexity: O(M² × N) where M is word length, N is dictionary size
-     * - For each word, try M positions × 26 letters = O(26M) transformations
-     * - Each transformation creates new M-length string: O(M)
-     * - Visit at most N words: O(M² × N) total
-     *
-     * Space Complexity: O(M × N) for queue and visited set storing N words of length M
-     *
-     * @param beginWord Starting word
-     * @param endWord Target word
-     * @param wordList Dictionary of valid words
-     * @return Minimum number of transformations, or -1 if impossible
+     * @param beginWord word where the chain starts
+     * @param endWord word the chain must reach
+     * @param wordList dictionary of allowed intermediate and final words
+     * @return shortest chain length including both endpoints, or -1 if unreachable
      */
     public int ladderLength(String beginWord, String endWord, List<String> wordList) {
         // Build dictionary set for O(1) lookup
@@ -140,5 +114,27 @@ class DoubletsSolution {
         
         // No valid transformation sequence found
         return -1;
+    }
+
+    public static void main(String[] args) {
+        DoubletsSolution solver = new DoubletsSolution();
+
+        List<List<String>> dictionaries = Arrays.asList(
+            Arrays.asList("hot", "dot", "dog", "lot", "log", "cog"),
+            Arrays.asList("hot", "dot", "dog", "lot", "log"),
+            Arrays.asList("apt", "opt", "oat", "mat", "man")
+        );
+        String[][] pairs = {
+            {"hit", "cog"},
+            {"hit", "cog"},
+            {"ape", "man"}
+        };
+        int[] expected = {5, -1, 6};
+
+        for (int i = 0; i < pairs.length; i++) {
+            int output = solver.ladderLength(pairs[i][0], pairs[i][1], dictionaries.get(i));
+            System.out.printf("begin=%s end=%s words=%s -> %d  expected=%d%n",
+                pairs[i][0], pairs[i][1], dictionaries.get(i), output, expected[i]);
+        }
     }
 }
