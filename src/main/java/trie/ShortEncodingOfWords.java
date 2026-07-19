@@ -7,80 +7,50 @@ import java.util.Set;
 /**
  * Problem: Short Encoding of Words
  *
- * A valid encoding of an array of words is any reference string s and array of indices
- * such that words.length == indices.length, the reference string s ends with '#', and for
- * each index indices[i], the substring of s starting from indices[i] up to (but not including)
- * the next '#' character equals words[i].
+ * Given lowercase words, return the length of the shortest reference string
+ * ending in '#' markers that can recover every word. A word does not need its
+ * own copy when it is already a suffix of a longer encoded word.
  *
- * Given an array of words, return the length of the shortest reference string s possible of
- * any valid encoding of words.
+ * Leetcode: https://leetcode.com/problems/short-encoding-of-words/ (Medium)
+ * Rating:   1632 (zerotrac Elo)
+ * Pattern:  Trie | Suffix elimination | Reversed suffix trie
  *
  * Example:
- * Input: words = ["time", "me", "bell"]
- * Output: 10
- * Explanation: A valid encoding is s = "time#bell#" and indices = [0, 2, 5].
- * words[0] = "time" starts at index 0, words[1] = "me" starts at index 2 (suffix of "time"),
- * words[2] = "bell" starts at index 5. Since "me" is a suffix of "time", we don't need
- * separate encoding for it. Total length = 5 ("time#") + 5 ("bell#") = 10.
+ *   Input:  words = ["time", "me", "bell"]
+ *   Output: 10
+ *   Why:    "me" is a suffix of "time", so "time#bell#" already contains all three words.
  *
- * Constraints:
- * - 1 <= words.length <= 2000
- * - 1 <= words[i].length <= 7
- * - words[i] consists of only lowercase letters
+ * Follow-ups:
+ *   1. Return the actual reference string and indices?
+ *      Keep only non-suffix words, concatenate them with '#', and record starting offsets.
+ *   2. Support a larger character set than lowercase English?
+ *      Use map-based trie children instead of a fixed 26-slot array.
+ *   3. Stream many words with duplicates under memory pressure?
+ *      Deduplicate first, then process longer words before shorter suffix candidates.
+ *   4. Support removing words from the encoding?
+ *      Keep terminal counts and recompute affected suffix paths, because relationships can change.
  *
- * LeetCode Problem: https://leetcode.com/problems/short-encoding-of-words
- *
- * Follow-up Questions:
- *
- * 1. How would you handle duplicate words in the input array?
- *    Answer: The Set-based approach naturally handles duplicates by removing them during
- *    suffix elimination. The Trie approach would insert the same word multiple times but
- *    only count its length once in the final encoding.
- *
- * 2. What if words could contain uppercase letters or special characters?
- *    Answer: The current solution works for any character set. For Trie approach, we'd need
- *    to adjust the children array size or use a HashMap instead of array for more flexibility.
- *
- * 3. Can you extend this to return the actual encoded string and indices array?
- *    Answer: Yes, we'd modify the Trie DFS to build the actual string by concatenating
- *    characters along paths to leaf nodes. For indices, we'd track the current position
- *    and record it when we complete each word.
- *
- * 4. How would you optimize for very large word arrays with memory constraints?
- *    Answer: We could process words in batches, or use a more memory-efficient Trie
- *    implementation with HashMap children instead of array. Alternatively, sort by length
- *    and process longer words first to identify suffixes early.
- *    Related problem: https://leetcode.com/problems/implement-trie-prefix-tree/
- *
- * 5. What if we need to support prefix matching instead of suffix matching?
- *    Answer: We would use a standard Trie without reversing words. Words that are prefixes
- *    of others would be eliminated instead of suffixes.
- *    Related problem: https://leetcode.com/problems/replace-words/
- * LeetCode Contest Rating: 1632
+ * Related: Implement Trie (Prefix Tree) (208), Replace Words (648).
  */
 public class ShortEncodingOfWords {
 
     /**
-     * Finds minimum encoding length using Set-based suffix elimination approach.
+     * Intuition: only words that are not suffixes of longer words need their own
+     * word + '#' entry. Keep every distinct word as a candidate, then for each
+     * word remove all proper suffixes it already covers. Anything left in the set
+     * cannot be recovered from another encoded word and must be counted directly.
      *
      * Algorithm:
-     * 1. Sort words by length in descending order to process longer words first
-     * 2. Add all words to a Set for efficient lookup and removal
-     * 3. For each word, remove all its suffixes from the Set
-     * 4. Sum the length of remaining words (each +1 for '#' delimiter)
+     *   1. Put all words in a set to deduplicate candidates.
+     *   2. Sort words from longest to shortest so longer words remove covered suffixes.
+     *   3. For each word, remove each proper suffix from the set.
+     *   4. Sum length + 1 for every remaining word to include the '#'.
      *
-     * Key insight: If word A is a suffix of word B, we only need to encode B.
-     * By processing longer words first and removing their suffixes, we ensure
-     * only necessary words remain for encoding.
-     *
-     * Time Complexity: O(N log N + N*L²) where N is number of words and L is average word length.
-     * - O(N log N) for sorting words by length
-     * - O(N * L²) for suffix removal (each word of length L has up to L suffixes, each requiring O(L) substring operations)
-     *
-     * Space Complexity: O(N * L) for storing all words in the Set.
+     * Time:  O(N log N + N*L^2) - sorting plus making and removing up to L suffix strings per word.
+     * Space: O(N*L) - the set stores distinct input words.
      *
      * @param words array of words to encode
-     * @return minimum length of encoded reference string
+     * @return minimum length of the encoded reference string
      */
     public int minimumLengthEncoding(String[] words) {
         Set<String> wordSet = new HashSet<>(Arrays.asList(words));
@@ -138,7 +108,7 @@ public class ShortEncodingOfWords {
         return dfs(root, 0);
     }
 
-    // Insert word into Trie in reversed order
+    /** Inserts a word from last character to first so suffixes share trie paths. */
     private void insertReversed(TrieNode root, String word) {
         TrieNode current = root;
         // Insert word in reverse (so suffixes become prefixes)
@@ -151,7 +121,7 @@ public class ShortEncodingOfWords {
         }
     }
 
-    // DFS to calculate total length from leaf nodes
+    /** Returns the encoded length contributed by leaf paths below this node. */
     private int dfs(TrieNode node, int depth) {
         int totalLength = 0;
         
@@ -171,8 +141,26 @@ public class ShortEncodingOfWords {
         return totalLength;
     }
 
-    // Trie node with children array for lowercase letters
+    /** Trie node with one child slot per lowercase letter. */
     private static class TrieNode {
         TrieNode[] children = new TrieNode[26];
     }
+
+    public static void main(String[] args) {
+        ShortEncodingOfWords solver = new ShortEncodingOfWords();
+
+        String[][] inputs = {
+            {"time", "me", "bell"},
+            {"t"},
+            {"me", "time", "time"}
+        };
+        int[] expected = {10, 2, 5};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.minimumLengthEncoding(inputs[i].clone());
+            System.out.printf("words=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
 }

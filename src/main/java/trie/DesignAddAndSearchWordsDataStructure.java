@@ -2,78 +2,53 @@ package trie;
 
 /**
  * Problem: Design Add and Search Words Data Structure
- * 
- * Design a data structure that supports adding new words and finding if a string 
- * matches any previously added string.
- * 
- * Implement the WordDictionary class:
- * - WordDictionary() Initializes the object.
- * - void addWord(word) Adds word to the data structure, it can be matched later.
- * - boolean search(word) Returns true if there is any string in the data structure 
- *   that matches word or false otherwise. word may contain dots '.' where dots can 
- *   be matched with any letter.
- * 
+ *
+ * Build a word dictionary that supports adding lowercase words and searching
+ * patterns. A dot in the search pattern matches exactly one lowercase letter,
+ * so the search may need to branch when the next character is unknown.
+ *
+ * Leetcode: https://leetcode.com/problems/design-add-and-search-words-data-structure/ (Medium)
+ * Rating:   acceptance 48.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Trie | Wildcard DFS | End-of-word matching
+ *
  * Example:
- * Input:
- * ["WordDictionary","addWord","addWord","addWord","search","search","search","search"]
- * [[],["bad"],["dad"],["mad"],["pad"],["bad"],[".ad"],["b.."]]
- * 
- * Output:
- * [null,null,null,null,false,true,true,true]
- * 
- * Explanation:
- * WordDictionary wordDictionary = new WordDictionary();
- * wordDictionary.addWord("bad");
- * wordDictionary.addWord("dad");
- * wordDictionary.addWord("mad");
- * wordDictionary.search("pad"); // return False (no match)
- * wordDictionary.search("bad"); // return True (exact match)
- * wordDictionary.search(".ad"); // return True (matches "bad", "dad", "mad")
- * wordDictionary.search("b.."); // return True (matches "bad")
- * 
- * The pattern ".ad" matches because '.' can represent any character, so it matches 
- * 'b' in "bad", 'd' in "dad", and 'm' in "mad".
- * 
- * Constraints:
- * - 1 <= word.length <= 25
- * - word in addWord consists of lowercase English letters.
- * - word in search consist of '.' or lowercase English letters.
- * - There will be at most 2 dots in word for search queries.
- * - At most 10^4 calls will be made to addWord and search.
- * 
- * LeetCode: https://leetcode.com/problems/design-add-and-search-words-data-structure/
- * 
- * Follow-up Questions:
- * 
- * 1. Q: How would you modify this to support prefix matching (e.g., "app*" matches "apple", "application")?
- *    A: Add a method that searches up to the wildcard position, then returns true if any valid 
- *    path exists from that node (i.e., check if the subtree is non-empty). This is simpler than 
- *    full wildcard matching since you only need to verify the prefix exists.
- *    Related: LeetCode 208 - Implement Trie (https://leetcode.com/problems/implement-trie-prefix-tree/)
- * 
- * 2. Q: What if wildcard '.' could match zero or more characters instead of exactly one?
- *    A: This becomes regex pattern matching with '.*' patterns. Use dynamic programming or 
- *    backtracking with memoization. For each '.*' sequence, try matching 0, 1, 2, ... characters 
- *    from the current position.
- *    Related: LeetCode 10 - Regular Expression Matching (https://leetcode.com/problems/regular-expression-matching/)
- * 
- * 3. Q: How would you handle case-insensitive search?
- *    A: Convert all input to lowercase during addWord and search operations. Alternatively, 
- *    expand the Trie nodes to have 52 children (26 lowercase + 26 uppercase) to preserve case 
- *    information while searching case-insensitively.
- * 
- * 4. Q: How would you optimize memory usage if you have millions of words?
- *    A: Use a HashMap instead of fixed-size array for children nodes to avoid allocating 26 slots 
- *    per node. Implement node compression (Patricia Trie) to merge chains of single-child nodes. 
- *    Use bit manipulation to store common prefixes more efficiently.
- * 
- * 5. Q: How would you modify this to return all matching words instead of just boolean?
- *    A: Store the complete word at each end node. During DFS search with wildcards, collect all 
- *    words where is_end is true. Return the collected list instead of a boolean.
- *    Related: LeetCode 212 - Word Search II (https://leetcode.com/problems/word-search-ii/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  addWord("bad"), addWord("dad"), addWord("mad"), search("pad"), search(".ad"), search("b..")
+ *   Output: null, null, null, false, true, true
+ *   Why:    "pad" has no p-edge from the root, ".ad" can branch to b/d/m, and "b.."
+ *           follows the b-edge while the dots fill the remaining two letters of "bad".
+ *
+ * Follow-ups:
+ *   1. Return every word that matches a dotted pattern?
+ *      Store the full word at terminal nodes and collect all successful DFS branches.
+ *   2. Let '.' match zero or more characters instead of exactly one?
+ *      Add memoized pattern matching over (trie node, pattern index), like regex matching.
+ *   3. Support delete(word) safely?
+ *      Unmark the terminal node, then prune unused child nodes while recursion unwinds.
+ *   4. Reduce memory for sparse alphabets?
+ *      Replace the fixed child array with a map or compress single-child paths.
+ *
+ * Related: Implement Trie (Prefix Tree) (208), Word Search II (212), Regular Expression Matching (10).
  */
 public class DesignAddAndSearchWordsDataStructure {
+
+    public static void main(String[] args) {
+        WordDictionary emptyDictionary = new WordDictionary();
+        System.out.printf("search(\"a\") on empty -> %s  expected=false%n", emptyDictionary.search("a"));
+
+        WordDictionary dictionary = new WordDictionary();
+        dictionary.addWord("bad");
+        System.out.printf("addWord(\"bad\") -> %s  expected=null%n", "null");
+        dictionary.addWord("dad");
+        System.out.printf("addWord(\"dad\") -> %s  expected=null%n", "null");
+        dictionary.addWord("mad");
+        System.out.printf("addWord(\"mad\") -> %s  expected=null%n", "null");
+
+        System.out.printf("search(\"pad\") -> %s  expected=false%n", dictionary.search("pad"));
+        System.out.printf("search(\"bad\") -> %s  expected=true%n", dictionary.search("bad"));
+        System.out.printf("search(\".ad\") -> %s  expected=true%n", dictionary.search(".ad"));
+        System.out.printf("search(\"b..\") -> %s  expected=true%n", dictionary.search("b.."));
+        System.out.printf("search(\"..\") -> %s  expected=false%n", dictionary.search(".."));
+    }
 
     /**
      * Approach 1: Trie with DFS and Recursion
@@ -122,17 +97,12 @@ public class DesignAddAndSearchWordsDataStructure {
         }
         
         /**
-         * Adds a word into the data structure.
-         * 
-         * Algorithm:
-         * 1. Start from root node
-         * 2. For each character, compute its index (0-25)
-         * 3. Create child node if it doesn't exist
-         * 4. Move to child node
-         * 5. Mark the last node as end of word
-         * 
-         * Time Complexity: O(L) where L is word length
-         * Space Complexity: O(L) in worst case when all characters are new
+         * Adds a lowercase word so later searches can match it exactly or through dots.
+         *
+         * Time:  O(L) - one trie edge is visited per character.
+         * Space: O(L) - a word with no shared prefix can add one node per character.
+         *
+         * @param word lowercase word to store
          */
         public void addWord(String word) {
             TrieNode current = root;
@@ -149,23 +119,19 @@ public class DesignAddAndSearchWordsDataStructure {
         }
         
         /**
-         * Returns if the word is in the data structure. A word could contain the dot 
-         * character '.' to represent any one letter.
-         * 
-         * Algorithm:
-         * 1. Start DFS from root with full word
-         * 2. For regular character: traverse to corresponding child
-         * 3. For '.': recursively try all 26 possible children
-         * 4. When word is fully processed, check if current node marks end of word
-         * 
-         * Time Complexity: O(26^k * L) where k is number of dots
-         * Space Complexity: O(L) for recursion stack
+         * Searches for a full-word match; each dot can stand for any one letter.
+         *
+         * Time:  O(26^D * L) - each of D dots may branch across child edges while fixed letters follow one path.
+         * Space: O(L) - recursive search keeps one frame per pattern character.
+         *
+         * @param word lowercase pattern that may contain dots
+         * @return true if an inserted word matches the entire pattern
          */
         public boolean search(String word) {
             return searchHelper(word, 0, root);
         }
         
-        // Helper method for recursive search with wildcard support
+        /** Recursively matches the remaining pattern from one trie node. */
         private boolean searchHelper(String word, int index, TrieNode node) {
             // Base case: reached end of word
             if (index == word.length()) {

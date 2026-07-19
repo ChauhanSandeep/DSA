@@ -7,53 +7,73 @@ import java.util.List;
 
 /**
  * Problem: Search Suggestions System
- * Leetcode: https://leetcode.com/problems/search-suggestions-system/
  *
- * Given a list of product strings and a search word, suggest at most 3 product names
- * after each character of the search word is typed. The suggested products must start
- * with the typed prefix and be in lexicographically increasing order.
+ * Given product names and a search word, return up to three lexicographically
+ * smallest products after each typed character. Every suggestion for a step must
+ * start with the prefix typed so far.
+ *
+ * Leetcode: https://leetcode.com/problems/search-suggestions-system/ (Medium)
+ * Rating:   1573 (zerotrac Elo)
+ * Pattern:  Trie | Autocomplete | Lexicographic DFS with result cap
  *
  * Example:
- * Input:
- *    products = ["mobile","mouse","moneypot","monitor","mousepad"]
- *    searchWord = "mouse"
- * Output:
- *    [
- *      ["mobile","moneypot","monitor"],
- *      ["mobile","moneypot","monitor"],
- *      ["mouse","mousepad"],
- *      ["mouse","mousepad"],
- *      ["mouse","mousepad"]
- *    ]
+ *   Input:  products = ["mobile", "mouse", "moneypot", "monitor", "mousepad"], searchWord = "mouse"
+ *   Output: [["mobile", "moneypot", "monitor"], ["mobile", "moneypot", "monitor"], ["mouse", "mousepad"], ["mouse", "mousepad"], ["mouse", "mousepad"]]
+ *   Why:    prefixes "m" and "mo" still match the three smallest mo-products, but "mou"
+ *           narrows the trie path to only "mouse" and "mousepad".
  *
- * Follow-up:
- * - How would you scale to millions of products?
- *  → Use Trie with indexing.
- * - What if prefix search must be case-insensitive?
- *  → Normalize input to lowercase.
- * LeetCode Contest Rating: 1573
+ * Follow-ups:
+ *   1. Serve millions of products with very low query latency?
+ *      Store the top three suggestions directly on each trie node during insertion.
+ *   2. Support case-insensitive search?
+ *      Normalize products and queries, while storing the original display string at terminal nodes.
+ *   3. Support products being added and removed continuously?
+ *      Keep per-node ordered sets or heaps and update them along each product's prefix path.
+ *   4. Rank suggestions by popularity before lexicographic order?
+ *      Store top-k candidates per prefix using a comparator over score, then name.
+ *
+ * Related: Implement Trie (Prefix Tree) (208), Design Search Autocomplete System (642).
  */
 public class SuggestedProducts {
 
   public static void main(String[] args) {
-    String[] products = {"mobile", "mouse", "moneypot", "monitor", "mousepad"};
-    String searchWord = "mouse";
+    SuggestedProducts solver = new SuggestedProducts();
 
-    List<List<String>> suggestions = new SuggestedProducts().getSuggestedProducts(products, searchWord);
-    System.out.println(suggestions);
+    String[][] productCases = {
+        {"mobile", "mouse", "moneypot", "monitor", "mousepad"},
+        {"havana"}
+    };
+    String[] searchWords = {"mouse", "tatiana"};
+    String[] expected = {
+        "[[mobile, moneypot, monitor], [mobile, moneypot, monitor], [mouse, mousepad], [mouse, mousepad], [mouse, mousepad]]",
+        "[[], [], [], [], [], [], []]"
+    };
+
+    for (int i = 0; i < productCases.length; i++) {
+      List<List<String>> got = solver.getSuggestedProducts(productCases[i].clone(), searchWords[i]);
+      System.out.printf("products=%s searchWord=%s -> %s  expected=%s%n",
+          Arrays.toString(productCases[i]), searchWords[i], got, expected[i]);
+    }
   }
 
   /**
-   * Builds a Trie and returns up to 3 suggestions for each prefix of searchWord.
+   * Intuition: each typed prefix corresponds to one trie node. If that path is
+   * missing, no product can start with the prefix; if it exists, every terminal
+   * word below that node is a valid suggestion. Sorting before insertion and DFS
+   * through child slots from 'a' to 'z' makes the first three results the smallest.
    *
-   * @param products Array of product names
-   * @param searchWord The search string typed by the user
-   * @return Suggestions for each prefix of searchWord
+   * Algorithm:
+   *   1. Sort products so trie DFS observes lexicographic product order.
+   *   2. Insert every product into the trie.
+   *   3. Grow the typed prefix one character at a time.
+   *   4. For each prefix, collect up to three words from the matching subtree.
    *
-   * 🔹 Time Complexity:
-   *     - Insert: O(N * L) for N words of length L
-   *     - DFS per prefix: O(3 * 26 * L) worst case (bounded by 3 results)
-   * 🔹 Space Complexity: O(N * L) for Trie
+   * Time:  O(P log P * L + P*L + S*L) - sorting compares products, insertion reads characters, and each prefix search is capped at three outputs.
+   * Space: O(P*L) - the trie stores product characters, sharing common prefixes.
+   *
+   * @param products product names made of lowercase English letters
+   * @param searchWord user query typed from left to right
+   * @return suggestions after each typed character
    */
   public List<List<String>> getSuggestedProducts(String[] products, String searchWord) {
     Trie trie = new Trie();
@@ -91,8 +111,9 @@ public class SuggestedProducts {
     }
 
     /**
-     * Inserts a word into the Trie.
-     * @param word The word to be inserted
+     * Inserts one product into the trie and marks its terminal node.
+     *
+     * @param word product name to insert
      */
     public void insert(String word) {
       Node current = root;
@@ -107,10 +128,10 @@ public class SuggestedProducts {
     }
 
     /**
-     * Returns up to 3 lexicographically smallest words starting with the given prefix.
+     * Returns up to three lexicographically smallest words starting with prefix.
      *
-     * @param prefix Prefix to search
-     * @return List of up to 3 matching words
+     * @param prefix prefix to complete
+     * @return list of matching words, capped at three
      */
     public List<String> getWordsStartingWith(String prefix) {
       Node current = root;
@@ -129,13 +150,7 @@ public class SuggestedProducts {
       return results;
     }
 
-    /**
-     * Performs DFS to find up to 3 words from the given node.
-     *
-     * @param node Current node in trie
-     * @param wordSoFar Prefix built so far
-     * @param result Accumulator for result list (max size = 3)
-     */
+    /** Collects at most three words below a prefix node in lexicographic order. */
     private void dfs(Node node, StringBuilder wordSoFar, List<String> result) {
         if (result.size() == 3) {
             return;
