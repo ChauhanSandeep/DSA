@@ -1,36 +1,54 @@
 package arrays.simulation;
 
 /**
- * Determines if a robot remains bounded in a circular path based on given movement instructions.
+ * Problem: Robot Bounded In Circle
  *
- * Approach:
- * - The robot starts at (0,0) facing North.
- * - It moves according to the instructions:
- *   - 'G': Move forward by one unit.
- *   - 'L': Turn left (90 degrees counterclockwise).
- *   - 'R': Turn right (90 degrees clockwise).
- * - If after one cycle, the robot either returns to the origin or does not face North, it is bounded.
- * - Runs in **O(N) time complexity**, where N is the length of instructions.
- * - Space complexity is **O(1)** as only a few variables are used.
+ * A robot starts at the origin facing north and repeatedly executes an instruction
+ * string made of G, L, and R. Decide whether repeating that instruction string
+ * forever keeps the robot within some circle instead of drifting away.
  *
- * LeetCode Problem: https://leetcode.com/problems/robot-bounded-in-circle/
- * LeetCode Contest Rating: 1521
+ * Leetcode: https://leetcode.com/problems/robot-bounded-in-circle/
+ * Rating:   1521 (zerotrac Elo, Q1, weekly-contest-136)
+ * Pattern:  Simulation | Geometry | One-cycle direction check
+ *
+ * Example:
+ *   Input:  "GGLLGG"
+ *   Output: true
+ *   Why:    after one cycle the robot is back at the origin, so repeating the
+ *           same cycle cannot move it farther away.
+ *
+ * Follow-ups:
+ *   1. What if instructions include variable step lengths?
+ *      Apply the same position and direction simulation with parsed distances.
+ *   2. What if the robot moves in 3D?
+ *      Track orientation as one of the possible 3D basis directions or rotations.
+ *   3. What if you need the smallest bounding radius?
+ *      Simulate enough cycles to close the path and track the maximum distance from origin.
  */
 public class BoundedRobot {
     public static void main(String[] args) {
-        String instructions = "GGLLGG";
-        System.out.println("Is robot bounded? " + isRobotBounded(instructions));
-        instructions = "GG";
-        System.out.println("Is robot bounded? " + isRobotBounded(instructions));
-        instructions = "GL";
-        System.out.println("Is robot bounded? " + isRobotBounded(instructions));
+        String[] inputs = {"GGLLGG", "GG", "GL"};
+        boolean[] expected = {true, false, true};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = isRobotBounded(inputs[i]);
+            System.out.printf("instructions=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
     /**
-     * Checks if the robot remains in a bounded circle after executing the given instructions.
+     * Intuition: if one instruction cycle ends at the origin, the path is clearly
+     * bounded because every cycle restarts from the same state. If it does not end
+     * at the origin but the robot faces a different direction, repeating the same
+     * instructions rotates the displacement; after at most four cycles those rotated
+     * displacements cancel out. The only unbounded case is ending away from the
+     * origin still facing north, because then every cycle adds the same displacement.
      *
-     * @param instructions The movement instructions for the robot.
-     * @return True if the robot is bounded; otherwise, false.
+     * Time:  O(n) - each instruction is interpreted once.
+     * Space: O(1) - only position and direction are stored.
+     *
+     * @param instructions movement instructions containing G, L, and R
+     * @return true if the repeated path is bounded, otherwise false
      */
     public static boolean isRobotBounded(String instructions) {
         int x = 0, y = 0; // Robot's position

@@ -1,69 +1,64 @@
 package arrays.kadane;
 
-/**
+
+
+import java.util.Arrays;/**
  * Problem: Maximum Score of Spliced Array
+ *
+ * You are given two equal-length arrays. You may choose one contiguous subarray
+ * from one array and splice it into the same positions of the other array. Return
+ * the best possible sum of either final array after at most one splice.
+ *
  * Leetcode: https://leetcode.com/problems/maximum-score-of-spliced-array/
- *
- * You are given two integer arrays nums1 and nums2 of equal length.
- * You may choose a subarray from either of the arrays and splice it into the other
- * to maximize the total sum of the destination array. The splicing can be done at any index,
- * and the subarray can be of any length (including zero).
- *
- * A splicing operation replaces a subarray from one array into the other (of the same indices).
+ * Rating:   1791 (zerotrac Elo, Q3, weekly-contest-299)
+ * Pattern:  Arrays | Kadane | Maximum gain over differences
  *
  * Example:
- * Input:
- *   nums1 = [60, 60, 60]
- *   nums2 = [10, 90, 10]
- * Output:
- *   210
+ *   Input:  nums1 = [60,60,60], nums2 = [10,90,10]
+ *   Output: 210
+ *   Why:    replacing the middle 60 in nums1 with 90 from nums2 adds a gain of 30,
+ *           turning nums1's sum from 180 into 210.
  *
- * Explanation:
- * - Splice subarray [90] from nums2 into nums1 at index 1: [60, 90, 60] → sum = 210
+ * Follow-ups:
+ *   1. What if you can splice multiple non-overlapping subarrays?
+ *      Use dynamic programming over the difference array with a transaction count.
+ *   2. What if you need the chosen splice indices?
+ *      Track Kadane's candidate start and best end while computing gain.
+ *   3. What if arrays are streamed and cannot be stored?
+ *      Maintain sums and Kadane gains online as paired values arrive.
  *
- * FAANG level Follow-ups:
- * Q: What if we can splice multiple subarrays?
- * A: Extend the algorithm to handle multiple splice operations.
- *
- * Q: How to find the indices of the spliced subarrays?
- * A: Track start and end indices during the maximum gain calculation.
- *
- * Q: Can we optimize for space complexity?
- * A: Use in-place modifications or single-pass algorithms to reduce space usage.
- *
- * Q: How does this relate to other array manipulation problems?
- * A: Similar to maximum sum subarray problems, but with splicing flexibility.
- * LeetCode Contest Rating: 1791
+ * Related: Maximum Subarray (53), Best Time to Buy and Sell Stock (121).
  */
 public class MaxScoreSplicedArray {
+    public static void main(String[] args) {
+        MaxScoreSplicedArray solver = new MaxScoreSplicedArray();
+        int[][] nums1Cases = {{60, 60, 60}, {20, 40, 20, 70, 30}};
+        int[][] nums2Cases = {{10, 90, 10}, {50, 20, 50, 40, 20}};
+        int[] expected = {210, 220};
 
-  public static void main(String[] args) {
-    MaxScoreSplicedArray obj = new MaxScoreSplicedArray();
-
-    int[] nums1 = {60, 60, 60};
-    int[] nums2 = {10, 90, 10};
-
-    System.out.println("Max Spliced Score: " + obj.maximumSplicedArray(nums1, nums2));
-  }
+        for (int i = 0; i < nums1Cases.length; i++) {
+            int got = solver.maximumSplicedArray(nums1Cases[i], nums2Cases[i]);
+            System.out.printf("nums1=%s nums2=%s -> %d  expected=%d%n",
+                Arrays.toString(nums1Cases[i]), Arrays.toString(nums2Cases[i]), got, expected[i]);
+        }
+    }
 
   /**
-   * Computes the maximum sum possible by splicing one subarray from either nums1 or nums2.
-   * Approach:
-   * 1. Calculate the total sum of both arrays.
-   * 2. For each array, compute the maximum gain by replacing a subarray from the other array.
-   * 3. Use Kadane's algorithm to find the maximum subarray gain:
-   *   - Gain at index i is defined as (source[i] - target[i]).
-   * 4. The final result is the maximum of:
-   *   - sum1 + maxGain1 (splicing nums2 into nums1)
-   *   - sum2 + maxGain2 (splicing nums1 into nums2)
-   *
-   * Time Complexity: O(N)
-   * Space Complexity: O(1)
-   *
-   * @param nums1 First input array
-   * @param nums2 Second input array
-   * @return Maximum possible sum after optimal splice
-   */
+     * Intuition: splicing nums2 into nums1 changes nums1 only by the differences
+     * nums2[i] - nums1[i] over the chosen subarray. So the best splice into nums1
+     * is the maximum subarray sum over that difference stream. The same reasoning
+     * applies in the other direction with nums1[i] - nums2[i]. We compute both base
+     * sums and both best gains; the answer is whichever destination array gets the
+     * larger final sum. A zero-length splice is allowed, so negative gains are reset
+     * to zero.
+     *
+     * Time:  O(n) - each paired index contributes to sums and gain scans a constant number of times.
+     * Space: O(1) - only running sums and Kadane state are stored.
+     *
+     * @param nums1 first array
+     * @param nums2 second array of the same length
+     * @return maximum possible array sum after at most one splice
+     */
   public int maximumSplicedArray(int[] nums1, int[] nums2) {
     int sum1 = arraySum(nums1);
     int sum2 = arraySum(nums2);

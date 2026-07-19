@@ -5,47 +5,69 @@ import java.util.PriorityQueue;
 
 
 /**
- * Problem Statement:
- * You are given the number of meeting rooms and a list of meetings with start and end times.
- * Each meeting must be assigned to a room, and if multiple rooms are available, assign the meeting
- * to the lowest-numbered room. If no room is available, the meeting waits for the earliest
- * finishing room. Return the room that hosted the most meetings.
+ * Problem: Meeting Rooms III
+ *
+ * Given n rooms numbered from 0 to n - 1 and a list of meeting start/end times,
+ * schedule every meeting in start-time order. Use the lowest-numbered available
+ * room; if all rooms are busy, delay the meeting until the earliest room opens.
+ * Return the room that hosted the most meetings, using the smallest room number
+ * to break ties.
+ *
+ * Leetcode: https://leetcode.com/problems/meeting-rooms-iii/
+ * Rating:   2093 (zerotrac Elo, Q4, weekly-contest-309)
+ * Pattern:  Intervals | Heap | Available-room and busy-room priority queues
  *
  * Example:
- * Input: n = 2, meetings = [[0,10],[1,5],[2,7],[3,4]]
- * Output: 0
- * Explanation: Room 0 hosted 2 meetings, Room 1 hosted 2, but room 0 handled them earlier.
+ *   Input:  n = 2, meetings = [[0,10],[1,5],[2,7],[3,4]]
+ *   Output: 0
+ *   Why:    both rooms host two meetings, and the tie goes to the smaller room id.
  *
- * Leetcode URL: https://leetcode.com/problems/meeting-rooms-iii
+ * Follow-ups:
+ *   1. What if meetings can be cancelled dynamically?
+ *      Use indexed heap entries or lazy deletion keyed by meeting id.
+ *   2. What if rooms have different costs?
+ *      Make the available-room heap order by cost first, then room number.
+ *   3. What if you need the full schedule, not just the room id?
+ *      Store each assigned interval per room while performing the same heap updates.
  *
- * Follow-up Questions:
- * 1. What if the meeting durations can be changed slightly (flexible start/end)? -> Use greedy + priority queue
- * 2. Can you optimize for minimal wait time instead of maximizing usage? -> Use heap and additional state tracking
- * 3. What if each room has different setup time or cost per meeting? -> Use cost-based priority queue
- * LeetCode Contest Rating: 2093
+ * Related: Meeting Rooms II (253), My Calendar I (729).
  */
 
 public class MeetingRoomsIII {
 
+    public static void main(String[] args) {
+        MeetingRoomsIII solver = new MeetingRoomsIII();
+        int[] roomCounts = {2, 3};
+        int[][][] meetings = {
+            {{0, 10}, {1, 5}, {2, 7}, {3, 4}},
+            {{1, 20}, {2, 10}, {3, 5}, {4, 9}, {6, 8}}
+        };
+        int[] expected = {0, 1};
+
+        for (int i = 0; i < meetings.length; i++) {
+            int[][] input = Arrays.stream(meetings[i]).map(int[]::clone).toArray(int[][]::new);
+            int got = solver.mostBooked(roomCounts[i], input);
+            System.out.printf("rooms=%d meetings=%s -> %d  expected=%d%n",
+                roomCounts[i], Arrays.deepToString(meetings[i]), got, expected[i]);
+        }
+    }
+
+
   /**
-   * Assigns meetings to rooms such that each meeting goes to the lowest-numbered available room.
-   * If all rooms are busy, the meeting waits for the room that becomes free the earliest.
-   *
-   * Steps:
-   * 1. Sort meetings by start time.
-   * 2. Use two priority queues:
-   *    - `availableRooms`: to manage free room numbers (min-heap).
-   *    - `busyRooms`: to manage rooms currently hosting a meeting with their end times (min-heap).
-   * 3. For each meeting:
-   *    - Free up rooms that have completed before the meeting starts.
-   *    - If an available room exists, assign it.
-   *    - Otherwise, wait for the earliest room to become free and schedule the meeting accordingly.
-   * 4. Track the number of meetings each room handles.
-   * 5. Return the room with the highest meeting count.
-   *
-   * Time Complexity: O(m log rooms) where m = number of meetings, rooms = number of rooms
-   * Space Complexity: O(rooms + m) for room queues and counters
-   */
+     * Intuition: two different choices must be made quickly for each meeting. When
+     * rooms are free, the smallest room number wins, so a min-heap of available
+     * room ids is perfect. When all rooms are busy, the meeting waits for the room
+     * with the earliest end time, with room number as a tie-breaker, so a second
+     * heap tracks busy rooms by release time. Sorting meetings by start time lets
+     * us release finished rooms before deciding where the next meeting goes.
+     *
+     * Time:  O(m log m + m log n) - meetings are sorted once, then each meeting does heap work over n rooms.
+     * Space: O(n) - the room heaps and count array store room-level state.
+     *
+     * @param rooms number of rooms, numbered from 0 to rooms - 1
+     * @param meetings meeting intervals [start, end]
+     * @return room id that hosted the most meetings
+     */
   public int mostBooked(int rooms, int[][] meetings) {
     // Sort meetings by start time
     Arrays.sort(meetings, (a, b) -> Integer.compare(a[0], b[0]));

@@ -1,62 +1,61 @@
 package arrays.indexhash;
 
-/**
- * Problem Statement:
- * Given an unsorted integer array nums, return the smallest positive integer that is not present in nums.
- * The algorithm must run in O(n) time and use O(1) auxiliary space.
+
+
+import java.util.Arrays;/**
+ * Problem: First Missing Positive
+ *
+ * Given an unsorted integer array, return the smallest positive integer that does
+ * not appear in the array. The solution must run in linear time and use only
+ * constant extra space, so the array itself has to serve as the bookkeeping.
+ *
+ * Leetcode: https://leetcode.com/problems/first-missing-positive/
+ * Rating:   acceptance 43.3% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | Index hashing | In-place sign marking
  *
  * Example:
- * Input: nums = [3,4,-1,1]
- * Output: 2
- * Explanation: The array contains 1, 3, 4, and -1. The positive integers present are 1, 3, 4.
- * The smallest missing positive is 2.
+ *   Input:  [3,4,-1,1]
+ *   Output: 2
+ *   Why:    1 is present, 2 is missing, and any values outside 1..n cannot be the
+ *           first missing positive before 2.
  *
- * LeetCode Link: https://leetcode.com/problems/first-missing-positive/
+ * Follow-ups:
+ *   1. What if the array is read-only?
+ *      Use a HashSet, or accept slower repeated scans if extra space is forbidden.
+ *   2. What if you need the kth missing positive?
+ *      Count missing positions after marking, then continue beyond n if needed.
+ *   3. What if zero is also considered a valid target?
+ *      Shift the tracked range and reserve one index to represent the boundary value.
  *
- * Follow-up Questions:
- * 1. What if we need to find the kth missing positive integer instead of the first?
- *    - We can modify the approach to count missing positives up to k, or use binary search on the count of present numbers up to a certain value.
- *      Relevant problem: https://leetcode.com/problems/kth-missing-positive-number/
- * 2. How would you handle this if the array contained duplicates?
- *    - The current approach already handles duplicates by ignoring them during placement or marking, as we only care about presence of each positive from 1 to n.
- * 3. What if the array is read-only and we cannot modify it?
- *    - We would need to use extra space like a set for tracking presence, but that violates O(1) space; alternatively, find a way to compute without modification, possibly with math, but it's challenging for O(n) time.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Missing Number (268), Kth Missing Positive Number (1539).
  */
 public class FirstMissingPositive {
-
     public static void main(String[] args) {
-        int[] arr = {3, 4, -1, 0, 1, 10};
-        int result = new FirstMissingPositive().firstMissingPositive(arr);
-        System.out.println("First missing positive number in array is " + result);
+        FirstMissingPositive solver = new FirstMissingPositive();
+        int[][] inputs = {{3, 4, -1, 1}, {1, 2, 0}, {7, 8, 9, 11, 12}};
+        int[] expected = {2, 3, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] copy = inputs[i].clone();
+            int got = solver.firstMissingPositive(copy);
+            System.out.printf("nums=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 
     /**
-     * Finds first missing positive using marking by negating array values.
+     * Intuition: the answer must be in the range 1..n+1 for an array of length n.
+     * Any number outside 1..n cannot help prove that one of those n positive slots
+     * exists. After confirming that 1 is present, we replace all irrelevant values
+     * with 1 so every remaining value is safe to use as an index marker. Then the
+     * sign at an index tells us whether the corresponding positive number appeared;
+     * the first positive sign left behind points to the missing value.
      *
-     * Algorithm:
-     * - Replace all invalid numbers (non-positive or > n) with INVALID_NUMBER
-     *   - Ensures we only care about numbers in [1, n]
-     *   - Invalid numbers won't interfere with marking phase
-     * - For each number in [1, n], negate value at corresponding index to mark presence
-     *   - For number x, mark index (x-1) by negating its value
-     *   - Use absolute value to handle already negated indices
-     *   - If number x exists, nums[x-1] will be negative
-     * - Scan for first positive value; its index +1 is the answer
-     *   - If nums[i] > 0, then number (i+1) is missing
-     *   - First positive value found is the answer
-     * Step 4: If all marked, return n+1
-     *         - All numbers [1, n] are present
-     *         - Answer must be n+1
+     * Time:  O(n) - the method uses a constant number of linear passes.
+     * Space: O(1) - the input array stores the presence marks in place.
      *
-     * Key insight: Array becomes hash table where index represents number and
-     * sign represents presence. Positive = missing, Negative = present.
-     *
-     * Time Complexity: O(N) where N is array length. Three passes: normalize, mark, scan.
-     * Space Complexity: O(1) using only constant extra space. Array modified in-place.
-     *
-     * @param nums array of integers (will be modified)
-     * @return smallest missing positive integer
+     * @param nums array to inspect and modify in place
+     * @return smallest positive integer missing from nums
      */
     public int firstMissingPositive(int[] nums) {
         int len = nums.length;

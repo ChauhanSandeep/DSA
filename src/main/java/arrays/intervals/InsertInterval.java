@@ -7,49 +7,65 @@ import java.util.List;
 
 
 /**
- * Problem Statement:
- * You are given an array of non-overlapping intervals sorted by their start times, and a new interval to insert.
- * Insert the new interval into the list such that the resulting list remains sorted and non-overlapping.
- * Merge intervals if necessary.
+ * Problem: Insert Interval
+ *
+ * Given sorted, non-overlapping intervals and one new interval, insert the new
+ * interval so the final list is still sorted and non-overlapping. Any intervals
+ * that touch or overlap the new interval must be merged into one interval.
+ *
+ * Leetcode: https://leetcode.com/problems/insert-interval/
+ * Rating:   acceptance 45.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | Intervals | Three-phase merge
  *
  * Example:
- * Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
- * Output: [[1,5],[6,9]]
- * Explanation: [2,5] overlaps with [1,3], so they merge into [1,5].
+ *   Input:  intervals = [[1,3],[6,9]], newInterval = [2,5]
+ *   Output: [[1,5],[6,9]]
+ *   Why:    [2,5] overlaps [1,3], so they combine into [1,5], while [6,9]
+ *           stays separate.
  *
- * Leetcode URL:
- * https://leetcode.com/problems/insert-interval
+ * Follow-ups:
+ *   1. What if the input intervals are unsorted?
+ *      Add the interval, sort by start time, then run the standard merge pass.
+ *   2. What if intervals are streamed in sorted order?
+ *      Emit intervals before the new one, merge overlaps, then stream the rest.
+ *   3. What if closed intervals that only touch should not merge?
+ *      Change the overlap condition from start <= end to start < end.
  *
- * Follow-up Questions:
- * 1. How would you handle this if the intervals were not sorted initially?
- *    → Sort the intervals by start time first, then use the same logic. Time complexity becomes O(n log n).
- *
- * 2. Can you do this in-place for large datasets?
- *    → Yes, if you’re allowed to modify the input list directly, use a single pass with an output index tracker.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Merge Intervals (56), Non-overlapping Intervals (435).
  */
 
 public class InsertInterval {
 
+    public static void main(String[] args) {
+        InsertInterval solver = new InsertInterval();
+        int[][][] intervals = {{{1, 3}, {6, 9}}, {{1, 2}, {3, 5}, {6, 7}, {8, 10}, {12, 16}}, {}};
+        int[][] newIntervals = {{2, 5}, {4, 8}, {5, 7}};
+        String[] expected = {"[[1, 5], [6, 9]]", "[[1, 2], [3, 10], [12, 16]]", "[[5, 7]]"};
+
+        for (int i = 0; i < intervals.length; i++) {
+            int[][] input = Arrays.stream(intervals[i]).map(int[]::clone).toArray(int[][]::new);
+            int[][] got = solver.insert(input, newIntervals[i]);
+            System.out.printf("intervals=%s new=%s -> %s  expected=%s%n",
+                Arrays.deepToString(intervals[i]), Arrays.toString(newIntervals[i]),
+                Arrays.deepToString(got), expected[i]);
+        }
+    }
+
+
     /**
-     * Inserts new interval into sorted non-overlapping intervals and merges if necessary.
+     * Intuition (interview default): because the existing intervals are already
+     * sorted and non-overlapping, every interval falls into exactly one of three
+     * groups: completely before the new interval, overlapping it, or completely
+     * after it. We can copy the before group unchanged, stretch the new interval
+     * across all overlaps, and then copy the after group unchanged. No sorting is
+     * needed because we never disturb the original order.
      *
-     * Algorithm:
-     * 1. Add all intervals that end before new interval starts (no overlap)
-     * 2. Merge all intervals that overlap with new interval
-     * 3. Add all intervals that start after merged interval ends (no overlap)
+     * Time:  O(n) - each existing interval is visited at most once.
+     * Space: O(n) - the returned array stores the merged interval list.
      *
-     * Key insight: Partition intervals into three groups based on their relationship
-     * with the new interval: those before, those overlapping, and those after. Process
-     * each group sequentially without needing to sort.
-     *
-     * Time Complexity: O(N) where N is number of intervals. Single pass through intervals.
-     *
-     * Space Complexity: O(N) for result list (excluding output array).
-     *
-     * @param intervals array of non-overlapping sorted intervals
-     * @param newInterval interval to insert [start, end]
-     * @return array of intervals after insertion with merges applied
+     * @param intervals sorted non-overlapping intervals
+     * @param newInterval interval to insert
+     * @return intervals after insertion and merging
      */
     public int[][] insert(int[][] intervals, int[] newInterval) {
         List<int[]> result = new ArrayList<>();

@@ -3,58 +3,58 @@ package arrays.kadane;
 import java.util.Arrays;
 
 /**
- * Problem: Maximum Subarray (Kadane’s Algorithm)
+ * Problem: Maximum Subarray
  *
- * Given an integer array `nums`, find the contiguous subarray (containing at
- * least one number)
- * which has the largest sum and return the subarray itself.
+ * Given an integer array, find a non-empty contiguous subarray with the largest
+ * possible sum and return that subarray. This version returns the elements of the
+ * best range, not just the sum.
  *
- * LeetCode Link:
- * https://leetcode.com/problems/maximum-subarray/
+ * Leetcode: https://leetcode.com/problems/maximum-subarray/
+ * Rating:   acceptance 53.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | Kadane | Reset negative prefix
  *
  * Example:
- * Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
- * Output: [4,-1,2,1]
- * Explanation: The contiguous subarray [4,-1,2,1] has the largest sum = 6.
+ *   Input:  [-2,1,-3,4,-1,2,1,-5,4]
+ *   Output: [4,-1,2,1]
+ *   Why:    that contiguous range has sum 6, and no other contiguous range has a
+ *           larger sum.
  *
- * Follow-up Questions:
- * - Can you return the maximum sum instead of the subarray? (Yes: Just return
- * `maxSum`)
- * - How do you solve this using Divide and Conquer? (See Leetcode Hard variant)
- * - What if you needed to return multiple max subarrays of equal sum?
- * (Requires additional logic to track all max subarrays)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. What if you only need the maximum sum?
+ *      Return maxSum directly and skip copying the subarray.
+ *   2. How would you solve it with divide and conquer?
+ *      Combine best prefix, suffix, total, and inner best for each segment.
+ *   3. What if multiple subarrays tie for max sum?
+ *      Track all ranges with the same best sum or define a tie-breaker.
+ *
+ * Related: Maximum Product Subarray (152), Maximum Score of Spliced Array (2321).
  */
 public class KadaneAlgo {
+    public static void main(String[] args) {
+        int[][] inputs = {{-2, 1, -3, 4, -1, 2, 1, -5, 4}, {-2, -3}, {5}};
+        String[] expected = {"[4, -1, 2, 1]", "[-2]", "[5]"};
 
-  public static void main(String[] args) {
-    int[] input = { -2 };
-    int[] maxSubarray = findMaxSubarray(new int[] { -2, -3 });
-
-    System.out.println("Maximum sum subarray: " + Arrays.toString(maxSubarray));
-  }
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = findMaxSubarray(inputs[i]);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), expected[i]);
+        }
+    }
 
   /**
-   * Kadane’s Algorithm to find the contiguous subarray with the maximum sum.
-   * Also returns the subarray itself.
-   *
-   * Steps:
-   * 1. Iterate over the array while maintaining:
-   * - currentSum: sum of current subarray being explored
-   * - maxSum: maximum sum encountered so far
-   * - startIndex, endIndex: track the best subarray
-   * 2. If currentSum < 0, reset it and move the temporary start forward.
-   * 3. If a new maxSum is found, update start and end pointers.
-   *
-   * Important conditions:
-   * - If all the numbers are negative, return the largest single element.
-   * 
-   * Time Complexity: O(n)
-   * Space Complexity: O(1) — no extra space except indices
-   *
-   * @param nums Input array
-   * @return Subarray with the maximum sum
-   */
+     * Intuition: a negative running sum hurts any future subarray more than it
+     * helps, so once the current sum drops below zero we should start fresh at the
+     * next index. While scanning, we remember the best sum seen so far and the range
+     * that produced it. This also handles all-negative arrays because the best value
+     * is updated before any negative running sum is reset. The temporary start marks
+     * where the current candidate range began.
+     *
+     * Time:  O(n) - each element is visited once, then the best range is copied once.
+     * Space: O(n) - the returned subarray copy can contain every input element.
+     *
+     * @param nums input array
+     * @return contiguous subarray with the maximum sum
+     */
   public static int[] findMaxSubarray(int[] nums) {
     if (nums == null || nums.length == 0) {
       return new int[0];

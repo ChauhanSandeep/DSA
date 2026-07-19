@@ -3,54 +3,65 @@ package arrays.intervals;
 import java.util.*;
 
 /**
- * Problem:
- * You are given a list of existing meeting schedules and a new meeting request.
- * Write a function to determine if the new meeting can be accommodated without overlapping.
+ * Problem: Meeting Schedule Insertion
+ *
+ * Given an existing list of meetings and one incoming meeting, decide whether the
+ * incoming meeting can be added without overlapping any existing meeting. Times
+ * are represented as HH:MM strings within one day, and touching endpoints are
+ * allowed, such as 11:00 after a meeting ending at 11:00.
+ *
+ * Pattern:  Intervals | Sorting | Gap check
  *
  * Example:
- * Existing: [10:00–11:00], [14:00–16:00], [23:00–23:30]
- * Incoming: [11:00–14:00] → Can be added ✔
- * Incoming: [10:30–11:30] → Overlaps ❌
+ *   Input:  existing = [[10:00,11:00],[14:00,16:00]], incoming = [11:00,14:00]
+ *   Output: true
+ *   Why:    the incoming meeting starts exactly when the first meeting ends and
+ *           ends exactly when the next meeting begins, so it fits in the gap.
  *
- * Time: O(N log N) due to sorting (can be reduced to O(N) if list is pre-sorted).
- * Space: O(1) additional.
- *
- * 🔗 Follow-up:
- * - Add a buffer time between meetings
- * - Handle multi-day meetings
- * - Support for recurring meetings
+ * Follow-ups:
+ *   1. What if every meeting needs a 10-minute buffer?
+ *      Expand each existing meeting by the buffer before checking gaps.
+ *   2. What if meetings can cross midnight?
+ *      Normalize into absolute minutes on a timeline that can exceed one day.
+ *   3. What if you receive many insertion requests?
+ *      Keep meetings sorted in a balanced tree and check only predecessor and successor.
  */
 public class MeetingSchedule {
+    public static void main(String[] args) {
+        String[][] schedule = {{"10:00", "11:00"}, {"14:00", "16:00"}, {"23:00", "23:30"}};
+        Meeting[] incomingMeetings = {new Meeting("11:00", "14:00"), new Meeting("10:30", "11:30")};
+        boolean[] expected = {true, false};
 
-  public static void main(String[] args) {
-    String[][] scheduleStr = {{"10:00", "11:00"}, {"14:00", "16:00"}, {"23:00", "23:30"}};
-
-    List<Meeting> meetings = new ArrayList<>();
-    for (String[] times : scheduleStr) {
-      meetings.add(new Meeting(times[0], times[1]));
+        for (int i = 0; i < incomingMeetings.length; i++) {
+            List<Meeting> meetings = new ArrayList<>();
+            for (String[] timeRange : schedule) {
+                meetings.add(new Meeting(timeRange[0], timeRange[1]));
+            }
+            String meetingsLabel = meetings.toString();
+            boolean got = MeetingScheduler.canAccommodate(meetings, incomingMeetings[i]);
+            System.out.printf("meetings=%s incoming=%s -> %s  expected=%s%n",
+                meetingsLabel, incomingMeetings[i], got, expected[i]);
+        }
     }
-
-    Meeting incoming = new Meeting("11:00", "14:00");
-    boolean canFit = MeetingScheduler.canAccommodate(meetings, incoming);
-
-    System.out.println("Can accommodate: " + canFit);
-    System.out.println("Updated Schedule: " + meetings);
-  }
 }
 
 class MeetingScheduler {
 
   /**
-   * Tries to accommodate a new meeting in an existing list of meetings.
-   *
-   * ✅ Steps:
-   * 1. Sort the existing meetings by start time
-   * 2. Try inserting in the gap between any two meetings or before/after all
-   *
-   * @param meetings List of existing meetings (can be unsorted)
-   * @param incoming The new meeting request
-   * @return true if it can be added without overlap
-   */
+     * Intuition: after meetings are sorted by start time, the incoming meeting can
+     * only fit in one of three places: before the first meeting, between two
+     * neighboring meetings, or after the last meeting. We do not need to compare it
+     * with every possible pair; checking each gap between consecutive meetings is
+     * enough because sorted order makes those the only open spaces. When a gap is
+     * found, inserting there preserves the sorted schedule.
+     *
+     * Time:  O(n log n) - sorting the meetings dominates the linear gap scan.
+     * Space: O(1) - aside from the in-place sort, only a few references are used.
+     *
+     * @param meetings existing meetings, possibly unsorted; modified when insertion succeeds
+     * @param incoming new meeting request
+     * @return true if incoming was inserted without overlap, otherwise false
+     */
   public static boolean canAccommodate(List<Meeting> meetings, Meeting incoming) {
     if (meetings.isEmpty()) {
       meetings.add(incoming);

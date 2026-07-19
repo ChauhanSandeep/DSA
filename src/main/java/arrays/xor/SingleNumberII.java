@@ -4,42 +4,46 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 137. Single Number II
+ * Problem: Single Number II
  *
- * Problem Statement:
- * Given an integer array nums where every element appears exactly three times
- * except for one element that appears exactly once. Find the single element
- * and return it. You must implement a solution with a linear runtime complexity
- * and use only constant extra space.
+ * Given an integer array where every value appears exactly three times except one
+ * value that appears once, return the single value. The intended solution should
+ * run in linear time and use constant extra space.
+ *
+ * Leetcode: https://leetcode.com/problems/single-number-ii/
+ * Rating:   acceptance 67.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Arrays | Bit manipulation | Bit counts modulo 3
  *
  * Example:
- * Input: nums = [2,2,3,2]
- * Output: 3
- * Explanation: Element 3 appears only once while 2 appears exactly three times.
+ *   Input:  [2,2,3,2]
+ *   Output: 3
+ *   Why:    the three copies of 2 contribute multiples of three to every bit
+ *           count, so only 3 leaves non-zero remainders.
  *
- * Input: nums = [0,1,0,1,0,1,99]
- * Output: 99
- * Explanation: Elements 0 and 1 appear exactly three times each, while 99 appears once.
+ * Follow-ups:
+ *   1. What if every other value appears k times?
+ *      Count each bit modulo k and rebuild the value from non-zero remainders.
+ *   2. What if two values appear once while others appear three times?
+ *      First identify distinguishing bits, then combine state tracking per group.
+ *   3. Can you do this with two bitmasks instead of 32 counters?
+ *      Track bits seen once and twice, clearing them when they are seen a third time.
  *
- * LeetCode Link: https://leetcode.com/problems/single-number-ii/
- *
- * Follow-up Questions:
- * 1. What if every element appears k times except one that appears once?
- *    Answer: Use bit counting approach with modulo k arithmetic for each bit position.
- * 2. What if there are two elements that appear once and others appear three times?
- *    Answer: Combine bit manipulation techniques from Single Number II and III approaches.
- * 3. How would you handle the case where elements appear different numbers of times?
- *    Answer: Use frequency counting with HashMap or extend bit manipulation for multiple patterns.
- * 4. What if we need to find all elements that don't follow the pattern?
- *    Answer: Use bit manipulation with multiple state tracking or frequency analysis.
- *
- * Related Problems:
- * - 136. Single Number: https://leetcode.com/problems/single-number/
- * - 260. Single Number III: https://leetcode.com/problems/single-number-iii/
- * - 645. Set Mismatch: https://leetcode.com/problems/set-mismatch/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Single Number (136), Single Number III (260).
  */
 public class SingleNumberII {
+
+    public static void main(String[] args) {
+        SingleNumberII solver = new SingleNumberII();
+        int[][] inputs = {{2, 2, 3, 2}, {0, 1, 0, 1, 0, 1, 99}, {-2, -2, 1, -2}};
+        int[] expected = {3, 99, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.singleNumber(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
 
     /**
      * Find single number using maths.
@@ -80,19 +84,18 @@ public class SingleNumberII {
     }
 
     /**
-     * Finds single number using bit manipulation with modular arithmetic.
+     * Intuition (interview default): look at one bit position at a time. Every
+     * number that appears three times contributes either zero set bits or three set
+     * bits at that position, so its contribution disappears modulo 3. If the final
+     * count at a bit position has remainder 1, the unique number must have that bit
+     * set. Repeating this for all 32 integer bits reconstructs the exact answer,
+     * including negative numbers because the sign bit is processed too.
      *
-     * Algorithm:
-     * 1. For each bit position, count how many numbers have that bit set
-     * 2. If count % 3 != 0, this means that in the result single number, this bit is set
-     * 3. Reconstruct the single number from these bits
-     * 4. Works because numbers appearing 3 times contribute 0 or 3 to each bit count
+     * Time:  O(n) - the 32 bit positions are constant, so all numbers are scanned a constant number of times.
+     * Space: O(1) - only counters and the reconstructed result are stored.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
-     *
-     * @param nums array where every element appears 3 times except one
-     * @return the element that appears exactly once
+     * @param nums array where every value appears three times except one
+     * @return value that appears exactly once
      */
     public int singleNumber(int[] nums) {
         int result = 0;
