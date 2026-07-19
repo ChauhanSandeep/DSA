@@ -271,6 +271,27 @@ def build_state(
     new_state_entries: list[dict] = []
     new_extras_entries: list[dict] = []
 
+    # ------------------------------------------------------------------
+    # Disambiguate duplicate class names (e.g. PalindromePairs exists in
+    # two packages). We key state.json by `task_id`, which equals the
+    # class name if unique, or "<ClassName>__<lastPkgSegment>" otherwise.
+    # The display fields (`task`, `problemName`) are unaffected.
+    # ------------------------------------------------------------------
+    seen_class_names: dict[str, int] = defaultdict(int)
+    for p in repo_problems:
+        if p.slug:
+            seen_class_names[p.task] += 1
+
+    def task_id_for(repo_problem: RepoProblem) -> str:
+        if seen_class_names[repo_problem.task] <= 1:
+            return repo_problem.task
+        # Terminal package segment as a suffix disambiguator.
+        rel = repo_problem.java_file
+        parts = rel.split("/")
+        # parts[-1] is the file, parts[-2] is the immediate directory.
+        pkg_hint = parts[-2] if len(parts) >= 2 else "dup"
+        return f"{repo_problem.task}__{pkg_hint}"
+
     for repo_problem in repo_problems:
         counts.scanned += 1
 
@@ -278,14 +299,16 @@ def build_state(
             counts.skipped_no_url += 1
             continue
 
+        task_id = task_id_for(repo_problem)
         nc_entry = neetcode_by_slug.get(repo_problem.slug)
-        preserved = existing_problems.get(repo_problem.task)
+        preserved = existing_problems.get(task_id)
 
         # Base metadata from repo + NC (or extras) join.
         if nc_entry:
             counts.matched_nc += 1
             base = {
-                "task": repo_problem.task,
+                "task": task_id,
+                "className": repo_problem.task,
                 "javaFile": repo_problem.java_file,
                 "leetcodeUrl": nc_entry["leetcodeUrl"],
                 "leetcodeNumber": nc_entry.get("leetcodeNumber"),
@@ -299,7 +322,8 @@ def build_state(
         else:
             counts.extras += 1
             base = {
-                "task": repo_problem.task,
+                "task": task_id,
+                "className": repo_problem.task,
                 "javaFile": repo_problem.java_file,
                 "leetcodeUrl": repo_problem.leetcode_url,
                 "leetcodeNumber": None,
@@ -311,7 +335,8 @@ def build_state(
                 "source": "extras",
             }
             extras_problems.append({
-                "task": repo_problem.task,
+                "task": task_id,
+                "className": repo_problem.task,
                 "javaFile": repo_problem.java_file,
                 "leetcodeUrl": repo_problem.leetcode_url,
                 "pattern": repo_problem.directory_pattern,
@@ -319,7 +344,6 @@ def build_state(
 
         if preserved:
             counts.preserved += 1
-            # Preserve SM-2 state, history, notes; refresh classification.
             entry = {
                 **base,
                 "sm2": preserved.get("sm2", _fresh_sm2(today)),
@@ -327,7 +351,6 @@ def build_state(
                 "userNotes": preserved.get("userNotes", ""),
                 "flags": preserved.get("flags", {"pinned": False, "skip": False}),
             }
-            # Ensure the shape is complete even for legacy state entries.
             entry["sm2"] = _ensure_sm2_shape(entry["sm2"], today)
         else:
             counts.added += 1
@@ -340,12 +363,12 @@ def build_state(
             }
             (new_state_entries if nc_entry else new_extras_entries).append(entry)
 
-        state_problems[repo_problem.task] = entry
+        state_problems[task_id] = entry
 
     # Detect removals (previously in state, no longer in repo).
-    for task in existing_problems:
-        if task not in state_problems:
-            counts.removed.append(task)
+    for task_id in existing_problems:
+        if task_id not in state_problems:
+            counts.removed.append(task_id)
 
     # Apply staggering to freshly added entries only.
     stagger_next_due(new_state_entries, NC_STAGGER_WEEKS, today)

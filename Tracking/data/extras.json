@@ -3,1752 +3,2044 @@
   "problems": [
     {
       "task": "AddStrings",
+      "className": "AddStrings",
       "javaFile": "src/main/java/strings/AddStrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/add-strings/",
       "pattern": "Strings"
     },
     {
       "task": "AllDivisionsWithTheHighestScoreOfABinaryArray",
+      "className": "AllDivisionsWithTheHighestScoreOfABinaryArray",
       "javaFile": "src/main/java/arrays/prefixsum/AllDivisionsWithTheHighestScoreOfABinaryArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-divisions-with-the-highest-score-of-a-binary-array/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "AllOne",
+      "className": "AllOne",
       "javaFile": "src/main/java/hashing/AllOne.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-oone-data-structure/",
       "pattern": "Uncategorized"
     },
     {
       "task": "AllPathsFromSourceToTarget",
+      "className": "AllPathsFromSourceToTarget",
       "javaFile": "src/main/java/graphs/AllPathsFromSourceToTarget.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-paths-from-source-to-target/",
       "pattern": "Graphs"
     },
     {
       "task": "AmountOfTimeForBinaryTreeToBeInfected",
+      "className": "AmountOfTimeForBinaryTreeToBeInfected",
       "javaFile": "src/main/java/trees/bfs/AmountOfTimeForBinaryTreeToBeInfected.java",
       "leetcodeUrl": "https://leetcode.com/problems/amount-of-time-for-binary-tree-to-be-infected/",
       "pattern": "Trees"
     },
     {
       "task": "AngleBetweenHandsOfAClock",
+      "className": "AngleBetweenHandsOfAClock",
       "javaFile": "src/main/java/maths/AngleBetweenHandsOfAClock.java",
       "leetcodeUrl": "https://leetcode.com/problems/angle-between-hands-of-a-clock/",
       "pattern": "Uncategorized"
     },
     {
       "task": "AppendCharactersToMakeSubsequence",
+      "className": "AppendCharactersToMakeSubsequence",
       "javaFile": "src/main/java/strings/patternmatching/AppendCharactersToMakeSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/append-characters-to-string-to-make-subsequence/",
       "pattern": "Strings"
     },
     {
       "task": "AtoI",
+      "className": "AtoI",
       "javaFile": "src/main/java/strings/AtoI.java",
       "leetcodeUrl": "https://leetcode.com/problems/string-to-integer-atoi/",
       "pattern": "Strings"
     },
     {
       "task": "AutocompleteSystem",
+      "className": "AutocompleteSystem",
       "javaFile": "src/main/java/design/AutocompleteSystem.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-search-autocomplete-system/",
       "pattern": "Design"
     },
     {
       "task": "BasicCalculator",
+      "className": "BasicCalculator",
       "javaFile": "src/main/java/stacksandqueues/calculator/BasicCalculator.java",
       "leetcodeUrl": "https://leetcode.com/problems/basic-calculator/",
       "pattern": "Stack"
     },
     {
       "task": "BasicCalculator2",
+      "className": "BasicCalculator2",
       "javaFile": "src/main/java/stacksandqueues/calculator/BasicCalculator2.java",
       "leetcodeUrl": "https://leetcode.com/problems/basic-calculator-ii/",
       "pattern": "Stack"
     },
     {
       "task": "BasicCalculator3",
+      "className": "BasicCalculator3",
       "javaFile": "src/main/java/stacksandqueues/calculator/BasicCalculator3.java",
       "leetcodeUrl": "https://leetcode.com/problems/basic-calculator-iii/",
       "pattern": "Stack"
     },
     {
       "task": "BattleshipsInABoard",
+      "className": "BattleshipsInABoard",
       "javaFile": "src/main/java/graphs/BattleshipsInABoard.java",
       "leetcodeUrl": "https://leetcode.com/problems/battleships-in-a-board/",
       "pattern": "Graphs"
     },
     {
       "task": "BestTimeToBuyAndSellStockIV",
+      "className": "BestTimeToBuyAndSellStockIV",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BestTimeToBuyAndSellStockIV.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "BestTimeToBuyAndSellStockWithTransactionFee",
+      "className": "BestTimeToBuyAndSellStockWithTransactionFee",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BestTimeToBuyAndSellStockWithTransactionFee.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "BiggestCakePiece",
+      "className": "BiggestCakePiece",
       "javaFile": "src/main/java/arrays/BiggestCakePiece.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-area-of-a-piece-of-cake-after-horizontal-and-vertical-cuts/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "BinaryTreeCameras",
+      "className": "BinaryTreeCameras",
       "javaFile": "src/main/java/trees/dfs/BinaryTreeCameras.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-cameras/",
       "pattern": "Trees"
     },
     {
       "task": "BinaryTreePaths",
+      "className": "BinaryTreePaths",
       "javaFile": "src/main/java/trees/dfs/BinaryTreePaths.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-paths/",
       "pattern": "Trees"
     },
     {
       "task": "BinaryTreeUpsideDown",
+      "className": "BinaryTreeUpsideDown",
       "javaFile": "src/main/java/codingassessment/sidewaystree/BinaryTreeUpsideDown.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-upside-down/",
       "pattern": "Uncategorized"
     },
     {
       "task": "BrokenCalculator",
+      "className": "BrokenCalculator",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/BrokenCalculator.java",
       "leetcodeUrl": "https://leetcode.com/problems/broken-calculator/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "BuySellStock3",
+      "className": "BuySellStock3",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BuySellStock3.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CallCounter",
+      "className": "CallCounter",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CallCounter.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-recent-calls/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "ChampagneTower",
+      "className": "ChampagneTower",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/ChampagneTower.java",
       "leetcodeUrl": "https://leetcode.com/problems/champagne-tower/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CheckIfAllAsAppearsBeforeAllBs",
+      "className": "CheckIfAllAsAppearsBeforeAllBs",
       "javaFile": "src/main/java/strings/CheckIfAllAsAppearsBeforeAllBs.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-all-as-appears-before-all-bs/",
       "pattern": "Strings"
     },
     {
       "task": "CheckIfEveryRowAndColumnContainsAllNumbers",
+      "className": "CheckIfEveryRowAndColumnContainsAllNumbers",
       "javaFile": "src/main/java/arrays/CheckIfEveryRowAndColumnContainsAllNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CheckIfMatrixIsXMatrix",
+      "className": "CheckIfMatrixIsXMatrix",
       "javaFile": "src/main/java/arrays/matrix/CheckIfMatrixIsXMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-matrix-is-x-matrix/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CoinChange2",
+      "className": "CoinChange2",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CoinChange2.java",
       "leetcodeUrl": "https://leetcode.com/problems/coin-change-2/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CombinationSumIII",
+      "className": "CombinationSumIII",
       "javaFile": "src/main/java/backtrack/CombinationSumIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/combination-sum-iii/",
       "pattern": "Backtracking"
     },
     {
       "task": "ConnectingCitiesWithMinimumCost",
+      "className": "ConnectingCitiesWithMinimumCost",
       "javaFile": "src/main/java/graphs/mst/ConnectingCitiesWithMinimumCost.java",
       "leetcodeUrl": "https://leetcode.com/problems/connecting-cities-with-minimum-cost/",
       "pattern": "Graphs"
     },
     {
       "task": "ConnectingCitiesWithMinimumCost_Prim",
+      "className": "ConnectingCitiesWithMinimumCost_Prim",
       "javaFile": "src/main/java/graphs/mst/ConnectingCitiesWithMinimumCost_Prim.java",
       "leetcodeUrl": "https://leetcode.com/problems/connecting-cities-with-minimum-cost/",
       "pattern": "Graphs"
     },
     {
       "task": "ConsecutiveNumbersSum",
+      "className": "ConsecutiveNumbersSum",
       "javaFile": "src/main/java/maths/ConsecutiveNumbersSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/consecutive-numbers-sum/",
       "pattern": "Uncategorized"
     },
     {
       "task": "ConstructBinaryTreeFromPreorderAndPostorderTraversal",
+      "className": "ConstructBinaryTreeFromPreorderAndPostorderTraversal",
       "javaFile": "src/main/java/trees/traversal/ConstructBinaryTreeFromPreorderAndPostorderTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/",
       "pattern": "Trees"
     },
     {
       "task": "ConstructTargetArrayWithMultipleSums",
+      "className": "ConstructTargetArrayWithMultipleSums",
       "javaFile": "src/main/java/greedy/ConstructTargetArrayWithMultipleSums.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-target-array-with-multiple-sums/",
       "pattern": "Greedy"
     },
     {
       "task": "ContainVirus",
+      "className": "ContainVirus",
       "javaFile": "src/main/java/graphs/ContainVirus.java",
       "leetcodeUrl": "https://leetcode.com/problems/contain-virus/",
       "pattern": "Graphs"
     },
     {
       "task": "ConvertBinaryNumberInALinkedListToInteger",
+      "className": "ConvertBinaryNumberInALinkedListToInteger",
       "javaFile": "src/main/java/linkedlist/ConvertBinaryNumberInALinkedListToInteger.java",
       "leetcodeUrl": "https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/",
       "pattern": "Linked List"
     },
     {
       "task": "ConvexHull",
+      "className": "ConvexHull",
       "javaFile": "src/main/java/maths/ConvexHull.java",
       "leetcodeUrl": "https://leetcode.com/problems/erect-the-fence/",
       "pattern": "Uncategorized"
     },
     {
       "task": "CountAndSay",
+      "className": "CountAndSay",
       "javaFile": "src/main/java/strings/CountAndSay.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-and-say/",
       "pattern": "Strings"
     },
     {
       "task": "CountDifferentPalindromicSubsequences",
+      "className": "CountDifferentPalindromicSubsequences",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountDifferentPalindromicSubsequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-different-palindromic-subsequences/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CountElementsWithStrictlySmallerAndGreaterElements",
+      "className": "CountElementsWithStrictlySmallerAndGreaterElements",
       "javaFile": "src/main/java/arrays/CountElementsWithStrictlySmallerAndGreaterElements.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-elements-with-strictly-smaller-and-greater-elements/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CountIntegersWithEvenDigitSum",
+      "className": "CountIntegersWithEvenDigitSum",
       "javaFile": "src/main/java/arrays/CountIntegersWithEvenDigitSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-integers-with-even-digit-sum/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CountMatricesWithAllOnes",
+      "className": "CountMatricesWithAllOnes",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountMatricesWithAllOnes.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-submatrices-with-all-ones/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CountNumberOfWaysToPlaceHouses",
+      "className": "CountNumberOfWaysToPlaceHouses",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountNumberOfWaysToPlaceHouses.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-number-of-ways-to-place-houses/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CountOfSmallerNumbersAfterSelf",
+      "className": "CountOfSmallerNumbersAfterSelf",
       "javaFile": "src/main/java/arrays/mergesort/CountOfSmallerNumbersAfterSelf.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CountPrimes",
+      "className": "CountPrimes",
       "javaFile": "src/main/java/maths/CountPrimes.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-primes/",
       "pattern": "Uncategorized"
     },
     {
       "task": "CountTheHiddenSequences",
+      "className": "CountTheHiddenSequences",
       "javaFile": "src/main/java/arrays/prefixsum/CountTheHiddenSequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-the-hidden-sequences/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CountUniqueCharactersOfAllSubstrings",
+      "className": "CountUniqueCharactersOfAllSubstrings",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountUniqueCharactersOfAllSubstrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CountWordsAfterAddingLetter",
+      "className": "CountWordsAfterAddingLetter",
       "javaFile": "src/main/java/bitwiseoperation/CountWordsAfterAddingLetter.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-words-obtained-after-adding-a-letter/",
       "pattern": "Bit Manipulation"
     },
     {
       "task": "CourseScheduleIII",
+      "className": "CourseScheduleIII",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/CourseScheduleIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/course-schedule-iii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CreateExpression",
+      "className": "CreateExpression",
       "javaFile": "src/main/java/arrays/binarysearch/CreateExpression.java",
       "leetcodeUrl": "https://leetcode.com/problems/summary-ranges/",
       "pattern": "Binary Search"
     },
     {
       "task": "CreateMaximumNumber",
+      "className": "CreateMaximumNumber",
       "javaFile": "src/main/java/greedy/CreateMaximumNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/create-maximum-number/",
       "pattern": "Greedy"
     },
     {
       "task": "CriticalConnectionsInANetwork",
+      "className": "CriticalConnectionsInANetwork",
       "javaFile": "src/main/java/graphs/CriticalConnectionsInANetwork.java",
       "leetcodeUrl": "https://leetcode.com/problems/critical-connections-in-a-network/",
       "pattern": "Graphs"
     },
     {
       "task": "CustomSortString",
+      "className": "CustomSortString",
       "javaFile": "src/main/java/strings/sorting/CustomSortString.java",
       "leetcodeUrl": "https://leetcode.com/problems/custom-sort-string/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "CutOffTreesForGolfEvent",
+      "className": "CutOffTreesForGolfEvent",
       "javaFile": "src/main/java/graphs/CutOffTreesForGolfEvent.java",
       "leetcodeUrl": "https://leetcode.com/problems/cut-off-trees-for-golf-event/",
       "pattern": "Graphs"
     },
     {
       "task": "DeleteNodeInALinkedList",
+      "className": "DeleteNodeInALinkedList",
       "javaFile": "src/main/java/linkedlist/DeleteNodeInALinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/delete-node-in-a-linked-list/",
       "pattern": "Linked List"
     },
     {
       "task": "DeleteOperationForTwoStrings",
+      "className": "DeleteOperationForTwoStrings",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/DeleteOperationForTwoStrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/delete-operation-for-two-strings/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "DeleteRepeatingLetter",
+      "className": "DeleteRepeatingLetter",
       "javaFile": "src/main/java/arrays/DeleteRepeatingLetter.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-deletion-cost-to-avoid-repeating-letters/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "DestroyingAsteroids",
+      "className": "DestroyingAsteroids",
       "javaFile": "src/main/java/greedy/DestroyingAsteroids.java",
       "leetcodeUrl": "https://leetcode.com/problems/destroying-asteroids/",
       "pattern": "Greedy"
     },
     {
       "task": "DivideAStringIntoGroupsOfSizeK",
+      "className": "DivideAStringIntoGroupsOfSizeK",
       "javaFile": "src/main/java/strings/DivideAStringIntoGroupsOfSizeK.java",
       "leetcodeUrl": "https://leetcode.com/problems/divide-a-string-into-groups-of-size-k/",
       "pattern": "Strings"
     },
     {
       "task": "Division",
+      "className": "Division",
       "javaFile": "src/main/java/maths/Division.java",
       "leetcodeUrl": "https://leetcode.com/problems/fraction-to-recurring-decimal/",
       "pattern": "Uncategorized"
     },
     {
       "task": "DominoAndTrominoTiling",
+      "className": "DominoAndTrominoTiling",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/DominoAndTrominoTiling.java",
       "leetcodeUrl": "https://leetcode.com/problems/domino-and-tromino-tiling/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "DungeonGame",
+      "className": "DungeonGame",
       "javaFile": "src/main/java/dynamicprogramming/gridpath/DungeonGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/dungeon-game/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "DuplicateFile",
+      "className": "DuplicateFile",
       "javaFile": "src/main/java/hashing/DuplicateFile.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-duplicate-file-in-system/",
       "pattern": "Uncategorized"
     },
     {
       "task": "DuplicateZeros",
+      "className": "DuplicateZeros",
       "javaFile": "src/main/java/arrays/slidingwindow/DuplicateZeros.java",
       "leetcodeUrl": "https://leetcode.com/problems/duplicate-zeros/",
       "pattern": "Sliding Window"
     },
     {
       "task": "EggDropProblem",
+      "className": "EggDropProblem",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/EggDropProblem.java",
       "leetcodeUrl": "https://leetcode.com/problems/super-egg-drop/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "EncodeAndDecodeTinyurl",
+      "className": "EncodeAndDecodeTinyurl",
       "javaFile": "src/main/java/design/EncodeAndDecodeTinyurl.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-tinyurl/",
       "pattern": "Design"
     },
     {
       "task": "EvaluateTrue",
+      "className": "EvaluateTrue",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/EvaluateTrue.java",
       "leetcodeUrl": "https://leetcode.com/problems/parsing-a-boolean-expression/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "ExclusiveTimeOfFunctions",
+      "className": "ExclusiveTimeOfFunctions",
       "javaFile": "src/main/java/stacksandqueues/ExclusiveTimeOfFunctions.java",
       "leetcodeUrl": "https://leetcode.com/problems/exclusive-time-of-functions/",
       "pattern": "Stack"
     },
     {
       "task": "FactorsCombination",
+      "className": "FactorsCombination",
       "javaFile": "src/main/java/Recursion/FactorsCombination.java",
       "leetcodeUrl": "https://leetcode.com/problems/factor-combinations/",
       "pattern": "Recursion"
     },
     {
       "task": "FairCandySwap",
+      "className": "FairCandySwap",
       "javaFile": "src/main/java/arrays/FairCandySwap.java",
       "leetcodeUrl": "https://leetcode.com/problems/fair-candy-swap/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "FenwickTreeRangeSumQuery",
+      "className": "FenwickTreeRangeSumQuery",
       "javaFile": "src/main/java/trees/segmenttree/FenwickTreeRangeSumQuery.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-mutable/",
       "pattern": "Advanced Graphs"
     },
     {
       "task": "FibonacciNumber",
+      "className": "FibonacciNumber",
       "javaFile": "src/main/java/dynamicprogramming/basics/FibonacciNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/fibonacci-number/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "FileSystem",
+      "className": "FileSystem",
       "javaFile": "src/main/java/design/FileSystem.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-in-memory-file-system/",
       "pattern": "Design"
     },
     {
       "task": "FindAllDuplicatesInAnArray",
+      "className": "FindAllDuplicatesInAnArray",
       "javaFile": "src/main/java/arrays/slidingwindow/FindAllDuplicatesInAnArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-duplicates-in-an-array/",
       "pattern": "Sliding Window"
     },
     {
       "task": "FindAllLonelyNumbersInTheArray",
+      "className": "FindAllLonelyNumbersInTheArray",
       "javaFile": "src/main/java/arrays/slidingwindow/FindAllLonelyNumbersInTheArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-lonely-numbers-in-the-array/",
       "pattern": "Sliding Window"
     },
     {
       "task": "FindAllPossibleRecipes",
+      "className": "FindAllPossibleRecipes",
       "javaFile": "src/main/java/graphs/topologicalsort/FindAllPossibleRecipes.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/",
       "pattern": "Graphs"
     },
     {
       "task": "FindCenterOfStarGraph",
+      "className": "FindCenterOfStarGraph",
       "javaFile": "src/main/java/graphs/FindCenterOfStarGraph.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-center-of-star-graph/",
       "pattern": "Graphs"
     },
     {
       "task": "FindOriginalArrayFromDoubledArray",
+      "className": "FindOriginalArrayFromDoubledArray",
       "javaFile": "src/main/java/arrays/hashmap/FindOriginalArrayFromDoubledArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-original-array-from-doubled-array/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "FindPeakElementII",
+      "className": "FindPeakElementII",
       "javaFile": "src/main/java/arrays/binarysearch/FindPeakElementII.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-a-peak-element-ii/",
       "pattern": "Binary Search"
     },
     {
       "task": "FindReplaceInString",
+      "className": "FindReplaceInString",
       "javaFile": "src/main/java/strings/FindReplaceInString.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-and-replace-in-string/",
       "pattern": "Strings"
     },
     {
       "task": "FindTheClosestPalindrome",
+      "className": "FindTheClosestPalindrome",
       "javaFile": "src/main/java/strings/FindTheClosestPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-closest-palindrome/",
       "pattern": "Strings"
     },
     {
       "task": "FindTheMostCompetitiveSubsequence",
+      "className": "FindTheMostCompetitiveSubsequence",
       "javaFile": "src/main/java/stacksandqueues/monotonicstack/FindTheMostCompetitiveSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-most-competitive-subsequence/",
       "pattern": "Stack"
     },
     {
       "task": "FirstNonRepeating",
+      "className": "FirstNonRepeating",
       "javaFile": "src/main/java/stacksandqueues/FirstNonRepeating.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-unique-character-in-a-string/",
       "pattern": "Stack"
     },
     {
       "task": "FirstUniqueChar",
+      "className": "FirstUniqueChar",
       "javaFile": "src/main/java/dailybytes/array/FirstUniqueChar.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-unique-character-in-a-string/",
       "pattern": "Uncategorized"
     },
     {
       "task": "FirstUniqueNumber",
+      "className": "FirstUniqueNumber",
       "javaFile": "src/main/java/design/FirstUniqueNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-unique-number/",
       "pattern": "Design"
     },
     {
       "task": "FlattenNestedListIterator",
+      "className": "FlattenNestedListIterator",
       "javaFile": "src/main/java/linkedlist/FlattenNestedListIterator.java",
       "leetcodeUrl": "https://leetcode.com/problems/flatten-nested-list-iterator/",
       "pattern": "Linked List"
     },
     {
       "task": "FlattenTree",
+      "className": "FlattenTree",
       "javaFile": "src/main/java/trees/traversal/FlattenTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/",
       "pattern": "Trees"
     },
     {
       "task": "FloodFill",
+      "className": "FloodFill",
       "javaFile": "src/main/java/graphs/FloodFill.java",
       "leetcodeUrl": "https://leetcode.com/problems/flood-fill/",
       "pattern": "Graphs"
     },
     {
       "task": "FrogJump",
+      "className": "FrogJump",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/FrogJump.java",
       "leetcodeUrl": "https://leetcode.com/problems/frog-jump/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "FurthestBuildingYouCanReach",
+      "className": "FurthestBuildingYouCanReach",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/FurthestBuildingYouCanReach.java",
       "leetcodeUrl": "https://leetcode.com/problems/furthest-building-you-can-reach/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "GameOfLife",
+      "className": "GameOfLife",
       "javaFile": "src/main/java/arrays/simulation/GameOfLife.java",
       "leetcodeUrl": "https://leetcode.com/problems/game-of-life/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "Graph",
+      "className": "Graph",
       "javaFile": "src/main/java/graphs/floydwarshall/Graph.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-graph-with-shortest-path-calculator/",
       "pattern": "Graphs"
     },
     {
       "task": "GrayCode",
+      "className": "GrayCode",
       "javaFile": "src/main/java/backtrack/GrayCode.java",
       "leetcodeUrl": "https://leetcode.com/problems/gray-code/",
       "pattern": "Backtracking"
     },
     {
       "task": "GrumpyBookstoreOwner",
+      "className": "GrumpyBookstoreOwner",
       "javaFile": "src/main/java/graphs/GrumpyBookstoreOwner.java",
       "leetcodeUrl": "https://leetcode.com/problems/grumpy-bookstore-owner/",
       "pattern": "Graphs"
     },
     {
       "task": "GuessingGame2",
+      "className": "GuessingGame2",
       "javaFile": "src/main/java/arrays/binarysearch/GuessingGame2.java",
       "leetcodeUrl": "https://leetcode.com/problems/guess-number-higher-or-lower-ii/",
       "pattern": "Binary Search"
     },
     {
       "task": "HeightChecker",
+      "className": "HeightChecker",
       "javaFile": "src/main/java/arrays/HeightChecker.java",
       "leetcodeUrl": "https://leetcode.com/problems/height-checker/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "HighestRatedItem",
+      "className": "HighestRatedItem",
       "javaFile": "src/main/java/graphs/HighestRatedItem.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-highest-ranked-items-within-a-price-range/",
       "pattern": "Graphs"
     },
     {
       "task": "IncreasingNDigitNumbers",
+      "className": "IncreasingNDigitNumbers",
       "javaFile": "src/main/java/backtrack/IncreasingNDigitNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/sequential-digits/",
       "pattern": "Backtracking"
     },
     {
       "task": "InsertDeleteGetrandomO1DuplicatesAllowed",
+      "className": "InsertDeleteGetrandomO1DuplicatesAllowed",
       "javaFile": "src/main/java/design/InsertDeleteGetrandomO1DuplicatesAllowed.java",
       "leetcodeUrl": "https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed/",
       "pattern": "Design"
     },
     {
       "task": "InsertSortedCircularLinkedList",
+      "className": "InsertSortedCircularLinkedList",
       "javaFile": "src/main/java/linkedlist/InsertSortedCircularLinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/",
       "pattern": "Linked List"
     },
     {
       "task": "IntegerDivisionWithoutOperators",
+      "className": "IntegerDivisionWithoutOperators",
       "javaFile": "src/main/java/maths/IntegerDivisionWithoutOperators.java",
       "leetcodeUrl": "https://leetcode.com/problems/divide-two-integers/",
       "pattern": "Uncategorized"
     },
     {
       "task": "IntegerToEnglishWords",
+      "className": "IntegerToEnglishWords",
       "javaFile": "src/main/java/strings/hashmap/IntegerToEnglishWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/integer-to-english-words/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "InvalidTransactions",
+      "className": "InvalidTransactions",
       "javaFile": "src/main/java/hashing/InvalidTransactions.java",
       "leetcodeUrl": "https://leetcode.com/problems/invalid-transactions/",
       "pattern": "Uncategorized"
     },
     {
       "task": "KDiffPairsInAnArray",
+      "className": "KDiffPairsInAnArray",
       "javaFile": "src/main/java/hashing/KDiffPairsInAnArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-diff-pairs-in-an-array/",
       "pattern": "Uncategorized"
     },
     {
       "task": "KDistance",
+      "className": "KDistance",
       "javaFile": "src/main/java/trees/dfs/KDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/",
       "pattern": "Trees"
     },
     {
       "task": "KeysAndRooms",
+      "className": "KeysAndRooms",
       "javaFile": "src/main/java/graphs/KeysAndRooms.java",
       "leetcodeUrl": "https://leetcode.com/problems/keys-and-rooms/",
       "pattern": "Graphs"
     },
     {
       "task": "KnightDialer",
+      "className": "KnightDialer",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/KnightDialer.java",
       "leetcodeUrl": "https://leetcode.com/problems/knight-dialer/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "KthFactorOfNumber",
+      "className": "KthFactorOfNumber",
       "javaFile": "src/main/java/maths/KthFactorOfNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/the-kth-factor-of-n/",
       "pattern": "Uncategorized"
     },
     {
       "task": "KthMissingPositiveNumber",
+      "className": "KthMissingPositiveNumber",
       "javaFile": "src/main/java/arrays/binarysearch/KthMissingPositiveNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-missing-positive-number/",
       "pattern": "Binary Search"
     },
     {
       "task": "KthPermutation",
+      "className": "KthPermutation",
       "javaFile": "src/main/java/backtrack/KthPermutation.java",
       "leetcodeUrl": "https://leetcode.com/problems/permutation-sequence/",
       "pattern": "Backtracking"
     },
     {
       "task": "KthSmallestInSortedMatrix",
+      "className": "KthSmallestInSortedMatrix",
       "javaFile": "src/main/java/heaps/KthSmallestInSortedMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/",
       "pattern": "Uncategorized"
     },
     {
       "task": "KthSmallestPrimeFraction",
+      "className": "KthSmallestPrimeFraction",
       "javaFile": "src/main/java/heaps/KthSmallestPrimeFraction.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-th-smallest-prime-fraction/",
       "pattern": "Uncategorized"
     },
     {
       "task": "LeastUniqueNumbers",
+      "className": "LeastUniqueNumbers",
       "javaFile": "src/main/java/arrays/heap/LeastUniqueNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "LicenseKeyFormatting",
+      "className": "LicenseKeyFormatting",
       "javaFile": "src/main/java/strings/LicenseKeyFormatting.java",
       "leetcodeUrl": "https://leetcode.com/problems/license-key-formatting/",
       "pattern": "Strings"
     },
     {
       "task": "LinkedListCycleII",
+      "className": "LinkedListCycleII",
       "javaFile": "src/main/java/linkedlist/LinkedListCycleII.java",
       "leetcodeUrl": "https://leetcode.com/problems/linked-list-cycle-ii/",
       "pattern": "Linked List"
     },
     {
       "task": "Logger",
+      "className": "Logger",
       "javaFile": "src/main/java/design/Logger.java",
       "leetcodeUrl": "https://leetcode.com/problems/logger-rate-limiter/",
       "pattern": "Design"
     },
     {
       "task": "LongPressedName",
+      "className": "LongPressedName",
       "javaFile": "src/main/java/strings/LongPressedName.java",
       "leetcodeUrl": "https://leetcode.com/problems/long-pressed-name/",
       "pattern": "Strings"
     },
     {
       "task": "LongestArithmeticSubsequence",
+      "className": "LongestArithmeticSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/sequence/LongestArithmeticSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-arithmetic-subsequence/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "LongestCommonSubstring",
+      "className": "LongestCommonSubstring",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/LongestCommonSubstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-common-substring/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "LongestDuplicateSubstring",
+      "className": "LongestDuplicateSubstring",
       "javaFile": "src/main/java/strings/patternmatching/LongestDuplicateSubstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-duplicate-substring/",
       "pattern": "Strings"
     },
     {
       "task": "LongestStringChain",
+      "className": "LongestStringChain",
       "javaFile": "src/main/java/dynamicprogramming/sequence/LongestStringChain.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-string-chain/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "LongestSubstringKRepeating",
+      "className": "LongestSubstringKRepeating",
       "javaFile": "src/main/java/strings/patternmatching/LongestSubstringKRepeating.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/",
       "pattern": "Strings"
     },
     {
       "task": "LongestSubstringWithAtMostKDistinctCharacters",
+      "className": "LongestSubstringWithAtMostKDistinctCharacters",
       "javaFile": "src/main/java/strings/patternmatching/LongestSubstringWithAtMostKDistinctCharacters.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/",
       "pattern": "Strings"
     },
     {
       "task": "LongestValidParentheses",
+      "className": "LongestValidParentheses",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/LongestValidParentheses.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-valid-parentheses/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "LowestCommonAncestorOfABinaryTree",
+      "className": "LowestCommonAncestorOfABinaryTree",
       "javaFile": "src/main/java/trees/binarysearchtree/LowestCommonAncestorOfABinaryTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/",
       "pattern": "Trees"
     },
     {
       "task": "MakeLargeIsland",
+      "className": "MakeLargeIsland",
       "javaFile": "src/main/java/graphs/MakeLargeIsland.java",
       "leetcodeUrl": "https://leetcode.com/problems/making-a-large-island/",
       "pattern": "Graphs"
     },
     {
       "task": "MakeLexicographicallySmallestArrayBySwappingElements",
+      "className": "MakeLexicographicallySmallestArrayBySwappingElements",
       "javaFile": "src/main/java/arrays/sorting/MakeLexicographicallySmallestArrayBySwappingElements.java",
       "leetcodeUrl": "https://leetcode.com/problems/make-lexicographically-smallest-array-by-swapping-elements/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MatrixBlockSum",
+      "className": "MatrixBlockSum",
       "javaFile": "src/main/java/arrays/prefixsum/MatrixBlockSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/matrix-block-sum/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MaxConsecutiveOnesIII",
+      "className": "MaxConsecutiveOnesIII",
       "javaFile": "src/main/java/arrays/slidingwindow/MaxConsecutiveOnesIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-consecutive-ones-iii/",
       "pattern": "Sliding Window"
     },
     {
       "task": "MaxEvents2",
+      "className": "MaxEvents2",
       "javaFile": "src/main/java/heaps/MaxEvents2.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/",
       "pattern": "Uncategorized"
     },
     {
       "task": "MaxEventsThatCanbeAttended",
+      "className": "MaxEventsThatCanbeAttended",
       "javaFile": "src/main/java/heaps/MaxEventsThatCanbeAttended.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/",
       "pattern": "Uncategorized"
     },
     {
       "task": "MaxGoodPeople",
+      "className": "MaxGoodPeople",
       "javaFile": "src/main/java/bitwiseoperation/MaxGoodPeople.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-good-people-based-on-statements/",
       "pattern": "Bit Manipulation"
     },
     {
       "task": "MaxIncreaseToKeepCitySkyline",
+      "className": "MaxIncreaseToKeepCitySkyline",
       "javaFile": "src/main/java/arrays/greedy/MaxIncreaseToKeepCitySkyline.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-increase-to-keep-city-skyline/",
       "pattern": "Greedy"
     },
     {
       "task": "MaxInvitations",
+      "className": "MaxInvitations",
       "javaFile": "src/main/java/graphs/MaxInvitations.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/",
       "pattern": "Graphs"
     },
     {
       "task": "MaxRectangleBinaryMatrix",
+      "className": "MaxRectangleBinaryMatrix",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/MaxRectangleBinaryMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximal-rectangle/",
       "pattern": "Stack"
     },
     {
       "task": "MaxResourceAccess",
+      "className": "MaxResourceAccess",
       "javaFile": "src/main/java/arrays/twopointers/MaxResourceAccess.java",
       "leetcodeUrl": "https://leetcode.com/problems/analyze-user-website-visit-pattern/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MaxScoreSplicedArray",
+      "className": "MaxScoreSplicedArray",
       "javaFile": "src/main/java/arrays/kadane/MaxScoreSplicedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-score-of-spliced-array/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MaxStack",
+      "className": "MaxStack",
       "javaFile": "src/main/java/stacksandqueues/design/MaxStack.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-stack/",
       "pattern": "Design"
     },
     {
       "task": "MaxSumOfRectangleNoLargerThanK",
+      "className": "MaxSumOfRectangleNoLargerThanK",
       "javaFile": "src/main/java/arrays/prefixsum/MaxSumOfRectangleNoLargerThanK.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MaxValueOfEquation",
+      "className": "MaxValueOfEquation",
       "javaFile": "src/main/java/arrays/twopointers/MaxValueOfEquation.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-value-of-equation/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MaxWithCost",
+      "className": "MaxWithCost",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MaxWithCost.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-points-with-cost/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MaximalNetworkRank",
+      "className": "MaximalNetworkRank",
       "javaFile": "src/main/java/graphs/MaximalNetworkRank.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximal-network-rank/",
       "pattern": "Graphs"
     },
     {
       "task": "MaximizeDistanceToClosestPerson",
+      "className": "MaximizeDistanceToClosestPerson",
       "javaFile": "src/main/java/arrays/MaximizeDistanceToClosestPerson.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximize-distance-to-closest-person/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MaximumLengthOfRepeatedSubarray",
+      "className": "MaximumLengthOfRepeatedSubarray",
       "javaFile": "src/main/java/dynamicprogramming/sequence/MaximumLengthOfRepeatedSubarray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-length-of-repeated-subarray/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MaximumNumberOfVisiblePoints",
+      "className": "MaximumNumberOfVisiblePoints",
       "javaFile": "src/main/java/maths/MaximumNumberOfVisiblePoints.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-visible-points/",
       "pattern": "Uncategorized"
     },
     {
       "task": "MaximumProfitJobScheduling",
+      "className": "MaximumProfitJobScheduling",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/MaximumProfitJobScheduling.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-profit-in-job-scheduling/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MaximumSumIncreasingTriplet",
+      "className": "MaximumSumIncreasingTriplet",
       "javaFile": "src/main/java/arrays/twopointers/MaximumSumIncreasingTriplet.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/",
       "pattern": "Arrays & Hashing"
     },
     {
-      "task": "MaximumSwap",
+      "task": "MaximumSwap__binarysearch",
+      "className": "MaximumSwap",
       "javaFile": "src/main/java/arrays/binarysearch/MaximumSwap.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-swap/",
       "pattern": "Binary Search"
     },
     {
-      "task": "MaximumSwap",
+      "task": "MaximumSwap__greedy",
+      "className": "MaximumSwap",
       "javaFile": "src/main/java/greedy/MaximumSwap.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-swap/",
       "pattern": "Greedy"
     },
     {
       "task": "MaximumTeamSizeWithOverlappingIntervals",
+      "className": "MaximumTeamSizeWithOverlappingIntervals",
       "javaFile": "src/main/java/arrays/binarysearch/MaximumTeamSizeWithOverlappingIntervals.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-team-size-with-overlapping-intervals/",
       "pattern": "Binary Search"
     },
     {
       "task": "MaximumUnitsOnATruck",
+      "className": "MaximumUnitsOnATruck",
       "javaFile": "src/main/java/arrays/greedy/MaximumUnitsOnATruck.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-units-on-a-truck/",
       "pattern": "Greedy"
     },
     {
       "task": "MaximumXor",
+      "className": "MaximumXor",
       "javaFile": "src/main/java/bitwiseoperation/MaximumXor.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/",
       "pattern": "Bit Manipulation"
     },
     {
       "task": "MaximumXorOfTwoNumbersInArray",
+      "className": "MaximumXorOfTwoNumbersInArray",
       "javaFile": "src/main/java/bitwiseoperation/MaximumXorOfTwoNumbersInArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/",
       "pattern": "Bit Manipulation"
     },
     {
       "task": "MeetingRoomsIII",
+      "className": "MeetingRoomsIII",
       "javaFile": "src/main/java/arrays/intervals/MeetingRoomsIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/meeting-rooms-iii/",
       "pattern": "Intervals"
     },
     {
       "task": "MergeNodesInBetweenZeros",
+      "className": "MergeNodesInBetweenZeros",
       "javaFile": "src/main/java/linkedlist/MergeNodesInBetweenZeros.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-nodes-in-between-zeros/",
       "pattern": "Linked List"
     },
     {
       "task": "MinBuses",
+      "className": "MinBuses",
       "javaFile": "src/main/java/graphs/MinBuses.java",
       "leetcodeUrl": "https://leetcode.com/problems/bus-routes/",
       "pattern": "Graphs"
     },
     {
       "task": "MinCostSum",
+      "className": "MinCostSum",
       "javaFile": "src/main/java/graphs/dijkstra/MinCostSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/",
       "pattern": "Graphs"
     },
     {
       "task": "MinCutPalindrome",
+      "className": "MinCutPalindrome",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinCutPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-partitioning-ii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MinInsertionPalindrome",
+      "className": "MinInsertionPalindrome",
       "javaFile": "src/main/java/strings/twopointers/MinInsertionPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/",
       "pattern": "Two Pointers"
     },
     {
       "task": "MinRefuel",
+      "className": "MinRefuel",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MinRefuel.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-number-of-refueling-stops/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MinSubarraySum",
+      "className": "MinSubarraySum",
       "javaFile": "src/main/java/stacksandqueues/MinSubarraySum.java",
       "leetcodeUrl": "https://leetcode.com/problems/sum-of-subarray-minimums/",
       "pattern": "Stack"
     },
     {
       "task": "MinTaps",
+      "className": "MinTaps",
       "javaFile": "src/main/java/arrays/greedy/MinTaps.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/",
       "pattern": "Greedy"
     },
     {
       "task": "Minesweeper",
+      "className": "Minesweeper",
       "javaFile": "src/main/java/graphs/Minesweeper.java",
       "leetcodeUrl": "https://leetcode.com/problems/minesweeper/",
       "pattern": "Graphs"
     },
     {
       "task": "MinimizeMaximumComponentCost",
+      "className": "MinimizeMaximumComponentCost",
       "javaFile": "src/main/java/graphs/unionfind/MinimizeMaximumComponentCost.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimize-maximum-component-cost/",
       "pattern": "Graphs"
     },
     {
       "task": "MinimumArrowsToBurstBalloons",
+      "className": "MinimumArrowsToBurstBalloons",
       "javaFile": "src/main/java/arrays/MinimumArrowsToBurstBalloons.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MinimumCostMergeStones",
+      "className": "MinimumCostMergeStones",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinimumCostMergeStones.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-merge-stones/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MinimumCostOfBuyingCandiesWithDiscount",
+      "className": "MinimumCostOfBuyingCandiesWithDiscount",
       "javaFile": "src/main/java/arrays/heap/MinimumCostOfBuyingCandiesWithDiscount.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-of-buying-candies-with-discount/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MinimumCostToConnectSticks",
+      "className": "MinimumCostToConnectSticks",
       "javaFile": "src/main/java/arrays/greedy/MinimumCostToConnectSticks.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-connect-sticks/",
       "pattern": "Greedy"
     },
     {
       "task": "MinimumCostToHireKWorkers",
+      "className": "MinimumCostToHireKWorkers",
       "javaFile": "src/main/java/heaps/MinimumCostToHireKWorkers.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-hire-k-workers/",
       "pattern": "Uncategorized"
     },
     {
       "task": "MinimumCostTreeFromLeafValues",
+      "className": "MinimumCostTreeFromLeafValues",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinimumCostTreeFromLeafValues.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MinimumDifficultyOfAJobSchedule",
+      "className": "MinimumDifficultyOfAJobSchedule",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/MinimumDifficultyOfAJobSchedule.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MinimumDominoRotationsForEqualRow",
+      "className": "MinimumDominoRotationsForEqualRow",
       "javaFile": "src/main/java/arrays/greedy/MinimumDominoRotationsForEqualRow.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-domino-rotations-for-equal-row/",
       "pattern": "Greedy"
     },
     {
       "task": "MinimumEdgeReversalsForAllNodesReachable",
+      "className": "MinimumEdgeReversalsForAllNodesReachable",
       "javaFile": "src/main/java/graphs/MinimumEdgeReversalsForAllNodesReachable.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-edge-reversals-so-every-node-is-reachable/",
       "pattern": "Graphs"
     },
     {
       "task": "MinimumJumpsToReachHome",
+      "className": "MinimumJumpsToReachHome",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MinimumJumpsToReachHome.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-jumps-to-reach-home/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MinimumLimitOfBallsInABag",
+      "className": "MinimumLimitOfBallsInABag",
       "javaFile": "src/main/java/arrays/binarysearch/MinimumLimitOfBallsInABag.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-limit-of-balls-in-a-bag/",
       "pattern": "Binary Search"
     },
     {
       "task": "MinimumMaxCostAfterKComponents",
+      "className": "MinimumMaxCostAfterKComponents",
       "javaFile": "src/main/java/graphs/mst/MinimumMaxCostAfterKComponents.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/",
       "pattern": "Graphs"
     },
     {
       "task": "MinimumMovesToAggregateSeats",
+      "className": "MinimumMovesToAggregateSeats",
       "javaFile": "src/main/java/greedy/MinimumMovesToAggregateSeats.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-equal-array-elements/",
       "pattern": "Greedy"
     },
     {
       "task": "MinimumMovesToEqualArrayElementsII",
+      "className": "MinimumMovesToEqualArrayElementsII",
       "javaFile": "src/main/java/arrays/MinimumMovesToEqualArrayElementsII.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MinimumMovesToReachTargetScore",
+      "className": "MinimumMovesToReachTargetScore",
       "javaFile": "src/main/java/greedy/MinimumMovesToReachTargetScore.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-reach-target-score/",
       "pattern": "Greedy"
     },
     {
       "task": "MinimumOperationsToReduceIntegerToZero",
+      "className": "MinimumOperationsToReduceIntegerToZero",
       "javaFile": "src/main/java/maths/MinimumOperationsToReduceIntegerToZero.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-operations-to-reduce-an-integer-to-0/",
       "pattern": "Uncategorized"
     },
     {
       "task": "MinimumRemoveToMakeValidParentheses",
+      "className": "MinimumRemoveToMakeValidParentheses",
       "javaFile": "src/main/java/stacksandqueues/MinimumRemoveToMakeValidParentheses.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/",
       "pattern": "Stack"
     },
     {
       "task": "MinimumSwapsToGroupAll1sTogether",
+      "className": "MinimumSwapsToGroupAll1sTogether",
       "javaFile": "src/main/java/arrays/slidingwindow/MinimumSwapsToGroupAll1sTogether.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together/",
       "pattern": "Sliding Window"
     },
     {
       "task": "MinimumTimeDifference",
+      "className": "MinimumTimeDifference",
       "javaFile": "src/main/java/strings/MinimumTimeDifference.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-time-difference/",
       "pattern": "Strings"
     },
     {
       "task": "MinimumTimeToMakeRopeColorful",
+      "className": "MinimumTimeToMakeRopeColorful",
       "javaFile": "src/main/java/strings/greedy/MinimumTimeToMakeRopeColorful.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-time-to-make-rope-colorful/",
       "pattern": "Greedy"
     },
     {
       "task": "MinimumWindowSubsequence",
+      "className": "MinimumWindowSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/MinimumWindowSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-window-subsequence/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "MostCommonWord",
+      "className": "MostCommonWord",
       "javaFile": "src/main/java/strings/hashmap/MostCommonWord.java",
       "leetcodeUrl": "https://leetcode.com/problems/most-common-word/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "MostStonesRemovedWithSameRowOrColumn",
+      "className": "MostStonesRemovedWithSameRowOrColumn",
       "javaFile": "src/main/java/graphs/MostStonesRemovedWithSameRowOrColumn.java",
       "leetcodeUrl": "https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/",
       "pattern": "Graphs"
     },
     {
       "task": "MyCalendarThree",
+      "className": "MyCalendarThree",
       "javaFile": "src/main/java/trees/segmenttree/MyCalendarThree.java",
       "leetcodeUrl": "https://leetcode.com/problems/my-calendar-iii/",
       "pattern": "Advanced Graphs"
     },
     {
       "task": "NestedListWeightSum",
+      "className": "NestedListWeightSum",
       "javaFile": "src/main/java/stacksandqueues/NestedListWeightSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/nested-list-weight-sum/",
       "pattern": "Stack"
     },
     {
       "task": "NetworkConnectivity_KruskalStyle",
+      "className": "NetworkConnectivity_KruskalStyle",
       "javaFile": "src/main/java/graphs/mst/NetworkConnectivity_KruskalStyle.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-operations-to-make-network-connected/",
       "pattern": "Graphs"
     },
     {
       "task": "NextGreaterElementII",
+      "className": "NextGreaterElementII",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/NextGreaterElementII.java",
       "leetcodeUrl": "https://leetcode.com/problems/next-greater-element-ii/",
       "pattern": "Stack"
     },
     {
       "task": "NextPermutation",
+      "className": "NextPermutation",
       "javaFile": "src/main/java/arrays/NextPermutation.java",
       "leetcodeUrl": "https://leetcode.com/problems/next-permutation/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "NiceSubarray",
+      "className": "NiceSubarray",
       "javaFile": "src/main/java/stacksandqueues/monotonicstack/NiceSubarray.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-number-of-nice-subarrays/",
       "pattern": "Stack"
     },
     {
       "task": "NonConsecutiveOnesCounter",
+      "className": "NonConsecutiveOnesCounter",
       "javaFile": "src/main/java/bitwiseoperation/NonConsecutiveOnesCounter.java",
       "leetcodeUrl": "https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/",
       "pattern": "Bit Manipulation"
     },
     {
       "task": "NumberOfDigitOne",
+      "className": "NumberOfDigitOne",
       "javaFile": "src/main/java/maths/NumberOfDigitOne.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-digit-one/",
       "pattern": "Uncategorized"
     },
     {
       "task": "NumberOfIslandsII",
+      "className": "NumberOfIslandsII",
       "javaFile": "src/main/java/graphs/unionfind/NumberOfIslandsII.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-islands-ii/",
       "pattern": "Graphs"
     },
     {
       "task": "NumberOfLaserBeamsInABank",
+      "className": "NumberOfLaserBeamsInABank",
       "javaFile": "src/main/java/arrays/NumberOfLaserBeamsInABank.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-laser-beams-in-a-bank/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "NumberOfMatchingSubsequences",
+      "className": "NumberOfMatchingSubsequences",
       "javaFile": "src/main/java/strings/patternmatching/NumberOfMatchingSubsequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-matching-subsequences/",
       "pattern": "Strings"
     },
     {
       "task": "NumberOfProvinces",
+      "className": "NumberOfProvinces",
       "javaFile": "src/main/java/graphs/NumberOfProvinces.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-provinces/",
       "pattern": "Graphs"
     },
     {
       "task": "NumberOfWaysToReconstructATree",
+      "className": "NumberOfWaysToReconstructATree",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/NumberOfWaysToReconstructATree.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-ways-to-reconstruct-a-tree/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "OptimalAccountBalancing",
+      "className": "OptimalAccountBalancing",
       "javaFile": "src/main/java/graphs/OptimalAccountBalancing.java",
       "leetcodeUrl": "https://leetcode.com/problems/optimal-account-balancing/",
       "pattern": "Graphs"
     },
     {
       "task": "OriginalDigits",
+      "className": "OriginalDigits",
       "javaFile": "src/main/java/hashing/OriginalDigits.java",
       "leetcodeUrl": "https://leetcode.com/problems/reconstruct-original-digits-from-english/",
       "pattern": "Uncategorized"
     },
     {
       "task": "PaintHouse2",
+      "className": "PaintHouse2",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouse2.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-ii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "PaintHouse3",
+      "className": "PaintHouse3",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouse3.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-iii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "PaintHouseII",
+      "className": "PaintHouseII",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouseII.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-ii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "PairsOfSongsWithTotalDurationsDivisibleBy60",
+      "className": "PairsOfSongsWithTotalDurationsDivisibleBy60",
       "javaFile": "src/main/java/strings/hashmap/PairsOfSongsWithTotalDurationsDivisibleBy60.java",
       "leetcodeUrl": "https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/",
       "pattern": "Arrays & Hashing"
     },
     {
-      "task": "PalindromePairs",
+      "task": "PalindromePairs__hashing",
+      "className": "PalindromePairs",
       "javaFile": "src/main/java/hashing/PalindromePairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-pairs/",
       "pattern": "Uncategorized"
     },
     {
-      "task": "PalindromePairs",
+      "task": "PalindromePairs__twopointers",
+      "className": "PalindromePairs",
       "javaFile": "src/main/java/strings/twopointers/PalindromePairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-pairs/",
       "pattern": "Two Pointers"
     },
     {
       "task": "PalindromePartitioningII",
+      "className": "PalindromePartitioningII",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/PalindromePartitioningII.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-partitioning-ii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "PartitionArrayIntoDisjointIntervals",
+      "className": "PartitionArrayIntoDisjointIntervals",
       "javaFile": "src/main/java/arrays/twopointers/PartitionArrayIntoDisjointIntervals.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-array-into-disjoint-intervals/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "PartitioningIntoMinimumNumberOfDeciBinaryNumbers",
+      "className": "PartitioningIntoMinimumNumberOfDeciBinaryNumbers",
       "javaFile": "src/main/java/strings/greedy/PartitioningIntoMinimumNumberOfDeciBinaryNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/partitioning-into-minimum-number-of-deci-binary-numbers/",
       "pattern": "Greedy"
     },
     {
       "task": "PathSum2",
+      "className": "PathSum2",
       "javaFile": "src/main/java/trees/dfs/PathSum2.java",
       "leetcodeUrl": "https://leetcode.com/problems/path-sum-ii/",
       "pattern": "Trees"
     },
     {
       "task": "PathSum3",
+      "className": "PathSum3",
       "javaFile": "src/main/java/trees/dfs/PathSum3.java",
       "leetcodeUrl": "https://leetcode.com/problems/path-sum-iii/",
       "pattern": "Trees"
     },
     {
       "task": "PossibleBipartition",
+      "className": "PossibleBipartition",
       "javaFile": "src/main/java/graphs/PossibleBipartition.java",
       "leetcodeUrl": "https://leetcode.com/problems/possible-bipartition/",
       "pattern": "Graphs"
     },
     {
       "task": "QueensAttackKing",
+      "className": "QueensAttackKing",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/QueensAttackKing.java",
       "leetcodeUrl": "https://leetcode.com/problems/queens-that-can-attack-the-king/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "QueueReconstructionByHeight",
+      "className": "QueueReconstructionByHeight",
       "javaFile": "src/main/java/arrays/greedy/QueueReconstructionByHeight.java",
       "leetcodeUrl": "https://leetcode.com/problems/queue-reconstruction-by-height/",
       "pattern": "Greedy"
     },
     {
       "task": "QueueUsingStack",
+      "className": "QueueUsingStack",
       "javaFile": "src/main/java/stacksandqueues/QueueUsingStack.java",
       "leetcodeUrl": "https://leetcode.com/problems/implement-queue-using-stacks/",
       "pattern": "Stack"
     },
     {
       "task": "RandomizedArrayShuffler",
+      "className": "RandomizedArrayShuffler",
       "javaFile": "src/main/java/maths/RandomizedArrayShuffler.java",
       "leetcodeUrl": "https://leetcode.com/problems/shuffle-an-array/",
       "pattern": "Uncategorized"
     },
     {
       "task": "RangeAddition",
+      "className": "RangeAddition",
       "javaFile": "src/main/java/arrays/prefixsum/RangeAddition.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-addition/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "RangeSumQuery2DMutable",
+      "className": "RangeSumQuery2DMutable",
       "javaFile": "src/main/java/trees/segmenttree/RangeSumQuery2DMutable.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-2d-mutable/",
       "pattern": "Advanced Graphs"
     },
     {
       "task": "RangeSumQueryMutable",
+      "className": "RangeSumQueryMutable",
       "javaFile": "src/main/java/trees/segmenttree/RangeSumQueryMutable.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-mutable/",
       "pattern": "Advanced Graphs"
     },
     {
       "task": "ReOrderLogFile",
+      "className": "ReOrderLogFile",
       "javaFile": "src/main/java/strings/sorting/ReOrderLogFile.java",
       "leetcodeUrl": "https://leetcode.com/problems/reorder-data-in-log-files/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "ReachableNodesInSubdividedGraph",
+      "className": "ReachableNodesInSubdividedGraph",
       "javaFile": "src/main/java/graphs/ReachableNodesInSubdividedGraph.java",
       "leetcodeUrl": "https://leetcode.com/problems/reachable-nodes-in-subdivided-graph/",
       "pattern": "Graphs"
     },
     {
       "task": "RearrangeArrayElementsBySign",
+      "className": "RearrangeArrayElementsBySign",
       "javaFile": "src/main/java/arrays/twopointers/RearrangeArrayElementsBySign.java",
       "leetcodeUrl": "https://leetcode.com/problems/rearrange-array-elements-by-sign/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "RecoverBinarySearchTree",
+      "className": "RecoverBinarySearchTree",
       "javaFile": "src/main/java/trees/binarysearchtree/RecoverBinarySearchTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/recover-binary-search-tree/",
       "pattern": "Trees"
     },
     {
       "task": "RedundantConnectionII",
+      "className": "RedundantConnectionII",
       "javaFile": "src/main/java/graphs/RedundantConnectionII.java",
       "leetcodeUrl": "https://leetcode.com/problems/redundant-connection-ii/",
       "pattern": "Graphs"
     },
     {
       "task": "RegionsCutBySlashes",
+      "className": "RegionsCutBySlashes",
       "javaFile": "src/main/java/graphs/RegionsCutBySlashes.java",
       "leetcodeUrl": "https://leetcode.com/problems/regions-cut-by-slashes/",
       "pattern": "Graphs"
     },
     {
       "task": "RemoveBoxes",
+      "className": "RemoveBoxes",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/RemoveBoxes.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-boxes/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "RemoveDuplicateLetters",
+      "className": "RemoveDuplicateLetters",
       "javaFile": "src/main/java/strings/stack/RemoveDuplicateLetters.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicate-letters/",
       "pattern": "Stack"
     },
     {
       "task": "RemoveDuplicatesFromSortedListII",
+      "className": "RemoveDuplicatesFromSortedListII",
       "javaFile": "src/main/java/linkedlist/RemoveDuplicatesFromSortedListII.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/",
       "pattern": "Linked List"
     },
     {
       "task": "RemoveInvalidParenthesis",
+      "className": "RemoveInvalidParenthesis",
       "javaFile": "src/main/java/backtrack/RemoveInvalidParenthesis.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-invalid-parentheses/",
       "pattern": "Backtracking"
     },
     {
       "task": "RepeatLimitedString",
+      "className": "RepeatLimitedString",
       "javaFile": "src/main/java/strings/heap/RepeatLimitedString.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-string-with-repeat-limit/",
       "pattern": "Heap / Priority Queue"
     },
     {
       "task": "RestoreTheArrayFromAdjacentPairs",
+      "className": "RestoreTheArrayFromAdjacentPairs",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/RestoreTheArrayFromAdjacentPairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/restore-the-array-from-adjacent-pairs/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "ReversePairs",
+      "className": "ReversePairs",
       "javaFile": "src/main/java/arrays/mergesort/ReversePairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-pairs/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "ReverseWordsInString",
+      "className": "ReverseWordsInString",
       "javaFile": "src/main/java/strings/twopointers/ReverseWordsInString.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-words-in-a-string/",
       "pattern": "Two Pointers"
     },
     {
       "task": "RotateFunction",
+      "className": "RotateFunction",
       "javaFile": "src/main/java/arrays/RotateFunction.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-function/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "RotatedDigits",
+      "className": "RotatedDigits",
       "javaFile": "src/main/java/strings/RotatedDigits.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotated-digits/",
       "pattern": "Strings"
     },
     {
       "task": "RotatedString",
+      "className": "RotatedString",
       "javaFile": "src/main/java/strings/patternmatching/RotatedString.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-string/",
       "pattern": "Strings"
     },
     {
       "task": "SatisfiabilityOfEqualityEquations",
+      "className": "SatisfiabilityOfEqualityEquations",
       "javaFile": "src/main/java/graphs/SatisfiabilityOfEqualityEquations.java",
       "leetcodeUrl": "https://leetcode.com/problems/satisfiability-of-equality-equations/",
       "pattern": "Graphs"
     },
     {
       "task": "ScrambleString",
+      "className": "ScrambleString",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/ScrambleString.java",
       "leetcodeUrl": "https://leetcode.com/problems/scramble-string/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "Search2DMatrixII",
+      "className": "Search2DMatrixII",
       "javaFile": "src/main/java/arrays/matrix/Search2DMatrixII.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-a-2d-matrix-ii/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "SentenceReverseInPlace",
+      "className": "SentenceReverseInPlace",
       "javaFile": "src/main/java/arrays/SentenceReverseInPlace.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-words-in-a-string-ii/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "ShortEncodingOfWords",
+      "className": "ShortEncodingOfWords",
       "javaFile": "src/main/java/trie/ShortEncodingOfWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/short-encoding-of-words/",
       "pattern": "Tries"
     },
     {
       "task": "ShortestCommonSupersequence",
+      "className": "ShortestCommonSupersequence",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/ShortestCommonSupersequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-common-supersequence/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "ShortestCommonSuperstring",
+      "className": "ShortestCommonSuperstring",
       "javaFile": "src/main/java/dynamicprogramming/ShortestCommonSuperstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-shortest-superstring/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "ShortestDistance",
+      "className": "ShortestDistance",
       "javaFile": "src/main/java/graphs/ShortestDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/01-matrix/",
       "pattern": "Graphs"
     },
     {
       "task": "ShortestPathInAGridWithObstaclesElimination",
+      "className": "ShortestPathInAGridWithObstaclesElimination",
       "javaFile": "src/main/java/graphs/ShortestPathInAGridWithObstaclesElimination.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/",
       "pattern": "Graphs"
     },
     {
       "task": "ShortestPathToGetAllKeys",
+      "className": "ShortestPathToGetAllKeys",
       "javaFile": "src/main/java/graphs/ShortestPathToGetAllKeys.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-path-to-get-all-keys/",
       "pattern": "Graphs"
     },
     {
       "task": "ShortestSubarraySum",
+      "className": "ShortestSubarraySum",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/ShortestSubarraySum.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "ShortestWordDistance",
+      "className": "ShortestWordDistance",
       "javaFile": "src/main/java/arrays/twopointers/ShortestWordDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-word-distance/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "SingleNumberII",
+      "className": "SingleNumberII",
       "javaFile": "src/main/java/arrays/xor/SingleNumberII.java",
       "leetcodeUrl": "https://leetcode.com/problems/single-number-ii/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "SlidingPuzzle",
+      "className": "SlidingPuzzle",
       "javaFile": "src/main/java/graphs/SlidingPuzzle.java",
       "leetcodeUrl": "https://leetcode.com/problems/sliding-puzzle/",
       "pattern": "Graphs"
     },
     {
       "task": "SlidingWindowMedian",
+      "className": "SlidingWindowMedian",
       "javaFile": "src/main/java/stacksandqueues/SlidingWindowMedian.java",
       "leetcodeUrl": "https://leetcode.com/problems/sliding-window-median/",
       "pattern": "Stack"
     },
     {
       "task": "SmallestRangeCoveringElementsFromKLists",
+      "className": "SmallestRangeCoveringElementsFromKLists",
       "javaFile": "src/main/java/stacksandqueues/SmallestRangeCoveringElementsFromKLists.java",
       "leetcodeUrl": "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/",
       "pattern": "Stack"
     },
     {
       "task": "SmallestReachableCity",
+      "className": "SmallestReachableCity",
       "javaFile": "src/main/java/graphs/floydwarshall/SmallestReachableCity.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/",
       "pattern": "Graphs"
     },
     {
       "task": "SmallestSufficientTeam",
+      "className": "SmallestSufficientTeam",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/SmallestSufficientTeam.java",
       "leetcodeUrl": "https://leetcode.com/problems/smallest-sufficient-team/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "SnapshotArray",
+      "className": "SnapshotArray",
       "javaFile": "src/main/java/arrays/binarysearch/SnapshotArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/snapshot-array/",
       "pattern": "Binary Search"
     },
     {
       "task": "SortTheMatrixDiagonally",
+      "className": "SortTheMatrixDiagonally",
       "javaFile": "src/main/java/arrays/sorting/SortTheMatrixDiagonally.java",
       "leetcodeUrl": "https://leetcode.com/problems/sort-the-matrix-diagonally/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "SortTransformedArray",
+      "className": "SortTransformedArray",
       "javaFile": "src/main/java/arrays/twopointers/SortTransformedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/sort-transformed-array/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "SpecialOperationsString",
+      "className": "SpecialOperationsString",
       "javaFile": "src/main/java/strings/SpecialOperationsString.java",
       "leetcodeUrl": "https://leetcode.com/problems/process-string-with-special-operations-ii/",
       "pattern": "Strings"
     },
     {
       "task": "SpiralTraversal",
+      "className": "SpiralTraversal",
       "javaFile": "src/main/java/trees/traversal/SpiralTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/spiral-order-traversal-of-binary-tree/",
       "pattern": "Trees"
     },
     {
       "task": "StrStr",
+      "className": "StrStr",
       "javaFile": "src/main/java/strings/patternmatching/StrStr.java",
       "leetcodeUrl": "https://leetcode.com/problems/implement-strstr/",
       "pattern": "Strings"
     },
     {
       "task": "StringCompression",
+      "className": "StringCompression",
       "javaFile": "src/main/java/strings/StringCompression.java",
       "leetcodeUrl": "https://leetcode.com/problems/string-compression/",
       "pattern": "Strings"
     },
     {
       "task": "StringToIntegerAtoi",
+      "className": "StringToIntegerAtoi",
       "javaFile": "src/main/java/strings/StringToIntegerAtoi.java",
       "leetcodeUrl": "https://leetcode.com/problems/string-to-integer-atoi/",
       "pattern": "Strings"
     },
     {
       "task": "SubarraySumsDivisibleByK",
+      "className": "SubarraySumsDivisibleByK",
       "javaFile": "src/main/java/arrays/slidingwindow/SubarraySumsDivisibleByK.java",
       "leetcodeUrl": "https://leetcode.com/problems/subarray-sums-divisible-by-k/",
       "pattern": "Sliding Window"
     },
     {
       "task": "SubarraysWithKDifferentIntegers",
+      "className": "SubarraysWithKDifferentIntegers",
       "javaFile": "src/main/java/arrays/slidingwindow/SubarraysWithKDifferentIntegers.java",
       "leetcodeUrl": "https://leetcode.com/problems/subarrays-with-k-different-integers/",
       "pattern": "Sliding Window"
     },
     {
       "task": "SubstringWithConcatenationOfAllWords",
+      "className": "SubstringWithConcatenationOfAllWords",
       "javaFile": "src/main/java/strings/patternmatching/SubstringWithConcatenationOfAllWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/substring-with-concatenation-of-all-words/",
       "pattern": "Strings"
     },
     {
       "task": "SudokuSolve",
+      "className": "SudokuSolve",
       "javaFile": "src/main/java/backtrack/SudokuSolve.java",
       "leetcodeUrl": "https://leetcode.com/problems/sudoku-solver/",
       "pattern": "Backtracking"
     },
     {
       "task": "SumOfDistancesInTree",
+      "className": "SumOfDistancesInTree",
       "javaFile": "src/main/java/trees/traversal/SumOfDistancesInTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/sum-of-distances-in-tree/",
       "pattern": "Trees"
     },
     {
       "task": "SumTree",
+      "className": "SumTree",
       "javaFile": "src/main/java/trees/dfs/SumTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-a-binary-tree-is-a-sum-tree/",
       "pattern": "Trees"
     },
     {
       "task": "SwapAdjacentInLRString",
+      "className": "SwapAdjacentInLRString",
       "javaFile": "src/main/java/arrays/twopointers/SwapAdjacentInLRString.java",
       "leetcodeUrl": "https://leetcode.com/problems/swap-adjacent-in-lr-string/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "TheSkylineProblem",
+      "className": "TheSkylineProblem",
       "javaFile": "src/main/java/trees/segmenttree/TheSkylineProblem.java",
       "leetcodeUrl": "https://leetcode.com/problems/the-skyline-problem/",
       "pattern": "Advanced Graphs"
     },
     {
       "task": "ThreeSumClosest",
+      "className": "ThreeSumClosest",
       "javaFile": "src/main/java/arrays/twopointers/ThreeSumClosest.java",
       "leetcodeUrl": "https://leetcode.com/problems/3sum-closest/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "TicTacToe",
+      "className": "TicTacToe",
       "javaFile": "src/main/java/arrays/TicTacToe.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-tic-tac-toe/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "TilingDominoes",
+      "className": "TilingDominoes",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/TilingDominoes.java",
       "leetcodeUrl": "https://leetcode.com/problems/domino-and-tromino-tiling/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "TimeNeededToRearrangeBinaryString",
+      "className": "TimeNeededToRearrangeBinaryString",
       "javaFile": "src/main/java/strings/TimeNeededToRearrangeBinaryString.java",
       "leetcodeUrl": "https://leetcode.com/problems/time-needed-to-rearrange-a-binary-string/",
       "pattern": "Strings"
     },
     {
       "task": "TopKFrequentWords",
+      "className": "TopKFrequentWords",
       "javaFile": "src/main/java/heaps/TopKFrequentWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/top-k-frequent-words/",
       "pattern": "Uncategorized"
     },
     {
       "task": "TweetCountsPerFrequency",
+      "className": "TweetCountsPerFrequency",
       "javaFile": "src/main/java/hashing/TweetCountsPerFrequency.java",
       "leetcodeUrl": "https://leetcode.com/problems/tweet-counts-per-frequency/",
       "pattern": "Uncategorized"
     },
     {
       "task": "TwentyFourGame",
+      "className": "TwentyFourGame",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/TwentyFourGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/24-game/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "UglyNumberII",
+      "className": "UglyNumberII",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/UglyNumberII.java",
       "leetcodeUrl": "https://leetcode.com/problems/ugly-number-ii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "VacuumCleaner",
+      "className": "VacuumCleaner",
       "javaFile": "src/main/java/dailybytes/string/VacuumCleaner.java",
       "leetcodeUrl": "https://leetcode.com/problems/robot-return-to-origin/",
       "pattern": "Uncategorized"
     },
     {
       "task": "ValidBstFromPreorder",
+      "className": "ValidBstFromPreorder",
       "javaFile": "src/main/java/trees/binarysearchtree/ValidBstFromPreorder.java",
       "leetcodeUrl": "https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/",
       "pattern": "Trees"
     },
     {
       "task": "ValidNumberChecker",
+      "className": "ValidNumberChecker",
       "javaFile": "src/main/java/strings/ValidNumberChecker.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-number/",
       "pattern": "Strings"
     },
     {
       "task": "ValidSquare",
+      "className": "ValidSquare",
       "javaFile": "src/main/java/maths/ValidSquare.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-square/",
       "pattern": "Uncategorized"
     },
     {
       "task": "ValidTriangleNumber",
+      "className": "ValidTriangleNumber",
       "javaFile": "src/main/java/arrays/twopointers/ValidTriangleNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-triangle-number/",
       "pattern": "Arrays & Hashing"
     },
     {
       "task": "VerticalTraversal",
+      "className": "VerticalTraversal",
       "javaFile": "src/main/java/trees/traversal/VerticalTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/",
       "pattern": "Trees"
     },
     {
       "task": "VideoStitching",
+      "className": "VideoStitching",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/VideoStitching.java",
       "leetcodeUrl": "https://leetcode.com/problems/video-stitching/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "WebsiteVisit",
+      "className": "WebsiteVisit",
       "javaFile": "src/main/java/hashing/WebsiteVisit.java",
       "leetcodeUrl": "https://leetcode.com/problems/analyze-user-website-visit-pattern/",
       "pattern": "Uncategorized"
     },
     {
       "task": "WildcardMatching",
+      "className": "WildcardMatching",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/WildcardMatching.java",
       "leetcodeUrl": "https://leetcode.com/problems/wildcard-matching/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "WordBreak2",
+      "className": "WordBreak2",
       "javaFile": "src/main/java/dynamicprogramming/linearpartition/WordBreak2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-break-ii/",
       "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "WordLadder2",
+      "className": "WordLadder2",
       "javaFile": "src/main/java/graphs/WordLadder2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-ladder-ii/",
       "pattern": "Graphs"
     },
     {
       "task": "WordPattern2",
+      "className": "WordPattern2",
       "javaFile": "src/main/java/backtrack/WordPattern2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-pattern-ii/",
       "pattern": "Backtracking"
     },
     {
       "task": "kPairsWithSmallestSums",
+      "className": "kPairsWithSmallestSums",
       "javaFile": "src/main/java/heaps/kPairsWithSmallestSums.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-k-pairs-with-smallest-sums/",
       "pattern": "Uncategorized"

@@ -4,6 +4,7 @@
   "problems": {
     "CombinationSum": {
       "task": "CombinationSum",
+      "className": "CombinationSum",
       "javaFile": "src/main/java/Recursion/CombinationSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/combination-sum/",
       "leetcodeNumber": 39,
@@ -30,6 +31,7 @@
     },
     "CombinationSum2": {
       "task": "CombinationSum2",
+      "className": "CombinationSum2",
       "javaFile": "src/main/java/Recursion/CombinationSum2.java",
       "leetcodeUrl": "https://leetcode.com/problems/combination-sum-ii/",
       "leetcodeNumber": 40,
@@ -56,6 +58,7 @@
     },
     "FactorsCombination": {
       "task": "FactorsCombination",
+      "className": "FactorsCombination",
       "javaFile": "src/main/java/Recursion/FactorsCombination.java",
       "leetcodeUrl": "https://leetcode.com/problems/factor-combinations/",
       "leetcodeNumber": null,
@@ -82,6 +85,7 @@
     },
     "LetterCombination": {
       "task": "LetterCombination",
+      "className": "LetterCombination",
       "javaFile": "src/main/java/Recursion/LetterCombination.java",
       "leetcodeUrl": "https://leetcode.com/problems/letter-combinations-of-a-phone-number/",
       "leetcodeNumber": 17,
@@ -108,6 +112,7 @@
     },
     "NumberOfPaths": {
       "task": "NumberOfPaths",
+      "className": "NumberOfPaths",
       "javaFile": "src/main/java/Recursion/NumberOfPaths.java",
       "leetcodeUrl": "https://leetcode.com/problems/unique-paths/",
       "leetcodeNumber": 62,
@@ -134,6 +139,7 @@
     },
     "RestoreIpAddress": {
       "task": "RestoreIpAddress",
+      "className": "RestoreIpAddress",
       "javaFile": "src/main/java/Recursion/RestoreIpAddress.java",
       "leetcodeUrl": "https://leetcode.com/problems/restore-ip-addresses/",
       "leetcodeNumber": 93,
@@ -160,6 +166,7 @@
     },
     "AddToArrayFormOfInteger": {
       "task": "AddToArrayFormOfInteger",
+      "className": "AddToArrayFormOfInteger",
       "javaFile": "src/main/java/arrays/AddToArrayFormOfInteger.java",
       "leetcodeUrl": "https://leetcode.com/problems/add-to-array-form-of-integer/",
       "leetcodeNumber": 989,
@@ -186,6 +193,7 @@
     },
     "BiggestCakePiece": {
       "task": "BiggestCakePiece",
+      "className": "BiggestCakePiece",
       "javaFile": "src/main/java/arrays/BiggestCakePiece.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-area-of-a-piece-of-cake-after-horizontal-and-vertical-cuts/",
       "leetcodeNumber": null,
@@ -212,6 +220,7 @@
     },
     "CanPlaceFlowers": {
       "task": "CanPlaceFlowers",
+      "className": "CanPlaceFlowers",
       "javaFile": "src/main/java/arrays/CanPlaceFlowers.java",
       "leetcodeUrl": "https://leetcode.com/problems/can-place-flowers/",
       "leetcodeNumber": 605,
@@ -238,6 +247,7 @@
     },
     "CheckIfEveryRowAndColumnContainsAllNumbers": {
       "task": "CheckIfEveryRowAndColumnContainsAllNumbers",
+      "className": "CheckIfEveryRowAndColumnContainsAllNumbers",
       "javaFile": "src/main/java/arrays/CheckIfEveryRowAndColumnContainsAllNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-every-row-and-column-contains-all-numbers/",
       "leetcodeNumber": null,
@@ -264,6 +274,7 @@
     },
     "CountElementsWithStrictlySmallerAndGreaterElements": {
       "task": "CountElementsWithStrictlySmallerAndGreaterElements",
+      "className": "CountElementsWithStrictlySmallerAndGreaterElements",
       "javaFile": "src/main/java/arrays/CountElementsWithStrictlySmallerAndGreaterElements.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-elements-with-strictly-smaller-and-greater-elements/",
       "leetcodeNumber": null,
@@ -290,6 +301,7 @@
     },
     "CountIntegersWithEvenDigitSum": {
       "task": "CountIntegersWithEvenDigitSum",
+      "className": "CountIntegersWithEvenDigitSum",
       "javaFile": "src/main/java/arrays/CountIntegersWithEvenDigitSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-integers-with-even-digit-sum/",
       "leetcodeNumber": null,
@@ -316,6 +328,7 @@
     },
     "DeleteRepeatingLetter": {
       "task": "DeleteRepeatingLetter",
+      "className": "DeleteRepeatingLetter",
       "javaFile": "src/main/java/arrays/DeleteRepeatingLetter.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-deletion-cost-to-avoid-repeating-letters/",
       "leetcodeNumber": null,
@@ -342,6 +355,7 @@
     },
     "FairCandySwap": {
       "task": "FairCandySwap",
+      "className": "FairCandySwap",
       "javaFile": "src/main/java/arrays/FairCandySwap.java",
       "leetcodeUrl": "https://leetcode.com/problems/fair-candy-swap/",
       "leetcodeNumber": null,
@@ -368,6 +382,7 @@
     },
     "HeightChecker": {
       "task": "HeightChecker",
+      "className": "HeightChecker",
       "javaFile": "src/main/java/arrays/HeightChecker.java",
       "leetcodeUrl": "https://leetcode.com/problems/height-checker/",
       "leetcodeNumber": null,
@@ -394,6 +409,7 @@
     },
     "LongestConsecutiveSequence": {
       "task": "LongestConsecutiveSequence",
+      "className": "LongestConsecutiveSequence",
       "javaFile": "src/main/java/arrays/LongestConsecutiveSequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-consecutive-sequence/",
       "leetcodeNumber": 128,
@@ -420,6 +436,7 @@
     },
     "MaximalSquare": {
       "task": "MaximalSquare",
+      "className": "MaximalSquare",
       "javaFile": "src/main/java/arrays/MaximalSquare.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximal-square/",
       "leetcodeNumber": 221,
@@ -446,6 +463,7 @@
     },
     "MaximizeDistanceToClosestPerson": {
       "task": "MaximizeDistanceToClosestPerson",
+      "className": "MaximizeDistanceToClosestPerson",
       "javaFile": "src/main/java/arrays/MaximizeDistanceToClosestPerson.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximize-distance-to-closest-person/",
       "leetcodeNumber": null,
@@ -472,6 +490,7 @@
     },
     "MinimumArrowsToBurstBalloons": {
       "task": "MinimumArrowsToBurstBalloons",
+      "className": "MinimumArrowsToBurstBalloons",
       "javaFile": "src/main/java/arrays/MinimumArrowsToBurstBalloons.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/",
       "leetcodeNumber": null,
@@ -498,6 +517,7 @@
     },
     "MinimumMovesToEqualArrayElementsII": {
       "task": "MinimumMovesToEqualArrayElementsII",
+      "className": "MinimumMovesToEqualArrayElementsII",
       "javaFile": "src/main/java/arrays/MinimumMovesToEqualArrayElementsII.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/",
       "leetcodeNumber": null,
@@ -524,6 +544,7 @@
     },
     "NextPermutation": {
       "task": "NextPermutation",
+      "className": "NextPermutation",
       "javaFile": "src/main/java/arrays/NextPermutation.java",
       "leetcodeUrl": "https://leetcode.com/problems/next-permutation/",
       "leetcodeNumber": null,
@@ -550,6 +571,7 @@
     },
     "NumberOfLaserBeamsInABank": {
       "task": "NumberOfLaserBeamsInABank",
+      "className": "NumberOfLaserBeamsInABank",
       "javaFile": "src/main/java/arrays/NumberOfLaserBeamsInABank.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-laser-beams-in-a-bank/",
       "leetcodeNumber": null,
@@ -576,6 +598,7 @@
     },
     "PlusOne": {
       "task": "PlusOne",
+      "className": "PlusOne",
       "javaFile": "src/main/java/arrays/PlusOne.java",
       "leetcodeUrl": "https://leetcode.com/problems/plus-one/",
       "leetcodeNumber": 66,
@@ -602,6 +625,7 @@
     },
     "RotateFunction": {
       "task": "RotateFunction",
+      "className": "RotateFunction",
       "javaFile": "src/main/java/arrays/RotateFunction.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-function/",
       "leetcodeNumber": null,
@@ -628,6 +652,7 @@
     },
     "SentenceReverseInPlace": {
       "task": "SentenceReverseInPlace",
+      "className": "SentenceReverseInPlace",
       "javaFile": "src/main/java/arrays/SentenceReverseInPlace.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-words-in-a-string-ii/",
       "leetcodeNumber": null,
@@ -654,6 +679,7 @@
     },
     "SignOfTheProductOfAnArray": {
       "task": "SignOfTheProductOfAnArray",
+      "className": "SignOfTheProductOfAnArray",
       "javaFile": "src/main/java/arrays/SignOfTheProductOfAnArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/sign-of-the-product-of-an-array/",
       "leetcodeNumber": 1822,
@@ -680,6 +706,7 @@
     },
     "SubsequenceSumCondition": {
       "task": "SubsequenceSumCondition",
+      "className": "SubsequenceSumCondition",
       "javaFile": "src/main/java/arrays/SubsequenceSumCondition.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-subsequences-that-satisfy-the-given-sum-condition/",
       "leetcodeNumber": 1498,
@@ -706,6 +733,7 @@
     },
     "TicTacToe": {
       "task": "TicTacToe",
+      "className": "TicTacToe",
       "javaFile": "src/main/java/arrays/TicTacToe.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-tic-tac-toe/",
       "leetcodeNumber": null,
@@ -732,6 +760,7 @@
     },
     "RottenOranges": {
       "task": "RottenOranges",
+      "className": "RottenOranges",
       "javaFile": "src/main/java/arrays/bfs/RottenOranges.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotting-oranges/",
       "leetcodeNumber": 994,
@@ -758,6 +787,7 @@
     },
     "BinarySearch": {
       "task": "BinarySearch",
+      "className": "BinarySearch",
       "javaFile": "src/main/java/arrays/binarysearch/BinarySearch.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-search/",
       "leetcodeNumber": 704,
@@ -784,6 +814,7 @@
     },
     "CapacityToShipPackagesWithinDDays": {
       "task": "CapacityToShipPackagesWithinDDays",
+      "className": "CapacityToShipPackagesWithinDDays",
       "javaFile": "src/main/java/arrays/binarysearch/CapacityToShipPackagesWithinDDays.java",
       "leetcodeUrl": "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/",
       "leetcodeNumber": 1011,
@@ -810,6 +841,7 @@
     },
     "CreateExpression": {
       "task": "CreateExpression",
+      "className": "CreateExpression",
       "javaFile": "src/main/java/arrays/binarysearch/CreateExpression.java",
       "leetcodeUrl": "https://leetcode.com/problems/summary-ranges/",
       "leetcodeNumber": null,
@@ -836,6 +868,7 @@
     },
     "FindMinimumInRotatedSortedArray": {
       "task": "FindMinimumInRotatedSortedArray",
+      "className": "FindMinimumInRotatedSortedArray",
       "javaFile": "src/main/java/arrays/binarysearch/FindMinimumInRotatedSortedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/",
       "leetcodeNumber": 153,
@@ -862,6 +895,7 @@
     },
     "FindPeakElement": {
       "task": "FindPeakElement",
+      "className": "FindPeakElement",
       "javaFile": "src/main/java/arrays/binarysearch/FindPeakElement.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-peak-element/",
       "leetcodeNumber": 162,
@@ -888,6 +922,7 @@
     },
     "FindPeakElementII": {
       "task": "FindPeakElementII",
+      "className": "FindPeakElementII",
       "javaFile": "src/main/java/arrays/binarysearch/FindPeakElementII.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-a-peak-element-ii/",
       "leetcodeNumber": null,
@@ -914,6 +949,7 @@
     },
     "FirstAndLastPositionBinarySearch": {
       "task": "FirstAndLastPositionBinarySearch",
+      "className": "FirstAndLastPositionBinarySearch",
       "javaFile": "src/main/java/arrays/binarysearch/FirstAndLastPositionBinarySearch.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/",
       "leetcodeNumber": 34,
@@ -940,6 +976,7 @@
     },
     "GuessingGame": {
       "task": "GuessingGame",
+      "className": "GuessingGame",
       "javaFile": "src/main/java/arrays/binarysearch/GuessingGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/guess-number-higher-or-lower/",
       "leetcodeNumber": 374,
@@ -966,6 +1003,7 @@
     },
     "GuessingGame2": {
       "task": "GuessingGame2",
+      "className": "GuessingGame2",
       "javaFile": "src/main/java/arrays/binarysearch/GuessingGame2.java",
       "leetcodeUrl": "https://leetcode.com/problems/guess-number-higher-or-lower-ii/",
       "leetcodeNumber": null,
@@ -992,6 +1030,7 @@
     },
     "KokoEatingBanana": {
       "task": "KokoEatingBanana",
+      "className": "KokoEatingBanana",
       "javaFile": "src/main/java/arrays/binarysearch/KokoEatingBanana.java",
       "leetcodeUrl": "https://leetcode.com/problems/koko-eating-bananas/",
       "leetcodeNumber": 875,
@@ -1018,6 +1057,7 @@
     },
     "KthMissingPositiveNumber": {
       "task": "KthMissingPositiveNumber",
+      "className": "KthMissingPositiveNumber",
       "javaFile": "src/main/java/arrays/binarysearch/KthMissingPositiveNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-missing-positive-number/",
       "leetcodeNumber": null,
@@ -1042,13 +1082,14 @@
         "skip": false
       }
     },
-    "MaximumSwap": {
-      "task": "MaximumSwap",
-      "javaFile": "src/main/java/greedy/MaximumSwap.java",
+    "MaximumSwap__binarysearch": {
+      "task": "MaximumSwap__binarysearch",
+      "className": "MaximumSwap",
+      "javaFile": "src/main/java/arrays/binarysearch/MaximumSwap.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-swap/",
       "leetcodeNumber": null,
       "problemName": "MaximumSwap",
-      "pattern": "Greedy",
+      "pattern": "Binary Search",
       "difficulty": "Unknown",
       "isNC150": false,
       "isBlind75": false,
@@ -1058,7 +1099,7 @@
         "intervalDays": 0,
         "repetitions": 0,
         "lastReviewed": null,
-        "nextDue": "2026-12-26",
+        "nextDue": "2026-11-14",
         "lastGrade": null
       },
       "history": [],
@@ -1070,6 +1111,7 @@
     },
     "MaximumTeamSizeWithOverlappingIntervals": {
       "task": "MaximumTeamSizeWithOverlappingIntervals",
+      "className": "MaximumTeamSizeWithOverlappingIntervals",
       "javaFile": "src/main/java/arrays/binarysearch/MaximumTeamSizeWithOverlappingIntervals.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-team-size-with-overlapping-intervals/",
       "leetcodeNumber": null,
@@ -1096,6 +1138,7 @@
     },
     "MinimumLimitOfBallsInABag": {
       "task": "MinimumLimitOfBallsInABag",
+      "className": "MinimumLimitOfBallsInABag",
       "javaFile": "src/main/java/arrays/binarysearch/MinimumLimitOfBallsInABag.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-limit-of-balls-in-a-bag/",
       "leetcodeNumber": null,
@@ -1122,6 +1165,7 @@
     },
     "SearchInRotatedSortedArray": {
       "task": "SearchInRotatedSortedArray",
+      "className": "SearchInRotatedSortedArray",
       "javaFile": "src/main/java/arrays/binarysearch/SearchInRotatedSortedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-in-rotated-sorted-array/",
       "leetcodeNumber": 33,
@@ -1148,6 +1192,7 @@
     },
     "SearchInRotatedSortedArrayII": {
       "task": "SearchInRotatedSortedArrayII",
+      "className": "SearchInRotatedSortedArrayII",
       "javaFile": "src/main/java/arrays/binarysearch/SearchInRotatedSortedArrayII.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/",
       "leetcodeNumber": 81,
@@ -1174,6 +1219,7 @@
     },
     "SearchInsertPosition": {
       "task": "SearchInsertPosition",
+      "className": "SearchInsertPosition",
       "javaFile": "src/main/java/arrays/binarysearch/SearchInsertPosition.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-insert-position/",
       "leetcodeNumber": 35,
@@ -1200,6 +1246,7 @@
     },
     "SingleElementInASortedArray": {
       "task": "SingleElementInASortedArray",
+      "className": "SingleElementInASortedArray",
       "javaFile": "src/main/java/arrays/binarysearch/SingleElementInASortedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/single-element-in-a-sorted-array/",
       "leetcodeNumber": 540,
@@ -1226,6 +1273,7 @@
     },
     "SnapshotArray": {
       "task": "SnapshotArray",
+      "className": "SnapshotArray",
       "javaFile": "src/main/java/arrays/binarysearch/SnapshotArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/snapshot-array/",
       "leetcodeNumber": null,
@@ -1252,6 +1300,7 @@
     },
     "SplitArrayLargestSum": {
       "task": "SplitArrayLargestSum",
+      "className": "SplitArrayLargestSum",
       "javaFile": "src/main/java/arrays/binarysearch/SplitArrayLargestSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/split-array-largest-sum/",
       "leetcodeNumber": 410,
@@ -1278,6 +1327,7 @@
     },
     "TimeMap": {
       "task": "TimeMap",
+      "className": "TimeMap",
       "javaFile": "src/main/java/arrays/binarysearch/TimeMap.java",
       "leetcodeUrl": "https://leetcode.com/problems/time-based-key-value-store/",
       "leetcodeNumber": 981,
@@ -1304,6 +1354,7 @@
     },
     "MaxIncreaseToKeepCitySkyline": {
       "task": "MaxIncreaseToKeepCitySkyline",
+      "className": "MaxIncreaseToKeepCitySkyline",
       "javaFile": "src/main/java/arrays/greedy/MaxIncreaseToKeepCitySkyline.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-increase-to-keep-city-skyline/",
       "leetcodeNumber": null,
@@ -1330,6 +1381,7 @@
     },
     "MaximumUnitsOnATruck": {
       "task": "MaximumUnitsOnATruck",
+      "className": "MaximumUnitsOnATruck",
       "javaFile": "src/main/java/arrays/greedy/MaximumUnitsOnATruck.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-units-on-a-truck/",
       "leetcodeNumber": null,
@@ -1356,6 +1408,7 @@
     },
     "MinFlipsToMonotoneIncreasing": {
       "task": "MinFlipsToMonotoneIncreasing",
+      "className": "MinFlipsToMonotoneIncreasing",
       "javaFile": "src/main/java/arrays/greedy/MinFlipsToMonotoneIncreasing.java",
       "leetcodeUrl": "https://leetcode.com/problems/flip-string-to-monotone-increasing/",
       "leetcodeNumber": 926,
@@ -1382,6 +1435,7 @@
     },
     "MinTaps": {
       "task": "MinTaps",
+      "className": "MinTaps",
       "javaFile": "src/main/java/arrays/greedy/MinTaps.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/",
       "leetcodeNumber": null,
@@ -1408,6 +1462,7 @@
     },
     "MinimumCostToConnectSticks": {
       "task": "MinimumCostToConnectSticks",
+      "className": "MinimumCostToConnectSticks",
       "javaFile": "src/main/java/arrays/greedy/MinimumCostToConnectSticks.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-connect-sticks/",
       "leetcodeNumber": null,
@@ -1434,6 +1489,7 @@
     },
     "MinimumDeletionsToMakeFrequenciesUnique": {
       "task": "MinimumDeletionsToMakeFrequenciesUnique",
+      "className": "MinimumDeletionsToMakeFrequenciesUnique",
       "javaFile": "src/main/java/arrays/greedy/MinimumDeletionsToMakeFrequenciesUnique.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-deletions-to-make-character-frequencies-unique/",
       "leetcodeNumber": 1647,
@@ -1460,6 +1516,7 @@
     },
     "MinimumDominoRotationsForEqualRow": {
       "task": "MinimumDominoRotationsForEqualRow",
+      "className": "MinimumDominoRotationsForEqualRow",
       "javaFile": "src/main/java/arrays/greedy/MinimumDominoRotationsForEqualRow.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-domino-rotations-for-equal-row/",
       "leetcodeNumber": null,
@@ -1486,6 +1543,7 @@
     },
     "NonDecreasingArray": {
       "task": "NonDecreasingArray",
+      "className": "NonDecreasingArray",
       "javaFile": "src/main/java/arrays/greedy/NonDecreasingArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/non-decreasing-array/",
       "leetcodeNumber": 665,
@@ -1512,6 +1570,7 @@
     },
     "PushDominoes": {
       "task": "PushDominoes",
+      "className": "PushDominoes",
       "javaFile": "src/main/java/arrays/greedy/PushDominoes.java",
       "leetcodeUrl": "https://leetcode.com/problems/push-dominoes/",
       "leetcodeNumber": 838,
@@ -1538,6 +1597,7 @@
     },
     "QueueReconstructionByHeight": {
       "task": "QueueReconstructionByHeight",
+      "className": "QueueReconstructionByHeight",
       "javaFile": "src/main/java/arrays/greedy/QueueReconstructionByHeight.java",
       "leetcodeUrl": "https://leetcode.com/problems/queue-reconstruction-by-height/",
       "leetcodeNumber": null,
@@ -1564,6 +1624,7 @@
     },
     "FindOriginalArrayFromDoubledArray": {
       "task": "FindOriginalArrayFromDoubledArray",
+      "className": "FindOriginalArrayFromDoubledArray",
       "javaFile": "src/main/java/arrays/hashmap/FindOriginalArrayFromDoubledArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-original-array-from-doubled-array/",
       "leetcodeNumber": null,
@@ -1590,6 +1651,7 @@
     },
     "InsertDeleteGetRandom": {
       "task": "InsertDeleteGetRandom",
+      "className": "InsertDeleteGetRandom",
       "javaFile": "src/main/java/arrays/hashmap/InsertDeleteGetRandom.java",
       "leetcodeUrl": "https://leetcode.com/problems/insert-delete-getrandom-o1/",
       "leetcodeNumber": 380,
@@ -1616,6 +1678,7 @@
     },
     "LeastUniqueNumbers": {
       "task": "LeastUniqueNumbers",
+      "className": "LeastUniqueNumbers",
       "javaFile": "src/main/java/arrays/heap/LeastUniqueNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/",
       "leetcodeNumber": null,
@@ -1642,6 +1705,7 @@
     },
     "MedianFinder": {
       "task": "MedianFinder",
+      "className": "MedianFinder",
       "javaFile": "src/main/java/arrays/heap/MedianFinder.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-median-from-data-stream/",
       "leetcodeNumber": 295,
@@ -1668,6 +1732,7 @@
     },
     "MinimumCostOfBuyingCandiesWithDiscount": {
       "task": "MinimumCostOfBuyingCandiesWithDiscount",
+      "className": "MinimumCostOfBuyingCandiesWithDiscount",
       "javaFile": "src/main/java/arrays/heap/MinimumCostOfBuyingCandiesWithDiscount.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-of-buying-candies-with-discount/",
       "leetcodeNumber": null,
@@ -1694,6 +1759,7 @@
     },
     "Twitter": {
       "task": "Twitter",
+      "className": "Twitter",
       "javaFile": "src/main/java/arrays/heap/Twitter.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-twitter/",
       "leetcodeNumber": 355,
@@ -1720,6 +1786,7 @@
     },
     "FirstMissingPositive": {
       "task": "FirstMissingPositive",
+      "className": "FirstMissingPositive",
       "javaFile": "src/main/java/arrays/indexhash/FirstMissingPositive.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-missing-positive/",
       "leetcodeNumber": 41,
@@ -1744,9 +1811,10 @@
         "skip": false
       }
     },
-    "InsertInterval": {
-      "task": "InsertInterval",
-      "javaFile": "src/main/java/greedy/InsertInterval.java",
+    "InsertInterval__intervals": {
+      "task": "InsertInterval__intervals",
+      "className": "InsertInterval",
+      "javaFile": "src/main/java/arrays/intervals/InsertInterval.java",
       "leetcodeUrl": "https://leetcode.com/problems/insert-interval/",
       "leetcodeNumber": 57,
       "problemName": "Insert Interval",
@@ -1760,7 +1828,7 @@
         "intervalDays": 0,
         "repetitions": 0,
         "lastReviewed": null,
-        "nextDue": "2026-09-05",
+        "nextDue": "2026-07-25",
         "lastGrade": null
       },
       "history": [],
@@ -1772,6 +1840,7 @@
     },
     "MeetingRoomsIII": {
       "task": "MeetingRoomsIII",
+      "className": "MeetingRoomsIII",
       "javaFile": "src/main/java/arrays/intervals/MeetingRoomsIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/meeting-rooms-iii/",
       "leetcodeNumber": null,
@@ -1798,6 +1867,7 @@
     },
     "MergeIntervals": {
       "task": "MergeIntervals",
+      "className": "MergeIntervals",
       "javaFile": "src/main/java/arrays/intervals/MergeIntervals.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-intervals/",
       "leetcodeNumber": 56,
@@ -1824,6 +1894,7 @@
     },
     "KadaneAlgo": {
       "task": "KadaneAlgo",
+      "className": "KadaneAlgo",
       "javaFile": "src/main/java/arrays/kadane/KadaneAlgo.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-subarray/",
       "leetcodeNumber": 53,
@@ -1850,6 +1921,7 @@
     },
     "MaxScoreSplicedArray": {
       "task": "MaxScoreSplicedArray",
+      "className": "MaxScoreSplicedArray",
       "javaFile": "src/main/java/arrays/kadane/MaxScoreSplicedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-score-of-spliced-array/",
       "leetcodeNumber": null,
@@ -1876,6 +1948,7 @@
     },
     "CheckIfMatrixIsXMatrix": {
       "task": "CheckIfMatrixIsXMatrix",
+      "className": "CheckIfMatrixIsXMatrix",
       "javaFile": "src/main/java/arrays/matrix/CheckIfMatrixIsXMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-matrix-is-x-matrix/",
       "leetcodeNumber": null,
@@ -1902,6 +1975,7 @@
     },
     "RotateArray": {
       "task": "RotateArray",
+      "className": "RotateArray",
       "javaFile": "src/main/java/arrays/matrix/RotateArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-array/",
       "leetcodeNumber": 189,
@@ -1928,6 +2002,7 @@
     },
     "RotateImage": {
       "task": "RotateImage",
+      "className": "RotateImage",
       "javaFile": "src/main/java/arrays/matrix/RotateImage.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-image/",
       "leetcodeNumber": 48,
@@ -1954,6 +2029,7 @@
     },
     "Search2DMatrix": {
       "task": "Search2DMatrix",
+      "className": "Search2DMatrix",
       "javaFile": "src/main/java/arrays/matrix/Search2DMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-a-2d-matrix/",
       "leetcodeNumber": 74,
@@ -1980,6 +2056,7 @@
     },
     "Search2DMatrixII": {
       "task": "Search2DMatrixII",
+      "className": "Search2DMatrixII",
       "javaFile": "src/main/java/arrays/matrix/Search2DMatrixII.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-a-2d-matrix-ii/",
       "leetcodeNumber": null,
@@ -2006,6 +2083,7 @@
     },
     "SetMatrixZero": {
       "task": "SetMatrixZero",
+      "className": "SetMatrixZero",
       "javaFile": "src/main/java/arrays/matrix/SetMatrixZero.java",
       "leetcodeUrl": "https://leetcode.com/problems/set-matrix-zeroes/",
       "leetcodeNumber": 73,
@@ -2032,6 +2110,7 @@
     },
     "SpiralMatrixTraversal": {
       "task": "SpiralMatrixTraversal",
+      "className": "SpiralMatrixTraversal",
       "javaFile": "src/main/java/arrays/matrix/SpiralMatrixTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/spiral-matrix/",
       "leetcodeNumber": 54,
@@ -2058,6 +2137,7 @@
     },
     "CountOfSmallerNumbersAfterSelf": {
       "task": "CountOfSmallerNumbersAfterSelf",
+      "className": "CountOfSmallerNumbersAfterSelf",
       "javaFile": "src/main/java/arrays/mergesort/CountOfSmallerNumbersAfterSelf.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-of-smaller-numbers-after-self/",
       "leetcodeNumber": null,
@@ -2084,6 +2164,7 @@
     },
     "ReversePairs": {
       "task": "ReversePairs",
+      "className": "ReversePairs",
       "javaFile": "src/main/java/arrays/mergesort/ReversePairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-pairs/",
       "leetcodeNumber": null,
@@ -2110,6 +2191,7 @@
     },
     "AllDivisionsWithTheHighestScoreOfABinaryArray": {
       "task": "AllDivisionsWithTheHighestScoreOfABinaryArray",
+      "className": "AllDivisionsWithTheHighestScoreOfABinaryArray",
       "javaFile": "src/main/java/arrays/prefixsum/AllDivisionsWithTheHighestScoreOfABinaryArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-divisions-with-the-highest-score-of-a-binary-array/",
       "leetcodeNumber": null,
@@ -2136,6 +2218,7 @@
     },
     "CountTheHiddenSequences": {
       "task": "CountTheHiddenSequences",
+      "className": "CountTheHiddenSequences",
       "javaFile": "src/main/java/arrays/prefixsum/CountTheHiddenSequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-the-hidden-sequences/",
       "leetcodeNumber": null,
@@ -2162,6 +2245,7 @@
     },
     "MatrixBlockSum": {
       "task": "MatrixBlockSum",
+      "className": "MatrixBlockSum",
       "javaFile": "src/main/java/arrays/prefixsum/MatrixBlockSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/matrix-block-sum/",
       "leetcodeNumber": null,
@@ -2188,6 +2272,7 @@
     },
     "MaxSumOfRectangleNoLargerThanK": {
       "task": "MaxSumOfRectangleNoLargerThanK",
+      "className": "MaxSumOfRectangleNoLargerThanK",
       "javaFile": "src/main/java/arrays/prefixsum/MaxSumOfRectangleNoLargerThanK.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/",
       "leetcodeNumber": null,
@@ -2214,6 +2299,7 @@
     },
     "ProductExceptSelf": {
       "task": "ProductExceptSelf",
+      "className": "ProductExceptSelf",
       "javaFile": "src/main/java/arrays/prefixsum/ProductExceptSelf.java",
       "leetcodeUrl": "https://leetcode.com/problems/product-of-array-except-self/",
       "leetcodeNumber": 238,
@@ -2240,6 +2326,7 @@
     },
     "RangeAddition": {
       "task": "RangeAddition",
+      "className": "RangeAddition",
       "javaFile": "src/main/java/arrays/prefixsum/RangeAddition.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-addition/",
       "leetcodeNumber": null,
@@ -2266,6 +2353,7 @@
     },
     "RangeSumQuery2DImmutable": {
       "task": "RangeSumQuery2DImmutable",
+      "className": "RangeSumQuery2DImmutable",
       "javaFile": "src/main/java/arrays/prefixsum/RangeSumQuery2DImmutable.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-2d-immutable/",
       "leetcodeNumber": 304,
@@ -2292,6 +2380,7 @@
     },
     "BoundedRobot": {
       "task": "BoundedRobot",
+      "className": "BoundedRobot",
       "javaFile": "src/main/java/arrays/simulation/BoundedRobot.java",
       "leetcodeUrl": "https://leetcode.com/problems/robot-bounded-in-circle/",
       "leetcodeNumber": 1041,
@@ -2318,6 +2407,7 @@
     },
     "GameOfLife": {
       "task": "GameOfLife",
+      "className": "GameOfLife",
       "javaFile": "src/main/java/arrays/simulation/GameOfLife.java",
       "leetcodeUrl": "https://leetcode.com/problems/game-of-life/",
       "leetcodeNumber": null,
@@ -2344,6 +2434,7 @@
     },
     "ContinuousSubarraySum": {
       "task": "ContinuousSubarraySum",
+      "className": "ContinuousSubarraySum",
       "javaFile": "src/main/java/arrays/slidingwindow/ContinuousSubarraySum.java",
       "leetcodeUrl": "https://leetcode.com/problems/continuous-subarray-sum/",
       "leetcodeNumber": 523,
@@ -2370,6 +2461,7 @@
     },
     "DuplicateZeros": {
       "task": "DuplicateZeros",
+      "className": "DuplicateZeros",
       "javaFile": "src/main/java/arrays/slidingwindow/DuplicateZeros.java",
       "leetcodeUrl": "https://leetcode.com/problems/duplicate-zeros/",
       "leetcodeNumber": null,
@@ -2396,6 +2488,7 @@
     },
     "FindAllDuplicatesInAnArray": {
       "task": "FindAllDuplicatesInAnArray",
+      "className": "FindAllDuplicatesInAnArray",
       "javaFile": "src/main/java/arrays/slidingwindow/FindAllDuplicatesInAnArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-duplicates-in-an-array/",
       "leetcodeNumber": null,
@@ -2422,6 +2515,7 @@
     },
     "FindAllLonelyNumbersInTheArray": {
       "task": "FindAllLonelyNumbersInTheArray",
+      "className": "FindAllLonelyNumbersInTheArray",
       "javaFile": "src/main/java/arrays/slidingwindow/FindAllLonelyNumbersInTheArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-lonely-numbers-in-the-array/",
       "leetcodeNumber": null,
@@ -2448,6 +2542,7 @@
     },
     "JumpGame": {
       "task": "JumpGame",
+      "className": "JumpGame",
       "javaFile": "src/main/java/arrays/slidingwindow/JumpGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/jump-game/",
       "leetcodeNumber": 55,
@@ -2474,6 +2569,7 @@
     },
     "JumpGame2": {
       "task": "JumpGame2",
+      "className": "JumpGame2",
       "javaFile": "src/main/java/arrays/slidingwindow/JumpGame2.java",
       "leetcodeUrl": "https://leetcode.com/problems/jump-game-ii/",
       "leetcodeNumber": 45,
@@ -2500,6 +2596,7 @@
     },
     "MaxConsecutiveOnesIII": {
       "task": "MaxConsecutiveOnesIII",
+      "className": "MaxConsecutiveOnesIII",
       "javaFile": "src/main/java/arrays/slidingwindow/MaxConsecutiveOnesIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-consecutive-ones-iii/",
       "leetcodeNumber": null,
@@ -2526,6 +2623,7 @@
     },
     "MaxSlidingWindow": {
       "task": "MaxSlidingWindow",
+      "className": "MaxSlidingWindow",
       "javaFile": "src/main/java/arrays/slidingwindow/MaxSlidingWindow.java",
       "leetcodeUrl": "https://leetcode.com/problems/sliding-window-maximum/",
       "leetcodeNumber": 239,
@@ -2552,6 +2650,7 @@
     },
     "MergeKSortedArrays": {
       "task": "MergeKSortedArrays",
+      "className": "MergeKSortedArrays",
       "javaFile": "src/main/java/arrays/slidingwindow/MergeKSortedArrays.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-k-sorted-lists/",
       "leetcodeNumber": 23,
@@ -2578,6 +2677,7 @@
     },
     "MinimumSwapsToGroupAll1sTogether": {
       "task": "MinimumSwapsToGroupAll1sTogether",
+      "className": "MinimumSwapsToGroupAll1sTogether",
       "javaFile": "src/main/java/arrays/slidingwindow/MinimumSwapsToGroupAll1sTogether.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together/",
       "leetcodeNumber": null,
@@ -2604,6 +2704,7 @@
     },
     "SubarraySumsDivisibleByK": {
       "task": "SubarraySumsDivisibleByK",
+      "className": "SubarraySumsDivisibleByK",
       "javaFile": "src/main/java/arrays/slidingwindow/SubarraySumsDivisibleByK.java",
       "leetcodeUrl": "https://leetcode.com/problems/subarray-sums-divisible-by-k/",
       "leetcodeNumber": null,
@@ -2630,6 +2731,7 @@
     },
     "SubarraysWithKDifferentIntegers": {
       "task": "SubarraysWithKDifferentIntegers",
+      "className": "SubarraysWithKDifferentIntegers",
       "javaFile": "src/main/java/arrays/slidingwindow/SubarraysWithKDifferentIntegers.java",
       "leetcodeUrl": "https://leetcode.com/problems/subarrays-with-k-different-integers/",
       "leetcodeNumber": null,
@@ -2656,6 +2758,7 @@
     },
     "MakeLexicographicallySmallestArrayBySwappingElements": {
       "task": "MakeLexicographicallySmallestArrayBySwappingElements",
+      "className": "MakeLexicographicallySmallestArrayBySwappingElements",
       "javaFile": "src/main/java/arrays/sorting/MakeLexicographicallySmallestArrayBySwappingElements.java",
       "leetcodeUrl": "https://leetcode.com/problems/make-lexicographically-smallest-array-by-swapping-elements/",
       "leetcodeNumber": null,
@@ -2682,6 +2785,7 @@
     },
     "MergeSortedArray": {
       "task": "MergeSortedArray",
+      "className": "MergeSortedArray",
       "javaFile": "src/main/java/arrays/sorting/MergeSortedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-sorted-array/",
       "leetcodeNumber": 88,
@@ -2708,6 +2812,7 @@
     },
     "RotatedSortedSearch": {
       "task": "RotatedSortedSearch",
+      "className": "RotatedSortedSearch",
       "javaFile": "src/main/java/arrays/sorting/RotatedSortedSearch.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-in-rotated-sorted-array/",
       "leetcodeNumber": 33,
@@ -2734,6 +2839,7 @@
     },
     "RotatedSortedSearchWithDuplicates": {
       "task": "RotatedSortedSearchWithDuplicates",
+      "className": "RotatedSortedSearchWithDuplicates",
       "javaFile": "src/main/java/arrays/sorting/RotatedSortedSearchWithDuplicates.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/",
       "leetcodeNumber": 81,
@@ -2760,6 +2866,7 @@
     },
     "SortTheMatrixDiagonally": {
       "task": "SortTheMatrixDiagonally",
+      "className": "SortTheMatrixDiagonally",
       "javaFile": "src/main/java/arrays/sorting/SortTheMatrixDiagonally.java",
       "leetcodeUrl": "https://leetcode.com/problems/sort-the-matrix-diagonally/",
       "leetcodeNumber": null,
@@ -2786,6 +2893,7 @@
     },
     "ContainerWithMostWater": {
       "task": "ContainerWithMostWater",
+      "className": "ContainerWithMostWater",
       "javaFile": "src/main/java/arrays/twopointers/ContainerWithMostWater.java",
       "leetcodeUrl": "https://leetcode.com/problems/container-with-most-water/",
       "leetcodeNumber": 11,
@@ -2812,6 +2920,7 @@
     },
     "DuplicateNumber": {
       "task": "DuplicateNumber",
+      "className": "DuplicateNumber",
       "javaFile": "src/main/java/arrays/twopointers/DuplicateNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-duplicate-number/",
       "leetcodeNumber": 287,
@@ -2838,6 +2947,7 @@
     },
     "FourSum": {
       "task": "FourSum",
+      "className": "FourSum",
       "javaFile": "src/main/java/arrays/twopointers/FourSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/4sum/",
       "leetcodeNumber": 18,
@@ -2864,6 +2974,7 @@
     },
     "MaxResourceAccess": {
       "task": "MaxResourceAccess",
+      "className": "MaxResourceAccess",
       "javaFile": "src/main/java/arrays/twopointers/MaxResourceAccess.java",
       "leetcodeUrl": "https://leetcode.com/problems/analyze-user-website-visit-pattern/",
       "leetcodeNumber": null,
@@ -2890,6 +3001,7 @@
     },
     "MaxValueOfEquation": {
       "task": "MaxValueOfEquation",
+      "className": "MaxValueOfEquation",
       "javaFile": "src/main/java/arrays/twopointers/MaxValueOfEquation.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-value-of-equation/",
       "leetcodeNumber": null,
@@ -2916,6 +3028,7 @@
     },
     "MaximumSumIncreasingTriplet": {
       "task": "MaximumSumIncreasingTriplet",
+      "className": "MaximumSumIncreasingTriplet",
       "javaFile": "src/main/java/arrays/twopointers/MaximumSumIncreasingTriplet.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/",
       "leetcodeNumber": null,
@@ -2942,6 +3055,7 @@
     },
     "MedianArrays": {
       "task": "MedianArrays",
+      "className": "MedianArrays",
       "javaFile": "src/main/java/arrays/twopointers/MedianArrays.java",
       "leetcodeUrl": "https://leetcode.com/problems/median-of-two-sorted-arrays/",
       "leetcodeNumber": 4,
@@ -2968,6 +3082,7 @@
     },
     "MinWindowSubstring": {
       "task": "MinWindowSubstring",
+      "className": "MinWindowSubstring",
       "javaFile": "src/main/java/arrays/twopointers/MinWindowSubstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-window-substring/",
       "leetcodeNumber": 76,
@@ -2994,6 +3109,7 @@
     },
     "PartitionArrayIntoDisjointIntervals": {
       "task": "PartitionArrayIntoDisjointIntervals",
+      "className": "PartitionArrayIntoDisjointIntervals",
       "javaFile": "src/main/java/arrays/twopointers/PartitionArrayIntoDisjointIntervals.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-array-into-disjoint-intervals/",
       "leetcodeNumber": null,
@@ -3020,6 +3136,7 @@
     },
     "PerfectSquares": {
       "task": "PerfectSquares",
+      "className": "PerfectSquares",
       "javaFile": "src/main/java/arrays/twopointers/PerfectSquares.java",
       "leetcodeUrl": "https://leetcode.com/problems/perfect-squares/",
       "leetcodeNumber": 279,
@@ -3046,6 +3163,7 @@
     },
     "RearrangeArrayElementsBySign": {
       "task": "RearrangeArrayElementsBySign",
+      "className": "RearrangeArrayElementsBySign",
       "javaFile": "src/main/java/arrays/twopointers/RearrangeArrayElementsBySign.java",
       "leetcodeUrl": "https://leetcode.com/problems/rearrange-array-elements-by-sign/",
       "leetcodeNumber": null,
@@ -3072,6 +3190,7 @@
     },
     "RemoveDuplicate2": {
       "task": "RemoveDuplicate2",
+      "className": "RemoveDuplicate2",
       "javaFile": "src/main/java/arrays/twopointers/RemoveDuplicate2.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/",
       "leetcodeNumber": 80,
@@ -3098,6 +3217,7 @@
     },
     "RemoveDuplicatesFromSortedArray": {
       "task": "RemoveDuplicatesFromSortedArray",
+      "className": "RemoveDuplicatesFromSortedArray",
       "javaFile": "src/main/java/arrays/twopointers/RemoveDuplicatesFromSortedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicates-from-sorted-array/",
       "leetcodeNumber": 26,
@@ -3124,6 +3244,7 @@
     },
     "RemoveElement": {
       "task": "RemoveElement",
+      "className": "RemoveElement",
       "javaFile": "src/main/java/arrays/twopointers/RemoveElement.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-element/",
       "leetcodeNumber": 27,
@@ -3150,6 +3271,7 @@
     },
     "ShortestWordDistance": {
       "task": "ShortestWordDistance",
+      "className": "ShortestWordDistance",
       "javaFile": "src/main/java/arrays/twopointers/ShortestWordDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-word-distance/",
       "leetcodeNumber": null,
@@ -3176,6 +3298,7 @@
     },
     "SortColors": {
       "task": "SortColors",
+      "className": "SortColors",
       "javaFile": "src/main/java/arrays/twopointers/SortColors.java",
       "leetcodeUrl": "https://leetcode.com/problems/sort-colors/",
       "leetcodeNumber": 75,
@@ -3202,6 +3325,7 @@
     },
     "SortTransformedArray": {
       "task": "SortTransformedArray",
+      "className": "SortTransformedArray",
       "javaFile": "src/main/java/arrays/twopointers/SortTransformedArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/sort-transformed-array/",
       "leetcodeNumber": null,
@@ -3228,6 +3352,7 @@
     },
     "SumSubarrayFinder": {
       "task": "SumSubarrayFinder",
+      "className": "SumSubarrayFinder",
       "javaFile": "src/main/java/arrays/twopointers/SumSubarrayFinder.java",
       "leetcodeUrl": "https://leetcode.com/problems/subarray-sum-equals-k/",
       "leetcodeNumber": 560,
@@ -3254,6 +3379,7 @@
     },
     "SwapAdjacentInLRString": {
       "task": "SwapAdjacentInLRString",
+      "className": "SwapAdjacentInLRString",
       "javaFile": "src/main/java/arrays/twopointers/SwapAdjacentInLRString.java",
       "leetcodeUrl": "https://leetcode.com/problems/swap-adjacent-in-lr-string/",
       "leetcodeNumber": null,
@@ -3280,6 +3406,7 @@
     },
     "ThreeSum": {
       "task": "ThreeSum",
+      "className": "ThreeSum",
       "javaFile": "src/main/java/arrays/twopointers/ThreeSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/3sum/",
       "leetcodeNumber": 15,
@@ -3306,6 +3433,7 @@
     },
     "ThreeSumClosest": {
       "task": "ThreeSumClosest",
+      "className": "ThreeSumClosest",
       "javaFile": "src/main/java/arrays/twopointers/ThreeSumClosest.java",
       "leetcodeUrl": "https://leetcode.com/problems/3sum-closest/",
       "leetcodeNumber": null,
@@ -3332,6 +3460,7 @@
     },
     "TrappingRainWater": {
       "task": "TrappingRainWater",
+      "className": "TrappingRainWater",
       "javaFile": "src/main/java/arrays/twopointers/TrappingRainWater.java",
       "leetcodeUrl": "https://leetcode.com/problems/trapping-rain-water/",
       "leetcodeNumber": 42,
@@ -3358,6 +3487,7 @@
     },
     "TrappingRainWaterII": {
       "task": "TrappingRainWaterII",
+      "className": "TrappingRainWaterII",
       "javaFile": "src/main/java/arrays/twopointers/TrappingRainWaterII.java",
       "leetcodeUrl": "https://leetcode.com/problems/trapping-rain-water/",
       "leetcodeNumber": 42,
@@ -3384,6 +3514,7 @@
     },
     "TwoSum": {
       "task": "TwoSum",
+      "className": "TwoSum",
       "javaFile": "src/main/java/arrays/twopointers/TwoSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/two-sum/",
       "leetcodeNumber": 1,
@@ -3410,6 +3541,7 @@
     },
     "TwoSumIIInputArrayIsSorted": {
       "task": "TwoSumIIInputArrayIsSorted",
+      "className": "TwoSumIIInputArrayIsSorted",
       "javaFile": "src/main/java/arrays/twopointers/TwoSumIIInputArrayIsSorted.java",
       "leetcodeUrl": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/",
       "leetcodeNumber": 167,
@@ -3436,6 +3568,7 @@
     },
     "ValidTriangleNumber": {
       "task": "ValidTriangleNumber",
+      "className": "ValidTriangleNumber",
       "javaFile": "src/main/java/arrays/twopointers/ValidTriangleNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-triangle-number/",
       "leetcodeNumber": null,
@@ -3462,6 +3595,7 @@
     },
     "MissingNumber": {
       "task": "MissingNumber",
+      "className": "MissingNumber",
       "javaFile": "src/main/java/arrays/xor/MissingNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/missing-number/",
       "leetcodeNumber": 268,
@@ -3488,6 +3622,7 @@
     },
     "SingleNumber": {
       "task": "SingleNumber",
+      "className": "SingleNumber",
       "javaFile": "src/main/java/arrays/xor/SingleNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/single-number/",
       "leetcodeNumber": 136,
@@ -3514,6 +3649,7 @@
     },
     "SingleNumberII": {
       "task": "SingleNumberII",
+      "className": "SingleNumberII",
       "javaFile": "src/main/java/arrays/xor/SingleNumberII.java",
       "leetcodeUrl": "https://leetcode.com/problems/single-number-ii/",
       "leetcodeNumber": null,
@@ -3540,6 +3676,7 @@
     },
     "CombinationSumIII": {
       "task": "CombinationSumIII",
+      "className": "CombinationSumIII",
       "javaFile": "src/main/java/backtrack/CombinationSumIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/combination-sum-iii/",
       "leetcodeNumber": null,
@@ -3566,6 +3703,7 @@
     },
     "Combinations": {
       "task": "Combinations",
+      "className": "Combinations",
       "javaFile": "src/main/java/backtrack/Combinations.java",
       "leetcodeUrl": "https://leetcode.com/problems/combinations/",
       "leetcodeNumber": 77,
@@ -3592,6 +3730,7 @@
     },
     "EqualSumSubsetPartition": {
       "task": "EqualSumSubsetPartition",
+      "className": "EqualSumSubsetPartition",
       "javaFile": "src/main/java/backtrack/EqualSumSubsetPartition.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-to-k-equal-sum-subsets/",
       "leetcodeNumber": 698,
@@ -3618,6 +3757,7 @@
     },
     "GrayCode": {
       "task": "GrayCode",
+      "className": "GrayCode",
       "javaFile": "src/main/java/backtrack/GrayCode.java",
       "leetcodeUrl": "https://leetcode.com/problems/gray-code/",
       "leetcodeNumber": null,
@@ -3644,6 +3784,7 @@
     },
     "IncreasingNDigitNumbers": {
       "task": "IncreasingNDigitNumbers",
+      "className": "IncreasingNDigitNumbers",
       "javaFile": "src/main/java/backtrack/IncreasingNDigitNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/sequential-digits/",
       "leetcodeNumber": null,
@@ -3670,6 +3811,7 @@
     },
     "KthPermutation": {
       "task": "KthPermutation",
+      "className": "KthPermutation",
       "javaFile": "src/main/java/backtrack/KthPermutation.java",
       "leetcodeUrl": "https://leetcode.com/problems/permutation-sequence/",
       "leetcodeNumber": null,
@@ -3696,6 +3838,7 @@
     },
     "MatchsticksToSquare": {
       "task": "MatchsticksToSquare",
+      "className": "MatchsticksToSquare",
       "javaFile": "src/main/java/backtrack/MatchsticksToSquare.java",
       "leetcodeUrl": "https://leetcode.com/problems/matchsticks-to-square/",
       "leetcodeNumber": 473,
@@ -3722,6 +3865,7 @@
     },
     "MaximumLengthOfAConcatenatedStringWithUniqueCharacters": {
       "task": "MaximumLengthOfAConcatenatedStringWithUniqueCharacters",
+      "className": "MaximumLengthOfAConcatenatedStringWithUniqueCharacters",
       "javaFile": "src/main/java/backtrack/MaximumLengthOfAConcatenatedStringWithUniqueCharacters.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-length-of-a-concatenated-string-with-unique-characters/",
       "leetcodeNumber": 1239,
@@ -3748,6 +3892,7 @@
     },
     "NQueen": {
       "task": "NQueen",
+      "className": "NQueen",
       "javaFile": "src/main/java/backtrack/NQueen.java",
       "leetcodeUrl": "https://leetcode.com/problems/n-queens/",
       "leetcodeNumber": 51,
@@ -3774,6 +3919,7 @@
     },
     "NQueen2": {
       "task": "NQueen2",
+      "className": "NQueen2",
       "javaFile": "src/main/java/backtrack/NQueen2.java",
       "leetcodeUrl": "https://leetcode.com/problems/n-queens-ii/",
       "leetcodeNumber": 52,
@@ -3800,6 +3946,7 @@
     },
     "Permutation": {
       "task": "Permutation",
+      "className": "Permutation",
       "javaFile": "src/main/java/backtrack/Permutation.java",
       "leetcodeUrl": "https://leetcode.com/problems/permutations/",
       "leetcodeNumber": 46,
@@ -3826,6 +3973,7 @@
     },
     "Permutation2": {
       "task": "Permutation2",
+      "className": "Permutation2",
       "javaFile": "src/main/java/backtrack/Permutation2.java",
       "leetcodeUrl": "https://leetcode.com/problems/permutations-ii/",
       "leetcodeNumber": 47,
@@ -3852,6 +4000,7 @@
     },
     "RemoveInvalidParenthesis": {
       "task": "RemoveInvalidParenthesis",
+      "className": "RemoveInvalidParenthesis",
       "javaFile": "src/main/java/backtrack/RemoveInvalidParenthesis.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-invalid-parentheses/",
       "leetcodeNumber": null,
@@ -3878,6 +4027,7 @@
     },
     "Subset": {
       "task": "Subset",
+      "className": "Subset",
       "javaFile": "src/main/java/backtrack/Subset.java",
       "leetcodeUrl": "https://leetcode.com/problems/subsets/",
       "leetcodeNumber": 78,
@@ -3904,6 +4054,7 @@
     },
     "Subset2": {
       "task": "Subset2",
+      "className": "Subset2",
       "javaFile": "src/main/java/backtrack/Subset2.java",
       "leetcodeUrl": "https://leetcode.com/problems/subsets-ii/",
       "leetcodeNumber": 90,
@@ -3930,6 +4081,7 @@
     },
     "SudokuSolve": {
       "task": "SudokuSolve",
+      "className": "SudokuSolve",
       "javaFile": "src/main/java/backtrack/SudokuSolve.java",
       "leetcodeUrl": "https://leetcode.com/problems/sudoku-solver/",
       "leetcodeNumber": null,
@@ -3956,6 +4108,7 @@
     },
     "SudokuValid": {
       "task": "SudokuValid",
+      "className": "SudokuValid",
       "javaFile": "src/main/java/backtrack/SudokuValid.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-sudoku/",
       "leetcodeNumber": 36,
@@ -3982,6 +4135,7 @@
     },
     "WordPattern2": {
       "task": "WordPattern2",
+      "className": "WordPattern2",
       "javaFile": "src/main/java/backtrack/WordPattern2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-pattern-ii/",
       "leetcodeNumber": null,
@@ -4008,6 +4162,7 @@
     },
     "CountWordsAfterAddingLetter": {
       "task": "CountWordsAfterAddingLetter",
+      "className": "CountWordsAfterAddingLetter",
       "javaFile": "src/main/java/bitwiseoperation/CountWordsAfterAddingLetter.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-words-obtained-after-adding-a-letter/",
       "leetcodeNumber": null,
@@ -4034,6 +4189,7 @@
     },
     "MaxGoodPeople": {
       "task": "MaxGoodPeople",
+      "className": "MaxGoodPeople",
       "javaFile": "src/main/java/bitwiseoperation/MaxGoodPeople.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-good-people-based-on-statements/",
       "leetcodeNumber": null,
@@ -4060,6 +4216,7 @@
     },
     "MaximumXor": {
       "task": "MaximumXor",
+      "className": "MaximumXor",
       "javaFile": "src/main/java/bitwiseoperation/MaximumXor.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/",
       "leetcodeNumber": null,
@@ -4086,6 +4243,7 @@
     },
     "MaximumXorOfTwoNumbersInArray": {
       "task": "MaximumXorOfTwoNumbersInArray",
+      "className": "MaximumXorOfTwoNumbersInArray",
       "javaFile": "src/main/java/bitwiseoperation/MaximumXorOfTwoNumbersInArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/",
       "leetcodeNumber": null,
@@ -4112,6 +4270,7 @@
     },
     "NonConsecutiveOnesCounter": {
       "task": "NonConsecutiveOnesCounter",
+      "className": "NonConsecutiveOnesCounter",
       "javaFile": "src/main/java/bitwiseoperation/NonConsecutiveOnesCounter.java",
       "leetcodeUrl": "https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/",
       "leetcodeNumber": null,
@@ -4138,6 +4297,7 @@
     },
     "SumOfTwoIntegers": {
       "task": "SumOfTwoIntegers",
+      "className": "SumOfTwoIntegers",
       "javaFile": "src/main/java/bitwiseoperation/SumOfTwoIntegers.java",
       "leetcodeUrl": "https://leetcode.com/problems/sum-of-two-integers/",
       "leetcodeNumber": 371,
@@ -4164,6 +4324,7 @@
     },
     "DoubletsSolution": {
       "task": "DoubletsSolution",
+      "className": "DoubletsSolution",
       "javaFile": "src/main/java/codingassessment/doubletsolution/DoubletsSolution.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-ladder/",
       "leetcodeNumber": 127,
@@ -4190,6 +4351,7 @@
     },
     "EditDistance": {
       "task": "EditDistance",
+      "className": "EditDistance",
       "javaFile": "src/main/java/codingassessment/editdistance/EditDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/edit-distance/",
       "leetcodeNumber": 72,
@@ -4216,6 +4378,7 @@
     },
     "BinaryTreeUpsideDown": {
       "task": "BinaryTreeUpsideDown",
+      "className": "BinaryTreeUpsideDown",
       "javaFile": "src/main/java/codingassessment/sidewaystree/BinaryTreeUpsideDown.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-upside-down/",
       "leetcodeNumber": null,
@@ -4242,6 +4405,7 @@
     },
     "FirstUniqueChar": {
       "task": "FirstUniqueChar",
+      "className": "FirstUniqueChar",
       "javaFile": "src/main/java/dailybytes/array/FirstUniqueChar.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-unique-character-in-a-string/",
       "leetcodeNumber": null,
@@ -4268,6 +4432,7 @@
     },
     "ValidAnagram": {
       "task": "ValidAnagram",
+      "className": "ValidAnagram",
       "javaFile": "src/main/java/dailybytes/array/ValidAnagram.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-anagram/",
       "leetcodeNumber": 242,
@@ -4294,6 +4459,7 @@
     },
     "CyclicLinkedList": {
       "task": "CyclicLinkedList",
+      "className": "CyclicLinkedList",
       "javaFile": "src/main/java/dailybytes/linkedlist/CyclicLinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/linked-list-cycle/",
       "leetcodeNumber": 141,
@@ -4320,6 +4486,7 @@
     },
     "MergeSortedLinkedList": {
       "task": "MergeSortedLinkedList",
+      "className": "MergeSortedLinkedList",
       "javaFile": "src/main/java/dailybytes/linkedlist/MergeSortedLinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-two-sorted-lists/",
       "leetcodeNumber": 21,
@@ -4346,6 +4513,7 @@
     },
     "RemoveNodes": {
       "task": "RemoveNodes",
+      "className": "RemoveNodes",
       "javaFile": "src/main/java/dailybytes/linkedlist/RemoveNodes.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-linked-list-elements/",
       "leetcodeNumber": 203,
@@ -4372,6 +4540,7 @@
     },
     "StackUsingQueue": {
       "task": "StackUsingQueue",
+      "className": "StackUsingQueue",
       "javaFile": "src/main/java/dailybytes/linkedlist/StackUsingQueue.java",
       "leetcodeUrl": "https://leetcode.com/problems/implement-stack-using-queues/",
       "leetcodeNumber": 225,
@@ -4398,6 +4567,7 @@
     },
     "ValidParenthesis": {
       "task": "ValidParenthesis",
+      "className": "ValidParenthesis",
       "javaFile": "src/main/java/dailybytes/linkedlist/ValidParenthesis.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-parentheses/",
       "leetcodeNumber": 20,
@@ -4424,6 +4594,7 @@
     },
     "AddBinary": {
       "task": "AddBinary",
+      "className": "AddBinary",
       "javaFile": "src/main/java/dailybytes/string/AddBinary.java",
       "leetcodeUrl": "https://leetcode.com/problems/add-binary/",
       "leetcodeNumber": 67,
@@ -4450,6 +4621,7 @@
     },
     "LongestCommonPrefix": {
       "task": "LongestCommonPrefix",
+      "className": "LongestCommonPrefix",
       "javaFile": "src/main/java/dailybytes/string/LongestCommonPrefix.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-common-prefix/",
       "leetcodeNumber": 14,
@@ -4476,6 +4648,7 @@
     },
     "VacuumCleaner": {
       "task": "VacuumCleaner",
+      "className": "VacuumCleaner",
       "javaFile": "src/main/java/dailybytes/string/VacuumCleaner.java",
       "leetcodeUrl": "https://leetcode.com/problems/robot-return-to-origin/",
       "leetcodeNumber": null,
@@ -4502,6 +4675,7 @@
     },
     "ValidPalindrome": {
       "task": "ValidPalindrome",
+      "className": "ValidPalindrome",
       "javaFile": "src/main/java/dailybytes/string/ValidPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-palindrome/",
       "leetcodeNumber": 125,
@@ -4528,6 +4702,7 @@
     },
     "ValidPalindrome2": {
       "task": "ValidPalindrome2",
+      "className": "ValidPalindrome2",
       "javaFile": "src/main/java/dailybytes/string/ValidPalindrome2.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-palindrome-ii/",
       "leetcodeNumber": 680,
@@ -4554,6 +4729,7 @@
     },
     "AutocompleteSystem": {
       "task": "AutocompleteSystem",
+      "className": "AutocompleteSystem",
       "javaFile": "src/main/java/design/AutocompleteSystem.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-search-autocomplete-system/",
       "leetcodeNumber": null,
@@ -4580,6 +4756,7 @@
     },
     "DesignBrowserHistory": {
       "task": "DesignBrowserHistory",
+      "className": "DesignBrowserHistory",
       "javaFile": "src/main/java/design/DesignBrowserHistory.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-browser-history/",
       "leetcodeNumber": 1472,
@@ -4606,6 +4783,7 @@
     },
     "DesignHashmap": {
       "task": "DesignHashmap",
+      "className": "DesignHashmap",
       "javaFile": "src/main/java/design/DesignHashmap.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-hashmap/",
       "leetcodeNumber": 706,
@@ -4632,6 +4810,7 @@
     },
     "DesignHashset": {
       "task": "DesignHashset",
+      "className": "DesignHashset",
       "javaFile": "src/main/java/design/DesignHashset.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-hashset/",
       "leetcodeNumber": 705,
@@ -4658,6 +4837,7 @@
     },
     "DesignTwitter": {
       "task": "DesignTwitter",
+      "className": "DesignTwitter",
       "javaFile": "src/main/java/design/DesignTwitter.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-twitter/",
       "leetcodeNumber": 355,
@@ -4684,6 +4864,7 @@
     },
     "DesignUndergroundSystem": {
       "task": "DesignUndergroundSystem",
+      "className": "DesignUndergroundSystem",
       "javaFile": "src/main/java/design/DesignUndergroundSystem.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-underground-system/",
       "leetcodeNumber": 1396,
@@ -4710,6 +4891,7 @@
     },
     "EncodeAndDecodeTinyurl": {
       "task": "EncodeAndDecodeTinyurl",
+      "className": "EncodeAndDecodeTinyurl",
       "javaFile": "src/main/java/design/EncodeAndDecodeTinyurl.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-tinyurl/",
       "leetcodeNumber": null,
@@ -4736,6 +4918,7 @@
     },
     "FileSystem": {
       "task": "FileSystem",
+      "className": "FileSystem",
       "javaFile": "src/main/java/design/FileSystem.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-in-memory-file-system/",
       "leetcodeNumber": null,
@@ -4762,6 +4945,7 @@
     },
     "FirstUniqueNumber": {
       "task": "FirstUniqueNumber",
+      "className": "FirstUniqueNumber",
       "javaFile": "src/main/java/design/FirstUniqueNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-unique-number/",
       "leetcodeNumber": null,
@@ -4788,6 +4972,7 @@
     },
     "InsertDeleteGetrandomO1DuplicatesAllowed": {
       "task": "InsertDeleteGetrandomO1DuplicatesAllowed",
+      "className": "InsertDeleteGetrandomO1DuplicatesAllowed",
       "javaFile": "src/main/java/design/InsertDeleteGetrandomO1DuplicatesAllowed.java",
       "leetcodeUrl": "https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed/",
       "leetcodeNumber": null,
@@ -4814,6 +4999,7 @@
     },
     "LRUCache": {
       "task": "LRUCache",
+      "className": "LRUCache",
       "javaFile": "src/main/java/design/LRUCache.java",
       "leetcodeUrl": "https://leetcode.com/problems/lru-cache/",
       "leetcodeNumber": 146,
@@ -4840,6 +5026,7 @@
     },
     "Logger": {
       "task": "Logger",
+      "className": "Logger",
       "javaFile": "src/main/java/design/Logger.java",
       "leetcodeUrl": "https://leetcode.com/problems/logger-rate-limiter/",
       "leetcodeNumber": null,
@@ -4866,6 +5053,7 @@
     },
     "CallCounter": {
       "task": "CallCounter",
+      "className": "CallCounter",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CallCounter.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-recent-calls/",
       "leetcodeNumber": null,
@@ -4892,6 +5080,7 @@
     },
     "CoinChange": {
       "task": "CoinChange",
+      "className": "CoinChange",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CoinChange.java",
       "leetcodeUrl": "https://leetcode.com/problems/coin-change/",
       "leetcodeNumber": 322,
@@ -4918,6 +5107,7 @@
     },
     "CoinChange2": {
       "task": "CoinChange2",
+      "className": "CoinChange2",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CoinChange2.java",
       "leetcodeUrl": "https://leetcode.com/problems/coin-change-2/",
       "leetcodeNumber": null,
@@ -4944,6 +5134,7 @@
     },
     "CoinChangeII": {
       "task": "CoinChangeII",
+      "className": "CoinChangeII",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CoinChangeII.java",
       "leetcodeUrl": "https://leetcode.com/problems/coin-change-ii/",
       "leetcodeNumber": 518,
@@ -4970,6 +5161,7 @@
     },
     "RodCutting": {
       "task": "RodCutting",
+      "className": "RodCutting",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/RodCutting.java",
       "leetcodeUrl": "https://leetcode.com/problems/coin-change/",
       "leetcodeNumber": 322,
@@ -4996,6 +5188,7 @@
     },
     "LongestCommonSubstring": {
       "task": "LongestCommonSubstring",
+      "className": "LongestCommonSubstring",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/LongestCommonSubstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-common-substring/",
       "leetcodeNumber": null,
@@ -5022,6 +5215,7 @@
     },
     "MinimumWindowSubsequence": {
       "task": "MinimumWindowSubsequence",
+      "className": "MinimumWindowSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/MinimumWindowSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-window-subsequence/",
       "leetcodeNumber": null,
@@ -5048,6 +5242,7 @@
     },
     "ShortestCommonSupersequence": {
       "task": "ShortestCommonSupersequence",
+      "className": "ShortestCommonSupersequence",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/ShortestCommonSupersequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-common-supersequence/",
       "leetcodeNumber": null,
@@ -5074,6 +5269,7 @@
     },
     "BrainPower": {
       "task": "BrainPower",
+      "className": "BrainPower",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/BrainPower.java",
       "leetcodeUrl": "https://leetcode.com/problems/solving-questions-with-brainpower/",
       "leetcodeNumber": 2140,
@@ -5100,6 +5296,7 @@
     },
     "BrokenCalculator": {
       "task": "BrokenCalculator",
+      "className": "BrokenCalculator",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/BrokenCalculator.java",
       "leetcodeUrl": "https://leetcode.com/problems/broken-calculator/",
       "leetcodeNumber": null,
@@ -5126,6 +5323,7 @@
     },
     "ChampagneTower": {
       "task": "ChampagneTower",
+      "className": "ChampagneTower",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/ChampagneTower.java",
       "leetcodeUrl": "https://leetcode.com/problems/champagne-tower/",
       "leetcodeNumber": null,
@@ -5152,6 +5350,7 @@
     },
     "ConcatenatedWords": {
       "task": "ConcatenatedWords",
+      "className": "ConcatenatedWords",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/ConcatenatedWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/concatenated-words/",
       "leetcodeNumber": 472,
@@ -5178,6 +5377,7 @@
     },
     "CountDifferentPalindromicSubsequences": {
       "task": "CountDifferentPalindromicSubsequences",
+      "className": "CountDifferentPalindromicSubsequences",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountDifferentPalindromicSubsequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-different-palindromic-subsequences/",
       "leetcodeNumber": null,
@@ -5204,6 +5404,7 @@
     },
     "CountMatricesWithAllOnes": {
       "task": "CountMatricesWithAllOnes",
+      "className": "CountMatricesWithAllOnes",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountMatricesWithAllOnes.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-submatrices-with-all-ones/",
       "leetcodeNumber": null,
@@ -5230,6 +5431,7 @@
     },
     "CountNumberOfWaysToPlaceHouses": {
       "task": "CountNumberOfWaysToPlaceHouses",
+      "className": "CountNumberOfWaysToPlaceHouses",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountNumberOfWaysToPlaceHouses.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-number-of-ways-to-place-houses/",
       "leetcodeNumber": null,
@@ -5256,6 +5458,7 @@
     },
     "CountUniqueCharactersOfAllSubstrings": {
       "task": "CountUniqueCharactersOfAllSubstrings",
+      "className": "CountUniqueCharactersOfAllSubstrings",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/CountUniqueCharactersOfAllSubstrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/",
       "leetcodeNumber": null,
@@ -5282,6 +5485,7 @@
     },
     "FrogJump": {
       "task": "FrogJump",
+      "className": "FrogJump",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/FrogJump.java",
       "leetcodeUrl": "https://leetcode.com/problems/frog-jump/",
       "leetcodeNumber": null,
@@ -5308,6 +5512,7 @@
     },
     "IntegerBreak": {
       "task": "IntegerBreak",
+      "className": "IntegerBreak",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/IntegerBreak.java",
       "leetcodeUrl": "https://leetcode.com/problems/integer-break/",
       "leetcodeNumber": 343,
@@ -5334,6 +5539,7 @@
     },
     "KnightDialer": {
       "task": "KnightDialer",
+      "className": "KnightDialer",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/KnightDialer.java",
       "leetcodeUrl": "https://leetcode.com/problems/knight-dialer/",
       "leetcodeNumber": null,
@@ -5360,6 +5566,7 @@
     },
     "LongestValidParentheses": {
       "task": "LongestValidParentheses",
+      "className": "LongestValidParentheses",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/LongestValidParentheses.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-valid-parentheses/",
       "leetcodeNumber": null,
@@ -5386,6 +5593,7 @@
     },
     "MaxWithCost": {
       "task": "MaxWithCost",
+      "className": "MaxWithCost",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MaxWithCost.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-points-with-cost/",
       "leetcodeNumber": null,
@@ -5412,6 +5620,7 @@
     },
     "MaximumPointsFromCards": {
       "task": "MaximumPointsFromCards",
+      "className": "MaximumPointsFromCards",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MaximumPointsFromCards.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/",
       "leetcodeNumber": 1423,
@@ -5438,6 +5647,7 @@
     },
     "MinRefuel": {
       "task": "MinRefuel",
+      "className": "MinRefuel",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MinRefuel.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-number-of-refueling-stops/",
       "leetcodeNumber": null,
@@ -5464,6 +5674,7 @@
     },
     "MinimumJumpsToReachHome": {
       "task": "MinimumJumpsToReachHome",
+      "className": "MinimumJumpsToReachHome",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/MinimumJumpsToReachHome.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-jumps-to-reach-home/",
       "leetcodeNumber": null,
@@ -5490,6 +5701,7 @@
     },
     "NumberOfWaysToReconstructATree": {
       "task": "NumberOfWaysToReconstructATree",
+      "className": "NumberOfWaysToReconstructATree",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/NumberOfWaysToReconstructATree.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-ways-to-reconstruct-a-tree/",
       "leetcodeNumber": null,
@@ -5516,6 +5728,7 @@
     },
     "PalindromicSubstrings": {
       "task": "PalindromicSubstrings",
+      "className": "PalindromicSubstrings",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/PalindromicSubstrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindromic-substrings/",
       "leetcodeNumber": 647,
@@ -5542,6 +5755,7 @@
     },
     "QueensAttackKing": {
       "task": "QueensAttackKing",
+      "className": "QueensAttackKing",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/QueensAttackKing.java",
       "leetcodeUrl": "https://leetcode.com/problems/queens-that-can-attack-the-king/",
       "leetcodeNumber": null,
@@ -5568,6 +5782,7 @@
     },
     "RestoreTheArrayFromAdjacentPairs": {
       "task": "RestoreTheArrayFromAdjacentPairs",
+      "className": "RestoreTheArrayFromAdjacentPairs",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/RestoreTheArrayFromAdjacentPairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/restore-the-array-from-adjacent-pairs/",
       "leetcodeNumber": null,
@@ -5594,6 +5809,7 @@
     },
     "SmallestSufficientTeam": {
       "task": "SmallestSufficientTeam",
+      "className": "SmallestSufficientTeam",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/SmallestSufficientTeam.java",
       "leetcodeUrl": "https://leetcode.com/problems/smallest-sufficient-team/",
       "leetcodeNumber": null,
@@ -5620,6 +5836,7 @@
     },
     "SubsetSum": {
       "task": "SubsetSum",
+      "className": "SubsetSum",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/SubsetSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-equal-subset-sum/",
       "leetcodeNumber": 416,
@@ -5646,6 +5863,7 @@
     },
     "TwentyFourGame": {
       "task": "TwentyFourGame",
+      "className": "TwentyFourGame",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/TwentyFourGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/24-game/",
       "leetcodeNumber": null,
@@ -5672,6 +5890,7 @@
     },
     "UglyNumberII": {
       "task": "UglyNumberII",
+      "className": "UglyNumberII",
       "javaFile": "src/main/java/dynamicprogramming/MiscellaneousDP/UglyNumberII.java",
       "leetcodeUrl": "https://leetcode.com/problems/ugly-number-ii/",
       "leetcodeNumber": null,
@@ -5698,6 +5917,7 @@
     },
     "ShortestCommonSuperstring": {
       "task": "ShortestCommonSuperstring",
+      "className": "ShortestCommonSuperstring",
       "javaFile": "src/main/java/dynamicprogramming/ShortestCommonSuperstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-shortest-superstring/",
       "leetcodeNumber": null,
@@ -5724,6 +5944,7 @@
     },
     "BestTimeToBuyAndSellStockIV": {
       "task": "BestTimeToBuyAndSellStockIV",
+      "className": "BestTimeToBuyAndSellStockIV",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BestTimeToBuyAndSellStockIV.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/",
       "leetcodeNumber": null,
@@ -5750,6 +5971,7 @@
     },
     "BestTimeToBuyAndSellStockWithCooldown": {
       "task": "BestTimeToBuyAndSellStockWithCooldown",
+      "className": "BestTimeToBuyAndSellStockWithCooldown",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BestTimeToBuyAndSellStockWithCooldown.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/",
       "leetcodeNumber": 309,
@@ -5776,6 +5998,7 @@
     },
     "BestTimeToBuyAndSellStockWithTransactionFee": {
       "task": "BestTimeToBuyAndSellStockWithTransactionFee",
+      "className": "BestTimeToBuyAndSellStockWithTransactionFee",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BestTimeToBuyAndSellStockWithTransactionFee.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/",
       "leetcodeNumber": null,
@@ -5802,6 +6025,7 @@
     },
     "BuySellStock0": {
       "task": "BuySellStock0",
+      "className": "BuySellStock0",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BuySellStock0.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
       "leetcodeNumber": 121,
@@ -5828,6 +6052,7 @@
     },
     "BuySellStock3": {
       "task": "BuySellStock3",
+      "className": "BuySellStock3",
       "javaFile": "src/main/java/dynamicprogramming/StockBuySell/BuySellStock3.java",
       "leetcodeUrl": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/",
       "leetcodeNumber": null,
@@ -5854,6 +6079,7 @@
     },
     "FibonacciNumber": {
       "task": "FibonacciNumber",
+      "className": "FibonacciNumber",
       "javaFile": "src/main/java/dynamicprogramming/basics/FibonacciNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/fibonacci-number/",
       "leetcodeNumber": null,
@@ -5880,6 +6106,7 @@
     },
     "PascalsTriangle": {
       "task": "PascalsTriangle",
+      "className": "PascalsTriangle",
       "javaFile": "src/main/java/dynamicprogramming/basics/PascalsTriangle.java",
       "leetcodeUrl": "https://leetcode.com/problems/pascals-triangle/",
       "leetcodeNumber": 118,
@@ -5906,6 +6133,7 @@
     },
     "StoneGame": {
       "task": "StoneGame",
+      "className": "StoneGame",
       "javaFile": "src/main/java/dynamicprogramming/gametheory/StoneGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/stone-game/",
       "leetcodeNumber": 877,
@@ -5932,6 +6160,7 @@
     },
     "DungeonGame": {
       "task": "DungeonGame",
+      "className": "DungeonGame",
       "javaFile": "src/main/java/dynamicprogramming/gridpath/DungeonGame.java",
       "leetcodeUrl": "https://leetcode.com/problems/dungeon-game/",
       "leetcodeNumber": null,
@@ -5958,6 +6187,7 @@
     },
     "LongestIncreasingPathInAMatrix": {
       "task": "LongestIncreasingPathInAMatrix",
+      "className": "LongestIncreasingPathInAMatrix",
       "javaFile": "src/main/java/dynamicprogramming/gridpath/LongestIncreasingPathInAMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-increasing-path-in-a-matrix/",
       "leetcodeNumber": 329,
@@ -5984,6 +6214,7 @@
     },
     "MinimumPathSum": {
       "task": "MinimumPathSum",
+      "className": "MinimumPathSum",
       "javaFile": "src/main/java/dynamicprogramming/gridpath/MinimumPathSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-path-sum/",
       "leetcodeNumber": 64,
@@ -6010,6 +6241,7 @@
     },
     "MinimumPathSumTriangle": {
       "task": "MinimumPathSumTriangle",
+      "className": "MinimumPathSumTriangle",
       "javaFile": "src/main/java/dynamicprogramming/gridpath/MinimumPathSumTriangle.java",
       "leetcodeUrl": "https://leetcode.com/problems/triangle/",
       "leetcodeNumber": 120,
@@ -6036,6 +6268,7 @@
     },
     "CountSubsetWithGivenDifference": {
       "task": "CountSubsetWithGivenDifference",
+      "className": "CountSubsetWithGivenDifference",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/CountSubsetWithGivenDifference.java",
       "leetcodeUrl": "https://leetcode.com/problems/target-sum/",
       "leetcodeNumber": 494,
@@ -6062,6 +6295,7 @@
     },
     "CountSubsetsWithGivenSum": {
       "task": "CountSubsetsWithGivenSum",
+      "className": "CountSubsetsWithGivenSum",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/CountSubsetsWithGivenSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/target-sum/",
       "leetcodeNumber": 494,
@@ -6088,6 +6322,7 @@
     },
     "EqualSum": {
       "task": "EqualSum",
+      "className": "EqualSum",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/EqualSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-equal-subset-sum/",
       "leetcodeNumber": 416,
@@ -6114,6 +6349,7 @@
     },
     "Knapsack": {
       "task": "Knapsack",
+      "className": "Knapsack",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/Knapsack.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-equal-subset-sum/",
       "leetcodeNumber": 416,
@@ -6140,6 +6376,7 @@
     },
     "ShortestSubarraySum": {
       "task": "ShortestSubarraySum",
+      "className": "ShortestSubarraySum",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/ShortestSubarraySum.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/",
       "leetcodeNumber": null,
@@ -6166,6 +6403,7 @@
     },
     "TargetSum": {
       "task": "TargetSum",
+      "className": "TargetSum",
       "javaFile": "src/main/java/dynamicprogramming/knapsackbounded/TargetSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/target-sum/",
       "leetcodeNumber": 494,
@@ -6192,6 +6430,7 @@
     },
     "ClimbingStairs": {
       "task": "ClimbingStairs",
+      "className": "ClimbingStairs",
       "javaFile": "src/main/java/dynamicprogramming/linearpartition/ClimbingStairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/climbing-stairs/",
       "leetcodeNumber": 70,
@@ -6218,6 +6457,7 @@
     },
     "DecodeWays": {
       "task": "DecodeWays",
+      "className": "DecodeWays",
       "javaFile": "src/main/java/dynamicprogramming/linearpartition/DecodeWays.java",
       "leetcodeUrl": "https://leetcode.com/problems/decode-ways/",
       "leetcodeNumber": 91,
@@ -6244,6 +6484,7 @@
     },
     "PalindromePartitioning": {
       "task": "PalindromePartitioning",
+      "className": "PalindromePartitioning",
       "javaFile": "src/main/java/dynamicprogramming/linearpartition/PalindromePartitioning.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-partitioning/",
       "leetcodeNumber": 131,
@@ -6270,6 +6511,7 @@
     },
     "WordBreak": {
       "task": "WordBreak",
+      "className": "WordBreak",
       "javaFile": "src/main/java/dynamicprogramming/linearpartition/WordBreak.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-break/",
       "leetcodeNumber": 139,
@@ -6296,6 +6538,7 @@
     },
     "WordBreak2": {
       "task": "WordBreak2",
+      "className": "WordBreak2",
       "javaFile": "src/main/java/dynamicprogramming/linearpartition/WordBreak2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-break-ii/",
       "leetcodeNumber": null,
@@ -6322,6 +6565,7 @@
     },
     "BurstBalloon": {
       "task": "BurstBalloon",
+      "className": "BurstBalloon",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/BurstBalloon.java",
       "leetcodeUrl": "https://leetcode.com/problems/burst-balloons/",
       "leetcodeNumber": 312,
@@ -6348,6 +6592,7 @@
     },
     "EggDropProblem": {
       "task": "EggDropProblem",
+      "className": "EggDropProblem",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/EggDropProblem.java",
       "leetcodeUrl": "https://leetcode.com/problems/super-egg-drop/",
       "leetcodeNumber": null,
@@ -6374,6 +6619,7 @@
     },
     "EvaluateTrue": {
       "task": "EvaluateTrue",
+      "className": "EvaluateTrue",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/EvaluateTrue.java",
       "leetcodeUrl": "https://leetcode.com/problems/parsing-a-boolean-expression/",
       "leetcodeNumber": null,
@@ -6400,6 +6646,7 @@
     },
     "MatrixChainMultiplication": {
       "task": "MatrixChainMultiplication",
+      "className": "MatrixChainMultiplication",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MatrixChainMultiplication.java",
       "leetcodeUrl": "https://leetcode.com/problems/burst-balloons/",
       "leetcodeNumber": 312,
@@ -6426,6 +6673,7 @@
     },
     "MinCostCutStick": {
       "task": "MinCostCutStick",
+      "className": "MinCostCutStick",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinCostCutStick.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-cut-a-stick/",
       "leetcodeNumber": 1547,
@@ -6452,6 +6700,7 @@
     },
     "MinCutPalindrome": {
       "task": "MinCutPalindrome",
+      "className": "MinCutPalindrome",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinCutPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-partitioning-ii/",
       "leetcodeNumber": null,
@@ -6478,6 +6727,7 @@
     },
     "MinimumCostMergeStones": {
       "task": "MinimumCostMergeStones",
+      "className": "MinimumCostMergeStones",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinimumCostMergeStones.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-merge-stones/",
       "leetcodeNumber": null,
@@ -6504,6 +6754,7 @@
     },
     "MinimumCostTreeFromLeafValues": {
       "task": "MinimumCostTreeFromLeafValues",
+      "className": "MinimumCostTreeFromLeafValues",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/MinimumCostTreeFromLeafValues.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/",
       "leetcodeNumber": null,
@@ -6530,6 +6781,7 @@
     },
     "PalindromePartitioningII": {
       "task": "PalindromePartitioningII",
+      "className": "PalindromePartitioningII",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/PalindromePartitioningII.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-partitioning-ii/",
       "leetcodeNumber": null,
@@ -6556,6 +6808,7 @@
     },
     "RemoveBoxes": {
       "task": "RemoveBoxes",
+      "className": "RemoveBoxes",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/RemoveBoxes.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-boxes/",
       "leetcodeNumber": null,
@@ -6582,6 +6835,7 @@
     },
     "ScrambleString": {
       "task": "ScrambleString",
+      "className": "ScrambleString",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/ScrambleString.java",
       "leetcodeUrl": "https://leetcode.com/problems/scramble-string/",
       "leetcodeNumber": null,
@@ -6608,6 +6862,7 @@
     },
     "CourseScheduleIII": {
       "task": "CourseScheduleIII",
+      "className": "CourseScheduleIII",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/CourseScheduleIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/course-schedule-iii/",
       "leetcodeNumber": null,
@@ -6634,6 +6889,7 @@
     },
     "FurthestBuildingYouCanReach": {
       "task": "FurthestBuildingYouCanReach",
+      "className": "FurthestBuildingYouCanReach",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/FurthestBuildingYouCanReach.java",
       "leetcodeUrl": "https://leetcode.com/problems/furthest-building-you-can-reach/",
       "leetcodeNumber": null,
@@ -6660,6 +6916,7 @@
     },
     "MaximumProfitJobScheduling": {
       "task": "MaximumProfitJobScheduling",
+      "className": "MaximumProfitJobScheduling",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/MaximumProfitJobScheduling.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-profit-in-job-scheduling/",
       "leetcodeNumber": null,
@@ -6686,6 +6943,7 @@
     },
     "MinimumDifficultyOfAJobSchedule": {
       "task": "MinimumDifficultyOfAJobSchedule",
+      "className": "MinimumDifficultyOfAJobSchedule",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/MinimumDifficultyOfAJobSchedule.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/",
       "leetcodeNumber": null,
@@ -6712,6 +6970,7 @@
     },
     "VideoStitching": {
       "task": "VideoStitching",
+      "className": "VideoStitching",
       "javaFile": "src/main/java/dynamicprogramming/scheduling/VideoStitching.java",
       "leetcodeUrl": "https://leetcode.com/problems/video-stitching/",
       "leetcodeNumber": null,
@@ -6738,6 +6997,7 @@
     },
     "LongestArithmeticSubsequence": {
       "task": "LongestArithmeticSubsequence",
+      "className": "LongestArithmeticSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/sequence/LongestArithmeticSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-arithmetic-subsequence/",
       "leetcodeNumber": null,
@@ -6764,6 +7024,7 @@
     },
     "LongestIncreasingSubsequence": {
       "task": "LongestIncreasingSubsequence",
+      "className": "LongestIncreasingSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/sequence/LongestIncreasingSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-increasing-subsequence/",
       "leetcodeNumber": 300,
@@ -6790,6 +7051,7 @@
     },
     "LongestStringChain": {
       "task": "LongestStringChain",
+      "className": "LongestStringChain",
       "javaFile": "src/main/java/dynamicprogramming/sequence/LongestStringChain.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-string-chain/",
       "leetcodeNumber": null,
@@ -6816,6 +7078,7 @@
     },
     "MaximumLengthOfRepeatedSubarray": {
       "task": "MaximumLengthOfRepeatedSubarray",
+      "className": "MaximumLengthOfRepeatedSubarray",
       "javaFile": "src/main/java/dynamicprogramming/sequence/MaximumLengthOfRepeatedSubarray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-length-of-repeated-subarray/",
       "leetcodeNumber": null,
@@ -6842,6 +7105,7 @@
     },
     "MaximumLengthPairChain": {
       "task": "MaximumLengthPairChain",
+      "className": "MaximumLengthPairChain",
       "javaFile": "src/main/java/dynamicprogramming/sequence/MaximumLengthPairChain.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-length-of-pair-chain/",
       "leetcodeNumber": 646,
@@ -6868,6 +7132,7 @@
     },
     "DeleteAndEarn": {
       "task": "DeleteAndEarn",
+      "className": "DeleteAndEarn",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/DeleteAndEarn.java",
       "leetcodeUrl": "https://leetcode.com/problems/delete-and-earn/",
       "leetcodeNumber": 740,
@@ -6894,6 +7159,7 @@
     },
     "DominoAndTrominoTiling": {
       "task": "DominoAndTrominoTiling",
+      "className": "DominoAndTrominoTiling",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/DominoAndTrominoTiling.java",
       "leetcodeUrl": "https://leetcode.com/problems/domino-and-tromino-tiling/",
       "leetcodeNumber": null,
@@ -6920,6 +7186,7 @@
     },
     "HouseRobber": {
       "task": "HouseRobber",
+      "className": "HouseRobber",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/HouseRobber.java",
       "leetcodeUrl": "https://leetcode.com/problems/house-robber/",
       "leetcodeNumber": 198,
@@ -6946,6 +7213,7 @@
     },
     "MaxProductSubarray": {
       "task": "MaxProductSubarray",
+      "className": "MaxProductSubarray",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/MaxProductSubarray.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-product-subarray/",
       "leetcodeNumber": 152,
@@ -6972,6 +7240,7 @@
     },
     "PaintHouse": {
       "task": "PaintHouse",
+      "className": "PaintHouse",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouse.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house/",
       "leetcodeNumber": 256,
@@ -6998,6 +7267,7 @@
     },
     "PaintHouse2": {
       "task": "PaintHouse2",
+      "className": "PaintHouse2",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouse2.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-ii/",
       "leetcodeNumber": null,
@@ -7024,6 +7294,7 @@
     },
     "PaintHouse3": {
       "task": "PaintHouse3",
+      "className": "PaintHouse3",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouse3.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-iii/",
       "leetcodeNumber": null,
@@ -7050,6 +7321,7 @@
     },
     "PaintHouseII": {
       "task": "PaintHouseII",
+      "className": "PaintHouseII",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouseII.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-ii/",
       "leetcodeNumber": null,
@@ -7076,6 +7348,7 @@
     },
     "TilingDominoes": {
       "task": "TilingDominoes",
+      "className": "TilingDominoes",
       "javaFile": "src/main/java/dynamicprogramming/statemachine/TilingDominoes.java",
       "leetcodeUrl": "https://leetcode.com/problems/domino-and-tromino-tiling/",
       "leetcodeNumber": null,
@@ -7102,6 +7375,7 @@
     },
     "DeleteOperationForTwoStrings": {
       "task": "DeleteOperationForTwoStrings",
+      "className": "DeleteOperationForTwoStrings",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/DeleteOperationForTwoStrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/delete-operation-for-two-strings/",
       "leetcodeNumber": null,
@@ -7128,6 +7402,7 @@
     },
     "DistinctSubsequence": {
       "task": "DistinctSubsequence",
+      "className": "DistinctSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/DistinctSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/distinct-subsequences/",
       "leetcodeNumber": 115,
@@ -7154,6 +7429,7 @@
     },
     "InterleavingString": {
       "task": "InterleavingString",
+      "className": "InterleavingString",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/InterleavingString.java",
       "leetcodeUrl": "https://leetcode.com/problems/interleaving-string/",
       "leetcodeNumber": 97,
@@ -7180,6 +7456,7 @@
     },
     "IsSubsequence": {
       "task": "IsSubsequence",
+      "className": "IsSubsequence",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/IsSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/is-subsequence/",
       "leetcodeNumber": 392,
@@ -7206,6 +7483,7 @@
     },
     "RegularExpressionMatching": {
       "task": "RegularExpressionMatching",
+      "className": "RegularExpressionMatching",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/RegularExpressionMatching.java",
       "leetcodeUrl": "https://leetcode.com/problems/regular-expression-matching/",
       "leetcodeNumber": 10,
@@ -7232,6 +7510,7 @@
     },
     "WildcardMatching": {
       "task": "WildcardMatching",
+      "className": "WildcardMatching",
       "javaFile": "src/main/java/dynamicprogramming/stringmatching/WildcardMatching.java",
       "leetcodeUrl": "https://leetcode.com/problems/wildcard-matching/",
       "leetcodeNumber": null,
@@ -7258,6 +7537,7 @@
     },
     "HouseRobberIII": {
       "task": "HouseRobberIII",
+      "className": "HouseRobberIII",
       "javaFile": "src/main/java/dynamicprogramming/tree/HouseRobberIII.java",
       "leetcodeUrl": "https://leetcode.com/problems/house-robber-iii/",
       "leetcodeNumber": 337,
@@ -7284,6 +7564,7 @@
     },
     "AllPathsFromSourceToTarget": {
       "task": "AllPathsFromSourceToTarget",
+      "className": "AllPathsFromSourceToTarget",
       "javaFile": "src/main/java/graphs/AllPathsFromSourceToTarget.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-paths-from-source-to-target/",
       "leetcodeNumber": null,
@@ -7310,6 +7591,7 @@
     },
     "AsFarFromLandAsPossible": {
       "task": "AsFarFromLandAsPossible",
+      "className": "AsFarFromLandAsPossible",
       "javaFile": "src/main/java/graphs/AsFarFromLandAsPossible.java",
       "leetcodeUrl": "https://leetcode.com/problems/as-far-from-land-as-possible/",
       "leetcodeNumber": 1162,
@@ -7336,6 +7618,7 @@
     },
     "BattleshipsInABoard": {
       "task": "BattleshipsInABoard",
+      "className": "BattleshipsInABoard",
       "javaFile": "src/main/java/graphs/BattleshipsInABoard.java",
       "leetcodeUrl": "https://leetcode.com/problems/battleships-in-a-board/",
       "leetcodeNumber": null,
@@ -7362,6 +7645,7 @@
     },
     "Bipartite": {
       "task": "Bipartite",
+      "className": "Bipartite",
       "javaFile": "src/main/java/graphs/Bipartite.java",
       "leetcodeUrl": "https://leetcode.com/problems/is-graph-bipartite/",
       "leetcodeNumber": 785,
@@ -7388,6 +7672,7 @@
     },
     "CloneGraph": {
       "task": "CloneGraph",
+      "className": "CloneGraph",
       "javaFile": "src/main/java/graphs/CloneGraph.java",
       "leetcodeUrl": "https://leetcode.com/problems/clone-graph/",
       "leetcodeNumber": 133,
@@ -7414,6 +7699,7 @@
     },
     "ContainVirus": {
       "task": "ContainVirus",
+      "className": "ContainVirus",
       "javaFile": "src/main/java/graphs/ContainVirus.java",
       "leetcodeUrl": "https://leetcode.com/problems/contain-virus/",
       "leetcodeNumber": null,
@@ -7440,6 +7726,7 @@
     },
     "CriticalConnectionsInANetwork": {
       "task": "CriticalConnectionsInANetwork",
+      "className": "CriticalConnectionsInANetwork",
       "javaFile": "src/main/java/graphs/CriticalConnectionsInANetwork.java",
       "leetcodeUrl": "https://leetcode.com/problems/critical-connections-in-a-network/",
       "leetcodeNumber": null,
@@ -7466,6 +7753,7 @@
     },
     "CutOffTreesForGolfEvent": {
       "task": "CutOffTreesForGolfEvent",
+      "className": "CutOffTreesForGolfEvent",
       "javaFile": "src/main/java/graphs/CutOffTreesForGolfEvent.java",
       "leetcodeUrl": "https://leetcode.com/problems/cut-off-trees-for-golf-event/",
       "leetcodeNumber": null,
@@ -7490,9 +7778,10 @@
         "skip": false
       }
     },
-    "EvaluateDivision": {
-      "task": "EvaluateDivision",
-      "javaFile": "src/main/java/graphs/floydwarshall/EvaluateDivision.java",
+    "EvaluateDivision__graphs": {
+      "task": "EvaluateDivision__graphs",
+      "className": "EvaluateDivision",
+      "javaFile": "src/main/java/graphs/EvaluateDivision.java",
       "leetcodeUrl": "https://leetcode.com/problems/evaluate-division/",
       "leetcodeNumber": 399,
       "problemName": "Evaluate Division",
@@ -7506,7 +7795,7 @@
         "intervalDays": 0,
         "repetitions": 0,
         "lastReviewed": null,
-        "nextDue": "2026-09-26",
+        "nextDue": "2026-08-22",
         "lastGrade": null
       },
       "history": [],
@@ -7518,6 +7807,7 @@
     },
     "FindCenterOfStarGraph": {
       "task": "FindCenterOfStarGraph",
+      "className": "FindCenterOfStarGraph",
       "javaFile": "src/main/java/graphs/FindCenterOfStarGraph.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-center-of-star-graph/",
       "leetcodeNumber": null,
@@ -7544,6 +7834,7 @@
     },
     "FindEventualSafeStates": {
       "task": "FindEventualSafeStates",
+      "className": "FindEventualSafeStates",
       "javaFile": "src/main/java/graphs/FindEventualSafeStates.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-eventual-safe-states/",
       "leetcodeNumber": 802,
@@ -7570,6 +7861,7 @@
     },
     "FloodFill": {
       "task": "FloodFill",
+      "className": "FloodFill",
       "javaFile": "src/main/java/graphs/FloodFill.java",
       "leetcodeUrl": "https://leetcode.com/problems/flood-fill/",
       "leetcodeNumber": null,
@@ -7596,6 +7888,7 @@
     },
     "GrumpyBookstoreOwner": {
       "task": "GrumpyBookstoreOwner",
+      "className": "GrumpyBookstoreOwner",
       "javaFile": "src/main/java/graphs/GrumpyBookstoreOwner.java",
       "leetcodeUrl": "https://leetcode.com/problems/grumpy-bookstore-owner/",
       "leetcodeNumber": null,
@@ -7622,6 +7915,7 @@
     },
     "HighestRatedItem": {
       "task": "HighestRatedItem",
+      "className": "HighestRatedItem",
       "javaFile": "src/main/java/graphs/HighestRatedItem.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-highest-ranked-items-within-a-price-range/",
       "leetcodeNumber": null,
@@ -7648,6 +7942,7 @@
     },
     "KeysAndRooms": {
       "task": "KeysAndRooms",
+      "className": "KeysAndRooms",
       "javaFile": "src/main/java/graphs/KeysAndRooms.java",
       "leetcodeUrl": "https://leetcode.com/problems/keys-and-rooms/",
       "leetcodeNumber": null,
@@ -7674,6 +7969,7 @@
     },
     "LargestDistanceNodes": {
       "task": "LargestDistanceNodes",
+      "className": "LargestDistanceNodes",
       "javaFile": "src/main/java/graphs/LargestDistanceNodes.java",
       "leetcodeUrl": "https://leetcode.com/problems/diameter-of-binary-tree/",
       "leetcodeNumber": 543,
@@ -7700,6 +7996,7 @@
     },
     "MakeLargeIsland": {
       "task": "MakeLargeIsland",
+      "className": "MakeLargeIsland",
       "javaFile": "src/main/java/graphs/MakeLargeIsland.java",
       "leetcodeUrl": "https://leetcode.com/problems/making-a-large-island/",
       "leetcodeNumber": null,
@@ -7726,6 +8023,7 @@
     },
     "MaxAreaIsland": {
       "task": "MaxAreaIsland",
+      "className": "MaxAreaIsland",
       "javaFile": "src/main/java/graphs/MaxAreaIsland.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-area-of-island/",
       "leetcodeNumber": 695,
@@ -7752,6 +8050,7 @@
     },
     "MaxInvitations": {
       "task": "MaxInvitations",
+      "className": "MaxInvitations",
       "javaFile": "src/main/java/graphs/MaxInvitations.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/",
       "leetcodeNumber": null,
@@ -7778,6 +8077,7 @@
     },
     "MaximalNetworkRank": {
       "task": "MaximalNetworkRank",
+      "className": "MaximalNetworkRank",
       "javaFile": "src/main/java/graphs/MaximalNetworkRank.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximal-network-rank/",
       "leetcodeNumber": null,
@@ -7804,6 +8104,7 @@
     },
     "MinBuses": {
       "task": "MinBuses",
+      "className": "MinBuses",
       "javaFile": "src/main/java/graphs/MinBuses.java",
       "leetcodeUrl": "https://leetcode.com/problems/bus-routes/",
       "leetcodeNumber": null,
@@ -7830,6 +8131,7 @@
     },
     "Minesweeper": {
       "task": "Minesweeper",
+      "className": "Minesweeper",
       "javaFile": "src/main/java/graphs/Minesweeper.java",
       "leetcodeUrl": "https://leetcode.com/problems/minesweeper/",
       "leetcodeNumber": null,
@@ -7856,6 +8158,7 @@
     },
     "MinimumEdgeReversalsForAllNodesReachable": {
       "task": "MinimumEdgeReversalsForAllNodesReachable",
+      "className": "MinimumEdgeReversalsForAllNodesReachable",
       "javaFile": "src/main/java/graphs/MinimumEdgeReversalsForAllNodesReachable.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-edge-reversals-so-every-node-is-reachable/",
       "leetcodeNumber": null,
@@ -7882,6 +8185,7 @@
     },
     "MostStonesRemovedWithSameRowOrColumn": {
       "task": "MostStonesRemovedWithSameRowOrColumn",
+      "className": "MostStonesRemovedWithSameRowOrColumn",
       "javaFile": "src/main/java/graphs/MostStonesRemovedWithSameRowOrColumn.java",
       "leetcodeUrl": "https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/",
       "leetcodeNumber": null,
@@ -7908,6 +8212,7 @@
     },
     "NumberOfClosedIslands": {
       "task": "NumberOfClosedIslands",
+      "className": "NumberOfClosedIslands",
       "javaFile": "src/main/java/graphs/NumberOfClosedIslands.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-closed-islands/",
       "leetcodeNumber": 1254,
@@ -7934,6 +8239,7 @@
     },
     "NumberOfIslands": {
       "task": "NumberOfIslands",
+      "className": "NumberOfIslands",
       "javaFile": "src/main/java/graphs/NumberOfIslands.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-islands/",
       "leetcodeNumber": 200,
@@ -7960,6 +8266,7 @@
     },
     "NumberOfProvinces": {
       "task": "NumberOfProvinces",
+      "className": "NumberOfProvinces",
       "javaFile": "src/main/java/graphs/NumberOfProvinces.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-provinces/",
       "leetcodeNumber": null,
@@ -7986,6 +8293,7 @@
     },
     "OptimalAccountBalancing": {
       "task": "OptimalAccountBalancing",
+      "className": "OptimalAccountBalancing",
       "javaFile": "src/main/java/graphs/OptimalAccountBalancing.java",
       "leetcodeUrl": "https://leetcode.com/problems/optimal-account-balancing/",
       "leetcodeNumber": null,
@@ -8012,6 +8320,7 @@
     },
     "PossibleBipartition": {
       "task": "PossibleBipartition",
+      "className": "PossibleBipartition",
       "javaFile": "src/main/java/graphs/PossibleBipartition.java",
       "leetcodeUrl": "https://leetcode.com/problems/possible-bipartition/",
       "leetcodeNumber": null,
@@ -8038,6 +8347,7 @@
     },
     "ReachableNodesInSubdividedGraph": {
       "task": "ReachableNodesInSubdividedGraph",
+      "className": "ReachableNodesInSubdividedGraph",
       "javaFile": "src/main/java/graphs/ReachableNodesInSubdividedGraph.java",
       "leetcodeUrl": "https://leetcode.com/problems/reachable-nodes-in-subdivided-graph/",
       "leetcodeNumber": null,
@@ -8064,6 +8374,7 @@
     },
     "ReconstructItinerary": {
       "task": "ReconstructItinerary",
+      "className": "ReconstructItinerary",
       "javaFile": "src/main/java/graphs/ReconstructItinerary.java",
       "leetcodeUrl": "https://leetcode.com/problems/reconstruct-itinerary/",
       "leetcodeNumber": 332,
@@ -8090,6 +8401,7 @@
     },
     "RedundantConnection": {
       "task": "RedundantConnection",
+      "className": "RedundantConnection",
       "javaFile": "src/main/java/graphs/RedundantConnection.java",
       "leetcodeUrl": "https://leetcode.com/problems/redundant-connection/",
       "leetcodeNumber": 684,
@@ -8116,6 +8428,7 @@
     },
     "RedundantConnectionII": {
       "task": "RedundantConnectionII",
+      "className": "RedundantConnectionII",
       "javaFile": "src/main/java/graphs/RedundantConnectionII.java",
       "leetcodeUrl": "https://leetcode.com/problems/redundant-connection-ii/",
       "leetcodeNumber": null,
@@ -8142,6 +8455,7 @@
     },
     "RegionsCutBySlashes": {
       "task": "RegionsCutBySlashes",
+      "className": "RegionsCutBySlashes",
       "javaFile": "src/main/java/graphs/RegionsCutBySlashes.java",
       "leetcodeUrl": "https://leetcode.com/problems/regions-cut-by-slashes/",
       "leetcodeNumber": null,
@@ -8168,6 +8482,7 @@
     },
     "RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable": {
       "task": "RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable",
+      "className": "RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable",
       "javaFile": "src/main/java/graphs/RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/",
       "leetcodeNumber": 1579,
@@ -8194,6 +8509,7 @@
     },
     "ReorderRoutesToMakeAllPathsLeadToCityZero": {
       "task": "ReorderRoutesToMakeAllPathsLeadToCityZero",
+      "className": "ReorderRoutesToMakeAllPathsLeadToCityZero",
       "javaFile": "src/main/java/graphs/ReorderRoutesToMakeAllPathsLeadToCityZero.java",
       "leetcodeUrl": "https://leetcode.com/problems/reorder-routes-to-make-all-paths-lead-to-the-city-zero/",
       "leetcodeNumber": 1466,
@@ -8220,6 +8536,7 @@
     },
     "SatisfiabilityOfEqualityEquations": {
       "task": "SatisfiabilityOfEqualityEquations",
+      "className": "SatisfiabilityOfEqualityEquations",
       "javaFile": "src/main/java/graphs/SatisfiabilityOfEqualityEquations.java",
       "leetcodeUrl": "https://leetcode.com/problems/satisfiability-of-equality-equations/",
       "leetcodeNumber": null,
@@ -8246,6 +8563,7 @@
     },
     "ShortestBridge": {
       "task": "ShortestBridge",
+      "className": "ShortestBridge",
       "javaFile": "src/main/java/graphs/ShortestBridge.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-bridge/",
       "leetcodeNumber": 934,
@@ -8272,6 +8590,7 @@
     },
     "ShortestDistance": {
       "task": "ShortestDistance",
+      "className": "ShortestDistance",
       "javaFile": "src/main/java/graphs/ShortestDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/01-matrix/",
       "leetcodeNumber": null,
@@ -8298,6 +8617,7 @@
     },
     "ShortestPathInAGridWithObstaclesElimination": {
       "task": "ShortestPathInAGridWithObstaclesElimination",
+      "className": "ShortestPathInAGridWithObstaclesElimination",
       "javaFile": "src/main/java/graphs/ShortestPathInAGridWithObstaclesElimination.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/",
       "leetcodeNumber": null,
@@ -8324,6 +8644,7 @@
     },
     "ShortestPathToGetAllKeys": {
       "task": "ShortestPathToGetAllKeys",
+      "className": "ShortestPathToGetAllKeys",
       "javaFile": "src/main/java/graphs/ShortestPathToGetAllKeys.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-path-to-get-all-keys/",
       "leetcodeNumber": null,
@@ -8350,6 +8671,7 @@
     },
     "SlidingPuzzle": {
       "task": "SlidingPuzzle",
+      "className": "SlidingPuzzle",
       "javaFile": "src/main/java/graphs/SlidingPuzzle.java",
       "leetcodeUrl": "https://leetcode.com/problems/sliding-puzzle/",
       "leetcodeNumber": null,
@@ -8376,6 +8698,7 @@
     },
     "SnakesAndLadders": {
       "task": "SnakesAndLadders",
+      "className": "SnakesAndLadders",
       "javaFile": "src/main/java/graphs/SnakesAndLadders.java",
       "leetcodeUrl": "https://leetcode.com/problems/snakes-and-ladders/",
       "leetcodeNumber": 909,
@@ -8402,6 +8725,7 @@
     },
     "SurroundedRegions": {
       "task": "SurroundedRegions",
+      "className": "SurroundedRegions",
       "javaFile": "src/main/java/graphs/SurroundedRegions.java",
       "leetcodeUrl": "https://leetcode.com/problems/surrounded-regions/",
       "leetcodeNumber": 130,
@@ -8426,9 +8750,10 @@
         "skip": false
       }
     },
-    "SwimInRisingWater": {
-      "task": "SwimInRisingWater",
-      "javaFile": "src/main/java/heaps/SwimInRisingWater.java",
+    "SwimInRisingWater__graphs": {
+      "task": "SwimInRisingWater__graphs",
+      "className": "SwimInRisingWater",
+      "javaFile": "src/main/java/graphs/SwimInRisingWater.java",
       "leetcodeUrl": "https://leetcode.com/problems/swim-in-rising-water/",
       "leetcodeNumber": 778,
       "problemName": "Swim In Rising Water",
@@ -8442,7 +8767,7 @@
         "intervalDays": 0,
         "repetitions": 0,
         "lastReviewed": null,
-        "nextDue": "2026-09-26",
+        "nextDue": "2026-08-08",
         "lastGrade": null
       },
       "history": [],
@@ -8454,6 +8779,7 @@
     },
     "TopologicalSort": {
       "task": "TopologicalSort",
+      "className": "TopologicalSort",
       "javaFile": "src/main/java/graphs/TopologicalSort.java",
       "leetcodeUrl": "https://leetcode.com/problems/course-schedule-ii/",
       "leetcodeNumber": 210,
@@ -8480,6 +8806,7 @@
     },
     "WaterFlow": {
       "task": "WaterFlow",
+      "className": "WaterFlow",
       "javaFile": "src/main/java/graphs/WaterFlow.java",
       "leetcodeUrl": "https://leetcode.com/problems/pacific-atlantic-water-flow/",
       "leetcodeNumber": 417,
@@ -8506,6 +8833,7 @@
     },
     "WordLadder": {
       "task": "WordLadder",
+      "className": "WordLadder",
       "javaFile": "src/main/java/graphs/WordLadder.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-ladder/",
       "leetcodeNumber": 127,
@@ -8532,6 +8860,7 @@
     },
     "WordLadder2": {
       "task": "WordLadder2",
+      "className": "WordLadder2",
       "javaFile": "src/main/java/graphs/WordLadder2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-ladder-ii/",
       "leetcodeNumber": null,
@@ -8558,6 +8887,7 @@
     },
     "WordSearch": {
       "task": "WordSearch",
+      "className": "WordSearch",
       "javaFile": "src/main/java/graphs/WordSearch.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-search/",
       "leetcodeNumber": 79,
@@ -8584,6 +8914,7 @@
     },
     "WordSearch2": {
       "task": "WordSearch2",
+      "className": "WordSearch2",
       "javaFile": "src/main/java/graphs/WordSearch2.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-search-ii/",
       "leetcodeNumber": 212,
@@ -8610,6 +8941,7 @@
     },
     "CheapestFlightWithStops": {
       "task": "CheapestFlightWithStops",
+      "className": "CheapestFlightWithStops",
       "javaFile": "src/main/java/graphs/bellman/CheapestFlightWithStops.java",
       "leetcodeUrl": "https://leetcode.com/problems/cheapest-flights-within-k-stops/",
       "leetcodeNumber": 787,
@@ -8636,6 +8968,7 @@
     },
     "ShortestPath": {
       "task": "ShortestPath",
+      "className": "ShortestPath",
       "javaFile": "src/main/java/graphs/bfs/ShortestPath.java",
       "leetcodeUrl": "https://leetcode.com/problems/shortest-path-in-binary-matrix/",
       "leetcodeNumber": 1091,
@@ -8662,6 +8995,7 @@
     },
     "MinCostSum": {
       "task": "MinCostSum",
+      "className": "MinCostSum",
       "javaFile": "src/main/java/graphs/dijkstra/MinCostSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/",
       "leetcodeNumber": null,
@@ -8688,6 +9022,7 @@
     },
     "NetworkDelayTimeSolver": {
       "task": "NetworkDelayTimeSolver",
+      "className": "NetworkDelayTimeSolver",
       "javaFile": "src/main/java/graphs/dijkstra/NetworkDelayTimeSolver.java",
       "leetcodeUrl": "https://leetcode.com/problems/network-delay-time/",
       "leetcodeNumber": 743,
@@ -8714,6 +9049,7 @@
     },
     "PathWithMinimumEffort": {
       "task": "PathWithMinimumEffort",
+      "className": "PathWithMinimumEffort",
       "javaFile": "src/main/java/graphs/dijkstra/PathWithMinimumEffort.java",
       "leetcodeUrl": "https://leetcode.com/problems/path-with-minimum-effort/",
       "leetcodeNumber": 1631,
@@ -8740,6 +9076,7 @@
     },
     "CourseScheduleIV": {
       "task": "CourseScheduleIV",
+      "className": "CourseScheduleIV",
       "javaFile": "src/main/java/graphs/floydwarshall/CourseScheduleIV.java",
       "leetcodeUrl": "https://leetcode.com/problems/course-schedule-iv/",
       "leetcodeNumber": 1462,
@@ -8764,8 +9101,36 @@
         "skip": false
       }
     },
+    "EvaluateDivision__floydwarshall": {
+      "task": "EvaluateDivision__floydwarshall",
+      "className": "EvaluateDivision",
+      "javaFile": "src/main/java/graphs/floydwarshall/EvaluateDivision.java",
+      "leetcodeUrl": "https://leetcode.com/problems/evaluate-division/",
+      "leetcodeNumber": 399,
+      "problemName": "Evaluate Division",
+      "pattern": "Graphs",
+      "difficulty": "Medium",
+      "isNC150": false,
+      "isBlind75": false,
+      "source": "neetcode",
+      "sm2": {
+        "easeFactor": 2.5,
+        "intervalDays": 0,
+        "repetitions": 0,
+        "lastReviewed": null,
+        "nextDue": "2026-09-26",
+        "lastGrade": null
+      },
+      "history": [],
+      "userNotes": "",
+      "flags": {
+        "pinned": false,
+        "skip": false
+      }
+    },
     "Graph": {
       "task": "Graph",
+      "className": "Graph",
       "javaFile": "src/main/java/graphs/floydwarshall/Graph.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-graph-with-shortest-path-calculator/",
       "leetcodeNumber": null,
@@ -8792,6 +9157,7 @@
     },
     "SmallestReachableCity": {
       "task": "SmallestReachableCity",
+      "className": "SmallestReachableCity",
       "javaFile": "src/main/java/graphs/floydwarshall/SmallestReachableCity.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/",
       "leetcodeNumber": null,
@@ -8818,6 +9184,7 @@
     },
     "CommutableIslands": {
       "task": "CommutableIslands",
+      "className": "CommutableIslands",
       "javaFile": "src/main/java/graphs/mst/CommutableIslands.java",
       "leetcodeUrl": "https://leetcode.com/problems/min-cost-to-connect-all-points/",
       "leetcodeNumber": 1584,
@@ -8844,6 +9211,7 @@
     },
     "ConnectingCitiesWithMinimumCost": {
       "task": "ConnectingCitiesWithMinimumCost",
+      "className": "ConnectingCitiesWithMinimumCost",
       "javaFile": "src/main/java/graphs/mst/ConnectingCitiesWithMinimumCost.java",
       "leetcodeUrl": "https://leetcode.com/problems/connecting-cities-with-minimum-cost/",
       "leetcodeNumber": null,
@@ -8870,6 +9238,7 @@
     },
     "ConnectingCitiesWithMinimumCost_Prim": {
       "task": "ConnectingCitiesWithMinimumCost_Prim",
+      "className": "ConnectingCitiesWithMinimumCost_Prim",
       "javaFile": "src/main/java/graphs/mst/ConnectingCitiesWithMinimumCost_Prim.java",
       "leetcodeUrl": "https://leetcode.com/problems/connecting-cities-with-minimum-cost/",
       "leetcodeNumber": null,
@@ -8896,6 +9265,7 @@
     },
     "MinCostToConnectPoints": {
       "task": "MinCostToConnectPoints",
+      "className": "MinCostToConnectPoints",
       "javaFile": "src/main/java/graphs/mst/MinCostToConnectPoints.java",
       "leetcodeUrl": "https://leetcode.com/problems/min-cost-to-connect-all-points/",
       "leetcodeNumber": 1584,
@@ -8922,6 +9292,7 @@
     },
     "MinimumMaxCostAfterKComponents": {
       "task": "MinimumMaxCostAfterKComponents",
+      "className": "MinimumMaxCostAfterKComponents",
       "javaFile": "src/main/java/graphs/mst/MinimumMaxCostAfterKComponents.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/",
       "leetcodeNumber": null,
@@ -8948,6 +9319,7 @@
     },
     "NetworkConnectivity_KruskalStyle": {
       "task": "NetworkConnectivity_KruskalStyle",
+      "className": "NetworkConnectivity_KruskalStyle",
       "javaFile": "src/main/java/graphs/mst/NetworkConnectivity_KruskalStyle.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-operations-to-make-network-connected/",
       "leetcodeNumber": null,
@@ -8974,6 +9346,7 @@
     },
     "AlienDictionary": {
       "task": "AlienDictionary",
+      "className": "AlienDictionary",
       "javaFile": "src/main/java/graphs/topologicalsort/AlienDictionary.java",
       "leetcodeUrl": "https://leetcode.com/problems/alien-dictionary/",
       "leetcodeNumber": 269,
@@ -9000,6 +9373,7 @@
     },
     "CourseSchedule": {
       "task": "CourseSchedule",
+      "className": "CourseSchedule",
       "javaFile": "src/main/java/graphs/topologicalsort/CourseSchedule.java",
       "leetcodeUrl": "https://leetcode.com/problems/course-schedule/",
       "leetcodeNumber": 207,
@@ -9026,6 +9400,7 @@
     },
     "CourseSchedule2": {
       "task": "CourseSchedule2",
+      "className": "CourseSchedule2",
       "javaFile": "src/main/java/graphs/topologicalsort/CourseSchedule2.java",
       "leetcodeUrl": "https://leetcode.com/problems/course-schedule-ii/",
       "leetcodeNumber": 210,
@@ -9052,6 +9427,7 @@
     },
     "FindAllPossibleRecipes": {
       "task": "FindAllPossibleRecipes",
+      "className": "FindAllPossibleRecipes",
       "javaFile": "src/main/java/graphs/topologicalsort/FindAllPossibleRecipes.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/",
       "leetcodeNumber": null,
@@ -9078,6 +9454,7 @@
     },
     "AccountsMerge": {
       "task": "AccountsMerge",
+      "className": "AccountsMerge",
       "javaFile": "src/main/java/graphs/unionfind/AccountsMerge.java",
       "leetcodeUrl": "https://leetcode.com/problems/accounts-merge/",
       "leetcodeNumber": 721,
@@ -9104,6 +9481,7 @@
     },
     "MinimizeMaximumComponentCost": {
       "task": "MinimizeMaximumComponentCost",
+      "className": "MinimizeMaximumComponentCost",
       "javaFile": "src/main/java/graphs/unionfind/MinimizeMaximumComponentCost.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimize-maximum-component-cost/",
       "leetcodeNumber": null,
@@ -9130,6 +9508,7 @@
     },
     "NumberOfIslandsII": {
       "task": "NumberOfIslandsII",
+      "className": "NumberOfIslandsII",
       "javaFile": "src/main/java/graphs/unionfind/NumberOfIslandsII.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-islands-ii/",
       "leetcodeNumber": null,
@@ -9156,6 +9535,7 @@
     },
     "Candy": {
       "task": "Candy",
+      "className": "Candy",
       "javaFile": "src/main/java/greedy/Candy.java",
       "leetcodeUrl": "https://leetcode.com/problems/candy/",
       "leetcodeNumber": null,
@@ -9182,6 +9562,7 @@
     },
     "CandyDistribution": {
       "task": "CandyDistribution",
+      "className": "CandyDistribution",
       "javaFile": "src/main/java/greedy/CandyDistribution.java",
       "leetcodeUrl": "https://leetcode.com/problems/candy/",
       "leetcodeNumber": null,
@@ -9208,6 +9589,7 @@
     },
     "ConstructTargetArrayWithMultipleSums": {
       "task": "ConstructTargetArrayWithMultipleSums",
+      "className": "ConstructTargetArrayWithMultipleSums",
       "javaFile": "src/main/java/greedy/ConstructTargetArrayWithMultipleSums.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-target-array-with-multiple-sums/",
       "leetcodeNumber": null,
@@ -9234,6 +9616,7 @@
     },
     "CreateMaximumNumber": {
       "task": "CreateMaximumNumber",
+      "className": "CreateMaximumNumber",
       "javaFile": "src/main/java/greedy/CreateMaximumNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/create-maximum-number/",
       "leetcodeNumber": null,
@@ -9260,6 +9643,7 @@
     },
     "DestroyingAsteroids": {
       "task": "DestroyingAsteroids",
+      "className": "DestroyingAsteroids",
       "javaFile": "src/main/java/greedy/DestroyingAsteroids.java",
       "leetcodeUrl": "https://leetcode.com/problems/destroying-asteroids/",
       "leetcodeNumber": null,
@@ -9284,8 +9668,36 @@
         "skip": false
       }
     },
+    "InsertInterval__greedy": {
+      "task": "InsertInterval__greedy",
+      "className": "InsertInterval",
+      "javaFile": "src/main/java/greedy/InsertInterval.java",
+      "leetcodeUrl": "https://leetcode.com/problems/insert-interval/",
+      "leetcodeNumber": 57,
+      "problemName": "Insert Interval",
+      "pattern": "Intervals",
+      "difficulty": "Medium",
+      "isNC150": true,
+      "isBlind75": true,
+      "source": "neetcode",
+      "sm2": {
+        "easeFactor": 2.5,
+        "intervalDays": 0,
+        "repetitions": 0,
+        "lastReviewed": null,
+        "nextDue": "2026-09-05",
+        "lastGrade": null
+      },
+      "history": [],
+      "userNotes": "",
+      "flags": {
+        "pinned": false,
+        "skip": false
+      }
+    },
     "MajorityElement": {
       "task": "MajorityElement",
+      "className": "MajorityElement",
       "javaFile": "src/main/java/greedy/MajorityElement.java",
       "leetcodeUrl": "https://leetcode.com/problems/majority-element/",
       "leetcodeNumber": 169,
@@ -9310,8 +9722,36 @@
         "skip": false
       }
     },
+    "MaximumSwap__greedy": {
+      "task": "MaximumSwap__greedy",
+      "className": "MaximumSwap",
+      "javaFile": "src/main/java/greedy/MaximumSwap.java",
+      "leetcodeUrl": "https://leetcode.com/problems/maximum-swap/",
+      "leetcodeNumber": null,
+      "problemName": "MaximumSwap",
+      "pattern": "Greedy",
+      "difficulty": "Unknown",
+      "isNC150": false,
+      "isBlind75": false,
+      "source": "extras",
+      "sm2": {
+        "easeFactor": 2.5,
+        "intervalDays": 0,
+        "repetitions": 0,
+        "lastReviewed": null,
+        "nextDue": "2026-12-26",
+        "lastGrade": null
+      },
+      "history": [],
+      "userNotes": "",
+      "flags": {
+        "pinned": false,
+        "skip": false
+      }
+    },
     "MinimumMovesToAggregateSeats": {
       "task": "MinimumMovesToAggregateSeats",
+      "className": "MinimumMovesToAggregateSeats",
       "javaFile": "src/main/java/greedy/MinimumMovesToAggregateSeats.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-equal-array-elements/",
       "leetcodeNumber": null,
@@ -9338,6 +9778,7 @@
     },
     "MinimumMovesToReachTargetScore": {
       "task": "MinimumMovesToReachTargetScore",
+      "className": "MinimumMovesToReachTargetScore",
       "javaFile": "src/main/java/greedy/MinimumMovesToReachTargetScore.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-reach-target-score/",
       "leetcodeNumber": null,
@@ -9364,6 +9805,7 @@
     },
     "AllOne": {
       "task": "AllOne",
+      "className": "AllOne",
       "javaFile": "src/main/java/hashing/AllOne.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-oone-data-structure/",
       "leetcodeNumber": null,
@@ -9390,6 +9832,7 @@
     },
     "DuplicateFile": {
       "task": "DuplicateFile",
+      "className": "DuplicateFile",
       "javaFile": "src/main/java/hashing/DuplicateFile.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-duplicate-file-in-system/",
       "leetcodeNumber": null,
@@ -9416,6 +9859,7 @@
     },
     "InvalidTransactions": {
       "task": "InvalidTransactions",
+      "className": "InvalidTransactions",
       "javaFile": "src/main/java/hashing/InvalidTransactions.java",
       "leetcodeUrl": "https://leetcode.com/problems/invalid-transactions/",
       "leetcodeNumber": null,
@@ -9442,6 +9886,7 @@
     },
     "KDiffPairsInAnArray": {
       "task": "KDiffPairsInAnArray",
+      "className": "KDiffPairsInAnArray",
       "javaFile": "src/main/java/hashing/KDiffPairsInAnArray.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-diff-pairs-in-an-array/",
       "leetcodeNumber": null,
@@ -9468,6 +9913,7 @@
     },
     "OriginalDigits": {
       "task": "OriginalDigits",
+      "className": "OriginalDigits",
       "javaFile": "src/main/java/hashing/OriginalDigits.java",
       "leetcodeUrl": "https://leetcode.com/problems/reconstruct-original-digits-from-english/",
       "leetcodeNumber": null,
@@ -9492,13 +9938,14 @@
         "skip": false
       }
     },
-    "PalindromePairs": {
-      "task": "PalindromePairs",
-      "javaFile": "src/main/java/strings/twopointers/PalindromePairs.java",
+    "PalindromePairs__hashing": {
+      "task": "PalindromePairs__hashing",
+      "className": "PalindromePairs",
+      "javaFile": "src/main/java/hashing/PalindromePairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-pairs/",
       "leetcodeNumber": null,
       "problemName": "PalindromePairs",
-      "pattern": "Two Pointers",
+      "pattern": "Uncategorized",
       "difficulty": "Unknown",
       "isNC150": false,
       "isBlind75": false,
@@ -9508,7 +9955,7 @@
         "intervalDays": 0,
         "repetitions": 0,
         "lastReviewed": null,
-        "nextDue": "2026-09-12",
+        "nextDue": "2026-11-07",
         "lastGrade": null
       },
       "history": [],
@@ -9520,6 +9967,7 @@
     },
     "PartitionLabels": {
       "task": "PartitionLabels",
+      "className": "PartitionLabels",
       "javaFile": "src/main/java/hashing/PartitionLabels.java",
       "leetcodeUrl": "https://leetcode.com/problems/partition-labels/",
       "leetcodeNumber": 763,
@@ -9546,6 +9994,7 @@
     },
     "SubsetSumEqualsK": {
       "task": "SubsetSumEqualsK",
+      "className": "SubsetSumEqualsK",
       "javaFile": "src/main/java/hashing/SubsetSumEqualsK.java",
       "leetcodeUrl": "https://leetcode.com/problems/subarray-sum-equals-k/",
       "leetcodeNumber": 560,
@@ -9572,6 +10021,7 @@
     },
     "TaskScheduler": {
       "task": "TaskScheduler",
+      "className": "TaskScheduler",
       "javaFile": "src/main/java/hashing/TaskScheduler.java",
       "leetcodeUrl": "https://leetcode.com/problems/task-scheduler/",
       "leetcodeNumber": 621,
@@ -9598,6 +10048,7 @@
     },
     "TweetCountsPerFrequency": {
       "task": "TweetCountsPerFrequency",
+      "className": "TweetCountsPerFrequency",
       "javaFile": "src/main/java/hashing/TweetCountsPerFrequency.java",
       "leetcodeUrl": "https://leetcode.com/problems/tweet-counts-per-frequency/",
       "leetcodeNumber": null,
@@ -9624,6 +10075,7 @@
     },
     "WebsiteVisit": {
       "task": "WebsiteVisit",
+      "className": "WebsiteVisit",
       "javaFile": "src/main/java/hashing/WebsiteVisit.java",
       "leetcodeUrl": "https://leetcode.com/problems/analyze-user-website-visit-pattern/",
       "leetcodeNumber": null,
@@ -9650,6 +10102,7 @@
     },
     "KClosestPointsToOrigin": {
       "task": "KClosestPointsToOrigin",
+      "className": "KClosestPointsToOrigin",
       "javaFile": "src/main/java/heaps/KClosestPointsToOrigin.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-closest-points-to-origin/",
       "leetcodeNumber": 973,
@@ -9676,6 +10129,7 @@
     },
     "KthLargestFinder": {
       "task": "KthLargestFinder",
+      "className": "KthLargestFinder",
       "javaFile": "src/main/java/heaps/KthLargestFinder.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-largest-element-in-an-array/",
       "leetcodeNumber": 215,
@@ -9702,6 +10156,7 @@
     },
     "KthSmallestInSortedMatrix": {
       "task": "KthSmallestInSortedMatrix",
+      "className": "KthSmallestInSortedMatrix",
       "javaFile": "src/main/java/heaps/KthSmallestInSortedMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/",
       "leetcodeNumber": null,
@@ -9728,6 +10183,7 @@
     },
     "KthSmallestPrimeFraction": {
       "task": "KthSmallestPrimeFraction",
+      "className": "KthSmallestPrimeFraction",
       "javaFile": "src/main/java/heaps/KthSmallestPrimeFraction.java",
       "leetcodeUrl": "https://leetcode.com/problems/k-th-smallest-prime-fraction/",
       "leetcodeNumber": null,
@@ -9754,6 +10210,7 @@
     },
     "KthlargestStreamFinder": {
       "task": "KthlargestStreamFinder",
+      "className": "KthlargestStreamFinder",
       "javaFile": "src/main/java/heaps/KthlargestStreamFinder.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-largest-element-in-a-stream/",
       "leetcodeNumber": 703,
@@ -9780,6 +10237,7 @@
     },
     "MaxEvents2": {
       "task": "MaxEvents2",
+      "className": "MaxEvents2",
       "javaFile": "src/main/java/heaps/MaxEvents2.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended-ii/",
       "leetcodeNumber": null,
@@ -9806,6 +10264,7 @@
     },
     "MaxEventsThatCanbeAttended": {
       "task": "MaxEventsThatCanbeAttended",
+      "className": "MaxEventsThatCanbeAttended",
       "javaFile": "src/main/java/heaps/MaxEventsThatCanbeAttended.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/",
       "leetcodeNumber": null,
@@ -9832,6 +10291,7 @@
     },
     "MeetingRoomsII": {
       "task": "MeetingRoomsII",
+      "className": "MeetingRoomsII",
       "javaFile": "src/main/java/heaps/MeetingRoomsII.java",
       "leetcodeUrl": "https://leetcode.com/problems/meeting-rooms-ii/",
       "leetcodeNumber": 253,
@@ -9858,6 +10318,7 @@
     },
     "MergeKLists": {
       "task": "MergeKLists",
+      "className": "MergeKLists",
       "javaFile": "src/main/java/heaps/MergeKLists.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-k-sorted-lists/",
       "leetcodeNumber": 23,
@@ -9884,6 +10345,7 @@
     },
     "MinimumCostToHireKWorkers": {
       "task": "MinimumCostToHireKWorkers",
+      "className": "MinimumCostToHireKWorkers",
       "javaFile": "src/main/java/heaps/MinimumCostToHireKWorkers.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-hire-k-workers/",
       "leetcodeNumber": null,
@@ -9908,8 +10370,36 @@
         "skip": false
       }
     },
+    "SwimInRisingWater__heaps": {
+      "task": "SwimInRisingWater__heaps",
+      "className": "SwimInRisingWater",
+      "javaFile": "src/main/java/heaps/SwimInRisingWater.java",
+      "leetcodeUrl": "https://leetcode.com/problems/swim-in-rising-water/",
+      "leetcodeNumber": 778,
+      "problemName": "Swim In Rising Water",
+      "pattern": "Advanced Graphs",
+      "difficulty": "Hard",
+      "isNC150": true,
+      "isBlind75": false,
+      "source": "neetcode",
+      "sm2": {
+        "easeFactor": 2.5,
+        "intervalDays": 0,
+        "repetitions": 0,
+        "lastReviewed": null,
+        "nextDue": "2026-09-26",
+        "lastGrade": null
+      },
+      "history": [],
+      "userNotes": "",
+      "flags": {
+        "pinned": false,
+        "skip": false
+      }
+    },
     "TopKFrequentElements": {
       "task": "TopKFrequentElements",
+      "className": "TopKFrequentElements",
       "javaFile": "src/main/java/heaps/TopKFrequentElements.java",
       "leetcodeUrl": "https://leetcode.com/problems/top-k-frequent-elements/",
       "leetcodeNumber": 347,
@@ -9936,6 +10426,7 @@
     },
     "TopKFrequentWords": {
       "task": "TopKFrequentWords",
+      "className": "TopKFrequentWords",
       "javaFile": "src/main/java/heaps/TopKFrequentWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/top-k-frequent-words/",
       "leetcodeNumber": null,
@@ -9962,6 +10453,7 @@
     },
     "kPairsWithSmallestSums": {
       "task": "kPairsWithSmallestSums",
+      "className": "kPairsWithSmallestSums",
       "javaFile": "src/main/java/heaps/kPairsWithSmallestSums.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-k-pairs-with-smallest-sums/",
       "leetcodeNumber": null,
@@ -9988,6 +10480,7 @@
     },
     "AddTwoNumbers": {
       "task": "AddTwoNumbers",
+      "className": "AddTwoNumbers",
       "javaFile": "src/main/java/linkedlist/AddTwoNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/add-two-numbers/",
       "leetcodeNumber": 2,
@@ -10014,6 +10507,7 @@
     },
     "ConvertBinaryNumberInALinkedListToInteger": {
       "task": "ConvertBinaryNumberInALinkedListToInteger",
+      "className": "ConvertBinaryNumberInALinkedListToInteger",
       "javaFile": "src/main/java/linkedlist/ConvertBinaryNumberInALinkedListToInteger.java",
       "leetcodeUrl": "https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/",
       "leetcodeNumber": null,
@@ -10040,6 +10534,7 @@
     },
     "CopyListWithRandomPointer": {
       "task": "CopyListWithRandomPointer",
+      "className": "CopyListWithRandomPointer",
       "javaFile": "src/main/java/linkedlist/CopyListWithRandomPointer.java",
       "leetcodeUrl": "https://leetcode.com/problems/copy-list-with-random-pointer/",
       "leetcodeNumber": 138,
@@ -10066,6 +10561,7 @@
     },
     "DeleteNodeInALinkedList": {
       "task": "DeleteNodeInALinkedList",
+      "className": "DeleteNodeInALinkedList",
       "javaFile": "src/main/java/linkedlist/DeleteNodeInALinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/delete-node-in-a-linked-list/",
       "leetcodeNumber": null,
@@ -10092,6 +10588,7 @@
     },
     "FlattenNestedListIterator": {
       "task": "FlattenNestedListIterator",
+      "className": "FlattenNestedListIterator",
       "javaFile": "src/main/java/linkedlist/FlattenNestedListIterator.java",
       "leetcodeUrl": "https://leetcode.com/problems/flatten-nested-list-iterator/",
       "leetcodeNumber": null,
@@ -10118,6 +10615,7 @@
     },
     "InsertSortedCircularLinkedList": {
       "task": "InsertSortedCircularLinkedList",
+      "className": "InsertSortedCircularLinkedList",
       "javaFile": "src/main/java/linkedlist/InsertSortedCircularLinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/insert-into-a-sorted-circular-linked-list/",
       "leetcodeNumber": null,
@@ -10144,6 +10642,7 @@
     },
     "IntersectionList": {
       "task": "IntersectionList",
+      "className": "IntersectionList",
       "javaFile": "src/main/java/linkedlist/IntersectionList.java",
       "leetcodeUrl": "https://leetcode.com/problems/intersection-of-two-linked-lists/",
       "leetcodeNumber": 160,
@@ -10170,6 +10669,7 @@
     },
     "LinkedListCycleII": {
       "task": "LinkedListCycleII",
+      "className": "LinkedListCycleII",
       "javaFile": "src/main/java/linkedlist/LinkedListCycleII.java",
       "leetcodeUrl": "https://leetcode.com/problems/linked-list-cycle-ii/",
       "leetcodeNumber": null,
@@ -10196,6 +10696,7 @@
     },
     "MergeNodesInBetweenZeros": {
       "task": "MergeNodesInBetweenZeros",
+      "className": "MergeNodesInBetweenZeros",
       "javaFile": "src/main/java/linkedlist/MergeNodesInBetweenZeros.java",
       "leetcodeUrl": "https://leetcode.com/problems/merge-nodes-in-between-zeros/",
       "leetcodeNumber": null,
@@ -10222,6 +10723,7 @@
     },
     "MiddleElement": {
       "task": "MiddleElement",
+      "className": "MiddleElement",
       "javaFile": "src/main/java/linkedlist/MiddleElement.java",
       "leetcodeUrl": "https://leetcode.com/problems/middle-of-the-linked-list/",
       "leetcodeNumber": 876,
@@ -10248,6 +10750,7 @@
     },
     "OddEvenLinkedList": {
       "task": "OddEvenLinkedList",
+      "className": "OddEvenLinkedList",
       "javaFile": "src/main/java/linkedlist/OddEvenLinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-linked-list/",
       "leetcodeNumber": 234,
@@ -10274,6 +10777,7 @@
     },
     "PalindromeList": {
       "task": "PalindromeList",
+      "className": "PalindromeList",
       "javaFile": "src/main/java/linkedlist/PalindromeList.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-linked-list/",
       "leetcodeNumber": 234,
@@ -10300,6 +10804,7 @@
     },
     "RemoveDuplicatesFromSortedList": {
       "task": "RemoveDuplicatesFromSortedList",
+      "className": "RemoveDuplicatesFromSortedList",
       "javaFile": "src/main/java/linkedlist/RemoveDuplicatesFromSortedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicates-from-sorted-list/",
       "leetcodeNumber": 83,
@@ -10326,6 +10831,7 @@
     },
     "RemoveDuplicatesFromSortedListII": {
       "task": "RemoveDuplicatesFromSortedListII",
+      "className": "RemoveDuplicatesFromSortedListII",
       "javaFile": "src/main/java/linkedlist/RemoveDuplicatesFromSortedListII.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/",
       "leetcodeNumber": null,
@@ -10352,6 +10858,7 @@
     },
     "RemoveNthNodeFromEndOfList": {
       "task": "RemoveNthNodeFromEndOfList",
+      "className": "RemoveNthNodeFromEndOfList",
       "javaFile": "src/main/java/linkedlist/RemoveNthNodeFromEndOfList.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/",
       "leetcodeNumber": 19,
@@ -10378,6 +10885,7 @@
     },
     "ReverseLinkedList": {
       "task": "ReverseLinkedList",
+      "className": "ReverseLinkedList",
       "javaFile": "src/main/java/linkedlist/ReverseLinkedList.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-linked-list/",
       "leetcodeNumber": 206,
@@ -10404,6 +10912,7 @@
     },
     "ReverseLinkedListII": {
       "task": "ReverseLinkedListII",
+      "className": "ReverseLinkedListII",
       "javaFile": "src/main/java/linkedlist/ReverseLinkedListII.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-linked-list-ii/",
       "leetcodeNumber": 92,
@@ -10430,6 +10939,7 @@
     },
     "ReverseListInKGroup": {
       "task": "ReverseListInKGroup",
+      "className": "ReverseListInKGroup",
       "javaFile": "src/main/java/linkedlist/ReverseListInKGroup.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-nodes-in-k-group/",
       "leetcodeNumber": 25,
@@ -10456,6 +10966,7 @@
     },
     "ReverseNodesInKGroup": {
       "task": "ReverseNodesInKGroup",
+      "className": "ReverseNodesInKGroup",
       "javaFile": "src/main/java/linkedlist/ReverseNodesInKGroup.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-nodes-in-k-group/",
       "leetcodeNumber": 25,
@@ -10482,6 +10993,7 @@
     },
     "RotateList": {
       "task": "RotateList",
+      "className": "RotateList",
       "javaFile": "src/main/java/linkedlist/RotateList.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-list/",
       "leetcodeNumber": 61,
@@ -10508,6 +11020,7 @@
     },
     "SwapPairs": {
       "task": "SwapPairs",
+      "className": "SwapPairs",
       "javaFile": "src/main/java/linkedlist/SwapPairs.java",
       "leetcodeUrl": "https://leetcode.com/problems/swap-nodes-in-pairs/",
       "leetcodeNumber": 24,
@@ -10534,6 +11047,7 @@
     },
     "AngleBetweenHandsOfAClock": {
       "task": "AngleBetweenHandsOfAClock",
+      "className": "AngleBetweenHandsOfAClock",
       "javaFile": "src/main/java/maths/AngleBetweenHandsOfAClock.java",
       "leetcodeUrl": "https://leetcode.com/problems/angle-between-hands-of-a-clock/",
       "leetcodeNumber": null,
@@ -10560,6 +11074,7 @@
     },
     "ConsecutiveNumbersSum": {
       "task": "ConsecutiveNumbersSum",
+      "className": "ConsecutiveNumbersSum",
       "javaFile": "src/main/java/maths/ConsecutiveNumbersSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/consecutive-numbers-sum/",
       "leetcodeNumber": null,
@@ -10586,6 +11101,7 @@
     },
     "ConvexHull": {
       "task": "ConvexHull",
+      "className": "ConvexHull",
       "javaFile": "src/main/java/maths/ConvexHull.java",
       "leetcodeUrl": "https://leetcode.com/problems/erect-the-fence/",
       "leetcodeNumber": null,
@@ -10612,6 +11128,7 @@
     },
     "CountPrimes": {
       "task": "CountPrimes",
+      "className": "CountPrimes",
       "javaFile": "src/main/java/maths/CountPrimes.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-primes/",
       "leetcodeNumber": null,
@@ -10638,6 +11155,7 @@
     },
     "Division": {
       "task": "Division",
+      "className": "Division",
       "javaFile": "src/main/java/maths/Division.java",
       "leetcodeUrl": "https://leetcode.com/problems/fraction-to-recurring-decimal/",
       "leetcodeNumber": null,
@@ -10664,6 +11182,7 @@
     },
     "FindSqrt": {
       "task": "FindSqrt",
+      "className": "FindSqrt",
       "javaFile": "src/main/java/maths/FindSqrt.java",
       "leetcodeUrl": "https://leetcode.com/problems/sqrtx/",
       "leetcodeNumber": 69,
@@ -10690,6 +11209,7 @@
     },
     "IntegerDivisionWithoutOperators": {
       "task": "IntegerDivisionWithoutOperators",
+      "className": "IntegerDivisionWithoutOperators",
       "javaFile": "src/main/java/maths/IntegerDivisionWithoutOperators.java",
       "leetcodeUrl": "https://leetcode.com/problems/divide-two-integers/",
       "leetcodeNumber": null,
@@ -10716,6 +11236,7 @@
     },
     "KthFactorOfNumber": {
       "task": "KthFactorOfNumber",
+      "className": "KthFactorOfNumber",
       "javaFile": "src/main/java/maths/KthFactorOfNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/the-kth-factor-of-n/",
       "leetcodeNumber": null,
@@ -10742,6 +11263,7 @@
     },
     "MaxPointsOnALine": {
       "task": "MaxPointsOnALine",
+      "className": "MaxPointsOnALine",
       "javaFile": "src/main/java/maths/MaxPointsOnALine.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-points-on-a-line/",
       "leetcodeNumber": 149,
@@ -10768,6 +11290,7 @@
     },
     "MaximumNumberOfVisiblePoints": {
       "task": "MaximumNumberOfVisiblePoints",
+      "className": "MaximumNumberOfVisiblePoints",
       "javaFile": "src/main/java/maths/MaximumNumberOfVisiblePoints.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-number-of-visible-points/",
       "leetcodeNumber": null,
@@ -10794,6 +11317,7 @@
     },
     "MinimumOperationsToReduceIntegerToZero": {
       "task": "MinimumOperationsToReduceIntegerToZero",
+      "className": "MinimumOperationsToReduceIntegerToZero",
       "javaFile": "src/main/java/maths/MinimumOperationsToReduceIntegerToZero.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-operations-to-reduce-an-integer-to-0/",
       "leetcodeNumber": null,
@@ -10820,6 +11344,7 @@
     },
     "MultiplyStrings": {
       "task": "MultiplyStrings",
+      "className": "MultiplyStrings",
       "javaFile": "src/main/java/maths/MultiplyStrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/multiply-strings/",
       "leetcodeNumber": 43,
@@ -10846,6 +11371,7 @@
     },
     "NumberOfDigitOne": {
       "task": "NumberOfDigitOne",
+      "className": "NumberOfDigitOne",
       "javaFile": "src/main/java/maths/NumberOfDigitOne.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-digit-one/",
       "leetcodeNumber": null,
@@ -10872,6 +11398,7 @@
     },
     "Power": {
       "task": "Power",
+      "className": "Power",
       "javaFile": "src/main/java/maths/Power.java",
       "leetcodeUrl": "https://leetcode.com/problems/powx-n/",
       "leetcodeNumber": 50,
@@ -10898,6 +11425,7 @@
     },
     "RandomizedArrayShuffler": {
       "task": "RandomizedArrayShuffler",
+      "className": "RandomizedArrayShuffler",
       "javaFile": "src/main/java/maths/RandomizedArrayShuffler.java",
       "leetcodeUrl": "https://leetcode.com/problems/shuffle-an-array/",
       "leetcodeNumber": null,
@@ -10924,6 +11452,7 @@
     },
     "ValidSquare": {
       "task": "ValidSquare",
+      "className": "ValidSquare",
       "javaFile": "src/main/java/maths/ValidSquare.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-square/",
       "leetcodeNumber": null,
@@ -10950,6 +11479,7 @@
     },
     "AsteroidCollision": {
       "task": "AsteroidCollision",
+      "className": "AsteroidCollision",
       "javaFile": "src/main/java/stacksandqueues/AsteroidCollision.java",
       "leetcodeUrl": "https://leetcode.com/problems/asteroid-collision/",
       "leetcodeNumber": 735,
@@ -10976,6 +11506,7 @@
     },
     "CarFleet": {
       "task": "CarFleet",
+      "className": "CarFleet",
       "javaFile": "src/main/java/stacksandqueues/CarFleet.java",
       "leetcodeUrl": "https://leetcode.com/problems/car-fleet/",
       "leetcodeNumber": 853,
@@ -11002,6 +11533,7 @@
     },
     "ExclusiveTimeOfFunctions": {
       "task": "ExclusiveTimeOfFunctions",
+      "className": "ExclusiveTimeOfFunctions",
       "javaFile": "src/main/java/stacksandqueues/ExclusiveTimeOfFunctions.java",
       "leetcodeUrl": "https://leetcode.com/problems/exclusive-time-of-functions/",
       "leetcodeNumber": null,
@@ -11028,6 +11560,7 @@
     },
     "FirstNonRepeating": {
       "task": "FirstNonRepeating",
+      "className": "FirstNonRepeating",
       "javaFile": "src/main/java/stacksandqueues/FirstNonRepeating.java",
       "leetcodeUrl": "https://leetcode.com/problems/first-unique-character-in-a-string/",
       "leetcodeNumber": null,
@@ -11054,6 +11587,7 @@
     },
     "GasStation": {
       "task": "GasStation",
+      "className": "GasStation",
       "javaFile": "src/main/java/stacksandqueues/GasStation.java",
       "leetcodeUrl": "https://leetcode.com/problems/gas-station/",
       "leetcodeNumber": 134,
@@ -11080,6 +11614,7 @@
     },
     "MinSubarraySum": {
       "task": "MinSubarraySum",
+      "className": "MinSubarraySum",
       "javaFile": "src/main/java/stacksandqueues/MinSubarraySum.java",
       "leetcodeUrl": "https://leetcode.com/problems/sum-of-subarray-minimums/",
       "leetcodeNumber": null,
@@ -11106,6 +11641,7 @@
     },
     "MinimumRemoveToMakeValidParentheses": {
       "task": "MinimumRemoveToMakeValidParentheses",
+      "className": "MinimumRemoveToMakeValidParentheses",
       "javaFile": "src/main/java/stacksandqueues/MinimumRemoveToMakeValidParentheses.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/",
       "leetcodeNumber": null,
@@ -11132,6 +11668,7 @@
     },
     "NestedListWeightSum": {
       "task": "NestedListWeightSum",
+      "className": "NestedListWeightSum",
       "javaFile": "src/main/java/stacksandqueues/NestedListWeightSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/nested-list-weight-sum/",
       "leetcodeNumber": null,
@@ -11158,6 +11695,7 @@
     },
     "ParenthesisChecker": {
       "task": "ParenthesisChecker",
+      "className": "ParenthesisChecker",
       "javaFile": "src/main/java/stacksandqueues/ParenthesisChecker.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-parentheses/",
       "leetcodeNumber": 20,
@@ -11184,6 +11722,7 @@
     },
     "QueueUsingStack": {
       "task": "QueueUsingStack",
+      "className": "QueueUsingStack",
       "javaFile": "src/main/java/stacksandqueues/QueueUsingStack.java",
       "leetcodeUrl": "https://leetcode.com/problems/implement-queue-using-stacks/",
       "leetcodeNumber": null,
@@ -11210,6 +11749,7 @@
     },
     "RemoveDuplicateRecursively": {
       "task": "RemoveDuplicateRecursively",
+      "className": "RemoveDuplicateRecursively",
       "javaFile": "src/main/java/stacksandqueues/RemoveDuplicateRecursively.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/",
       "leetcodeNumber": 1209,
@@ -11236,6 +11776,7 @@
     },
     "RemoveKDigits": {
       "task": "RemoveKDigits",
+      "className": "RemoveKDigits",
       "javaFile": "src/main/java/stacksandqueues/RemoveKDigits.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-k-digits/",
       "leetcodeNumber": 402,
@@ -11262,6 +11803,7 @@
     },
     "ReversePolishNotation": {
       "task": "ReversePolishNotation",
+      "className": "ReversePolishNotation",
       "javaFile": "src/main/java/stacksandqueues/ReversePolishNotation.java",
       "leetcodeUrl": "https://leetcode.com/problems/evaluate-reverse-polish-notation/",
       "leetcodeNumber": 150,
@@ -11288,6 +11830,7 @@
     },
     "SimplifyPath": {
       "task": "SimplifyPath",
+      "className": "SimplifyPath",
       "javaFile": "src/main/java/stacksandqueues/SimplifyPath.java",
       "leetcodeUrl": "https://leetcode.com/problems/simplify-path/",
       "leetcodeNumber": 71,
@@ -11314,6 +11857,7 @@
     },
     "SingleThreadCPU": {
       "task": "SingleThreadCPU",
+      "className": "SingleThreadCPU",
       "javaFile": "src/main/java/stacksandqueues/SingleThreadCPU.java",
       "leetcodeUrl": "https://leetcode.com/problems/single-threaded-cpu/",
       "leetcodeNumber": 1834,
@@ -11340,6 +11884,7 @@
     },
     "SlidingWindowMaximum": {
       "task": "SlidingWindowMaximum",
+      "className": "SlidingWindowMaximum",
       "javaFile": "src/main/java/stacksandqueues/SlidingWindowMaximum.java",
       "leetcodeUrl": "https://leetcode.com/problems/sliding-window-maximum/",
       "leetcodeNumber": 239,
@@ -11366,6 +11911,7 @@
     },
     "SlidingWindowMedian": {
       "task": "SlidingWindowMedian",
+      "className": "SlidingWindowMedian",
       "javaFile": "src/main/java/stacksandqueues/SlidingWindowMedian.java",
       "leetcodeUrl": "https://leetcode.com/problems/sliding-window-median/",
       "leetcodeNumber": null,
@@ -11392,6 +11938,7 @@
     },
     "SmallestRangeCoveringElementsFromKLists": {
       "task": "SmallestRangeCoveringElementsFromKLists",
+      "className": "SmallestRangeCoveringElementsFromKLists",
       "javaFile": "src/main/java/stacksandqueues/SmallestRangeCoveringElementsFromKLists.java",
       "leetcodeUrl": "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/",
       "leetcodeNumber": null,
@@ -11418,6 +11965,7 @@
     },
     "LargestHistogram": {
       "task": "LargestHistogram",
+      "className": "LargestHistogram",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/LargestHistogram.java",
       "leetcodeUrl": "https://leetcode.com/problems/largest-rectangle-in-histogram/",
       "leetcodeNumber": 84,
@@ -11444,6 +11992,7 @@
     },
     "MaxRectangleBinaryMatrix": {
       "task": "MaxRectangleBinaryMatrix",
+      "className": "MaxRectangleBinaryMatrix",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/MaxRectangleBinaryMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximal-rectangle/",
       "leetcodeNumber": null,
@@ -11470,6 +12019,7 @@
     },
     "MinStack": {
       "task": "MinStack",
+      "className": "MinStack",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/MinStack.java",
       "leetcodeUrl": "https://leetcode.com/problems/min-stack/",
       "leetcodeNumber": 155,
@@ -11496,6 +12046,7 @@
     },
     "NextGreaterElement": {
       "task": "NextGreaterElement",
+      "className": "NextGreaterElement",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/NextGreaterElement.java",
       "leetcodeUrl": "https://leetcode.com/problems/next-greater-element-i/",
       "leetcodeNumber": 496,
@@ -11522,6 +12073,7 @@
     },
     "NextGreaterElementII": {
       "task": "NextGreaterElementII",
+      "className": "NextGreaterElementII",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/NextGreaterElementII.java",
       "leetcodeUrl": "https://leetcode.com/problems/next-greater-element-ii/",
       "leetcodeNumber": null,
@@ -11548,6 +12100,7 @@
     },
     "StockSpanProblem": {
       "task": "StockSpanProblem",
+      "className": "StockSpanProblem",
       "javaFile": "src/main/java/stacksandqueues/adityavermaplaylist/StockSpanProblem.java",
       "leetcodeUrl": "https://leetcode.com/problems/online-stock-span/",
       "leetcodeNumber": 901,
@@ -11574,6 +12127,7 @@
     },
     "BasicCalculator": {
       "task": "BasicCalculator",
+      "className": "BasicCalculator",
       "javaFile": "src/main/java/stacksandqueues/calculator/BasicCalculator.java",
       "leetcodeUrl": "https://leetcode.com/problems/basic-calculator/",
       "leetcodeNumber": null,
@@ -11600,6 +12154,7 @@
     },
     "BasicCalculator2": {
       "task": "BasicCalculator2",
+      "className": "BasicCalculator2",
       "javaFile": "src/main/java/stacksandqueues/calculator/BasicCalculator2.java",
       "leetcodeUrl": "https://leetcode.com/problems/basic-calculator-ii/",
       "leetcodeNumber": null,
@@ -11626,6 +12181,7 @@
     },
     "BasicCalculator3": {
       "task": "BasicCalculator3",
+      "className": "BasicCalculator3",
       "javaFile": "src/main/java/stacksandqueues/calculator/BasicCalculator3.java",
       "leetcodeUrl": "https://leetcode.com/problems/basic-calculator-iii/",
       "leetcodeNumber": null,
@@ -11652,6 +12208,7 @@
     },
     "LfuCacheTest": {
       "task": "LfuCacheTest",
+      "className": "LfuCacheTest",
       "javaFile": "src/main/java/stacksandqueues/design/LfuCacheTest.java",
       "leetcodeUrl": "https://leetcode.com/problems/lfu-cache/",
       "leetcodeNumber": 460,
@@ -11678,6 +12235,7 @@
     },
     "LruCacheTest": {
       "task": "LruCacheTest",
+      "className": "LruCacheTest",
       "javaFile": "src/main/java/stacksandqueues/design/LruCacheTest.java",
       "leetcodeUrl": "https://leetcode.com/problems/lru-cache/",
       "leetcodeNumber": 146,
@@ -11704,6 +12262,7 @@
     },
     "MaxStack": {
       "task": "MaxStack",
+      "className": "MaxStack",
       "javaFile": "src/main/java/stacksandqueues/design/MaxStack.java",
       "leetcodeUrl": "https://leetcode.com/problems/max-stack/",
       "leetcodeNumber": null,
@@ -11730,6 +12289,7 @@
     },
     "DailyTemperatures": {
       "task": "DailyTemperatures",
+      "className": "DailyTemperatures",
       "javaFile": "src/main/java/stacksandqueues/monotonicstack/DailyTemperatures.java",
       "leetcodeUrl": "https://leetcode.com/problems/daily-temperatures/",
       "leetcodeNumber": 739,
@@ -11756,6 +12316,7 @@
     },
     "FindTheMostCompetitiveSubsequence": {
       "task": "FindTheMostCompetitiveSubsequence",
+      "className": "FindTheMostCompetitiveSubsequence",
       "javaFile": "src/main/java/stacksandqueues/monotonicstack/FindTheMostCompetitiveSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-most-competitive-subsequence/",
       "leetcodeNumber": null,
@@ -11782,6 +12343,7 @@
     },
     "LargestRectangleInHistogram": {
       "task": "LargestRectangleInHistogram",
+      "className": "LargestRectangleInHistogram",
       "javaFile": "src/main/java/stacksandqueues/monotonicstack/LargestRectangleInHistogram.java",
       "leetcodeUrl": "https://leetcode.com/problems/largest-rectangle-in-histogram/",
       "leetcodeNumber": 84,
@@ -11808,6 +12370,7 @@
     },
     "NiceSubarray": {
       "task": "NiceSubarray",
+      "className": "NiceSubarray",
       "javaFile": "src/main/java/stacksandqueues/monotonicstack/NiceSubarray.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-number-of-nice-subarrays/",
       "leetcodeNumber": null,
@@ -11834,6 +12397,7 @@
     },
     "AddStrings": {
       "task": "AddStrings",
+      "className": "AddStrings",
       "javaFile": "src/main/java/strings/AddStrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/add-strings/",
       "leetcodeNumber": null,
@@ -11860,6 +12424,7 @@
     },
     "AtoI": {
       "task": "AtoI",
+      "className": "AtoI",
       "javaFile": "src/main/java/strings/AtoI.java",
       "leetcodeUrl": "https://leetcode.com/problems/string-to-integer-atoi/",
       "leetcodeNumber": null,
@@ -11886,6 +12451,7 @@
     },
     "CheckIfAllAsAppearsBeforeAllBs": {
       "task": "CheckIfAllAsAppearsBeforeAllBs",
+      "className": "CheckIfAllAsAppearsBeforeAllBs",
       "javaFile": "src/main/java/strings/CheckIfAllAsAppearsBeforeAllBs.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-all-as-appears-before-all-bs/",
       "leetcodeNumber": null,
@@ -11912,6 +12478,7 @@
     },
     "CountAndSay": {
       "task": "CountAndSay",
+      "className": "CountAndSay",
       "javaFile": "src/main/java/strings/CountAndSay.java",
       "leetcodeUrl": "https://leetcode.com/problems/count-and-say/",
       "leetcodeNumber": null,
@@ -11938,6 +12505,7 @@
     },
     "DivideAStringIntoGroupsOfSizeK": {
       "task": "DivideAStringIntoGroupsOfSizeK",
+      "className": "DivideAStringIntoGroupsOfSizeK",
       "javaFile": "src/main/java/strings/DivideAStringIntoGroupsOfSizeK.java",
       "leetcodeUrl": "https://leetcode.com/problems/divide-a-string-into-groups-of-size-k/",
       "leetcodeNumber": null,
@@ -11964,6 +12532,7 @@
     },
     "FindReplaceInString": {
       "task": "FindReplaceInString",
+      "className": "FindReplaceInString",
       "javaFile": "src/main/java/strings/FindReplaceInString.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-and-replace-in-string/",
       "leetcodeNumber": null,
@@ -11990,6 +12559,7 @@
     },
     "FindTheClosestPalindrome": {
       "task": "FindTheClosestPalindrome",
+      "className": "FindTheClosestPalindrome",
       "javaFile": "src/main/java/strings/FindTheClosestPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-closest-palindrome/",
       "leetcodeNumber": null,
@@ -12016,6 +12586,7 @@
     },
     "LengthOfLastWord": {
       "task": "LengthOfLastWord",
+      "className": "LengthOfLastWord",
       "javaFile": "src/main/java/strings/LengthOfLastWord.java",
       "leetcodeUrl": "https://leetcode.com/problems/length-of-last-word/",
       "leetcodeNumber": 58,
@@ -12042,6 +12613,7 @@
     },
     "LicenseKeyFormatting": {
       "task": "LicenseKeyFormatting",
+      "className": "LicenseKeyFormatting",
       "javaFile": "src/main/java/strings/LicenseKeyFormatting.java",
       "leetcodeUrl": "https://leetcode.com/problems/license-key-formatting/",
       "leetcodeNumber": null,
@@ -12068,6 +12640,7 @@
     },
     "LongPressedName": {
       "task": "LongPressedName",
+      "className": "LongPressedName",
       "javaFile": "src/main/java/strings/LongPressedName.java",
       "leetcodeUrl": "https://leetcode.com/problems/long-pressed-name/",
       "leetcodeNumber": null,
@@ -12094,6 +12667,7 @@
     },
     "LongestSubstringWithoutRepeatingCharacters": {
       "task": "LongestSubstringWithoutRepeatingCharacters",
+      "className": "LongestSubstringWithoutRepeatingCharacters",
       "javaFile": "src/main/java/strings/LongestSubstringWithoutRepeatingCharacters.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
       "leetcodeNumber": 3,
@@ -12120,6 +12694,7 @@
     },
     "MinimumTimeDifference": {
       "task": "MinimumTimeDifference",
+      "className": "MinimumTimeDifference",
       "javaFile": "src/main/java/strings/MinimumTimeDifference.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-time-difference/",
       "leetcodeNumber": null,
@@ -12146,6 +12721,7 @@
     },
     "PermutationII": {
       "task": "PermutationII",
+      "className": "PermutationII",
       "javaFile": "src/main/java/strings/PermutationII.java",
       "leetcodeUrl": "https://leetcode.com/problems/permutations-ii/",
       "leetcodeNumber": 47,
@@ -12172,6 +12748,7 @@
     },
     "RotatedDigits": {
       "task": "RotatedDigits",
+      "className": "RotatedDigits",
       "javaFile": "src/main/java/strings/RotatedDigits.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotated-digits/",
       "leetcodeNumber": null,
@@ -12198,6 +12775,7 @@
     },
     "SpecialOperationsString": {
       "task": "SpecialOperationsString",
+      "className": "SpecialOperationsString",
       "javaFile": "src/main/java/strings/SpecialOperationsString.java",
       "leetcodeUrl": "https://leetcode.com/problems/process-string-with-special-operations-ii/",
       "leetcodeNumber": null,
@@ -12224,6 +12802,7 @@
     },
     "StringCompression": {
       "task": "StringCompression",
+      "className": "StringCompression",
       "javaFile": "src/main/java/strings/StringCompression.java",
       "leetcodeUrl": "https://leetcode.com/problems/string-compression/",
       "leetcodeNumber": null,
@@ -12250,6 +12829,7 @@
     },
     "StringToIntegerAtoi": {
       "task": "StringToIntegerAtoi",
+      "className": "StringToIntegerAtoi",
       "javaFile": "src/main/java/strings/StringToIntegerAtoi.java",
       "leetcodeUrl": "https://leetcode.com/problems/string-to-integer-atoi/",
       "leetcodeNumber": null,
@@ -12276,6 +12856,7 @@
     },
     "TimeNeededToRearrangeBinaryString": {
       "task": "TimeNeededToRearrangeBinaryString",
+      "className": "TimeNeededToRearrangeBinaryString",
       "javaFile": "src/main/java/strings/TimeNeededToRearrangeBinaryString.java",
       "leetcodeUrl": "https://leetcode.com/problems/time-needed-to-rearrange-a-binary-string/",
       "leetcodeNumber": null,
@@ -12302,6 +12883,7 @@
     },
     "ValidNumberChecker": {
       "task": "ValidNumberChecker",
+      "className": "ValidNumberChecker",
       "javaFile": "src/main/java/strings/ValidNumberChecker.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-number/",
       "leetcodeNumber": null,
@@ -12328,6 +12910,7 @@
     },
     "ZigZagConversion": {
       "task": "ZigZagConversion",
+      "className": "ZigZagConversion",
       "javaFile": "src/main/java/strings/ZigZagConversion.java",
       "leetcodeUrl": "https://leetcode.com/problems/zigzag-conversion/",
       "leetcodeNumber": 6,
@@ -12354,6 +12937,7 @@
     },
     "ZigZagStringConverter": {
       "task": "ZigZagStringConverter",
+      "className": "ZigZagStringConverter",
       "javaFile": "src/main/java/strings/ZigZagStringConverter.java",
       "leetcodeUrl": "https://leetcode.com/problems/zigzag-conversion/",
       "leetcodeNumber": 6,
@@ -12380,6 +12964,7 @@
     },
     "HandOfStraights": {
       "task": "HandOfStraights",
+      "className": "HandOfStraights",
       "javaFile": "src/main/java/strings/greedy/HandOfStraights.java",
       "leetcodeUrl": "https://leetcode.com/problems/hand-of-straights/",
       "leetcodeNumber": 846,
@@ -12406,6 +12991,7 @@
     },
     "LongestHappyString": {
       "task": "LongestHappyString",
+      "className": "LongestHappyString",
       "javaFile": "src/main/java/strings/greedy/LongestHappyString.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-happy-string/",
       "leetcodeNumber": 1405,
@@ -12432,6 +13018,7 @@
     },
     "MinimumTimeToMakeRopeColorful": {
       "task": "MinimumTimeToMakeRopeColorful",
+      "className": "MinimumTimeToMakeRopeColorful",
       "javaFile": "src/main/java/strings/greedy/MinimumTimeToMakeRopeColorful.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-time-to-make-rope-colorful/",
       "leetcodeNumber": null,
@@ -12458,6 +13045,7 @@
     },
     "PartitioningIntoMinimumNumberOfDeciBinaryNumbers": {
       "task": "PartitioningIntoMinimumNumberOfDeciBinaryNumbers",
+      "className": "PartitioningIntoMinimumNumberOfDeciBinaryNumbers",
       "javaFile": "src/main/java/strings/greedy/PartitioningIntoMinimumNumberOfDeciBinaryNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/partitioning-into-minimum-number-of-deci-binary-numbers/",
       "leetcodeNumber": null,
@@ -12484,6 +13072,7 @@
     },
     "ReorganizeString": {
       "task": "ReorganizeString",
+      "className": "ReorganizeString",
       "javaFile": "src/main/java/strings/greedy/ReorganizeString.java",
       "leetcodeUrl": "https://leetcode.com/problems/reorganize-string/",
       "leetcodeNumber": 767,
@@ -12510,6 +13099,7 @@
     },
     "RomanNumbers": {
       "task": "RomanNumbers",
+      "className": "RomanNumbers",
       "javaFile": "src/main/java/strings/greedy/RomanNumbers.java",
       "leetcodeUrl": "https://leetcode.com/problems/roman-to-integer/",
       "leetcodeNumber": 13,
@@ -12536,6 +13126,7 @@
     },
     "TextJustification": {
       "task": "TextJustification",
+      "className": "TextJustification",
       "javaFile": "src/main/java/strings/greedy/TextJustification.java",
       "leetcodeUrl": "https://leetcode.com/problems/text-justification/",
       "leetcodeNumber": 68,
@@ -12562,6 +13153,7 @@
     },
     "GroupAnagrams": {
       "task": "GroupAnagrams",
+      "className": "GroupAnagrams",
       "javaFile": "src/main/java/strings/hashmap/GroupAnagrams.java",
       "leetcodeUrl": "https://leetcode.com/problems/group-anagrams/",
       "leetcodeNumber": 49,
@@ -12588,6 +13180,7 @@
     },
     "IntegerToEnglishWords": {
       "task": "IntegerToEnglishWords",
+      "className": "IntegerToEnglishWords",
       "javaFile": "src/main/java/strings/hashmap/IntegerToEnglishWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/integer-to-english-words/",
       "leetcodeNumber": null,
@@ -12614,6 +13207,7 @@
     },
     "IsomorphicStrings": {
       "task": "IsomorphicStrings",
+      "className": "IsomorphicStrings",
       "javaFile": "src/main/java/strings/hashmap/IsomorphicStrings.java",
       "leetcodeUrl": "https://leetcode.com/problems/isomorphic-strings/",
       "leetcodeNumber": 205,
@@ -12640,6 +13234,7 @@
     },
     "MostCommonWord": {
       "task": "MostCommonWord",
+      "className": "MostCommonWord",
       "javaFile": "src/main/java/strings/hashmap/MostCommonWord.java",
       "leetcodeUrl": "https://leetcode.com/problems/most-common-word/",
       "leetcodeNumber": null,
@@ -12666,6 +13261,7 @@
     },
     "PairsOfSongsWithTotalDurationsDivisibleBy60": {
       "task": "PairsOfSongsWithTotalDurationsDivisibleBy60",
+      "className": "PairsOfSongsWithTotalDurationsDivisibleBy60",
       "javaFile": "src/main/java/strings/hashmap/PairsOfSongsWithTotalDurationsDivisibleBy60.java",
       "leetcodeUrl": "https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/",
       "leetcodeNumber": null,
@@ -12692,6 +13288,7 @@
     },
     "RomanToInt": {
       "task": "RomanToInt",
+      "className": "RomanToInt",
       "javaFile": "src/main/java/strings/hashmap/RomanToInt.java",
       "leetcodeUrl": "https://leetcode.com/problems/roman-to-integer/",
       "leetcodeNumber": 13,
@@ -12718,6 +13315,7 @@
     },
     "UniqueEmailAddresses": {
       "task": "UniqueEmailAddresses",
+      "className": "UniqueEmailAddresses",
       "javaFile": "src/main/java/strings/hashmap/UniqueEmailAddresses.java",
       "leetcodeUrl": "https://leetcode.com/problems/unique-email-addresses/",
       "leetcodeNumber": 929,
@@ -12744,6 +13342,7 @@
     },
     "VerifyingAnAlienDictionary": {
       "task": "VerifyingAnAlienDictionary",
+      "className": "VerifyingAnAlienDictionary",
       "javaFile": "src/main/java/strings/hashmap/VerifyingAnAlienDictionary.java",
       "leetcodeUrl": "https://leetcode.com/problems/verifying-an-alien-dictionary/",
       "leetcodeNumber": 953,
@@ -12770,6 +13369,7 @@
     },
     "RepeatLimitedString": {
       "task": "RepeatLimitedString",
+      "className": "RepeatLimitedString",
       "javaFile": "src/main/java/strings/heap/RepeatLimitedString.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-string-with-repeat-limit/",
       "leetcodeNumber": null,
@@ -12796,6 +13396,7 @@
     },
     "AppendCharactersToMakeSubsequence": {
       "task": "AppendCharactersToMakeSubsequence",
+      "className": "AppendCharactersToMakeSubsequence",
       "javaFile": "src/main/java/strings/patternmatching/AppendCharactersToMakeSubsequence.java",
       "leetcodeUrl": "https://leetcode.com/problems/append-characters-to-string-to-make-subsequence/",
       "leetcodeNumber": null,
@@ -12822,6 +13423,7 @@
     },
     "KMPAlgorithm": {
       "task": "KMPAlgorithm",
+      "className": "KMPAlgorithm",
       "javaFile": "src/main/java/strings/patternmatching/KMPAlgorithm.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/",
       "leetcodeNumber": 28,
@@ -12848,6 +13450,7 @@
     },
     "LongestDuplicateSubstring": {
       "task": "LongestDuplicateSubstring",
+      "className": "LongestDuplicateSubstring",
       "javaFile": "src/main/java/strings/patternmatching/LongestDuplicateSubstring.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-duplicate-substring/",
       "leetcodeNumber": null,
@@ -12874,6 +13477,7 @@
     },
     "LongestRepeatingCharacterReplacement": {
       "task": "LongestRepeatingCharacterReplacement",
+      "className": "LongestRepeatingCharacterReplacement",
       "javaFile": "src/main/java/strings/patternmatching/LongestRepeatingCharacterReplacement.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-repeating-character-replacement/",
       "leetcodeNumber": 424,
@@ -12900,6 +13504,7 @@
     },
     "LongestSubstringKRepeating": {
       "task": "LongestSubstringKRepeating",
+      "className": "LongestSubstringKRepeating",
       "javaFile": "src/main/java/strings/patternmatching/LongestSubstringKRepeating.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/",
       "leetcodeNumber": null,
@@ -12926,6 +13531,7 @@
     },
     "LongestSubstringWithAtMostKDistinctCharacters": {
       "task": "LongestSubstringWithAtMostKDistinctCharacters",
+      "className": "LongestSubstringWithAtMostKDistinctCharacters",
       "javaFile": "src/main/java/strings/patternmatching/LongestSubstringWithAtMostKDistinctCharacters.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/",
       "leetcodeNumber": null,
@@ -12952,6 +13558,7 @@
     },
     "NumberOfMatchingSubsequences": {
       "task": "NumberOfMatchingSubsequences",
+      "className": "NumberOfMatchingSubsequences",
       "javaFile": "src/main/java/strings/patternmatching/NumberOfMatchingSubsequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-matching-subsequences/",
       "leetcodeNumber": null,
@@ -12978,6 +13585,7 @@
     },
     "RepeatedDNASequences": {
       "task": "RepeatedDNASequences",
+      "className": "RepeatedDNASequences",
       "javaFile": "src/main/java/strings/patternmatching/RepeatedDNASequences.java",
       "leetcodeUrl": "https://leetcode.com/problems/repeated-dna-sequences/",
       "leetcodeNumber": 187,
@@ -13004,6 +13612,7 @@
     },
     "RotatedString": {
       "task": "RotatedString",
+      "className": "RotatedString",
       "javaFile": "src/main/java/strings/patternmatching/RotatedString.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotate-string/",
       "leetcodeNumber": null,
@@ -13030,6 +13639,7 @@
     },
     "StrStr": {
       "task": "StrStr",
+      "className": "StrStr",
       "javaFile": "src/main/java/strings/patternmatching/StrStr.java",
       "leetcodeUrl": "https://leetcode.com/problems/implement-strstr/",
       "leetcodeNumber": null,
@@ -13056,6 +13666,7 @@
     },
     "SubstringWithConcatenationOfAllWords": {
       "task": "SubstringWithConcatenationOfAllWords",
+      "className": "SubstringWithConcatenationOfAllWords",
       "javaFile": "src/main/java/strings/patternmatching/SubstringWithConcatenationOfAllWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/substring-with-concatenation-of-all-words/",
       "leetcodeNumber": null,
@@ -13082,6 +13693,7 @@
     },
     "AllAnagrams": {
       "task": "AllAnagrams",
+      "className": "AllAnagrams",
       "javaFile": "src/main/java/strings/sorting/AllAnagrams.java",
       "leetcodeUrl": "https://leetcode.com/problems/find-all-anagrams-in-a-string/",
       "leetcodeNumber": 438,
@@ -13108,6 +13720,7 @@
     },
     "CustomSortString": {
       "task": "CustomSortString",
+      "className": "CustomSortString",
       "javaFile": "src/main/java/strings/sorting/CustomSortString.java",
       "leetcodeUrl": "https://leetcode.com/problems/custom-sort-string/",
       "leetcodeNumber": null,
@@ -13134,6 +13747,7 @@
     },
     "LargestNumber": {
       "task": "LargestNumber",
+      "className": "LargestNumber",
       "javaFile": "src/main/java/strings/sorting/LargestNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/largest-number/",
       "leetcodeNumber": 179,
@@ -13160,6 +13774,7 @@
     },
     "ReOrderLogFile": {
       "task": "ReOrderLogFile",
+      "className": "ReOrderLogFile",
       "javaFile": "src/main/java/strings/sorting/ReOrderLogFile.java",
       "leetcodeUrl": "https://leetcode.com/problems/reorder-data-in-log-files/",
       "leetcodeNumber": null,
@@ -13186,6 +13801,7 @@
     },
     "DecodeString": {
       "task": "DecodeString",
+      "className": "DecodeString",
       "javaFile": "src/main/java/strings/stack/DecodeString.java",
       "leetcodeUrl": "https://leetcode.com/problems/decode-string/",
       "leetcodeNumber": 394,
@@ -13212,6 +13828,7 @@
     },
     "RemoveDuplicateLetters": {
       "task": "RemoveDuplicateLetters",
+      "className": "RemoveDuplicateLetters",
       "javaFile": "src/main/java/strings/stack/RemoveDuplicateLetters.java",
       "leetcodeUrl": "https://leetcode.com/problems/remove-duplicate-letters/",
       "leetcodeNumber": null,
@@ -13238,6 +13855,7 @@
     },
     "ValidParenthesisString": {
       "task": "ValidParenthesisString",
+      "className": "ValidParenthesisString",
       "javaFile": "src/main/java/strings/stack/ValidParenthesisString.java",
       "leetcodeUrl": "https://leetcode.com/problems/valid-parenthesis-string/",
       "leetcodeNumber": 678,
@@ -13264,6 +13882,7 @@
     },
     "LongestPalindrome": {
       "task": "LongestPalindrome",
+      "className": "LongestPalindrome",
       "javaFile": "src/main/java/strings/twopointers/LongestPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/longest-palindromic-substring/",
       "leetcodeNumber": 5,
@@ -13290,6 +13909,7 @@
     },
     "MinInsertionPalindrome": {
       "task": "MinInsertionPalindrome",
+      "className": "MinInsertionPalindrome",
       "javaFile": "src/main/java/strings/twopointers/MinInsertionPalindrome.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/",
       "leetcodeNumber": null,
@@ -13316,6 +13936,7 @@
     },
     "PalindromeNumber": {
       "task": "PalindromeNumber",
+      "className": "PalindromeNumber",
       "javaFile": "src/main/java/strings/twopointers/PalindromeNumber.java",
       "leetcodeUrl": "https://leetcode.com/problems/palindrome-number/",
       "leetcodeNumber": 9,
@@ -13340,8 +13961,36 @@
         "skip": false
       }
     },
+    "PalindromePairs__twopointers": {
+      "task": "PalindromePairs__twopointers",
+      "className": "PalindromePairs",
+      "javaFile": "src/main/java/strings/twopointers/PalindromePairs.java",
+      "leetcodeUrl": "https://leetcode.com/problems/palindrome-pairs/",
+      "leetcodeNumber": null,
+      "problemName": "PalindromePairs",
+      "pattern": "Two Pointers",
+      "difficulty": "Unknown",
+      "isNC150": false,
+      "isBlind75": false,
+      "source": "extras",
+      "sm2": {
+        "easeFactor": 2.5,
+        "intervalDays": 0,
+        "repetitions": 0,
+        "lastReviewed": null,
+        "nextDue": "2026-09-12",
+        "lastGrade": null
+      },
+      "history": [],
+      "userNotes": "",
+      "flags": {
+        "pinned": false,
+        "skip": false
+      }
+    },
     "ReverseInteger": {
       "task": "ReverseInteger",
+      "className": "ReverseInteger",
       "javaFile": "src/main/java/strings/twopointers/ReverseInteger.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-integer/",
       "leetcodeNumber": 7,
@@ -13368,6 +14017,7 @@
     },
     "ReverseString": {
       "task": "ReverseString",
+      "className": "ReverseString",
       "javaFile": "src/main/java/strings/twopointers/ReverseString.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-string/",
       "leetcodeNumber": 344,
@@ -13394,6 +14044,7 @@
     },
     "ReverseWordsInString": {
       "task": "ReverseWordsInString",
+      "className": "ReverseWordsInString",
       "javaFile": "src/main/java/strings/twopointers/ReverseWordsInString.java",
       "leetcodeUrl": "https://leetcode.com/problems/reverse-words-in-a-string/",
       "leetcodeNumber": null,
@@ -13420,6 +14071,7 @@
     },
     "AmountOfTimeForBinaryTreeToBeInfected": {
       "task": "AmountOfTimeForBinaryTreeToBeInfected",
+      "className": "AmountOfTimeForBinaryTreeToBeInfected",
       "javaFile": "src/main/java/trees/bfs/AmountOfTimeForBinaryTreeToBeInfected.java",
       "leetcodeUrl": "https://leetcode.com/problems/amount-of-time-for-binary-tree-to-be-infected/",
       "leetcodeNumber": null,
@@ -13446,6 +14098,7 @@
     },
     "ConnectNode": {
       "task": "ConnectNode",
+      "className": "ConnectNode",
       "javaFile": "src/main/java/trees/bfs/ConnectNode.java",
       "leetcodeUrl": "https://leetcode.com/problems/populating-next-right-pointers-in-each-node/",
       "leetcodeNumber": 116,
@@ -13472,6 +14125,7 @@
     },
     "MaximumDepthOfBinaryTree": {
       "task": "MaximumDepthOfBinaryTree",
+      "className": "MaximumDepthOfBinaryTree",
       "javaFile": "src/main/java/trees/bfs/MaximumDepthOfBinaryTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
       "leetcodeNumber": 104,
@@ -13498,6 +14152,7 @@
     },
     "MaximumWidthOfBinaryTree": {
       "task": "MaximumWidthOfBinaryTree",
+      "className": "MaximumWidthOfBinaryTree",
       "javaFile": "src/main/java/trees/bfs/MaximumWidthOfBinaryTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/maximum-width-of-binary-tree/",
       "leetcodeNumber": 662,
@@ -13524,6 +14179,7 @@
     },
     "TimeNeededToInformAllEmployees": {
       "task": "TimeNeededToInformAllEmployees",
+      "className": "TimeNeededToInformAllEmployees",
       "javaFile": "src/main/java/trees/bfs/TimeNeededToInformAllEmployees.java",
       "leetcodeUrl": "https://leetcode.com/problems/time-needed-to-inform-all-employees/",
       "leetcodeNumber": 1376,
@@ -13550,6 +14206,7 @@
     },
     "BinarySearchTreeIterator": {
       "task": "BinarySearchTreeIterator",
+      "className": "BinarySearchTreeIterator",
       "javaFile": "src/main/java/trees/binarysearchtree/BinarySearchTreeIterator.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-search-tree-iterator/",
       "leetcodeNumber": 173,
@@ -13576,6 +14233,7 @@
     },
     "BstIterator": {
       "task": "BstIterator",
+      "className": "BstIterator",
       "javaFile": "src/main/java/trees/binarysearchtree/BstIterator.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-search-tree-iterator/",
       "leetcodeNumber": 173,
@@ -13602,6 +14260,7 @@
     },
     "ConstructBst": {
       "task": "ConstructBst",
+      "className": "ConstructBst",
       "javaFile": "src/main/java/trees/binarysearchtree/ConstructBst.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/",
       "leetcodeNumber": 105,
@@ -13628,6 +14287,7 @@
     },
     "ConvertSortedArrayToBinarySearchTree": {
       "task": "ConvertSortedArrayToBinarySearchTree",
+      "className": "ConvertSortedArrayToBinarySearchTree",
       "javaFile": "src/main/java/trees/binarysearchtree/ConvertSortedArrayToBinarySearchTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/",
       "leetcodeNumber": 108,
@@ -13654,6 +14314,7 @@
     },
     "KthSmallestElementInABst": {
       "task": "KthSmallestElementInABst",
+      "className": "KthSmallestElementInABst",
       "javaFile": "src/main/java/trees/binarysearchtree/KthSmallestElementInABst.java",
       "leetcodeUrl": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/",
       "leetcodeNumber": 230,
@@ -13680,6 +14341,7 @@
     },
     "LowestCommonAncestorOfABinaryTree": {
       "task": "LowestCommonAncestorOfABinaryTree",
+      "className": "LowestCommonAncestorOfABinaryTree",
       "javaFile": "src/main/java/trees/binarysearchtree/LowestCommonAncestorOfABinaryTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/",
       "leetcodeNumber": null,
@@ -13706,6 +14368,7 @@
     },
     "LowestCommonAncestorOfBinarySearchTree": {
       "task": "LowestCommonAncestorOfBinarySearchTree",
+      "className": "LowestCommonAncestorOfBinarySearchTree",
       "javaFile": "src/main/java/trees/binarysearchtree/LowestCommonAncestorOfBinarySearchTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/",
       "leetcodeNumber": 235,
@@ -13732,6 +14395,7 @@
     },
     "PermutationBst": {
       "task": "PermutationBst",
+      "className": "PermutationBst",
       "javaFile": "src/main/java/trees/binarysearchtree/PermutationBst.java",
       "leetcodeUrl": "https://leetcode.com/problems/unique-binary-search-trees-ii/",
       "leetcodeNumber": 95,
@@ -13758,6 +14422,7 @@
     },
     "RecoverBinarySearchTree": {
       "task": "RecoverBinarySearchTree",
+      "className": "RecoverBinarySearchTree",
       "javaFile": "src/main/java/trees/binarysearchtree/RecoverBinarySearchTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/recover-binary-search-tree/",
       "leetcodeNumber": null,
@@ -13784,6 +14449,7 @@
     },
     "SerializeAndDeserializeBinaryTree": {
       "task": "SerializeAndDeserializeBinaryTree",
+      "className": "SerializeAndDeserializeBinaryTree",
       "javaFile": "src/main/java/trees/binarysearchtree/SerializeAndDeserializeBinaryTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/",
       "leetcodeNumber": 297,
@@ -13810,6 +14476,7 @@
     },
     "SerializeDeserializeBst": {
       "task": "SerializeDeserializeBst",
+      "className": "SerializeDeserializeBst",
       "javaFile": "src/main/java/trees/binarysearchtree/SerializeDeserializeBst.java",
       "leetcodeUrl": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/",
       "leetcodeNumber": 297,
@@ -13836,6 +14503,7 @@
     },
     "UniqueBinaryTree": {
       "task": "UniqueBinaryTree",
+      "className": "UniqueBinaryTree",
       "javaFile": "src/main/java/trees/binarysearchtree/UniqueBinaryTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/unique-binary-search-trees/",
       "leetcodeNumber": 96,
@@ -13862,6 +14530,7 @@
     },
     "ValidBstFromPreorder": {
       "task": "ValidBstFromPreorder",
+      "className": "ValidBstFromPreorder",
       "javaFile": "src/main/java/trees/binarysearchtree/ValidBstFromPreorder.java",
       "leetcodeUrl": "https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/",
       "leetcodeNumber": null,
@@ -13888,6 +14557,7 @@
     },
     "ValidateBinarySearchTree": {
       "task": "ValidateBinarySearchTree",
+      "className": "ValidateBinarySearchTree",
       "javaFile": "src/main/java/trees/binarysearchtree/ValidateBinarySearchTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/validate-binary-search-tree/",
       "leetcodeNumber": 98,
@@ -13914,6 +14584,7 @@
     },
     "BinaryTreeCameras": {
       "task": "BinaryTreeCameras",
+      "className": "BinaryTreeCameras",
       "javaFile": "src/main/java/trees/dfs/BinaryTreeCameras.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-cameras/",
       "leetcodeNumber": null,
@@ -13940,6 +14611,7 @@
     },
     "BinaryTreeMaximumPathSum": {
       "task": "BinaryTreeMaximumPathSum",
+      "className": "BinaryTreeMaximumPathSum",
       "javaFile": "src/main/java/trees/dfs/BinaryTreeMaximumPathSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-maximum-path-sum/",
       "leetcodeNumber": 124,
@@ -13966,6 +14638,7 @@
     },
     "BinaryTreePaths": {
       "task": "BinaryTreePaths",
+      "className": "BinaryTreePaths",
       "javaFile": "src/main/java/trees/dfs/BinaryTreePaths.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-paths/",
       "leetcodeNumber": null,
@@ -13992,6 +14665,7 @@
     },
     "KDistance": {
       "task": "KDistance",
+      "className": "KDistance",
       "javaFile": "src/main/java/trees/dfs/KDistance.java",
       "leetcodeUrl": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/",
       "leetcodeNumber": null,
@@ -14018,6 +14692,7 @@
     },
     "PathSum2": {
       "task": "PathSum2",
+      "className": "PathSum2",
       "javaFile": "src/main/java/trees/dfs/PathSum2.java",
       "leetcodeUrl": "https://leetcode.com/problems/path-sum-ii/",
       "leetcodeNumber": null,
@@ -14044,6 +14719,7 @@
     },
     "PathSum3": {
       "task": "PathSum3",
+      "className": "PathSum3",
       "javaFile": "src/main/java/trees/dfs/PathSum3.java",
       "leetcodeUrl": "https://leetcode.com/problems/path-sum-iii/",
       "leetcodeNumber": null,
@@ -14070,6 +14746,7 @@
     },
     "SumTree": {
       "task": "SumTree",
+      "className": "SumTree",
       "javaFile": "src/main/java/trees/dfs/SumTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-a-binary-tree-is-a-sum-tree/",
       "leetcodeNumber": null,
@@ -14096,6 +14773,7 @@
     },
     "FenwickTreeRangeSumQuery": {
       "task": "FenwickTreeRangeSumQuery",
+      "className": "FenwickTreeRangeSumQuery",
       "javaFile": "src/main/java/trees/segmenttree/FenwickTreeRangeSumQuery.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-mutable/",
       "leetcodeNumber": null,
@@ -14122,6 +14800,7 @@
     },
     "MyCalendarThree": {
       "task": "MyCalendarThree",
+      "className": "MyCalendarThree",
       "javaFile": "src/main/java/trees/segmenttree/MyCalendarThree.java",
       "leetcodeUrl": "https://leetcode.com/problems/my-calendar-iii/",
       "leetcodeNumber": null,
@@ -14148,6 +14827,7 @@
     },
     "RangeSumQuery2DMutable": {
       "task": "RangeSumQuery2DMutable",
+      "className": "RangeSumQuery2DMutable",
       "javaFile": "src/main/java/trees/segmenttree/RangeSumQuery2DMutable.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-2d-mutable/",
       "leetcodeNumber": null,
@@ -14174,6 +14854,7 @@
     },
     "RangeSumQueryMutable": {
       "task": "RangeSumQueryMutable",
+      "className": "RangeSumQueryMutable",
       "javaFile": "src/main/java/trees/segmenttree/RangeSumQueryMutable.java",
       "leetcodeUrl": "https://leetcode.com/problems/range-sum-query-mutable/",
       "leetcodeNumber": null,
@@ -14200,6 +14881,7 @@
     },
     "TheSkylineProblem": {
       "task": "TheSkylineProblem",
+      "className": "TheSkylineProblem",
       "javaFile": "src/main/java/trees/segmenttree/TheSkylineProblem.java",
       "leetcodeUrl": "https://leetcode.com/problems/the-skyline-problem/",
       "leetcodeNumber": null,
@@ -14226,6 +14908,7 @@
     },
     "BinaryTreeLevelOrderTraversal": {
       "task": "BinaryTreeLevelOrderTraversal",
+      "className": "BinaryTreeLevelOrderTraversal",
       "javaFile": "src/main/java/trees/traversal/BinaryTreeLevelOrderTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-level-order-traversal/",
       "leetcodeNumber": 102,
@@ -14252,6 +14935,7 @@
     },
     "BinaryTreeRightSideView": {
       "task": "BinaryTreeRightSideView",
+      "className": "BinaryTreeRightSideView",
       "javaFile": "src/main/java/trees/traversal/BinaryTreeRightSideView.java",
       "leetcodeUrl": "https://leetcode.com/problems/binary-tree-right-side-view/",
       "leetcodeNumber": 199,
@@ -14278,6 +14962,7 @@
     },
     "ConstructBinaryTreeFromPreorderAndPostorderTraversal": {
       "task": "ConstructBinaryTreeFromPreorderAndPostorderTraversal",
+      "className": "ConstructBinaryTreeFromPreorderAndPostorderTraversal",
       "javaFile": "src/main/java/trees/traversal/ConstructBinaryTreeFromPreorderAndPostorderTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/",
       "leetcodeNumber": null,
@@ -14304,6 +14989,7 @@
     },
     "FlattenTree": {
       "task": "FlattenTree",
+      "className": "FlattenTree",
       "javaFile": "src/main/java/trees/traversal/FlattenTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/",
       "leetcodeNumber": null,
@@ -14330,6 +15016,7 @@
     },
     "SpiralTraversal": {
       "task": "SpiralTraversal",
+      "className": "SpiralTraversal",
       "javaFile": "src/main/java/trees/traversal/SpiralTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/spiral-order-traversal-of-binary-tree/",
       "leetcodeNumber": null,
@@ -14356,6 +15043,7 @@
     },
     "SumOfDistancesInTree": {
       "task": "SumOfDistancesInTree",
+      "className": "SumOfDistancesInTree",
       "javaFile": "src/main/java/trees/traversal/SumOfDistancesInTree.java",
       "leetcodeUrl": "https://leetcode.com/problems/sum-of-distances-in-tree/",
       "leetcodeNumber": null,
@@ -14382,6 +15070,7 @@
     },
     "VerticalTraversal": {
       "task": "VerticalTraversal",
+      "className": "VerticalTraversal",
       "javaFile": "src/main/java/trees/traversal/VerticalTraversal.java",
       "leetcodeUrl": "https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/",
       "leetcodeNumber": null,
@@ -14408,6 +15097,7 @@
     },
     "DesignAddAndSearchWordsDataStructure": {
       "task": "DesignAddAndSearchWordsDataStructure",
+      "className": "DesignAddAndSearchWordsDataStructure",
       "javaFile": "src/main/java/trie/DesignAddAndSearchWordsDataStructure.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-add-and-search-words-data-structure/",
       "leetcodeNumber": 211,
@@ -14434,6 +15124,7 @@
     },
     "ShortEncodingOfWords": {
       "task": "ShortEncodingOfWords",
+      "className": "ShortEncodingOfWords",
       "javaFile": "src/main/java/trie/ShortEncodingOfWords.java",
       "leetcodeUrl": "https://leetcode.com/problems/short-encoding-of-words/",
       "leetcodeNumber": null,
@@ -14460,6 +15151,7 @@
     },
     "SuggestedProducts": {
       "task": "SuggestedProducts",
+      "className": "SuggestedProducts",
       "javaFile": "src/main/java/trie/SuggestedProducts.java",
       "leetcodeUrl": "https://leetcode.com/problems/search-suggestions-system/",
       "leetcodeNumber": 1268,
@@ -14486,6 +15178,7 @@
     },
     "TrieTest": {
       "task": "TrieTest",
+      "className": "TrieTest",
       "javaFile": "src/main/java/trie/TrieTest.java",
       "leetcodeUrl": "https://leetcode.com/problems/implement-trie-prefix-tree/",
       "leetcodeNumber": 208,
@@ -14512,6 +15205,7 @@
     },
     "WordSearchII": {
       "task": "WordSearchII",
+      "className": "WordSearchII",
       "javaFile": "src/main/java/trie/WordSearchII.java",
       "leetcodeUrl": "https://leetcode.com/problems/word-search-ii/",
       "leetcodeNumber": 212,
