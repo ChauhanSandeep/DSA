@@ -3,32 +3,45 @@ package linkedlist;
 import java.util.*;
 
 /**
- * Reverse Nodes in k-Group
+ * Problem: Reverse Nodes in k-Group
  *
- * Problem: Given a linked list, reverse the nodes in groups of k and return the modified list.
- * If the number of nodes is not a multiple of k, the remaining nodes should stay as is.
+ * Reverse every complete group of k nodes in a singly linked list, leaving the
+ * final incomplete group unchanged. This file keeps several original variants
+ * for comparison.
+ *
+ * Leetcode: https://leetcode.com/problems/reverse-nodes-in-k-group/ (Hard)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | k-group reversal | Two pointers
  *
  * Example:
- * Input: head = [1,2,3,4,5], k = 2
- * Output: [2,1,4,3,5]
+ *   Input:  head = [1,2,3,4,5], k = 3
+ *   Output: [3,2,1,4,5]
+ *   Why:    only the first three nodes form a complete group.
  *
- * Input: head = [1,2,3,4,5], k = 3
- * Output: [3,2,1,4,5]
+ * Follow-ups:
+ *   1. Avoid recursion stack growth?
+ *      Use the iterative two-pointer or stack variant.
+ *   2. Reverse groups from the right?
+ *      Compute length, skip length % k nodes, then reverse full groups.
+ *   3. Can group sizes vary?
+ *      Accept an array of sizes and verify each group before reversing.
  *
- * LeetCode: https://leetcode.com/problems/reverse-nodes-in-k-group
- *
- * Follow-up questions:
- * Q: What if we need to reverse from right to left instead?
- * A: Use stack or two-pass approach to identify groups from the end.
- *
- * Q: How to handle very long linked lists efficiently?
- * A: Use iterative approach with constant space to avoid stack overflow.
- *
- * Q: Can we support different group sizes for different segments?
- * A: Extend to take array of group sizes and process accordingly.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Swap Nodes in Pairs (24), Reverse Linked List II (92).
  */
 public class ReverseNodesInKGroup {
+
+    public static void main(String[] args) {
+        ReverseNodesInKGroup solver = new ReverseNodesInKGroup();
+        int[][] inputs = { {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5} };
+        int[] ks = {2, 3};
+        int[][] expected = { {2, 1, 4, 3, 5}, {3, 2, 1, 4, 5} };
+        for (int i = 0; i < inputs.length; i++) {
+            ListNode head = ListUtils.createList(inputs[i]);
+            ListNode outputHead = solver.reverseKGroupTwoPointer(head, ks[i]);
+            int[] output = ListUtils.toArray(outputHead);
+            System.out.printf("head=%s k=%d -> %s  expected=%s%n", Arrays.toString(inputs[i]), ks[i], Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
 
     // Definition for singly-linked list
     public static class ListNode {
@@ -39,22 +52,23 @@ public class ReverseNodesInKGroup {
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
 
-    /**
-     * Two-pointer approach with clear separation of concerns.
-     * Separates node identification from reversal logic.
+        /**
+     * Intuition: separate the work into finding a complete k-node group,
+     * reversing exactly that closed interval, and reconnecting it to the prefix
+     * and suffix that stay outside the group.
      *
-     * Steps:
-     * - Identify k nodes for the current group.
-     * - Reverse the identified group.
-     * - Reconnect the reversed group with the rest of the list.
-     * - Repeat until fewer than k nodes remain.
+     * Algorithm:
+     *   1. Return head when the list is empty or k is 1.
+     *   2. Use dummy and prevGroupEndNode before the current group.
+     *   3. While k nodes remain, identify group start, group end, and next group start.
+     *   4. Reverse the group, reconnect it, and move prevGroupEndNode forward.
      *
-     * Time Complexity: O(n) where n is number of nodes
-     * Space Complexity: O(1) - in-place reversal
+     * Time:  O(n) - every node is counted and rewired a constant number of times.
+     * Space: O(1) - only pointer variables are used.
      *
-     * @param head Head of the linked list
-     * @param k Group size for reversal
-     * @return Modified list head after k-group reversals
+     * @param head head of the linked list
+     * @param k group size to reverse
+     * @return head after reversing each complete k-sized group
      */
     public ListNode reverseKGroupTwoPointer(ListNode head, int k) {
         if (head == null || k == 1) return head;
@@ -80,7 +94,7 @@ public class ReverseNodesInKGroup {
         return dummy.next;
     }
 
-    // Check if there are at least k nodes starting from head
+    /** Returns true when at least k nodes remain from head. */
     private boolean hasKNodes(ListNode head, int k) {
         while (k > 0 && head != null) {
             head = head.next;
@@ -89,7 +103,7 @@ public class ReverseNodesInKGroup {
         return k == 0;
     }
 
-    // Get the kth node (1-indexed)
+    /** Returns the kth node from head using 1-based counting. */
     private ListNode getKthNode(ListNode head, int k) {
         while (k > 1 && head != null) {
             head = head.next;
@@ -98,7 +112,7 @@ public class ReverseNodesInKGroup {
         return head;
     }
 
-    // Reverse list from start to end (inclusive) and return new head
+    /** Reverses the inclusive range start..end and returns end as the new head. */
     private ListNode reverseList(ListNode start, ListNode end) {
         ListNode prev = end.next;
         ListNode current = start;
@@ -152,7 +166,7 @@ public class ReverseNodesInKGroup {
         return prev; // New head of reversed group
     }
 
-    // Helper: get length of linked list
+    /** Counts the number of nodes in the list. */
     private int getLength(ListNode head) {
         int length = 0;
         while (head != null) {
@@ -238,7 +252,7 @@ public class ReverseNodesInKGroup {
         return dummy.next;
     }
 
-    // Reverse exactly k nodes starting from head
+    /** Reverses exactly k nodes starting at head and returns the new head. */
     private ListNode reverseKNodes(ListNode head, int k) {
         ListNode prev = null;
         ListNode current = head;
@@ -355,7 +369,7 @@ public class ReverseNodesInKGroup {
         return reconnectSegments(processedSegments);
     }
 
-    // Split list into segments of given size
+    /** Splits the list into disconnected segments of at most segmentSize nodes. */
     private List<ListNode> splitList(ListNode head, int segmentSize) {
         List<ListNode> segments = new ArrayList<>();
         ListNode current = head;
@@ -381,7 +395,7 @@ public class ReverseNodesInKGroup {
         return segments;
     }
 
-    // Reconnect processed segments
+    /** Connects processed segments back into one list. */
     private ListNode reconnectSegments(List<ListNode> segments) {
         if (segments.isEmpty()) return null;
 

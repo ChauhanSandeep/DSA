@@ -1,37 +1,47 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
- * Given the head of a linked list, remove the nth node from the end of the list and return its head.
+ * Problem: Remove Nth Node From End of List
  *
- * Example 1:
- * Input: head = [1,2,3,4,5], n = 2
- * Output: [1,2,3,5]
+ * Remove the nth node from the end of a singly linked list and return the new
+ * head. A dummy node makes removing the original head use the same rewiring as
+ * removing any middle node.
  *
- * Example 2:
- * Input: head = [1], n = 1
- * Output: []
+ * Leetcode: https://leetcode.com/problems/remove-nth-node-from-end-of-list/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Two pointers | Dummy node
  *
- * Example 3:
- * Input: head = [1,2], n = 1
- * Output: [1]
+ * Example:
+ *   Input:  head = [1,2,3,4,5], n = 2
+ *   Output: [1,2,3,5]
+ *   Why:    the second node from the end is 4, so slow bypasses it.
  *
- * LeetCode: https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+ * Follow-ups:
+ *   1. Can this be one pass?
+ *      Keep fast n + 1 steps ahead of slow.
+ *   2. Remove nth from the start?
+ *      Traverse to the node before position n and bypass its next node.
+ *   3. What if n is invalid?
+ *      Validate while advancing fast and return unchanged or throw.
  *
- * Follow-up Questions:
- * 1. How would you solve this problem with only one pass through the list?
- *    - We can use the two-pointer technique with a fast and slow pointer.
- * 2. What if we need to remove the nth node from the beginning instead of the end?
- *    - We can directly traverse to the (n-1)th node and remove the next node.
- * 3. How would you handle very large lists that don't fit in memory?
- *    - We would need to process the list in chunks or use external sorting.
- *
- * Related Problems:
- * - Remove Duplicates from Sorted List (https://leetcode.com/problems/remove-duplicates-from-sorted-list/)
- * - Remove Linked List Elements (https://leetcode.com/problems/remove-linked-list-elements/)
- * - Delete Node in a Linked List (https://leetcode.com/problems/delete-node-in-a-linked-list/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Delete Node in a Linked List (237), Remove Linked List Elements (203).
  */
 public class RemoveNthNodeFromEndOfList {
+
+    public static void main(String[] args) {
+        RemoveNthNodeFromEndOfList solver = new RemoveNthNodeFromEndOfList();
+        int[][] inputs = { {1, 2, 3, 4, 5}, {1} };
+        int[] ns = {2, 1};
+        int[][] expected = { {1, 2, 3, 5}, {} };
+        for (int i = 0; i < inputs.length; i++) {
+            ListNode outputHead = solver.removeNthFromEnd(createLinkedList(inputs[i]), ns[i]);
+            int[] output = new int[expected[i].length];
+            for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+            System.out.printf("head=%s n=%d -> %s  expected=%s%n", Arrays.toString(inputs[i]), ns[i], Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
 
     /**
      * Definition for singly-linked list.
@@ -44,12 +54,23 @@ public class RemoveNthNodeFromEndOfList {
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
 
-    /**
-     * Removes the nth node from the end of the list in one pass.
+        /**
+     * Intuition: if fast starts n + 1 links ahead of slow, then slow is exactly
+     * before the node to delete when fast reaches null. The dummy node provides a
+     * valid before-node even when deleting the head.
      *
-     * @param head The head of the linked list
-     * @param n The position from the end to remove (1-based)
-     * @return The head of the modified list
+     * Algorithm:
+     *   1. Create dummy before head and start fast and slow at dummy.
+     *   2. Move fast n + 1 steps, returning head if n is too large.
+     *   3. Move fast and slow together until fast reaches null.
+     *   4. Bypass slow.next and return dummy.next.
+     *
+     * Time:  O(n) - the two pointers make one pass overall.
+     * Space: O(1) - only dummy, fast, and slow are stored.
+     *
+     * @param head head of the linked list
+     * @param n one-based position from the end to remove
+     * @return head after removal
      */
     public ListNode removeNthFromEnd(ListNode head, int n) {
         // Create a dummy node to handle edge cases (like removing the first node)

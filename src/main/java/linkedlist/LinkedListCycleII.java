@@ -3,30 +3,42 @@ package linkedlist;
 import java.util.*;
 
 /**
- * 142. Linked List Cycle II
+ * Problem: Linked List Cycle II
  *
- * Problem: Given the head of a linked list, return the node where the cycle begins.
- * If there is no cycle, return null.
+ * Given a linked list, return the node where a cycle begins. If there is no
+ * cycle, return null. The primary Floyd solution leaves the list structure
+ * unchanged.
+ *
+ * Leetcode: https://leetcode.com/problems/linked-list-cycle-ii/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Floyd cycle detection | Two pointers
  *
  * Example:
- * Input: head = [3,2,0,-4], pos = 1
- * Output: return node with value 2
- * Explanation: There is a cycle, tail connects to the 1st node (0-indexed).
+ *   Input:  head = [3,2,0,-4], pos = 1
+ *   Output: node with value 2
+ *   Why:    the tail points back to the node at index 1.
  *
- * LeetCode: https://leetcode.com/problems/linked-list-cycle-ii
+ * Follow-ups:
+ *   1. How do you find cycle length?
+ *      Walk once around the cycle after detecting a meeting point.
+ *   2. How do you remove the cycle?
+ *      Find the node before the entry and set its next to null.
+ *   3. What if the structure is a graph?
+ *      Use graph visited-state cycle detection instead.
  *
- * Follow-up questions:
- * Q: Can you solve it using O(1) memory?
- * A: Yes, use Floyd's cycle-finding algorithm with mathematical analysis.
- *
- * Q: How to find the length of the cycle?
- * A: After finding cycle start, traverse once more until reaching same node.
- *
- * Q: What if there are multiple cycles?
- * A: This problem assumes at most one cycle; for multiple cycles, need graph algorithms.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Linked List Cycle (141), Find the Duplicate Number (287).
  */
 public class LinkedListCycleII {
+
+    public static void main(String[] args) {
+        LinkedListCycleII solver = new LinkedListCycleII();
+        ListNode head = new ListNode(3); head.next = new ListNode(2); head.next.next = new ListNode(0); head.next.next.next = new ListNode(-4); head.next.next.next.next = head.next;
+        ListNode output = solver.detectCycle(head);
+        System.out.printf("head=%s pos=%d -> %d  expected=%d%n", Arrays.toString(new int[] {3, 2, 0, -4}), 1, output == null ? -1 : output.val, 2);
+        ListNode acyclic = new ListNode(1); acyclic.next = new ListNode(2);
+        ListNode noCycle = solver.detectCycle(acyclic);
+        System.out.printf("head=%s pos=%d -> %d  expected=%d%n", Arrays.toString(new int[] {1, 2}), -1, noCycle == null ? -1 : noCycle.val, -1);
+    }
 
     // Definition for singly-linked list
     static class ListNode {
@@ -38,17 +50,22 @@ public class LinkedListCycleII {
         }
     }
 
-    /**
-     * Floyd's Cycle-Finding Algorithm (Tortoise and Hare).
-     * Optimal O(1) space solution using two pointers.
+        /**
+     * Intuition: fast gains one node per step on slow, so the two pointers meet
+     * if a cycle exists. Resetting one pointer to head makes both pointers the
+     * same distance from the entry, so moving together finds the start.
      *
      * Algorithm:
-     * Phase 1: Detect cycle using slow/fast pointers
-     * Phase 2: Find cycle start using mathematical property
-     * - Distance from head to cycle start = Distance from meeting point to cycle start
+     *   1. Return null for an empty or single-node list.
+     *   2. Move slow by one and fast by two until they meet or fast reaches null.
+     *   3. Return null if fast proves the list is acyclic.
+     *   4. Move start from head and slow from the meeting point until they meet.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(1)
+     * Time:  O(n) - the two phases traverse a linear number of nodes.
+     * Space: O(1) - only pointer variables are used.
+     *
+     * @param head head of the linked list
+     * @return cycle entry node, or null if no cycle exists
      */
     public ListNode detectCycle(ListNode head) {
         if (head == null || head.next == null) {
@@ -239,6 +256,7 @@ public class LinkedListCycleII {
         return findCycleRecursive(head, visited);
     }
 
+    /** Recursively returns the first node seen twice. */
     private ListNode findCycleRecursive(ListNode node, Set<ListNode> visited) {
         if (node == null) {
             return null;
