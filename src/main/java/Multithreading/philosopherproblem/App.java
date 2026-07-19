@@ -5,24 +5,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Dining Philosophers Problem Implementation using Multithreading.
+ * Runs the Dining Philosophers concurrency simulation.
  *
- * Problem Statement:
- * - Five philosophers sit around a circular table.
- * - Each philosopher alternates between thinking and eating.
- * - To eat, a philosopher needs to pick up two chopsticks (left and right).
- * - The challenge is to prevent deadlock and starvation while ensuring fairness.
- *
- * Solution Approach:
- * - Each philosopher runs in a separate thread.
- * - We use an array of chopsticks where each philosopher shares chopsticks with neighbors.
- * - To prevent deadlock, we ensure a global ordering of chopstick acquisition.
- *
- * Time Complexity:
- * - O(N) where N is the number of philosophers.
- *
- * Space Complexity:
- * - O(N) due to the creation of N threads.
+ * The demo creates one philosopher task per philosopher and one shared
+ * ReentrantLock-backed Chopstick per table position. Philosophers run in a fixed
+ * thread pool, repeatedly think, try to acquire two chopsticks, eat, and release
+ * the locks until the simulation timer marks them full.
  */
 public class App {
 

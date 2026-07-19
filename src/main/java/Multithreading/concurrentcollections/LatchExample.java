@@ -3,21 +3,12 @@ package Multithreading.concurrentcollections;
 import java.util.concurrent.*;
 
 /**
- * Demonstrates the use of CountDownLatch to synchronize multiple threads.
+ * Demonstrates one-shot coordination with CountDownLatch.
  *
- * CountDownLatch allows a certain number of threads to reach a common synchronization point before proceeding.
- * Once the latch count reaches zero, the main thread continues execution.
- *
- * - A thread pool of size 2 is created.
- * - 10 worker threads are executed, but the main thread waits only for 5 of them to finish.
- * - The remaining threads continue executing in the background.
- *
- * Key Features:
- * - CountDownLatch ensures only 5 worker threads must complete before proceeding.
- * - Other worker threads may still be running, but they do not block the main thread.
- *
- * Time Complexity: O(n) where n = total number of worker threads.
- * Space Complexity: O(1) (constant space apart from thread storage).
+ * Ten worker tasks are submitted to a small fixed thread pool, while the main
+ * thread waits only for the first five countdowns. CountDownLatch is not reset
+ * after it reaches zero, so it is useful when one or more threads need to wait
+ * for a fixed number of events before continuing.
  */
 public class LatchExample {
 
@@ -58,9 +49,7 @@ public class LatchExample {
         }
     }
 
-    /**
-     * Worker class that simulates a task and decrements the latch count.
-     */
+    /** Worker that simulates work and decrements the shared latch. */
     static class Worker implements Runnable {
         private final int workerId;
         private final CountDownLatch latch;

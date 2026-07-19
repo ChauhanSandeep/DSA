@@ -1,20 +1,11 @@
 package Multithreading.utilities;
 
 /**
- * Problem: Print Odd and Even numbers using two threads in sequence.
- * 
- * Intuition:
- * - One thread prints odd numbers, and the other prints even numbers.
- * - A shared lock is used for synchronization.
- * - Threads use `wait()` and `notifyAll()` to alternate execution.
+ * Demonstrates ordered odd/even printing with wait and notifyAll.
  *
- * Approach:
- * - Use a shared lock object.
- * - Each thread waits until it's its turn to print.
- * - The sequence is maintained by a shared flag.
- *
- * Time Complexity: O(N) — Each number is printed once.
- * Space Complexity: O(1) — Constant extra space used.
+ * Two NumberPrinter threads share one monitor object and a static turn flag.
+ * Each thread enters a synchronized block, waits while it is not that thread's
+ * turn, prints its number, toggles the flag, and notifies the other thread.
  */
 public class OddEvenPrinter {
 
@@ -29,9 +20,7 @@ public class OddEvenPrinter {
     }
 }
 
-/**
- * Runnable class for printing numbers sequentially.
- */
+/** Runnable that prints either odd or even numbers using the shared monitor. */
 class NumberPrinter implements Runnable {
     private static boolean isEvenTurn = false; // Shared flag to indicate turn
     private final Object lock;

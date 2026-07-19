@@ -4,13 +4,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Simulates a student-library scenario where multiple students try to read books concurrently.
- * Uses a fixed thread pool to manage student threads efficiently.
+ * Runs the student-library concurrency simulation.
  *
- * Problem: Concurrency control in resource-sharing environments.
- * Solution: Uses a thread pool to prevent excessive thread creation and manage students effectively.
- *
- * @author [Your Name]
+ * The demo creates shared Book instances and submits Student tasks to a fixed
+ * thread pool. Each Book protects its read section with a ReentrantLock, so many
+ * students can run concurrently while only one student reads a specific book at
+ * a time.
  */
 public class App {
 
@@ -38,6 +37,14 @@ public class App {
             e.printStackTrace();
         } finally {
             studentThreadPool.shutdown();
+            try {
+                if (!studentThreadPool.awaitTermination(Constants.SIMULATION_DURATION_MS + 2000L, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+                    studentThreadPool.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                studentThreadPool.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
 
         System.out.println("Library simulation ended.");

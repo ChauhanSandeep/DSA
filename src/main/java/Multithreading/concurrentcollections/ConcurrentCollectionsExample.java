@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Demonstrates the use of synchronized collections in a multithreaded environment.
+ * Demonstrates Collections.synchronizedList for concurrent writes.
  *
- * - Uses a synchronized `ArrayList` to prevent concurrent modification issues.
- * - Properly synchronizes access during iteration.
- * - Ensures correct thread joining and exception handling.
+ * Two writer threads add values to the same synchronized list. The synchronized
+ * wrapper protects individual list operations, and the final size check is read
+ * inside a synchronized block to demonstrate the external lock required for
+ * compound actions such as iteration.
  */
 public class ConcurrentCollectionsExample {
 
@@ -37,9 +38,7 @@ public class ConcurrentCollectionsExample {
         }
     }
 
-    /**
-     * Creates a writer thread that adds numbers to the given list.
-     */
+    /** Creates a writer thread that appends numbers to the shared list. */
     private static Thread createWriterThread(List<Integer> list) {
         return new Thread(() -> {
             for (int i = 0; i < 1000; i++) {

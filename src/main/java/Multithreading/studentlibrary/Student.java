@@ -3,14 +3,11 @@ package Multithreading.studentlibrary;
 import java.util.Random;
 
 /**
- * Represents a student who randomly selects books to read from the library.
- * Each student continuously picks a random book and reads it while ensuring
- * proper concurrency control.
+ * Represents one student task in the library simulation.
  *
- * Problem: Concurrency in resource sharing (students competing for books).
- * Solution: Uses locking to ensure mutual exclusion when reading books.
- *
- * @author [Your Name]
+ * A student repeatedly chooses a random shared Book and calls its lock-protected
+ * read method until the simulation duration expires. The Student itself owns no
+ * lock; synchronization is delegated to the Book being read.
  */
 public class Student implements Runnable {
 
@@ -19,10 +16,10 @@ public class Student implements Runnable {
     private final Random random;
 
     /**
-     * Initializes a student with a unique ID and access to all books.
+     * Creates a student with an id and access to the shared book array.
      *
-     * @param id    The unique identifier for the student.
-     * @param books The array of books available in the library.
+     * @param id student display id
+     * @param books shared books available in the library
      */
     public Student(int id, Book[] books) {
         this.studentId = id;
@@ -49,9 +46,7 @@ public class Student implements Runnable {
         System.out.println("Student " + studentId + " has finished reading and is leaving the library.");
     }
 
-    /**
-     * Returns the student's unique ID.
-     */
+    /** Returns this student's display id. */
     public int getId() {
         return studentId;
     }

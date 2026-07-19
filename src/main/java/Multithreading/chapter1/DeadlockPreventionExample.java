@@ -5,19 +5,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Demonstrates a potential deadlock scenario and its prevention.
- * 
- * **Problem:**
- * - `worker1` locks `lock1` first, then tries to acquire `lock2`.
- * - `worker2` locks `lock2` first, then tries to acquire `lock1`.
- * - This can cause a deadlock if both threads wait indefinitely for the other to release its lock.
- * 
- * **Solution:**
- * - Used `tryLock()` with a timeout to prevent deadlocks.
- * - If a thread cannot acquire both locks, it releases the acquired lock and retries.
- * 
- * **Time Complexity:** O(1) per iteration  
- * **Space Complexity:** O(1) (constant space usage)
+ * Demonstrates avoiding a classic two-lock deadlock with timed ReentrantLock
+ * acquisition.
+ *
+ * The two workers request lock1 and lock2 in opposite orders, which would be
+ * dangerous with unconditional lock calls. Each worker uses tryLock with a
+ * timeout so a failed second acquisition releases the first lock instead of
+ * waiting forever.
  */
 public class DeadlockPreventionExample {
     private final Lock lock1 = new ReentrantLock();
@@ -27,18 +21,13 @@ public class DeadlockPreventionExample {
         new DeadlockPreventionExample().startThreads();
     }
 
-    /**
-     * Starts two threads that attempt to acquire locks in a conflicting order.
-     */
+    /** Starts the two workers that acquire the same locks in opposite orders. */
     public void startThreads() {
         new Thread(this::worker1, "Worker1").start();
         new Thread(this::worker2, "Worker2").start();
     }
 
-    /**
-     * Worker1 tries to acquire lock1 first, then lock2.
-     * Uses tryLock() with timeout to prevent deadlock.
-     */
+    /** Tries lock1 first, then lock2, using timed tryLock calls. */
     private void worker1() {
         try {
             if (lock1.tryLock(1, TimeUnit.SECONDS)) {
@@ -65,10 +54,7 @@ public class DeadlockPreventionExample {
         }
     }
 
-    /**
-     * Worker2 tries to acquire lock2 first, then lock1.
-     * Uses tryLock() with timeout to prevent deadlock.
-     */
+    /** Tries lock2 first, then lock1, using timed tryLock calls. */
     private void worker2() {
         try {
             if (lock2.tryLock(1, TimeUnit.SECONDS)) {

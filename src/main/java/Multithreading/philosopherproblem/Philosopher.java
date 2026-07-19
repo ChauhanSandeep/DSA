@@ -5,13 +5,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents a philosopher in the Dining Philosophers problem.
- * Each philosopher alternates between thinking and eating, while ensuring no deadlocks occur.
+ * Represents one philosopher task in the Dining Philosophers simulation.
  *
- * Problem: Dining Philosophers Problem (Concurrency Control)
- * Solution: Uses a tryLock() mechanism with a timeout to prevent deadlock.
- *
- * @author [Your Name]
+ * A philosopher loops until an AtomicBoolean stop flag is set. Each loop thinks,
+ * tries to acquire two Chopstick locks with timed tryLock calls, eats if both
+ * locks are held, and releases any acquired locks before retrying.
  */
 public class Philosopher implements Runnable {
 
@@ -22,37 +20,42 @@ public class Philosopher implements Runnable {
     private final AtomicBoolean hasFinishedEating;  // Ensures thread-safe state management
     private int eatingCounter = 0;  // Tracks the number of times the philosopher has eaten
 
+    /** Returns this philosopher's display id. */
     public int getPhilosopherId() {
         return philosopherId;
     }
 
+    /** Returns the chopstick this philosopher tries before the other one. */
     public Chopstick getLowerChopstick() {
         return lowerChopstick;
     }
 
+    /** Returns the chopstick this philosopher tries after the first one. */
     public Chopstick getHigherChopstick() {
         return higherChopstick;
     }
 
+    /** Returns the random source used to vary thinking and eating delays. */
     public Random getRandom() {
         return random;
     }
 
+    /** Returns the AtomicBoolean stop flag used by the simulation. */
     public AtomicBoolean getHasFinishedEating() {
         return hasFinishedEating;
     }
 
+    /** Returns how many times this philosopher has eaten. */
     public int getEatingCounter() {
         return eatingCounter;
     }
 
     /**
-     * Initializes a philosopher with assigned chopsticks.
-     * The chopsticks are assigned in increasing order to reduce deadlock probability.
+     * Initializes a philosopher with two shared chopsticks.
      *
-     * @param id The philosopher's unique ID.
-     * @param leftChopstick The left chopstick.
-     * @param rightChopstick The right chopstick.
+     * @param id philosopher display id
+     * @param leftChopstick one neighboring chopstick
+     * @param rightChopstick the other neighboring chopstick
      */
     public Philosopher(int id, Chopstick leftChopstick, Chopstick rightChopstick) {
         this.philosopherId = id;
@@ -87,28 +90,20 @@ public class Philosopher implements Runnable {
         }
     }
 
-    /**
-     * Simulates the philosopher thinking.
-     * The philosopher waits for a random amount of time before attempting to eat.
-     */
+    /** Simulates thinking before the philosopher tries to acquire chopsticks. */
     private void think() throws InterruptedException {
         System.out.println("Philosopher " + philosopherId + " is thinking...");
         TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
     }
 
-    /**
-     * Simulates the philosopher eating.
-     * The philosopher waits for a random amount of time while eating.
-     */
+    /** Simulates eating while both chopstick locks are held. */
     private void eat() throws InterruptedException {
         System.out.println("Philosopher " + philosopherId + " is eating...");
         eatingCounter++;
         TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
     }
 
-    /**
-     * Sets the philosopher's state to full, signaling them to stop eating.
-     */
+    /** Signals this philosopher to stop after the current loop iteration. */
     public void setFull() {
         hasFinishedEating.set(true);
     }
