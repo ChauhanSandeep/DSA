@@ -1,0 +1,92 @@
+# On every push that modifies Tracking/data/state.json, diffs the new file
+# against the previous commit and appends a Markdown summary of the newly
+# recorded grades to the pinned "Study log" issue.
+#
+# Result: after you finish a weekend review and commit state.json, a
+# comment like:
+#     ### 📓 Review log — ⭐ 1 · ✅ 3 · 🟡 2 (6 total)
+#     **Sat 25 Jul 2026**
+#     - ✅ solved Two Sum — Easy · Arrays & Hashing
+#     - ...
+# lands on the study-log issue, giving you a searchable history without
+# leaving GitHub.
+#
+name: Log review to study log
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Tracking/data/state.json"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: log-review
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with previous commit)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Ensure study-log label exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create study-log --color "5319e7" --description "Study log" 2>/dev/null || true
+
+      - name: Generate log comment
+        id: comment
+        run: |
+          python Tracking/scripts/review_log.py --base HEAD^ > /tmp/comment.md
+          SIZE=$(wc -c </tmp/comment.md | tr -d ' ')
+          echo "size=$SIZE" >> "$GITHUB_OUTPUT"
+          if [ "$SIZE" -gt 0 ]; then
+            echo "----- comment preview -----"
+            cat /tmp/comment.md
+            echo "---------------------------"
+          else
+            echo "No newly recorded grades in this push — nothing to log."
+          fi
+
+      - name: Find or create study-log issue
+        if: steps.comment.outputs.size != '0'
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE=$(gh issue list \
+            --label study-log \
+            --state open \
+            --json number \
+            --jq ".[0].number")
+          if [ -z "$ISSUE" ]; then
+            ISSUE=$(gh issue create \
+              --title "📓 Study log — DSA reviews" \
+              --body "Rolling log of DSA review sessions. Each comment is one commit's worth of grades, appended by \`.github/workflows/log-review.yml\`." \
+              --label study-log \
+              | tail -n 1 \
+              | grep -oE '[0-9]+$')
+          fi
+          echo "number=$ISSUE" >> "$GITHUB_OUTPUT"
+
+      - name: Post comment
+        if: steps.comment.outputs.size != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body-file /tmp/comment.md
