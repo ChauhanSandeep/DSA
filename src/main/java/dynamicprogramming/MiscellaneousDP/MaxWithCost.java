@@ -1,33 +1,30 @@
 package dynamicprogramming.MiscellaneousDP;
 
+import java.util.Arrays;
 /**
- * LeetCode: https://leetcode.com/problems/maximum-number-of-points-with-cost/
+ * Problem: Maximum Number of Points With Cost
  *
- * Problem Statement:
- * You are given a 2D integer matrix `points` of size `m x n`.
- * Each cell contains some points. You start from any cell in the first row
- * and move down row by row. From a cell `(i, j)`, you can move to any cell `(i+1, k)`
- * in the next row but you incur a cost of `abs(j - k)`.
+ * Choose one cell in each row of a points matrix. Moving from column c in one row
+ * to column d in the next loses abs(c - d) points. Return the maximum total score.
  *
- * Your goal is to return the maximum total points you can collect.
+ * Leetcode: https://leetcode.com/problems/maximum-number-of-points-with-cost/
+ * Rating:   2106 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Row DP | Left/right sweep optimization
  *
  * Example:
- * Input: points = [
-*       [1,2,3],
-*       [1,5,1],
-*       [3,1,1]
- * ]
- * Output: 9
- * Explanation: Start from points[0][2] = 3 → points[1][1] = 5 → points[2][0] = 3
- * Total = 3 + 5 + 3 - (2) (minus cost) = 9
+ *   Input:  points = [[1,2,3],[1,5,1],[3,1,1]]
+ *   Output: 9
+ *   Why:    choosing columns 2 -> 1 -> 0 scores 3 + 5 + 3 minus movement cost 2, for 9.
  *
- * Follow-up Questions:
- * Q: Can this be done in-place with O(1) extra space?
- * A: Not without altering input or compromising performance. Right now O(n) is optimal.
+ * Follow-ups:
+ *   1. What if the movement cost is squared distance?
+ *      The left/right linear sweep no longer works; use convex hull trick or divide-and-conquer optimization if applicable.
+ *   2. Return the chosen path of columns?
+ *      Store parent columns while computing each row's best transition.
+ *   3. Can the input be updated online?
+ *      Maintain row transitions with segment trees, though full recomputation is often simpler.
  *
- * Q: Can this be done using segment tree?
- * A: Yes, but would be overkill as current approach is already linear per row.
- * LeetCode Contest Rating: 2106
+ * Related: Minimum Falling Path Sum (931), Paint House II (265).
  */
 public class MaxWithCost {
 
@@ -74,34 +71,26 @@ public class MaxWithCost {
     return maxPoints;
   }
 
-  /**  Optimized approach using linear sweeps to avoid O(n²) complexity.
-   *
-   * Naively comparing all `k` leads to O(n²) time per row.
-   * Instead, we precompute:
-   * - `leftMax[col]`: The best possible value when coming from the left side of col,
-   *   accounting for the cost of moving right (−1 per step).
-   * - `rightMax[col]`: The best possible value when coming from the right side of col,
-   *   accounting for the cost of moving left (−1 per step).
-   *
-   * Transformation Logic:
-   * - Moving right from col `k` to col `col` reduces the value by (col - k),
-   *   which can be simulated in left-to-right sweep:
-   *     leftMax[col] = max(prevRowMaxPoints[col], leftMax[col - 1] - 1)
-   *     [ This means that we can either take the max from previous row at the same column
-   *                                      OR
-   *     we can take the value from left column of same row and reduce it by 1 ]
-   *
-   * - Moving left from col `k` to col `col` reduces the value by (k - col),
-   *   simulated in right-to-left sweep:
-   *     rightMax[col] = max(rightMax[col + 1] - 1, prevRowMaxPoints[col])
-   *
-   * At each column, the best transition from the previous row is:
-   *     max(leftMax[col], rightMax[col])
-   * Then add the current cell’s point value: `points[row][col]`
-   *
-   * Time Complexity: O(rows × cols)
-   * Space Complexity: O(cols)
-   */
+  /**
+     * Intuition (interview default): for a target column, the best previous column
+     * is either on its left or on its right. A left-to-right sweep carries the best
+     * value that can arrive from the left, losing one point per step as it moves
+     * right. A right-to-left sweep does the symmetric work. Taking the max of those
+     * two precomputed values gives the same recurrence as the naive scan, but each
+     * row is only linear.
+     *
+     * Algorithm:
+     *   1. Initialize prevRowMaxPoints from the first row.
+     *   2. For each next row, compute leftMax and rightMax sweeps from the previous row.
+     *   3. Set currRowMaxPoints[col] to points[row][col] plus the better sweep value.
+     *   4. Replace the previous row and return its maximum after the last row.
+     *
+     * Time:  O(m*n) - each row performs three linear passes over the columns.
+     * Space: O(n) - only previous row and two sweep arrays are stored.
+     *
+     * @param points matrix of point values
+     * @return maximum score after choosing one cell per row
+     */
   public long maxPointsOptimized(int[][] points) {
     int rows = points.length;
     int cols = points[0].length;
@@ -171,4 +160,19 @@ public class MaxWithCost {
     }
     return rightMax;
   }
+
+    public static void main(String[] args) {
+        MaxWithCost solver = new MaxWithCost();
+        int[][][] inputs = {
+            {{5}},
+            {{1, 2, 3}, {1, 5, 1}, {3, 1, 1}}
+        };
+        long[] expected = {5, 9};
+
+        for (int i = 0; i < inputs.length; i++) {
+            long got = solver.maxPointsOptimized(inputs[i]);
+            System.out.printf("points=%s -> %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
+    }
 }

@@ -3,50 +3,54 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * A certain bug's home is on the x-axis at position x. Help them get there from position 0.
+ * Problem: Minimum Jumps to Reach Home
  *
- * The bug jumps according to the following rules:
- * 1. It can jump exactly a positions forward (to the right).
- * 2. It can jump exactly b positions backward (to the left).
- * 3. It cannot jump backward twice in a row.
- * 4. It cannot jump to any forbidden positions.
- * 5. It can jump beyond its home, but it cannot jump to positions with negative integers.
+ * A bug starts at 0 and wants to reach x. It may jump a positions forward or b
+ * positions backward, cannot land on forbidden positions, and cannot jump backward
+ * twice in a row. Return the minimum jumps, or -1 if unreachable.
  *
- * Given an array of integers forbidden, where forbidden[i] means the bug cannot jump to the position forbidden[i], and integers a, b, and x, return the minimum number of jumps needed for the bug to reach its home. If there is no possible sequence of jumps that lands the bug on position x, return -1.
+ * Leetcode: https://leetcode.com/problems/minimum-jumps-to-reach-home/
+ * Rating:   2124 (zerotrac Elo)
+ * Pattern:  BFS | State graph | Direction-aware visited state
  *
- * Example 1:
- * Input: forbidden = [14,4,18,1,15], a = 3, b = 15, x = 9
- * Output: 3
- * Explanation: 3 jumps forward (0 -> 3 -> 6 -> 9) will get the bug home.
+ * Example:
+ *   Input:  forbidden = [14,4,18,1,15], a = 3, b = 15, x = 9
+ *   Output: 3
+ *   Why:    three forward jumps go 0 -> 3 -> 6 -> 9 without hitting a forbidden position.
  *
- * Example 2:
- * Input: forbidden = [8,3,16,6,12,20], a = 15, b = 13, x = 11
- * Output: -1
+ * Follow-ups:
+ *   1. Allow up to k backward jumps in a row?
+ *      Add the current backward-run length to the BFS state.
+ *   2. Return the actual path?
+ *      Store a parent pointer for each visited state and reconstruct when x is reached.
+ *   3. What if forbidden positions are streamed?
+ *      The graph changes over time; use dynamic shortest-path updates or rerun BFS when needed.
  *
- * LeetCode: https://leetcode.com/problems/minimum-jumps-to-reach-home/
- *
- * Follow-up Questions:
- * 1. What if the bug can jump backward multiple times in a row?
- *    - The problem would become more complex as we'd need to track the number of consecutive backward jumps.
- * 2. How would you handle very large values of x, a, and b (e.g., up to 2000)?
- *    - The BFS approach with proper bounds should handle this efficiently.
- * 3. What if there are multiple forbidden positions?
- *    - The solution already handles multiple forbidden positions using a set.
- *
- * Related Problems:
- * - Jump Game II (https://leetcode.com/problems/jump-game-ii/)
- * - Jump Game III (https://leetcode.com/problems/jump-game-iii/)
- * LeetCode Contest Rating: 2124
+ * Related: Frog Jump (403), Jump Game III (1306).
  */
 public class MinimumJumpsToReachHome {
     /**
-     * Calculates the minimum number of jumps needed to reach home.
+     * Intuition: this is a shortest-path problem on positions, but position alone
+     * is not enough state. Landing at the same position after a backward jump is
+     * different from landing there after a forward jump, because only one of those
+     * states may jump backward next. BFS explores by jump count, so the first time
+     * it reaches x is minimal. A finite upper bound keeps the search from drifting
+     * forever to the right.
      *
-     * @param forbidden Array of forbidden positions
-     * @param a Number of positions to jump forward
-     * @param b Number of positions to jump backward
-     * @param x Target position (home)
-     * @return Minimum number of jumps or -1 if not possible
+     * Algorithm:
+     *   1. Build forbiddenSet, visited[position][direction], and a BFS queue from position 0.
+     *   2. Process BFS one level at a time so jumps is the current distance.
+     *   3. Always try a forward jump within maxLimit.
+     *   4. Try a backward jump only when the previous jump was not backward.
+     *
+     * Time:  O(U) - at most two direction states are visited for each position up to the bound U.
+     * Space: O(U) - the visited states and queue are bounded by the same positions.
+     *
+     * @param forbidden positions the bug cannot land on
+     * @param a forward jump length
+     * @param b backward jump length
+     * @param x target home position
+     * @return minimum jumps to reach x, or -1 if impossible
      */
     public int minimumJumps(int[] forbidden, int a, int b, int x) {
         // Maximum possible position we need to consider
@@ -158,5 +162,20 @@ public class MinimumJumpsToReachHome {
         }
 
         return -1;
+    }
+
+    public static void main(String[] args) {
+        MinimumJumpsToReachHome solver = new MinimumJumpsToReachHome();
+        int[][] forbidden = {{}, {14, 4, 18, 1, 15}, {8, 3, 16, 6, 12, 20}};
+        int[] forward = {2, 3, 15};
+        int[] backward = {1, 15, 13};
+        int[] target = {0, 9, 11};
+        int[] expected = {0, 3, -1};
+
+        for (int i = 0; i < forbidden.length; i++) {
+            int got = solver.minimumJumps(forbidden[i], forward[i], backward[i], target[i]);
+            System.out.printf("forbidden=%s a=%d b=%d x=%d -> %d  expected=%d%n",
+                Arrays.toString(forbidden[i]), forward[i], backward[i], target[i], got, expected[i]);
+        }
     }
 }

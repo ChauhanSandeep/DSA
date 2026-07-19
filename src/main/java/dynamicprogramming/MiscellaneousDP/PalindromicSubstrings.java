@@ -1,65 +1,52 @@
 package dynamicprogramming.MiscellaneousDP;
 
 /**
- * Problem: Palindromic Substrings (LeetCode #647)
+ * Problem: Palindromic Substrings
  *
- * Problem Statement:
- * Given a string s, return the number of palindromic substrings in it.
- * A string is a palindrome when it reads the same backward as forward.
- * A substring is a contiguous sequence of characters within the string.
+ * Given a string, count how many substrings are palindromes. Substrings are
+ * contiguous, and equal text at different positions is counted separately.
  *
- * Example 1:
- * Input: s = "abc"
- * Output: 3
- * Explanation: Three palindromic strings: "a", "b", "c".
+ * Leetcode: https://leetcode.com/problems/palindromic-substrings/
+ * Rating:   acceptance 73.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming | Expand around center | Interval DP alternative
  *
- * Example 2:
- * Input: s = "aaa"
- * Output: 6
- * Explanation: Six palindromic strings: "a", "a", "a", "aa", "aa", "aaa".
+ * Example:
+ *   Input:  s = "aaa"
+ *   Output: 6
+ *   Why:    the three single letters, two "aa" substrings, and one "aaa" are all palindromes.
  *
- * Approaches:
- * 1. Expand Around Center (Optimal): O(n²) time, O(1) space
- *    - Consider each character and each pair of characters as the center of a palindrome
- *    - Expand outwards to count all palindromes with that center
+ * Follow-ups:
+ *   1. Return all distinct palindromic substrings?
+ *      Add each palindrome to a set, or use a palindromic tree for large strings.
+ *   2. Find the longest palindromic substring?
+ *      Keep the best bounds while expanding centers.
+ *   3. Can counting be O(n)?
+ *      Yes, Manacher's algorithm counts palindromic radii in linear time.
  *
- * 2. Dynamic Programming: O(n²) time, O(n²) space
- *    - Use a 2D DP array where dp[i][j] is true if s[i..j] is a palindrome
- *    - Fill the DP table and count palindromic substrings
- *
- * 3. Brute Force: O(n³) time, O(1) space
- *    - Check all possible substrings and count palindromes
- *
- * Time Complexity: O(n²) for optimal solution
- * Space Complexity: O(1) for optimal solution
- *
- * Follow-up Questions:
- * 1. What if we need to return all the distinct palindromic substrings instead of just counting them?
- *    Answer: We can modify the solution to collect all palindromic substrings in a set to avoid duplicates.
- *
- * 2. How would you find the longest palindromic substring?
- *    Answer: We can modify the expand around center approach to keep track of the longest palindrome found.
- *
- * 3. What if the string is very large (millions of characters)?
- *    Answer: For very large strings, we might need more advanced algorithms like Manacher's algorithm (O(n) time).
- *
- * LeetCode: https://leetcode.com/problems/palindromic-substrings/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Longest Palindromic Substring (5), Count Different Palindromic Subsequences (730).
  */
 public class PalindromicSubstrings {
 
     private int count = 0;
 
     /**
-     * Optimal Expand Around Center Solution
+     * Intuition (interview default): every palindrome has a center. Odd-length
+     * palindromes center on a character, while even-length palindromes center
+     * between two characters. If we expand from each possible center while the two
+     * sides match, every successful expansion is one palindromic substring, and no
+     * palindrome is missed because it has exactly one center.
      *
-     * Approach:
-     * 1. For each character in the string, consider it as the center of a palindrome
-     * 2. Expand around the center to find all palindromes
-     * 3. Handle both odd-length and even-length palindromes
+     * Algorithm:
+     *   1. Reset the shared count before scanning centers.
+     *   2. For each index, expand once for odd length and once for even length.
+     *   3. Each matching expansion increments count until the pointers leave the string or mismatch.
+     *   4. Return the accumulated count.
      *
-     * Time Complexity: O(n²) - Each expansion can take O(n) time in the worst case
-     * Space Complexity: O(1) - Only constant extra space is used
+     * Time:  O(n^2) - each center may expand across the whole string in the worst case.
+     * Space: O(1) - only counters and two expanding pointers are stored.
+     *
+     * @param input string to inspect
+     * @return number of palindromic substrings
      */
     public int countSubstrings(String input) {
         if (input == null || input.length() == 0) {
@@ -169,23 +156,14 @@ public class PalindromicSubstrings {
     }
 
     public static void main(String[] args) {
-        PalindromicSubstrings solution = new PalindromicSubstrings();
+        PalindromicSubstrings solver = new PalindromicSubstrings();
+        String[] inputs = {"", "abc", "aaa", "a"};
+        int[] expected = {0, 3, 6, 1};
 
-        // Test cases
-        System.out.println("Test 1: " + solution.countSubstrings("abc"));      // Expected: 3
-        System.out.println("Test 2: " + solution.countSubstrings("aaa"));      // Expected: 6
-        System.out.println("Test 3: " + solution.countSubstrings("a"));        // Expected: 1
-        System.out.println("Test 4: " + solution.countSubstrings(""));         // Expected: 0
-        System.out.println("Test 5: " + solution.countSubstrings("racecar"));  // Expected: 10
-
-        // Test DP solution
-        System.out.println("\nDP Solution:");
-        System.out.println("Test 1: " + solution.countSubstringsDP("abc"));     // Expected: 3
-        System.out.println("Test 2: " + solution.countSubstringsDP("aaa"));     // Expected: 6
-
-        // Test optimized solution
-        System.out.println("\nOptimized Solution:");
-        System.out.println("Test 1: " + solution.countSubstringsOptimized("abc"));  // Expected: 3
-        System.out.println("Test 2: " + solution.countSubstringsOptimized("aaa"));  // Expected: 6
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countSubstrings(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
+
 }

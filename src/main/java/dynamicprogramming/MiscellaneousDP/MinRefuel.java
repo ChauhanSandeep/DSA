@@ -1,69 +1,79 @@
 package dynamicprogramming.MiscellaneousDP;
 
 import java.util.PriorityQueue;
+import java.util.Arrays;
 
 
 /**
- * Problem: Minimum Refueling Stops
+ * Problem: Minimum Number of Refueling Stops
  *
- * You are given:
- * - A `target` distance you need to travel.
- * - `startFuel`, the initial amount of fuel in your tank.
- * - A list of `stations`, where stations[i] = [position_i, fuel_i] means a station at position_i offers fuel_i liters.
+ * You start with some fuel and pass stations on the way to a target distance. Each
+ * station has a position and fuel amount. Return the fewest refuels needed to
+ * reach the target, or -1 if it is impossible.
  *
- * Return the minimum number of refueling stops to reach the target.
- * If you cannot reach the target, return -1.
+ * Leetcode: https://leetcode.com/problems/minimum-number-of-refueling-stops/
+ * Rating:   2074 (zerotrac Elo)
+ * Pattern:  Greedy | Max heap | Reachability DP alternative
  *
  * Example:
- * Input:
- *   target = 100,
- *   startFuel = 25,
- *   stations = [
- *   [25,25],
- *   [50,25],
- *   [75,25]
- *   ]
- * Output: 3
- * Explanation:
- * - Start at position 0 with 25 fuel.
- * - Stop at station 1 (position 25, fuel 25) to refuel to 50.
- * * - Stop at station 2 (position 50, fuel 25) to refuel to 75.
+ *   Input:  target = 100, startFuel = 10, stations = [[10,60],[20,30],[30,30],[60,40]]
+ *   Output: 2
+ *   Why:    refuel at distance 10, later choose the best reachable fuel again, and
+ *           two total stops are enough to reach 100.
  *
- * LeetCode Link:
- * https://leetcode.com/problems/minimum-number-of-refueling-stops/
+ * Follow-ups:
+ *   1. Can this be solved with DP?
+ *      Yes, dp[stops] stores the farthest distance reachable with exactly that many refuels.
+ *   2. What if station fuel has a price and we minimize cost?
+ *      Use a cost-aware shortest path or greedy fuel-price strategy depending on constraints.
+ *   3. Return the chosen station indices?
+ *      Store station indices in the heap and record each polled station.
  *
- * Follow-up Questions:
- * 1. Can we use dynamic programming to solve this problem?
- *    ➤ Yes. DP[i] = max distance reachable with i refuels.
- * 2. What if all fuel stations are sorted in reverse?
- *    ➤ Doesn't matter; algorithm still works since it greedily adds reachable stations.
- * LeetCode Contest Rating: 2074
+ * Related: Gas Station (134), Course Schedule III (630).
  */
 public class MinRefuel {
 
-  public static void main(String[] args) {
-    int[][] stations = {{25, 25}, {50, 25}, {75, 25}};
-    int target = 100;
-    int startFuel = 25;
+    public static void main(String[] args) {
+        MinRefuel solver = new MinRefuel();
+        int[] targets = {1, 100, 100};
+        int[] startFuel = {1, 1, 10};
+        int[][][] stations = {
+            {},
+            {{10, 100}},
+            {{10, 60}, {20, 30}, {30, 30}, {60, 40}}
+        };
+        int[] expected = {0, -1, 2};
 
-    int result = new MinRefuel().minRefuelStops(target, startFuel, stations);
-    System.out.println("Minimum Refueling Stops: " + result); // Output: 3
-  }
+        for (int i = 0; i < targets.length; i++) {
+            int got = solver.minRefuelStops(targets[i], startFuel[i], stations[i]);
+            System.out.printf("target=%d startFuel=%d stations=%s -> %d  expected=%d%n",
+                targets[i], startFuel[i], Arrays.deepToString(stations[i]), got, expected[i]);
+        }
+    }
+
 
   /**
-   * Greedy + Max-Heap Approach:
-   * Always choose to refuel from the station with the **maximum** fuel reachable so far.
-   *
-   * Algorithm:
-   * 1. Traverse stations in order.
-   * 2. Add all stations within reach to a max-heap.
-   * 3. If no station is available and target is not yet reached, return -1.
-   * 4. Greedily refuel from the station with the most fuel (poll from heap).
-   * 5. Repeat until the target is reachable.
-   *
-   * Time Complexity: O(n log n) due to heap operations.
-   * Space Complexity: O(n) for the heap.
-   */
+     * Intuition (interview default): drive as far as possible before deciding to
+     * refuel. Every station already passed is a valid past choice, and if we get
+     * stuck, the best past choice is the reachable station with the most fuel. A
+     * max heap keeps those available fuels ready. This greedy choice is safe
+     * because refueling earlier or later from the same passed station gives the
+     * same added reach, so choosing the largest fuel maximizes future options.
+     *
+     * Algorithm:
+     *   1. Push every station whose position is within currentFuel into a max heap.
+     *   2. If the target is still unreachable and the heap is empty, return -1.
+     *   3. Otherwise refuel from the largest reachable station and count one stop.
+     *   4. Repeat until currentFuel reaches target.
+     *
+     * Time:  O(n log n) - each station is pushed once and at most once popped from the heap.
+     * Space: O(n) - the heap can hold all reachable stations not yet used.
+     *
+     * @param target destination distance
+     * @param startFuel initial fuel amount
+     * @param stations stations[i] is [position, fuel]
+     * @return minimum number of refuels, or -1 if impossible
+     */
   public int minRefuelStops(int target, int startFuel, int[][] stations) {
       if (startFuel >= target) {
           return 0;

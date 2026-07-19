@@ -3,74 +3,65 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * Count Unique Characters of All Substrings of a Given String
+ * Problem: Count Unique Characters of All Substrings of a Given String
  *
- * Let's define a function countUniqueChars(s) that returns the number of unique
- * characters in s. A character is unique if it appears exactly once in the string.
+ * For every substring, count how many characters appear exactly once inside that
+ * substring, then return the sum across all substrings. The answer fits in a
+ * 32-bit integer.
  *
- * Given a string s, return the sum of countUniqueChars(t) where t is a substring of s.
- * The test cases are generated such that the answer fits in a 32-bit integer.
- *
- * Key insight: Instead of examining every substring, we calculate how many substrings
- * each character contributes to as a unique character. This transforms an O(n³)
- * brute force approach into an efficient O(n) solution.
+ * Leetcode: https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/
+ * Rating:   2034 (zerotrac Elo)
+ * Pattern:  Contribution counting | Index DP idea | Previous/next occurrence
  *
  * Example:
- * Input: s = "ABC"
- * Output: 10
- * Explanation: All substrings are: "A"(1), "B"(1), "C"(1), "AB"(2), "BC"(2), "ABC"(3)
- * Sum = 1 + 1 + 1 + 2 + 2 + 3 = 10
+ *   Input:  s = "ABA"
+ *   Output: 8
+ *   Why:    the middle B is unique in six substrings, and the two A occurrences
+ *           contribute one substring each, for a total of 8.
  *
- * Example:
- * Input: s = "ABA"
- * Output: 8
- * Explanation: Substrings: "A"(1), "B"(1), "A"(1), "AB"(2), "BA"(1), "ABA"(1)
- * Sum = 1 + 1 + 1 + 2 + 1 + 1 = 8 (Note: "ABA" has only B as unique)
+ * Follow-ups:
+ *   1. What if the alphabet is fixed uppercase English letters?
+ *      Use two int arrays per character instead of a map of position lists.
+ *   2. Count characters that appear exactly k times in all substrings?
+ *      Use neighbouring occurrence windows around each kth occurrence group.
+ *   3. Find the substring with the maximum number of unique characters?
+ *      Use a sliding window if the goal is distinct characters, but exact-once counts need frequency tracking.
  *
- * LeetCode: https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/
- *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we need to find substrings with exactly k unique characters?
- *    Answer: Use sliding window technique with character frequency tracking and adjust window size dynamically.
- * 2. How to handle case-sensitive strings with both uppercase and lowercase letters?
- *    Answer: Extend position arrays from 26 to 58 (26*2 + 6 for other ASCII chars) or use HashMap.
- * 3. What if string length is extremely large (billions of characters) with patterns?
- *    Answer: Use string compression, pattern recognition, or mathematical formulas for repeating sequences.
- * 4. How would you modify this to count characters that appear at least k times?
- *    Answer: Change uniqueness criteria and modify contribution calculation with different boundary constraints.
- * 5: Find substring with maximum unique characters?
- *  * Use sliding window with character frequency tracking (https://leetcode.com/problems/longest-substring-without-repeating-characters/)
- *
- * Related Problems:
- * - LeetCode 3: Longest Substring Without Repeating Characters
- * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
- * - LeetCode 992: Subarrays with K Different Integers
- * LeetCode Contest Rating: 2034
+ * Related: Longest Substring Without Repeating Characters (3), Distinct Subsequences II (940).
  */
 public class CountUniqueCharactersOfAllSubstrings {
 
-  public static void main(String[] args) {
-    CountUniqueCharactersOfAllSubstrings solver = new CountUniqueCharactersOfAllSubstrings();
-    System.out.println("Result (Optimized): " + solver.uniqueLetterString("ABC")); // Expected: 10
-  }
+    public static void main(String[] args) {
+        CountUniqueCharactersOfAllSubstrings solver = new CountUniqueCharactersOfAllSubstrings();
+        String[] inputs = {"", "ABC", "ABA"};
+        int[] expected = {0, 10, 8};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.uniqueLetterString(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
 
 /**
- * Approach (Contribution Method):
- * Instead of generating all substrings, we calculate the contribution of each character occurrence
- * directly using distances to its previous and next occurrence.
- *
- * Steps:
- * 1. Create a map from each character to a list of its positions in the string.
- *    - Initialize each list with -1 as a left boundary.
- * 2. Traverse the string and record positions of each character in the map.
- * 3. For each character's position list:
- *    - Append string.length() as a right boundary.
- *    - For every actual occurrence index 'i':
- *         * Compute distance to its previous occurrence: (positions[i] - positions[i-1])
- *         * Compute distance to its next occurrence: (positions[i+1] - positions[i])
- *         * The product of these two distances gives the number of substrings where this occurrence of the character is unique.
- *    - Add all such contributions to the total sum.
- */
+     * Intuition: instead of asking every substring what it contains, ask each
+     * character occurrence how many substrings count it as unique. An occurrence at
+     * position p stays unique exactly when the substring starts after the previous
+     * same character and ends before the next same character. That gives
+     * (p - previous) choices for the left boundary and (next - p) choices for the
+     * right boundary, so their product is this occurrence's contribution.
+     *
+     * Algorithm:
+     *   1. Build a map from each character to all of its positions, seeded with left boundary -1.
+     *   2. Append the right boundary inputString.length() to each position list.
+     *   3. For every real occurrence, add leftDistance * rightDistance to totalSum.
+     *
+     * Time:  O(n) - each character position is inserted once and visited once again.
+     * Space: O(n) - the position lists store all character indices.
+     *
+     * @param inputString string whose substring unique-character sum is needed
+     * @return total unique-character contribution over all substrings
+     */
  public int uniqueLetterString(String inputString) {
     if (inputString == null || inputString.isEmpty()) {
       return 0;

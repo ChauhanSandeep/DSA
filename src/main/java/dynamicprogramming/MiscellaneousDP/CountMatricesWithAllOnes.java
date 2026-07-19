@@ -4,72 +4,69 @@ import java.util.*;
 
 
 /**
- * Problem: Count Submatrices with All Ones
+ * Problem: Count Submatrices With All Ones
  *
- * Given a rows x cols binary matrix filled with 0's and 1's, find the number of submatrices that have all ones.
+ * Given a binary matrix, count every rectangular submatrix whose cells are all 1.
+ * Rectangles of all sizes count, not just squares.
+ *
+ * Leetcode: https://leetcode.com/problems/count-submatrices-with-all-ones/
+ * Rating:   1845 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Histogram DP | Monotonic stack
  *
  * Example:
- * Input: matrix = [[1,0,1],
- *                  [1,1,0],
- *                  [1,1,0]]
- * Output: 13
- * Explanation: There are 6 rectangles of side 1x1.
- *              There are 2 rectangles of side 1x2.
- *              There are 3 rectangles of side 2x1.
- *              There are 1 rectangle of side 2x2.
- *              There are 1 rectangle of side 3x1.
- *              Total number of rectangles = 6 + 2 + 3 + 1 + 1 = 13.
+ *   Input:  matrix = [[1,0,1],[1,1,0],[1,1,0]]
+ *   Output: 13
+ *   Why:    each row's vertical heights reveal all-one rectangles ending on that
+ *           row; summing those row contributions gives 13 total rectangles.
  *
- * LeetCode Problem Link: https://leetcode.com/problems/count-submatrices-with-all-ones/
+ * Follow-ups:
+ *   1. Count only all-one squares?
+ *      Use square DP where dp[row][col] is the largest square ending at that cell.
+ *   2. Find the largest all-one rectangle instead of counting all?
+ *      Reuse row histograms and run largest-rectangle-in-histogram per row.
+ *   3. What if the matrix is sparse and huge?
+ *      Store runs of ones or non-zero coordinates and avoid scanning known zero regions.
  *
- * Follow-up Questions:
- *
- * 1. How would you modify this to count only square submatrices with all ones?
- *    Answer: Use DP where dp[i][j] represents the side length of the largest square
- *    ending at (i,j). Sum all dp values to get the count of square submatrices.
- *    Related problem: https://leetcode.com/problems/count-square-submatrices-with-all-ones/
- *
- * 2. What if you need to find the largest submatrix area instead of counting all?
- *    Answer: Use similar histogram approach but track maximum area instead of counting.
- *    For each row's histogram, find the largest rectangle area using monotonic stack.
- *    Related problem: https://leetcode.com/problems/maximal-rectangle/
- *
- * 3. How would you handle a 3D matrix instead of 2D?
- *    Answer: Extend to 3D by treating each 2D slice along one dimension. For each slice,
- *    build cumulative counts in the third dimension and apply 2D submatrix counting.
- *
- * 4. Can you optimize space if the matrix is very large but sparse?
- *    Answer: Use sparse matrix representation with coordinates and values. Process only
- *    non-zero regions, skipping areas known to contain zeros.
- *
- * 5. What if you need to count submatrices with at least k ones instead of all ones?
- *    Answer: Use sliding window or prefix sum 2D approach. For each submatrix, calculate
- *    sum using prefix sums and count those with sum >= k.
- * LeetCode Contest Rating: 1845
+ * Related: Count Square Submatrices With All Ones (1277), Maximal Rectangle (85).
  */
 public class CountMatricesWithAllOnes {
 
-  public static void main(String[] args) {
-    int[][] binaryMatrix = {{0, 1, 1, 0}, {0, 1, 1, 1}, {1, 1, 1, 0}};
-    CountMatricesWithAllOnes solver = new CountMatricesWithAllOnes();
-    System.out.println("Total Submatrices with All Ones: " + solver.numSubmatrix(binaryMatrix));
-  }
+    public static void main(String[] args) {
+        CountMatricesWithAllOnes solver = new CountMatricesWithAllOnes();
+        int[][][] inputs = {
+            {{0}},
+            {{1, 0, 1}, {1, 1, 0}, {1, 1, 0}},
+            {{0, 1, 1, 0}, {0, 1, 1, 1}, {1, 1, 1, 0}}
+        };
+        int[] expected = {0, 13, 24};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.numSubmatrix(inputs[i]);
+            System.out.printf("matrix=%s -> %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
+    }
+
 
   /**
-   * Optimized space approach using single height array instead of full height matrix.
-   *
-   * Algorithm Steps:
-   * 1. Process matrix row by row
-   * 2. Update height array for current row based on previous heights
-   * 3. Calculate rectangles for current histogram and add to total
-   * 4. Reuse same height array for next iteration
-   *
-   * Time Complexity: O(rows * cols)
-   * Space Complexity: O(cols) - only single height array needed
-   *
-   * @param matrix Binary matrix containing only 0s and 1s
-   * @return Total count of submatrices containing all ones
-   */
+     * Intuition: after processing a row, heights[col] tells how many consecutive
+     * ones end at that row in each column. Any all-one submatrix ending at the
+     * current row corresponds to a contiguous histogram window, with height equal
+     * to the minimum bar in that window. The stack helper computes, for every right
+     * edge, how many such rectangles end there by reusing the previous smaller bar's
+     * count instead of scanning left one column at a time.
+     *
+     * Algorithm:
+     *   1. Maintain heights[col] as consecutive ones ending at the current row.
+     *   2. After each row update, treat heights as a histogram.
+     *   3. Add the stack helper count for all rectangles whose bottom edge is this row.
+     *
+     * Time:  O(rows*cols) - each row updates heights and each column enters and leaves the stack once.
+     * Space: O(cols) - heights, stack, and per-column counts are one row wide.
+     *
+     * @param matrix binary matrix
+     * @return number of all-one submatrices
+     */
   public int numSubmatrix(int[][] matrix) {
     if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
       return 0;

@@ -3,28 +3,30 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * 679. 24 Game
+ * Problem: 24 Game
  *
- * Problem: Given 4 cards with numbers on them, determine if we can use +, -, *, /
- * operations to get 24. Each card must be used exactly once.
+ * Given four numbers, decide whether you can combine all of them with +, -, *, and
+ * / to make exactly 24. Every card must be used once, and parentheses may be used
+ * in any order.
+ *
+ * Leetcode: https://leetcode.com/problems/24-game/
+ * Rating:   acceptance 59.6% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Pair reduction | Floating-point search
  *
  * Example:
- * Input: [4, 1, 8, 7]
- * Output: true
- * Explanation: (8-4) * (7-1) = 24
+ *   Input:  cards = [4,1,8,7]
+ *   Output: true
+ *   Why:    (8 - 4) * (7 - 1) equals 24, using every card exactly once.
  *
- * LeetCode: https://leetcode.com/problems/24-game
+ * Follow-ups:
+ *   1. Return the expression that makes 24?
+ *      Carry an expression string alongside each numeric value during recursion.
+ *   2. Support n cards instead of four?
+ *      The same pair-reduction search works, but the branching grows very quickly.
+ *   3. Avoid floating-point precision concerns?
+ *      Represent values as reduced rational numbers with numerator and denominator.
  *
- * Follow-up questions:
- * Q: What if we need to find the actual expression?
- * A: Modify the backtracking to store the expression string alongside calculations.
- *
- * Q: What if we have n cards instead of 4?
- * A: Same algorithm works, complexity becomes factorial in n.
- *
- * Q: What about integer overflow?
- * A: Use double precision and check bounds, or use BigDecimal for exact arithmetic.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Different Ways to Add Parentheses (241), Expression Add Operators (282).
  */
 public class TwentyFourGame {
 
@@ -32,15 +34,24 @@ public class TwentyFourGame {
     private static final double TARGET = 24.0;
 
     /**
-     * Determines if 24 can be made from the given cards using basic arithmetic operations.
+     * Intuition: any fully parenthesized expression eventually combines two current
+     * values into one value. So we can choose every pair, replace it with every
+     * possible operation result, and recurse on the smaller list. When only one
+     * number remains, it represents one complete expression tree. Because there are
+     * always exactly four cards, exhaustive search is small enough and easier to
+     * trust than trying to force a greedy rule.
      *
-     * Algorithm: Backtracking with all possible combinations of numbers and operations
-     * - For each pair of numbers, try all 4 operations (+, -, *, /)
-     * - Recursively solve with the remaining numbers plus the result
-     * - Base case: when one number remains, check if it equals 24
+     * Algorithm:
+     *   1. Convert the four integers to a list of doubles.
+     *   2. Recursively choose every pair of current numbers.
+     *   3. Replace the pair with each valid operation result and solve the smaller list.
+     *   4. Accept when the final value is within EPS of 24.
      *
-     * Time Complexity: O(1) - constant since we always have exactly 4 numbers
-     * Space Complexity: O(1) - constant recursion depth and space
+     * Time:  O(1) - the input size is fixed at four cards, so the search tree has constant size.
+     * Space: O(1) - recursion depth and temporary lists are bounded by four cards.
+     *
+     * @param nums four card values
+     * @return true if the cards can make 24
      */
     public boolean judgePoint24(int[] nums) {
         List<Double> numbers = new ArrayList<>();
@@ -158,5 +169,17 @@ public class TwentyFourGame {
         }
 
         return false;
+    }
+
+    public static void main(String[] args) {
+        TwentyFourGame solver = new TwentyFourGame();
+        int[][] inputs = {{1, 2, 1, 2}, {4, 1, 8, 7}, {1, 1, 1, 1}};
+        boolean[] expected = {false, true, false};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.judgePoint24(inputs[i]);
+            System.out.printf("cards=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 }

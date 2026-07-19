@@ -5,74 +5,51 @@ import java.util.*;
 /**
  * Problem: Broken Calculator
  *
- * There is a broken calculator that has the integer startValue on its display initially.
- * In one operation, you can:
- * - Multiply the number on display by 2, or
- * - Subtract 1 from the number on display
+ * A calculator starts at startValue. One operation can either multiply the display
+ * by 2 or subtract 1. Return the minimum number of operations needed to reach the
+ * target.
  *
- * Given two integers startValue and target, return the minimum number of operations
- * needed to display target on the calculator.
+ * Leetcode: https://leetcode.com/problems/broken-calculator/
+ * Rating:   1909 (zerotrac Elo)
+ * Pattern:  Greedy | Reverse simulation | Shortest path alternative
  *
  * Example:
- * Input: startValue = 2, target = 3
- * Output: 2
- * Explanation: Use double operation and then decrement {2 -> 4 -> 3}.
+ *   Input:  startValue = 2, target = 3
+ *   Output: 2
+ *   Why:    the shortest forward path is 2 -> 4 -> 3, using one double and one subtract.
  *
- * Constraints:
- * - 1 <= startValue, target <= 10^9
+ * Follow-ups:
+ *   1. Return the actual operation list?
+ *      Record reverse operations, then invert and reverse them at the end.
+ *   2. What if multiply by k replaces multiply by 2?
+ *      Reverse from target, divide by k when divisible, otherwise increment toward divisibility.
+ *   3. What if operations have different costs?
+ *      Model values as graph nodes and run Dijkstra over bounded reachable values.
  *
- * LeetCode Problem: https://leetcode.com/problems/broken-calculator
- *
- * Follow-up Questions:
- *
- * 1. What if we have three operations: multiply by 2, subtract 1, and add 1?
- *    Answer: Still use reverse approach but now we can either divide by 2 (if even) or
- *    subtract 1 to reach startValue. The greedy choice remains optimal.
- *
- * 2. How would you modify if multiplication factor is k instead of 2?
- *    Answer: In reverse, divide by k when target is divisible by k, otherwise increment.
- *    The algorithm structure remains the same with k replacing 2.
- *
- * 3. What if you need to return the actual sequence of operations?
- *    Answer: Store each operation in a list during the reverse process, then reverse
- *    the list and swap operations (divide becomes multiply, add becomes subtract).
- *
- * 4. Can you solve this if the operations cost different amounts?
- *    Answer: This becomes a weighted shortest path problem. Use Dijkstra's algorithm
- *    or dynamic programming to find the minimum cost path from startValue to target.
- *
- * 5. How would you handle if both multiply and divide operations are available?
- *    Answer: The problem becomes more complex as we have four operations. Use BFS with
- *    state space exploration to find the shortest path, or apply bidirectional search.
- * LeetCode Contest Rating: 1909
+ * Related: 2 Keys Keyboard (650), Integer Replacement (397).
  */
 public class BrokenCalculator {
 
   /**
-   * Finds minimum operations using reverse greedy approach.
-   *
-   * Algorithm:
-   * 1. Work backwards from target to startValue instead of forward
-   * 2. If target is even, divide by 2 (reverse of multiply)
-   * 3. If target is odd, add 1 (reverse of subtract)
-   * 4. When target <= startValue, only subtract operations remain
-   * 5. Count total operations performed
-   *
-   * Key insight: Working backwards simplifies the problem because:
-   * - From any number, we have two choices going forward (multiply or subtract)
-   * - Going backwards, the choice is deterministic based on parity
-   * - If even: must divide (only way to reach this from smaller even number efficiently)
-   * - If odd: must add 1 first to make it even, then divide
-   *
-   * Time Complexity: O(log target). Each division by 2 reduces target exponentially,
-   * similar to binary representation. Worst case is when target is large power of 2.
-   *
-   * Space Complexity: O(1) using only a few variables.
-   *
-   * @param startValue initial value on calculator display
-   * @param target desired value to reach
-   * @return minimum number of operations needed
-   */
+     * Intuition: the forward direction branches at every value, but the reverse
+     * direction is nearly forced. If target is even, the best previous value is
+     * target / 2 because that undoes a multiply. If target is odd and still above
+     * startValue, it could not have come from multiplying an integer, so we undo a
+     * subtract by adding 1. Once target drops below startValue, only forward
+     * subtract operations are left, so the remaining cost is the difference.
+     *
+     * Algorithm:
+     *   1. Work backward while target is still larger than startValue.
+     *   2. If target is even, divide by 2; otherwise add 1 to undo a subtract operation.
+     *   3. Count each reverse move, then add startValue - target for the remaining forward subtracts.
+     *
+     * Time:  O(log target) - repeated divisions by 2 shrink the target quickly.
+     * Space: O(1) - only counters and the current target value are stored.
+     *
+     * @param startValue initial calculator value
+     * @param target desired value
+     * @return minimum number of operations
+     */
   public int brokenCalc(int startValue, int target) {
     int operations = 0;
 
@@ -155,4 +132,16 @@ public class BrokenCalculator {
 
     return -1;
   }
+
+    public static void main(String[] args) {
+        BrokenCalculator solver = new BrokenCalculator();
+        int[][] inputs = {{2, 3}, {5, 8}, {10, 1}};
+        int[] expected = {2, 2, 9};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.brokenCalc(inputs[i][0], inputs[i][1]);
+            System.out.printf("startValue=%d target=%d -> %d  expected=%d%n",
+                inputs[i][0], inputs[i][1], got, expected[i]);
+        }
+    }
 }

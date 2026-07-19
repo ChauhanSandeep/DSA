@@ -3,32 +3,44 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.Arrays;
 
 /**
- * Problem: Coins in a Line (Two Players Game)
+ * Problem: Coins in a Line
  *
- * Description:
- * - Given `n` coins in a line (where `n` is even), two players take turns picking a coin from either end.
- * - The goal is to maximize the amount collected by the first player.
- * - Both players play optimally.
+ * Two players alternately take one coin from either end of a line of coins. Both
+ * play optimally. Return the maximum value the first player can collect.
+ *
+ * Source: InterviewBit - Coins in a Line
+ * Pattern:  Dynamic programming | Interval DP | Minimax recurrence
  *
  * Example:
- *  Input: [5, 4, 8, 10]
- *  Output: 15
- *  Explanation:
- *  - Player 1 picks 10 (right end), Player 2 picks 5 (left end).
- *  Player 1 then picks 8 (right end), Player 2 picks 4 (left end).
- *  Player 1's total = 10 + 8 = 18, Player 2's total = 5 + 4 = 9.
- *  Player 1 wins with a total of 18 coins.
+ *   Input:  coins = [5,4,8,10]
+ *   Output: 15
+ *   Why:    the first player can take 10 first; whatever the opponent does, the
+ *           remaining best guaranteed total for the first player is 15.
  *
- * Problem Link:
- * https://www.interviewbit.com/problems/coins-in-a-line/
+ * Follow-ups:
+ *   1. Return the first player's moves?
+ *      Store whether left or right was chosen for each interval while filling DP.
+ *   2. What if players may take one or two coins per turn?
+ *      Expand the interval transition to all legal left/right take counts.
+ *   3. What if there are three players?
+ *      The state must track whose turn it is and each player's score vector, not just one max value.
+ *
+ * Related: Predict the Winner (486), Stone Game (877).
  */
 public class CoinsInLine {
+
     public static void main(String[] args) {
-        int[] coins = {5, 4, 8, 10};
-        CoinsInLine game = new CoinsInLine();
-        System.out.println("Max coins (Recursive DP): " + game.maxCoinsRecursive(coins));
-        System.out.println("Max coins (Optimized DP): " + game.maxCoinsOptimized(coins));
+        CoinsInLine solver = new CoinsInLine();
+        int[][] inputs = {{}, {5}, {5, 4, 8, 10}, {8, 15, 3, 7}};
+        int[] expected = {0, 5, 15, 22};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.maxCoinsOptimized(inputs[i]);
+            System.out.printf("coins=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
+
 
     /**
      * Finds maximum coins first player can collect using recursive DP with player tracking.
@@ -138,47 +150,24 @@ public class CoinsInLine {
     }
 
     /**
-     * Finds maximum coins first player can collect using optimized DP (without player tracking).
+     * Intuition (interview default): dp[left][right] is the maximum value the
+     * current player can collect from that interval. If the current player takes
+     * the left coin, the opponent then chooses an end and will leave the smaller of
+     * the two future intervals. The same logic applies to taking the right coin.
+     * That min inside the recurrence is the opponent's optimal response, while the
+     * outer max is our choice.
      *
      * Algorithm:
-     * 1. State Definition:
-     *    - dp[leftIndex][rightIndex] = max coins current player can collect
-     *      from coins[leftIndex...rightIndex] when it's their turn
-     *    - This implicitly handles both players by considering opponent's optimal response
+     *   1. Create dp[leftIndex][rightIndex] for the best score from that interval.
+     *   2. Recursively try taking the left coin and the right coin.
+     *   3. After each take, assume the opponent chooses the branch that minimizes our future score.
+     *   4. Memoize and return the better of the two choices.
      *
-     * 2. Base Case:
-     *    - If leftIndex > rightIndex: return 0 (no coins available)
+     * Time:  O(n^2) - each interval is computed once with O(1) recursive work.
+     * Space: O(n^2) - the interval memo table stores every left/right pair.
      *
-     * 3. Recursive Transition:
-     *    When current player picks left coin:
-     *    - They get coins[left]
-     *    - Opponent plays next from coins[left+1...right]
-     *    - Opponent will choose optimally, leaving us with the minimum of:
-     *      a) If opponent picks left: we continue with coins[left+2...right]
-     *      b) If opponent picks right: we continue with coins[left+1...right-1]
-     *    
-     *    Similarly for picking right coin:
-     *    - They get coins[right]
-     *    - Opponent will leave us with minimum of:
-     *      a) If opponent picks left: we continue with coins[left+1...right-1]
-     *      b) If opponent picks right: we continue with coins[left...right-2]
-     *
-     * 4. Final Answer:
-     *    - Choose maximum between picking left and picking right
-     *
-     * Key Insight: We don't need to explicitly track whose turn it is. Instead, we
-     * compute the maximum the current player can get, assuming the opponent responds
-     * optimally. The min() represents the opponent's optimal choice that minimizes
-     * our future gains.
-     *
-     * Time Complexity: O(n²) where n is number of coins
-     * - We fill an n×n DP table
-     * - Each cell computed once
-     *
-     * Space Complexity: O(n²) for DP table + O(n) recursion stack
-     *
-     * @param coins array of coin values
-     * @return maximum total value first player can collect
+     * @param coins coin values in order
+     * @return maximum value the first player can collect
      */
     public int maxCoinsOptimized(int[] coins) {
         int numCoins = coins.length;

@@ -1,69 +1,51 @@
 package dynamicprogramming.MiscellaneousDP;
 
+import java.util.Arrays;
 /**
- * Problem: Maximum Points You Can Obtain From Cards (LeetCode #1423)
+ * Problem: Maximum Points You Can Obtain From Cards
  *
- * Problem Statement:
- * There are several cards arranged in a row, and each card has an associated number of points.
- * The points are given in the integer array cardPoints. In one step, you can take one card from the
- * beginning or from the end of the row. You have to take exactly k cards. Your score is the sum of
- * the points of the cards you have taken. Given the integer array cardPoints and the integer k,
- * return the maximum score you can obtain.
+ * Cards are in a row, and each move takes one card from either the left end or
+ * the right end. After exactly k cards, return the maximum score possible.
  *
- * Example 1:
- * Input: cardPoints = [1,2,3,4,5,6,1], k = 3
- * Output: 12
- * Explanation: After the first step, your score will always be 1. However, choosing the rightmost card first
- * will maximize your total score. The optimal strategy is to take the three cards on the right, giving a
- * final score of 1 + 6 + 5 = 12.
+ * Leetcode: https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/
+ * Rating:   1574 (zerotrac Elo)
+ * Pattern:  Sliding window | Prefix choice | Complement subarray
  *
- * Example 2:
- * Input: cardPoints = [2,2,2], k = 2
- * Output: 4
- * Explanation: Regardless of which two cards you take, your score will always be 4.
+ * Example:
+ *   Input:  cardPoints = [1,2,3,4,5,6,1], k = 3
+ *   Output: 12
+ *   Why:    taking the three rightmost cards gives 1 + 6 + 5 = 12, better than any other end split.
  *
- * Approaches:
- * 1. Sliding Window (Optimal): O(k) time, O(1) space
- *    - The problem can be transformed into finding the minimum subarray of size (n - k)
- *    - The maximum points will be totalSum - minSubarraySum
+ * Follow-ups:
+ *   1. Return which side was chosen at each step?
+ *      Track the best split between left-taken and right-taken cards, then output that many L and R moves.
+ *   2. What if cards can be taken from either end in variable-size batches?
+ *      The simple complement window no longer applies; use interval DP over remaining ranges.
+ *   3. What if k changes for many queries?
+ *      Precompute prefix sums from both ends and answer each k by checking splits in O(k) or with extra RMQ structure.
  *
- * 2. Prefix Sum with Sliding Window: O(n) time, O(n) space
- *    - Calculate prefix sums and slide a window of size (n - k) to find minimum subarray sum
- *
- * 3. Two Pointers (Greedy): O(k) time, O(1) space
- *    - Try all possible combinations of taking i cards from left and (k-i) from right
- *
- * Time Complexity: O(k) for optimal solution
- * Space Complexity: O(1) for optimal solution
- *
- * Follow-up Questions:
- * 1. What if we need to handle very large k values (k > cardPoints.length)?
- *    Answer: We can take k % cardPoints.length and calculate accordingly, as the pattern would repeat.
- *
- * 2. Can we extend this to take from both ends in any order?
- *    Answer: The problem already allows taking from either end in any order, but if you mean taking
- *    multiple cards at once, that would be a different problem requiring a different approach.
- *
- * 3. How would you modify the solution if each card has a weight and we need to maximize weighted sum?
- *    Answer: The sliding window approach would still work, but we'd need to adjust the sum calculation
- *    to account for weights, making it more complex.
- *
- * LeetCode: https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/
- * LeetCode Contest Rating: 1574
+ * Related: Minimum Size Subarray Sum (209), Sliding Window Maximum (239).
  */
 public class MaximumPointsFromCards {
 
     /**
-     * Optimal Sliding Window Solution
+     * Intuition: taking k cards from the ends is the same as leaving exactly n - k
+     * contiguous cards in the middle. So maximizing the taken score means minimizing
+     * the score of the left-behind window. A fixed-size sliding window finds the
+     * minimum middle sum, and the answer is total sum minus that minimum.
      *
-     * Approach:
-     * 1. Calculate the total sum of all cards
-     * 2. Calculate the sum of the first (n - k) cards (minimum subarray)
-     * 3. Slide the window of size (n - k) and keep track of the minimum sum
-     * 4. The answer is totalSum - minSubarraySum
+     * Algorithm:
+     *   1. Sum all card points and return it immediately when k takes every card.
+     *   2. Let windowSize be the number of cards left behind.
+     *   3. Slide that fixed-size window to find the minimum middle sum.
+     *   4. Return totalSum - minWindowSum.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(1)
+     * Time:  O(n) - the total and fixed-size window scans are linear.
+     * Space: O(1) - only running sums are stored.
+     *
+     * @param cardPoints points on each card
+     * @param k number of cards to take
+     * @return maximum obtainable score
      */
     public int maxScore(int[] cardPoints, int k) {
         int totalCards = cardPoints.length;
@@ -165,19 +147,16 @@ public class MaximumPointsFromCards {
     }
 
     public static void main(String[] args) {
-        MaximumPointsFromCards solution = new MaximumPointsFromCards();
+        MaximumPointsFromCards solver = new MaximumPointsFromCards();
+        int[][] cards = {{1, 2, 3}, {1, 2, 3, 4, 5, 6, 1}, {2, 2, 2}};
+        int[] kValues = {0, 3, 2};
+        int[] expected = {0, 12, 4};
 
-        // Test cases
-        int[] cards1 = {1, 2, 3, 4, 5, 6, 1};
-        System.out.println("Test 1: " + solution.maxScore(cards1, 3)); // Expected: 12
-
-        int[] cards2 = {2, 2, 2};
-        System.out.println("Test 2: " + solution.maxScore(cards2, 2)); // Expected: 4
-
-        int[] cards3 = {9, 7, 7, 9, 7, 7, 9};
-        System.out.println("Test 3: " + solution.maxScore(cards3, 7)); // Expected: 55
-
-        // Test with k = 0 (edge case)
-        System.out.println("Test 4: " + solution.maxScore(cards1, 0)); // Expected: 0
+        for (int i = 0; i < cards.length; i++) {
+            int got = solver.maxScore(cards[i], kValues[i]);
+            System.out.printf("cardPoints=%s k=%d -> %d  expected=%d%n",
+                Arrays.toString(cards[i]), kValues[i], got, expected[i]);
+        }
     }
+
 }

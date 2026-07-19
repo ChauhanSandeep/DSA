@@ -3,40 +3,54 @@ package dynamicprogramming.MiscellaneousDP;
 import java.util.*;
 
 /**
- * 90. Count Different Palindromic Subsequences
+ * Problem: Count Different Palindromic Subsequences
  *
- * Problem: Given a string s, return the number of different non-empty palindromic
- * subsequences in s. The answer may be large; return modulo 10^9+7.
+ * Given a string, count how many distinct non-empty palindromic subsequences it
+ * contains. Subsequences can skip characters, but equal text should be counted
+ * only once. Return the answer modulo 1,000,000,007.
+ *
+ * Leetcode: https://leetcode.com/problems/count-different-palindromic-subsequences/
+ * Rating:   acceptance 48.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming | Interval DP | Distinct subsequences
  *
  * Example:
- * Input: s = "bccb"
- * Output: 6
- * Subsequences: "b","c","bb","cc","bcb","bccb"
+ *   Input:  s = "bccb"
+ *   Output: 6
+ *   Why:    the distinct palindromic subsequences are b, c, bb, cc, bcb, and bccb.
  *
- * LeetCode: https://leetcode.com/problems/count-different-palindromic-subsequences
+ * Follow-ups:
+ *   1. Can the O(n^2) search for matching inner characters be sped up?
+ *      Precompute next and previous occurrence arrays for each character.
+ *   2. What if the alphabet is much larger than lowercase letters?
+ *      Use maps of character positions instead of fixed-size occurrence arrays.
+ *   3. Can we list the subsequences instead of counting them?
+ *      Only for small inputs; the output itself can be exponential.
  *
- * Follow-up questions:
- * Q: Can we optimize space?
- * A: Use rolling arrays to reduce DP table size.
- *
- * Q: How to handle larger alphabet?
- * A: Increase dimension for character map or compress string.
- *
- * Q: What about distinct substrings instead?
- * A: Use suffix automaton or suffix array techniques.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Palindromic Substrings (647), Distinct Subsequences II (940).
  */
 public class CountDifferentPalindromicSubsequences {
 
     private static final int MOD = 1_000_000_007;
 
     /**
-     * DP solution: dp[i][j] is count of distinct palindromic subsequences in s[i..j]
-     * - If s[i]==s[j], include new palindromes formed by s[i]...s[j]
-     * - Else merge results from dp[i+1][j] + dp[i][j-1] - dp[i+1][j-1]
+     * Intuition: dp[left][right] stores the number of distinct palindromic
+     * subsequences inside s[left..right]. If the ends differ, we combine the two
+     * intervals that drop one end and subtract their overlap. If the ends match,
+     * every inner palindrome can be wrapped by that character, plus the one-letter
+     * and two-letter palindromes made from the ends; repeated copies inside the
+     * interval decide how much of that wrapped work was already counted.
      *
-     * Time Complexity: O(n^2)
-     * Space Complexity: O(n^2)
+     * Algorithm:
+     *   1. Fill intervals from shorter suffix starts to longer right endpoints.
+     *   2. If s[i] and s[j] differ, add the two smaller intervals and subtract their overlap.
+     *   3. If they match, scan inward for duplicate boundary characters and apply the matching case.
+     *   4. Normalize each value modulo MOD and return dp[0][n-1].
+     *
+     * Time:  O(n^3) - there are O(n^2) intervals and this version may scan inside each one.
+     * Space: O(n^2) - the interval DP table stores one value for each substring range.
+     *
+     * @param s input string
+     * @return number of distinct non-empty palindromic subsequences modulo 1,000,000,007
      */
     public int countPalindromicSubsequences(String s) {
         int n = s.length();
@@ -98,5 +112,16 @@ public class CountDifferentPalindromicSubsequences {
         }
 
         return dp[n-1];
+    }
+
+    public static void main(String[] args) {
+        CountDifferentPalindromicSubsequences solver = new CountDifferentPalindromicSubsequences();
+        String[] inputs = {"a", "bccb", "aaa"};
+        int[] expected = {1, 6, 3};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countPalindromicSubsequences(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 }

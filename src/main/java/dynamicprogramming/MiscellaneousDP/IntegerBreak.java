@@ -1,42 +1,49 @@
 package dynamicprogramming.MiscellaneousDP;
 
 /**
- * 343. Integer Break
+ * Problem: Integer Break
  *
- * Problem: Given an integer n, break it into the sum of k positive integers
- * where k >= 2, and maximize the product of those integers.
+ * Break n into at least two positive integers and maximize the product of those
+ * parts. Return the maximum product.
+ *
+ * Leetcode: https://leetcode.com/problems/integer-break/
+ * Rating:   acceptance 62.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming | Integer partition | Greedy math optimization
  *
  * Example:
- * Input: n = 10
- * Output: 36
- * Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36
+ *   Input:  n = 10
+ *   Output: 36
+ *   Why:    10 = 3 + 3 + 4, and 3*3*4 = 36 is better than any other required split.
  *
- * LeetCode: https://leetcode.com/problems/integer-break
+ * Follow-ups:
+ *   1. Return the actual partition?
+ *      Store split choices in DP or greedily output mostly 3s with the remainder rule.
+ *   2. What if the product must be returned modulo a number for huge n?
+ *      Use the greedy 3s insight with fast modular exponentiation.
+ *   3. What if exactly k parts are required?
+ *      Distribute n as evenly as possible across k parts, or run DP with part count.
  *
- * Follow-up questions:
- * Q: What if we want to minimize the number of parts k?
- * A: Use as many 3s as possible, then handle remainders with 2s and 4s.
- *
- * Q: Can we extend this to real numbers?
- * A: Yes, optimal split approaches e ≈ 2.718, so use 3s in discrete case.
- *
- * Q: How to handle very large n efficiently?
- * A: Use mathematical formula with modular exponentiation.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Cutting Rope, 2 Keys Keyboard (650).
  */
 public class IntegerBreak {
 
     /**
-     * Mathematical solution based on the fact that optimal splits use mostly 3s.
+     * Intuition (interview default): products grow fastest when parts are close to
+     * 3. For any remaining value greater than 4, cutting off a 3 improves or keeps
+     * the product better than leaving that value whole. We stop at 4 because 2 + 2
+     * is better than 3 + 1. The small n cases are special because the problem
+     * requires at least two parts.
      *
-     * Algorithm: Greedy approach using mathematical insight
-     * - For n > 4, optimal solution uses as many 3s as possible
-     * - Handle remainders: if remainder = 1, use one less 3 and add 4
-     * - if remainder = 2, add one 2
-     * - Special cases for n ≤ 4
+     * Algorithm:
+     *   1. Return the required small-n answers for 2, 3, and 4.
+     *   2. While n is greater than 4, multiply product by 3 and reduce n by 3.
+     *   3. Multiply by the final remaining n and return the product.
      *
-     * Time Complexity: O(log n) for exponentiation
-     * Space Complexity: O(1)
+     * Time:  O(n) - the loop removes 3 each iteration.
+     * Space: O(1) - only the product and remaining value are stored.
+     *
+     * @param n integer to break
+     * @return maximum product after at least one split
      */
     public int integerBreak(int n) {
         if (n == 2) return 1;
@@ -278,5 +285,16 @@ public class IntegerBreak {
         }
 
         return product;
+    }
+
+    public static void main(String[] args) {
+        IntegerBreak solver = new IntegerBreak();
+        int[] inputs = {2, 3, 10, 8};
+        int[] expected = {1, 2, 36, 18};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.integerBreak(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 }

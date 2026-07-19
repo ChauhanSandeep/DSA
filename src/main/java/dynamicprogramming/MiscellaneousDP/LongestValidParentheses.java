@@ -4,77 +4,62 @@ import java.util.*;
 
 
 /**
- * LongestValidParentheses.java
+ * Problem: Longest Valid Parentheses
  *
- * Problem Statement:
- * Given a string containing just the characters '(' and ')', return the length of the longest 
- * valid (well-formed) parentheses substring.
+ * Given a string containing only '(' and ')', return the length of the longest
+ * contiguous substring that forms valid parentheses.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-valid-parentheses/
+ * Rating:   acceptance 39.2% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming adjacent | Two-pass counters | Stack alternative
  *
  * Example:
- * Input: s = "(()"
- * Output: 2
- * Explanation: The longest valid parentheses substring is "()".
+ *   Input:  s = ")()())"
+ *   Output: 4
+ *   Why:    the substring "()()" is valid and has length 4; no longer contiguous valid block exists.
  *
- * Input: s = ")()())"
- * Output: 4
- * Explanation: The longest valid parentheses substring is "()()".
+ * Follow-ups:
+ *   1. Return the substring itself?
+ *      Track the start index whenever maxLength is updated.
+ *   2. Support multiple bracket types?
+ *      Use the stack approach with bracket matching instead of simple counters.
+ *   3. Count all valid substrings?
+ *      Use DP where dp[i] is the longest valid suffix ending at i, then aggregate carefully.
  *
- * LeetCode link: https://leetcode.com/problems/longest-valid-parentheses/
- *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - Can you solve it in one pass instead of two?
- *    → Yes, use stack-based approach for single pass O(n) solution.
- *  - What if you need to return the actual substring, not just length?
- *    → Track start index when updating maxLength in any approach.
- *  - Can you handle multiple types of brackets ([], {}, ())?
- *    → Extend stack approach to validate matching pairs.
- *  - What if string is extremely long (billions of characters)?
- *    → Use streaming approach with constant space (two-pass counter method).
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 20 (Valid Parentheses): https://leetcode.com/problems/valid-parentheses/
- *  - LeetCode 22 (Generate Parentheses): https://leetcode.com/problems/generate-parentheses/
- *  - LeetCode 301 (Remove Invalid Parentheses): https://leetcode.com/problems/remove-invalid-parentheses/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Parentheses (20), Generate Parentheses (22), Remove Invalid Parentheses (301).
  */
 public class LongestValidParentheses {
-  public static void main(String[] args) {
-    LongestValidParentheses lvp = new LongestValidParentheses();
-    System.out.println(lvp.longestValidParenthesesStack("(()"));          // Output: 2
-    System.out.println(lvp.longestValidParenthesesStack("(())"));         // Output: 4
-    System.out.println(lvp.longestValidParenthesesStack("))()()(()()()"));// Output: 6
 
-    System.out.println(lvp.longestValidParentheses("(()"));           // Output: 2
-    System.out.println(lvp.longestValidParentheses("(())"));          // Output: 4
-    System.out.println(lvp.longestValidParentheses("))()()(()()()")); // Output: 6
-  }
+    public static void main(String[] args) {
+        LongestValidParentheses solver = new LongestValidParentheses();
+        String[] inputs = {"", "(()", ")()())", "(())"};
+        int[] expected = {0, 2, 4, 4};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.longestValidParentheses(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
 
   /**
-     * Main method: Two-pass counter approach (Optimal for space).
-     * Step-by-step:
-     *  1. First pass (left to right):
-     *     - Count open and closed parentheses
-     *     - When open == closed: valid substring, update maxLength
-     *     - When closed > open: reset counters (invalid, can't recover)
-     *  2. Second pass (right to left):
-     *     - Same logic but swap conditions
-     *     - When open == closed: valid substring, update maxLength
-     *     - When open > closed: reset counters
-     *  3. Return maxLength
+     * Intuition (interview default): a left-to-right scan can recognize valid
+     * blocks whenever opens and closes balance, but it must reset when closes get
+     * ahead because no earlier open can fix that prefix. The mirror problem happens
+     * with extra opens, so a right-to-left scan catches cases like "(()". Together,
+     * the two scans cover both kinds of imbalance while using only counters.
      *
-     * Why two passes?
-     * - Left-to-right catches cases like "()()"
-     * - Right-to-left catches cases like "(()"
-     * - Example: "(()" - left pass misses it, right pass finds "()"
+     * Algorithm:
+     *   1. Scan left to right, counting open and closed parentheses.
+     *   2. Update maxLength when counts match, and reset when closed exceeds open.
+     *   3. Scan right to left with the same counters.
+     *   4. Update on balance again, and reset when open exceeds closed.
      *
-     * Key Insight:
-     * Left-to-right scan handles excess closing parentheses by resetting.
-     * Right-to-left scan handles excess opening parentheses by resetting.
-     * Together they cover all cases without needing extra space.
+     * Time:  O(n) - the string is scanned twice.
+     * Space: O(1) - only counters and the best length are stored.
      *
-     * Algorithm: Two-pass counter with reset.
-     * Time Complexity: O(n), two linear passes.
-     * Space Complexity: O(1), only counters used.
+     * @param input parentheses string
+     * @return length of the longest valid parentheses substring
      */
     public int longestValidParentheses(String input) {
         if (input == null || input.length() < 2) {

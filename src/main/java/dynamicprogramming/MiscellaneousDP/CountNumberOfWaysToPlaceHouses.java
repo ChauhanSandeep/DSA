@@ -1,73 +1,53 @@
 package dynamicprogramming.MiscellaneousDP;
 
 /**
- * Problem: Count Number Of Ways To Place Houses (LeetCode #2320)
+ * Problem: Count Number of Ways to Place Houses
  *
- * Problem Statement:
- * There is a street with n * 2 plots, where there are n plots on each side of the street. The plots on each side are
- * numbered from 1 to n. On each plot, a house can be placed. Return the number of ways houses can be placed such
- * that no two houses are adjacent to each other on the same side of the street. The answer may be very large, so
- * return it modulo 10^9 + 7.
+ * There are n plots on each side of a street. A house may be placed or not placed
+ * on each plot, but adjacent plots on the same side cannot both contain houses.
+ * Return the total number of valid two-sided placements modulo 1,000,000,007.
  *
- * Example 1:
- * Input: n = 1
- * Output: 4
- * Explanation: Possible arrangements:
- * 1. All plots are empty.
- * 2. A house is placed on one side.
- * 3. A house is placed on the other side.
- * 4. Two houses (one on each side) are placed.
+ * Leetcode: https://leetcode.com/problems/count-number-of-ways-to-place-houses/
+ * Rating:   1608 (zerotrac Elo)
+ * Pattern:  Dynamic programming | Fibonacci counting | Matrix exponentiation alternative
  *
- * Example 2:
- * Input: n = 2
- * Output: 9
+ * Example:
+ *   Input:  n = 2
+ *   Output: 9
+ *   Why:    one side has 3 valid patterns: 00, 01, and 10; the two sides are independent, so 3*3 = 9.
  *
- * Approach:
- * This problem can be broken down into counting the number of ways to place houses on one side of the street,
- * and then squaring that number since both sides are independent. The key insight is recognizing that the problem
- * for one side is similar to the House Robber problem but for counting valid arrangements rather than maximizing profit.
+ * Follow-ups:
+ *   1. What if there are k independent sides?
+ *      Raise the one-side count to the kth power modulo MOD.
+ *   2. What if some plots are blocked?
+ *      Reset or modify the one-side DP around blocked positions.
+ *   3. What if n is extremely large?
+ *      Use matrix exponentiation to compute the Fibonacci-style count in O(log n).
  *
- * For one side of the street:
- * - If we place a house at position i, we cannot place at i-1
- * - If we don't place a house at position i, we can make a choice for i-1
- *
- * We can use dynamic programming where dp[i] represents the number of ways to arrange houses up to position i.
- * The recurrence relation is: dp[i] = dp[i-1] + dp[i-2] (similar to Fibonacci)
- *
- * Time Complexity: O(n) - We compute the result in a single pass
- * Space Complexity: O(1) - We only use constant extra space
- *
- * Follow-up Questions:
- * 1. What if the street has k sides instead of 2?
- *    Answer: The result would be (ways_for_one_side)^k, as each side is independent.
- *
- * 2. What if there are additional constraints, like certain plots being unavailable?
- *    Answer: We would need to modify the DP approach to skip unavailable plots and adjust the recurrence relation accordingly.
- *
- * 3. What if we need to count the number of houses placed in each valid arrangement?
- *    Answer: We could extend the DP state to track both the count of arrangements and the total number of houses placed.
- *
- * LeetCode: https://leetcode.com/problems/count-number-of-ways-to-place-houses/
- * LeetCode Contest Rating: 1608
+ * Related: House Robber (198), Fibonacci Number (509), Count Vowels Permutation (1220).
  */
 public class CountNumberOfWaysToPlaceHouses {
     private static final int MOD = 1_000_000_007;
 
     /**
-     * Calculates the number of ways to place houses on both sides of the street.
+     * Intuition (interview default): solve one side first. For a prefix of plots,
+     * either the last plot is empty, so any valid arrangement of the previous prefix
+     * works, or the last plot has a house, so the previous plot must be empty and
+     * any valid arrangement up to two plots back works. That gives the Fibonacci
+     * recurrence ways[i] = ways[i - 1] + ways[i - 2]. The two street sides do not
+     * constrain each other, so the final answer is oneSideWays squared.
      *
-     * Steps to solve:
-     * 1. For one side of the street, the problem reduces to counting binary strings of length plotCount with no two consecutive 1's.
-     * 2. We can use dynamic programming where dp[i] represents the number of ways to arrange houses up to position i.
-     * 3. The recurrence relation is: dp[i] = dp[i-1] + dp[i-2] (similar to Fibonacci)
-     * 4. For the other side of the street, the count would be the same since both sides are identical.
-     * 5. The total number of ways is (ways_for_one_side * ways_for_other_side) % MOD.
+     * Algorithm:
+     *   1. Handle plotCount 0 and 1 exactly as the original base cases do.
+     *   2. Let dp[i] be the number of valid arrangements for one side with i plots.
+     *   3. Fill dp[i] = dp[i-1] + dp[i-2] because plot i is either empty or has a house after an empty plot.
+     *   4. Square dp[plotCount] for the two independent sides and take MOD.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(n) for the DP array, can be optimized to O(1) with two variables.
+     * Time:  O(n) - each plot count is computed once.
+     * Space: O(n) - the original DP table stores one-side counts for every plot count.
      *
-     * @param plotCount The number of plots on each side of the street
-     * @return The number of ways to place houses on both sides of the street modulo 10^9 + 7
+     * @param plotCount number of plots on each side of the street
+     * @return number of valid two-sided placements modulo 1,000,000,007
      */
     public int countHousePlacements(int plotCount) {
         if (plotCount == 0) {
@@ -194,5 +174,16 @@ public class CountNumberOfWaysToPlaceHouses {
         a[0][1] = y;
         a[1][0] = z;
         a[1][1] = w;
+    }
+
+    public static void main(String[] args) {
+        CountNumberOfWaysToPlaceHouses solver = new CountNumberOfWaysToPlaceHouses();
+        int[] inputs = {1, 2, 3};
+        int[] expected = {4, 9, 25};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countHousePlacements(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 }
