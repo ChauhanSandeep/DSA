@@ -3,28 +3,30 @@ package design;
 import java.util.*;
 
 /**
- * 535. Encode and Decode TinyURL
- * 
- * Problem: Design a URL shortening service like TinyURL that encodes a URL to 
- * a shortened URL and decodes it back to the original URL.
- * 
+ * Problem: Encode and Decode TinyURL
+ *
+ * Design a URL shortener that maps long URLs to compact short URLs and can decode
+ * each generated short URL back to its original long URL. The mapping must stay
+ * stable for repeated encodes of the same URL.
+ *
+ * Leetcode: https://leetcode.com/problems/encode-and-decode-tinyurl/ (Medium)
+ * Rating:   not available (design problem)
+ * Pattern:  Design | Hash map | Base62 id encoding
+ *
  * Example:
- * String url = "https://leetcode.com/problems/design-tinyurl";
- * String encoded = codec.encode(url);   // returns something like "http://tinyurl.com/4e9iAk"
- * String decoded = codec.decode(encoded); // returns original URL
- * 
- * LeetCode: https://leetcode.com/problems/encode-and-decode-tinyurl
- * 
- * Follow-up questions:
- * Q: How to ensure generated URLs are collision-free?
- * A: Use cryptographic hash or maintain global counter with base conversion.
- * 
- * Q: How to handle URL expiration?
- * A: Add timestamp tracking and cleanup processes for expired URLs.
- * 
- * Q: How to scale to billions of URLs?
- * A: Use distributed hash tables, database sharding, and caching layers.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  encode("https://leetcode.com/problems/design-tinyurl"), then decode(result)
+ *   Output: "https://leetcode.com/problems/design-tinyurl"
+ *   Why:    the short code is stored as a key that points back to the original URL.
+ *
+ * Follow-ups:
+ *   1. How would you avoid predictable short codes?
+ *      Generate random Base62 codes and retry on collision.
+ *   2. How would you scale id generation across machines?
+ *      Allocate id ranges per shard or use a distributed unique id service.
+ *   3. How would you expire old links?
+ *      Store expiration metadata and clean entries during reads or background sweeps.
+ *
+ * Related: Encode and Decode Strings (271), Design File System (1166).
  */
 public class EncodeAndDecodeTinyurl {
     
@@ -42,6 +44,15 @@ public class EncodeAndDecodeTinyurl {
         private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private long counter = 1;
         
+        /**
+         * Encodes a long URL to a stable TinyURL.
+         *
+         * Time:  O(1) average - map lookups plus short Base62 conversion.
+         * Space: O(1) - stores one mapping only for a new URL.
+         *
+         * @param longUrl original URL to shorten
+         * @return shortened URL
+         */
         public String encode(String longUrl) {
             if (urlToCode.containsKey(longUrl)) {
                 return BASE_URL + urlToCode.get(longUrl);
@@ -54,11 +65,21 @@ public class EncodeAndDecodeTinyurl {
             return BASE_URL + shortCode;
         }
         
+        /**
+         * Decodes a TinyURL back to the original URL.
+         *
+         * Time:  O(1) average - extracts the code and looks it up.
+         * Space: O(1) - no extra storage.
+         *
+         * @param shortUrl shortened URL previously returned by encode
+         * @return original URL, or null if the code is unknown
+         */
         public String decode(String shortUrl) {
             String shortCode = shortUrl.substring(BASE_URL.length());
             return codeToUrl.get(shortCode);
         }
         
+        /** Converts a positive numeric id into a Base62 code. */
         private String toBase62(long num) {
             StringBuilder sb = new StringBuilder();
             while (num > 0) {
@@ -308,5 +329,20 @@ public class EncodeAndDecodeTinyurl {
             }
             return sb.length() == 0 ? "0" : sb.reverse().toString();
         }
+    }
+
+    public static void main(String[] args) {
+        Codec codec = new Codec();
+        String firstUrl = "https://leetcode.com/problems/design-tinyurl";
+        String firstShort = codec.encode(firstUrl);
+        boolean[] got = {firstUrl.equals(codec.decode(firstShort)), firstShort.equals(codec.encode(firstUrl))};
+        boolean[] expected = {true, true};
+        System.out.printf("url=%s -> %s  expected=%s%n",
+                firstUrl, Arrays.toString(got), Arrays.toString(expected));
+
+        String secondUrl = "https://example.com/a/b";
+        String secondShort = codec.encode(secondUrl);
+        System.out.printf("url=%s -> %s  expected=%s%n",
+                secondUrl, codec.decode(secondShort), secondUrl);
     }
 }

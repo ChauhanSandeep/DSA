@@ -1,7 +1,26 @@
 package design.connect4ai;
 
 /**
- * This class represents the game play actions for the Connect 4 AI, including moves and comparisons for the Minimax algorithm.
+ * Problem: Connect Four AI Move Record
+ *
+ * Represent a candidate or completed Connect Four move for the minimax player. The
+ * object stores row, column, and heuristic value so recursive search can compare
+ * moves without changing the public data layout.
+ *
+ * Pattern:  Design | Value object | Minimax move metadata
+ *
+ * Example:
+ *   Input:  possibleMove(2, 3, 10)
+ *   Output: row = 2, col = 3, value = 10
+ *   Why:    the returned record copies the requested coordinates and score.
+ *
+ * Follow-ups:
+ *   1. How would you make move records immutable?
+ *      Set fields in a constructor and remove setters.
+ *   2. How would you compare equal-valued moves deterministically?
+ *      Add a tie-break rule such as center-column preference.
+ *   3. How would you store principal variation paths?
+ *      Add a parent pointer or a list of subsequent best moves.
  */
 public class GamePlay {
     public int row;
@@ -78,5 +97,20 @@ public class GamePlay {
 
     public int getCol() {
         return col;
+    }
+
+    public static void main(String[] args) {
+        GamePlay factory = new GamePlay();
+        GamePlay done = factory.moveDone(2, 3);
+        int[] gotDone = {done.getRow(), done.getCol(), done.getValue()};
+        int[] expectedDone = {2, 3, -1};
+        System.out.printf("moveDone(2,3) -> %s  expected=%s%n",
+                java.util.Arrays.toString(gotDone), java.util.Arrays.toString(expectedDone));
+
+        GamePlay possible = factory.possibleMove(1, 4, 9);
+        int[] gotPossible = {possible.getRow(), possible.getCol(), possible.getValue()};
+        int[] expectedPossible = {1, 4, 9};
+        System.out.printf("possibleMove(1,4,9) -> %s  expected=%s%n",
+                java.util.Arrays.toString(gotPossible), java.util.Arrays.toString(expectedPossible));
     }
 }

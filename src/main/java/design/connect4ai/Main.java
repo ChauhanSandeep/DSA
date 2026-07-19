@@ -2,6 +2,28 @@ package design.connect4ai;
 
 import java.util.Scanner;
 
+/**
+ * Problem: Connect Four AI Demo Driver
+ *
+ * Provide an entry point for a Connect Four game where a human X player can play
+ * against a minimax-controlled O player. The standardized demo below uses a
+ * deterministic board sequence instead of interactive input.
+ *
+ * Pattern:  Design | Game loop | Minimax integration
+ *
+ * Example:
+ *   Input:  X drops four discs in column 1 with O moves in column 2
+ *   Output: X wins by column
+ *   Why:    four X pieces stack vertically in the same column.
+ *
+ * Follow-ups:
+ *   1. How would you validate user input robustly?
+ *      Reject out-of-range and full-column moves before mutating the board.
+ *   2. How would you make the AI stronger?
+ *      Increase depth and add alpha-beta pruning with a better evaluation function.
+ *   3. How would you support replay?
+ *      Log each move and rebuild board state from the move list.
+ */
 public class Main {
     
     static int columnPosition;
@@ -9,56 +31,17 @@ public class Main {
     static MinMax computerPlayer;
     ////////////////////
     
-    public static void main(String[] args) {	
-        //We define the AI computer player "O" and the board
-	computerPlayer = new MinMax(State.O);
-	theBoard = new State();
-	System.out.println("Connect 4 in Java!\n");
-	theBoard.printBoard();
-        //While the game has not finished
-	while(!theBoard.checkGameOver()) {
-            System.out.println();
-            switch (theBoard.lastLetterPlayed) {
-            //If O played last, then X plays now (blue color)
-                case State.O:
-                    System.out.print("User X moves.");
-                    try {
-                        do {
-                            System.out.print("\nSelect a column to drop your piece (1-7): ");
-                            Scanner in = new Scanner(System.in);
-                            columnPosition = in.nextInt();
-                        } while (theBoard.checkFullColumn(columnPosition-1));
-                    } catch (Exception e){
-                        System.out.println("\nValid numbers are 1,2,3,4,5,6 or 7. Try again\n");
-                        break;
-                    }
-                    //Movement of the user
-                    theBoard.makeMove(columnPosition-1, State.X);
-                    System.out.println();
-                    break;
-            //If X played last, then O plays now (red color)
-                case State.X:
-                    GamePlay computerMove = computerPlayer.getNextMove(theBoard);
-                    theBoard.makeMove(computerMove.col, State.O);
-                    System.out.println("Computer O moves on column "+(computerMove.col+1)+".");
-                    System.out.println();
-                    break;
-                default:
-                    break;
-            }
-            theBoard.printBoard();
+    public static void main(String[] args) {
+        theBoard = new State();
+        int[] columns = {0, 1, 0, 1, 0, 1, 0};
+        int[] letters = {State.X, State.O, State.X, State.O, State.X, State.O, State.X};
+        for (int i = 0; i < columns.length; i++) {
+            theBoard.makeMove(columns[i], letters[i]);
         }
-        //The game has finished because...
-        System.out.println();
-        if (theBoard.winner == State.X) {
-            System.out.println("User X wins!");
-            System.out.println(theBoard.winningMethod);
-        } else if (theBoard.winner == State.O) {
-            System.out.println("Computer O wins!");
-            System.out.println(theBoard.winningMethod);
-        } else {
-            System.out.println("It's a draw!");
-        }
-        System.out.println("Game over.");
-    }// end main method
+
+        boolean got = theBoard.checkWinState();
+        System.out.printf("moves=vertical-X -> %s  expected=true%n", got);
+        System.out.printf("winner -> %d  expected=%d%n", theBoard.winner, State.X);
+    }
+// end main method
 }//end Main class
