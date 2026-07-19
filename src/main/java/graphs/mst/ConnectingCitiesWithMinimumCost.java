@@ -3,41 +3,61 @@ package graphs.mst;
 import java.util.*;
 
 /**
- * There are `n` cities labeled from 1 to n. You are given an array `connections` where
- * connections[i] = [city1, city2, cost] represents the cost to connect city1 and city2.
+ * Problem: Connecting Cities With Minimum Cost
  *
- * Return the minimum total cost to connect all cities such that every pair of cities is connected.
- * If it's not possible to connect all cities, return -1.
+ * Given cities labeled 1 through n and weighted undirected connections, return
+ * the minimum total cost to connect all cities. Return -1 if the available
+ * connections cannot form one connected component.
+ *
+ * Leetcode: https://leetcode.com/problems/connecting-cities-with-minimum-cost/ (Medium)
+ * Rating:   1753 (zerotrac Elo)
+ * Pattern:  Graph | Minimum spanning tree | Kruskal with Union-Find
  *
  * Example:
- * Input: n = 3, connections = [[1,2,5],[1,3,6],[2,3,1]]
- * Output: 6
- * Explaination : Connect 1-2 with cost 5 and 2-3 with cost 1.
+ *   Input:  n = 3, connections = [[1,2,5],[1,3,6],[2,3,1]]
+ *   Output: 6
+ *   Why:    choosing edges 2-3 and 1-2 connects all cities for 1 + 5.
  *
- * LeetCode Link: https://leetcode.com/problems/connecting-cities-with-minimum-cost/
- * LeetCode Contest Rating: 1753
+ * Follow-ups:
+ *   1. Need the exact edges in the minimum network?
+ *      Store each connection whose union succeeds.
+ *   2. Graph is very dense?
+ *      Prim's algorithm with adjacency lists or a matrix may be preferable.
+ *   3. Connections stream in over time?
+ *      Maintain DSU incrementally, but recomputing the MST is needed if cheaper cycle edges arrive late.
+ *
+ * Related: Min Cost to Connect All Points (1584), Kruskal's algorithm.
  */
 public class ConnectingCitiesWithMinimumCost {
 
-    /**
-     * Uses Kruskal's algorithm to compute the minimum cost to connect all cities.
+    public static void main(String[] args) {
+        ConnectingCitiesWithMinimumCost solver = new ConnectingCitiesWithMinimumCost();
+        int[][] connections1 = {{1, 2, 5}, {1, 3, 6}, {2, 3, 1}};
+        int[][] connections2 = {{1, 2, 3}};
+
+        System.out.printf("n=3 connections=%s -> %d  expected=6%n",
+            Arrays.deepToString(connections1), solver.minimumCost(3, connections1));
+        System.out.printf("n=3 connections=%s -> %d  expected=-1%n",
+            Arrays.deepToString(connections2), solver.minimumCost(3, connections2));
+    }
+
+        /**
+     * Intuition: the cheapest network that connects all cities is a minimum
+     * spanning tree. Kruskal's algorithm considers connections from cheapest to
+     * most expensive and accepts only edges that join different components.
      *
-     * Intuition:
-     *  - This is a Minimum Spanning Tree (MST) problem.
-     *  - Kruskal's algorithm sorts all edges by cost and greedily picks the smallest edges
-     *    that connect two different components (using Union-Find).
+     * Algorithm:
+     *   1. Sort connections by cost in ascending order.
+     *   2. Initialize Union-Find over the 1-based city labels.
+     *   3. For each connection, union its endpoints; accepted edges add to totalCost.
+     *   4. Return totalCost once citiesCount - 1 edges are accepted, otherwise -1.
      *
-     * Steps:
-     * 1. Sort all connections based on cost.
-     * 2. Use Union-Find to add edges without forming cycles.
-     * 3. Stop when all cities are connected (citiesCount - 1 edges used).
+     * Time:  O(E log E) - sorting connections dominates Union-Find operations.
+     * Space: O(N) - Union-Find parent array.
      *
-     * Time Complexity: O(E log E) where E = number of connections
-     * Space Complexity: O(N) for Union-Find data structures
-     *
-     * @param citiesCount Number of cities
-     * @param connections List of connections [city1, city2, cost]
-     * @return Minimum cost to connect all cities, or -1 if impossible
+     * @param citiesCount number of cities labeled 1 through citiesCount
+     * @param connections undirected weighted edges [city1, city2, cost]
+     * @return minimum cost to connect all cities, or -1 when impossible
      */
     public int minimumCost(int citiesCount, int[][] connections) {
         // Sort edges by cost (ascending)

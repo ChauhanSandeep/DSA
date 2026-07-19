@@ -4,55 +4,65 @@ import java.util.*;
 
 
 /**
- * Problem: Course Schedule IV (Leetcode 1462)
- * Link: https://leetcode.com/problems/course-schedule-iv/
+ * Problem: Course Schedule IV
  *
- * Problem Statement:
- * There are n courses labeled from 0 to n-1. You are given an array of prerequisite pairs
- * and a list of query pairs. Each prerequisite pair [a, b] means course a is a prerequisite of course b.
+ * Given direct prerequisite pairs and query pairs, answer whether one course is a
+ * direct or indirect prerequisite of another. The primary solution precomputes
+ * transitive reachability so each query is answered by one matrix lookup.
  *
- * Task:
- * For each query [u, v], determine whether u is a prerequisite of v (directly or indirectly).
+ * Leetcode: https://leetcode.com/problems/course-schedule-iv/ (Medium)
+ * Rating:   1693 (zerotrac Elo)
+ * Pattern:  Graph | Floyd-Warshall | Transitive closure
  *
  * Example:
- * Input:
- *   n = 3
- *   prerequisites = [[0,1],[1,2]]
- *   queries = [[0,2],[1,2],[2,0]]
- * Output:
- *   [true, true, false]
- * Explanation:
- * [0,2] true because 0 -> 1 -> 2
- * [1,2] true because 1 -> 2
- * [2,0] false because 2 can be taken up without 0
+ *   Input:  n = 3, prerequisites = [[0,1],[1,2]], queries = [[0,2],[1,2],[2,0]]
+ *   Output: [true, true, false]
+ *   Why:    0 reaches 2 through 1, 1 directly reaches 2, and 2 reaches no prerequisite chain back to 0.
  *
- * Follow-up Questions:
- * 1. Can we optimize beyond Floyd-Warshall?
- *    - Yes, by using Topological Sort + BFS/DFS for each query or
- *      precomputing reachability using graph traversal. Optimized approaches
- *      often achieve O(n^2 + m) where m is edges, instead of O(n^3).
+ * Follow-ups:
+ *   1. Optimize sparse DAGs?
+ *      Run BFS/DFS from each source or propagate prerequisite sets in topological order.
+ *   2. Queries arrive online?
+ *      Use DFS with memoization per queried source-target pair.
+ *   3. Prerequisites change dynamically?
+ *      Dynamic transitive closure is needed; recomputing may be simpler unless updates are frequent.
  *
- * 2. What if queries are online (streaming)?
- *    - Maintain adjacency and use DFS with memoization for each query.
- *
- * 3. Can we handle dynamic prerequisites (edges added/removed)?
- *    - Yes, but requires advanced techniques like Dynamic Transitive Closure (using DAG reachability data structures).
- * LeetCode Contest Rating: 1693
+ * Related: Course Schedule (207), Course Schedule II (210), Parallel Courses (1136).
  */
 public class CourseScheduleIV {
 
-  /**
-   * Floyd-Warshall based approach.
+  public static void main(String[] args) {
+    CourseScheduleIV solver = new CourseScheduleIV();
+    int[][] prerequisites1 = {{0, 1}, {1, 2}};
+    int[][] queries1 = {{0, 2}, {1, 2}, {2, 0}};
+    int[][] prerequisites2 = {};
+    int[][] queries2 = {{0, 1}, {1, 0}};
+
+    System.out.printf("n=3 prerequisites=%s queries=%s -> %s  expected=[true, true, false]%n",
+        Arrays.deepToString(prerequisites1), Arrays.deepToString(queries1),
+        solver.checkIfPrerequisite(3, prerequisites1, queries1));
+    System.out.printf("n=2 prerequisites=%s queries=%s -> %s  expected=[false, false]%n",
+        Arrays.deepToString(prerequisites2), Arrays.deepToString(queries2),
+        solver.checkIfPrerequisite(2, prerequisites2, queries2));
+  }
+
+    /**
+   * Intuition: prerequisite reachability is transitive: if A is before B and B is
+   * before C, then A is before C. Floyd-Warshall turns direct prerequisite facts
+   * into a complete reachability table that answers each query immediately.
    *
-   * Steps:
-   * 1. Initialize a reachability matrix with direct prerequisites.
-   * 2. Use Floyd-Warshall to compute transitive closure:
-   *    - If A → B and B → C, then A → C.
-   * 3. For each query, directly check reachability[from][to].
+   * Algorithm:
+   *   1. Mark every direct prerequisite pair in reachable.
+   *   2. For each intermediate course, connect every fromCourse that reaches it to every toCourse it reaches.
+   *   3. Read each query directly from reachable[fromCourse][targetCourse].
    *
-   * Algorithm: Floyd-Warshall
-   * Time Complexity: O(courseCount^3 + queryCount), where courseCount = number of courses, queryCount = number of queries
-   * Space Complexity: O(courseCount^2) for reachability matrix
+   * Time:  O(courseCount^3 + queryCount) - triple transitive-closure loop plus query scan.
+   * Space: O(courseCount^2) - reachability matrix.
+   *
+   * @param courseCount number of courses labeled 0 to courseCount - 1
+   * @param prerequisites direct prerequisite pairs [from, to]
+   * @param queries prerequisite queries [from, to]
+   * @return booleans telling whether each from course is a prerequisite of each target course
    */
   public List<Boolean> checkIfPrerequisite(int courseCount, int[][] prerequisites, int[][] queries) {
     boolean[][] reachable = new boolean[courseCount][courseCount];

@@ -2,50 +2,40 @@ package graphs.topologicalsort;
 
 import java.util.*;
 
-/**
- * LeetCode Problem: Course Schedule
- * https://leetcode.com/problems/course-schedule/
- *
- * Problem Statement:
- * You are given the total number of courses (numCourses) and a list of prerequisite pairs
- * where each pair [a, b] indicates that course `a` depends on course `b`.
- * Return true if it is possible to finish all courses. Otherwise, return false.
- *
- * Example:
- * Input: numCourses = 2, prerequisites = [[1, 0]]
- * Output: true
- * Explanation: You can take course 0 first, then course 1.
- *
- * Input: numCourses = 2, prerequisites = [[1, 0], [0, 1]]
- * Output: false
- * Explanation: Circular dependency exists.
- *
- * Follow-up Questions:
- * - What if you need to return the course order?
- *   Leetcode: https://leetcode.com/problems/course-schedule-ii/
- *
- * - How to handle very large input efficiently?
- *   Use iterative approaches and adjacency lists.
- * LeetCode Contest Rating: Not available (not a contest problem)
- */
+  /**
+   * Intuition: a course schedule is impossible exactly when the prerequisite graph
+   * has a directed cycle. DFS coloring catches this when recursion reaches a node
+   * currently in the VISITING state.
+   *
+   * Algorithm:
+   *   1. Build the original prerequisite adjacency list from prerequisite to dependent courses.
+   *   2. Keep visitStatus values UNVISITED, VISITING, and VISITED.
+   *   3. DFS from every course; a VISITING neighbor means a cycle.
+   *   4. Return true only if no DFS finds a cycle.
+   *
+   * Time:  O(V + E) - each course and prerequisite edge is processed once.
+   * Space: O(V + E) - adjacency map plus recursion and visit status.
+   *
+   * @param totalCourses number of courses labeled 0 to totalCourses - 1
+   * @param prerequisites pairs [course, prerequisite]
+   * @return true if all courses can be completed
+   */
 public class CourseSchedule {
   private static final int UNVISITED = 0;
   private static final int VISITING = 1;
   private static final int VISITED = 2;
 
   public static void main(String[] args) {
-    int[][] prerequisites = {
-        {1, 0},
-        {0, 1}
-    };
-
     CourseSchedule scheduler = new CourseSchedule();
-    boolean canFinishDFS = scheduler.canFinishUsingDFS(2, prerequisites);
-    System.out.println("Can finish all courses (DFS): " + canFinishDFS);
+    int[][] prerequisites1 = {{1, 0}};
+    int[][] prerequisites2 = {{1, 0}, {0, 1}};
 
-    boolean canFinishBFS = scheduler.canFinishUsingKahns(2, prerequisites);
-    System.out.println("Can finish all courses (BFS): " + canFinishBFS);
+    System.out.printf("numCourses=2 prerequisites=%s -> dfs=%s kahn=%s  expected=true%n",
+        Arrays.deepToString(prerequisites1), scheduler.canFinishUsingDFS(2, prerequisites1), scheduler.canFinishUsingKahns(2, prerequisites1));
+    System.out.printf("numCourses=2 prerequisites=%s -> dfs=%s kahn=%s  expected=false%n",
+        Arrays.deepToString(prerequisites2), scheduler.canFinishUsingDFS(2, prerequisites2), scheduler.canFinishUsingKahns(2, prerequisites2));
   }
+
 
   /**
    * Determines if all courses can be completed using DFS cycle detection.

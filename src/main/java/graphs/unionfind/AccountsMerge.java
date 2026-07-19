@@ -5,42 +5,44 @@ import java.util.*;
 /**
  * Problem: Accounts Merge
  *
- * Given a list of accounts where each element accounts[i] is a list of strings, where the first element
- * accounts[i][0] is a name, and the rest of the elements are emails representing emails of the account.
- * Now, we would like to merge these accounts. Two accounts definitely belong to the same person if there
- * is some common email to both accounts. After merging the accounts, return the accounts in the following
- * format: the first element of each account is the name, and the rest of the elements are emails in sorted order.
+ * Accounts contain a name followed by email addresses. Accounts sharing at least
+ * one email belong to the same person and should be merged, with emails sorted in
+ * the merged result.
+ *
+ * Leetcode: https://leetcode.com/problems/accounts-merge/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Union-Find | Connected components of emails/accounts
  *
  * Example:
- * Input: accounts = [
- *      ["John","johnsmith@mail.com","john_newyork@mail.com"],
- *      ["John","johnsmith@mail.com","john00@mail.com"],
- *      ["Mary","mary@mail.com"],
- *      ["John","johnnybravo@mail.com"]
- * ]
- * Output: [
- *      ["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],
- *      ["Mary","mary@mail.com"],
- *      ["John","johnnybravo@mail.com"]
- * ]
+ *   Input:  [["John","a@mail.com","b@mail.com"],["John","b@mail.com","c@mail.com"]]
+ *   Output: [["John","a@mail.com","b@mail.com","c@mail.com"]]
+ *   Why:    the shared email b@mail.com connects both accounts into one component.
  *
- * LeetCode: https://leetcode.com/problems/accounts-merge
+ * Follow-ups:
+ *   1. Handle millions of accounts?
+ *      Stream the email-to-account map and union operations, or shard by normalized email hash.
+ *   2. Emails have aliases or case differences?
+ *      Normalize addresses before building graph or Union-Find connections.
+ *   3. Need to prevent unsafe merges?
+ *      Require verified email ownership and keep an audit trail for every merge decision.
  *
- * Follow-up Questions:
- * 1. How would you handle millions of accounts efficiently?
- *    Answer: Use distributed Union-Find or MapReduce approach for parallel processing.
- *
- * 2. What if email addresses can have different formats (case sensitivity, aliases)?
- *    Answer: Normalize emails before processing (lowercase, remove dots in Gmail, etc.).
- *
- * 3. How would you detect and prevent malicious account merging?
- *    Answer: Add validation, rate limiting, and audit trails for account merging operations.
- *    Related: https://leetcode.com/problems/similar-string-groups/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Similar String Groups (839), Number of Provinces (547), Redundant Connection (684).
  */
 public class AccountsMerge {
+
+    public static void main(String[] args) {
+        AccountsMerge solver = new AccountsMerge();
+        List<List<String>> accounts1 = Arrays.asList(
+            Arrays.asList("John", "johnsmith@mail.com", "john_newyork@mail.com"),
+            Arrays.asList("John", "johnsmith@mail.com", "john00@mail.com"));
+        List<List<String>> accounts2 = Arrays.asList(
+            Arrays.asList("Mary", "mary@mail.com"));
+
+        System.out.printf("accounts=%s -> %s  expected=[[John, john00@mail.com, john_newyork@mail.com, johnsmith@mail.com]]%n",
+            accounts1, solver.accountsMerge(accounts1));
+        System.out.printf("accounts=%s -> %s  expected=[[Mary, mary@mail.com]]%n",
+            accounts2, solver.accountsMerge(accounts2));
+    }
 
     /**
      * BFS method : Merges accounts using BFS to find connected components of emails.
@@ -114,27 +116,22 @@ public class AccountsMerge {
         return result;
     }
 
-    /**
-     * Main method: Merges accounts using Union-Find (Disjoint Set Union).
-     * Step-by-step:
-     *  1. Map each email to its first occurrence account index (email -> accountIndex)
-     *  2. Initialize Union-Find structure with number of accounts
-     *  3. For each account, union all its emails with first account having any of those emails
-     *  4. Group emails by their root account (using findRoot operation)
-     *  5. For each group, create merged account with name and sorted emails
+        /**
+     * Intuition: shared emails connect accounts into components. Union-Find merges
+     * account indices whenever an email is seen in more than one account; after all
+     * unions, each root owns the sorted union of emails in its component.
      *
-     * Key Insight:
-     * Emails are the connection points between accounts. If two accounts share an email,
-     * they belong to the same person (connected component). Union-Find efficiently handles
-     * transitive connections (A connects to B, B connects to C => A connects to C).
+     * Algorithm:
+     *   1. Map each email to its first seen account index.
+     *   2. Union the current account with the previous account whenever an email repeats.
+     *   3. Group every account's emails under its root account.
+     *   4. Sort each root's email set and prepend the root account name.
      *
-     * Algorithm: Union-Find with Path Compression and Union by Rank.
-     * Time Complexity: O(n * k * α(n) + n * k * log k) where:
-     *                  - n = number of accounts
-     *                  - k = average emails per account
-     *                  - α(n) = inverse Ackermann function (nearly constant)
-     *                  - n*k*log k for sorting emails in merged accounts
-     * Space Complexity: O(n * k) for email mappings and result storage.
+     * Time:  O(A * E * a(A) + M log M) - email scans plus sorting merged email groups.
+     * Space: O(M + A) - email maps, grouped email sets, and Union-Find arrays.
+     *
+     * @param accounts account rows with name followed by emails
+     * @return merged accounts with sorted emails
      */
     public List<List<String>> accountsMerge(List<List<String>> accounts) {
         int accountCount = accounts.size();

@@ -1,40 +1,61 @@
 package graphs.mst;
 
 /**
- * There are n computers labeled from 0 to n - 1.
- * You are given a list of connections where each connection[i] = [ai, bi] represents a connection between computers ai and bi.
- * Any computer can reach any other directly or indirectly through a series of connections.
- * You can remove and reuse cables (edges) between any two computers.
+ * Problem: Number of Operations to Make Network Connected
  *
- * Return the minimum number of operations needed to connect all computers.
- * If it's not possible, return -1.
+ * Given n computers and undirected cable connections, cables may be removed and
+ * reused elsewhere. Return the minimum number of operations needed to connect all
+ * computers, or -1 if there are not enough cables.
+ *
+ * Leetcode: https://leetcode.com/problems/number-of-operations-to-make-network-connected/ (Medium)
+ * Rating:   1633 (zerotrac Elo)
+ * Pattern:  Graph | Union-Find | Connected components
  *
  * Example:
- * Input: n = 6, connections = [[0,1],[0,2],[0,3],[1,4]]
- * Output: 1
+ *   Input:  n = 6, connections = [[0,1],[0,2],[0,3],[1,4]]
+ *   Output: -1
+ *   Why:    four cables cannot connect six computers because at least n - 1 cables are required.
  *
- * Link: https://leetcode.com/problems/number-of-operations-to-make-network-connected/
- * LeetCode Contest Rating: 1633
+ * Follow-ups:
+ *   1. Need the specific cables to move?
+ *      Track redundant edges while union returns false, then pair them with disconnected components.
+ *   2. Connections arrive online?
+ *      DSU can merge components incrementally and report the current component count.
+ *   3. Need to support deletions?
+ *      Use offline dynamic connectivity or more advanced fully dynamic graph structures.
+ *
+ * Related: Number of Provinces (547), Redundant Connection (684), Accounts Merge (721).
  */
 public class NetworkConnectivity_KruskalStyle {
 
-  /**
-   * Intuition:
-   * - This is a graph connectivity problem. We want to connect all nodes (computers) using given edges.
-   * - Think of it as forming a single connected component (like a Minimum Spanning Tree).
-   * - Use Union-Find to count how many connected components we have.
+  public static void main(String[] args) {
+    NetworkConnectivity_KruskalStyle solver = new NetworkConnectivity_KruskalStyle();
+    int[][] connections1 = {{0, 1}, {0, 2}, {0, 3}, {1, 4}};
+    int[][] connections2 = {{0, 1}, {0, 2}, {1, 2}};
+
+    System.out.printf("n=6 connections=%s -> %d  expected=-1%n",
+        java.util.Arrays.deepToString(connections1), solver.makeConnected(6, connections1));
+    System.out.printf("n=4 connections=%s -> %d  expected=1%n",
+        java.util.Arrays.deepToString(connections2), solver.makeConnected(4, connections2));
+  }
+
+    /**
+   * Intuition: to connect n computers, at least n - 1 cables must exist. Once that
+   * is true, every extra cable inside a component can be reused to connect two
+   * components, so the answer is the number of connected components minus one.
    *
-   * Key Observations:
-   * - To connect n nodes, we need at least (n - 1) edges.
-   * - Extra edges (that form cycles) can be reused to connect disconnected parts.
+   * Algorithm:
+   *   1. Return -1 immediately if there are fewer than n - 1 connections.
+   *   2. Initialize Union-Find with each computer as its own component.
+   *   3. Union every cable endpoint and decrement components on successful merges.
+   *   4. Return components - 1.
    *
-   * Steps:
-   * 1. If number of connections < n - 1 => Not enough cables, return -1.
-   * 2. Use Union-Find to group nodes into connected components.
-   * 3. The number of operations needed = (number of components - 1)
+   * Time:  O(N + E * a(N)) - Union-Find operations are effectively constant time.
+   * Space: O(N) - parent and rank arrays.
    *
-   * Time Complexity: O(N + E * α(N)) — α(N) is inverse Ackermann, nearly constant
-   * Space Complexity: O(N) — for parent and rank arrays
+   * @param n number of computers labeled 0 to n - 1
+   * @param connections undirected cable endpoints [a, b]
+   * @return minimum rewiring operations, or -1 if not enough cables exist
    */
   public int makeConnected(int n, int[][] connections) {
     // Not enough cables to connect all nodes

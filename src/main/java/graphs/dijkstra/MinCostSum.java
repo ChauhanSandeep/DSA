@@ -2,54 +2,37 @@ package graphs.dijkstra;
 
 import java.util.*;
 
-/**
- * 1368. Minimum Cost to Make at Least One Valid Path in a Grid
- *
- * Problem:
- * You're given a grid of size `rows x cols`, where each cell contains a direction: 'R', 'L', 'U', or 'D'.
- * You can move from a cell to an adjacent cell only if it's in the direction specified — otherwise, you must
- * pay a cost of `1` to change the direction. Find the **minimum total cost** to go from the top-left (0,0) to
- * the bottom-right (rows-1, cols-1).
- *
- * Example:
- * Input:
- * rows = 3, cols = 3
- * matrix = [
- *              "RRR", 
- *              "DDD", 
- *              "UUU"
- *          ]
- * Output: 2
- *
- * Explanation:
- * - Start at (0,0) → Go right (free) → right (free) → right (cost 1, wrong direction) → down (free) → down (free)
- *   → down (cost 1, wrong direction) → reached (2,2)
- * - Total cost = 2
- *
- * Approach:
- * - Apply Dijkstra's Algorithm using a Min-Heap (PriorityQueue).
- * - Track cost to reach each cell, update if a cheaper path is found.
- * - If moving in the expected direction, no cost is added; else, +1 cost.
- *
- * Time Complexity: O(R * C * log(R * C)) → Grid traversal with PQ operations.
- * Space Complexity: O(R * C) → For distance tracking and visited management.
- *
- * Follow-up Questions:
- * - Can you solve it with 0-1 BFS instead of Dijkstra? (Yes) → [0-1 BFS](https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/editorial/)
- * - What if diagonal directions are added? (Extend direction arrays accordingly)
- * LeetCode Contest Rating: 2069
- */
+    /**
+     * Intuition: each cell-to-neighbor move has cost 0 when it follows the cell's
+     * arrow and cost 1 otherwise. That makes the grid a weighted graph with
+     * non-negative edges, so Dijkstra can safely finalize the cheapest cell first.
+     *
+     * Algorithm:
+     *   1. Initialize dist with infinity and seed (0,0) with cost 0.
+     *   2. Pop the lowest-cost point from the priority queue.
+     *   3. For each of 4 directions, compute whether changing the current arrow adds 0 or 1.
+     *   4. Relax the neighbor and push it when a lower cost is found.
+     *
+     * Time:  O(rows * cols * log(rows * cols)) - each cell relaxation uses the heap.
+     * Space: O(rows * cols) - distance matrix and priority queue storage.
+     *
+     * @param rows number of rows in matrix
+     * @param cols number of columns in matrix
+     * @param matrix direction grid using R, D, L, and U
+     * @return minimum arrow-change cost from top-left to bottom-right
+     */
 public class MinCostSum {
     public static void main(String[] args) {
-        int rows = 3;
-        int cols = 3;
-        String[] matrix = {
-                "RRR",
-                "DDD",
-                "UUU"
-        };
-        System.out.println("Minimum cost: " + new MinCostSum().minCostPath(rows, cols, matrix));
+        MinCostSum solver = new MinCostSum();
+        String[] matrix1 = {"RRR", "DDD", "UUU"};
+        String[] matrix2 = {"R"};
+
+        System.out.printf("matrix=%s -> %d  expected=1%n",
+            Arrays.toString(matrix1), solver.minCostPath(3, 3, matrix1));
+        System.out.printf("matrix=%s -> %d  expected=0%n",
+            Arrays.toString(matrix2), solver.minCostPath(1, 1, matrix2));
     }
+
 
     // Directions: Right, Down, Left, Up
     private static final int[] dx = {0, 1, 0, -1};

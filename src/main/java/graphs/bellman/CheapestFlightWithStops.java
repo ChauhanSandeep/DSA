@@ -2,42 +2,45 @@ package graphs.bellman;
 
 import java.util.*;
 
-/**
- * LeetCode Problem: Cheapest Flights Within K Stops
- * https://leetcode.com/problems/cheapest-flights-within-k-stops/
- *
- * Problem Statement:
- * Given `n` cities and a list of flights in the form [from, to, price],
- * determine the cheapest price from `src` to `dst` with at most `k` stops.
- * Return -1 if such a route does not exist.
- *
- * Example:
- * Input: n = 3, flights = [[0,1,100],[1,2,100],[0,2,500]], src = 0, dst = 2, k = 1
- * Output: 200
- * Explanation: The cheapest route is 0 -> 1 -> 2 with a total cost of 200.
- *
- * Follow-up Questions:
- * - What if we need to return the actual path instead of just the cost?
- * - Can we adapt the solution to handle dynamic changes in the flight network?
- * - What changes are needed if the constraints change to *at most K edges* (vs stops)?
- * LeetCode Contest Rating: 1786
- */
+    /**
+     * Intuition: a normal shortest-path state is just the city, but the stop
+     * limit means two arrivals at the same city are not equivalent. This method
+     * keeps remaining edges in the heap state, so a path is useful when it reaches
+     * a city with more stops left to continue exploring.
+     *
+     * Algorithm:
+     *   1. Build the exact adjacency list from each flight source to [destination, price].
+     *   2. Push [cost, city, stopsLeft] for the source into a min-heap.
+     *   3. Pop cheapest states; if destination is popped, return that cost.
+     *   4. When stops remain, push neighbors if this route leaves more stops for that city.
+     *
+     * Time:  O(E log E) - each accepted state can push outgoing flights into the heap.
+     * Space: O(V + E) - adjacency list, heap states, and minStops map.
+     *
+     * @param totalCities number of cities labeled 0 to totalCities - 1
+     * @param flights directed flights [from, to, price]
+     * @param source starting city
+     * @param destination target city
+     * @param maxStops maximum allowed intermediate stops
+     * @return cheapest valid price, or -1 if no valid route exists
+     */
 public class CheapestFlightWithStops {
 
     public static void main(String[] args) {
-        int[][] flights = {
-            {0, 1, 100},
-            {1, 2, 100},
-            {0, 2, 500}
-        };
-
         CheapestFlightWithStops solver = new CheapestFlightWithStops();
-        int cheapestCost = solver.findCheapestPriceDijkstra(3, flights, 0, 2, 1);
-        System.out.println("Cheapest cost using Dijkstra's: " + cheapestCost);
+        int[][] flights1 = {{0, 1, 100}, {1, 2, 100}, {0, 2, 50}};
+        int[][] flights2 = {{0, 1, 100}};
 
-        int cheapestCostBFS = solver.findCheapestPriceBellmanFord(3, flights, 0, 2, 1);
-        System.out.println("Cheapest cost using BFS: " + cheapestCostBFS);
+        System.out.printf("n=3 flights=%s src=0 dst=2 k=1 -> dijkstra=%d bellman=%d  expected=50%n",
+            Arrays.deepToString(flights1),
+            solver.findCheapestPriceDijkstra(3, flights1, 0, 2, 1),
+            solver.findCheapestPriceBellmanFord(3, flights1, 0, 2, 1));
+        System.out.printf("n=3 flights=%s src=0 dst=2 k=1 -> dijkstra=%d bellman=%d  expected=-1%n",
+            Arrays.deepToString(flights2),
+            solver.findCheapestPriceDijkstra(3, flights2, 0, 2, 1),
+            solver.findCheapestPriceBellmanFord(3, flights2, 0, 2, 1));
     }
+
 
     /**
      * Approach 1 : Modified Dijkstra's algorithm that tracks the remaining stops.

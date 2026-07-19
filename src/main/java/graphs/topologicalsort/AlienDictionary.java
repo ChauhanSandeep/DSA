@@ -2,43 +2,36 @@ package graphs.topologicalsort;
 
 import java.util.*;
 
-/**
- * Problem: Alien Dictionary
- * LeetCode: https://leetcode.com/problems/alien-dictionary/
- *
- * You are given a list of words sorted lexicographically in an alien language.
- * Derive the order of characters in this language.
- * If the dictionary order is invalid, return an empty string.
- * If multiple valid orders exist, return any.
- *
- * Example:
- * Input: ["wrt","wrf","er","ett","rftt"]
- * Output: "wertf"
- *
- * Approach:
- * - Build a directed graph where an edge u -> v indicates u must appear before v.
- * - Use Kahn’s Algorithm (BFS Topological Sort) to generate a valid character order.
- *
- * Time Complexity: O(C) where C = total number of characters across all words.
- * Space Complexity: O(1), since max distinct characters = 26 (lowercase English letters).
- *
- * Follow-up Questions (FAANG-style):
- * 1. What if multiple valid orders exist?
- *    - Any valid topological order is acceptable; but to return the lexicographically smallest, use a PriorityQueue instead of Queue.
- * 2. How to detect cycles in this problem?
- *    - If after topological sort the output length < total unique characters, a cycle exists.
- * 3. Can this be solved using DFS instead of BFS?
- *    - Yes, perform a DFS-based topological sort with cycle detection.
- * LeetCode Contest Rating: Not available (not a contest problem)
- */
+  /**
+   * Intuition: the first differing character between two adjacent sorted words is
+   * the only new ordering fact that pair can prove. Collect those facts as edges,
+   * then topologically sort characters with zero remaining prerequisites.
+   *
+   * Algorithm:
+   *   1. Initialize adjacency and indegree entries for every character that appears.
+   *   2. Compare adjacent words, rejecting invalid prefix order and adding the first-difference edge.
+   *   3. Queue all zero-indegree characters and process them with Kahn's algorithm.
+   *   4. Return the built order only if every character was processed; otherwise return empty string.
+   *
+   * Time:  O(C) - adjacent comparisons and graph traversal touch the input characters and edges.
+   * Space: O(1) - lowercase alphabet size is bounded, though maps are used for clarity.
+   *
+   * @param words dictionary words sorted by the alien alphabet
+   * @return one valid character order, or empty string if the dictionary is invalid
+   */
 public class AlienDictionary {
 
   public static void main(String[] args) {
-    String[] words = {"wrt", "wrf", "er", "ett", "rftt"};
     AlienDictionary solver = new AlienDictionary();
-    String order = solver.findAlienLanguageOrder(words);
-    System.out.println(order); // Expected Output: "wertf"
+    String[] words1 = {"wrt", "wrf", "er", "ett", "rftt"};
+    String[] words2 = {"abc", "ab"};
+
+    System.out.printf("words=%s -> %s  expected=wertf%n",
+        Arrays.toString(words1), solver.findAlienLanguageOrder(words1));
+    System.out.printf("words=%s -> '%s'  expected='' %n",
+        Arrays.toString(words2), solver.findAlienLanguageOrder(words2));
   }
+
 
   /**
    * Derives character order in alien language using BFS topological sort.

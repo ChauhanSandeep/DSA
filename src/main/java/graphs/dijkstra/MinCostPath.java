@@ -5,22 +5,46 @@ import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
-/**
- * Find min cost required to reach each vertex of graph from vertex 1
- */
+    /**
+     * Intuition: Dijkstra repeatedly finalizes the unvisited vertex with the
+     * smallest cost seen so far. The priority queue may contain stale paths, so
+     * the original visited check decides whether the popped vertex should print
+     * and expand its neighbors.
+     *
+     * Algorithm:
+     *   1. Build the original undirected adjacency list from [vertex1, vertex2, weight] input.
+     *   2. Push vertex 1 with cost 0 into the priority queue.
+     *   3. Pop the lowest-cost pair; if unvisited, mark it and print its path/cost.
+     *   4. Push all unvisited neighbors with accumulated weights.
+     *
+     * Time:  O(E log E) - every edge can add heap entries and heap operations are logarithmic.
+     * Space: O(V + E) - adjacency list, visited array, and priority queue.
+     *
+     * @param vertices number of vertices in input, labeled 1 through vertices
+     * @param input edges in [vertex1, vertex2, weight] format
+     */
 public class MinCostPath {
 
     public static void main(String[] args) {
         ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
-        graph.add((ArrayList<Integer>) Stream.of(1, 2, 1).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(2, 3, 4).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(1, 4, 3).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(4, 3, 2).collect(toList()));
-        graph.add((ArrayList<Integer>) Stream.of(1, 3, 10).collect(toList()));
+        graph.add((ArrayList<Integer>) Stream.of(1, 2, 5).collect(toList()));
+        graph.add((ArrayList<Integer>) Stream.of(2, 3, 7).collect(toList()));
+        graph.add((ArrayList<Integer>) Stream.of(1, 3, 20).collect(toList()));
 
-        new MinCostPath().solve(4, graph);
+        MinCostPath solver = new MinCostPath();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(buffer));
+        solver.solve(3, graph);
+        System.setOut(originalOut);
+        String output = buffer.toString().trim().replace(System.lineSeparator(), " | ");
+        String expected = "[to: 1 via:  with weight: 0] | [to: 2 via: 2 with weight: 5] | [to: 3 via: 23 with weight: 12]";
+        System.out.printf("edges=%s -> %s  expected=%s%n", graph, output, expected);
     }
+
 
     /**
      * This works on Dijkstra's algorithm

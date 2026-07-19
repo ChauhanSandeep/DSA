@@ -3,48 +3,43 @@ package graphs.unionfind;
 import java.util.*;
 
 /**
- * NumberOfIslandsII.java
+ * Problem: Number of Islands II
  *
- * Problem Statement:
- * You are given an empty 2D binary grid of size m x n. The grid represents a map where:
- * - 0 represents water
- * - 1 represents land
- * 
- * Initially, all cells are water. You are given an array positions where positions[i] = [ri, ci] 
- * is the position of the land being added at the ith operation.
- * 
- * Return an array of integers answer where answer[i] is the number of islands after adding the 
- * land at positions[i]. An island is surrounded by water and is formed by connecting adjacent 
- * lands horizontally or vertically.
+ * Start with an all-water grid and add land cells one operation at a time. After
+ * each addition, return the current number of islands, where islands connect
+ * horizontally and vertically.
+ *
+ * Leetcode: https://leetcode.com/problems/number-of-islands-ii/ (Hard)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Union-Find on grid | Dynamic connectivity
  *
  * Example:
- * Input: m = 3, n = 3, positions = [[0,0],[0,1],[1,2],[2,1]]
- * Output: [1,1,2,3]
- * Explanation:
- * After adding land at (0,0): 1 island
- * After adding land at (0,1): 1 island (connects with previous)
- * After adding land at (1,2): 2 islands
- * After adding land at (2,1): 3 islands
+ *   Input:  m = 3, n = 3, positions = [[0,0],[0,1],[1,2],[2,1]]
+ *   Output: [1,1,2,3]
+ *   Why:    the second land touches the first, while the later two additions form separate islands.
  *
- * LeetCode link: https://leetcode.com/problems/number-of-islands-ii/
+ * Follow-ups:
+ *   1. Support removing land?
+ *      Standard DSU cannot split components; use offline reverse processing or rebuild affected components.
+ *   2. Allow diagonal connections?
+ *      Check eight directions before unioning neighboring land cells.
+ *   3. Very large grid with few positions?
+ *      Use hash maps keyed by active cell id instead of allocating rows * cols arrays.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - What if we also need to support removing land (setting to water)?
- *    → Need to rebuild connected components or use more complex data structures.
- *  - Can you handle diagonal connections (8 directions instead of 4)?
- *    → Same algorithm, just check 8 neighbors instead of 4.
- *  - What if grid is very large but positions array is small?
- *    → Current solution already handles this efficiently with sparse representation.
- *  - How would you optimize for repeated queries on same grid?
- *    → Cache intermediate states or use persistent data structures.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 200 (Number of Islands): https://leetcode.com/problems/number-of-islands/
- *  - LeetCode 547 (Number of Provinces): https://leetcode.com/problems/number-of-provinces/
- *  - LeetCode 323 (Number of Connected Components in Undirected Graph): https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Number of Islands (200), Number of Provinces (547), Dynamic Connectivity.
  */
 public class NumberOfIslandsII {
+
+    public static void main(String[] args) {
+        NumberOfIslandsII solver = new NumberOfIslandsII();
+        int[][] positions1 = {{0, 0}, {0, 1}, {1, 2}, {2, 1}};
+        int[][] positions2 = {{0, 0}, {0, 0}};
+
+        System.out.printf("rows=3 cols=3 positions=%s -> %s  expected=[1, 1, 2, 3]%n",
+            Arrays.deepToString(positions1), solver.numIslands2(3, 3, positions1));
+        System.out.printf("rows=1 cols=1 positions=%s -> %s  expected=[1, 1]%n",
+            Arrays.deepToString(positions2), solver.numIslands2(1, 1, positions2));
+    }
 
     /**
      * Main method: Union-Find (Disjoint Set Union) approach.
