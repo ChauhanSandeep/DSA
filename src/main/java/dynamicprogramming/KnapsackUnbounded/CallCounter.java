@@ -2,36 +2,32 @@ package dynamicprogramming.knapsackunbounded;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Arrays;
 
 
 /**
- * Design a class that counts the number of recent calls within the last 3000 milliseconds.
- * Each call to `ping(int t)` records a timestamp and returns the number of calls that have
- * happened in the time window [t - 3000, t].
+ * Problem: Number of Recent Calls
  *
- * Constraint : Each `ping` is called with strictly increasing timestamp values.
+ * Design a counter that records ping timestamps and returns how many pings happened in the inclusive window [time - 3000, time]. Calls are strictly increasing, so expired calls leave from the front.
+ *
+ * Leetcode: https://leetcode.com/problems/number-of-recent-calls/ (Easy)
+ * Rating:   contest Elo 1338
+ * Pattern:  Queue | Sliding window | Online stream counting
+ *
  * Example:
- * Input:
- *    ping(1)     -> returns 1
- *    ping(300)   -> returns 2
- *    ping(3000)  -> returns 3
- *    ping(3002)  -> returns 3
- *    ping(7000)  -> returns 1
+ *   Input:  ping times = [1, 300, 3000, 3002]
+ *   Output: [1, 2, 3, 3]
+ *   Why:    at time 3002, only 300, 3000, and 3002 remain in the last 3000 ms.
  *
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * LeetCode Link:
- * https://leetcode.com/problems/number-of-recent-calls/
- *
- * Follow-up Questions (FAANG-relevant):
- * 1. What if the time window changes frequently?
- *    → Allow dynamic window length as a constructor param or in ping().
- *
- * 2. Can you optimize for high-frequency calls (10^6 per second)?
- *    → Use a ring buffer or sliding window with fixed-size arrays instead of a queue.
- *
- * 3. Can this be extended for multiple clients/IDs?
- *    → Use a `Map<ClientId, Queue<Integer>>` to track timestamps per client.
- * LeetCode Contest Rating: 1338
+ * Related: Moving Average from Data Stream (346), Logger Rate Limiter (359).
  */
 public class CallCounter {
 
@@ -41,20 +37,22 @@ public class CallCounter {
     this.callTimestamps = new LinkedList<>();
   }
 
-  /**
-   * Design:
-   * - Uses a queue (`Queue<Integer> callTimestamps`) to store timestamps of recent calls.
-   * - The `ping(int time)` method receives the current timestamp, adds it to the queue,
-   *   and removes outdated timestamps (older than `time - 3000`).
-   * - Returns the count of valid timestamps within the last 3000 milliseconds.
+    /**
+   * Intuition: callTimestamps stores exactly the pings that may still be inside the latest 3000 ms window. Since times increase, expired values are always at the front; after adding time and polling old fronts, the queue size is the answer.
    *
-   * - Time Complexity: O(N) in the worst case (removing old timestamps), but amortized O(1).
-   * - Space Complexity: O(N), where N is the number of calls stored in the queue.
+   * Algorithm:
+   *   1. Append time to callTimestamps.
+   *   2. Compute maxAllowedTimestamp = time - 3000.
+   *   3. Poll front timestamps while they are older than maxAllowedTimestamp.
+   *   4. Return the remaining queue size.
    *
-   * @param time The timestamp of the new call (milliseconds, strictly increasing).
-   * @return The number of calls made in the last 3 seconds.
+   * Time:  O(1) amortized - each timestamp is inserted and removed once.
+   * Space: O(w) - stores calls in the active window.
+   *
+   * @param time timestamp of the new ping
+   * @return number of pings in [time - 3000, time]
    */
-  public int ping(int time) {
+public int ping(int time) {
     // Add the current timestamp
     callTimestamps.offer(time);
 
@@ -69,15 +67,14 @@ public class CallCounter {
     return callTimestamps.size();
   }
 
-  /**
-   * Main method to demonstrate functionality.
-   */
-  public static void main(String[] args) {
-    CallCounter callCounter = new CallCounter();
-    System.out.println(callCounter.ping(1));    // Output: 1
-    System.out.println(callCounter.ping(300));  // Output: 2
-    System.out.println(callCounter.ping(3000)); // Output: 3
-    System.out.println(callCounter.ping(3002)); // Output: 3
-    System.out.println(callCounter.ping(7000)); // Output: 1
+    public static void main(String[] args) {
+    int[][] inputs = { {1, 300, 3000, 3002}, {7000} };
+    int[][] expected = { {1, 2, 3, 3}, {1} };
+    for (int i = 0; i < inputs.length; i++) {
+      CallCounter callCounter = new CallCounter();
+      int[] got = new int[inputs[i].length];
+      for (int j = 0; j < inputs[i].length; j++) got[j] = callCounter.ping(inputs[i][j]);
+      System.out.printf("times=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+    }
   }
 }

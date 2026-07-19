@@ -3,70 +3,60 @@ package dynamicprogramming.sequence;
 import java.util.*;
 
 /**
- * Problem: Longest String Chain (LeetCode #1048)
+ * Problem: Longest String Chain
  *
- * Problem Statement:
- * Given a list of words, each word consists of English lowercase letters.
- * Let's say word1 is a predecessor of word2 if and only if we can add exactly one letter anywhere in word1 to make it equal to word2.
- * A word chain is a sequence of words [word_1, word_2, ..., word_k] with k >= 1, where word_1 is a predecessor of word_2, word_2 is a predecessor of word_3, and so on.
- * Return the longest possible length of a word chain with words chosen from the given list of words.
+ * A word can follow another when it is formed by inserting exactly one character while preserving order. Return the longest chain length.
  *
- * Example 1:
- * Input: words = ["a","b","ba","bca","bda","bdca"]
- * Output: 4
- * Explanation: One of the longest word chains is ["a","ba","bda","bdca"].
+ * Leetcode: https://leetcode.com/problems/longest-string-chain/ (Medium)
+ * Rating:   contest Elo 1599
+ * Pattern:  Dynamic programming | Hash map | DAG by word length
  *
- * Example 2:
- * Input: words = ["xbc","pcxbcf","xb","cxbc","pcxbc"]
- * Output: 5
- * Explanation: One of the longest word chains is ["xb", "xbc", "cxbc", "pcxbc", "pcxbcf"].
+ * Example:
+ *   Input:  words = ["a", "b", "ba", "bca", "bda", "bdca"]
+ *   Output: 4
+ *   Why:    a -> ba -> bda -> bdca is a valid chain.
  *
- * Approach:
- * We'll use dynamic programming to solve this problem. The key insight is that for each word, we can remove
- * one character at a time and check if the resulting word exists in our set of words.
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Steps to solve:
- * 1. Sort the words by their lengths to ensure we process shorter words before longer ones.
- * 2. Use a hash map to store the longest chain length ending with each word.
- * 3. For each word, try removing each character and check if the resulting word exists in our map.
- * 4. Update the maximum chain length for the current word based on its predecessors.
- * 5. Keep track of the overall maximum chain length.
- *
- * Follow-up Questions:
- * 1. What if we need to return the actual longest word chain instead of just its length?
- *    Answer: We can modify the solution to store the actual chain for each word in the map instead of just the length.
- *
- * 2. What if the words can contain uppercase letters and special characters?
- *    Answer: We would need to handle case sensitivity and potentially filter out invalid words based on the problem constraints.
- *
- * 3. Can we solve this using a graph-based approach?
- *    Answer: Yes, we can model this as a graph where words are nodes and edges represent the predecessor relationship.
- *    The longest chain would then be the longest path in this DAG, which can be found using topological sorting.
- *
- * LeetCode: https://leetcode.com/problems/longest-string-chain/
- * LeetCode Contest Rating: 1599
+ * Related: Longest Increasing Subsequence (300), Word Ladder (127).
  */
 public class LongestStringChain {
 
-    /**
-     * Calculates the length of the longest possible word chain.
+    public static void main(String[] args) {
+        LongestStringChain solution = new LongestStringChain();
+        String[][] inputs = { {"a", "b", "ba", "bca", "bda", "bdca"}, {"xbc", "pcxbcf", "xb", "cxbc", "pcxbc"}, {} };
+        int[] expected = {4, 5, 0};
+        for (int i = 0; i < inputs.length; i++) {
+            String[] words = inputs[i].clone();
+            int got = solution.longestStrChain(words);
+            System.out.printf("words=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: after sorting by length, every possible predecessor of a word has already been processed. Removing each character generates all predecessors, and the best predecessor chain plus one is the chain ending at the word.
      *
-     * Steps to solve:
-     * 1. Sort the words by their lengths to process shorter words first.
-     * 2. Use a hash map to store the longest chain length for each word.
-     * 3. For each word, generate all possible predecessors by removing one character.
-     * 4. For each predecessor, if it exists in the map, update the current word's chain length.
-     * 5. Keep track of the maximum chain length found.
+     * Algorithm:
+     *   1. Sort words by length.
+     *   2. Keep dp from word to best chain length.
+     *   3. For each word, remove each character to form predecessors.
+     *   4. Use any predecessor value plus one.
+     *   5. Store the word value and track the maximum.
      *
-     * Time Complexity: O(N * L^2) where N is the number of words and L is the maximum length of a word
-     *      N because we process each word (contribution O(N)), and L^2 because for each word of length L, we iterate
-     *      over each character (contributionO(L)) and each predecessor generation takes (contribution O(L)) time.
-     * Space Complexity: O(N) for the hash map
+     * Time:  O(n * L^2) - each deletion builds a length-L string.
+     * Space: O(n) - one map entry per word.
      *
-     * @param words The array of words
-     * @return The length of the longest word chain
+     * @param words input words
+     * @return longest chain length
      */
-    public int longestStrChain(String[] words) {
+public int longestStrChain(String[] words) {
         // Sort the words by their lengths
         Arrays.sort(words, (a, b) -> a.length() - b.length());
 
@@ -171,12 +161,8 @@ public class LongestStringChain {
         return maxChainLength;
     }
 
-    /**
-     * Checks if word1 is a predecessor of word2
-     * A word1 is a predecessor of word2 if we can add exactly one character to word1 to get word2
-     * and the relative order of characters is preserved
-     */
-    private boolean isPredecessor(String word1, String word2) {
+        /** Checks whether word1 is a predecessor of word2. */
+private boolean isPredecessor(String word1, String word2) {
         if (word2.length() != word1.length() + 1) {
             return false;
         }

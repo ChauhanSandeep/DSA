@@ -2,31 +2,38 @@ package dynamicprogramming.stringmatching;
 
 /**
  * Problem: Interleaving String
- * LeetCode: https://leetcode.com/problems/interleaving-string/
  *
- * Given three strings s1, s2, and s3, determine whether s3 is formed by an interleaving of s1 and s2.
- * Interleaving means characters from both strings are used in a way that maintains the left-to-right order
- * of characters from each string individually.
+ * Decide whether target can be formed by using every character from two source strings while preserving each source order.
+ *
+ * Leetcode: https://leetcode.com/problems/interleaving-string/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | String matching | Prefix feasibility
  *
  * Example:
- * Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbcbcac"
- * Output: true
- * Explanation: "aa" + "dbbc" + "bc" + "a" + "c" = "aadbbcbcac".
+ *   Input:  first = "aabcc", second = "dbbca", target = "aadbbcbcac"
+ *   Output: true
+ *   Why:    each target prefix can be formed from a valid prefix of the two sources.
  *
- * Follow-Up Questions:
- * - Can we use 2 pointers approach?
- *   - No, example : s1 = "aab" s2 = "aac" s3 = "aaabac". The order in which we move the pointer matters
- * - Can you solve this using Bottom-Up DP with reduced space? (Yes: 2D array → 1D array)
- * - Can you solve using BFS/DFS iterative approach?
- *   LeetCode: https://leetcode.com/problems/interleaving-string/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
+ *
+ * Related: Edit Distance (72), Distinct Subsequences (115).
  */
 public class InterleavingString {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     InterleavingString solver = new InterleavingString();
-    System.out.println(solver.isInterleavingTopDown("aab", "axy", "aaxaaby")); // true
-    System.out.println(solver.isInterleaveBottomUp("aab", "axy", "aaxaaby")); // true
+    String[][] inputs = { {"aabcc", "dbbca", "aadbbcbcac"}, {"aabcc", "dbbca", "aadbbbaccc"}, {"", "abc", "abc"} };
+    boolean[] expected = {true, false, true};
+    for (int i = 0; i < inputs.length; i++) {
+      boolean got = solver.isInterleaveBottomUp(inputs[i][0], inputs[i][1], inputs[i][2]);
+      System.out.printf("first=%s second=%s target=%s -> %s  expected=%s%n", inputs[i][0], inputs[i][1], inputs[i][2], got, expected[i]);
+    }
   }
 
   /**
@@ -59,6 +66,7 @@ public class InterleavingString {
     return isInterleaveRecursive(first, second, target, 0, 0, memo);
   }
 
+  /** Solves one memoized interleaving suffix state. */
   private boolean isInterleaveRecursive(String first, String second, String target, int indexFirst, int indexSecond,
       Boolean[][] memo) {
     if (indexFirst == first.length() && indexSecond == second.length()) {
@@ -90,29 +98,25 @@ public class InterleavingString {
     return isValid;
   }
 
-  /**
-   * Bottom-Up Dynamic Programming Approach.
+    /**
+   * Intuition: dp[i][j] means first[0..i - 1] and second[0..j - 1] can form target[0..i + j - 1]. The last target character must come from either first or second, so top and left predecessor states decide the cell.
    *
-   * Steps:
-   * 1. Create a 2D DP table where dp[i][j] = true if target[0...i+j-1] can be formed using first[0...i-1] and second[0...j-1].
-   * 2. Initialize dp[0][0] = true (empty strings form empty target).
-   * 3. Fill first row and column using direct character matches with target.
-   * 4. For each dp[i][j], check if:
-   *    - dp[i-1][j] is true and first[i-1] matches target[i+j-1]
-   *    - OR dp[i][j-1] is true and second[j-1] matches target[i+j-1]
-   * 5. Final result is dp[first.length()][second.length()]
+   * Algorithm:
+   *   1. Reject mismatched total lengths.
+   *   2. Create dp and set dp[0][0] = true.
+   *   3. Initialize first row and first column.
+   *   4. Fill inner cells from top and left predecessor states.
+   *   5. Return dp[lengthFirst][lengthSecond].
    *
-   * Algorithm: Bottom-Up Dynamic Programming
+   * Time:  O(lengthFirst * lengthSecond) - every prefix pair is checked.
+   * Space: O(lengthFirst * lengthSecond) - stores the table.
    *
-   * Time Complexity: O(firstLength * secondLength)
-   * Space Complexity: O(firstLength * secondLength)
-   *
-   * @param first  First input string
-   * @param second Second input string
-   * @param target Interleaved result string
-   * @return True if target is valid interleaving of first and second
+   * @param first first source
+   * @param second second source
+   * @param target candidate interleaving
+   * @return true if target is a valid interleaving
    */
-  public boolean isInterleaveBottomUp(String first, String second, String target) {
+public boolean isInterleaveBottomUp(String first, String second, String target) {
     int lengthFirst = first.length();
     int lengthSecond = second.length();
 

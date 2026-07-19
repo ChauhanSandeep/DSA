@@ -4,86 +4,63 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
- * Problem: Furthest Building You Can Reach (LeetCode #1642)
+ * Problem: Furthest Building You Can Reach
  *
- * Problem Statement:
- * You are given an integer array heights representing the heights of buildings, some bricks, and some ladders.
- * You start your journey from building 0 and move to the next building by possibly using bricks or ladders.
+ * Move across building heights using bricks or ladders for upward jumps. Return the furthest index reachable with optimal resource assignment.
  *
- * While moving from building i to building i+1 (0-indexed):
- * - If the current building's height >= next building's height, you do not need a ladder or bricks.
- * - If the current building's height < next building's height, you can either use one ladder or (h[i+1] - h[i]) bricks.
+ * Leetcode: https://leetcode.com/problems/furthest-building-you-can-reach/ (Medium)
+ * Rating:   contest Elo 1962
+ * Pattern:  Greedy | Min-heap | Resource scheduling
  *
- * Return the furthest building index (0-indexed) you can reach if you use the given ladders and bricks optimally.
+ * Example:
+ *   Input:  heights = [4,2,7,6,9,14,12], bricks = 5, ladders = 1
+ *   Output: 4
+ *   Why:    after reaching index 4, the next climb needs more resources than remain.
  *
- * Example 1:
- * Input: heights = [4,2,7,6,9,14,12], bricks = 5, ladders = 1
- * Output: 4
- * Explanation: Starting at building 0, you can follow these steps:
- * - Go to building 1 without using ladders nor bricks since 4 >= 2
- * - Go to building 2 using 5 bricks (2 < 7, difference is 5)
- * - Go to building 3 without using ladders nor bricks since 7 >= 6
- * - Go to building 4 using 3 bricks (6 < 9, difference is 3)
- * It's impossible to go beyond building 4 because you have to climb 5 more bricks to reach building 5,
- * but you only have 0 bricks and 1 ladder.
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Approach:
- * We can solve this problem using a greedy approach with a min-heap. The key insight is to use ladders for the
- * largest jumps and bricks for the smaller ones. We'll keep track of the largest jumps using a min-heap, and
- * when we run out of ladders, we'll use bricks for the smallest jump in the heap.
- *
- * Steps to solve:
- * 1. Use a min-heap to keep track of the k largest jumps, where k is the number of ladders.
- * 2. For each building, calculate the height difference with the next building.
- * 3. If the height difference is positive (we need to climb):
- *    a. If we have ladders remaining, use a ladder and add the jump to the heap.
- *    b. If no ladders left, check if we can replace the smallest ladder jump with bricks.
- *    c. If we can't use bricks for the smallest ladder jump, we can't proceed further.
- * 4. If we can't make the jump with the available resources, return the current building index.
- * 5. If we can make all jumps, return the last building index.
- *
- * Time Complexity: O(n log k) where n is the number of buildings and k is the number of ladders
- * Space Complexity: O(k) for the min-heap
- *
- * Follow-up Questions:
- * 1. What if we have multiple types of ladders with different lengths?
- *    Answer: We would need to modify the approach to consider the ladder types and their lengths when deciding
- *    which ladder to use for each jump, potentially using a priority queue to manage the ladders.
- *
- * 2. What if we can use both bricks and ladders for a single jump?
- *    Answer: The problem would become more complex as we would need to decide the optimal combination of bricks
- *    and ladders for each jump, possibly requiring a different dynamic programming approach.
- *
- * 3. Can you solve it with O(1) space?
- *    Answer: No, since we need to keep track of the largest jumps to make optimal use of ladders, which requires
- *    some form of sorting or priority queue, leading to at least O(k) space.
- *
- * LeetCode: https://leetcode.com/problems/furthest-building-you-can-reach/
- * LeetCode Contest Rating: 1962
+ * Related: Course Schedule III (630), Minimum Number of Refueling Stops (871).
  */
 public class FurthestBuildingYouCanReach {
 
-    /**
-     * Calculates the furthest building you can reach with the given bricks and ladders.
+    public static void main(String[] args) {
+        FurthestBuildingYouCanReach solution = new FurthestBuildingYouCanReach();
+        int[][] heightCases = { {4, 2, 7, 6, 9, 14, 12}, {4, 12, 2, 7, 3, 18, 20, 3, 19}, {1} };
+        int[] bricksCases = {5, 10, 0};
+        int[] ladderCases = {1, 2, 0};
+        int[] expected = {4, 7, 0};
+        for (int i = 0; i < heightCases.length; i++) {
+            int got = solution.furthestBuilding(heightCases[i], bricksCases[i], ladderCases[i]);
+            System.out.printf("heights=%s bricks=%d ladders=%d -> %d  expected=%d%n", Arrays.toString(heightCases[i]), bricksCases[i], ladderCases[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: ladders should cover the largest climbs seen so far, and bricks should cover smaller climbs. ladderJumpMinHeap stores climbs assigned to ladders; a larger new climb can replace the smallest ladder climb if bricks can pay for that smaller one.
      *
-     * Steps to solve:
-     * 1. Initialize a min-heap to keep track of the largest jumps where ladders are used.
-     * 2. Iterate through each building from index 0 to n-2:
-     *    a. Calculate the height difference between the current and next building.
-     *    b. If the height difference is positive (need to climb):
-     *       - If we have ladders remaining, use a ladder and add the jump to the heap.
-     *       - Else, if the heap is not empty and the current jump is larger than the smallest jump in the heap:
-     *           * Replace the smallest ladder jump with bricks (remove it from heap and add to bricks).
-     *           * Use a ladder for the current jump.
-     *       - If we can't use bricks for the jump (not enough bricks), return the current index.
-     * 3. If we can process all buildings, return the last index.
+     * Algorithm:
+     *   1. Scan adjacent height differences.
+     *   2. Ignore non-positive climbs.
+     *   3. Use ladder slots while available.
+     *   4. Otherwise swap a larger climb into the ladder heap when bricks can pay the smaller climb.
+     *   5. Return the current index when neither resource can pay.
      *
-     * @param heights Array of building heights
-     * @param bricks Number of bricks available
-     * @param ladders Number of ladders available
-     * @return The furthest building index (0-based) that can be reached
+     * Time:  O(n log ladders) - positive climbs may touch the heap.
+     * Space: O(ladders) - heap stores ladder climbs.
+     *
+     * @param heights building heights
+     * @param bricks available bricks
+     * @param ladders available ladders
+     * @return furthest reachable index
      */
-    public int furthestBuilding(int[] heights, int bricks, int ladders) {
+public int furthestBuilding(int[] heights, int bricks, int ladders) {
         // Min-heap to store the largest jumps where ladders are used
         PriorityQueue<Integer> ladderJumpMinHeap = new PriorityQueue<>();
 
@@ -153,10 +130,8 @@ public class FurthestBuildingYouCanReach {
         return left;
     }
 
-    /**
-     * Helper method to check if we can reach the target building
-     */
-    private boolean canReach(int[] heights, int target, int bricks, int ladders) {
+        /** Checks whether a target building prefix is reachable. */
+private boolean canReach(int[] heights, int target, int bricks, int ladders) {
         // Collect all positive jumps up to the target building
         int[] jumps = new int[target];
         int jumpCount = 0;
@@ -211,10 +186,8 @@ public class FurthestBuildingYouCanReach {
         return left;
     }
 
-    /**
-     * Helper method using counting sort for the jumps
-     */
-    private boolean canReachCountingSort(int[] heights, int target, int bricks, int ladders) {
+        /** Checks prefix reachability using counted jump sizes. */
+private boolean canReachCountingSort(int[] heights, int target, int bricks, int ladders) {
         int maxJump = 0;
         int jumpCount = 0;
 

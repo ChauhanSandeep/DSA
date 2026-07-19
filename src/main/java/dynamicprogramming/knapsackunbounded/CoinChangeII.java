@@ -1,102 +1,62 @@
 package dynamicprogramming.knapsackunbounded;
 
+import java.util.Arrays;
+
 
 /**
  * Problem: Coin Change II
- * 
- * You are given an integer array coins representing coins of different denominations 
- * and an integer amount representing a total amount of money.
- * 
- * Return the number of combinations that make up that amount. If that amount of money 
- * cannot be made up by any combination of the coins, return 0.
- * 
- * You may assume that you have an infinite number of each kind of coin.
- * The answer is guaranteed to fit into a signed 32-bit integer.
- * 
- * Example 1:
- * Input: amount = 5, coins = [1,2,5]
- * Output: 4
- * Explanation: There are four ways to make up the amount:
- * 5 = 5
- * 5 = 2 + 2 + 1
- * 5 = 2 + 1 + 1 + 1
- * 5 = 1 + 1 + 1 + 1 + 1
- * 
- * LeetCode: https://leetcode.com/problems/coin-change-ii/description/
- * 
- * Follow-up Questions:
- * 
- * 1. Q: What is the difference between Coin Change I and Coin Change II?
- *    A: Coin Change I asks for the minimum number of coins to make the amount (optimization problem), 
- *    while Coin Change II asks for the number of combinations to make the amount (counting problem). 
- *    Coin Change I uses min() operation, while Coin Change II uses sum() operation in DP transitions.
- *    Related: LeetCode 322 - Coin Change (https://leetcode.com/problems/coin-change/)
- * 
- * 2. Q: Why does iterating coins in outer loop and amount in inner loop avoid counting duplicates?
- *    A: By fixing the coin order in the outer loop, we ensure combinations are built in a consistent 
- *    sequence. For example, [1,2] and [2,1] are treated as the same combination because we always 
- *    consider coin 1 before coin 2. If we iterate amount in outer loop, we would count permutations 
- *    instead of combinations.
- * 
- * 3. Q: How would you modify this to count permutations instead of combinations?
- *    A: Swap the loop order - iterate amount in outer loop and coins in inner loop. This allows 
- *    different orderings of the same coins to be counted separately (e.g., [1,2] and [2,1] as different).
- *    Related: LeetCode 377 - Combination Sum IV (https://leetcode.com/problems/combination-sum-iv/)
- * 
- * 4. Q: Can you solve this with space complexity O(amount) instead of O(n * amount)?
- *    A: Yes, see Approach 2 below. Since we only need the previous row to compute the current row, 
- *    we can use a 1D array and update it in-place. This is possible because we iterate coins in 
- *    outer loop and amounts in inner loop.
- * 
- * 5. Q: What if you need to return the actual combinations instead of just the count?
- *    A: Modify the DP to store lists of combinations instead of counts. At each step, for each way 
- *    to make (amount - coin), append the current coin to create new combinations. This significantly 
- *    increases space complexity to O(number_of_combinations * average_combination_length).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *
+ * Count combinations that sum to a target amount when every denomination is available unlimited times. Coin order does not matter.
+ *
+ * Leetcode: https://leetcode.com/problems/coin-change-ii/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Unbounded knapsack | Combination counting
+ *
+ * Example:
+ *   Input:  amount = 5, coins = [1, 2, 5]
+ *   Output: 4
+ *   Why:    the combinations are [5], [2,2,1], [2,1,1,1], and five 1s.
+ *
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
+ *
+ * Related: Coin Change (322), Combination Sum IV (377).
  */
 public class CoinChangeII {
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         CoinChangeII solver = new CoinChangeII();
-        int[] coins = {1, 2, 5};
-        int amount = 5;
-
-        System.out.println("Number of combinations (2D DP): " + solver.change(amount, coins));
-        System.out.println("Number of combinations (Recursive with Memoization): " + solver.changeRecursiveMemo(amount, coins));
+        int[][] coinCases = { {1, 2, 5}, {2}, {10} };
+        int[] amounts = {5, 3, 0};
+        int[] expected = {4, 0, 1};
+        for (int i = 0; i < coinCases.length; i++) {
+            int got = solver.changeRecursiveMemo(amounts[i], coinCases[i]);
+            System.out.printf("coins=%s amount=%d -> %d  expected=%d%n", Arrays.toString(coinCases[i]), amounts[i], got, expected[i]);
+        }
     }
 
-    /**
-     * 2D Dynamic Programming (Bottom-Up)
-     * 
+        /**
+     * Intuition: dp[i][j] counts combinations for amount j using the first i coins. Excluding coin i copies dp[i - 1][j]; including it adds dp[i][j - coins[i - 1]] because the same coin row remains available.
+     *
      * Algorithm:
-     * 1. Create a 2D DP table where dp[i][j] represents the number of ways to make 
-     *    amount j using the first i coins
-     * 2. Base case: dp[i][0] = 1 (one way to make 0: use no coins)
-     * 3. For each coin i and amount j:
-     *    - Option 1: Don't use coin i, inherit from dp[i-1][j]
-     *    - Option 2: Use coin i (if possible), add dp[i][j-coins[i-1]]
-     * 4. Return dp[n][amount]
-     * 
-     * Key Insights:
-     * - This is an unbounded knapsack problem (unlimited use of each item)
-     * - dp[i][j] = dp[i-1][j] + dp[i][j-coins[i-1]]
-     *   The first term: don't use current coin
-     *   The second term: use current coin (stay at same coin index since unbounded)
-     * - We iterate coins in outer loop to avoid counting duplicate combinations
-     * 
-     * Why This Avoids Duplicates:
-     * By processing coins in a fixed order, we ensure each combination is counted once.
-     * For example, with coins [1,2] and amount 3:
-     * - When processing coin 1: we get combinations starting with 1: [1,1,1]
-     * - When processing coin 2: we get combinations with 2 (including earlier 1s): [1,2], [2,1] becomes just [1,2]
-     * 
-     * Time Complexity: O(n * amount) where n is number of coins
-     * Space Complexity: O(n * amount) for the DP table
-     * 
-     * @param amount target amount to make change for
-     * @param coins array of coin denominations
-     * @return number of combinations that sum to amount
+     *   1. Create dp[length + 1][amount + 1].
+     *   2. Set dp[i][0] = 1 for all i.
+     *   3. Iterate i from 1..length and j from 1..amount.
+     *   4. Start from the exclude-current value.
+     *   5. Add the include-current value when the coin fits.
+     *
+     * Time:  O(length * amount) - every table cell is filled once.
+     * Space: O(length * amount) - stores the full table.
+     *
+     * @param amount target amount
+     * @param coins coin denominations
+     * @return number of combinations
      */
-    public int change(int amount, int[] coins) {
+public int change(int amount, int[] coins) {
         int length = coins.length;
         
         // dp[i][j] = number of ways to make amount j using first i coins
@@ -164,16 +124,8 @@ public class CoinChangeII {
         return coinChangeHelper(coins, 0, amount, memo);
     }
 
-    /**
-     * Helper method for recursive solution with memoization.
-     * 
-     * @param coins array of coin denominations
-     * @param coinIndex current coin index being considered
-     * @param remainingAmount amount left to make
-     * @param memo memoization table to cache computed results
-     * @return number of ways to make remainingAmount using coins from coinIndex onwards
-     */
-    private int coinChangeHelper(int[] coins, int coinIndex, int remainingAmount, Integer[][] memo) {
+        /** Counts combinations from one coin index and remaining amount. */
+private int coinChangeHelper(int[] coins, int coinIndex, int remainingAmount, Integer[][] memo) {
         // Base case 1: Successfully made the amount
         if (remainingAmount == 0) {
             return 1;

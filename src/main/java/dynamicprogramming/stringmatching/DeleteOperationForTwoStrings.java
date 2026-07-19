@@ -1,65 +1,60 @@
 package dynamicprogramming.stringmatching;
 
 /**
- * Problem: Delete Operation for Two Strings (LeetCode #583)
+ * Problem: Delete Operation for Two Strings
  *
- * Problem Statement:
- * Given two strings word1 and word2, return the minimum number of steps required to make word1 and word2 the same.
- * In one step, you can delete exactly one character in either string.
+ * Return the minimum deletions needed to make two strings equal. Characters may be deleted from either string.
  *
- * Example 1:
- * Input: word1 = "sea", word2 = "eat"
- * Output: 2
- * Explanation: You need one step to make "sea" to "ea" and another step to make "eat" to "ea".
+ * Leetcode: https://leetcode.com/problems/delete-operation-for-two-strings/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Longest common subsequence | String matching
  *
- * Example 2:
- * Input: word1 = "leetcode", word2 = "etco"
- * Output: 4
- * Explanation: You need four steps to make leetcode to etco. (delete 'l', 'e', 'd', 'e')
+ * Example:
+ *   Input:  word1 = "sea", word2 = "eat"
+ *   Output: 2
+ *   Why:    deleting s and t leaves the common string ea.
  *
- * Approach:
- * This problem can be reduced to finding the length of the longest common subsequence (LCS) between the two strings.
- * The minimum number of deletions required is equal to:
- * (length of word1 - LCS) + (length of word2 - LCS)
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * We can solve this using dynamic programming where dp[i][j] represents the length of the LCS of
- * word1[0..i-1] and word2[0..j-1].
- *
- * Follow-up Questions:
- * 1. What if we can perform insertions and deletions?
- *    Answer: The problem would become the edit distance problem, where we can perform insert, delete, or replace operations.
- *
- * 2. What if each operation has a different cost?
- *    Answer: We would need to modify the DP approach to account for different costs for insertions and deletions.
- *
- * 3. Can you solve it in O(n) space?
- *    Answer: Yes, we can optimize the space complexity by using two 1D arrays instead of a 2D array.
- *
- * LeetCode: https://leetcode.com/problems/delete-operation-for-two-strings/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Edit Distance (72), Longest Common Subsequence (1143).
  */
 public class DeleteOperationForTwoStrings {
 
-    /**
-     * Calculates the minimum number of steps to make two strings equal by deleting characters.
+    public static void main(String[] args) {
+        DeleteOperationForTwoStrings solution = new DeleteOperationForTwoStrings();
+        String[][] inputs = { {"sea", "eat"}, {"leetcode", "etco"}, {"", "abc"} };
+        int[] expected = {2, 4, 3};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solution.minDistance(inputs[i][0], inputs[i][1]);
+            System.out.printf("word1=%s word2=%s -> %d  expected=%d%n", inputs[i][0], inputs[i][1], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: dp[index1][index2] is the LCS length for the two prefixes. Matching characters extend the diagonal LCS; otherwise the best LCS drops one last character from either prefix. Everything outside the LCS must be deleted.
      *
-     * Steps to solve:
-     * 1. Find the length of the longest common subsequence (LCS) between the two strings.
-     * 2. The minimum number of deletions required is:
-     *    (length of word1 - LCS) + (length of word2 - LCS)
-     * 3. To find the LCS, we use dynamic programming:
-     *    a. Create a 2D DP array where dp[i][j] represents the LCS of word1[0..i-1] and word2[0..j-1].
-     *    b. If the current characters match, dp[i][j] = dp[i-1][j-1] + 1.
-     *    c. If they don't match, dp[i][j] = max(dp[i-1][j], dp[i][j-1]).
+     * Algorithm:
+     *   1. Create dp[length1 + 1][length2 + 1].
+     *   2. Iterate both prefix lengths.
+     *   3. Extend diagonally on matching characters.
+     *   4. Otherwise take the best of top and left.
+     *   5. Convert LCS length to deletions from both strings.
      *
-     * Time Complexity: O(m*n) where m and n are the lengths of word1 and word2
-     * Space Complexity: O(m*n) for the DP table, which can be optimized to O(min(m,n))
+     * Time:  O(length1 * length2) - every prefix pair is processed.
+     * Space: O(length1 * length2) - stores the table.
      *
-     * @param word1 The first input string
-     * @param word2 The second input string
-     * @return The minimum number of deletions required
+     * @param word1 first string
+     * @param word2 second string
+     * @return minimum deletions
      */
-    public int minDistance(String word1, String word2) {
+public int minDistance(String word1, String word2) {
         int length1 = word1.length();
         int length2 = word2.length();
 

@@ -7,58 +7,57 @@ import java.util.Comparator;
 /**
  * Problem: Maximum Length of Pair Chain
  *
- * You are given an array of n pairs where pairs[i] = [lefti, righti] and lefti < righti.
- * A pair p2 = [c, d] follows a pair p1 = [a, b] if b < c. A chain of pairs can be formed in this fashion.
- * Return the length longest chain which can be formed.
- * You do not need to use up all the given intervals. You can select pairs in any order.
+ * Form the longest chain of pairs where [c,d] can follow [a,b] only when b < c. Pairs may be reordered before choosing.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-length-of-pair-chain/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Greedy intervals | Sequence ordering
  *
  * Example:
- * Input: pairs = [[1,2],[2,3],[3,4]]
- * Output: 2
- * Explanation: The longest chain is [1,2] → [3,4].
+ *   Input:  pairs = [[1,2],[2,3],[3,4]]
+ *   Output: 2
+ *   Why:    [1,2] can be followed by [3,4].
  *
- * LeetCode Problem Link: https://leetcode.com/problems/maximum-length-of-pair-chain/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions:
- * 1. Q: What if we need to find the actual chain sequence, not just length?
- *    A: Store parent pointers in DP approach or track selected pairs in greedy approach
- * 2. Q: What if pairs can overlap (b <= c instead of b < c)?
- *    A: Change condition to pairs[j][1] <= pairs[i][0] in DP transition
- * 3. Q: Find minimum number of chains to cover all pairs?
- *    A: This becomes interval scheduling - sort by end time and use greedy approach
- * 4. Q: What if each pair has a weight and we want maximum weight chain?
- *    A: Modify DP to track maximum weight instead of length: dp[i] = max(dp[i], dp[j] + weight[i])
- * 5. Q: Maximum number of non-overlapping intervals?
- *    A: Classic activity selection problem - greedy by earliest finish time
- *       (https://leetcode.com/problems/non-overlapping-intervals/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Non-overlapping Intervals (435), Russian Doll Envelopes (354).
  */
 public class MaximumLengthPairChain {
 
-  public static void main(String[] args) {
-    int[][] pairIntervals = {{5, 14}, {39, 60}, {15, 28}, {27, 40}, {50, 90}};
+    public static void main(String[] args) {
     MaximumLengthPairChain solver = new MaximumLengthPairChain();
-    System.out.println("Maximum chain length (DP): " + solver.findLongestChain(pairIntervals));
-    System.out.println("Maximum chain length (Greedy): " + solver.findLongestChainGreedy(pairIntervals));
+    int[][][] pairCases = { {{1, 2}, {2, 3}, {3, 4}}, {{5, 14}, {39, 60}, {15, 28}, {27, 40}, {50, 90}}, {} };
+    int[] expected = {2, 3, 0};
+    for (int i = 0; i < pairCases.length; i++) {
+      int[][] input = Arrays.stream(pairCases[i]).map(int[]::clone).toArray(int[][]::new);
+      int got = solver.findLongestChain(input);
+      System.out.printf("pairs=%s -> %d  expected=%d%n", Arrays.deepToString(pairCases[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Finds maximum length of pair chain using dynamic programming approach.
+    /**
+   * Intuition: longestChainEndingAt[currentIndex] is the best chain that must end at currentIndex after sorting by start. Any previous pair whose end is before the current start can be extended into the current pair.
    *
-   * Algorithm Steps:
-   * 1. Sort pairs by first element to ensure proper ordering for DP
-   * 2. Initialize DP array where dp[i] represents longest chain ending at index i
-   * 3. For each pair, check all previous pairs to find valid extensions
-   * 4. Update dp[i] with maximum chain length that can end at position i
-   * 5. Return maximum value in dp array
+   * Algorithm:
+   *   1. Return 0 for null or empty input.
+   *   2. Sort pairs by first element.
+   *   3. Initialize every chain length to 1.
+   *   4. For each current pair, scan previous compatible pairs.
+   *   5. Track the global maximum.
    *
-   * Time Complexity: O(n^2) for nested loops to check all pair combinations
-   * Space Complexity: O(n) for DP array storage
+   * Time:  O(n^2) - every pair combination is checked.
+   * Space: O(n) - stores chain lengths.
    *
-   * @param pairIntervals Array of pairs where each pair is [start, end]
-   * @return Maximum length of chain that can be formed
+   * @param pairIntervals [start, end] pairs
+   * @return maximum chain length
    */
-  public int findLongestChain(int[][] pairIntervals) {
+public int findLongestChain(int[][] pairIntervals) {
     if (pairIntervals == null || pairIntervals.length == 0) {
       return 0;
     }

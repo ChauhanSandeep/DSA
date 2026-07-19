@@ -1,51 +1,62 @@
 package dynamicprogramming.scheduling;
 
+import java.util.Arrays;
+
 /**
- * You want to schedule a list of jobs in d days. Jobs are dependent (i.e., to work on the ith job, you have to finish all the jobs j where 0 <= j < i).
+ * Problem: Minimum Difficulty of a Job Schedule
  *
- * You have to finish at least one task every day. The difficulty of a job schedule is the sum of difficulties of each day of the d days.
- * The difficulty of a day is the maximum difficulty of a job done on that day.
+ * Schedule ordered jobs over exactly d days, at least one job per day. Minimize the sum of daily maximum difficulties.
  *
- * Given an array jobDifficulty and an integer d. The difficulty of the ith job is jobDifficulty[i].
+ * Leetcode: https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/ (Hard)
+ * Rating:   contest Elo 2035
+ * Pattern:  Dynamic programming | Sequence partitioning | Min over split
  *
- * Return the minimum difficulty of a job schedule. If you cannot find a schedule for the jobs, return -1.
+ * Example:
+ *   Input:  jobDifficulty = [6,5,4,3,2,1], d = 2
+ *   Output: 7
+ *   Why:    first five jobs on day 1 and the last job on day 2 costs 6 + 1.
  *
- * Example 1:
- * Input: jobDifficulty = [6,5,4,3,2,1], d = 2
- * Output: 7
- * Explanation: First day you can finish the first 5 jobs, total difficulty = 6.
- *              Second day you can finish the last job, total difficulty = 1.
- *              The difficulty of the schedule = 6 + 1 = 7
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Example 2:
- * Input: jobDifficulty = [9,9,9], d = 4
- * Output: -1
- * Explanation: If you finish a job per day you will still have a free day. You cannot find a schedule for the given jobs.
- *
- * LeetCode: https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/
- *
- * Follow-up Questions:
- * 1. What if the job difficulties can be negative?
- *    - The solution already handles both positive and negative numbers correctly.
- * 2. How would you handle very large input sizes (e.g., n = 1000, d = 100)?
- *    - The O(n²d) time complexity should handle this within reasonable time limits.
- * 3. How would you modify the solution to also return the optimal schedule?
- *    - We could track the partition points during the DP to reconstruct the schedule.
- *
- * Related Problems:
- * - Minimum Number of Days to Eat N Oranges (https://leetcode.com/problems/minimum-number-of-days-to-eat-n-oranges/)
- * - Minimum Cost to Cut a Stick (https://leetcode.com/problems/minimum-cost-to-cut-a-stick/)
- * LeetCode Contest Rating: 2035
+ * Related: Split Array Largest Sum (410), Minimum Cost to Cut a Stick (1547).
  */
 public class MinimumDifficultyOfAJobSchedule {
-    /**
-     * Calculates the minimum difficulty of a job schedule.
+
+    public static void main(String[] args) {
+        MinimumDifficultyOfAJobSchedule solution = new MinimumDifficultyOfAJobSchedule();
+        int[][] jobCases = { {6, 5, 4, 3, 2, 1}, {9, 9, 9}, {1, 1, 1} };
+        int[] dayCases = {2, 4, 3};
+        int[] expected = {7, -1, 3};
+        for (int i = 0; i < jobCases.length; i++) {
+            int got = solution.minDifficulty(jobCases[i], dayCases[i]);
+            System.out.printf("jobs=%s days=%d -> %d  expected=%d%n", Arrays.toString(jobCases[i]), dayCases[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: dp[i][k] is the minimum difficulty for the first i jobs in k days. Choosing j as the first job on day k makes jobs j..i the last day, costing their maximum plus dp[j - 1][k - 1].
      *
-     * @param jobDifficulty Array of job difficulties
-     * @param d Number of days
-     * @return Minimum difficulty or -1 if not possible
+     * Algorithm:
+     *   1. Return -1 when jobs are fewer than days.
+     *   2. Initialize dp with a large sentinel and dp[0][0] = 0.
+     *   3. Iterate job prefix i and day count k.
+     *   4. Walk j backward to try every last-day start.
+     *   5. Update dp[i][k] with previous days plus last-day maximum.
+     *
+     * Time:  O(n^2 * d) - each prefix/day scans split points.
+     * Space: O(n * d) - stores the table.
+     *
+     * @param jobDifficulty ordered job difficulties
+     * @param d number of days
+     * @return minimum difficulty or -1
      */
-    public int minDifficulty(int[] jobDifficulty, int d) {
+public int minDifficulty(int[] jobDifficulty, int d) {
         int n = jobDifficulty.length;
         // If we have more days than jobs, it's not possible
         if (n < d) {

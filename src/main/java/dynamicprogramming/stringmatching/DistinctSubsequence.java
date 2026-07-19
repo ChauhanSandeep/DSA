@@ -1,44 +1,39 @@
 package dynamicprogramming.stringmatching;
 
 /**
- * Distinct Subsequences
+ * Problem: Distinct Subsequences
  *
- * Problem Statement:
- * Given two strings s and t, return the number of distinct subsequences of s which equals t.
- * A string's subsequence is a new string formed from the original string by deleting some
- * (can be none) of the characters without disturbing the relative positions of the remaining characters.
+ * Count how many distinct subsequences of source equal target. Deletions must preserve the order of remaining characters.
+ *
+ * Leetcode: https://leetcode.com/problems/distinct-subsequences/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | String matching | Counting subsequences
  *
  * Example:
- * Input: s = "rabbbit", t = "rabbit"
- * Output: 3
- * Explanation: There are 3 ways you can generate "rabbit" from s.
- * - rabb b it (using 1st b)
- * - rab b bit (using 2nd b)
- * - rabb b it (using 3rd b)
+ *   Input:  source = "rabbbit", target = "rabbit"
+ *   Output: 3
+ *   Why:    choose which one of the three b characters in source is skipped.
  *
- * LeetCode: https://leetcode.com/problems/distinct-subsequences/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How to optimize space complexity? - Use 1D DP array instead of 2D matrix
- * 2. Handle integer overflow for large counts? - Use BigInteger or modular arithmetic
- * 3. Find actual subsequences instead of just count? - Maintain path tracking during DP
- * 4. What if strings are very large? - Consider rolling hash or suffix array optimizations
- * 5. Case-insensitive matching? - Normalize strings before processing
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Is Subsequence (392), Delete Operation for Two Strings (583).
  */
 public class DistinctSubsequence {
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         DistinctSubsequence solution = new DistinctSubsequence();
-        String sourceString = "rabbbit";
-        String targetString = "rabbit";
-
-        System.out.println("Memoization Result: " +
-            solution.numDistinctMemoization(sourceString, targetString)); // Output: 3
-        System.out.println("Dynamic Programming Result: " +
-            solution.numDistinctDP(sourceString, targetString)); // Output: 3
-        System.out.println("Space Optimized Result: " +
-            solution.numDistinctSpaceOptimized(sourceString, targetString)); // Output: 3
+        String[][] inputs = { {"rabbbit", "rabbit"}, {"babgbag", "bag"}, {"abc", ""} };
+        int[] expected = {3, 5, 1};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solution.numDistinctDP(inputs[i][0], inputs[i][1]);
+            System.out.printf("source=%s target=%s -> %d  expected=%d%n", inputs[i][0], inputs[i][1], got, expected[i]);
+        }
     }
 
     /**
@@ -78,10 +73,8 @@ public class DistinctSubsequence {
         return recHelper(sourceString, targetString, 0, 0, dp);
     }
 
-    /**
-     * Recursive helper method to count distinct subsequences with memoization
-     */
-    private int recHelper(String sourceString, String targetString, int sourceIndex, int targetIndex,
+        /** Counts subsequences from one source and target index. */
+private int recHelper(String sourceString, String targetString, int sourceIndex, int targetIndex,
         int[][] dp) {
         // Base case: target string fully matched
         if (targetIndex == targetString.length()) {
@@ -114,24 +107,24 @@ public class DistinctSubsequence {
         return count;
     }
 
-    /**
-     * Finds distinct subsequences using bottom-up dynamic programming
+        /**
+     * Intuition: dp[targetIndex][sourceIndex] counts ways to form the target prefix from the source prefix. On a character match, the source character can be used as the last target character or skipped; on mismatch, it can only be skipped.
      *
-     * Algorithm: Bottom-up Dynamic Programming
-     * Steps:
-     * 1. Create 2D DP table where dp[i][j] = ways to form target[0..i-1] using source[0..j-1]
-     * 2. Initialize base case: empty target can be formed in 1 way from any prefix
-     * 3. Fill table: if characters match, add both use and skip options
-     * 4. If characters don't match, only skip option is available
+     * Algorithm:
+     *   1. Handle target longer than source and empty target.
+     *   2. Create dp[targetLength + 1][sourceLength + 1].
+     *   3. Set dp[0][sourceIndex] = 1.
+     *   4. Fill targetIndex and sourceIndex in increasing order.
+     *   5. Add use and skip counts on a match, else copy skip.
      *
-     * Time Complexity: O(m * n) where m = target length, n = source length
-     * Space Complexity: O(m * n) for the DP table
+     * Time:  O(targetLength * sourceLength) - every cell is computed once.
+     * Space: O(targetLength * sourceLength) - stores the table.
      *
-     * @param sourceString the string to search in
-     * @param targetString the subsequence to find
-     * @return number of distinct ways to form target from source
+     * @param sourceString source string
+     * @param targetString target subsequence
+     * @return number of distinct subsequences
      */
-    public int numDistinctDP(String sourceString, String targetString) {
+public int numDistinctDP(String sourceString, String targetString) {
         int targetLength = targetString.length();
         int sourceLength = sourceString.length();
 

@@ -3,85 +3,59 @@ package dynamicprogramming.knapsackunbounded;
 import java.util.Arrays;
 
 /**
- * Coin Change
+ * Problem: Coin Change
  *
- * Problem:
- * You are given an integer array coins representing coins of different denominations and an integer
- * amount representing a total amount of money. Return the fewest number of coins needed to make up
- * that amount. If that amount cannot be made up by any combination of the coins, return -1.
- * You may assume that you have an infinite number of each kind of coin.
+ * Return the fewest coins needed to make an amount using unlimited copies of each denomination. Return -1 if the amount is unreachable.
  *
- * Example:
- * Input: coins = [1,2,5], amount = 11
- * Output: 3
- * Explanation: 11 = 5 + 5 + 1 (3 coins)
+ * Leetcode: https://leetcode.com/problems/coin-change/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Unbounded knapsack | Minimum count
  *
  * Example:
- * Input: coins = [2], amount = 3
- * Output: -1
- * Explanation: Cannot make 3 with only coins of denomination 2
+ *   Input:  coins = [1, 2, 5], amount = 11
+ *   Output: 3
+ *   Why:    11 = 5 + 5 + 1 uses three coins, and no two coins can make 11.
  *
- * Constraints:
- * - 1 <= coins.length <= 12
- * - 1 <= coins[i] <= 2^31 - 1
- * - 0 <= amount <= 10^4
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * LeetCode: https://leetcode.com/problems/coin-change/
- *
- * Follow-up Questions:
- * Q1: What if we need to return the actual combination of coins, not just the count?
- * A1: Store parent pointers in DP array to backtrack and reconstruct the solution path.
- *
- * Q2: How would you optimize if the amount is very large but coins are limited?
- * A2: Use BFS approach with queue, exploring amounts level by level until target is reached.
- *
- * Q3: What if each coin can be used only a limited number of times?
- * A3: Add a third dimension to DP tracking remaining coins for each denomination (bounded knapsack).
- *
- * Q4: Can you solve this with recursion + memoization (top-down DP)?
- * A4: Yes - recursively compute min coins for (amount - coin) and memoize results in a map.
- *
- * Q5: What if we want to find the maximum number of coins instead of minimum?
- * A5: Change the logic to maximize instead of minimize, useful for maximizing change given.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Coin Change II (518), Combination Sum IV (377).
  */
 public class CoinChange {
 
-    public static void main(String[] args) {
-        int[] coins = {1, 2, 5};
-        int amount = 11;
-        int result = minCoins(coins, amount);
-        System.out.println("Minimum coins needed for amount " + amount + ": " + result);
-        
-        int[] coins2 = {2};
-        int amount2 = 3;
-        int result2 = minCoins(coins2, amount2);
-        System.out.println("Minimum coins needed for amount " + amount2 + ": " + result2);
+        public static void main(String[] args) {
+        int[][] coinCases = { {1, 2, 5}, {2}, {1} };
+        int[] amounts = {11, 3, 0};
+        int[] expected = {3, -1, 0};
+        for (int i = 0; i < coinCases.length; i++) {
+            int got = minCoins(coinCases[i], amounts[i]);
+            System.out.printf("coins=%s amount=%d -> %d  expected=%d%n", Arrays.toString(coinCases[i]), amounts[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Finds the minimum number of coins needed to make up the target amount.
+        /**
+     * Intuition: dp[currentAmount] is the fewest coins for exactly currentAmount. If coin is the last coin used, the previous optimal amount is currentAmount - coin, so trying all fitting coins gives the minimum.
      *
-     * Algorithm (Bottom-Up Dynamic Programming):
-     * 1. Create DP array where dp[i] = minimum coins needed for amount i
-     * 2. Initialize dp[0] = 0 (base case: 0 coins for amount 0)
-     * 3. Initialize all other values to infinity (amount + 1 as sentinel)
-     * 4. For each amount from 1 to target:
-     *    - Try each coin denomination
-     *    - If coin <= amount, update: dp[amount] = min(dp[amount], dp[amount - coin] + 1)
-     * 5. Return dp[target] if reachable, else -1
+     * Algorithm:
+     *   1. Reject invalid inputs and handle amount 0.
+     *   2. Fill dp with amount + 1 as infinity.
+     *   3. Set dp[0] = 0.
+     *   4. For each amount, try every coin that fits.
+     *   5. Return -1 if amount remains unreachable.
      *
-     * Key Insight: For each amount, we build on optimal solutions for smaller amounts.
-     * If we can make amount-coin with k coins, we can make amount with k+1 coins.
+     * Time:  O(amount * coins.length) - each amount tries each coin.
+     * Space: O(amount) - one array of amounts.
      *
-     * Time Complexity: O(amount * n) where n is number of coin denominations
-     * Space Complexity: O(amount) for the DP array
-     *
-     * @param coins Array of available coin denominations (infinite supply of each)
-     * @param amount Target amount to make
-     * @return Minimum number of coins needed, or -1 if impossible
+     * @param coins denominations with unlimited supply
+     * @param amount target amount
+     * @return minimum coins or -1
      */
-    public static int minCoins(int[] coins, int amount) {
+public static int minCoins(int[] coins, int amount) {
         if (coins == null || coins.length == 0 || amount < 0) return -1;
         if (amount == 0) return 0;
 

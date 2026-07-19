@@ -3,44 +3,59 @@ package dynamicprogramming.sequence;
 import java.util.*;
 
 /**
- * 1027. Longest Arithmetic Subsequence
+ * Problem: Longest Arithmetic Subsequence
  *
- * Problem: Given an array nums, return the length of the longest arithmetic subsequence.
- * An arithmetic subsequence is a sequence where the difference between consecutive
- * elements is the same.
+ * Return the length of the longest subsequence whose adjacent differences are all equal. The subsequence may skip elements but preserves order.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-arithmetic-subsequence/ (Medium)
+ * Rating:   contest Elo 1759
+ * Pattern:  Dynamic programming | Hash map by difference | Sequence DP
  *
  * Example:
- * Input: nums = [3,6,9,12]
- * Output: 4
- * Explanation: The whole array is an arithmetic sequence with steps of length = 3.
+ *   Input:  nums = [9, 4, 7, 2, 10]
+ *   Output: 3
+ *   Why:    [4, 7, 10] has common difference 3.
  *
- * LeetCode: https://leetcode.com/problems/longest-arithmetic-subsequence
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up questions:
- * Q: What if we need to find all longest arithmetic subsequences?
- * A: Modify DP to track actual sequences instead of just lengths.
- *
- * Q: Can we optimize for very large arrays?
- * A: Current solution is already optimal O(n²), can't improve asymptotically.
- *
- * Q: How to handle overflow with large differences?
- * A: Use HashMap with proper key handling or compress the difference range.
- * LeetCode Contest Rating: 1759
+ * Related: Arithmetic Slices II (446), Longest Increasing Subsequence (300).
  */
 public class LongestArithmeticSubsequence {
 
-    /**
-     * Dynamic Programming approach using HashMap for each position.
+    public static void main(String[] args) {
+        LongestArithmeticSubsequence solution = new LongestArithmeticSubsequence();
+        int[][] inputs = { {3, 6, 9, 12}, {9, 4, 7, 2, 10}, {20, 1, 15, 3, 10, 5, 8} };
+        int[] expected = {4, 3, 4};
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solution.longestArithSeqLength(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: dp[i].get(diff) is the longest arithmetic subsequence ending at i with difference diff. Every earlier j defines diff = nums[i] - nums[j]; extend dp[j] for that diff or start a new length-2 pair.
      *
      * Algorithm:
-     * - For each position i, maintain map[diff] = length of longest subsequence ending at i with difference diff
-     * - For each pair (j, i) where j < i, calculate diff = nums[i] - nums[j]
-     * - Extend subsequence: dp[i][diff] = max(dp[i][diff], dp[j][diff] + 1)
+     *   1. Return n for length at most 2.
+     *   2. Create one map per ending index.
+     *   3. For each i, scan all previous j.
+     *   4. Compute diff and extend the previous length for that diff.
+     *   5. Store and track the maximum length.
      *
-     * Time Complexity: O(n²)
-     * Space Complexity: O(n²) for storing all difference maps
+     * Time:  O(n^2) - every pair j < i is processed.
+     * Space: O(n^2) - maps can store one difference per pair.
+     *
+     * @param nums input array
+     * @return longest arithmetic subsequence length
      */
-    public int longestArithSeqLength(int[] nums) {
+public int longestArithSeqLength(int[] nums) {
         int n = nums.length;
         if (n <= 2) return n;
 
@@ -247,6 +262,7 @@ public class LongestArithmeticSubsequence {
     }
 
     // Recursive DFS with memoization
+    /** Solves one memoized stock or sequence state. */
     private int dfs(int[] nums, int index, int diff, Map<String, Integer> memo) {
         String key = index + "," + diff;
         if (memo.containsKey(key)) {

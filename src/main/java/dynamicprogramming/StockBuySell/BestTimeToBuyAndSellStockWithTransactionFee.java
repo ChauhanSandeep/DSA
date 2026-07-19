@@ -1,46 +1,42 @@
 package dynamicprogramming.stockbuysell;
 
+import java.util.Arrays;
+
 /**
- * Best Time to Buy and Sell Stock with Transaction Fee
+ * Problem: Best Time to Buy and Sell Stock with Transaction Fee
  *
- * Problem Statement:
- * You are given an array prices where prices[i] is the price of a given stock on the ith day,
- * and an integer fee representing a transaction fee. Find the maximum profit you can achieve.
- * You may complete as many transactions as you like, but you need to pay the transaction fee
- * for each transaction. You may not engage in multiple transactions simultaneously
- * (i.e., you must sell the stock before you buy again).
+ * Return the maximum profit from unlimited transactions when each sale pays a fixed fee. You cannot hold more than one share at once.
+ *
+ * Leetcode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Dynamic programming | Stock state machine | Transaction fee
  *
  * Example:
- * Input: prices = [1,3,2,8,4,9], fee = 2
- * Output: 8
- * Explanation: The maximum profit can be achieved by:
- * - Buying at prices[0] = 1
- * - Selling at prices[3] = 8
- * - Buying at prices[4] = 4
- * - Selling at prices[5] = 9
- * The total profit is ((8 - 1) - 2) + ((9 - 4) - 2) = 8.
+ *   Input:  prices = [1, 3, 2, 8, 4, 9], fee = 2
+ *   Output: 8
+ *   Why:    transactions 1->8 and 4->9 earn (7 - 2) + (5 - 2).
  *
- * LeetCode: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/
+ * Follow-ups:
+ *   1. How would you return an actual solution, not only the value?
+ *      Store predecessor or choice information while filling the same states.
+ *   2. How can space be reduced?
+ *      Keep only the previous row or active states when the recurrence allows it.
+ *   3. How would constraints such as fees, limits, or weights change it?
+ *      Add the constraint to the state or transition and keep the same invariant.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if fee is paid on both buy and sell? - Modify state transitions to include fee on buy
- * 2. What if different fees for different transaction amounts? - Use fee calculation function
- * 3. How to minimize number of transactions while maximizing profit? - Track transaction count in DP state
- * 4. What if there's a daily holding fee? - Add daily fee to holding state calculation
- * 5. How to handle percentage-based fees? - Calculate fee as percentage of transaction amount
- * 6. What if we want actual transaction details? - Maintain transaction log during DP
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Stock II (122), Stock with Cooldown (309), Stock IV (188).
  */
 public class BestTimeToBuyAndSellStockWithTransactionFee {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     BestTimeToBuyAndSellStockWithTransactionFee solution = new BestTimeToBuyAndSellStockWithTransactionFee();
-
-    int[] stockPrices = {1, 3, 2, 8, 4, 9};
-    int transactionFee = 2;
-
-    int maxProfitOptimized = solution.maxProfitOptimized(stockPrices, transactionFee);
-    System.out.println("Optimized maximum profit: " + maxProfitOptimized); // Output: 8
+    int[][] priceCases = { {1, 3, 2, 8, 4, 9}, {1, 3, 7, 5, 10, 3}, {1} };
+    int[] fees = {2, 3, 2};
+    int[] expected = {8, 6, 0};
+    for (int i = 0; i < priceCases.length; i++) {
+      int got = solution.maxProfitOptimized(priceCases[i], fees[i]);
+      System.out.printf("prices=%s fee=%d -> %d  expected=%d%n", Arrays.toString(priceCases[i]), fees[i], got, expected[i]);
+    }
   }
 
   /**
@@ -91,18 +87,24 @@ public class BestTimeToBuyAndSellStockWithTransactionFee {
       return totalProfit;
   }
 
-  /**
-   * Steps:
-   * 1. Maintain two states: holding stock and not holding stock
-   * 2. For each day, calculate maximum profit for both states
-   * 3. Holding state: max of (keep holding, buy today)
-   * 4. Not holding state: max of (keep not holding, sell today minus fee)
-   * 5. Final answer is profit when not holding any stock
+    /**
+   * Intuition: maxProfitAfterBuy is the best profit while holding stock, and maxProfitAfterSell is the best profit while not holding. Selling realizes held profit minus fee; buying spends today's price from the previous sell state.
    *
-   * Time Complexity: O(n)
-   * Space Complexity: O(1)
+   * Algorithm:
+   *   1. Return 0 for fewer than two prices.
+   *   2. Initialize buy and sell states.
+   *   3. For each day, compute the new sell state.
+   *   4. Compute the new buy state.
+   *   5. Return the final sell state.
+   *
+   * Time:  O(n) - each price is processed once.
+   * Space: O(1) - stores two states.
+   *
+   * @param stockPrices daily prices
+   * @param transactionFee fee per sale
+   * @return maximum profit
    */
-  public int maxProfitOptimized(int[] stockPrices, int transactionFee) {
+public int maxProfitOptimized(int[] stockPrices, int transactionFee) {
     if (stockPrices == null || stockPrices.length < 2) {
       return 0;
     }
