@@ -5,36 +5,41 @@ import java.util.*;
 /**
  * Problem: Snakes and Ladders
  *
- * You are given an n x n integer matrix board where the cells are labeled from 1 to n² in a
- * Boustrophedon style starting from the bottom left of the board and alternating direction each row.
- * You start on square 1 of the board. In each move, starting from square curr, do the following:
- * Choose a destination square next with a label in the range [curr + 1, min(curr + 6, n²)].
- * If next has a snake or ladder, you must move to the destination of that snake or ladder.
- * The game ends when you reach the square n².
- * Return the least number of moves required to reach the square n². If it is not possible, return -1.
+ * Given an n by n board numbered from 1 to n*n in alternating left-to-right and
+ * right-to-left rows from the bottom, return the fewest dice moves needed to
+ * reach the final square. A snake or ladder is followed at most once per move.
+ *
+ * Leetcode: https://leetcode.com/problems/snakes-and-ladders/
+ * Rating:   2020 (zerotrac Elo)
+ * Pattern:  Graph | BFS on numbered squares | Boustrophedon board mapping
  *
  * Example:
- * Input: board = [[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1]]
- * Output: 2
- * Explanation: In the first move, move from start to square 2. In the second move, move from square 2 to square 12.
+ *   Input:  board = [[-1,-1],[-1,3]]
+ *   Output: 1
+ *   Why:    from square 1, rolling a 1 reaches square 2, then the ladder sends the
+ *           player to square 3; rolling further can also finish in one move.
  *
- * LeetCode: https://leetcode.com/problems/snakes-and-ladders
+ * Follow-ups:
+ *   1. Return the actual squares visited?
+ *      Store parent square and dice result for each BFS discovery.
+ *   2. Dice has f faces instead of 6?
+ *      Change the transition range to current + 1 through current + f.
+ *   3. Snakes or ladders can chain in one move?
+ *      Keep following destinations until a normal square or a repeated square is reached.
  *
- * Follow-up Questions:
- * 1. What if we want to find the path with maximum probability of winning?
- *    Answer: Use Dijkstra's algorithm with negative log probabilities or dynamic programming.
- *
- * 2. How would you handle multiple players on the same board?
- *    Answer: Extend state space to include all player positions and use game theory approaches.
- *
- * 3. What if the dice can have different number of faces?
- *    Answer: Modify the range from [curr+1, curr+6] to [curr+1, curr+faces].
- *    Related: https://leetcode.com/problems/minimum-jumps-to-reach-home/
- *
- * @author Sandeep
- * LeetCode Contest Rating: 2020
+ * Related: Open the Lock (752), Minimum Jumps to Reach Home (1654), Sliding Puzzle (773).
  */
 public class SnakesAndLadders {
+
+    public static void main(String[] args) {
+        SnakesAndLadders solver = new SnakesAndLadders();
+        int[][][] boards = {{{-1, -1}, {-1, 3}}, {{-1, -1}, {-1, -1}}};
+        int[] expected = {1, 1};
+        for (int i = 0; i < boards.length; i++) {
+            int output = solver.snakesAndLadders(boards[i]);
+            System.out.printf("board=%s -> %d  expected=%d%n", Arrays.deepToString(boards[i]), output, expected[i]);
+        }
+    }
 
     /**
      * Finds minimum moves to reach the end using BFS.

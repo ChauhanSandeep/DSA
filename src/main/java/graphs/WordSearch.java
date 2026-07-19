@@ -1,30 +1,45 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
- * Problem: Word Search (LeetCode #79)
- * https://leetcode.com/problems/word-search/
+ * Problem: Word Search
  *
- * Given an m x n 2D board and a word, determine if the word exists in the grid.
- * The word can be constructed from letters of sequentially adjacent cells (horizontally or vertically),
- * and the same cell may not be used more than once.
+ * Given a 2D board of letters and a word, decide whether the word can be formed
+ * by walking through horizontally or vertically adjacent cells. The same cell may
+ * not be used more than once in one word path.
+ *
+ * Leetcode: https://leetcode.com/problems/word-search/
+ * Rating:   acceptance 47.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Backtracking DFS | In-place visited marking
  *
  * Example:
- * Input:
- *   board = [
- *     ['A','B','C','E'],
- *     ['S','F','C','S'],
- *     ['A','D','E','E']
- *   ],
- *   word = "ABCCED"
- * Output: true
+ *   Input:  board = [[A,B,C,E],[S,F,C,S],[A,D,E,E]], word = "ABCB"
+ *   Output: false
+ *   Why:    the letters exist, but forming ABCB would require reusing the B cell,
+ *           which the rules forbid.
  *
- * Follow-up Questions:
- * - What if words can also be constructed diagonally?
- * - How would you handle large dictionaries? (Use Trie + DFS)
- * - What if multiple words need to be found? (Word Search II: https://leetcode.com/problems/word-search-ii/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Search for many words at once?
+ *      Build a trie and run shared DFS from the board; see Word Search II.
+ *   2. Allow diagonal movement?
+ *      Add the four diagonal directions to the DFS transitions.
+ *   3. Count all matching paths instead of existence?
+ *      Do not stop at the first success; accumulate successful DFS leaves.
+ *
+ * Related: Word Search II (212), Number of Islands (200), Path With Maximum Gold (1219).
  */
 public class WordSearch {
+
+    public static void main(String[] args) {
+        char[][] board = {{'A', 'B', 'C', 'E'}, {'S', 'F', 'C', 'S'}, {'A', 'D', 'E', 'E'}};
+        String[] words = {"ABCCED", "ABCB"};
+        boolean[] expected = {true, false};
+        for (int i = 0; i < words.length; i++) {
+            boolean output = doesWordExist(board, words[i]);
+            System.out.printf("board=%s word=%s -> %b  expected=%b%n", Arrays.deepToString(board), words[i], output, expected[i]);
+        }
+    }
 
     /**
      * Public API to check if the given word exists in the board.
@@ -97,14 +112,4 @@ public class WordSearch {
         return found;
     }
 
-    public static void main(String[] args) {
-        char[][] board = {
-            {'A', 'B', 'C', 'E'},
-            {'S', 'F', 'C', 'S'},
-            {'A', 'D', 'E', 'E'}};
-
-        System.out.println(doesWordExist(board, "ABCCED")); // true
-        System.out.println(doesWordExist(board, "SEE"));    // true
-        System.out.println(doesWordExist(board, "ABCB"));   // false
-    }
 }

@@ -5,47 +5,42 @@ import java.util.*;
 /**
  * Problem: Shortest Path in a Grid with Obstacles Elimination
  *
- * You are given an m x n integer matrix grid where each cell is either 0
- * (empty) or 1 (obstacle).
- * You can move up, down, left, or right from and to an empty cell. Return the
- * minimum number of steps
- * to walk from the upper left corner (0, 0) to the lower right corner (m - 1, n
- * - 1) given that
- * you can eliminate at most k obstacles. If it is not possible to find such
- * walk, return -1.
+ * Move from the top-left cell to the bottom-right cell of a 0/1 grid. You may
+ * eliminate at most k obstacle cells, and each move goes one step in the four
+ * cardinal directions. Return the fewest steps, or -1 if no valid walk exists.
+ *
+ * Leetcode: https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/
+ * Rating:   1967 (zerotrac Elo)
+ * Pattern:  Graph | BFS with state | Dominance pruning
  *
  * Example:
- * Input: grid = [
- * [0,0,0],
- * [1,1,0],
- * [0,0,0],
- * [0,1,1],
- * [0,0,0]
- * ],
- * k = 1
- * Output: 6
- * Explanation: The shortest path without eliminating any obstacle is 10.
- * The shortest path with one obstacle elimination at position (3,2) is 6.
+ *   Input:  grid = [[0,0,0],[1,1,0],[0,0,0],[0,1,1],[0,0,0]], k = 1
+ *   Output: 6
+ *   Why:    one obstacle can be removed near the bottom, making a shorter route
+ *           than walking around all obstacles.
  *
- * LeetCode:
- * https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination
+ * Follow-ups:
+ *   1. Return the actual path?
+ *      Store parent pointers keyed by row, column, and remaining eliminations.
+ *   2. Obstacles have different removal costs?
+ *      Track remaining budget and use Dijkstra if moves or removals have weights.
+ *   3. Count how many shortest paths exist?
+ *      Run BFS by layers and count ways for states that reach the destination at the first depth.
  *
- * Follow-up Questions:
- * 1. What if we need to find all possible shortest paths?
- * Answer: Modify BFS to track all parent nodes and reconstruct all paths.
- *
- * 2. How would you handle negative weights (rewards for eliminating obstacles)?
- * Answer: Use Dijkstra's algorithm instead of BFS for weighted shortest path.
- *
- * 3. What if obstacles have different elimination costs?
- * Answer: Extend state to track remaining budget and use priority queue.
- * Related:
- * https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/
- *
- * @author Sandeep
- *         LeetCode Contest Rating: 1967
+ * Related: Shortest Path to Get All Keys (864), Minimum Cost to Make at Least One Valid Path (1368).
  */
 public class ShortestPathInAGridWithObstaclesElimination {
+
+    public static void main(String[] args) {
+        ShortestPathInAGridWithObstaclesElimination solver = new ShortestPathInAGridWithObstaclesElimination();
+        int[][][] grids = {{{0, 0, 0}, {1, 1, 0}, {0, 0, 0}, {0, 1, 1}, {0, 0, 0}}, {{0, 1, 1}, {1, 1, 1}, {1, 0, 0}}};
+        int[] eliminations = {1, 1};
+        int[] expected = {6, -1};
+        for (int i = 0; i < grids.length; i++) {
+            int output = solver.shortestPath(grids[i], eliminations[i]);
+            System.out.printf("grid=%s k=%d -> %d  expected=%d%n", Arrays.deepToString(grids[i]), eliminations[i], output, expected[i]);
+        }
+    }
 
     /**
      * Finds shortest path using BFS with optimized state tracking.

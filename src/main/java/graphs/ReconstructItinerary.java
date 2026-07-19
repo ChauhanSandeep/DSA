@@ -4,55 +4,47 @@ import java.util.*;
 
 
 /**
- * Problem Statement:
- * You are given a list of airline tickets where tickets[i] = [from_i, to_i] represent the departure 
- * and arrival airports of one flight. Reconstruct the itinerary in order and return it.
+ * Problem: Reconstruct Itinerary
  *
- * All of the tickets belong to a man who departs from "JFK", thus, the itinerary must begin with "JFK".
- * If there are multiple valid itineraries, you should return the itinerary that has the smallest 
- * lexical order when read as a single string.
+ * Given airline tickets [from, to], rebuild an itinerary that starts at JFK and
+ * uses every ticket exactly once. If more than one valid itinerary exists, return
+ * the lexicographically smallest airport sequence.
  *
- * For example, the itinerary ["JFK", "LGA"] has a smaller lexical order than ["JFK", "LGB"].
- * You may assume all tickets form at least one valid itinerary. You must use all the tickets once and only once.
+ * Leetcode: https://leetcode.com/problems/reconstruct-itinerary/
+ * Rating:   acceptance 44.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Eulerian path | Hierholzer DFS with lexical ordering
  *
- * Example 1:
- * Input: tickets = [
- *    ["MUC","LHR"],
- *    ["JFK","MUC"],
- *    ["SFO","SJC"],
- *    ["LHR","SFO"]]
- * Output: ["JFK","MUC","LHR","SFO","SJC"]
- * Explanation:
- * Start at JFK → MUC → LHR → SFO → SJC (uses all 4 tickets)
+ * Example:
+ *   Input:  tickets = [[JFK,SFO],[JFK,ATL],[SFO,ATL],[ATL,JFK],[ATL,SFO]]
+ *   Output: [JFK, ATL, JFK, SFO, ATL, SFO]
+ *   Why:    both JFK choices can lead to valid trips, so the path taking ATL first
+ *           wins because it is lexicographically smaller.
  *
- * LeetCode link: https://leetcode.com/problems/reconstruct-itinerary/
+ * Follow-ups:
+ *   1. Validate that an itinerary exists before building it?
+ *      Check directed Euler path degree conditions and that all ticket endpoints are connected.
+ *   2. Return all valid itineraries in lexical order?
+ *      Use backtracking with ticket counts, but it can be exponential.
+ *   3. Start from an arbitrary airport?
+ *      Pass the start airport into the same Hierholzer traversal.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - What if there's no valid itinerary (tickets don't form a connected path)?
- *    → Problem guarantees valid itinerary exists, but could add validation to check connectivity.
- *  - How would you handle returning all possible valid itineraries?
- *    → Use backtracking to generate all paths, then sort and return all valid ones.
- *  - What if we don't start from "JFK" but from any arbitrary airport?
- *    → Modify algorithm to accept starting airport as parameter; Hierholzer's algorithm still works.
- *  - Can you determine if an Eulerian path exists before attempting to find it?
- *    → Yes, check if at most 2 vertices have odd degree (for undirected) or specific in/out-degree conditions (for directed).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Course Schedule II (210), Alien Dictionary (269), Network Delay Time (743).
+ *
  */
 public class ReconstructItinerary {
 
   public static void main(String[] args) {
-    List<List<String>> tickets = Arrays.asList(
-        Arrays.asList("JFK", "SFO"),
-        Arrays.asList("JFK", "ATL"),
-        Arrays.asList("SFO", "ATL"),
-        Arrays.asList("ATL", "JFK"),
-        Arrays.asList("ATL", "SFO")
-    );
-
-    ReconstructItinerary itineraryBuilder = new ReconstructItinerary();
-    List<String> itinerary = itineraryBuilder.findItinerary(tickets);
-    System.out.println(itinerary);
+    ReconstructItinerary solver = new ReconstructItinerary();
+    List<List<List<String>>> cases = Arrays.asList(
+        Arrays.asList(Arrays.asList("MUC", "LHR"), Arrays.asList("JFK", "MUC"), Arrays.asList("SFO", "SJC"), Arrays.asList("LHR", "SFO")),
+        Arrays.asList(Arrays.asList("JFK", "SFO"), Arrays.asList("JFK", "ATL"), Arrays.asList("SFO", "ATL"), Arrays.asList("ATL", "JFK"), Arrays.asList("ATL", "SFO")));
+    List<List<String>> expected = Arrays.asList(Arrays.asList("JFK", "MUC", "LHR", "SFO", "SJC"), Arrays.asList("JFK", "ATL", "JFK", "SFO", "ATL", "SFO"));
+    for (int i = 0; i < cases.size(); i++) {
+      List<String> output = solver.findItinerary(cases.get(i));
+      System.out.printf("tickets=%s -> %s  expected=%s%n", cases.get(i), output, expected.get(i));
+    }
   }
+
 
   /**
      * Main method: Reconstructs itinerary using Hierholzer's Algorithm (Optimal).

@@ -1,24 +1,45 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
  * Problem: Surrounded Regions
  *
- * Given an m x n matrix board containing 'X' and 'O', capture all regions that are 4-directionally surrounded by 'X'.
- * A region is captured by flipping all 'O's into 'X's in that surrounded region.
+ * Given a board of X and O, flip every O region that is completely surrounded by
+ * X. Any O connected to the border is safe and must remain O.
+ *
+ * Leetcode: https://leetcode.com/problems/surrounded-regions/
+ * Rating:   acceptance 45.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Boundary DFS | Reverse capture
  *
  * Example:
- * Input: board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
- * Output: [["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]
- * Explanation: Surrounded regions should not be on the border, which means that any 'O' on the border of the board
- * are not flipped to 'X'. Any 'O' that is not on the border and it is not connected to an 'O' on the border will be flipped to 'X'.
+ *   Input:  board = [[X,X,X,X],[X,O,O,X],[X,X,O,X],[X,O,X,X]]
+ *   Output: [[X,X,X,X],[X,X,X,X],[X,X,X,X],[X,O,X,X]]
+ *   Why:    the bottom O touches the border and survives; the middle O component
+ *           has no border connection, so it is captured.
  *
- * LeetCode: https://leetcode.com/problems/surrounded-regions
+ * Follow-ups:
+ *   1. Avoid recursion for very large boards?
+ *      Use a queue from border O cells instead of recursive DFS.
+ *   2. Return the number of cells flipped?
+ *      Increment a counter when converting remaining O cells to X.
+ *   3. Capture regions under diagonal connectivity?
+ *      Add diagonal directions to the border traversal and component definition.
  *
- * Time Complexity: O(m * n) where m is the number of rows and n is the number of columns
- * Space Complexity: O(m * n) in the worst case for the recursion stack
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Number of Islands (200), Pacific Atlantic Water Flow (417), Walls and Gates (286).
  */
 public class SurroundedRegions {
+
+    public static void main(String[] args) {
+        SurroundedRegions solver = new SurroundedRegions();
+        char[][][] boards = {{{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'X'}, {'X', 'X', 'O', 'X'}, {'X', 'O', 'X', 'X'}}, {{'O'}}};
+        char[][][] expected = {{{'X', 'X', 'X', 'X'}, {'X', 'X', 'X', 'X'}, {'X', 'X', 'X', 'X'}, {'X', 'O', 'X', 'X'}}, {{'O'}}};
+        for (int i = 0; i < boards.length; i++) {
+            String input = Arrays.deepToString(boards[i]);
+            solver.solve(boards[i]);
+            System.out.printf("board=%s -> %s  expected=%s%n", input, Arrays.deepToString(boards[i]), Arrays.deepToString(expected[i]));
+        }
+    }
     public void solve(char[][] board) {
         if (board == null || board.length == 0 || board[0].length == 0) {
             return;

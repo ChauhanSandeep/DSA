@@ -3,48 +3,42 @@ package graphs;
 import java.util.*;
 
 /**
- * Problem: Count the total number of **unique end states** in an N x N Tic-Tac-Toe game.
+ * Problem: Tic-Tac-Toe End States
  *
- * A valid end state is defined as:
- * - A configuration where one player wins (row/column/diagonal fully marked), OR
- * - The board is completely filled (draw), with no further moves possible.
+ * For an n by n Tic-Tac-Toe board, count the unique board positions where the
+ * game is over. A board is an end state when either player has a full row,
+ * column, or diagonal, or when the board is full.
  *
- * --- Example ---
- * For N = 3 (3x3 board), the total number of such end states is a finite number which this program calculates.
- * It includes all final positions whether the game ended in a win or draw.
- * Answer: 5478 unique end states for a 3x3 Tic-Tac-Toe board.
+ * Pattern:  Graph | Game-state DFS | Backtracking with terminal-state dedupe
  *
- * --- Approach ---
- * - Use **DFS with backtracking** to simulate all possible move sequences.
- * - Represent the board as a **string** (e.g., "---xo---x").
- * - Track already visited configurations to avoid redundant exploration.
- * - After each move, check whether the game has reached an **end state**.
- * - Maintain a global set of end states to ensure **uniqueness**.
+ * Example:
+ *   Input:  size = 1
+ *   Output: 1
+ *   Why:    the first move fills the only cell and also wins, so there is exactly
+ *           one possible final board.
  *
- * --- Time & Space Complexity ---
- * Time: O((N^2)!) in worst-case, but pruning + visited set reduces it significantly for N=3.
- * Space: O(N^2) for each board string + visited set.
- *
- * Follow-up Questions:
- * Q: What if board size is 4x4 or larger?
- * A: Algorithm still works but becomes exponential; optimizations or memoization may be needed.
- *
- * Q: Can we return actual board configurations instead of just count?
- * A: Yes. `endStatesSet` already stores the board strings.
- *
- * Q: How to represent draw vs win in output?
- * A: Extend `isEndState()` to return win/draw info separately.
+ * Follow-ups:
+ *   1. Count distinct games instead of distinct final boards?
+ *      Do not dedupe by board string; count every move sequence that reaches a terminal state.
+ *   2. Return final boards split by X win, O win, and draw?
+ *      Classify each terminal board before inserting it into result buckets.
+ *   3. Scale beyond 3 by 3?
+ *      The state space grows factorially, so add symmetry reduction or memoization.
  */
 public class TicTacToeEndStates {
 
+    public static void main(String[] args) {
+        TicTacToeEndStates solver = new TicTacToeEndStates();
+        int[] sizes = {1, 2};
+        int[] expected = {1, 24};
+        for (int i = 0; i < sizes.length; i++) {
+            int output = solver.countEndStates(sizes[i]);
+            System.out.printf("size=%d -> %d  expected=%d%n", sizes[i], output, expected[i]);
+        }
+    }
+
     private final Set<String> endStatesSet = new HashSet<>(); // Stores unique end states
 
-    public static void main(String[] args) {
-        int boardSize = 3;
-        TicTacToeEndStates solver = new TicTacToeEndStates();
-        int totalEndStates = solver.countEndStates(boardSize);
-        System.out.println("Total unique end states: " + totalEndStates);
-    }
 
     /**
      * Counts the number of unique end states for an N x N Tic-Tac-Toe board.

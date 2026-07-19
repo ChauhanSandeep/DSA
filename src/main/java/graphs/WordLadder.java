@@ -3,28 +3,46 @@ package graphs;
 import java.util.*;
 
 /**
- * 127. Word Ladder
+ * Problem: Word Ladder
  *
- * Problem: Given two words (beginWord and endWord), and a dictionary's word
- * list,
- * find the length of shortest transformation sequence from beginWord to
- * endWord,
- * where only one letter can be changed at a time and each transformed word must
- * exist in the word list.
+ * Transform beginWord into endWord by changing one letter at a time, and every
+ * intermediate word must be in the dictionary. Return the length of the shortest
+ * transformation sequence, including both endpoints, or 0 if none exists.
+ *
+ * Leetcode: https://leetcode.com/problems/word-ladder/
+ * Rating:   acceptance 46.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | BFS on implicit word graph | Bidirectional search
  *
  * Example:
- * Input: beginWord = "hit", endWord = "cog", wordList =
- * ["hot","dot","dog","lot","log","cog"]
- * Output: 5
- * Explanation: "hit" -> "hot" -> "dot" -> "dog" -> "cog"
+ *   Input:  beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+ *   Output: 5
+ *   Why:    the shortest chain is hit -> hot -> dot -> dog -> cog, which contains
+ *           five words including the start and end.
  *
- * LeetCode: https://leetcode.com/problems/word-ladder
+ * Follow-ups:
+ *   1. Return all shortest ladders?
+ *      Build shortest-level parent links with BFS, then backtrack paths; see Word Ladder II.
+ *   2. Optimize neighbor generation for huge dictionaries?
+ *      Precompute wildcard buckets such as h*t -> [hot, hit].
+ *   3. Weighted letter changes?
+ *      Replace BFS with Dijkstra because transformations no longer have equal cost.
  *
- * Approaches:
- * 1. Simple BFS - Standard breadth-first search approach
- * 2. Bidirectional BFS - Optimized search from both ends for better performance
+ * Related: Word Ladder II (126), Minimum Genetic Mutation (433), Open the Lock (752).
+ *
  */
 public class WordLadder {
+
+    public static void main(String[] args) {
+        WordLadder solver = new WordLadder();
+        String[] begins = {"hit", "hit"};
+        String[] ends = {"cog", "cog"};
+        List<List<String>> wordLists = Arrays.asList(Arrays.asList("hot", "dot", "dog", "lot", "log", "cog"), Arrays.asList("hot", "dot", "dog", "lot", "log"));
+        int[] expected = {5, 0};
+        for (int i = 0; i < begins.length; i++) {
+            int output = solver.ladderLength(begins[i], ends[i], wordLists.get(i));
+            System.out.printf("begin=%s end=%s words=%s -> %d  expected=%d%n", begins[i], ends[i], wordLists.get(i), output, expected[i]);
+        }
+    }
 
     /**
      * BFS approach - optimal for shortest path.

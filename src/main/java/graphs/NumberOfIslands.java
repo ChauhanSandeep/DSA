@@ -1,37 +1,47 @@
 package graphs;
 
+import java.util.Arrays;
+
 /**
- * Number of Islands problem
- * LeetCode: https://leetcode.com/problems/number-of-islands/
+ * Problem: Number of Islands
  *
- * --- Problem Description ---
- * Given a 2D grid of '1' (land) and '0' (water), count the number of islands.
- * An island is surrounded by water and is formed by horizontally or vertically connected lands.
+ * Given a grid of water cells ('0') and land cells ('1'), count how many separate
+ * islands are present. Land belongs to the same island only when it touches another
+ * land cell horizontally or vertically.
  *
- * --- Approach ---
- * 1. Iterate through each cell in the grid.
- * 2. When encountering a '1', it signifies the start of an island:
- *    - Use **DFS** to explore and mark all connected land as visited.
- *    - Increment island count.
- * 3. Continue scanning the grid until all islands are counted.
+ * Leetcode: https://leetcode.com/problems/number-of-islands/
+ * Rating:   acceptance 64.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Grid traversal | DFS flood fill
  *
- * --- Complexity Analysis ---
- * - **Time Complexity:** O(m * n) in the worst case (every cell visited once).
- * - **Space Complexity:** O(m * n) in worst case (DFS recursion stack).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  grid = [[1,1,0],[0,1,0],[1,0,1]]
+ *   Output: 3
+ *   Why:    the top-left land mass is one island, and the two diagonal land cells
+ *           do not connect to it or to each other because diagonals do not count.
+ *
+ * Follow-ups:
+ *   1. Count islands without modifying the grid?
+ *      Keep a separate visited matrix instead of sinking land in place.
+ *   2. Avoid recursion on a huge grid?
+ *      Use the BFS variant with an explicit queue to avoid call-stack overflow.
+ *   3. Count islands as land is added online?
+ *      Use Union-Find and merge newly added land with active neighbors.
+ *
+ * Related: Number of Provinces (547), Max Area of Island (695), Number of Closed Islands (1254).
+ *
  */
 public class NumberOfIslands {
 
     public static void main(String[] args) {
-        char[][] grid = {
-                {'1', '1', '1', '1', '0'},
-                {'1', '1', '0', '1', '0'},
-                {'0', '0', '1', '0', '0'},
-                {'0', '0', '0', '1', '1'}
-        };
-
-        System.out.println("Number of islands: " + numIslands(grid));
+        char[][][] grids = {{{'1', '1', '0'}, {'0', '1', '0'}, {'1', '0', '1'}}, {{'0'}}, {{'1', '1'}, {'1', '1'}}};
+        int[] expected = {3, 0, 1};
+        for (int i = 0; i < grids.length; i++) {
+            String input = Arrays.deepToString(grids[i]);
+            int output = numIslands(grids[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n", input, output, expected[i]);
+        }
     }
+
 
     /**
      * Counts the number of islands using DFS.

@@ -4,72 +4,53 @@ import java.util.*;
 
 
 /**
- * Problem: Topological Sort using DFS with Cycle Detection
+ * Problem: Topological Sort with Cycle Detection
  *
- * --- Problem Statement ---
- * Given a Directed Graph with `N` nodes, perform Topological Sort.
- * Return a valid topological ordering if possible. If the graph contains a cycle,
- * return an empty array since a topological sort is not possible in cyclic graphs.
+ * Given a directed graph, return an ordering where every node appears after all
+ * of its prerequisites. If the graph contains a directed cycle, no topological
+ * ordering exists, so return an empty array.
  *
- * --- Example ---
- * Input:
- * N = 6, Edges = [
- *   5 -> 2, 5 -> 0,
- *   4 -> 0, 4 -> 1,
- *   2 -> 3, 3 -> 1
- * ]
- * Output: [5, 4, 2, 3, 1, 0] (One possible valid ordering)
+ * Leetcode: https://leetcode.com/problems/course-schedule-ii/
+ * Rating:   acceptance 55.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | DFS topological sort | Three-color cycle detection
  *
- * --- Approach ---
- * - Use **DFS traversal** with **three-color marking** (UNVISITED, VISITING, VISITED) to detect cycles.
- * - Track the visited states to avoid reprocessing.
- * - Store result in postorder (dependencies before dependent).
- * - Reverse the final list to get valid topological order.
+ * Example:
+ *   Input:  n = 6, edges = [5->2,5->0,4->0,4->1,2->3,3->1]
+ *   Output: [5,4,2,3,1,0]
+ *   Why:    every directed edge points from an earlier node to a later node in the
+ *           returned order; other valid orders may also exist.
  *
- * --- Time Complexity ---
- * O(V + E), where V = number of vertices, E = number of edges.
+ * Follow-ups:
+ *   1. Return the lexicographically smallest topological order?
+ *      Use Kahn's algorithm with a min-heap of zero-indegree nodes.
+ *   2. Count all possible topological orders?
+ *      Backtrack over the current zero-indegree set; this is exponential.
+ *   3. Detect and return one cycle?
+ *      Keep the recursion path and slice it when a VISITING neighbor is found.
  *
- * --- Space Complexity ---
- * O(V) for visited array and topological result list.
- *
- * Follow-up Questions:
- * Q: Can we use Kahn's Algorithm (BFS) instead of DFS?
- * A: Yes. Kahn’s Algorithm also works and is more suitable when in-degree tracking is needed.
- *
- * Q: What if the graph has multiple valid topological orders?
- * A: This algorithm will return any one of them based on traversal order.
- *
- * Leetcode link: https://leetcode.com/problems/course-schedule-ii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Course Schedule (207), Alien Dictionary (269), Parallel Courses (1136).
  */
 public class TopologicalSort {
+
+  public static void main(String[] args) {
+    ArrayList<ArrayList<Integer>> dag = new ArrayList<>();
+    for (int i = 0; i < 6; i++) dag.add(new ArrayList<>());
+    dag.get(5).add(2); dag.get(5).add(0); dag.get(4).add(0); dag.get(4).add(1); dag.get(2).add(3); dag.get(3).add(1);
+    ArrayList<ArrayList<Integer>> cycle = new ArrayList<>();
+    for (int i = 0; i < 2; i++) cycle.add(new ArrayList<>());
+    cycle.get(0).add(1); cycle.get(1).add(0);
+    int[][] outputs = {performTopologicalSort(6, dag), performTopologicalSort(2, cycle)};
+    int[][] expected = {{5, 4, 2, 3, 1, 0}, {}};
+    String[] inputs = {"dag", "cycle"};
+    for (int i = 0; i < outputs.length; i++) {
+      System.out.printf("graph=%s -> %s  expected=%s%n", inputs[i], Arrays.toString(outputs[i]), Arrays.toString(expected[i]));
+    }
+  }
 
   private static final int UNVISITED = 0;
   private static final int VISITING = 1;
   private static final int VISITED = 2;
 
-  public static void main(String[] args) {
-    int numNodes = 6;
-    ArrayList<ArrayList<Integer>> adjacencyList = new ArrayList<>();
-    for (int i = 0; i < numNodes; i++) {
-      adjacencyList.add(new ArrayList<>());
-    }
-
-    // Directed Acyclic Graph (DAG)
-    adjacencyList.get(5).add(2);
-    adjacencyList.get(5).add(0);
-    adjacencyList.get(4).add(0);
-    adjacencyList.get(4).add(1);
-    adjacencyList.get(2).add(3);
-    adjacencyList.get(3).add(1);
-
-    int[] result = performTopologicalSort(numNodes, adjacencyList);
-    if (result.length == 0) {
-      System.out.println("Cycle detected! Topological sorting not possible.");
-    } else {
-      System.out.println("Topological Sort Order: " + Arrays.toString(result));
-    }
-  }
 
   /**
    * Performs Topological Sort on a directed graph using DFS and cycle detection.

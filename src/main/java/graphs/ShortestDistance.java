@@ -5,42 +5,48 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * LeetCode: https://leetcode.com/problems/01-matrix/
+ * Problem: 01 Matrix
  *
- * --- Problem Description ---
- * Given a binary matrix where:
- * - `0` represents an empty cell.
- * - `1` represents a filled cell.
- * Return a matrix where each `1` is replaced by the shortest distance to the nearest `0`.
+ * Given a binary matrix, replace every 1 with its distance to the nearest 0.
+ * Distance is measured by 4-directional moves between neighboring cells.
  *
- * --- Approach ---
- * 1. **Use Multi-Source BFS**, starting from all `0`s and expanding outward.
- * 2. **Mark all `1`s as `Integer.MAX_VALUE` initially** to indicate unprocessed distances.
- * 3. **BFS propagates distances optimally** in O(N²) time.
+ * Leetcode: https://leetcode.com/problems/01-matrix/
+ * Rating:   acceptance 54.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Multi-source BFS | Nearest zero distance
  *
- * --- Complexity Analysis ---
- * - **Time Complexity:** O(N * M) → Each cell is processed at most once.
- * - **Space Complexity:** O(N * M) → Queue stores at most N * M elements.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  mat = [[0,0,0],[0,1,0],[1,1,1]]
+ *   Output: [[0,0,0],[0,1,0],[1,2,1]]
+ *   Why:    all zero cells start at distance 0, and each 1 receives the first BFS
+ *           layer that reaches it from any zero.
+ *
+ * Follow-ups:
+ *   1. Return distance to the nearest 1 instead?
+ *      Seed BFS with all 1 cells and expand into 0 cells.
+ *   2. Movement has different costs by direction?
+ *      Replace BFS with Dijkstra because layers no longer mean equal distance.
+ *   3. Avoid modifying the input matrix?
+ *      Write distances into a separate matrix initialized with a large value.
+ *
+ * Related: Walls and Gates (286), Rotting Oranges (994), Shortest Bridge (934).
  */
 public class ShortestDistance {
+
+    public static void main(String[] args) {
+        ShortestDistance solver = new ShortestDistance();
+        int[][][] inputs = {{{0, 0, 0}, {0, 1, 0}, {1, 1, 1}}, {{0}}};
+        int[][][] expected = {{{0, 0, 0}, {0, 1, 0}, {1, 2, 1}}, {{0}}};
+        for (int i = 0; i < inputs.length; i++) {
+            String input = Arrays.deepToString(inputs[i]);
+            int[][] output = solver.updateMatrix(inputs[i]);
+            System.out.printf("matrix=%s -> %s  expected=%s%n", input, Arrays.deepToString(output), Arrays.deepToString(expected[i]));
+        }
+    }
 
     private static final int[][] DIRECTIONS = {
             {-1, 0}, {1, 0}, {0, -1}, {0, 1} // Up, Down, Left, Right
     };
 
-    public static void main(String[] args) {
-        int[][] mat = {
-                {0, 0, 0},
-                {0, 1, 0},
-                {1, 1, 1}
-        };
-
-        int[][] result = new ShortestDistance().updateMatrix(mat);
-        for (int[] row : result) {
-            System.out.println(Arrays.toString(row));
-        }
-    }
 
     /**
      * Computes the shortest distance from each cell to the nearest '0' using Multi-Source BFS.

@@ -5,32 +5,41 @@ import java.util.*;
 /**
  * Problem: Shortest Path to Get All Keys
  *
- * You are given an m x n grid grid where:
- * - '.' is an empty cell.
- * - '#' is a wall.
- * - '@' is the starting point.
- * - Lowercase letters represent keys.
- * - Uppercase letters represent locks.
+ * In a grid with walls, a start cell, lowercase keys, and uppercase locks, find
+ * the fewest moves needed to collect every key. A lock can be crossed only after
+ * collecting its matching lowercase key.
  *
- * You start at the starting point and one move consists of walking one space in one of the four cardinal directions.
- * You cannot walk outside the grid, or walk into a wall.
- * If you walk over a key, you can pick it up and you cannot pick up a key more than once.
- * If you walk over a lock, you can only do so if you have the corresponding key.
- *
- * Return the lowest number of moves to acquire all keys. If it's impossible, return -1.
+ * Leetcode: https://leetcode.com/problems/shortest-path-to-get-all-keys/
+ * Rating:   2259 (zerotrac Elo)
+ * Pattern:  Graph | BFS with bitmask state | Keys and locks
  *
  * Example:
- * Input: grid = ["@.a.#","###.#","b.A.B"]
- * Output: 8
- * Explanation: The path is @ -> . -> a -> . -> b -> . -> A -> B
+ *   Input:  grid = ["@.a.#","###.#","b.A.B"]
+ *   Output: 8
+ *   Why:    the route must collect a and b before passing locks A and B, and BFS
+ *           finds the first state whose key mask contains both keys.
  *
- * LeetCode: https://leetcode.com/problems/shortest-path-to-get-all-keys
+ * Follow-ups:
+ *   1. Return the path of moves?
+ *      Store parent states keyed by row, column, and key mask.
+ *   2. More than 6 keys?
+ *      Bitmask BFS still works for moderate k, but state count grows as 2^k.
+ *   3. Keys can be consumed when opening locks?
+ *      The state must track key counts or availability, not just a collected mask.
  *
- * Time Complexity: O(m * n * 2^k) where m is number of rows, n is number of columns, and k is number of keys
- * Space Complexity: O(m * n * 2^k) for the visited set
- * LeetCode Contest Rating: 2259
+ * Related: Shortest Path in a Grid with Obstacles Elimination (1293), Sliding Puzzle (773).
  */
 public class ShortestPathToGetAllKeys {
+
+    public static void main(String[] args) {
+        ShortestPathToGetAllKeys solver = new ShortestPathToGetAllKeys();
+        String[][] inputs = {{"@.a..", "###.#", "b.A.B"}, {"@Aa"}};
+        int[] expected = {8, -1};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.shortestPathAllKeys(inputs[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
     private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 
     public int shortestPathAllKeys(String[] grid) {
