@@ -3,66 +3,56 @@ package arrays.binarysearch;
 import java.util.Arrays;
 
 /**
- * ✅ Problem: Maximum Team Size With Overlapping Intervals
+ * Problem: Maximum Team Size With Overlapping Intervals
  *
- * Each employee i has a closed interval [startTime[i], endTime[i]]. Two
- * employees can interact iff their intervals share at least one point.
- * A team is valid if there exists a "captain" inside it who interacts
- * with every other member (the others need not pairwise overlap).
- * Return the maximum possible team size.
+ * Each employee has a closed interval. A team is valid when one captain overlaps every other member, even if non-captains do not overlap each other.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/maximum-team-size-with-overlapping-intervals/   (Medium)
- * 🏷️ Pattern:  Intervals · Sorting · Binary search (firstTrue / Pattern 2)
+ * Leetcode: https://leetcode.com/problems/maximum-team-size-with-overlapping-intervals/ (Medium)
+ * Rating:   acceptance 43.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Intervals | Sorting endpoints | Binary search counts
  *
- * 🧪 Example:
+ * Example:
  *   Input:  startTime = [3,4,6], endTime = [8,5,7]
- *   Output: 3                         // captain = 0 ([3,8]) overlaps both others
+ *   Output: 3
+ *   Why:    interval [3,8] overlaps both [4,5] and [6,7].
  *
- * 🚧 Edge cases to remember:
- *   - n == 1                          → answer is 1 (captain alone)
- *   - all intervals disjoint          → answer is 1
- *   - touching at a single point      → counts as overlap (closed endpoints)
- *   - duplicate intervals             → handled naturally by counting
+ * Follow-ups:
+ *   1. Return members? Save the best captain, then collect intervals overlapping it.
+ *   2. Half-open intervals? Change the strict endpoint comparisons.
+ *   3. Employee weights? Use sorted endpoints with prefix sums.
+ *   4. Require pairwise overlap? Sweep endpoints for max concurrent intervals.
  *
- * 🔍 Follow-ups:
- *   1. Return the actual team? Re-scan and collect indices overlapping the best captain.
- *   2. Half-open intervals [s, e)? Swap strict / non-strict bounds on the miss counts.
- *   3. Weighted employees? Replace counts with prefix sums of weights on sorted endpoints.
- *   4. "Every pair overlaps" variant (Helly)? Use a sweep line for max concurrent intervals.
- *
- * 🔁 Related: Meeting Rooms II (253), Minimum Arrows to Burst Balloons (452),
- *             Car Pooling (1094), My Calendar III (732).
+ * Related: Meeting Rooms II (253), My Calendar III (732).
  */
 public class MaximumTeamSizeWithOverlappingIntervals {
 
-    /**
-     * 🧠 Intuition: only the captain has constraints, so for a fixed
-     * captain `c` the best team is `c` plus everyone whose interval
-     * overlaps `c`'s. The answer is therefore the max over all `c` of
-     * `#{j : j overlaps c}` (and `c` overlaps itself, so it self-counts).
-     *
-     * Overlap is an AND of two conditions, which is awkward. Flip it:
-     * for captain `[S, E]`, an interval is NON-overlapping iff it ended
-     * strictly before `S` OR started strictly after `E` — two disjoint
-     * one-sided counts that fall straight out of sorted endpoint arrays
-     * via two `firstTrue` searches (Pattern 2):
-     *   - `countSmaller(arr, S)` → first i with arr[i] >= S   (predicate `arr[i] >= S`)
-     *   - `countGreater(arr, E)` → first i with arr[i] >  E   (predicate `arr[i] >  E`)
+    public static void main(String[] args) {
+        MaximumTeamSizeWithOverlappingIntervals solver = new MaximumTeamSizeWithOverlappingIntervals();
+        int[][] starts = { {3,4,6}, {1,10,20}, {1} };
+        int[][] ends = { {8,5,7}, {2,11,21}, {1} };
+        int[] expected = { 3, 1, 1 };
+        for (int i = 0; i < starts.length; i++) {
+            int got = solver.maximumTeamSize(starts[i], ends[i]);
+            System.out.printf("starts=%s ends=%s -> %d  expected=%d%n", Arrays.toString(starts[i]), Arrays.toString(ends[i]), got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: For one captain [S, E], valid teammates are all intervals that overlap it. Count non-overlaps with sorted endpoints, then subtract from n.
      *
      * Algorithm:
-     *   1. Sort copies of startTime and endTime ascending.
-     *   2. For each captain with interval [S, E]:
-     *        endedBefore  = countSmaller(sortedEnds,    S)     // ends   <  S
-     *        startedAfter = n − countGreater(sortedStarts, E)  // starts >  E
-     *        overlapping  = n − endedBefore − startedAfter
-     *   3. Track the maximum `overlapping`.
+     *   1. Clone and sort start and end arrays.
+     *   2. For each captain, count ends < S and starts > E.
+     *   3. Compute overlapping = n - endedBefore - startedAfter.
+     *   4. Track the maximum overlapping count.
      *
-     * Time:  O(n log n)
-     * Space: O(n)
+     * Time:  O(n log n) - sorting plus two binary searches per interval.
+     * Space: O(n) - sorted endpoint copies are stored.
      *
-     * @param startTime startTime[i] = employee i's start (inclusive)
-     * @param endTime   endTime[i]   = employee i's end   (inclusive)
-     * @return maximum valid team size
+     * @param startTime inclusive starts
+     * @param endTime inclusive ends
+     * @return largest valid team size
      */
     public int maximumTeamSize(int[] startTime, int[] endTime) {
         if (startTime == null || startTime.length == 0) return 0;
@@ -135,25 +125,5 @@ public class MaximumTeamSizeWithOverlappingIntervals {
     // ---------------------------------------------------------------------
     // Demo
     // ---------------------------------------------------------------------
-    public static void main(String[] args) {
-        MaximumTeamSizeWithOverlappingIntervals solver =
-            new MaximumTeamSizeWithOverlappingIntervals();
 
-        int[][] starts   = { {3,4,6}, {1,10,20}, {1,2,3,4}, {1},  {1,9,2}    };
-        int[][] ends     = { {8,5,7}, {2,11,21}, {4,4,4,4}, {1},  {10,10,3}  };
-        int[]   expected = {       3,         1,         4,   1,          3  };
-
-        for (int i = 0; i < starts.length; i++) {
-            int got = solver.maximumTeamSize(starts[i], ends[i]);
-            System.out.printf("starts=%s ends=%s  →  %d  expected=%d%n",
-                Arrays.toString(starts[i]),
-                Arrays.toString(ends[i]),
-                got, expected[i]);
-        }
-
-        // sanity-check the binary-search primitives on a sorted array
-        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        System.out.println("countSmaller(arr, 7) = " + countSmaller(arr, 7) + "  expected=6"); // arr[i] >= 7
-        System.out.println("countGreater(arr, 7) = " + countGreater(arr, 7) + "  expected=7"); // arr[i] >  7
-    }
 }

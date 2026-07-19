@@ -1,42 +1,58 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * 1011. Capacity To Ship Packages Within D Days
+ * Problem: Capacity To Ship Packages Within D Days
  *
- * Problem: A conveyor belt has packages that must be shipped from one port to another
- * within D days. Find the least weight capacity of the ship to ship all packages within D days.
+ * Packages must be shipped in order within D days. Return the smallest ship capacity that can carry each day's contiguous package group without exceeding capacity.
+ *
+ * Leetcode: https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/ (Medium)
+ * Rating:   zerotrac 1725 (Q3, weekly-128)
+ * Pattern:  Binary search on answer | Greedy feasibility | Minimum feasible capacity
  *
  * Example:
- * Input: weights = [1,2,3,4,5,6,7,8,9,10], D = 5
- * Output: 15
- * Explanation: Ship capacity 15: Day 1: [1,2,3,4,5], Day 2: [6,7], Day 3: [8], Day 4: [9], Day 5: [10]
+ *   Input:  weights = [1,2,3,4,5,6,7,8,9,10], D = 5
+ *   Output: 15
+ *   Why:    capacity 15 finishes in five days, while smaller capacities require more days.
  *
- * LeetCode: https://leetcode.com/problems/capacity-to-ship-packages-within-d-days
+ * Follow-ups:
+ *   1. Can package order change? Then this becomes a scheduling/bin-packing variant.
+ *   2. Need exactly D non-empty days? The same capacity works when a feasible split can be refined.
+ *   3. Many D queries? Precompute prefix/jump data or rerun the monotonic check per query.
+ *   4. Streaming weights? Track max and sum online, but exact search waits for the stream end.
  *
- * Follow-up questions:
- * Q: What if packages can be split across days?
- * A: Different problem - use greedy approach to fill each day to maximum capacity.
- *
- * Q: How to handle case where we need exactly D days (not within D days)?
- * A: Modify the feasibility check to ensure we use exactly D days.
- *
- * Q: Can we optimize for very large arrays?
- * A: Current solution is already optimal O(n log(sum)), can't improve asymptotically.
- * LeetCode Contest Rating: 1725
+ * Related: Koko Eating Bananas (875), Split Array Largest Sum (410).
  */
 public class CapacityToShipPackagesWithinDDays {
 
-    /**
-     * Finds the minimum ship capacity to transport all packages within D days.
+    public static void main(String[] args) {
+        CapacityToShipPackagesWithinDDays solver = new CapacityToShipPackagesWithinDDays();
+        int[][] weights = { {1,2,3,4,5,6,7,8,9,10}, {3,2,2,4,1,4}, {1,2,3} };
+        int[] days = { 5, 3, 3 };
+        int[] expected = { 15, 6, 3 };
+        for (int i = 0; i < weights.length; i++) {
+            int got = solver.shipWithinDays(weights[i], days[i]);
+            System.out.printf("weights=%s days=%d -> %d  expected=%d%n", Arrays.toString(weights[i]), days[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: Capacity is monotonic: if one capacity works, every larger capacity works. Greedy simulation tells whether a candidate capacity can ship in D days.
      *
-     * Algorithm: Binary search on capacity
-     * - Search space: [max_weight, sum_of_all_weights]
-     * - For each capacity, simulate shipping to check if feasible within D days
-     * - Use greedy approach: pack as many packages as possible each day
-     * - Binary search to find minimum feasible capacity
+     * Algorithm:
+     *   1. Set left to the heaviest package and right to the total weight.
+     *   2. Try mid as the candidate capacity.
+     *   3. If mid is feasible, keep the left half including mid.
+     *   4. Otherwise raise left above mid.
      *
-     * Time Complexity: O(n * log(sum)) where n is number of packages, sum is total weight
-     * Space Complexity: O(1)
+     * Time:  O(n log S) - each check scans all weights across the sum range.
+     * Space: O(1) - only counters and bounds are used.
+     *
+     * @param weights package weights in order
+     * @param D maximum allowed days
+     * @return minimum feasible capacity
      */
     public int shipWithinDays(int[] weights, int D) {
         int left = 0, right = 0;
@@ -61,7 +77,7 @@ public class CapacityToShipPackagesWithinDDays {
         return left;
     }
 
-    // Check if packages can be shipped within D days with given capacity
+    /** Returns whether capacity can ship all packages within D days. */
     private boolean canShipWithCapacity(int[] weights, int D, int capacity) {
         int daysNeeded = 1;
         int currentLoad = 0;
@@ -104,7 +120,7 @@ public class CapacityToShipPackagesWithinDDays {
         return totalWeight;
     }
 
-    // Verbose feasibility check with day-by-day simulation
+    /** Simulates remaining day capacity for the verbose solution. */
     private boolean canShipInTime(int[] weights, int D, int capacity) {
         int day = 1;
         int currentCapacity = capacity;
@@ -166,7 +182,7 @@ public class CapacityToShipPackagesWithinDDays {
         return left;
     }
 
-    // Calculate exact number of days needed for given capacity
+    /** Counts days required for a given ship capacity. */
     private int calculateDaysNeeded(int[] weights, int capacity) {
         int days = 1;
         int currentLoad = 0;

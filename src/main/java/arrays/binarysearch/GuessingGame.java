@@ -3,24 +3,37 @@ package arrays.binarysearch;
 /**
  * Problem: Guess Number Higher or Lower
  *
- * You are playing a game where you need to guess a number chosen by an API.
- * The API provides feedback indicating if your guess is lower, higher, or equal to the picked number.
+ * A hidden number lies in 1..n and a guess API tells whether a guess is correct, too high, or too low. Return the hidden number with binary search.
+ *
+ * Leetcode: https://leetcode.com/problems/guess-number-higher-or-lower/ (Easy)
+ * Rating:   acceptance 57.9% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | API feedback | Inclusive bounds
  *
  * Example:
- *   Input: n = 10, pick = 6
+ *   Input:  n = 10, pick = 6
  *   Output: 6
- *   Explanation: The API will guide you through guesses until you find the number.
+ *   Why:    API feedback discards the half that cannot contain 6.
  *
- * Leetcode: https://leetcode.com/problems/guess-number-higher-or-lower/
+ * Follow-ups:
+ *   1. Wrong guesses have costs? Use interval DP as in problem 375.
+ *   2. API can lie once? Track uncertainty ranges or use error-correcting search.
+ *   3. n exceeds int? Use long bounds and overflow-safe mid.
+ *   4. API calls are expensive? Binary search minimizes ordered yes/no calls.
  *
- * Follow-up questions:
- * 1️⃣ Can you optimize it further if the guess API is expensive?
- *     - If API calls are costly, consider caching previous guesses or using a more balanced search strategy to minimize calls.
- * 2️⃣ What if the range is huge (like 10^9)?
- *     - The same binary search approach still applies, as it’s logarithmic in time.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Guess Number Higher or Lower II (375), First Bad Version (278).
  */
 public class GuessingGame {
+
+    public static void main(String[] args) {
+        int[] limits = { 10, 1, 100 };
+        int[] picks = { 6, 1, 73 };
+        for (int i = 0; i < limits.length; i++) {
+            GuessingGame game = new GuessingGame(picks[i]);
+            int got = game.guessNumber(limits[i]);
+            System.out.printf("n=%d pick=%d -> %d  expected=%d%n", limits[i], picks[i], got, picks[i]);
+        }
+    }
+
 
     private final int pickedNumber;
     private static final Integer SAME_NUMBER = 0;
@@ -35,12 +48,7 @@ public class GuessingGame {
         this.pickedNumber = pickedNumber;
     }
 
-    /**
-     * Mock API that returns:
-     *  - 0 if the guess is correct
-     *  - -1 if the picked number is smaller than the guess
-     *  - 1 if the picked number is larger than the guess
-     */
+        /** Mock API response for the stored picked number. */
     private int guess(int num) {
         if (num == pickedNumber) {
             return SAME_NUMBER;
@@ -54,31 +62,22 @@ public class GuessingGame {
     /**
      * Main method to test the guessing game logic.
      */
-    public static void main(String[] args) {
-        GuessingGame game = new GuessingGame(3);
-        int result = game.guessNumber(10);
-        System.out.println("Guessed Number: " + result);
-    }
 
-    /**
-     * Uses binary search to find the number picked by the game.
-     *
-     * Steps:
-     *  1. Initialize the search boundaries as [1, n].
-     *  2. Perform binary search:
-     *     - If guess(mid) == 0, return mid.
-     *     - If guess(mid) < 0, search in the left half.
-     *     - If guess(mid) > 0, search in the right half.
-     *  3. If no number found (shouldn’t happen with correct input), return -1.
+
+        /**
+     * Intuition: The API orders the hidden number relative to mid. A too-high guess discards mid and larger values; a too-low guess discards mid and smaller values.
      *
      * Algorithm:
-     *  - Binary search algorithm
+     *   1. Set low = 1 and high = n.
+     *   2. Guess mid with overflow-safe arithmetic.
+     *   3. Return mid on SAME_NUMBER.
+     *   4. Move high or low past mid based on the API response.
      *
-     * Time Complexity: O(log n) — each iteration halves the search range.
-     * Space Complexity: O(1) — constant space.
+     * Time:  O(log n) - each guess halves the range.
+     * Space: O(1) - only bounds are stored.
      *
-     * @param n The upper bound of the number range.
-     * @return The guessed number if found, -1 otherwise.
+     * @param n upper search bound
+     * @return picked number, or -1 if not found
      */
     public int guessNumber(int n) {
         int low = 1;

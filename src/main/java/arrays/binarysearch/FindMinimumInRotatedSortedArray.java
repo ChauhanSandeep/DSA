@@ -1,57 +1,55 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * Suppose an array of length n sorted in ascending order is rotated between 1 and n times.
- * Given the sorted rotated array nums of unique elements, return the minimum element of this array.
+ * Problem: Find Minimum in Rotated Sorted Array
  *
- * Example 1:
- * Input: nums = [3,4,5,1,2]
- * Output: 1
- * Explanation: The original array was [1,2,3,4,5] rotated 3 times.
+ * A strictly increasing array was rotated, creating at most one order break. Return the minimum value by locating the lower sorted segment.
  *
- * Example 2:
- * Input: nums = [4,5,6,7,0,1,2]
- * Output: 0
- * Explanation: The original array was [0,1,2,4,5,6,7] and it was rotated 4 times.
+ * Leetcode: https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/ (Medium)
+ * Rating:   acceptance 55.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search | Rotated sorted array | Compare with right boundary
  *
- * LeetCode: https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/
+ * Example:
+ *   Input:  nums = [4,5,6,7,0,1,2]
+ *   Output: 0
+ *   Why:    the rotation drop occurs before 0, making it the smallest value.
  *
- * Follow-up Questions:
- * 1. How would you handle the case when the array contains duplicates?
- *    - We would need to handle cases where nums[mid] == nums[right].
- * 2. How would you find the number of rotations performed on the original sorted array?
- *    - The number of rotations is equal to the index of the minimum element.
- * 3. What if the array is not rotated?
- *    - The first element would be the minimum in that case.
+ * Follow-ups:
+ *   1. Return the rotation count? Return the minimum index instead of the value.
+ *   2. Allow duplicates? Shrink the right boundary when nums[mid] == nums[right].
+ *   3. Find the maximum? Look for the value just before the drop.
+ *   4. Search for a target? Use sorted-half elimination.
  *
- * Related Problems:
- * - Search in Rotated Sorted Array (https://leetcode.com/problems/search-in-rotated-sorted-array/)
- * - Find Minimum in Rotated Sorted Array II (https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Search in Rotated Sorted Array (33), Find Minimum in Rotated Sorted Array II (154).
  */
 public class FindMinimumInRotatedSortedArray {
-    /**
-     * Binary Search - Compare with Right Boundary
-     * 
+
+    public static void main(String[] args) {
+        FindMinimumInRotatedSortedArray solver = new FindMinimumInRotatedSortedArray();
+        int[][] inputs = { {3,4,5,1,2}, {11,13,15,17}, {4,5,6,7,0,1,2} };
+        int[] expected = { 1, 11, 0 };
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.findMin(inputs[i]);
+            System.out.printf("nums=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: Comparing mid with the right boundary reveals whether the rotation drop is to the right. If not, mid stays a valid minimum candidate.
+     *
      * Algorithm:
-     * 1. Use binary search with left and right pointers
-     * 2. Compare mid element with right element to determine which half is sorted
-     * 3. If nums[mid] > nums[right], minimum is in right half (unsorted part)
-     * 4. Otherwise, minimum is in left half (including mid)
-     * 5. Converge until left == right
-     * 
-     * Key Insight:
-     * In a rotated sorted array, one half is always sorted. The minimum element
-     * lies at the rotation point where the sorted order breaks. By comparing mid
-     * with the right boundary, we can determine which half contains the break point.
-     * 
-     * Why Compare with Right Instead of Left:
-     * Comparing with right allows us to identify the unsorted portion reliably.
-     * If nums[mid] > nums[right], we know rotation happened in [mid+1, right].
-     * If nums[mid] <= nums[right], the right portion is sorted, so min is in [left, mid].
-     * 
-     * Time Complexity: O(log n) - binary search halves the search space each iteration
-     * Space Complexity: O(1) - only uses constant extra space
+     *   1. Initialize left and right over the whole array.
+     *   2. Compute mid while left < right.
+     *   3. Move left to mid + 1 when nums[mid] > nums[right].
+     *   4. Otherwise move right to mid and return nums[left] after convergence.
+     *
+     * Time:  O(log n) - the search range is halved.
+     * Space: O(1) - only boundary indexes are used.
+     *
+     * @param nums rotated sorted array with distinct values
+     * @return minimum value
      */
     public int findMin(int[] nums) {
         int left = 0;

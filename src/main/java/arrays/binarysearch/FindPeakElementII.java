@@ -1,61 +1,56 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * Find a Peak Element II
+ * Problem: Find a Peak Element II
  *
- * Problem Statement:
- * Given a 0-indexed m x n matrix mat where no two adjacent cells are equal,
- * find any peak element mat[i][j] and return the length 2 array [i,j].
- * A peak element is an element that is strictly greater than all of its
- * adjacent neighbors (left, right, top, bottom). Elements on the boundary
- * are compared only with their existing neighbors.
+ * Given a matrix with no equal adjacent cells, return any cell greater than its up, down, left, and right neighbors. Boundary cells compare only with existing neighbors.
+ *
+ * Leetcode: https://leetcode.com/problems/find-a-peak-element-ii/ (Medium)
+ * Rating:   acceptance 55.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary search on columns | Column maximum | Move toward larger neighbor
  *
  * Example:
- * Input: mat = [[1,4],[3,2]]
- * Output: [0,1]
- * Explanation: Element at position [0,1] is 4, which is greater than its
- * neighbors 1 and 2, making it a peak element.
+ *   Input:  mat = [[1,4],[3,2]]
+ *   Output: [0,1]
+ *   Why:    4 is greater than its left and lower neighbors.
  *
- * LeetCode: https://leetcode.com/problems/find-a-peak-element-ii/
+ * Follow-ups:
+ *   1. Search rows instead? Symmetrically find the max column in a middle row.
+ *   2. Return all peaks? Traverse every cell.
+ *   3. Allow equal adjacent values? Compress plateaus or change strictness.
+ *   4. Extend to 3D? Search a middle plane and move toward a larger neighbor plane.
  *
- * Follow-up Questions that FAANG might ask:
- * 1. Can you optimize for better time complexity?
- *    Answer: The binary search approach achieves O(m log n) or O(n log m),
- *    which is optimal for this problem.
- *
- * 2. What if we need to find all peak elements?
- *    Answer: Would require O(mn) traversal as binary search optimization
- *    wouldn't apply when finding all peaks.
- *
- * 3. How would you handle a 3D matrix?
- *    Answer: Similar binary search approach but with more complex neighbor
- *    comparisons and potentially higher time complexity.
- *
- * 4. What if adjacent elements could be equal?
- *    Answer: Problem becomes more complex as we'd need to handle plateau
- *    regions and modify peak definition.
- *
- * Related Problems:
- * - Find Peak Element (1D version): https://leetcode.com/problems/find-peak-element/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Find Peak Element (162).
  */
 public class FindPeakElementII {
 
-  /**
-   * Finds a peak element in a 2D matrix using binary search approach.
+  public static void main(String[] args) {
+    FindPeakElementII solver = new FindPeakElementII();
+    int[][][] inputs = { {{1, 4}, {3, 2}}, {{10}} };
+    int[][] expected = { {1, 0}, {0, 0} };
+    for (int i = 0; i < inputs.length; i++) {
+      int[] got = solver.locatePeakElement(inputs[i]);
+      System.out.printf("mat=%s -> %s  expected=%s%n", Arrays.deepToString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+    }
+  }
+
+
+    /**
+   * Intuition: The maximum in a column already beats vertical neighbors in that column. If it loses horizontally, a peak is guaranteed toward the larger horizontal neighbor.
    *
    * Algorithm:
-   * 1. Apply binary search on rows (or columns)
-   * 2. For each middle column, find the row with maximum element
-   * 3. Check if this maximum element is greater than elements left and right
-   * 4. If yes, it's a peak. If not, move to the half containing larger neighbor
-   * 5. Continue until we find a peak
+   *   1. Binary search columns with inclusive bounds.
+   *   2. Find the row of the maximum value in midCol.
+   *   3. Return it if it beats left and right neighbors.
+   *   4. Otherwise move toward the larger neighbor side.
    *
-   * Time Complexity: O(m * log n) where m is number of rows and n is number of columns
-   * Space Complexity: O(1) - only using constant extra space
+   * Time:  O(m log n) - each probe scans m rows and halves columns.
+   * Space: O(1) - only indexes are stored.
    *
-   * @param mat the input 2D matrix
-   * @return array containing [row, column] coordinates of any peak element
+   * @param mat matrix with no equal adjacent cells
+   * @return coordinates [row, col] of a peak, or [-1, -1]
    */
   public int[] locatePeakElement(int[][] mat) {
     int left = 0;
@@ -86,7 +81,7 @@ public class FindPeakElementII {
     return new int[]{-1, -1};
   }
 
-  // Helper method to find row index of maximum element in a column
+  /** Returns the row index of the maximum value in a column. */
   private int findMaxRowInColumn(int[][] mat, int col) {
     int maxIndex = 0;
     for (int i = 1; i < mat.length; i++) {

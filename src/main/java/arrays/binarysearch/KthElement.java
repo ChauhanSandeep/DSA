@@ -1,44 +1,41 @@
 package arrays.binarysearch;
 
+import java.util.Arrays;
+
 /**
- * GeeksForGeeks link: https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0
+ * Problem: K-th Element of Two Sorted Arrays
  *
- * Problem:
- * Given two sorted arrays `arr1` and `arr2`, return the Kth element in the merged sorted array without merging them.
+ * Given two sorted arrays, return the k-th value in their merged order without explicitly merging them. The optimal method binary searches a valid partition.
  *
- * Constraints:
- * - Time: O(log(min(n, m)))
- * - Space: O(1)
+ * Leetcode: none (GeeksForGeeks: https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0)
+ * Pattern:  Binary search on partition | Sorted arrays | Order statistic
  *
  * Example:
- * arr1 = [2, 3, 6, 7, 9]
- * arr2 = [1, 4, 8, 10]
- * k = 5
- * Output: 6 (5th smallest in merged array)
+ *   Input:  arr1 = [2,3,6,7,9], arr2 = [1,4,8,10], k = 5
+ *   Output: 6
+ *   Why:    the merged order is [1,2,3,4,6,7,8,9,10].
  *
- * Follow-up Questions:
+ * Follow-ups:
+ *   1. Find the median? Query the middle k value or two middle values.
+ *   2. Many k queries? Partition per query or merge once offline.
+ *   3. K-th unique value? Skip duplicate runs while counting.
+ *   4. Many arrays? Use a min-heap and extract k times.
  *
- * 1. What if you need to find the median instead of k-th element?
- *    Answer: Use k = (n+m+1)/2 for lower median, k = (n+m+2)/2 for upper median.
- *    For even total length, median is average of two middle elements.
- *
- * 2. How would you handle if one array is much larger than the other?
- *    Answer: Binary search approach scales well. Two-pointer approach would waste time
- *    iterating through smaller array. Complexity remains O(log(min(n,m))).
- *
- * 3. Can you find k-th element in k queries efficiently?
- *    Answer: Precompute using binary search once for each k. Total O(q * log(min(n,m)))
- *    where q is number of queries. Or use two pointers for all k values together.
- *
- * 4. What if arrays have duplicates and you need the k-th unique element?
- *    Answer: Modify comparison to skip duplicates. When advancing pointers, skip over
- *    equal elements. Count only unique elements toward k.
- *
- * 5. How would you handle three or more sorted arrays?
- *    Answer: Use min-heap with (value, array_index, element_index). Extract min k times.
- *    Time: O(k log m) where m is number of arrays.
+ * Related: Median of Two Sorted Arrays (4), Merge k Sorted Lists (23).
  */
 public class KthElement {
+
+  public static void main(String[] args) {
+    int[][] first = { {2,3,6,7,9}, {1,2}, {} };
+    int[][] second = { {1,4,8,10}, {3,4,5}, {1} };
+    int[] kth = { 5, 4, 1 };
+    int[] expected = { 6, 4, 1 };
+    for (int i = 0; i < kth.length; i++) {
+      int got = findKthElement(first[i], second[i], kth[i]);
+      System.out.printf("arr1=%s arr2=%s k=%d -> %d  expected=%d%n", Arrays.toString(first[i]), Arrays.toString(second[i]), kth[i], got, expected[i]);
+    }
+  }
+
 
   /**
    * Finds k-th element using two-pointer approach.
@@ -86,22 +83,22 @@ public class KthElement {
     }
   }
 
-  /**
-   * Finds the Kth element in the union of two sorted arrays using binary search.
+    /**
+   * Intuition: A valid partition has exactly k values on the left and every left value <= every right value. Binary search how many values the smaller array contributes.
    *
-   * Steps:
-   * 1. Ensure we always perform binary search on the smaller array.
-   * 2. Define binary search bounds based on `k`.
-   * 3. In each iteration, partition both arrays such that the left partitions
-   *   contain `k` elements in total.
-   * 4. Check if the partitions are valid:
-   *   - If maxLeft1 <= minRight2 and maxLeft2 <= minRight1, we found the correct partition.
-   *  - Otherwise, adjust the binary search bounds accordingly.
-   * 5. Once the correct partition is found, the k-th element is the maximum of the left partitions.
-   * 6. Return this value.
+   * Algorithm:
+   *   1. Ensure arr1 is the smaller array.
+   *   2. Reject k outside the combined range.
+   *   3. Binary search cut1 and derive cut2 = k - cut1.
+   *   4. Return max(leftMax1, leftMax2) when partition inequalities hold.
    *
-   * Time complexity: O(log(min(n, m))) where n and m are the lengths of the two arrays.
-   * Space complexity: O(1).
+   * Time:  O(log min(n, m)) - binary search uses the smaller array.
+   * Space: O(1) - only partition values are stored.
+   *
+   * @param arr1 first sorted array
+   * @param arr2 second sorted array
+   * @param k 1-indexed merged position
+   * @return k-th smallest value
    */
   public static int findKthElement(int[] arr1, int[] arr2, int k) {
     int len1 = arr1.length;
