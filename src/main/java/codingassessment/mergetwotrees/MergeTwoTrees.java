@@ -8,74 +8,53 @@ import java.util.List;
 /**
  * Problem: Merge Two N-ary Trees
  *
- * Given two N-ary trees (not binary trees), merge the source tree into the target tree.
- * Each node has a key (unique among siblings) and a value. When merging:
- * - If a key exists in both trees, sum the values
- * - If a key exists only in source tree, create new branch in target tree
- * - Keys are unique among child nodes of a single parent
- * - Child nodes can be stored in any order
+ * Given a target N-ary tree and a source N-ary tree, merge the source into the
+ * target in place. Nodes are matched by key among siblings. Matching nodes have
+ * their values summed, while source-only children are copied into the matching
+ * target location.
  *
- * 📝 Example:
- *   Source:            Target:                      Result:
- *   ROOT:22            ROOT:20                      ROOT:42
- *   /  |  \              / | \                    /   /      \  \
- * W:2 K:16 C:4        W:5 K:2 R:13             W:7  K:18     C:4 R:13
- *    / | \             |   |   \              /   /  | \  \       |
- * V:3 E:6  F:7        M:5 M:2  P:13         M:5 V:3 E:6 F:7 M:2  P:13
+ * Pattern:  Tree | Iterative DFS | Key-based sibling matching
  *
- * 🎯 Constraints:
- * - Tree nodes have unique keys among siblings
- * - Values are integers that can be summed
- * - Trees can have arbitrary number of children per node
+ * Example:
+ *   Input:  target = A:10[B:1,C:2], source = A:5[B:4,D:7]
+ *   Output: A:15[B:5,C:2,D:7]
+ *   Why:    A and B match by key and have their values summed, C remains from the
+ *           target, and D is copied from the source.
  *
- * 💡 Follow-up Questions with Answers:
- * 1. Q: How would you handle trees with millions of nodes efficiently?
- *    A: Use iterative DFS with explicit stack (as implemented) to avoid stack overflow.
- *       Consider using memory-mapped files or streaming for very large trees.
+ * Follow-ups:
+ *   1. Avoid the linear scan through target children for every source child?
+ *      Build a key-to-child map for each target sibling list before processing that parent.
+ *   2. Return a new merged tree without mutating either input?
+ *      Deep-copy the target first, then merge the source into that copy.
+ *   3. Merge many source trees at once?
+ *      Aggregate children by key at each level, summing values before recursing or pushing work.
+ *   4. Handle duplicate keys among siblings?
+ *      Define a conflict rule first, such as grouping duplicates by key or switching to position-based merge.
  *
- * 2. Q: What if we want to merge multiple trees (not just two)?
- *    A: Extend solution to merge trees pairwise: merge(merge(t1, t2), t3), or use HashMap
- *       at each level to aggregate values from all trees by key before creating merged nodes.
- *
- * 3. Q: How would you implement merge for binary trees instead of N-ary trees?
- *    A: Simpler approach - recursively merge left and right subtrees. At each node, sum values
- *       if both exist, or take non-null node if one is null.
- *
- * 4. Q: What if keys are not unique among siblings?
- *    A: Need to define merge strategy: sum all nodes with same key, or maintain separate nodes.
- *       May need to use position-based merging instead of key-based.
- *
- * 5. Q: How would you return a new merged tree without modifying target?
- *    A: Create deep copy of target first, then merge source into the copy. Or build new tree
- *       by traversing both trees simultaneously and creating new nodes.
- *
- * Related Problems:
- * - Merge Two Binary Trees (LeetCode #617)
- * - Clone N-ary Tree
+ * Related: Merge Two Binary Trees (617), Clone N-ary Tree.
  */
 public class MergeTwoTrees {
 
     /**
-     * Merges source tree into target tree using iterative DFS.
+     * Intuition: a recursive merge would be natural: merge the two roots, then
+     * recursively merge children that share a key. This code uses explicit stacks
+     * to simulate that DFS. The two stack tops represent the same logical position:
+     * a source node and the target node receiving its contribution. For each source
+     * child, the code scans target children for the same key, adds values on a
+     * match, or creates a missing child before descending.
      *
      * Algorithm:
-     * 1. Use two parallel stacks to traverse source and target trees in sync
-     * 2. For each source node child, find matching key in target node children
-     * 3. If key exists in target, sum values and push both children to stacks
-     * 4. If key missing in target, create new subtree from source node
-     * 5. After processing all children, merge root values
+     *   1. Return early if target, source, or source.children is empty.
+     *   2. Push source and target roots onto parallel stacks.
+     *   3. For each source child, linearly scan target children for a matching key.
+     *   4. Sum a matching target child or create a new target child, then push the pair.
+     *   5. Pop when a source node has no more children, then add the source root value.
      *
-     * Key insight: Using NodeState to track current child index enables iterative DFS
-     * that mirrors recursive approach without stack overflow risk. Parallel traversal
-     * maintains correspondence between source and target nodes.
+     * Time:  O(s*c) - each source node is processed once and may scan c target siblings.
+     * Space: O(h) - the explicit DFS stacks grow with the source tree height.
      *
-     * Time Complexity: O(n * m) where n is number of nodes in source tree and m is
-     * average number of children per node (due to linear search for matching keys)
-     *
-     * Space Complexity: O(h) where h is height of source tree (for DFS stacks)
-     *
-     * @param target The target tree to merge into (modified in-place)
-     * @param source The source tree to merge from (not modified)
+     * @param target target tree that is updated in place
+     * @param source source tree whose values and missing branches are merged into target
      */
     public void merge(TreeNode target, TreeNode source) {
       if (target == null || source == null || source.children.isEmpty()) {
@@ -132,8 +111,7 @@ public class MergeTwoTrees {
     }
 
     /**
-     * Helper class to track DFS traversal state.
-     * Maintains current position in children list to enable iterative traversal.
+     * Tracks which child index is next for one source node during iterative DFS.
      */
     private static class NodeState {
         int currentIndex;
@@ -146,8 +124,7 @@ public class MergeTwoTrees {
     }
 
     /**
-     * N-ary tree node with key-value pair and children list.
-     * Keys are unique among siblings to enable key-based matching during merge.
+     * N-ary tree node with key, value, and insertion-ordered children.
      */
     private static class TreeNode {
         String key;
@@ -158,6 +135,37 @@ public class MergeTwoTrees {
             this.value = value;
             this.key = key;
             this.children = new ArrayList<>();
+        }
+    }
+
+    public static void main(String[] args) {
+        MergeTwoTrees solver = new MergeTwoTrees();
+
+        TreeNode target = new TreeNode(10, "A");
+        target.children.add(new TreeNode(1, "B"));
+        target.children.add(new TreeNode(2, "C"));
+        TreeNode source = new TreeNode(5, "A");
+        source.children.add(new TreeNode(4, "B"));
+        source.children.add(new TreeNode(7, "D"));
+        solver.merge(target, source);
+        String firstOutput = target.key + ":" + target.value + "["
+            + target.children.get(0).key + ":" + target.children.get(0).value + ","
+            + target.children.get(1).key + ":" + target.children.get(1).value + ","
+            + target.children.get(2).key + ":" + target.children.get(2).value + "]";
+
+        TreeNode nullSourceTarget = new TreeNode(2, "R");
+        solver.merge(nullSourceTarget, null);
+        String secondOutput = nullSourceTarget.key + ":" + nullSourceTarget.value;
+
+        String[] inputs = {
+            "target=A:10[B:1,C:2], source=A:5[B:4,D:7]",
+            "target=R:2, source=null"
+        };
+        String[] outputs = {firstOutput, secondOutput};
+        String[] expected = {"A:15[B:5,C:2,D:7]", "R:2"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            System.out.printf("%s -> %s  expected=%s%n", inputs[i], outputs[i], expected[i]);
         }
     }
 }

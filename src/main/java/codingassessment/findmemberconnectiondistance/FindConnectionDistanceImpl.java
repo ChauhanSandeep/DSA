@@ -3,77 +3,62 @@ package codingassessment.findmemberconnectiondistance;
 import java.util.*;
 
 /**
- * Problem: Find Shortest Path Between Two Members in Social Network
+ * Problem: Find Connection Distance Between Members
  *
- * Given a social network represented as a graph where members are nodes and connections
- * are edges, find the shortest connection distance (degrees of separation) between two members.
- * Uses bidirectional BFS for optimal performance in large networks.
+ * Given a social graph where members are nodes and connections are undirected
+ * edges, return the smallest number of connections needed to move from one
+ * member to another. If the two members are in different components, return -1.
  *
- * 📝 Example:
- * If member A is connected to B, B to C, and C to D:
- * - Distance(A, B) = 1
- * - Distance(A, C) = 2
- * - Distance(A, D) = 3
+ * Pattern:  Graph | Bidirectional BFS | Shortest path in an unweighted graph
  *
- * 🎯 Constraints:
- * - Members are uniquely identified by integer IDs
- * - Network is undirected (connections are bidirectional)
- * - May contain disconnected components
+ * Example:
+ *   Input:  A-B-C-D and A-E, query E to D
+ *   Output: 4
+ *   Why:    the shortest route is E-A-B-C-D, and the counted edges are E-A,
+ *           A-B, B-C, and C-D.
  *
- * 💡 Follow-up Questions with Answers:
- * 1. Q: Why use bidirectional BFS instead of regular BFS?
- *    A: Bidirectional BFS explores from both ends simultaneously, meeting in the middle.
- *       For distance d, regular BFS explores O(b^d) nodes while bidirectional explores
- *       O(2 * b^(d/2)) nodes where b is branching factor. This is significantly faster.
+ * Follow-ups:
+ *   1. Support weighted connection strength?
+ *      Replace BFS with Dijkstra's algorithm and store cumulative weights.
+ *   2. Answer many repeated queries quickly?
+ *      Cache hot pair distances or precompute landmark distances for approximate lookup.
+ *   3. Handle directed or blocked relationships?
+ *      Traverse only outgoing edges that pass the visibility or permission check.
+ *   4. Return the actual chain of members?
+ *      Keep parent maps on both sides and stitch the two partial paths at the meeting member.
  *
- * 2. Q: How would you handle weighted connections (e.g., friendship strength)?
- *    A: Use Dijkstra's algorithm instead of BFS. Maintain priority queue ordered by
- *       cumulative connection weight. Return minimum weighted path distance.
- *
- * 3. Q: What if we need to find all pairs shortest paths?
- *    A: For dense graphs, use Floyd-Warshall (O(n³)). For sparse graphs, run BFS from
- *       each node (O(n * (n + e))). Can cache results for frequently queried pairs.
- *
- * 4. Q: How would you optimize for millions of members and billions of connections?
- *    A: Use distributed BFS with graph partitioning, landmark-based distance estimation,
- *       or hierarchical clustering. Cache popular query results in Redis/Memcached.
- *
- * 5. Q: What if members can block each other (directed edges with restrictions)?
- *    A: Model as directed graph. Check edge validity before traversing. May need to
- *       maintain separate adjacency lists for each direction with access control checks.
- *
- * Related Problems:
- * - Six Degrees of Kevin Bacon
- * - Word Ladder (LeetCode #127)
- * - Shortest Path in Binary Matrix (LeetCode #1091)
+ * Related: Word Ladder (127), Shortest Path in Binary Matrix (1091), Open the Lock (752).
  */
 public class FindConnectionDistanceImpl implements FindConnectionDistance {
     private final MemberConnections memberConnections;
 
+    /** Creates a distance calculator over the provided connection source. */
     public FindConnectionDistanceImpl(MemberConnections memberConnections) {
         this.memberConnections = memberConnections;
     }
 
     /**
-     * Calculates shortest connection distance using bidirectional BFS.
+     * Intuition: a one-sided BFS is already correct for an unweighted social graph,
+     * but it can fan out badly when the people are far apart. Bidirectional BFS is
+     * the same shortest-path idea started from both endpoints: instead of exploring
+     * every member within distance d from one side, each frontier usually grows only
+     * to about d / 2. Each side stores the shortest distance at which it first
+     * reached a member. When a newly discovered member was already seen by the
+     * opposite side, the two partial paths meet there.
      *
      * Algorithm:
-     * 1. Initialize two BFS searches starting from both members
-     * 2. Maintain separate visited sets and distance maps for each search
-     * 3. Alternate between expanding from member1 and member2
-     * 4. When searches meet (common node visited), return sum of distances
-     * 5. If queues exhaust without meeting, return -1 (no connection)
+     *   1. Return 0 immediately when the two member ids are the same.
+     *   2. Create forward and backward queues, visited sets, and distance maps.
+     *   3. Seed one search from member1 and one from member2.
+     *   4. Alternate expanding one queued member from each side.
+     *   5. Return the distance sum when a discovered member appears in the other side.
      *
-     * Key insight: Bidirectional search reduces time complexity from O(b^d) to O(2*b^(d/2))
-     * where b is branching factor and d is distance. This is exponentially faster for
-     * large distances.
+     * Time:  O(b^(d/2)) - two frontiers usually grow to about half the shortest distance.
+     * Space: O(b^(d/2)) - queues, visited sets, and distance maps hold both frontiers.
      *
-     * Time Complexity: O(b^(d/2)) where b is average connections per member, d is distance
-     * Space Complexity: O(b^(d/2)) for visited sets and queues
-     *
-     * @param member1 First member
-     * @param member2 Second member
-     * @return Shortest connection distance, or -1 if no connection exists
+     * @param member1 first endpoint in the social graph
+     * @param member2 second endpoint in the social graph
+     * @return shortest connection distance in edges, or -1 if no connection exists
      */
     @Override
     public int calculateConnectionDistance(Member member1, Member member2) {
@@ -151,5 +136,78 @@ public class FindConnectionDistanceImpl implements FindConnectionDistance {
 
         // No connection path exists between members
         return -1;
+    }
+
+    public static void main(String[] args) {
+        class DemoMember implements Member {
+            private final int memberId;
+            private final String name;
+
+            DemoMember(int memberId, String name) {
+                this.memberId = memberId;
+                this.name = name;
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public int getMemberId() {
+                return memberId;
+            }
+        }
+
+        class DemoConnections implements MemberConnections {
+            private final Map<Integer, List<Member>> idToConnections = new HashMap<>();
+
+            void connect(Member firstMember, Member secondMember) {
+                if (!idToConnections.containsKey(firstMember.getMemberId())) {
+                    idToConnections.put(firstMember.getMemberId(), new ArrayList<Member>());
+                }
+                if (!idToConnections.containsKey(secondMember.getMemberId())) {
+                    idToConnections.put(secondMember.getMemberId(), new ArrayList<Member>());
+                }
+                idToConnections.get(firstMember.getMemberId()).add(secondMember);
+                idToConnections.get(secondMember.getMemberId()).add(firstMember);
+            }
+
+            @Override
+            public List<Member> getConnections(Member member) {
+                List<Member> connections = idToConnections.get(member.getMemberId());
+                return connections == null ? Collections.<Member>emptyList() : connections;
+            }
+        }
+
+        DemoMember alice = new DemoMember(1, "Alice");
+        DemoMember bob = new DemoMember(2, "Bob");
+        DemoMember carol = new DemoMember(3, "Carol");
+        DemoMember dan = new DemoMember(4, "Dan");
+        DemoMember eve = new DemoMember(5, "Eve");
+        DemoMember frank = new DemoMember(6, "Frank");
+        DemoMember gina = new DemoMember(7, "Gina");
+
+        DemoConnections connections = new DemoConnections();
+        connections.connect(alice, bob);
+        connections.connect(bob, carol);
+        connections.connect(carol, dan);
+        connections.connect(dan, eve);
+        connections.connect(alice, frank);
+
+        FindConnectionDistanceImpl solver = new FindConnectionDistanceImpl(connections);
+        Member[][] inputs = {
+            {alice, eve},
+            {bob, frank},
+            {alice, gina},
+            {carol, carol}
+        };
+        int[] expected = {4, 2, -1, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.calculateConnectionDistance(inputs[i][0], inputs[i][1]);
+            System.out.printf("pair=%s-%s -> %d  expected=%d%n",
+                inputs[i][0].getName(), inputs[i][1].getName(), output, expected[i]);
+        }
     }
 }

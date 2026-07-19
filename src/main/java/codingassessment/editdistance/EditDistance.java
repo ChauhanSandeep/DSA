@@ -1,77 +1,59 @@
 package codingassessment.editdistance;
 
+import java.util.Arrays;
+
 /**
- * Problem: Edit Distance (Levenshtein Distance)
+ * Problem: Edit Distance
  *
- * Given two strings word1 and word2, return the minimum number of operations required
- * to convert word1 to word2. You can perform three operations:
- * - Insert a character
- * - Delete a character
- * - Replace a character
+ * Given two strings, return the fewest single-character edits needed to turn the
+ * first string into the second. The allowed edits are insert, delete, and replace.
+ * Empty strings are valid inputs, so some answers are just the other length.
  *
- * 🔗 LeetCode: https://leetcode.com/problems/edit-distance/
+ * Leetcode: https://leetcode.com/problems/edit-distance/ (Medium)
+ * Rating:   acceptance 60.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic programming | String alignment | Levenshtein distance
  *
- * 📝 Example:
- * Input: word1 = "horse", word2 = "ros"
- * Output: 3
- * Explanation:
- *   horse -> rorse (replace 'h' with 'r')
- *   rorse -> rose (remove 'r')
- *   rose -> ros (remove 'e')
+ * Example:
+ *   Input:  word1 = "horse", word2 = "ros"
+ *   Output: 3
+ *   Why:    replace h with r, delete the extra r, then delete e; no two-edit path
+ *           can fix both the order and the two extra characters.
  *
- * Input: word1 = "intention", word2 = "execution"
- * Output: 5
+ * Follow-ups:
+ *   1. Reduce memory from O(m*n) to O(min(m,n))?
+ *      Keep only the previous and current DP rows, because each cell reads one row back.
+ *   2. Return the actual edit script, not just the count?
+ *      Store parent choices in the table and walk backward from dp[m][n].
+ *   3. Give insert, delete, and replace different costs?
+ *      Use the same recurrence, but add the configured cost for each candidate move.
+ *   4. Support adjacent swaps as one edit?
+ *      Extend the recurrence with a Damerau-Levenshtein transition when two chars cross.
  *
- * 🎯 Constraints:
- * - 0 <= word1.length, word2.length <= 500
- * - word1 and word2 consist of lowercase English letters
- *
- * 💡 Follow-up Questions with Answers:
- * 1. Q: How would you optimize space complexity?
- *    A: Use 1D DP array instead of 2D. Since we only need previous row to compute current row,
- *       maintain two arrays (current and previous) or single array with careful updating.
- *       Space reduces from O(m*n) to O(min(m,n)).
- *
- * 2. Q: How would you reconstruct the actual sequence of operations?
- *    A: Backtrack through DP table from dp[m][n] to dp[0][0]. At each cell, determine which
- *       operation was used (insert/delete/replace) based on which neighbor gave minimum value.
- *       Store operations in list while backtracking.
- *
- * 3. Q: What if operations have different costs (e.g., insert=1, delete=2, replace=3)?
- *    A: Modify recurrence relation to use weighted costs: min(insert*cost1, delete*cost2, replace*cost3).
- *       Same algorithm structure, just different operation costs.
- *
- * 4. Q: How would you handle case-insensitive comparison?
- *    A: Convert both strings to lowercase before processing. Or modify character comparison
- *       to use equalsIgnoreCase() or toLowerCase() comparison.
- *
- * 5. Q: What if we want to find longest common subsequence (LCS) instead?
- *    A: Similar DP approach: dp[i][j] = dp[i-1][j-1]+1 if chars match, else max(dp[i-1][j], dp[i][j-1]).
- *       Edit distance and LCS are related: edit_distance = m + n - 2*LCS (when only insert/delete allowed).
- *
- * Related Problems:
- * - Longest Common Subsequence (LeetCode #1143)
- * - Delete Operation for Two Strings (LeetCode #583)
- * - Minimum ASCII Delete Sum for Two Strings (LeetCode #712)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Delete Operation for Two Strings (583), Minimum ASCII Delete Sum for Two Strings (712),
+ * Longest Common Subsequence (1143).
  */
 public class EditDistance {
 
     /**
-     * Computes minimum edit distance using top-down DP with memoization.
+     * Intuition: the brute-force tree tries every possible edit script, but the
+     * same leftover suffixes show up again and again through different edit orders.
+     * Name that repeated state: "what is the cheapest way to convert word1[i..]
+     * into word2[j..]?" If the next characters match, both pointers move for free.
+     * Otherwise the first edit must be insert, delete, or replace, and memoization
+     * stores the best answer for each suffix pair.
      *
      * Algorithm:
-     * 1. Start from beginning of both strings
-     * 2. If characters match, move to next in both strings (no operation needed)
-     * 3. If characters differ, try all three operations and take minimum
-     * 4. Use memoization to cache results for subproblems
+     *   1. Allocate memo for every firstIndex and secondIndex suffix pair.
+     *   2. Recursively solve from indexes 0 and 0.
+     *   3. Return remaining length when either string is exhausted.
+     *   4. Cache matching-character moves or the minimum of insert, delete, replace.
      *
-     * Time Complexity: O(m * n) where m, n are lengths of word1 and word2
-     * Space Complexity: O(m * n) for memoization table + O(m + n) for recursion stack
+     * Time:  O(m*n) - there are m*n index pairs, and each pair does constant work once.
+     * Space: O(m*n) - memo stores every suffix pair plus O(m+n) recursion depth.
      *
-     * @param word1 First string
-     * @param word2 Second string
-     * @return Minimum number of operations to convert word1 to word2
+     * @param word1 source string to convert
+     * @param word2 target string to build
+     * @return minimum number of edits needed to convert word1 into word2
      */
     public int minDistanceRecursive(String word1, String word2) {
         int firstWordLen = word1.length();
@@ -80,17 +62,7 @@ public class EditDistance {
         return computeMinDistance(word1, word2, 0, 0, memo);
     }
 
-    /**
-     * Recursive helper that computes minimum edit distance from positions i and j.
-     * Uses memoization to avoid recomputing overlapping subproblems.
-     *
-     * @param word1 First string
-     * @param word2 Second string
-     * @param firstIndex Current position in word1
-     * @param secondIndex Current position in word2
-     * @param memo Memoization table to cache computed results
-     * @return Minimum operations to convert word1[firstIndex..] to word2[secondIndex..]
-     */
+    /** Computes the best edit count for the two suffixes beginning at the given indexes. */
     private int computeMinDistance(String word1, String word2, int firstIndex, int secondIndex, Integer[][] memo) {
         // Base case: if one string exhausted, need to insert/delete remaining characters
         if (firstIndex == word1.length()) {
@@ -121,23 +93,25 @@ public class EditDistance {
     }
 
     /**
-     * Computes minimum edit distance using bottom-up dynamic programming.
+     * Intuition: the same suffix idea can be flipped into a prefix table that is
+     * easier to trace in an interview. dp[i][j] represents the cheapest conversion
+     * from the first i chars of word1 to the first j chars of word2. Empty prefixes
+     * are just "delete everything" or "insert everything." For a non-empty pair,
+     * the final move must come from one of three already-smaller prefixes: left
+     * means insert, top means delete, and diagonal means match or replace.
      *
      * Algorithm:
-     * 1. Create DP table where dp[i][j] = min operations to convert word1[0..i-1] to word2[0..j-1]
-     * 2. Initialize base cases: converting to/from empty string
-     * 3. Fill table: if chars match, take diagonal; else take min of three operations
-     * 4. Return dp[m][n] as final answer
+     *   1. Create dp where dp[i][j] is the cost for word1[0..i-1] to word2[0..j-1].
+     *   2. Initialize empty-prefix rows and columns with insert/delete counts.
+     *   3. Fill each cell from match, insert, delete, and replace transitions.
+     *   4. Return dp[firstWordLen][secondWordLen].
      *
-     * Key insight: Build solution from smaller subproblems. Each cell depends only on
-     * three neighbors (left, top, diagonal), enabling efficient bottom-up computation.
+     * Time:  O(m*n) - the table has one cell per pair of prefix lengths, and each is filled once.
+     * Space: O(m*n) - the DP table stores all prefix-pair answers.
      *
-     * Time Complexity: O(m * n) where m, n are lengths of word1 and word2
-     * Space Complexity: O(m * n) for DP table
-     *
-     * @param word1 First string
-     * @param word2 Second string
-     * @return Minimum number of operations to convert word1 to word2
+     * @param word1 source string to convert
+     * @param word2 target string to build
+     * @return minimum number of edits needed to convert word1 into word2
      */
     public int minDistanceIterative(String word1, String word2) {
         int firstWordLen = word1.length();
@@ -174,5 +148,22 @@ public class EditDistance {
         }
 
         return dp[firstWordLen][secondWordLen];
+    }
+
+    public static void main(String[] args) {
+        EditDistance solver = new EditDistance();
+
+        String[][] inputs = {
+            {"horse", "ros"},
+            {"intention", "execution"},
+            {"", "abc"}
+        };
+        int[] expected = {3, 5, 3};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.minDistanceIterative(inputs[i][0], inputs[i][1]);
+            System.out.printf("words=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
     }
 }

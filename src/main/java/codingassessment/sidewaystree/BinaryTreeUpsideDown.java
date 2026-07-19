@@ -3,67 +3,55 @@ package codingassessment.sidewaystree;
 import utils.TreeNode;
 
 /**
- * ✅ Problem: Binary Tree Upside Down
+ * Problem: Binary Tree Upside Down
  *
- * 🔗 LeetCode: https://leetcode.com/problems/binary-tree-upside-down/
+ * Given a binary tree where every right child is either a leaf with a left sibling
+ * or null, flip the tree so the original leftmost node becomes the new root. For
+ * each old parent, its old right child becomes the new left child, and the old
+ * parent becomes the new right child.
  *
- * Given a binary tree where every node has either 0 or 2 children and all right children are leaves,
- * flip it upside down so that the original leftmost node becomes the new root.
+ * Leetcode: https://leetcode.com/problems/binary-tree-upside-down/ (Medium)
+ * Rating:   acceptance 65.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Binary tree | Recursion | Pointer rewiring
  *
- * 📈 Example:
- * for example, turn these:
+ * Example:
+ *   Input:  preorder with nulls = [1,2,4,null,null,5,null,null,3,null,null]
+ *   Output: preorder with nulls = [4,5,null,null,2,3,null,null,1,null,null]
+ *   Why:    node 4 was the leftmost node, so it becomes the root; node 5 becomes
+ *           its left child and old parent 2 becomes its right child.
  *
- *        1                1
- *       / \              / \
- *      2   3            2   3
- *     /
- *    4
- *   / \
- *  5   6
+ * Follow-ups:
+ *   1. Write the same transform iteratively?
+ *      Walk down the left spine while carrying the previous parent and previous right child.
+ *   2. Validate the input shape before flipping?
+ *      Reject any node that has a right child without a left sibling or a non-leaf right child.
+ *   3. Flip the tree without mutating the original?
+ *      Build copied nodes while following the same left-spine rewiring order.
+ *   4. Restore the original tree after flipping?
+ *      Apply the inverse pointer assignment along the new right spine.
  *
- * into these:
- *
- *        1               1
- *       /               /
- *      2---3           2---3
- *     /
- *    4
- *   /
- *  5---6
- *
- * where 5 is the new root node for the left tree, and 2 for the right tree.
- * oriented correctly:
- *
- *     5                  2
- *    / \                / \
- *   6   4              3   1
- *        \
- *         2
- *        / \
- *       3   1
- *
- * 🔁 Transformation Rules:
- * - Original left child becomes new parent
- * - Original right child becomes new left child
- * - Original parent becomes new right child
- *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Invert Binary Tree (226), Flatten Binary Tree to Linked List (114).
  */
 public class BinaryTreeUpsideDown {
 
     /**
-     * ✅ Recursively flips the binary tree upside down
+     * Intuition: trying to flip the current root first loses the real root of the
+     * answer, because the new root is the leftmost node. So the recursion first
+     * walks down the left spine until that base node is found, then rewires while
+     * unwinding. At each old parent, the already-flipped lower part is correct; the
+     * local job is to rotate this parent under its old left child.
      *
-     * Time Complexity: O(N) – each node visited once
-     * Space Complexity: O(H) – height of the tree (due to recursion stack)
+     * Algorithm:
+     *   1. Return the node itself for an empty tree or a node with no left child.
+     *   2. Recurse on node.leftChild to find and keep the final newRoot.
+     *   3. Save the old left and right children.
+     *   4. Make old right the new left, old parent the new right, then cut old links.
      *
-     * ⚠️ Edge Cases:
-     * - Tree is empty (null)
-     * - Tree has only one node
-     * - Tree violates assumption (has nodes with only right child): invalid input
+     * Time:  O(n) - each node is visited and rewired once.
+     * Space: O(h) - recursion uses one stack frame per tree level.
      *
-     * @param node Root node of the binary tree
-     * @return New root after the transformation
+     * @param node root of the tree to flip in place
+     * @return new root after the upside-down transform
      */
     public static TreeNode flipUpsideDown(TreeNode node) {
         if (node == null || node.leftChild == null) {
@@ -88,9 +76,7 @@ public class BinaryTreeUpsideDown {
     }
 
     /**
-     * 📤 Utility to print the tree in Preorder format
-     *
-     * @param node The root of the subtree to print
+     * Prints the tree in preorder with null markers.
      */
     public static void printPreOrder(TreeNode node) {
         if (node == null) {
@@ -103,19 +89,34 @@ public class BinaryTreeUpsideDown {
     }
 
     public static void main(String[] args) {
-        System.out.println("✅ Test Case: Problem Example");
-        TreeNode root = new TreeNode(1);
-        root.leftChild = new TreeNode(2);
-        root.rightChild = new TreeNode(3);
-        root.leftChild.leftChild = new TreeNode(4);
-        root.leftChild.leftChild.leftChild = new TreeNode(5);
-        root.leftChild.leftChild.rightChild = new TreeNode(6);
+        TreeNode example = new TreeNode(1);
+        example.leftChild = new TreeNode(2);
+        example.rightChild = new TreeNode(3);
+        example.leftChild.leftChild = new TreeNode(4);
+        example.leftChild.rightChild = new TreeNode(5);
 
-        System.out.println("🔹 Original Tree (Preorder):");
-        printPreOrder(root);
+        TreeNode single = new TreeNode(7);
 
-        TreeNode flipped = flipUpsideDown(root);
-        System.out.println("\n🔄 Flipped Tree (Preorder):");
-        printPreOrder(flipped);
+        TreeNode[] inputs = {example, single};
+        String[] inputLabels = {
+            "1 2 4 null null 5 null null 3 null null",
+            "7 null null"
+        };
+        String[] expected = {
+            "4 5 null null 2 3 null null 1 null null",
+            "7 null null"
+        };
+
+        java.io.PrintStream originalOut = System.out;
+        for (int i = 0; i < inputs.length; i++) {
+            TreeNode outputRoot = flipUpsideDown(inputs[i]);
+            java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+            System.setOut(new java.io.PrintStream(buffer));
+            printPreOrder(outputRoot);
+            System.out.flush();
+            System.setOut(originalOut);
+            String output = buffer.toString().trim();
+            System.out.printf("preorder=%s -> %s  expected=%s%n", inputLabels[i], output, expected[i]);
+        }
     }
 }
