@@ -3,71 +3,63 @@ package strings.greedy;
 import java.util.PriorityQueue;
 
 /**
- * Given a string s, rearrange the characters of s so that any two adjacent characters are not the same.
- * Return any possible rearrangement of s or return an empty string if not possible.
+ * Problem: Reorganize String
  *
- * Example 1:
- * Input: s = "aab"
- * Output: "aba"
+ * Rearrange the characters of a lowercase string so no two adjacent characters
+ * are equal. Return any valid rearrangement, or the empty string when no such
+ * arrangement exists.
  *
- * Example 2:
- * Input: s = "aaab"
- * Output: ""
+ * Leetcode: https://leetcode.com/problems/reorganize-string/ (Medium)
+ * Rating:   acceptance 56.4% (Medium), contest rating 1681
+ * Pattern:  Greedy | Max heap | Pair most frequent characters
  *
- * LeetCode: https://leetcode.com/problems/reorganize-string/
+ * Example:
+ *   Input:  s = "aab"
+ *   Output: "aba"
+ *   Why:    the two 'a' characters are separated by 'b', so no equal characters touch.
  *
- * Follow-up Questions:
- * 1. How would you handle the case where we need to ensure that no two identical characters are at least k distance apart?
- *    - We could modify the solution to maintain a queue of recently used characters and their availability times.
- * 2. What if the string contains Unicode characters?
- *    - The solution would work the same way since we're working with character frequencies.
- * 3. How would you find all possible valid rearrangements instead of just one?
- *    - We would need to use backtracking to explore all possible valid orderings.
+ * Follow-ups:
+ *   1. Keep identical characters at least k distance apart?
+ *      Use a cooldown queue before a character can return to the heap.
+ *   2. Return the lexicographically smallest valid rearrangement?
+ *      Combine feasibility checks with ordered candidate selection at each position.
+ *   3. Support arbitrary Unicode characters?
+ *      Replace the 26-count array with a frequency map keyed by character.
+ *   4. Count all valid rearrangements?
+ *      Use backtracking with memoization over remaining counts and previous character.
  *
- * Related Problems:
- * - Task Scheduler (https://leetcode.com/problems/task-scheduler/)
- * - Rearrange String k Distance Apart (https://leetcode.com/problems/rearrange-string-k-distance-apart/)
- * LeetCode Contest Rating: 1681
+ * Related: Rearrange String k Distance Apart (358), Task Scheduler (621), Longest Happy String (1405).
  */
 public class ReorganizeString {
+
+    public static void main(String[] args) {
+        ReorganizeString solver = new ReorganizeString();
+        String[] inputs = {"aab", "aaab", "a"};
+        String[] expected = {"aba", "", "a"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.reorganizeString(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
+    }
+
     /**
-     * Optimal solution using a max-heap (priority queue) and greedy strategy.
-     *
-     * Steps:
-     * 1. Count the frequency of each character in s using an array of size 26.
-     * 2. Compute the maximum frequency; if it exceeds (n + 1) / 2, immediately return "" because
-     *    you cannot arrange characters to avoid adjacent duplicates (pigeonhole principle).
-     * 3. Build a max-heap where each entry contains (remainingCount, character). The heap is
-     *    ordered by remainingCount in descending order.
-     * 4. While the heap contains at least two characters:
-     *    - Pop the two characters with highest remaining counts (say c1 and c2).
-     *    - Append c1 and c2 to the result (ensuring they are different).
-     *    - Decrement their remaining counts and push them back into the heap if counts remain > 0.
-     * 5. If one character remains in the heap after the loop:
-     *    - Append it only if it does not match the last character already in the result.
-     *    - Because of the earlier feasibility check, if it remains, it will be safe to append.
-     * 6. Convert the result to a string and return it.
+     * Intuition: if one character appears more than half the string length rounded
+     * up, there are not enough other characters to separate its copies. Otherwise,
+     * repeatedly placing the two most frequent remaining characters keeps the most
+     * dangerous counts apart.
      *
      * Algorithm:
-     * - Greedy with a max-heap (priority queue) of character-count pairs.
+     *   1. Count character frequencies and reject impossible inputs using the max count.
+     *   2. Put every present character into a max heap ordered by remaining count.
+     *   3. While at least two characters remain, append the two most frequent and decrement them.
+     *   4. Append the last remaining character if any, then return the built string.
      *
-     * Time Complexity:
-     * - O(n log k), where n is the length of str and k is the number of distinct characters (k <= 26).
-     *   - Counting frequencies is O(n).
-     *   - Each push/pop operation on the heap is O(log k), and we perform O(n) such operations.
+     * Time:  O(n log k) - each appended character may update the heap, with k <= 26.
+     * Space: O(n + k) - the result builder plus the heap and frequency array.
      *
-     * Space Complexity:
-     * - O(k) for the heap and O(n) for the output string builder.
-     *
-     * Edge cases handled:
-     * - str has length 1 (always valid).
-     * - str where one character frequency is too high (immediately return "").
-     * - str where all characters are the same (length > 1, invalid).
-     * - General cases with multiple characters and varying frequencies.
-     *
-     * @param str input string consisting of lowercase English letters
-     * @return any valid reorganization of str such that no two adjacent characters are the same,
-     *         or the empty string "" if such reorganization is not possible
+     * @param str lowercase input string to reorganize
+     * @return a valid reorganization, or the empty string if impossible
      */
     public String reorganizeString(String str) {
         if (str == null || str.length() <= 1) {

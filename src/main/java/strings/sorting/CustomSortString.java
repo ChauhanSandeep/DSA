@@ -10,71 +10,62 @@ import java.util.stream.Collectors;
 /**
  * Problem: Custom Sort String
  *
- * You are given two strings order and s. All the characters of order are unique
- * and were
- * sorted in some custom order previously. Permute the characters of s so that
- * they match
- * the order that order was sorted. More specifically, if character x occurs
- * before
- * character y in order, then x should occur before y in the permuted string.
+ * Given a custom order string and another string, permute the second string so
+ * characters that appear in order follow that relative order. Characters absent
+ * from order may appear after the ordered characters.
  *
- * Return any permutation of s that satisfies this property.
+ * Leetcode: https://leetcode.com/problems/custom-sort-string/ (Medium)
+ * Rating:   acceptance 72.4% (Medium), contest rating 1424
+ * Pattern:  Sorting | Custom comparator | Character priority map
  *
  * Example:
- * Input: order = "cba", s = "abcd"
- * Output: "cbad"
- * Explanation:
- * - "c", "b", "a" appear in order, so the order should be "c", "b", "a"
- * - "d" is not in order, so it can be placed anywhere (placed at end here)
+ *   Input:  order = "cba", s = "abcd"
+ *   Output: "cbad"
+ *   Why:    c, b, and a must appear in that order; d is not constrained by order.
  *
- * Input: order = "cbafg", s = "abcd"
- * Output: "cbad"
- * Explanation: Characters "c", "b", "a" from order come first in that order,
- * then "d"
+ * Follow-ups:
+ *   1. Optimize for long strings with lowercase letters only?
+ *      Count frequencies, emit ordered characters, then emit the leftovers.
+ *   2. Support duplicate characters in order?
+ *      Use the first occurrence as priority or reject invalid order input.
+ *   3. Use a custom alphabet with Unicode?
+ *      Store priorities in a Map<Character, Integer> instead of a fixed array.
  *
- * LeetCode: https://leetcode.com/problems/custom-sort-string/
- *
- * Follow-up Questions:
- * 1. Q: What if the order string contains duplicate characters?
- * A: Problem states order has unique characters, but we could handle by using
- * first occurrence.
- *
- * 2. Q: How would you handle Unicode characters or case sensitivity?
- * A: Current solution works with Unicode. For case-insensitive, convert to same
- * case first.
- *
- * 3. Q: What about very large strings with memory constraints?
- * A: Consider counting approach to avoid creating character arrays, or
- * streaming approach.
- *
- * 4. Q: How would you optimize if order string is much larger than s?
- * A: Use Set for faster lookups when checking if character exists in order.
- *
- * Related Problems:
- * - Sort Array by Increasing Frequency:
- * https://leetcode.com/problems/sort-array-by-increasing-frequency/
- * - Relative Sort Array: https://leetcode.com/problems/relative-sort-array/
- * - Valid Anagram: https://leetcode.com/problems/valid-anagram/
- * LeetCode Contest Rating: 1424
+ * Related: Relative Sort Array (1122), Sort Characters By Frequency (451).
  */
 public class CustomSortString {
 
+    public static void main(String[] args) {
+        CustomSortString solver = new CustomSortString();
+        String[] orders = {"cba", "bcafg", "kqep"};
+        String[] inputs = {"abcd", "abcd", "pekeq"};
+        String[] expected = {"cbad", "bcad", "kqeep"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.customSortString(orders[i], inputs[i]);
+            System.out.printf("order=%s s=%s -> %s  expected=%s%n", orders[i], inputs[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Sorts string str according to custom order using priority-based sorting.
+     * Intuition: sorting becomes straightforward once every character has a numeric
+     * priority. Characters listed in order receive their index as priority; all
+     * other characters receive a large default priority so they move after the
+     * constrained characters.
      *
      * Algorithm:
-     * 1. Create priority mapping where each character in order gets index as
-     * priority
-     * 2. Characters not in order get default priority (placed at end)
-     * 3. Convert string to character array and sort using custom comparator
-     * 4. Join sorted characters back into string
+     *   1. Return str directly when it is null or empty.
+     *   2. Build a map from each order character to its priority index.
+     *   3. Box str characters into an array so a comparator can sort them.
+     *   4. Sort by mapped priority and append the sorted characters into the result.
      *
-     * Time Complexity: O(n log n) where n is length of string str
-     * Space Complexity: O(n) for character array and priority mapping
+     * Time:  O(n log n) - sorting n characters dominates.
+     * Space: O(n + m) - boxed characters plus the priority map for order.
      *
-     * @param order the string defining custom sort order
-     * @param str   the string to be sorted according to custom order
-     * @return string str sorted according to order
+     * @param order custom character ordering
+     * @param str string to permute according to order
+     * @return a permutation of str that respects order
      */
     public String customSortString(String order, String str) {
         if (str == null || str.isEmpty()) {
@@ -161,7 +152,7 @@ public class CustomSortString {
         return result.toString();
     }
 
-    // Helper method to append character multiple times efficiently
+    /** Appends the same character count times to the builder. */
     private void appendCharacterMultipleTimes(StringBuilder sb, char c, int count) {
         for (int i = 0; i < count; i++) {
             sb.append(c);

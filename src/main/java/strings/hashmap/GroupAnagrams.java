@@ -6,53 +6,67 @@ import java.util.*;
 /**
  * Problem: Group Anagrams
  *
- * Given an array of strings `strs`, group the anagrams together. You can return the answer in any order.
- * An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase,
- * typically using all the original letters exactly once.
+ * Given an array of strings, group together words that are anagrams of each
+ * other. The groups may be returned in any order, but each group contains words
+ * with the same multiset of characters.
+ *
+ * Leetcode: https://leetcode.com/problems/group-anagrams/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Hash map | Canonical key | Sorting characters
  *
  * Example:
- * Input: strs = ["eat","tea","tan","ate","nat","bat"]
- * Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+ *   Input:  strs = ["eat","tea","tan","ate","nat","bat"]
+ *   Output: [["ate","eat","tea"],["bat"],["nat","tan"]]
+ *   Why:    each group shares the same sorted-character key.
  *
- * Explanation:
- * - "eat", "tea", "ate" are anagrams (all contain letters 'a', 'e', 't')
- * - "tan", "nat" are anagrams (both contain letters 'a', 'n', 't')
- * - "bat" has no anagrams in the list
+ * Follow-ups:
+ *   1. Optimize for very long strings?
+ *      Use frequency-count keys to avoid sorting every word.
+ *   2. Support Unicode characters?
+ *      Build keys from a Map<Character, Integer> rather than a 26-entry array.
+ *   3. Process a huge stream of words?
+ *      Emit groups by partitioning or external sorting on the canonical key.
  *
- * LeetCode: https://leetcode.com/problems/group-anagrams/
- *
- * Follow-up Questions:
- * 1. Q: What if the strings contain Unicode characters?
- *    A: The current sorting approach works for Unicode. Frequency counting would need
- *       to use a Map instead of fixed-size array.
- * 2. Q: How would you optimize for very long strings?
- *    A: Use frequency counting instead of sorting to avoid O(k log k) per string.
- * 3. Q: What about case sensitivity?
- *    A: Convert to lowercase before processing, or modify comparison logic.
- * 4. Q: Memory constraints for large datasets?
- *    A: Consider streaming approach or external sorting for very large inputs.
- *
- * Related Problems:
- * - Valid Anagram: https://leetcode.com/problems/valid-anagram/
- * - Find All Anagrams in a String: https://leetcode.com/problems/find-all-anagrams-in-a-string/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Anagram (242), Find All Anagrams in a String (438), Group Shifted Strings (249).
  */
 public class GroupAnagrams {
 
+    public static void main(String[] args) {
+        GroupAnagrams solver = new GroupAnagrams();
+        String[][] inputs = { {"eat", "tea", "tan", "ate", "nat", "bat"}, {""} };
+        String[][][] expected = {
+            {{"ate", "eat", "tea"}, {"bat"}, {"nat", "tan"}},
+            {{""}}
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            java.util.List<java.util.List<String>> got = solver.groupAnagrams(inputs[i]);
+            for (java.util.List<String> group : got) {
+                java.util.Collections.sort(group);
+            }
+            got.sort(java.util.Comparator.comparing(group -> group.get(0)));
+            System.out.printf("strs=%s -> %s  expected=%s%n",
+                java.util.Arrays.toString(inputs[i]), got, java.util.Arrays.deepToString(expected[i]));
+        }
+    }
+
+
     /**
-     * Groups anagrams together using sorted string as key.
+     * Intuition: anagrams become identical after their characters are sorted. That
+     * sorted form is a canonical key: every word with the same key belongs in the
+     * same bucket, and words with different keys cannot be anagrams.
      *
      * Algorithm:
-     * 1. For each string, sort its characters to create a canonical form
-     * 2. Use the sorted string as key in HashMap
-     * 3. Group all strings that have the same sorted form
-     * 4. Return all groups as list of lists
+     *   1. Return an empty list for null or empty input.
+     *   2. For each string, sort its characters to build the key.
+     *   3. Add the original string to the list stored for that key.
+     *   4. Return all map values as the grouped anagrams.
      *
-     * Time Complexity: O(n * k * log k) where n is number of strings, k is max string length
-     * Space Complexity: O(n * k) for storing all strings in the result
+     * Time:  O(n * k log k) - n words, each sorting up to k characters.
+     * Space: O(n * k) - groups store all input strings and keys.
      *
-     * @param strs array of strings to group
-     * @return list of grouped anagrams
+     * @param strs strings to group by anagram equivalence
+     * @return grouped anagrams
      */
     public List<List<String>> groupAnagrams(String[] strs) {
         if (strs == null || strs.length == 0) {
@@ -73,7 +87,7 @@ public class GroupAnagrams {
         return new ArrayList<>(anagramGroups.values());
     }
 
-    // Helper method to create sorted key from string
+    /** Returns the sorted-character canonical key for an anagram group. */
     private String getSortedKey(String str) {
         char[] charArray = str.toCharArray();
         Arrays.sort(charArray);
@@ -115,7 +129,7 @@ public class GroupAnagrams {
         return new ArrayList<>(anagramGroups.values());
     }
 
-    // Helper method to create frequency-based key
+    /** Returns the frequency-count canonical key for lowercase anagrams. */
     private String getFrequencyKey(String str) {
         int[] charCount = new int[26]; // For lowercase English letters
 

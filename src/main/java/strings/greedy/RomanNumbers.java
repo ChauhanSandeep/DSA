@@ -5,54 +5,69 @@ import java.util.Map;
 
 
 /**
- * Problem: Convert Roman numerals to integers and vice versa.
+ * Problem: Roman Numbers
  *
- * LeetCode Links:
- * - Roman to Integer: https://leetcode.com/problems/roman-to-integer/
- * - Integer to Roman: https://leetcode.com/problems/integer-to-roman/
+ * Convert Roman numerals to integers and convert integers in the range 1..3999
+ * back to canonical Roman numerals. The same symbol table supports additive and
+ * subtractive notation such as IV, IX, XL, and CM.
  *
- * Problem Statement:
- * - You are given a Roman numeral and need to convert it to an integer.
- * - You are given an integer (1 to 3999) and need to convert it to a Roman numeral.
+ * Leetcode: https://leetcode.com/problems/roman-to-integer/ (Easy)
+ * Leetcode: https://leetcode.com/problems/integer-to-roman/ (Medium)
+ * Rating:   no contest Elo (pre-contest problems)
+ * Pattern:  Greedy | Symbol values | Subtractive notation
  *
  * Example:
- * - romanToInteger("MCMIV") → 1904
- * - intToRoman(58) → "LVIII"
+ *   Input:  roman = "MCMIV", number = 58
+ *   Output: 1904 and "LVIII"
+ *   Why:    MCMIV is 1000 + 900 + 4, while 58 is L + V + III.
  *
- * Follow-up Questions (FAANG interview-style):
- * 1. What if you had to support values > 3999?
- *    - Roman numerals historically didn’t support large values, but you could use overlines or modern extensions.
- * 2. How to validate whether a Roman numeral string is valid?
- *    - Use regex: ^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
- * 3. Can you design this as a bi-directional converter using a shared abstraction?
- *    - Yes, using an Enum or Symbol table class to store mapping and invertibility.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Validate that a Roman numeral is canonical?
+ *      Convert it to an integer and back, then compare with the original string.
+ *   2. Support values above 3999?
+ *      Add an overline or parenthesized multiplier convention to the symbol table.
+ *   3. Parse lowercase input?
+ *      Normalize the string to uppercase before reading symbols.
+ *
+ * Related: Roman to Integer (13), Integer to Roman (12).
  */
 public class RomanNumbers {
 
-  public static void main(String[] args) {
-    String roman = "MCMIV";
-    int num = 58;
+    public static void main(String[] args) {
+        String[] romanInputs = {"MCMIV", "LVIII"};
+        int[] romanExpected = {1904, 58};
+        int[] numberInputs = {58, 1994};
+        String[] numberExpected = {"LVIII", "MCMXCIV"};
 
-    System.out.println("Roman to Integer → " + roman + ": " + romanToInteger(roman));
-    System.out.println("Integer to Roman → " + num + ": " + intToRoman(num));
-  }
+        for (int i = 0; i < romanInputs.length; i++) {
+            int got = romanToInteger(romanInputs[i]);
+            System.out.printf("roman=%s -> %d  expected=%d%n", romanInputs[i], got, romanExpected[i]);
+        }
+        for (int i = 0; i < numberInputs.length; i++) {
+            String got = intToRoman(numberInputs[i]);
+            System.out.printf("number=%d -> %s  expected=%s%n", numberInputs[i], got, numberExpected[i]);
+        }
+    }
+
 
   /**
-   * Converts a Roman numeral to an integer.
+   * Intuition: a Roman symbol usually adds its value, but a smaller symbol before
+   * a larger one is subtractive. Scanning from right to left makes that decision
+   * local: subtract only when the current value is less than the value already
+   * seen to its right.
    *
-   * Steps:
-   * - Traverse from right to left
-   * - Subtract if current value is less than the previous one (e.g., IV = 5 - 1)
-   * - Otherwise, add it to the result
+   * Algorithm:
+   *   1. Reject null or empty input.
+   *   2. Build the Roman-symbol-to-value map.
+   *   3. Scan from right to left, subtracting values smaller than previousValue and adding the rest.
+   *   4. Update previousValue after each symbol and return the total.
    *
-   * Algorithm: Greedy with reverse traversal
-   * Time Complexity: O(N)
-   * Space Complexity: O(1)
+   * Time:  O(n) - each Roman symbol is processed once.
+   * Space: O(1) - the symbol map has a fixed seven entries.
    *
-   * @param roman Roman numeral string (e.g., "MCMIV")
-   * @return Integer equivalent
-   * @throws IllegalArgumentException for invalid input
+   * @param roman Roman numeral string such as "MCMIV"
+   * @return integer value represented by the Roman numeral
+   * @throws IllegalArgumentException when the input is empty or contains an unknown symbol
    */
   public static int romanToInteger(String roman) {
     if (roman == null || roman.isEmpty()) {
@@ -85,19 +100,22 @@ public class RomanNumbers {
   }
 
   /**
-   * Converts an integer to a Roman numeral.
+   * Intuition: canonical Roman numerals always use the largest possible symbol or
+   * subtractive pair first. A descending value table lets the code repeatedly take
+   * the biggest symbol that still fits until the number reaches zero.
    *
-   * Steps:
-   * - Use predefined Roman symbols and values
-   * - While num >= symbol value, subtract and append symbol
+   * Algorithm:
+   *   1. Reject values outside the standard 1..3999 range.
+   *   2. Walk descending Roman values and their symbols.
+   *   3. While the current value fits, append its symbol and subtract it from number.
+   *   4. Return the accumulated Roman numeral.
    *
-   * Algorithm: Greedy
-   * Time Complexity: O(1) – number of Roman symbols is constant
-   * Space Complexity: O(1)
+   * Time:  O(1) - the table has a fixed size and output length is bounded for 1..3999.
+   * Space: O(1) - only the fixed tables and output builder are used.
    *
-   * @param number Integer between 1 and 3999
-   * @return Roman numeral string
-   * @throws IllegalArgumentException if number is out of range
+   * @param number integer value between 1 and 3999
+   * @return canonical Roman numeral representation
+   * @throws IllegalArgumentException when number is outside 1..3999
    */
   public static String intToRoman(int number) {
     if (number <= 0 || number > 3999) {
@@ -119,7 +137,7 @@ public class RomanNumbers {
     return result.toString();
   }
 
-  // Utility method to return Roman symbol to integer value mapping
+  /** Returns the fixed Roman symbol to integer value mapping. */
   private static Map<Character, Integer> getRomanToIntMap() {
     Map<Character, Integer> romanToInt = new HashMap<>();
     romanToInt.put('I', 1);

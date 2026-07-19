@@ -4,51 +4,60 @@ import java.util.PriorityQueue;
 
 
 /**
- * ---------------------------------------------------------------
- * 💡 Problem: Longest Happy String
- * ---------------------------------------------------------------
- * You are given three integers: `a`, `b`, and `c` representing the number of 'a', 'b', and 'c' characters respectively.
- * Construct the longest possible string such that it does not contain "aaa", "bbb", or "ccc" as a substring.
- * The string is considered "happy" if there are no three consecutive identical characters.
+ * Problem: Longest Happy String
  *
- * 🔹 Example:
- * Input: a = 1, b = 1, c = 7
- * Output: "ccbccacc"
- * Explanation: A valid happy string with no "ccc" and max usage of 'c's.
+ * Given counts of 'a', 'b', and 'c', build the longest possible string that
+ * never contains "aaa", "bbb", or "ccc" as a substring. Any longest valid
+ * string may be returned.
  *
- * 🔗 Leetcode Link: https://leetcode.com/problems/longest-happy-string/
+ * Leetcode: https://leetcode.com/problems/longest-happy-string/ (Medium)
+ * Rating:   acceptance 56.5% (Medium), contest rating 1821
+ * Pattern:  Greedy | Max heap | Avoid three consecutive equal characters
  *
- * ---------------------------------------------------------------
- * 🔄 Follow-up Questions:
- * ---------------------------------------------------------------
- * 1. Can we extend the logic for N characters (not just 'a', 'b', 'c')?
- *    → Yes, use a max-heap and generalize the logic for any char with streak constraint.
- * 2. Can we do it without heap?
- *    → Yes, greedy character selection can be done using manual comparisons.
- * LeetCode Contest Rating: 1821
+ * Example:
+ *   Input:  a = 1, b = 1, c = 7
+ *   Output: "ccaccbcc"
+ *   Why:    it uses as many characters as possible while placing a or b before a third c.
+ *
+ * Follow-ups:
+ *   1. Generalize to k character types?
+ *      Store all remaining counts in the same max heap and skip choices that violate the streak limit.
+ *   2. Change the limit from 2 to L repeats?
+ *      Track the current run length and only block a character when its run reaches L.
+ *   3. Return the lexicographically smallest longest happy string?
+ *      Break ties by smaller character while still respecting the same feasibility rule.
+ *
+ * Related: Reorganize String (767), Task Scheduler (621), Construct String With Repeat Limit (2182).
  */
 public class LongestHappyString {
 
-  public static void main(String[] args) {
-    LongestHappyString solver = new LongestHappyString();
+    public static void main(String[] args) {
+        LongestHappyString solver = new LongestHappyString();
+        int[][] counts = { {1, 1, 7}, {2, 2, 1}, {0, 0, 0} };
+        String[] expected = {"ccaccbcc", "ababc", ""};
 
-    String result = solver.generateHappyStringUsingHeap(1, 1, 7);
-    System.out.println("Heap-based happy string: " + result);
+        for (int i = 0; i < counts.length; i++) {
+            String got = solver.generateHappyStringUsingHeap(counts[i][0], counts[i][1], counts[i][2]);
+            System.out.printf("counts=%s -> %s  expected=%s%n",
+                java.util.Arrays.toString(counts[i]), got, expected[i]);
+        }
+    }
 
-    String optimized = solver.generateHappyStringGreedy(1, 1, 7);
-    System.out.println("Greedy-based happy string: " + optimized);
-  }
 
   /**
-   * Heap-based greedy approach to build the longest "happy" string.
+   * Intuition: always spend the character with the largest remaining count, unless
+   * it would create three equal characters in a row. In that blocked case, the
+   * next largest character is the cheapest separator that lets the dominant
+   * character be used again later.
    *
-   * Steps:
-   * 1. Use a max-heap to always pick the character with the highest remaining count.
-   * 2. If last two characters in the result are same as the top char, skip it for now and use the next best.
-   * 3. Put back unused characters with updated count.
+   * Algorithm:
+   *   1. Push every positive character count into a max heap.
+   *   2. Pop the best character and append it if it does not match the last two characters.
+   *   3. If it is blocked, append the next best character and push the blocked one back.
+   *   4. Reinsert any character whose remaining count is still positive.
    *
-   * Time Complexity: O(n log k), where n = total characters, k = 3 (fixed size)
-   * Space Complexity: O(n) for result, O(k) for heap
+   * Time:  O(n log k) - one heap operation per appended character, with k = 3.
+   * Space: O(n) - the builder stores the answer and the heap stores at most three entries.
    */
   public String generateHappyStringUsingHeap(int aCount, int bCount, int cCount) {
     PriorityQueue<CharCount> maxHeap = new PriorityQueue<>((x, y) -> Integer.compare(y.count, x.count));

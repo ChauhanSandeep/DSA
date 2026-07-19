@@ -4,35 +4,59 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Converts a Roman numeral string to its corresponding integer value.
  * Problem: Roman to Integer
- * Example: "MCMIV" -> 1904
- * Explaination:
- * - Roman numerals are represented by combinations of letters from the Latin alphabet.
- * - Each letter has a fixed integer value.
- * - The numeral is read from left to right, and the values are added together.
  *
- * LeetCode Equivalent: https://leetcode.com/problems/roman-to-integer/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Convert a Roman numeral into its integer value. Roman symbols usually add
+ * their values, but a smaller symbol before a larger one represents subtraction,
+ * as in IV, IX, XL, XC, CD, and CM.
+ *
+ * Leetcode: https://leetcode.com/problems/roman-to-integer/ (Easy)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Hash map | Reverse scan | Subtractive notation
+ *
+ * Example:
+ *   Input:  s = "MCMIV"
+ *   Output: 1904
+ *   Why:    M is 1000, CM is 900, and IV is 4.
+ *
+ * Follow-ups:
+ *   1. Validate canonical Roman numerals?
+ *      Convert to integer, convert back with Integer to Roman, and compare strings.
+ *   2. Support lowercase input?
+ *      Normalize with toUpperCase before scanning.
+ *   3. Avoid building the map on every call?
+ *      Use a static final map or switch expression for the seven symbols.
+ *
+ * Related: Integer to Roman (12).
  */
 public class RomanToInt {
     public static void main(String[] args) {
-        String romanNumeral = "MCMIV";
-        int integerValue = romanToInteger(romanNumeral);
-        System.out.println("Integer value for " + romanNumeral + " is " + integerValue);
+        String[] inputs = {"MCMIV", "LVIII", "III"};
+        int[] expected = {1904, 58, 3};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = romanToInteger(inputs[i]);
+            System.out.printf("roman=%s -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 
+
     /**
-     * Converts a Roman numeral string to an integer.
+     * Intuition: when scanning from right to left, the largest symbol to the right
+     * tells whether the current symbol should add or subtract. A smaller current
+     * value means it belongs to a subtractive pair; otherwise it contributes normally.
      *
-     * Approach:
-     * - Use a HashMap to store the integer values of Roman numerals.
-     * - Traverse the string from right to left, keeping track of the last processed numeral.
-     * - If the current numeral is smaller than the last processed one, subtract it (e.g., IV = 4).
-     * - Otherwise, add it to the result.
+     * Algorithm:
+     *   1. Reject null or blank input.
+     *   2. Store Roman symbol values in a map.
+     *   3. Scan from right to left, subtracting values smaller than lastSeenValue and adding the rest.
+     *   4. Update lastSeenValue after each symbol and return the total.
      *
-     * Time Complexity: O(N) - Single traversal of the string.
-     * Space Complexity: O(1) - Constant extra space for the HashMap.
+     * Time:  O(n) - one pass over the Roman numeral.
+     * Space: O(1) - the value map contains seven fixed symbols.
+     *
+     * @param roman Roman numeral string to convert
+     * @return integer represented by roman
      */
     public static int romanToInteger(String roman) {
         if (roman == null || roman.trim().isEmpty()) {

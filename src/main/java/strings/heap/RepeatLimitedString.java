@@ -6,46 +6,59 @@ import java.util.PriorityQueue;
 
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/construct-string-with-repeat-limit/
+ * Problem: Construct String With Repeat Limit
  *
- * Problem Statement:
- * Given a string `s` and an integer `repeatLimit`, construct the **lexicographically largest string**
- * that can be made from `s` such that **no character repeats more than `repeatLimit` times consecutively**.
+ * Rearrange characters from s to build the lexicographically largest possible
+ * string where no character appears more than repeatLimit times consecutively.
+ * Not every input character must be used.
+ *
+ * Leetcode: https://leetcode.com/problems/construct-string-with-repeat-limit/ (Medium)
+ * Rating:   acceptance 67.1% (Medium), contest rating 1680
+ * Pattern:  Greedy | Max heap | Break repeated runs
  *
  * Example:
- * Input: s = "cczazcc", repeatLimit = 3
- * Output: "zzcccac"
+ *   Input:  s = "cczazcc", repeatLimit = 3
+ *   Output: "zzcccac"
+ *   Why:    z is used first for lexicographic size, and a smaller breaker allows more c characters.
  *
- * Follow-up Questions:
- * 1. What if repeatLimit is very large or very small?
- *    - Large repeatLimit means fewer switches; small repeatLimit may require many different characters.
- * 2. Can you solve it without using a priority queue?
- *    - Yes, by simulating character access using a frequency array from 'z' to 'a' and maintaining indices.
- * 3. How to solve for streaming data (continuous characters arriving)?
- *    - Requires window-based frequency handling and deferred write strategies.
- * LeetCode Contest Rating: 1680
+ * Follow-ups:
+ *   1. Solve without a heap?
+ *      Use a 26-count array and scan from z down to find the current and breaker characters.
+ *   2. Require using every character?
+ *      Return impossible when no breaker exists for a still-over-limit character.
+ *   3. Support arbitrary alphabets?
+ *      Replace character comparison and frequency storage with an ordered map or heap entries.
+ *
+ * Related: Longest Happy String (1405), Reorganize String (767), Task Scheduler (621).
  */
-
 public class RepeatLimitedString {
 
-  public static void main(String[] args) {
-    System.out.println(repeatLimitedString("aababab", 2));   // Output: "bababa"
-    System.out.println(repeatLimitedString("cczazcc", 3));   // Output: "zzcccac"
-    System.out.println(repeatLimitedString("a", 1));         // Output: "a"
-  }
+    public static void main(String[] args) {
+        String[] inputs = {"cczazcc", "aababab", "a"};
+        int[] limits = {3, 2, 1};
+        String[] expected = {"zzcccac", "bbabaa", "a"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = repeatLimitedString(inputs[i], limits[i]);
+            System.out.printf("s=%s repeatLimit=%d -> %s  expected=%s%n", inputs[i], limits[i], got, expected[i]);
+        }
+    }
+
 
   /**
-   * Constructs the lexicographically largest string with a repeat limit on consecutive characters.
+   * Intuition: lexicographic maximum means always try the largest remaining
+   * character first. If that character still has copies after hitting the repeat
+   * limit, insert the next largest available character as a breaker so the larger
+   * character can be used again.
    *
-   * Steps:
-   * 1. Count the frequency of each character in the string.
-   * 2. Use a max-heap (priority queue) to always pick the lexicographically largest character.
-   * 3. Append it up to `repeatLimit` times.
-   * 4. If still remaining, use the next largest character as a breaker.
-   * 5. Reinsert characters with remaining frequencies back into the heap.
+   * Algorithm:
+   *   1. Count character frequencies.
+   *   2. Put characters in a max heap ordered by character value.
+   *   3. Append the largest character up to repeatLimit times.
+   *   4. If copies remain, append one breaker character and reinsert remaining counts.
    *
-   * Time Complexity: O(N log 26) ≈ O(N), where N = length of input string.
-   * Space Complexity: O(1) — constant space for frequency map since only lowercase letters are used.
+   * Time:  O(n log k) - each appended character may update the heap, with k distinct characters.
+   * Space: O(k) - the heap and frequency map store distinct characters only.
    */
   public static String repeatLimitedString(String str, int repeatLimit) {
     // Step 1: Count frequencies

@@ -1,52 +1,62 @@
 package strings.greedy;
 
 /**
- * LeetCode 1689. Partitioning Into Minimum Number Of Deci-Binary Numbers
+ * Problem: Partitioning Into Minimum Number Of Deci-Binary Numbers
  *
- * A decimal number is called deci-binary if each of its digits is either 0 or 1 without any leading zeros.
- * For example, 101 and 1100 are deci-binary, while 112 and 3001 are not.
+ * A deci-binary number contains only digits 0 and 1. Given a decimal string,
+ * return the fewest positive deci-binary numbers whose digit-wise sum can form
+ * that number.
  *
- * Given a string n that represents a positive decimal integer, return the minimum number of positive
- * deci-binary numbers needed to sum up to n.
+ * Leetcode: https://leetcode.com/problems/partitioning-into-minimum-number-of-deci-binary-numbers/ (Medium)
+ * Rating:   acceptance 88.9% (Medium), contest rating 1355
+ * Pattern:  Greedy | Digit maximum | Lower bound equals construction
  *
- * Example 1:
- * Input: n = "32"
- * Output: 3
- * Explanation: 10 + 11 + 11 = 32
+ * Example:
+ *   Input:  n = "82734"
+ *   Output: 8
+ *   Why:    the digit 8 needs eight numbers contributing 1 in that position, and eight numbers can cover every smaller digit.
  *
- * Example 2:
- * Input: n = "82734"
- * Output: 8
- * Explanation: We need at least 8 deci-binary numbers to sum up to 82734
+ * Follow-ups:
+ *   1. Construct the actual deci-binary addends?
+ *      For round r, place 1 in every position whose digit is at least r.
+ *   2. Can scanning stop early?
+ *      Yes, digit 9 is the maximum possible answer.
+ *   3. What if digits were base b but addends still used 0/1?
+ *      The answer remains the maximum digit in that base representation.
  *
- * LeetCode Link: https://leetcode.com/problems/partitioning-into-minimum-number-of-deci-binary-numbers/
- *
- * Follow-up Questions:
- * - How would you prove this greedy approach is optimal? (Each position needs max digit iterations)
- * - Can you optimize for very long numbers? (Early termination when max digit 9 is found)
- * - How would you construct actual deci-binary numbers instead of just count? (Build numbers digit by digit)
- * - What if we need to minimize sum of deci-binary numbers instead of count? (Different optimization problem)
- * LeetCode Contest Rating: 1355
+ * Related: Additive Number (306), Split a String Into the Max Number of Unique Substrings (1593).
  */
 public class PartitioningIntoMinimumNumberOfDeciBinaryNumbers {
 
+    public static void main(String[] args) {
+        PartitioningIntoMinimumNumberOfDeciBinaryNumbers solver = new PartitioningIntoMinimumNumberOfDeciBinaryNumbers();
+        String[] inputs = {"32", "82734", "111"};
+        int[] expected = {3, 8, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.minPartitions(inputs[i]);
+            System.out.printf("n=%s -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds minimum number of deci-binary numbers needed to sum to given number.
+     * Intuition: one deci-binary addend can contribute at most 1 to any digit
+     * position. Therefore a digit d needs at least d addends. The largest digit is
+     * also sufficient, because each smaller digit can choose that many of those
+     * addends to receive a 1.
      *
      * Algorithm:
-     * Key insight: minimum count equals the maximum digit in the number because each
-     * deci-binary number can contribute at most 1 to any digit position
+     *   1. Scan every digit in the input string.
+     *   2. Convert the digit character to its numeric value.
+     *   3. Track the maximum digit seen so far.
+     *   4. Return 9 immediately if found; otherwise return the maximum digit.
      *
-     * 1. Each deci-binary number can contribute at most 1 to any digit position
-     * 2. Position with largest digit d requires exactly d deci-binary numbers
-     * 3. All other positions can be satisfied within these d numbers
-     * 4. Simply find and return the maximum digit
+     * Time:  O(n) - one scan of the input digits.
+     * Space: O(1) - only the current maximum digit is stored.
      *
-     * Time Complexity: O(n) where n is length of input string
-     * Space Complexity: O(1) - only uses constant extra space
-     *
-     * @param input String representation of positive decimal integer
-     * @return Minimum number of deci-binary numbers needed to sum to n
+     * @param input decimal string representation of a positive integer
+     * @return minimum number of deci-binary numbers needed
      */
     public int minPartitions(String input) {
         int maxDigit = 0;

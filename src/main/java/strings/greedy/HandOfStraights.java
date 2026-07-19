@@ -3,67 +3,71 @@ package strings.greedy;
 import java.util.*;
 
 /**
- * HandOfStraights.java
+ * Problem: Hand of Straights
  *
- * Problem Statement:
- * Alice has some cards, where each card has a value written on it. She wants to rearrange the 
- * cards into groups such that each group has exactly groupSize cards, and the values in each 
- * group are consecutive integers.
- * 
- * Given an integer array hand where hand[i] is the value on the ith card, and an integer 
- * groupSize, return true if she can rearrange the cards into valid groups, or false otherwise.
+ * Given card values and a group size, decide whether every card can be
+ * rearranged into groups of exactly groupSize consecutive values. Each card must
+ * be used once.
  *
- * Example 1:
- * Input: hand = [1,2,3,6,2,3,4,7,8], groupSize = 3
- * Output: true
- * Explanation: Alice's hand can be rearranged as [1,2,3], [2,3,4], [6,7,8].
+ * Leetcode: https://leetcode.com/problems/hand-of-straights/ (Medium)
+ * Rating:   acceptance 57.1% (Medium), contest rating 1565
+ * Pattern:  Greedy | Ordered frequency map | Consecutive grouping
  *
- * Example 2:
- * Input: hand = [1,2,3,4,5], groupSize = 4
- * Output: false
- * Explanation: Cannot form groups of 4 consecutive cards.
+ * Example:
+ *   Input:  hand = [1,2,3,6,2,3,4,7,8], groupSize = 3
+ *   Output: true
+ *   Why:    the cards can become [1,2,3], [2,3,4], and [6,7,8].
  *
- * LeetCode link: https://leetcode.com/problems/hand-of-straights/
+ * Follow-ups:
+ *   1. What if group sizes can vary?
+ *      The fixed greedy no longer applies; this becomes search or DP over remaining cards.
+ *   2. Return the actual groups instead of a boolean?
+ *      Record each consecutive run while decrementing the same frequency map.
+ *   3. Handle a massive value range with few cards?
+ *      Keep the TreeMap approach because it stores only values that appear.
+ *   4. What if cards arrive online?
+ *      Buffer counts and greedily close groups only when smaller values can no longer arrive.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - What if groupSize can vary for different groups?
- *    → Problem becomes NP-hard; need backtracking or DP.
- *  - Can you handle very large card values efficiently?
- *    → Use TreeMap (already does this) instead of sorting array.
- *  - What if you need to return the actual groups formed?
- *    → Track groups as you build them in the algorithm.
- *  - How would you optimize for very small groupSize (e.g., 2)?
- *    → Can use simpler greedy without TreeMap overhead.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 1296 (Divide Array in Sets of K Consecutive Numbers): https://leetcode.com/problems/divide-array-in-sets-of-k-consecutive-numbers/
- *  - LeetCode 659 (Split Array into Consecutive Subsequences): https://leetcode.com/problems/split-array-into-consecutive-subsequences/
- *  - LeetCode 1121 (Divide Array Into Increasing Sequences): https://leetcode.com/problems/divide-array-into-increasing-sequences/
- * LeetCode Contest Rating: 1565
+ * Related: Divide Array in Sets of K Consecutive Numbers (1296), Split Array into Consecutive Subsequences (659).
  */
 public class HandOfStraights {
 
+    public static void main(String[] args) {
+        HandOfStraights solver = new HandOfStraights();
+        int[][] hands = {
+            {1, 2, 3, 6, 2, 3, 4, 7, 8},
+            {1, 2, 3, 4, 5},
+            {1, 2, 3, 4}
+        };
+        int[] groupSizes = {3, 4, 1};
+        boolean[] expected = {true, false, true};
+
+        for (int i = 0; i < hands.length; i++) {
+            boolean got = solver.isNStraightHand(hands[i], groupSizes[i]);
+            System.out.printf("hand=%s groupSize=%d -> %s  expected=%s%n",
+                java.util.Arrays.toString(hands[i]), groupSizes[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Main method: Greedy approach with TreeMap (Optimal).
-     * Step-by-step:
-     *  1. Check if total cards divisible by groupSize (early exit if not)
-     *  2. Count frequency of each card value using TreeMap (keeps sorted order)
-     *  3. While cards remain:
-     *     a. Pick smallest available card (TreeMap gives this automatically)
-     *     b. Try to form group starting from this card
-     *     c. For each of the next groupSize consecutive values:
-     *        - Check if available, if not return false
-     *        - Decrement count, remove from map if count becomes 0
-     *  4. If all groups formed successfully, return true
+     * Intuition: the smallest remaining card has no smaller card available to sit
+     * before it, so any valid arrangement must start one group at that value. If the
+     * next groupSize consecutive values are not all available, that smallest card
+     * cannot be placed anywhere and the hand is impossible.
      *
-     * Key Insight:
-     * Greedy works! Always start with the smallest available card. If we can't
-     * form a consecutive group from the smallest card, it's impossible because
-     * that card must go somewhere and can only fit in a consecutive sequence.
+     * Algorithm:
+     *   1. Reject hands whose size is not divisible by groupSize.
+     *   2. Count card frequencies in a TreeMap so the smallest remaining card is easy to find.
+     *   3. Repeatedly start from the smallest card and consume one copy of each needed consecutive value.
+     *   4. Return false on the first missing value; otherwise all cards formed valid groups.
      *
-     * Algorithm: Greedy with TreeMap.
-     * Time Complexity: O(n log n), TreeMap operations are O(log n), done n times.
-     * Space Complexity: O(n) for TreeMap storing unique card values.
+     * Time:  O(n log n) - each card update touches the ordered map.
+     * Space: O(n) - the frequency map can store every distinct card value.
+     *
+     * @param hands card values to partition into consecutive groups
+     * @param groupSize required number of cards in every group
+     * @return true if all cards can be partitioned into valid groups
      */
     public boolean isNStraightHand(int[] hands, int groupSize) {
         if (hands.length % groupSize != 0) {

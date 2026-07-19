@@ -6,65 +6,63 @@ import java.util.Set;
 /**
  * Problem: Unique Email Addresses
  *
- * Every valid email consists of a local name and a domain name, separated by the '@' sign.
- * Besides lowercase letters, the email may contain one or more '.' or '+'.
+ * Normalize each email by applying Gmail-style local-name rules: dots in the
+ * local part are ignored, and everything after the first plus sign is ignored.
+ * Domains remain unchanged. Return the number of unique normalized addresses.
  *
- * If you add periods '.' between some characters in the local name part of an email address,
- * mail sent there will be forwarded to the same address without dots in the local name.
- * Note that this rule does not apply to domain names.
- *
- * If you add a plus '+' in the local name, everything after the first plus sign will be ignored.
- * This allows certain emails to be filtered. Note that this rule does not apply to domain names.
- *
- * It is possible to use both of these rules at the same time.
+ * Leetcode: https://leetcode.com/problems/unique-email-addresses/ (Easy)
+ * Rating:   acceptance 67.7% (Easy), contest rating 1199
+ * Pattern:  Hash set | String normalization | Local/domain split
  *
  * Example:
- * Input: emails = ["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"]
- * Output: 2
- * Explanation: "testemail@leetcode.com" and "testemail@lee.tcode.com" actually receive mails.
- * The first two emails normalize to the same address "testemail@leetcode.com".
+ *   Input:  emails = ["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"]
+ *   Output: 2
+ *   Why:    the first two normalize to the same leetcode.com address; the third has a different domain.
  *
- * LeetCode Link: https://leetcode.com/problems/unique-email-addresses/
+ * Follow-ups:
+ *   1. Domain names are case-insensitive?
+ *      Normalize the domain with lowercase before inserting into the set.
+ *   2. Need to group originals by normalized address?
+ *      Use Map<String, List<String>> instead of a HashSet.
+ *   3. Process invalid email formats?
+ *      Decide whether to reject, skip, or report invalid entries during normalization.
  *
- * 1. What if domain names also have special rules like case-insensitivity?
- *    Answer: We would normalize the domain name by converting it to lowercase before
- *    concatenating with the local name. The algorithm structure remains the same.
- *
- * 2. How would you handle invalid email formats in the input?
- *    Answer: Add validation to check for '@' presence, non-empty local and domain parts,
- *    and proper character sets. Return early or skip invalid emails based on requirements.
- *
- * 3. Can you optimize for space if the email list is extremely large?
- *    Answer: Instead of storing full normalized emails, we could use a hash of the normalized
- *    email or implement a streaming approach that processes emails in batches.
- *
- * 4. How would you extend this to support additional filtering rules?
- *    Answer: Refactor the normalization logic into a separate method that accepts rule
- *    configurations. Use strategy pattern to apply different rule sets dynamically.
- *
- * 5. What if we need to group emails by their normalized form?
- *    Answer: Use HashMap<String, List<String>> instead of HashSet, where key is the normalized
- *    email and value is the list of original emails that map to it.
- * LeetCode Contest Rating: 1199
+ * Related: Valid Email Address, Group Anagrams (49).
  */
 public class UniqueEmailAddresses {
 
+    public static void main(String[] args) {
+        UniqueEmailAddresses solver = new UniqueEmailAddresses();
+        String[][] inputs = {
+            {"test.email+alex@leetcode.com", "test.e.mail+bob.cathy@leetcode.com", "testemail+david@lee.tcode.com"},
+            {"a@leetcode.com", "a+b@leetcode.com", "a.b@leetcode.com"}
+        };
+        int[] expected = {2, 2};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.numUniqueEmails(inputs[i]);
+            System.out.printf("emails=%s -> %d  expected=%d%n",
+                java.util.Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Counts unique email addresses after applying local name rules.
+     * Intuition: after normalization, two emails reach the same inbox exactly when
+     * their normalized strings are equal. A set naturally removes duplicates while
+     * preserving only the number of distinct inboxes.
      *
      * Algorithm:
-     * 1. For each email, split into local and domain parts at '@'
-     * 2. Process local part: remove dots, ignore everything after first '+'
-     * 3. Keep domain part unchanged
-     * 4. Combine processed local and domain parts
-     * 5. Use HashSet to track unique normalized emails
-     * 6. Return count of unique emails
+     *   1. Return 0 for null or empty email input.
+     *   2. Normalize each email by splitting local and domain parts.
+     *   3. In the local part, ignore dots and stop at the first plus sign.
+     *   4. Add valid normalized addresses to a set and return its size.
      *
-     * Time Complexity: O(n * m) where n is number of emails, m is average email length
-     * Space Complexity: O(n * m) for storing normalized emails in set
+     * Time:  O(n * m) - n emails with average length m are scanned.
+     * Space: O(n * m) - the set may store every normalized email.
      *
-     * @param emails Array of email addresses to normalize and count
-     * @return Number of unique email addresses after normalization
+     * @param emails email addresses to normalize
+     * @return number of unique normalized email addresses
      */
     public int numUniqueEmails(String[] emails) {
         if (emails == null || emails.length == 0) {
@@ -83,7 +81,7 @@ public class UniqueEmailAddresses {
         return uniqueEmails.size();
     }
 
-    // Helper method to normalize email according to rules
+    /** Normalizes one email address according to local-name dot and plus rules. */
     private String normalizeEmail(String email) {
         if (email == null || !email.contains("@")) {
             return null;
@@ -103,7 +101,7 @@ public class UniqueEmailAddresses {
         return processedLocal + "@" + domain;
     }
 
-    // Helper method to process local name according to rules
+    /** Applies dot removal and plus truncation to the local name. */
     private String processLocalName(String localName) {
         StringBuilder result = new StringBuilder();
 

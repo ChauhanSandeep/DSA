@@ -1,112 +1,49 @@
 package strings.stack;
 
 /**
- * 316. Remove Duplicate Letters
+ * Problem: Remove Duplicate Letters
  *
- * Problem Statement:
- * Given a string s, remove duplicate letters so that every letter appears once and only once.
- * You must make sure your result is the smallest in lexicographical order among all possible results.
+ * Remove duplicate letters so every distinct letter appears exactly once, while
+ * producing the lexicographically smallest possible subsequence among all valid
+ * choices.
+ *
+ * Leetcode: https://leetcode.com/problems/remove-duplicate-letters/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Monotonic stack | Last occurrence | Greedy subsequence
  *
  * Example:
- * Input:  s = "cbacdcbc"
- * Output: "acdb"
+ *   Input:  s = "cbacdcbc"
+ *   Output: "acdb"
+ *   Why:    all distinct letters remain once, and larger removable prefixes are popped before smaller letters.
  *
- * Explanation:
- * - All distinct characters in "cbacdcbc" are: c, b, a, d.
- * - We want each of them to appear exactly once in the result.
- * - Among all subsequences that contain each of these characters exactly once,
- *   "acdb" is the lexicographically smallest.
+ * Follow-ups:
+ *   1. Support all ASCII characters?
+ *      Use arrays of size 128 or maps instead of 26-entry lowercase arrays.
+ *   2. Use a custom character order?
+ *      Replace direct character comparison with the custom rank comparison.
+ *   3. Process input too large for memory?
+ *      You still need future occurrence knowledge, so precompute or externally store last positions.
  *
- * Approach (High-level):
- * - Optimal (Monotonic Stack + Last Occurrence):
- *   Iterate over the string while maintaining:
- *     - A stack to build the resulting subsequence.
- *     - A boolean array to track which characters are already in the stack.
- *     - An array of last occurrences for each character.
- *   For each character, if it is not already in the stack, we compare it with the
- *   top of the stack and pop from the stack while:
- *     - The top character is lexicographically larger than the current character, and
- *     - The top character appears later in the string (so we can still use it later).
- *   Push the current character to the stack and mark it as visited.
- *   Finally, form the result from the stack.
- *
- * - Alternative (Greedy Selection by Window + Counting):
- *   Repeatedly choose the smallest possible character that can be the next in the result while
- *   ensuring all remaining distinct characters can still appear later. Use a frequency array
- *   and a visited array to guide selection. This is also O(n) with a bit more logic complexity.
- *
- * LeetCode Link:
- * https://leetcode.com/problems/remove-duplicate-letters/
- *
- * Potential Follow-up Questions (FAANG-style) and Brief Answers:
- *
- * 1. Follow-up: What if the input can contain all ASCII characters, not just 'a' to 'z'?
- *    - Answer: Replace fixed-size arrays (length 26) with maps or arrays sized to the ASCII/Unicode range.
- *      For example, use int[128] for ASCII or a HashMap<Character, Integer> for generic Unicode.[web:7]
- *
- * 2. Follow-up: How would you handle a very large input stream that does not fit in memory?
- *    - Answer: If the stream is too large, you may need a multi-pass or chunk-based strategy.
- *      For strict lexicographical minimality, you typically need access to global last occurrences.
- *      In streaming, you would approximate or maintain partial indices via external storage.[web:2]
- *
- * 3. Follow-up: This problem is the same as "Smallest Subsequence of Distinct Characters" (LeetCode 1081).
- *    Can you generalize your solution to that problem?
- *    - Answer: The optimal monotonic stack solution directly applies. You simply use the same
- *      logic for any string of lowercase letters. The constraints and behavior are identical.[web:7]
- *
- * 4. Follow-up: Can we modify the solution to ensure stability with respect to some custom ordering
- *    (e.g., a custom comparator instead of standard lexicographical order)?
- *    - Answer: Yes. Replace direct character comparisons with calls to the custom comparator.
- *      The monotonic stack condition (top > current) becomes "top is greater than current by custom comparator".
- *
- * 5. Follow-up: How would you test this thoroughly?
- *    - Answer: Include tests for:
- *        - Single-character strings.
- *        - All characters identical.
- *        - Already strictly increasing sequences.
- *        - Strictly decreasing sequences.
- *        - Random strings with high duplication.
- *        - Edge lengths: minimum (length 1) and maximum allowed by constraints.[web:5]
+ * Related: Smallest Subsequence of Distinct Characters (1081), Create Maximum Number (321).
  */
 public class RemoveDuplicateLetters {
 
     /**
-     * Optimal solution using a monotonic stack and last occurrence tracking.
+     * Intuition: build the answer like a stack. If the current character is smaller
+     * than the stack top and that top appears again later, popping it makes the
+     * prefix smaller without losing the ability to include every distinct letter.
      *
      * Algorithm:
-     * 1. Edge case: if the string is null or empty, return it directly.
-     * 2. Precompute the last occurrence index of each character.
-     *    - Use an int array lastIndex[26] where lastIndex[c - 'a'] is the last index of character c.
-     * 3. Maintain:
-     *    - A stack-like structure (StringBuilder used as a stack) to store the current result.
-     *    - A boolean array inResult[26] to mark which characters are already in the current result.
-     * 4. Iterate over the characters of the string s by index i:
-     *    - Let current = s.charAt(i).
-     *    - If current is already inResult, skip it (we already used this character once).
-     *    - Otherwise:
-     *        a. While the "stack" is not empty AND
-     *             - The last character in the stack is greater than current (lexicographically), AND
-     *             - The last occurrence of that last character is after index i (meaning we can still use
-     *               that character later),
-     *           then pop that character from the stack and mark it as not inResult.
-     *        b. Append current to the stack and mark it as inResult.
-     * 5. Convert the stack to a string and return it.
+     *   1. Return input directly for null or length at most one.
+     *   2. Record the last index where each character appears.
+     *   3. Scan characters, skipping those already in the result stack.
+     *   4. Pop larger stack characters that appear later, then append the current character.
      *
-     * Time Complexity:
-     * - O(n), where n is the length of s.
-     *   Each character is pushed and popped at most once.
+     * Time:  O(n) - each character is pushed and popped at most once.
+     * Space: O(1) - fixed arrays and at most 26 stack characters are used.
      *
-     * Space Complexity:
-     * - O(1) additional space (ignoring the output string) because:
-     *   - lastIndex and inResult are fixed-size arrays of length 26.
-     *   - The stack holds at most 26 distinct characters.
-     *
-     * This approach guarantees that:
-     * - Each character appears once.
-     * - The resulting sequence is lexicographically smallest among all valid subsequences.[web:5][web:2]
-     *
-     * @param input the input string consisting of lowercase English letters
-     * @return the lexicographically smallest string with all distinct characters from s
+     * @param input lowercase string to deduplicate
+     * @return lexicographically smallest subsequence containing each distinct letter once
      */
     public String removeDuplicateLetters(String input) {
         if (input == null || input.length() <= 1) {
@@ -213,23 +150,14 @@ public class RemoveDuplicateLetters {
     // Simple main for basic sanity checks during local debugging.
     public static void main(String[] args) {
         RemoveDuplicateLetters solver = new RemoveDuplicateLetters();
+        String[] inputs = {"bcabc", "cbacdcbc", "aaaaa", "abacb"};
+        String[] expected = {"abc", "acdb", "a", "abc"};
 
-        String input1 = "bcabc";
-        String input2 = "cbacdcbc";
-        String input3 = "aaaaa";
-        String input4 = "abacb";
-
-        System.out.println("Optimal:");
-        System.out.println("Input: " + input1 + " -> Output: " + solver.removeDuplicateLetters(input1));
-        System.out.println("Input: " + input2 + " -> Output: " + solver.removeDuplicateLetters(input2));
-        System.out.println("Input: " + input3 + " -> Output: " + solver.removeDuplicateLetters(input3));
-        System.out.println("Input: " + input4 + " -> Output: " + solver.removeDuplicateLetters(input4));
-
-        System.out.println("Alternative:");
-        System.out.println("Input: " + input1 + " -> Output: " + solver.removeDuplicateLettersAlternative(input1));
-        System.out.println("Input: " + input2 + " -> Output: " + solver.removeDuplicateLettersAlternative(input2));
-        System.out.println("Input: " + input3 + " -> Output: " + solver.removeDuplicateLettersAlternative(input3));
-        System.out.println("Input: " + input4 + " -> Output: " + solver.removeDuplicateLettersAlternative(input4));
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.removeDuplicateLetters(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
+
 }
 
