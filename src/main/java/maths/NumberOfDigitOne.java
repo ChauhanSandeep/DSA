@@ -1,39 +1,65 @@
 package maths;
 
 /**
- * Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.
+ * Problem: Number of Digit One
  *
- * Example 1:
- * Input: n = 13
- * Output: 6
- * Explanation: Digit 1 occurred in the following numbers: 1, 10, 11, 12, 13.
+ * Given n, count how many times the digit 1 appears in all non-negative
+ * integers from 0 through n. The mathematical solution counts contribution by
+ * digit position instead of visiting every number.
  *
- * Example 2:
- * Input: n = 0
- * Output: 0
+ * Leetcode: https://leetcode.com/problems/number-of-digit-one/ (Hard)
+ * Rating:   acceptance 39.2% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Digit counting | Place-value decomposition
  *
- * LeetCode: https://leetcode.com/problems/number-of-digit-one/
+ * Example:
+ *   Input:  n = 13
+ *   Output: 6
+ *   Why:    the digit 1 appears in 1, 10, 11 twice, 12, and 13.
  *
- * Follow-up Questions:
- * 1. How would you optimize the solution for very large n (e.g., 10^9)?
- *    - The mathematical approach already handles large n efficiently with O(log n) time complexity.
- * 2. What if we need to count a different digit (e.g., count digit 2)?
- *    - The solution can be generalized by replacing '1' with the target digit in the calculations.
- * 3. How would you modify the solution to count digit 1 in numbers within a range [a, b]?
- *    - We can compute count(b) - count(a-1) using the same approach.
+ * Follow-ups:
+ *   1. How would you count a digit other than 1?
+ *      Adjust the current-digit cases, taking special care when the target digit is 0.
+ *   2. How would you count ones in a range [a, b]?
+ *      Compute countDigitOne(b) - countDigitOne(a - 1).
+ *   3. How would you handle n larger than 32-bit integers?
+ *      Promote the input and count to long or use decimal string place-value logic.
  *
- * Related Problems:
- * - Factorial Trailing Zeroes (https://leetcode.com/problems/factorial-trailing-zeroes/)
- * - Count Digit One (https://leetcode.com/problems/count-digit-one/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Factorial Trailing Zeroes (172), Count Primes (204).
  */
+
 public class NumberOfDigitOne {
-    /**
-     * Counts the total number of digit 1 appearing in all numbers from 1 to n.
+
+    public static void main(String[] args) {
+        NumberOfDigitOne solver = new NumberOfDigitOne();
+        int[] inputs = { 0, 13, 99 };
+        int[] expected = { 0, 6, 20 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countDigitOne(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: focus on one decimal position at a time. The higher digits tell
+     * how many full cycles of 0 through 9 occur at that position, the current
+     * digit decides whether there is a partial extra cycle, and the lower digits
+     * decide how much of that partial cycle is included.
      *
-     * @param n Upper bound (inclusive)
-     * @return Total count of digit 1
+     * Algorithm:
+     *   1. Iterate i over place values 1, 10, 100, and so on.
+     *   2. Split n into higher, current, and lower parts around i.
+     *   3. Add higher * i when current is 0.
+     *   4. Add higher * i + lower + 1 when current is 1.
+     *   5. Add (higher + 1) * i when current is greater than 1.
+     *
+     * Time:  O(log n) - one pass per decimal digit.
+     * Space: O(1) - only place-value counters are stored.
+     *
+     * @param n inclusive upper bound
+     * @return total occurrences of digit 1 from 0 through n
      */
+
     public int countDigitOne(int n) {
         int count = 0;
 
@@ -74,9 +100,8 @@ public class NumberOfDigitOne {
         return count;
     }
 
-    /**
-     * Helper method to count the number of '1's in a single number.
-     */
+        /** Counts digit 1 occurrences inside one number. */
+
     private int countOnesInNumber(int num) {
         int count = 0;
         while (num > 0) {

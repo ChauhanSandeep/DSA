@@ -6,54 +6,69 @@ import java.util.*;
 /**
  * Problem: Max Points on a Line
  *
- * Given an array of points where points[i] = [xi, yi] represents a point on the X-Y plane,
- * return the maximum number of points that lie on the same straight line.
+ * Given points on a 2D plane, return the largest number of points that lie on
+ * one straight line. A line can be identified from an anchor point by its
+ * reduced slope to every other point.
+ *
+ * Leetcode: https://leetcode.com/problems/max-points-on-a-line/ (Hard)
+ * Rating:   acceptance 31.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Geometry | GCD-normalized slopes
  *
  * Example:
- * Input: points = [[1,1],[2,2],[3,3]]
- * Output: 3
- * Explanation: All three points lie on the same line.
+ *   Input:  points = [[1,1],[2,2],[3,3]]
+ *   Output: 3
+ *   Why:    all three points have the same slope from any endpoint.
  *
- * LeetCode: https://leetcode.com/problems/max-points-on-a-line
+ * Follow-ups:
+ *   1. How do you avoid floating-point precision bugs?
+ *      Store each slope as a reduced dy/dx pair using gcd normalization.
+ *   2. How would you return the actual points on the best line?
+ *      Keep the point indices for the slope bucket that produces the maximum.
+ *   3. How would this extend to 3D collinearity?
+ *      Normalize direction vectors (dx, dy, dz) from each anchor instead of 2D slopes.
  *
- * Follow-up Questions:
- * 1. How would you handle floating point precision issues?
- *    Answer: Use rational numbers (fraction representation) or GCD normalization for slopes.
- *
- * 2. What if we need to find all maximal collinear sets?
- *    Answer: Modify algorithm to store actual point sets instead of just counting.
- *
- * 3. How would you extend this to 3D space?
- *    Answer: Use plane equations instead of line equations, requiring 3 points to define a plane.
- *    Related: https://leetcode.com/problems/minimum-lines-to-represent-a-line-chart/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Erect the Fence (587), Check If It Is a Straight Line (1232).
  */
+
 public class MaxPointsOnALine {
 
-  /**
-   * Finds maximum number of points on the same line using slope-based HashMap approach.
+  public static void main(String[] args) {
+    MaxPointsOnALine solver = new MaxPointsOnALine();
+    int[][][] inputs = {
+        { {1, 1}, {2, 2}, {3, 3} },
+        { {1, 1}, {3, 2}, {5, 3}, {4, 1}, {2, 3}, {1, 4} },
+        { {0, 0} }
+    };
+    int[] expected = { 3, 4, 1 };
+
+    for (int i = 0; i < inputs.length; i++) {
+      int got = solver.maxPoints(inputs[i]);
+      System.out.printf("points=%s -> %d  expected=%d%n",
+          Arrays.deepToString(inputs[i]), got, expected[i]);
+    }
+  }
+
+
+    /**
+   * Intuition: fix one anchor point and group every later point by the line it
+   * forms with that anchor. Two points are on the same anchor line exactly when
+   * their reduced dy/dx slope is the same, so a map from slope string to count
+   * gives the best line through that anchor.
    *
    * Algorithm:
-   * 1. For each point as anchor, calculate slopes to all other points
-   * 2. Use HashMap to count occurrences of each slope from the anchor
-   * 3. Slope is represented as reduced fraction (dy/dx) to avoid floating point errors
-   * 4. Handle vertical lines separately (infinite slope)
-   * 5. Track maximum count across all anchor points
+   *   1. Return the point count directly for arrays of size 2 or less.
+   *   2. For each anchorIndex, build a fresh slopeMap for later points.
+   *   3. Reduce dy and dx by their greatest common divisor.
+   *   4. Normalize the sign and vertical-line representation.
+   *   5. Update the global maximum with the largest bucket plus the anchor.
    *
-   * Key insight: If multiple points share the same slope from an anchor point,
-   * they must be collinear with the anchor. The slope acts as a signature for
-   * the line passing through the anchor.
+   * Time:  O(n^2) - every pair of points is considered once.
+   * Space: O(n) - one slope map is stored for a single anchor at a time.
    *
-   * Time Complexity: O(N^2) where N is the number of points. For each of N points,
-   * we calculate slopes to all other points, and GCD calculation is O(log M) where M
-   * is the coordinate value, which is effectively constant given the constraints.
-   *
-   * Space Complexity: O(N) for the HashMap storing slopes from each anchor point.
-   * In worst case, all points have unique slopes from a given anchor.
-   *
-   * @param points array of 2D points
-   * @return maximum number of points on the same line
+   * @param points array of [x, y] coordinates
+   * @return maximum number of collinear points
    */
+
   public int maxPoints(int[][] points) {
     if (points.length <= 2) {
       return points.length;
@@ -93,16 +108,8 @@ public class MaxPointsOnALine {
     return maxCount;
   }
 
-  /**
-   * Helper method to compute greatest common divisor using Euclidean algorithm.
-   * This is used to reduce slope fractions to their simplest form.
-   * For example if the inputs are (4, 6), the GCD is 2, so the reduced form is (2, 3).
-   *
-   * The idea:
-   * - GCD(a, b) = GCD(b, a % b)
-   * - Continue until b becomes 0.
-   * - The remaining non-zero value of a is the GCD.
-   */
+    /** Computes the positive greatest common divisor with the Euclidean algorithm. */
+
   private int getGreatestCommonDivisor(int firstNumber, int secondNumber) {
     // Handle negative inputs — GCD is always positive
     firstNumber = Math.abs(firstNumber);
@@ -188,29 +195,14 @@ public class MaxPointsOnALine {
     return globalMaxPoints;
   }
 
-  /**
-   * Helper method to check if two points are identical (same coordinates).
-   *
-   * @param firstPoint  first point coordinates [x, y]
-   * @param secondPoint second point coordinates [x, y]
-   * @return true if points have identical coordinates, false otherwise
-   */
+    /** Returns true when two points have the same coordinates. */
+
   private boolean arePointsIdentical(int[] firstPoint, int[] secondPoint) {
     return firstPoint[0] == secondPoint[0] && firstPoint[1] == secondPoint[1];
   }
 
-  /**
-   * Helper method to calculate slope between two points using double precision.
-   *
-   * Special cases:
-   * - Vertical line (same x-coordinate): returns Double.MAX_VALUE
-   * - Horizontal line (same y-coordinate): returns 0.0
-   * - Regular line: returns (y2 - y1) / (x2 - x1)
-   *
-   * @param firstPoint  starting point [x, y]
-   * @param secondPoint ending point [x, y]
-   * @return slope as double value
-   */
+    /** Calculates the floating-point slope used by the alternative solution. */
+
   private double calculateSlope(int[] firstPoint, int[] secondPoint) {
     int deltaX = secondPoint[0] - firstPoint[0];
     int deltaY = secondPoint[1] - firstPoint[1];

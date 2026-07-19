@@ -7,58 +7,50 @@ import java.util.Random;
 /**
  * Problem: Shuffle an Array
  *
- * Given an integer array nums, design an algorithm to randomly shuffle the array.
- * All permutations of the array should be equally likely as a result of the shuffling.
+ * Design an object that can reset an array to its original configuration and
+ * return a uniformly random shuffle. The shuffle method should make every
+ * permutation equally likely.
  *
- * Implement the Solution class:
- * - Solution(int[] nums): Initializes the object with the integer array nums.
- * - int[] reset(): Resets the array to its original configuration and returns it.
- * - int[] shuffle(): Returns a random shuffling of the array.
+ * Leetcode: https://leetcode.com/problems/shuffle-an-array/ (Medium)
+ * Rating:   acceptance 59.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Randomization | Fisher-Yates shuffle
  *
  * Example:
- * Input:
- * ["Solution", "shuffle", "reset", "shuffle"]
- * [[[1, 2, 3]], [], [], []]
- * Output:
- * [null, [3, 1, 2], [1, 2, 3], [1, 3, 2]]
+ *   Input:  nums = [1,2,3], then call shuffle(), reset()
+ *   Output: reset returns [1,2,3]
+ *   Why:    reset must restore the saved original array regardless of prior shuffles.
  *
- * LeetCode: https://leetcode.com/problems/shuffle-an-array/
+ * Follow-ups:
+ *   1. How do you prove the shuffle is uniform?
+ *      At each index, choose uniformly among the remaining elements, giving probability 1 / n!.
+ *   2. How would you shuffle a stream of unknown length?
+ *      Use reservoir sampling or assign random priorities as elements arrive.
+ *   3. How would you make concurrent shuffles safe?
+ *      Avoid shared mutable arrays or synchronize access around state changes.
  *
- * Follow-up Questions (FAANG-style):
- * 1. How do you ensure all permutations are equally likely?
- *    - Use Fisher-Yates shuffle which guarantees uniform distribution of all n! permutations.
- * 2. What if you need to shuffle a stream of elements without knowing the size?
- *    - Use Reservoir Sampling algorithm for streaming shuffle.
- *    - Related: https://leetcode.com/problems/random-pick-index/
- * 3. How would you shuffle a linked list?
- *    - Convert to array, shuffle, then rebuild list, or use recursive approach.
- * 4. What if you need to shuffle very large arrays that don't fit in memory?
- *    - Use external sorting techniques with random pivot selection.
- * 5. How do you shuffle with weighted probabilities for each element?
- *    - Use weighted reservoir sampling or cumulative distribution function.
- * 6. What if multiple threads need to shuffle simultaneously?
- *    - Use ThreadLocalRandom or synchronize access to shared Random instance.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Random Pick Index (398), Random Pick with Weight (528).
  */
+
 public class RandomizedArrayShuffler {
 
   public static void main(String[] args) {
-    int[] testArray = {1, 2, 3, 4, 5};
-    ShuffleArraySolution solution = new ShuffleArraySolution(testArray);
+    int[][] inputs = { {1, 2, 3}, {} };
 
-    System.out.println("Original: " + Arrays.toString(testArray));
-    System.out.println("Shuffled: " + Arrays.toString(solution.shuffle()));
-    System.out.println("Reset: " + Arrays.toString(solution.reset()));
-    System.out.println("Shuffled Again: " + Arrays.toString(solution.shuffle()));
+    for (int[] input : inputs) {
+      ShuffleArraySolution solution = new ShuffleArraySolution(input);
+      int[] shuffled = solution.shuffle();
+      int[] sortedShuffle = shuffled.clone();
+      int[] sortedExpected = input.clone();
+      Arrays.sort(sortedShuffle);
+      Arrays.sort(sortedExpected);
+      boolean isPermutation = Arrays.equals(sortedShuffle, sortedExpected);
+      System.out.printf("nums=%s -> %s  expected=%s%n",
+          Arrays.toString(input), isPermutation, true);
 
-    // Test edge cases
-    int[] emptyArray = {};
-    ShuffleArraySolution emptySolution = new ShuffleArraySolution(emptyArray);
-    System.out.println("Empty Array Shuffle: " + Arrays.toString(emptySolution.shuffle()));
-
-    int[] singleElement = {42};
-    ShuffleArraySolution single = new ShuffleArraySolution(singleElement);
-    System.out.println("Single Element Shuffle: " + Arrays.toString(single.shuffle()));
+      int[] reset = solution.reset();
+      System.out.printf("reset nums=%s -> %s  expected=%s%n",
+          Arrays.toString(input), Arrays.toString(reset), Arrays.toString(input));
+    }
   }
 }
 
@@ -68,20 +60,23 @@ class ShuffleArraySolution {
   private int[] currentConfiguration; // Mutable working copy for shuffling
   private final Random randomGenerator; // Random number generator for shuffling
 
-  /**
-   * Initializes the solution with the given array.
+    /**
+   * Intuition: reset needs a clean snapshot of the original input, while shuffle
+   * needs a mutable working copy. Storing both copies lets each operation be
+   * independent of previous shuffles.
    *
-   * Algorithm: Array Cloning and Random Generator Setup
-   * Steps:
-   * 1. Store immutable copy of original array for reset functionality
-   * 2. Create mutable working copy for shuffle operations
-   * 3. Initialize random generator for unbiased shuffling
+   * Algorithm:
+   *   1. Reject null input.
+   *   2. Clone nums into originalConfiguration for future resets.
+   *   3. Clone nums into currentConfiguration for shuffle mutations.
+   *   4. Create the Random instance used by shuffle.
    *
-   * Time Complexity: O(n) for array cloning
-   * Space Complexity: O(n) for storing original and working copies
+   * Time:  O(n) - two array clones copy every element.
+   * Space: O(n) - original and current configurations are stored.
    *
-   * @param nums the input array to be shuffled
+   * @param nums input array to shuffle and reset
    */
+
   public ShuffleArraySolution(int[] nums) {
     if (nums == null) {
       throw new IllegalArgumentException("Input array cannot be null");
@@ -92,39 +87,44 @@ class ShuffleArraySolution {
     this.randomGenerator = new Random(); // Initialize random generator
   }
 
-  /**
-   * Resets the array to its original configuration and returns it.
+    /**
+   * Intuition: resetting should forget all random swaps done so far. Cloning the
+   * saved original configuration restores the exact starting order and prevents
+   * callers from mutating the saved copy through the returned array.
    *
-   * Algorithm: Array Restoration
-   * Steps:
-   * 1. Create fresh copy of original array
-   * 2. Replace current working array with restored version
-   * 3. Return the reset array
+   * Algorithm:
+   *   1. Clone originalConfiguration into currentConfiguration.
+   *   2. Return the restored currentConfiguration.
    *
-   * Time Complexity: O(n) for array cloning
-   * Space Complexity: O(1) auxiliary space
+   * Time:  O(n) - cloning copies every element.
+   * Space: O(n) - the restored working array is a fresh clone.
    *
-   * @return array in original configuration
+   * @return array restored to the original configuration
    */
+
   public int[] reset() {
     currentConfiguration = originalConfiguration.clone();
     return currentConfiguration;
   }
 
-  /**
-   * Implementation using Knuth shuffle (original Fisher-Yates).
+    /**
+   * Intuition: Fisher-Yates fixes the array from left to right. At index
+   * currentIndex, every element from currentIndex through the end is equally
+   * likely to be chosen for that slot, so no permutation is favored.
    *
-   * Algorithm: Knuth Shuffle (Forward Direction)
-   * Steps:
-   * 1. Iterate from first to second-last element
-   * 2. For each position i, select random element from remaining unshuffled elements
-   * 3. Swap current element with randomly selected element
+   * Algorithm:
+   *   1. Return immediately for arrays of size 0 or 1.
+   *   2. For each currentIndex before the last element, count remainingElements.
+   *   3. Pick randomOffset in that remaining range and convert it to randomIndex.
+   *   4. Swap currentIndex with randomIndex in currentConfiguration.
+   *   5. Return the shuffled working array.
    *
-   * Time Complexity: O(n)
-   * Space Complexity: O(1)
+   * Time:  O(n) - each index is processed once.
+   * Space: O(1) - shuffling mutates the working array in place.
    *
-   * @return randomly shuffled array using forward iteration
+   * @return uniformly shuffled current array
    */
+
   public int[] shuffle() {
     if (currentConfiguration.length <= 1) {
       return currentConfiguration;
@@ -140,19 +140,8 @@ class ShuffleArraySolution {
     return currentConfiguration;
   }
 
-  /**
-   * Swaps two elements in the array at specified indices.
-   *
-   * Performs in-place swap using temporary variable to avoid
-   * potential issues with XOR swap when indices are equal.
-   *
-   * Time Complexity: O(1)
-   * Space Complexity: O(1)
-   *
-   * @param array the array containing elements to swap
-   * @param firstIndex index of first element
-   * @param secondIndex index of second element
-   */
+    /** Swaps two positions in the given array when they differ. */
+
   private void swapElements(int[] array, int firstIndex, int secondIndex) {
     if (firstIndex != secondIndex) { // Optimization: avoid unnecessary work
       int temporaryValue = array[firstIndex];

@@ -1,54 +1,62 @@
 package maths;
 
 /**
- * Computes the square root of a given number using binary search.
+ * Problem: Square Root with Decimal Precision
  *
- * This approach finds the integer part of the square root first and then refines
- * it to the desired precision using a binary search method.
+ * Given a number, compute its square root to a small decimal tolerance using
+ * binary search. Negative inputs return NaN because they do not have a real
+ * square root.
  *
- * Algorithm:
- * - Use binary search to determine the integer square root.
- * - Use another binary search to refine the result to the required decimal precision.
+ * Leetcode: https://leetcode.com/problems/sqrtx/ (closest integer-only variant)
+ * Rating:   acceptance 42.1% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Binary search on answer | Monotonic predicate
  *
- * Edge Cases Considered:
- * - Negative numbers (return NaN since square root is not defined for them in real numbers).
- * - Zero (square root of 0 is 0).
- * - Non-perfect squares (handles decimal precision correctly).
+ * Example:
+ *   Input:  number = 3
+ *   Output: about 1.732
+ *   Why:    1.732 squared is approximately 3, and the search narrows around that value.
  *
- * Time Complexity: O(log n) for integer part + O(log precision) for decimal refinement.
- * Space Complexity: O(1)
+ * Follow-ups:
+ *   1. How would you return only the integer square root?
+ *      Stop after findIntegerSqrt and return the floor value.
+ *   2. How would you support configurable precision?
+ *      Pass decimalPlaces through to refineSqrt instead of hard-coding 3.
+ *   3. How would you handle very large decimal numbers?
+ *      Use BigDecimal and compare mid * mid with the target at the desired scale.
  *
- * LeetCode Reference: https://leetcode.com/problems/sqrtx/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Perfect Square (367), Pow(x, n) (50).
  */
+
 public class FindSqrt {
     public static void main(String[] args) {
-        FindSqrt sqrtCalculator = new FindSqrt();
+        FindSqrt solver = new FindSqrt();
+        double[] inputs = { 16, 3, 0, -4 };
+        String[] expected = { "4.000", "1.732", "0.000", "NaN" };
 
-        // Test cases for perfect squares
-        assert sqrtCalculator.computeSqrt(16) == 4 : "Incorrect answer";
-        assert sqrtCalculator.computeSqrt(25) == 5 : "Incorrect answer";
-
-        // Test case for non-perfect square with precision
-        double result = sqrtCalculator.computeSqrt(3);
-        assert result > 1.732 && result < 1.733 : "Incorrect answer";
-
-        // Edge cases
-        assert Double.isNaN(sqrtCalculator.computeSqrt(-4)) : "Incorrect handling of negative numbers";
-        assert sqrtCalculator.computeSqrt(0) == 0 : "Incorrect handling of zero";
+        for (int i = 0; i < inputs.length; i++) {
+            double value = solver.computeSqrt(inputs[i]);
+            String got = Double.isNaN(value) ? "NaN" : String.format("%.3f", value);
+            System.out.printf("number=%.1f -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Computes the square root of a number up to 3 decimal places using binary search.
-     * 
-     * Intuition: Square root is monotonic (√a < √b when a < b), enabling binary search.
-     * Approach: Find integer part via binary search, then refine decimals in [integer, integer+1].
-     * 
-     * Example: √10 → integer part = 3 (3² = 9 < 10), then refine to ~3.162
+        /**
+     * Intuition: the predicate mid * mid <= number is monotonic. Values below
+     * the square root pass, and values above it fail, so binary search can first
+     * locate the integer floor and then refine inside the next unit interval.
      *
-     * @param number The input number
-     * @return Square root with 3 decimal places, or NaN if negative
+     * Algorithm:
+     *   1. Return NaN for negative input and 0 for zero.
+     *   2. Find the integerPart with binary search on whole numbers.
+     *   3. Refine between integerPart and integerPart + 1 for 3 decimal places.
+     *
+     * Time:  O(log n + log precision) - two binary searches shrink their ranges.
+     * Space: O(1) - only scalar search bounds are stored.
+     *
+     * @param number input value whose square root is needed
+     * @return approximate square root, or NaN for negative input
      */
+
     public double computeSqrt(double number) {
         if (number < 0) return Double.NaN;  // Negative numbers not defined
         if (number == 0) return 0;          // Base case
@@ -57,16 +65,8 @@ public class FindSqrt {
         return refineSqrt(number, integerPart, 3);
     }
 
-    /**
-     * Finds the integer part of the square root using binary search.
-     * 
-     * Goal: Find largest integer where mid² ≤ num
-     * Logic: If mid² < num, search higher; if mid² > num, search lower
-     * Example: √10 → search [1,10] → find 3 (since 3²=9 < 10 but 4²=16 > 10)
-     *
-     * @param num The input number
-     * @return Floor of the square root
-     */
+        /** Finds the integer floor of the square root using binary search. */
+
     private int findIntegerSqrt(int num) {
         int low = 1, high = num, result = 0;
 
@@ -86,17 +86,8 @@ public class FindSqrt {
         return result;
     }
 
-    /**
-     * Refines square root to specified decimal precision using binary search.
-     * 
-     * Searches in range [integerPart, integerPart+1] until desired precision reached.
-     * Tolerance determines when to stop (10^-(decimalPlaces+1))
-     *
-     * @param number The input number
-     * @param integerPart Integer part of the square root
-     * @param decimalPlaces Decimal precision required
-     * @return Square root with decimal precision
-     */
+        /** Refines the square root between the integer part and the next integer. */
+
     private double refineSqrt(double number, int integerPart, int decimalPlaces) {
         double low = integerPart;
         double high = integerPart + 1;

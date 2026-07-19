@@ -1,71 +1,68 @@
 package maths;
 
 /**
- * MultiplyStrings.java (LeetCode 43)
+ * Problem: Multiply Strings
  *
- * Problem Statement:
- * Given two non-negative integers num1 and num2 represented as strings,
- * return the product of num1 and num2, also represented as a string.
- * 
- * Note: You must not use any built-in BigInteger library or convert the
- * inputs to integer directly.
+ * Given two non-negative integers represented as strings, return their product
+ * as a string. The solution must not use BigInteger or directly convert the
+ * whole input strings to built-in integer values.
  *
- * Example 1:
- * Input: num1 = "2", num2 = "3"
- * Output: "6"
+ * Leetcode: https://leetcode.com/problems/multiply-strings/ (Medium)
+ * Rating:   acceptance 44.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | String arithmetic | Grade-school multiplication
  *
- * Example 2:
- * Input: num1 = "123", num2 = "456"
- * Output: "56088"
+ * Example:
+ *   Input:  num1 = "123", num2 = "456"
+ *   Output: "56088"
+ *   Why:    the digit products and carries match the standard multiplication by hand.
  *
- * LeetCode link: https://leetcode.com/problems/multiply-strings/
+ * Follow-ups:
+ *   1. How would you support negative numbers?
+ *      Track the sign separately, multiply absolute values, then prefix '-' if needed.
+ *   2. How would you add numbers represented as strings?
+ *      Process from right to left with one carry, similar to the final carry pass here.
+ *   3. How would you multiply extremely long strings faster?
+ *      Use Karatsuba or FFT-based multiplication instead of the O(m * n) baseline.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- * - How would you handle negative numbers?
- * → Track sign separately, multiply absolute values, apply sign to result.
- * - Can you optimize for very large numbers?
- * → Use Karatsuba algorithm (O(n^1.58)) instead of grade-school (O(n²)).
- * - What if numbers have different bases (not base 10)?
- * → Generalize digit extraction/combination logic with modulo base.
- * - How would you implement division similarly?
- * → Long division with string manipulation, more complex.
- *
- * Relevant Follow-up Problems:
- * - LeetCode 2 (Add Two Numbers):
- * https://leetcode.com/problems/add-two-numbers/
- * - LeetCode 415 (Add Strings): https://leetcode.com/problems/add-strings/
- * - LeetCode 67 (Add Binary): https://leetcode.com/problems/add-binary/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Add Strings (415), Add Binary (67), Divide Two Integers (29).
  */
+
 public class MultiplyStrings {
 
-    /**
-     * Main method: Grade-school multiplication simulation (Optimal for interviews).
-     * Step-by-step:
-     * 1. Edge case: if either number is "0", return "0"
-     * 2. Create result array of size (m + n) - max possible length
-     * 3. Multiply each digit of num1 with each digit of num2 (nested loops)
-     * 4. For digits at positions i and j:
-     * - Their product contributes to positions (i + j) and (i + j + 1)
-     * - Add product to position (i + j + 1)
-     * 5. Handle carries by processing result array right-to-left
-     * 6. Convert array to string, skip leading zeros
+    public static void main(String[] args) {
+        MultiplyStrings solver = new MultiplyStrings();
+        String[][] inputs = { {"2", "3"}, {"123", "456"}, {"0", "52"} };
+        String[] expected = { "6", "56088", "0" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.multiply(inputs[i][0], inputs[i][1]);
+            System.out.printf("num1=%s num2=%s -> %s  expected=%s%n",
+                inputs[i][0], inputs[i][1], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: each digit pair contributes to fixed positions in the final
+     * product, just like multiplication on paper. The result array stores those
+     * positional sums, and the original code pushes carry values leftward as it
+     * processes each pair.
      *
-     * Key Insight:
-     * When multiplying digit at index i (from right) with digit at index j,
-     * the result affects positions i+j and i+j+1 in the final answer.
-     * 
-     * Example: 123 × 45
-     * Position indexing: 1 2 3
-     * × 4 5
-     * -------
-     * digit[2]=3 × digit[1]=5 = 15 → goes to position[2+1]=3 (ones) and [2+1+1]=4
-     * (tens)
+     * Algorithm:
+     *   1. Return "0" if either input is zero.
+     *   2. Allocate result with length len1 + len2, the maximum possible digits.
+     *   3. Multiply digits from right to left and add into currentDigitIndex.
+     *   4. Store sum % 10 at currentDigitIndex and add sum / 10 to carryIndex.
+     *   5. Build the answer string while skipping leading zeros.
      *
-     * Algorithm: Grade-school multiplication.
-     * Time Complexity: O(m × n) where m, n are lengths of num1, num2.
-     * Space Complexity: O(m + n) for result array.
+     * Time:  O(m * n) - every digit in num1 is multiplied by every digit in num2.
+     * Space: O(m + n) - the result array stores at most m + n digits.
+     *
+     * @param num1 first non-negative integer string
+     * @param num2 second non-negative integer string
+     * @return product represented as a string
      */
+
     public String multiply(String num1, String num2) {
         // Edge case: if either is zero
         if (num1.equals("0") || num2.equals("0")) {

@@ -7,56 +7,61 @@ import java.util.List;
 /**
  * Problem: The Kth Factor of N
  *
- * Given two positive integers n and k, return the kth positive divisor of n.
- * A divisor of n is a positive integer that divides n without a remainder.
- * Note that the divisors are returned in ascending order.
- * If n has less than k divisors, return -1.
+ * Given positive integers n and k, return the kth positive factor of n in
+ * ascending order. If n has fewer than k factors, return -1.
  *
- * Example 1:
- * Input: n = 12, k = 3
- * Output: 3
- * Explanation: Factors of 12 are [1, 2, 3, 4, 6, 12], the 3rd factor is 3.
+ * Leetcode: https://leetcode.com/problems/the-kth-factor-of-n/ (Medium)
+ * Rating:   1232 (zerotrac Elo)
+ * Pattern:  Math | Divisors | Square-root factor pairing
  *
- * LeetCode: https://leetcode.com/problems/the-kth-factor-of-n/
+ * Example:
+ *   Input:  n = 12, k = 3
+ *   Output: 3
+ *   Why:    the factors are [1, 2, 3, 4, 6, 12], so the 3rd one is 3.
  *
- * Follow-up Questions (FAANG-style):
- * 1. What if we need to find all factors of n?
- *    - Modify to collect all factors and return the list.
- * 2. How would you handle multiple queries for different k values on the same n?
- *    - Precompute and store all factors once, then answer queries in O(1).
- * 3. What if n can be very large (up to 10^18)?
- *    - Use prime factorization and mathematical formula for factor count.
- *    - Related: https://leetcode.com/problems/count-primes/
- * 4. How to find the kth largest factor instead of kth smallest?
- *    - Reverse the iteration order or use total_factors - k + 1 approach.
- * 5. What if we need factors in a specific range [L, R]?
- *    - Modify the algorithm to only consider factors within the given range.
- * 6. How to optimize for multiple test cases with similar n values?
- *    - Use memoization or precompute factors for commonly queried numbers.
- * LeetCode Contest Rating: 1232
+ * Follow-ups:
+ *   1. How would you answer many k queries for the same n?
+ *      Precompute the sorted factor list once and index into it.
+ *   2. How would you find the kth largest factor?
+ *      Convert it to the (totalFactors - k + 1)th smallest factor.
+ *   3. How would this scale for n up to 10^18?
+ *      Use prime factorization to generate divisors without scanning every value.
+ *
+ * Related: Count Primes (204), Ugly Number (263).
  */
+
 public class KthFactorOfNumber {
   public static void main(String[] args) {
-    int n = 12, k = 3;
-    System.out.println("The " + k + "th factor of " + n + " is: " + findKthFactor(n, k));
+    int[][] inputs = { {12, 3}, {7, 2}, {4, 4} };
+    int[] expected = { 3, 7, -1 };
+
+    for (int i = 0; i < inputs.length; i++) {
+      int got = findKthFactor(inputs[i][0], inputs[i][1]);
+      System.out.printf("n=%d k=%d -> %d  expected=%d%n",
+          inputs[i][0], inputs[i][1], got, expected[i]);
+    }
   }
-  /**
-   * This approach collects factors in a list for better clarity.
+    /**
+   * Intuition: factors come in pairs around the square root. Scanning only up
+   * to sqrt(n) finds the smaller half in ascending order and the larger half in
+   * reverse order through n / divisor. Combining those two lists gives the full
+   * sorted order without checking every number up to n.
    *
-   * Algorithm: Factor Collection with Square Root Optimization
-   * Steps:
-   * 1. Collect smaller factors (≤ √n) in ascending order
-   * 2. Collect larger factors (> √n) in descending order by division
-   * 3. Handle perfect square case to avoid duplicates
-   * 4. Return k-th factor if it exists
+   * Algorithm:
+   *   1. Reject non-positive n or k.
+   *   2. Scan divisor from 1 through sqrt(n).
+   *   3. Add each small divisor and its distinct paired larger factor.
+   *   4. If k is outside the total factor count, return -1.
+   *   5. Return from smallerFactors directly or from largerFactors in reverse.
    *
-   * Time Complexity: O(√n)
-   * Space Complexity: O(√n) for storing factors
+   * Time:  O(sqrt(n)) - divisibility is tested only up to the square root.
+   * Space: O(sqrt(n)) - discovered factor pairs are stored in two lists.
    *
-   * @param n the number to find factors of
-   * @param k the position of factor to find
-   * @return k-th smallest factor or -1 if doesn't exist
+   * @param n number whose factors are being searched
+   * @param k one-based factor position in ascending order
+   * @return kth factor, or -1 when it does not exist
    */
+
   public static int findKthFactor(int n, int k) {
     if (n <= 0 || k <= 0) {
       return -1;
@@ -97,13 +102,8 @@ public class KthFactorOfNumber {
     }
   }
 
-  /**
-   * Checks if a number is a divisor of another number.
-   *
-   * @param number the number to check divisibility for
-   * @param divisor the potential divisor
-   * @return true if divisor divides number evenly
-   */
+    /** Returns true when divisor divides number evenly. */
+
   private static boolean isDivisor(int number, int divisor) {
     return number % divisor == 0;
   }

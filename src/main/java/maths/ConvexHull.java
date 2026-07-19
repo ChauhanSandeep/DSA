@@ -3,43 +3,77 @@ package maths;
 import java.util.*;
 
 /**
- * 587. Erect the Fence
+ * Problem: Erect the Fence
  *
- * Problem: Given an array of points representing positions of trees,
- * return the points that form the fence (convex hull) that encloses all trees.
- * The fence must use the minimum number of ropes to enclose all trees.
+ * Given tree coordinates on a 2D plane, return every tree that lies on the
+ * outer fence enclosing all trees. Boundary trees that are collinear with a
+ * hull edge must be included, not discarded.
+ *
+ * Leetcode: https://leetcode.com/problems/erect-the-fence/ (Hard)
+ * Rating:   acceptance 53.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Math | Computational geometry | Convex hull
  *
  * Example:
- * Input: trees = [[1,1],[2,2],[2,0],[2,4],[3,3],[4,2]]
- * Output: [[1,1],[2,0],[3,3],[2,4],[4,2]]
+ *   Input:  trees = [[1,1],[2,2],[2,0],[2,4],[3,3],[4,2]]
+ *   Output: [[1,1],[2,0],[2,4],[3,3],[4,2]]
+ *   Why:    [2,2] is inside the fence, while the other five points lie on its boundary.
  *
- * LeetCode: https://leetcode.com/problems/erect-the-fence
+ * Follow-ups:
+ *   1. How do you handle all points being collinear?
+ *      Keep collinear boundary points instead of popping them from the hull.
+ *   2. How would you compute the hull in 3D?
+ *      Build and update visible faces with an incremental or QuickHull-style method.
+ *   3. How would you support dynamic point insertions?
+ *      Use a dynamic convex hull data structure or rebuild in batches.
  *
- * Follow-up questions:
- * Q: How to handle very large point sets efficiently?
- * A: Use divide-and-conquer algorithms or randomized approaches like Clarkson-Shor.
- *
- * Q: Can we compute convex hull in higher dimensions?
- * A: Use incremental algorithms or Quickhull generalized to d dimensions.
- *
- * Q: How to handle degenerate cases like collinear points?
- * A: Carefully handle boundary conditions and include collinear points on hull.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Max Points on a Line (149), Minimum Lines to Represent a Line Chart (2280).
  */
+
 public class ConvexHull {
 
-    /**
-     * Graham Scan algorithm - classic and efficient.
+    public static void main(String[] args) {
+        ConvexHull solver = new ConvexHull();
+        int[][][] inputs = {
+            { {0, 0}, {1, 1}, {2, 2} },
+            { {1, 1}, {2, 2}, {2, 0}, {2, 4}, {3, 3}, {4, 2} }
+        };
+        int[][][] expected = {
+            { {0, 0}, {1, 1}, {2, 2} },
+            { {1, 1}, {2, 0}, {2, 4}, {3, 3}, {4, 2} }
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] got = solver.outerTrees(inputs[i]);
+            Arrays.sort(got, (a, b) -> a[0] != b[0]
+                ? Integer.compare(a[0], b[0])
+                : Integer.compare(a[1], b[1]));
+            System.out.printf("trees=%s -> %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), Arrays.deepToString(got), Arrays.deepToString(expected[i]));
+        }
+    }
+
+
+        /**
+     * Intuition: choose a pivot on the outside, then sort every other point by
+     * the angle it makes with that pivot. Walking through those angles lets the
+     * stack represent the current fence boundary. When the next point would make
+     * a right turn, the previous point cannot stay on the outside; collinear
+     * boundary points are kept because this problem wants every fence tree.
      *
-     * Algorithm: Polar angle sorting + stack processing
-     * - Find bottom-most point (or leftmost if tie)
-     * - Sort points by polar angle with respect to pivot
-     * - Use stack to process points and maintain convex hull
-     * - Handle collinear points carefully for this problem
+     * Algorithm:
+     *   1. Return small inputs directly, then find the bottom-left pivot.
+     *   2. Sort the remaining points by polar angle and distance from the pivot.
+     *   3. Reverse the final collinear suffix so far boundary points are included.
+     *   4. Scan with a stack, popping only turns that move inside the fence.
+     *   5. Convert the stack of Point objects back to int[][] coordinates.
      *
-     * Time Complexity: O(n log n) for sorting
-     * Space Complexity: O(n) for output and auxiliary data
+     * Time:  O(n log n) - sorting dominates the scan.
+     * Space: O(n) - Point objects and the hull stack are stored.
+     *
+     * @param trees coordinates of all trees
+     * @return coordinates of trees on the outer fence
      */
+
     public int[][] outerTrees(int[][] trees) {
         int n = trees.length;
         if (n <= 3) return trees;
