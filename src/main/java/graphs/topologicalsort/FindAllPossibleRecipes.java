@@ -3,70 +3,71 @@ package graphs.topologicalsort;
 import java.util.*;
 
 /**
- * Problem Statement:
- * You have information about n different recipes. You are given:
- * - recipes[i]: name of the ith recipe
- * - ingredients[i]: list of ingredients needed for recipes[i]
- * - supplies: list of ingredients you initially have (infinite supply)
+ * Problem: Find All Possible Recipes From Given Supplies
  *
- * A recipe can be created if you have all its ingredients. Some ingredients might be other recipes.
- * Return a list of all recipes you can create (in any order).
+ * Given recipes, their ingredient lists, and initial supplies, return every
+ * recipe that can be created. A completed recipe becomes an available ingredient
+ * for later recipes, while cyclic or missing dependencies stay unavailable.
+ *
+ * Leetcode: https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/ (Medium)
+ * Rating:   1679 (zerotrac Elo)
+ * Pattern:  Graph | Topological sort | Dependency in-degree
  *
  * Example:
- * Input: recipes = ["bread","sandwich","burger"], 
- *        ingredients = [["yeast","flour"],["bread","meat"],["sandwich","meat","bread"]], 
- *        supplies = ["yeast","flour","meat"]
- * Output: ["bread","sandwich","burger"]
- * Explanation:
- * - bread: can make with yeast + flour (both in supplies)
- * - sandwich: can make with bread (created) + meat (in supplies)
- * - burger: can make with sandwich (created) + meat + bread (both available)
+ *   Input:  recipes = ["bread","sandwich"], ingredients = [["yeast","flour"],["bread","meat"]], supplies = ["yeast","flour","meat"]
+ *   Output: ["bread", "sandwich"]
+ *   Why:    bread is made from supplies first, then bread becomes an ingredient for sandwich.
  *
- * LeetCode link: https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/
+ * Follow-ups:
+ *   1. Return recipes in creation order?
+ *      The BFS topological order already gives a valid earliest-available order.
+ *   2. Ingredients have limited quantities?
+ *      Track counts and consume quantities when a recipe is committed.
+ *   3. Circular recipe dependencies?
+ *      Recipes in cycles never reach in-degree zero unless an external supply breaks the cycle.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - What if there are circular dependencies between recipes?
- *    → Topological sort handles this naturally - recipes in cycles will never reach in-degree 0.
- *  - How would you return recipes in order of creation (earliest to latest)?
- *    → The BFS queue processing order already gives this - it's inherent in topological sort.
- *  - What if ingredients have limited quantities (not infinite)?
- *    → Track quantity consumed/available, check feasibility before marking recipe as makeable.
- *  - How would you optimize if supplies list is very large?
- *    → Use HashSet for O(1) lookup instead of List when checking ingredient availability.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 207 (Course Schedule): https://leetcode.com/problems/course-schedule/
- *  - LeetCode 210 (Course Schedule II): https://leetcode.com/problems/course-schedule-ii/
- *  - LeetCode 1136 (Parallel Courses): https://leetcode.com/problems/parallel-courses/
- * LeetCode Contest Rating: 1679
+ * Related: Course Schedule (207), Course Schedule II (210), Parallel Courses (1136).
  */
 public class FindAllPossibleRecipes {
 
-    /**
-     * Main method: Finds all makeable recipes using BFS-based Topological Sort.
-     * Step-by-step:
-     *  1. Build dependency graph:
-     *     - Each ingredient points to recipes that need it
-     *     - Track in-degree for each recipe (number of missing ingredients)
-     *  2. Initialize queue with all available supplies (base ingredients)
-     *  3. Process queue (BFS):
-     *     a. Remove ingredient from queue
-     *     b. For each recipe that needs this ingredient:
-     *        - Decrease its in-degree (one ingredient now available)
-     *        - If in-degree becomes 0: all ingredients available, recipe can be made
-     *        - Add recipe to queue (it becomes available as ingredient for other recipes)
-     *        - Add recipe to result
-     *  4. Return all makeable recipes
+    public static void main(String[] args) {
+        FindAllPossibleRecipes solver = new FindAllPossibleRecipes();
+        String[] recipes1 = {"bread", "sandwich"};
+        List<List<String>> ingredients1 = Arrays.asList(
+            Arrays.asList("yeast", "flour"), Arrays.asList("bread", "meat"));
+        String[] supplies1 = {"yeast", "flour", "meat"};
+        String[] recipes2 = {"bread"};
+        List<List<String>> ingredients2 = Arrays.asList(Arrays.asList("yeast", "flour"));
+        String[] supplies2 = {"yeast"};
+
+        System.out.printf("recipes=%s ingredients=%s supplies=%s -> bfs=%s dfs=%s  expected=[bread, sandwich]%n",
+            Arrays.toString(recipes1), ingredients1, Arrays.toString(supplies1),
+            solver.findAllRecipes(recipes1, ingredients1, supplies1),
+            solver.findAllRecipesDFS(recipes1, ingredients1, supplies1));
+        System.out.printf("recipes=%s ingredients=%s supplies=%s -> bfs=%s dfs=%s  expected=[]%n",
+            Arrays.toString(recipes2), ingredients2, Arrays.toString(supplies2),
+            solver.findAllRecipes(recipes2, ingredients2, supplies2),
+            solver.findAllRecipesDFS(recipes2, ingredients2, supplies2));
+    }
+
+        /**
+     * Intuition: a recipe is ready when all of its ingredients have become
+     * available. Treat each ingredient as pointing to the recipes that need it,
+     * and use inDegree as the count of still-missing ingredients per recipe.
      *
-     * Key Insight:
-     * This is topological sort applied to recipes/ingredients dependency graph.
-     * Recipes with in-degree 0 have all prerequisites met and can be created.
-     * Once created, they become available ingredients for other recipes.
+     * Algorithm:
+     *   1. Build ingredient -> recipes dependency lists and recipe in-degree counts.
+     *   2. Queue every initial supply.
+     *   3. Pop available items; for every recipe needing that item, decrement its in-degree.
+     *   4. When a recipe reaches zero, add it to the result and queue it as a new ingredient.
      *
-     * Algorithm: BFS-based Topological Sort (Kahn's Algorithm variant).
-     * Time Complexity: O(R + I), where R is total recipes and I is total ingredient occurrences.
-     *                  Each recipe and ingredient processed at most once.
-     * Space Complexity: O(R + I) for graph, in-degree map, and queue.
+     * Time:  O(R + I) - recipes and ingredient occurrences are processed through the graph once.
+     * Space: O(R + I) - dependency graph, in-degree map, queue, and result.
+     *
+     * @param recipes recipe names
+     * @param ingredients ingredients.get(i) lists what recipes[i] needs
+     * @param supplies initially available ingredients
+     * @return all recipes that can be created
      */
     public List<String> findAllRecipes(String[] recipes, List<List<String>> ingredients, String[] supplies) {
         // Build dependency graph: ingredient -> list of recipes needing it

@@ -6,69 +6,43 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * You are given an undirected connected graph with n nodes labeled from 0 to n - 1 and a 2D
- * integer array edges where edges[i] = [ui, vi, wi] denotes an undirected edge between node ui
- * and node vi with weight wi, and an integer k.
+ * Problem: Minimize Maximum Component Cost
  *
- * You are allowed to remove any number of edges from the graph such that the resulting graph
- * has at most k connected components.
+ * Given a connected weighted graph and a target number of components k, remove
+ * edges so the maximum edge weight left inside any component is as small as
+ * possible. The original solution builds an MST and cuts its largest edges.
  *
- * The cost of a component is defined as the maximum edge weight in that component. If a component
- * has no edges, its cost is 0.
+ * Leetcode: https://leetcode.com/problems/minimize-maximum-component-cost/ (Medium)
+ * Rating:   1642 (zerotrac Elo)
+ * Pattern:  Graph | Union-Find | Kruskal MST partitioning
  *
- * Return the minimum possible value of the maximum cost among all components after such removals.
+ * Example:
+ *   Input:  n = 5, edges = [[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k = 2
+ *   Output: 4
+ *   Why:    after removing the MST edge of weight 6, the largest remaining selected edge is 4.
  *
- * Example 1:
- * Input: n = 5, edges = [[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k = 2
- * 
- *         0
- *         |4
- *         1
- *        2| \3
- *         3  2
- *         |6
- *         4
- * Output: 4
- * Explanation:
- * We need to split the graph into at most 2 components. The key insight is to remove the
- * heaviest edge (weight 6) between nodes 3 and 4.
- * After removal:
- * - Component 1: nodes {0,1,2,3} with edges [0,1,4], [1,2,3], [1,3,2]. Maximum edge weight = 4
- * - Component 2: node {4} with no edges. Maximum edge weight = 0
- * The maximum cost among all components is max(4, 0) = 4.
- * This is optimal because if we keep the edge with weight 6, the maximum cost would be 6.
+ * Follow-ups:
+ *   1. Return which edges to remove?
+ *      Track MST edges and output the k - 1 largest selected edges.
+ *   2. Edge weights can be negative?
+ *      Kruskal still sorts by weight; define component cost carefully for all-negative components.
+ *   3. Minimize the sum of component costs instead?
+ *      That changes the objective and generally needs a different optimization strategy.
  *
- * LeetCode Problem: https://leetcode.com/problems/minimize-maximum-component-cost/
- *
- * Follow-up Questions:
- *
- * 1. What if we want to know which exact edges to remove?
- *    Answer: Modify the solution to track which edges are included when forming components.
- *    During binary search, when we find the optimal threshold weight, record all edges with
- *    weight greater than this threshold - those are the edges to remove.
- *
- * 2. How would you handle the case where edge weights can be negative?
- *    Answer: The problem becomes more complex. We'd need to adjust the binary search range
- *    to include negative values. The concept remains the same, but the lower bound would be
- *    the minimum edge weight instead of 0.
- *
- * 3. What if instead of removing edges, we can add edges with cost?
- *    Answer: This becomes a different problem - Minimum Spanning Tree variants. We'd use
- *    Kruskal's or Prim's algorithm but stop when we have exactly k components, adding edges
- *    in increasing order of weight.
- *    Related: https://leetcode.com/problems/min-cost-to-connect-all-points/
- *
- * 4. Can we solve this if k can be larger than n?
- *    Answer: If k >= n, we can split the graph into n separate components (all isolated nodes)
- *    by removing all edges. The maximum cost would be 0 since no component has edges.
- *
- * 5. What if we want to minimize the sum of all component costs instead of maximum?
- *    Answer: This requires a different approach. We'd use dynamic programming or greedy
- *    algorithm to partition the graph. We'd still use Union-Find but optimize for sum
- *    rather than maximum, which changes the decision-making process significantly.
- * LeetCode Contest Rating: 1642
+ * Related: Minimum Spanning Tree, Min Cost to Connect All Points (1584).
  */
 public class MinimizeMaximumComponentCost {
+
+  public static void main(String[] args) {
+    MinimizeMaximumComponentCost solver = new MinimizeMaximumComponentCost();
+    int[][] edges1 = {{0, 1, 4}, {1, 2, 3}, {1, 3, 2}, {3, 4, 6}};
+    int[][] edges2 = {{0, 1, 4}};
+
+    System.out.printf("nodes=5 edges=%s k=2 -> %d  expected=4%n",
+        Arrays.deepToString(edges1), solver.minimizeMaximumComponentCost(5, edges1, 2));
+    System.out.printf("nodes=2 edges=%s k=2 -> %d  expected=0%n",
+        Arrays.deepToString(edges2), solver.minimizeMaximumComponentCost(2, edges2, 2));
+  }
 
   /**
    * Uses Kruskal's MST algorithm with strategic edge removal to partition the graph.

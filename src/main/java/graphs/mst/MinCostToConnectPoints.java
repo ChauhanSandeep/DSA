@@ -3,35 +3,60 @@ package graphs.mst;
 import java.util.*;
 
 /**
- * You are given an array `points` representing integer coordinates of some points on a 2D plane,
- * where points[i] = [xi, yi]. The cost of connecting two points (xi, yi) and (xj, yj) is the
- * Manhattan distance: |xi - xj| + |yi - yj|.
+ * Problem: Min Cost to Connect All Points
  *
- * <p>Return the minimum cost to make all points connected. All points must be connected using
- * edges.
+ * Given points on a 2D plane, connect every point with edges whose costs are
+ * Manhattan distances. Return the minimum total cost required so all points are
+ * connected in one component.
  *
- * <p>Example: Input: points = [[0,0],[2,2],[3,10],[5,2],[7,0]] Output: 20
+ * Leetcode: https://leetcode.com/problems/min-cost-to-connect-all-points/ (Medium)
+ * Rating:   1858 (zerotrac Elo)
+ * Pattern:  Graph | Minimum spanning tree | Prim on complete graph
  *
- * <p>LeetCode Link: https://leetcode.com/problems/min-cost-to-connect-all-points/ LeetCode Contest
- * Rating: 1858
+ * Example:
+ *   Input:  points = [[0,0],[2,2],[3,10],[5,2],[7,0]]
+ *   Output: 20
+ *   Why:    the MST chooses the cheapest set of Manhattan edges that connects every point once.
+ *
+ * Follow-ups:
+ *   1. Improve the heap-based Prim solution on a complete graph?
+ *      Use the O(n^2) optimized Prim scan to avoid pushing O(n^2) heap entries.
+ *   2. Need the actual connections?
+ *      Store the parent point whenever minDist improves.
+ *   3. What if points arrive online?
+ *      Dynamic MST maintenance is needed; recomputing may be simplest for moderate n.
+ *
+ * Related: Connecting Cities With Minimum Cost (1135), Minimum Spanning Tree.
  */
 public class MinCostToConnectPoints {
 
-  /**
-   * Solves the problem using Prim's Algorithm for Minimum Spanning Tree (MST).
+  public static void main(String[] args) {
+    MinCostToConnectPoints solver = new MinCostToConnectPoints();
+    int[][] points1 = {{0, 0}, {2, 2}, {3, 10}, {5, 2}, {7, 0}};
+    int[][] points2 = {{3, 12}};
+
+    System.out.printf("points=%s -> prim=%d optimized=%d  expected=20%n",
+        Arrays.deepToString(points1), solver.minCostConnectPoints(points1), solver.minCostConnectPointsOptimized(points1));
+    System.out.printf("points=%s -> prim=%d optimized=%d  expected=0%n",
+        Arrays.deepToString(points2), solver.minCostConnectPoints(points2), solver.minCostConnectPointsOptimized(points2));
+  }
+
+    /**
+   * Intuition: all points form a complete graph where edge cost is Manhattan
+   * distance. Prim's algorithm grows the MST from point 0, always accepting the
+   * cheapest edge that connects a not-yet-visited point.
    *
-   * <p>Intuition: - Treat the points as nodes in a graph. - Edges between them have a cost =
-   * Manhattan distance. - Use Prim’s algorithm to build the MST with minimum total cost.
+   * Algorithm:
+   *   1. Seed the heap with all edges from point 0 and record their best known costs.
+   *   2. Pop the cheapest edge; skip it if the target is already visited or stale.
+   *   3. Mark the target visited and add the edge cost to totalCost.
+   *   4. Relax edges from the new point to every unvisited point.
    *
-   * <p>Steps: 1. Start with point 0 in MST. 2. Use a min-heap to always add the edge with the least
-   * cost to the MST. 3. Track visited points and avoid cycles. 4. Repeat until all points are
-   * included.
+   * Time:  O(N^2 log N) - dense graph relaxations create heap work.
+   * Space: O(N^2) - heap can hold many candidate edges in the worst case.
    *
-   * <p>Time Complexity: O(N^2 * logN) where N is number of points Space Complexity: O(N) for
-   * visited and minDist, plus heap overhead
-   *
-   * @param points An array of 2D coordinates
-   * @return The minimum total cost to connect all points
+   * @param points coordinates [x, y]
+   * @return minimum total Manhattan cost to connect all points
    */
   public int minCostConnectPoints(int[][] points) {
     int length = points.length;

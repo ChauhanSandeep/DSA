@@ -4,43 +4,62 @@ import java.util.*;
 
 
 /**
- * There are n nodes (labelled 1 to n) in a directed weighted graph. You are given a list of times,
- * where times[i] = [u, v, w] represents that the node u can transmit a signal to node v with a delay of w seconds.
+ * Problem: Network Delay Time
  *
- * Given that a signal is sent from a starting node k, return the minimum time it takes for all the nodes
- * to receive the signal. If it is impossible for all the nodes to receive the signal, return -1.
+ * A signal starts at node k in a directed weighted network. Each edge [u, v, w]
+ * means the signal takes w time to travel from u to v. Return the earliest time
+ * when every node has received the signal, or -1 if some node is unreachable.
+ *
+ * Leetcode: https://leetcode.com/problems/network-delay-time/ (Medium)
+ * Rating:   acceptance 61.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Dijkstra | Single-source shortest paths
  *
  * Example:
- * Input: times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2
- * Output: 2
+ *   Input:  times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2
+ *   Output: 2
+ *   Why:    nodes 1 and 3 receive the signal at time 1, and node 4 receives it at time 2.
  *
- * LeetCode Link: https://leetcode.com/problems/network-delay-time/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Edges can have negative delays?
+ *      Use Bellman-Ford and reject negative cycles because Dijkstra needs non-negative weights.
+ *   2. Need the receiving path for every node?
+ *      Track parent pointers whenever a node's best delay improves.
+ *   3. Need many source queries on a dense graph?
+ *      Precompute all-pairs shortest paths with Floyd-Warshall.
+ *
+ * Related: Cheapest Flights Within K Stops (787), Path With Minimum Effort (1631).
  */
 public class NetworkDelayTimeSolver {
 
-  /**
-   * Intuition:
-   *  - Treat the input as a directed, weighted graph.
-   *  - Use Dijkstra’s algorithm to find the shortest path from the source node `k` to all other nodes.
-   *  - The answer is the maximum distance among all nodes.
+  public static void main(String[] args) {
+    NetworkDelayTimeSolver solver = new NetworkDelayTimeSolver();
+    int[][] times1 = {{2, 1, 1}, {2, 3, 1}, {3, 4, 1}};
+    int[][] times2 = {{1, 2, 1}};
+
+    System.out.printf("times=%s n=4 k=2 -> %d  expected=2%n",
+        Arrays.deepToString(times1), solver.networkDelayTime(times1, 4, 2));
+    System.out.printf("times=%s n=3 k=1 -> %d  expected=-1%n",
+        Arrays.deepToString(times2), solver.networkDelayTime(times2, 3, 1));
+  }
+
+    /**
+   * Intuition: the time a node receives the signal is its shortest-path distance
+   * from k. Dijkstra finalizes the smallest unfinalized arrival time first; after
+   * all reachable nodes are finalized, the network delay is the slowest arrival.
    *
-   * Steps:
-   * 1. Build an adjacency list to represent the graph.
-   * 2. Use a min-heap (priority queue) to always process the node with the current shortest known distance.
-   * 3. Keep updating the shortest distance to each node using relaxation.
-   * 4. At the end, if any node is unreachable, return -1. Otherwise, return the maximum of all shortest distances.
+   * Algorithm:
+   *   1. Build the directed adjacency list from times.
+   *   2. Push [k, 0] into a min-heap ordered by current time.
+   *   3. Pop states, skipping nodes already finalized in shortestTimeMap.
+   *   4. Push unfinalized neighbors with accumulated time, then return the maximum finalized time.
    *
-   * Time Complexity:
-   *  - O(E log V), where E = number of edges, V = number of nodes.
+   * Time:  O(E log E) - each edge may create a heap entry.
+   * Space: O(V + E) - graph, heap, and finalized-time map.
    *
-   * Space Complexity:
-   *  - O(E + V) for the graph and distance tracking.
-   *
-   * @param times 2D array representing edges [u, v, w]
-   * @param n     Total number of nodes
-   * @param k     Starting node
-   * @return Minimum time to reach all nodes, or -1 if unreachable
+   * @param times directed edges [source, target, delay]
+   * @param n total nodes labeled 1 through n
+   * @param k starting node
+   * @return earliest time all nodes receive the signal, or -1 if any node is unreachable
    */
   public int networkDelayTime(int[][] times, int n, int k) {
     // Step 1: Build the graph as an adjacency list

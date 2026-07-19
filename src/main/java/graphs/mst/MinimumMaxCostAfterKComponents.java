@@ -4,23 +4,30 @@ import java.util.*;
 
 
 /**
- Leetcode: Minimum Maximum Edge Weight in a Graph After Removals
-
- You are given an undirected connected graph with n nodes labeled from 0 to n - 1
- and a 2D integer array edges where edges[i] = [ui, vi, wi] denotes an edge between ui and vi with weight wi.
- You are allowed to remove any number of edges such that there are at most k connected components.
-
- Cost of a component = max edge weight in that component (0 if no edges).
- Return the minimum possible value of the maximum cost among all components.
-
- Example:
- Input: n = 5, edges = [[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k = 2
- Output: 4
- Explanation: Remove edge (3-4 with weight 6), components have costs [4, 0], max = 4.
-
- Link: https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/
+ * Problem: Minimum Maximum Edge Cost After K Components
  *
- * LeetCode Contest Rating: 2243
+ * Given a connected weighted undirected graph, remove edges so the graph has at
+ * most k connected components. Minimize the maximum edge weight that remains in
+ * any component.
+ *
+ * Leetcode: https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/ (Hard)
+ * Rating:   2243 (zerotrac Elo)
+ * Pattern:  Graph | Minimum spanning tree | Remove largest MST edges
+ *
+ * Example:
+ *   Input:  n = 5, edges = [[0,1,4],[1,2,3],[1,3,2],[3,4,6]], k = 2
+ *   Output: 4
+ *   Why:    remove the heaviest MST edge 6, leaving the largest remaining component edge as 4.
+ *
+ * Follow-ups:
+ *   1. Need exactly k components rather than at most k?
+ *      For a connected graph, remove exactly k - 1 MST edges unless k >= n.
+ *   2. Need the removed edges?
+ *      Track the selected MST edges, sort them, and return the largest k - 1 selected edges.
+ *   3. Graph may be disconnected?
+ *      Build a spanning forest and validate whether the starting component count is already within k.
+ *
+ * Related: Min Cost to Connect All Points (1584), Kruskal MST partitioning.
  */
 public class MinimumMaxCostAfterKComponents {
 
@@ -34,23 +41,24 @@ public class MinimumMaxCostAfterKComponents {
     }
   }
 
-  /**
-   * Builds MST using Prim’s algorithm and removes (allowedComponents - 1) largest edges to form allowedComponents components.
+    /**
+   * Intuition: any useful solution can be viewed through an MST: first keep the
+   * lightest edges needed for connectivity, then split components by removing the
+   * largest MST edges. The largest remaining kept edge is the minimized maximum cost.
    *
-   * @param nodes     Number of nodes
-   * @param edges Edges in format [u, v, weight]
-   * @param allowedComponents     Max allowed components
-   * @return Minimum possible maximum cost among all components
+   * Algorithm:
+   *   1. Build the original adjacency list and run Prim's algorithm from node 0.
+   *   2. Record weights of accepted MST edges, skipping the dummy starting edge.
+   *   3. If the MST did not reach nodes - 1 edges, return -1.
+   *   4. Sort MST weights, remove allowedComponents - 1 largest, and return the largest kept weight.
    *
-   * Approach:
-   * 1. Build an adjacency list from edges.
-   * 2. Use Prim's algorithm to construct the MST.
-   * 3. Track weights of selected MST edges.
-   * 4. Remove top (allowedComponents - 1) highest weights to get allowedComponents components.
-   * 5. Return max of remaining MST edge weights.
+   * Time:  O(E log E) - Prim's heap processing plus sorting selected MST weights.
+   * Space: O(V + E) - adjacency list, heap, visited array, and MST weights.
    *
-   * Time Complexity: O(E log V) — Prim’s algorithm via PriorityQueue
-   * Space Complexity: O(E + V) — For graph and visited tracking
+   * @param nodes number of nodes labeled 0 to nodes - 1
+   * @param edges undirected weighted edges [u, v, weight]
+   * @param allowedComponents maximum number of components allowed
+   * @return minimum possible maximum edge cost among components, or -1 if the MST cannot be built
    */
   public int minimumCost(int nodes, int[][] edges, int allowedComponents) {
     // Build graph using adjacency list
@@ -117,10 +125,14 @@ public class MinimumMaxCostAfterKComponents {
   /** Driver method to test the logic */
   public static void main(String[] args) {
     MinimumMaxCostAfterKComponents solver = new MinimumMaxCostAfterKComponents();
-    int n = 5;
-    int[][] edges = {{0, 1, 4}, {1, 2, 3}, {1, 3, 2}, {3, 4, 6}};
-    int k = 2;
-    int result = solver.minimumCost(n, edges, k);
-    System.out.println("Minimum max component cost = " + result); // Expected: 4
+    int[][] edges1 = {{0, 1, 4}, {1, 2, 3}, {1, 3, 2}, {3, 4, 6}};
+    int[][] edges2 = {{0, 1, 4}};
+
+    System.out.printf("nodes=5 edges=%s k=2 -> %d  expected=4%n",
+        Arrays.deepToString(edges1), solver.minimumCost(5, edges1, 2));
+    System.out.printf("nodes=2 edges=%s k=2 -> %d  expected=0%n",
+        Arrays.deepToString(edges2), solver.minimumCost(2, edges2, 2));
   }
+
+
 }

@@ -1,42 +1,39 @@
 package graphs.unionfind;
 
 /**
- * Disjoint Set (Union-Find) Data Structure
+ * Problem: Disjoint Set (Union-Find) Data Structure
  *
- * A disjoint-set data structure maintains a collection of non-overlapping sets.
- * It provides near-constant-time operations to add new sets, merge sets,
- * and determine whether elements are in the same set.
+ * Maintain non-overlapping sets with efficient find, union, and connected
+ * operations. Path compression and union by rank keep repeated operations fast.
  *
- * This implementation uses two key optimizations:
- * 1. **Path Compression**: During find operations, flatten the tree structure by making
- *    nodes point directly to the root, reducing future query times.
- * 2. **Union by Rank**: When merging sets, attach the shorter tree under the root of
- *    the taller tree to keep the tree balanced and shallow.
+ * Pattern:  Data structure | Union-Find | Path compression and union by rank
  *
- * Applications:
- * - Kruskal's Minimum Spanning Tree algorithm
- * - Network connectivity problems
- * - Image processing (finding connected components)
- * - Detecting cycles in undirected graphs
- * - Least Common Ancestor problems
+ * Example:
+ *   Input:  union(0,1), union(1,2), connected(0,2)
+ *   Output: true
+ *   Why:    0 and 2 share the same root after the two unions.
  *
- * Time Complexity (with both optimizations):
- * - Find: O(α(n)) - inverse Ackermann function, practically constant
- * - Union: O(α(n)) - inverse Ackermann function, practically constant
- * - Connected: O(α(n)) - two find operations
+ * Follow-ups:
+ *   1. Need component sizes?
+ *      Store a size array at roots and update it during union.
+ *   2. Need rollback support?
+ *      Avoid path compression and keep a stack of parent/rank changes to undo unions.
+ *   3. Need weighted ratios between nodes?
+ *      Store each node's weight relative to its parent and update weights during union.
  *
- * Space Complexity: O(n) for parent and rank arrays
- *
- * Related LeetCode Problems:
- * - #547 Number of Provinces
- * - #684 Redundant Connection
- * - #721 Accounts Merge
- * - #990 Satisfiability of Equality Equations
- * - #1202 Smallest String With Swaps
- *
- * @author Sandeep Chauhan
+ * Related: Number of Provinces (547), Accounts Merge (721), Redundant Connection (684).
  */
 public class DisjointSet {
+
+  public static void main(String[] args) {
+    DisjointSet disjointSet = new DisjointSet(4);
+    disjointSet.union(0, 1);
+    disjointSet.union(1, 2);
+    System.out.printf("operations=[union(0,1), union(1,2)] query=connected(0,2) -> %s  expected=true%n",
+        disjointSet.connected(0, 2));
+    System.out.printf("operations=[union(0,1), union(1,2)] query=connected(0,3) -> %s  expected=false%n",
+        disjointSet.connected(0, 3));
+  }
   private int[] parent; // parent[i] is the parent of node i
   private int[] rank; // rank[i] is the rank (approximate depth) of the tree rooted at i
 

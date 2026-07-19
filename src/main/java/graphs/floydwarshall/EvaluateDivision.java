@@ -10,37 +10,30 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * ✅ Problem: Evaluate Division
+ * Problem: Evaluate Division
  *
- * You are given equations of the form `A / B = value` and a list of queries
- * `C / D`. For each query return the computed ratio by chaining equations, or
- * -1.0 if a variable is unknown or no chain connects the two variables.
+ * Given equations of the form A / B = value and queries C / D, compute each
+ * queried ratio by chaining known equations. Return -1.0 when a variable is
+ * unknown or no path connects the two variables.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/evaluate-division/   (Medium)
- * 🏷️ Pattern:  Graph · BFS traversal · Floyd–Warshall (multiplicative all-pairs)
+ * Leetcode: https://leetcode.com/problems/evaluate-division/ (Medium)
+ * Rating:   acceptance 62.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | Weighted traversal | Floyd-Warshall with multiplication
  *
- * 🧪 Example:
- *   equations = [["a","b"],["b","c"]], values = [2.0, 3.0]
- *   queries   = [["a","c"],["b","a"],["a","e"],["a","a"],["x","x"]]
- *   Output    = [6.0, 0.5, -1.0, 1.0, -1.0]   // a/c = 2*3, x is unknown
+ * Example:
+ *   Input:  equations = [["a","b"],["b","c"]], values = [2.0,3.0], queries = [["a","c"],["b","a"]]
+ *   Output: [6.0, 0.5]
+ *   Why:    a / c = (a / b) * (b / c) = 6, and b / a is the reciprocal of a / b.
  *
- * 🚧 Edge cases to remember:
- *   - query variable never appears in equations → -1.0
- *   - x / x where x is unknown                  → -1.0 (not 1.0)
- *   - a / a where a is known                    → 1.0  (diagonal initialised)
- *   - disconnected variables                    → -1.0 (ratio never filled)
+ * Follow-ups:
+ *   1. Few variables but many queries?
+ *      Precompute all ratios with Floyd-Warshall and answer each query in O(1).
+ *   2. Many variables but few queries?
+ *      Use BFS or DFS per query to avoid O(V^3) preprocessing.
+ *   3. Equations arrive dynamically?
+ *      Use Union-Find with ratios to each root for efficient incremental merges.
  *
- *  Approach                Method                  Time          Space
- *  ----------------------  ----------------------  ------------  --------
- *  BFS per query           evaluateEquationsBFS    O(Q*(V+E))    O(V+E)
- *  Floyd-Warshall (best)   evaluateEquations       O(V^3 + Q)    O(V^2)
- *
- * 🔍 Follow-ups:
- *   1. Few variables, many queries? Floyd–Warshall precompute wins.
- *   2. Many variables, few queries? BFS/DFS per query is cheaper.
- *   3. Dynamic add/remove equations? Prefer Union-Find with ratios to root.
- *
- * 🔁 Related: Currency Conversion, Satisfiability of Equality Equations (990).
+ * Related: Satisfiability of Equality Equations (990), Currency Conversion.
  */
 public class EvaluateDivision {
 
@@ -138,26 +131,24 @@ public class EvaluateDivision {
         return -1.0; // disconnected
     }
 
-    /**
-     * 🧠 Intuition: treat every variable as a node and `a / b = w` as an edge
-     * whose "distance" is the ratio a/b (and b/a = 1/w backwards). Instead of
-     * summing weights along a path like classic Floyd–Warshall, we MULTIPLY
-     * them, because a/c = (a/b) * (b/c). Precompute every reachable ratio once,
-     * then each query is a single matrix lookup.
+        /**
+     * Intuition: model a / b = value as a weighted edge and store ratios in a
+     * matrix. Floyd-Warshall can combine ratios through an intermediate variable
+     * by multiplication, so every connected pair becomes answerable by lookup.
      *
      * Algorithm:
-     *   1. Map each distinct node (variable) to an index; init ratio[i][i] = 1.
-     *   2. Fill direct edges: ratio[from][to] = w, ratio[to][from] = 1/w.
-     *   3. Floyd–Warshall: if from→via and via→to known, set from→to = product.
-     *   4. Answer each query by lookup; unknown node or 0 ratio → -1.0.
+     *   1. Assign every variable an index and initialize known self ratios to 1.
+     *   2. Fill direct ratios and reciprocal ratios from the equations.
+     *   3. For each via variable, multiply known from->via and via->to ratios to fill missing pairs.
+     *   4. Answer queries by matrix lookup, returning -1.0 for unknown or disconnected variables.
      *
-     * Time:  O(V^3 + Q)   — V = distinct nodes, Q = queries
-     * Space: O(V^2)       — the ratio matrix
+     * Time:  O(V^3 + Q) - all-pairs precomputation plus one lookup per query.
+     * Space: O(V^2) - ratio matrix for all variable pairs.
      *
-     * @param equations variable pairs, equations.get(i) = [from, to] meaning from/to
-     * @param values    values.get(i) = value of equations.get(i)
-     * @param queries   pairs [from, to] asking for from/to
-     * @return array of query results, -1.0 when not computable
+     * @param equations variable pairs where equations[i] is [numerator, denominator]
+     * @param values ratio values for equations
+     * @param queries requested ratios [numerator, denominator]
+     * @return query results, or -1.0 when a ratio cannot be computed
      */
     public double[] evaluateEquations(List<List<String>> equations, double[] values,
                                       List<List<String>> queries) {
@@ -217,7 +208,6 @@ public class EvaluateDivision {
     // ---------------------------------------------------------------------
     public static void main(String[] args) {
         EvaluateDivision solver = new EvaluateDivision();
-
         List<List<String>> equations = Arrays.asList(
                 Arrays.asList("a", "b"), Arrays.asList("b", "c"));
         double[] values = {2.0, 3.0};
@@ -225,15 +215,15 @@ public class EvaluateDivision {
                 Arrays.asList("a", "c"), Arrays.asList("b", "a"),
                 Arrays.asList("a", "e"), Arrays.asList("a", "a"),
                 Arrays.asList("x", "x"));
-
         double[] expected = {6.0, 0.5, -1.0, 1.0, -1.0};
-        double[] gotBFS = solver.evaluateEquationsBFS(equations, values, queries);
-        double[] gotFloyd = solver.evaluateEquations(equations, values, queries);
-        System.out.printf("queries=%s%n", queries);
-        System.out.printf("BFS   →  %s  expected=%s%n",
-                Arrays.toString(gotBFS), Arrays.toString(expected));
-        System.out.printf("Floyd →  %s  expected=%s%n",
-                Arrays.toString(gotFloyd), Arrays.toString(expected));
+
+        System.out.printf("queries=%s -> bfs=%s floyd=%s  expected=%s%n",
+                queries,
+                Arrays.toString(solver.evaluateEquationsBFS(equations, values, queries)),
+                Arrays.toString(solver.evaluateEquations(equations, values, queries)),
+                Arrays.toString(expected));
     }
+
+
 }
 

@@ -13,58 +13,26 @@ import java.util.Set;
 /**
  * Problem: Unlockable Locks
  *
- * You are given n people. Each person owns exactly one lock and exactly one key.
- * - locks[i] is the lock number owned by person i.
- * - keys[i]  is the key  number owned by person i.
- * A lock numbered x can only be unlocked using a key numbered x. A key can be reused
- * any number of times.
+ * Each person owns one lock and one reusable key. Friends in the same connected
+ * component can share all keys, so a person's lock is unlockable when its number
+ * appears in the key set pooled by that component.
  *
- * You are also given a list of friendship pairs friends[i] = [u, v]. Friendship is
- * bidirectional and transitive (if A~B and B~C then A, B, C can all share keys).
- * Friends in the same connected component can freely exchange all their keys.
+ * Pattern:  Graph | Union-Find | Connected component aggregation
  *
- * Return the maximum number of locks that can be unlocked across all people.
- *
- * Example 1:
- *   locks   = [1, 2, 3, 4]
- *   keys    = [2, 1, 4, 5]
- *   friends = [[0,1], [1,2]]
- *   Component {0,1,2}: locks={1,2,3}, keys={1,2,4} -> locks 1 & 2 unlockable
- *   Person 3 isolated: lock 4, key 5 -> not unlockable
+ * Example:
+ *   Input:  locks = [1,2,3,4], keys = [2,1,4,5], friends = [[0,1],[1,2]]
  *   Output: 2
+ *   Why:    component {0,1,2} has keys {1,2,4}, which unlock locks 1 and 2 only.
  *
- * Example 2:
- *   locks   = [1, 2, 3, 4]
- *   keys    = [4, 3, 2, 1]
- *   friends = [[0,1], [1,2], [2,3]]
- *   Single component holds keys {1,2,3,4} -> all 4 locks unlockable
- *   Output: 4
+ * Follow-ups:
+ *   1. Friendships are directed?
+ *      Compress strongly connected components, then reason about reachability between SCCs.
+ *   2. Keys are single-use?
+ *      Count matching lock/key frequencies per component and sum min(lockCount, keyCount).
+ *   3. Friendships change over time?
+ *      DSU handles union-only updates; deletions need offline dynamic connectivity or link-cut trees.
  *
- * Constraints:
- *   1 <= n <= 1e5,  0 <= friends.length <= 1e5,  1 <= locks[i], keys[i] <= 1e9
- *
- * Follow-up Questions:
- *
- * 1. What if friendships were directed (A can give keys to B but not vice versa)?
- *    Answer: This becomes a reachability problem on a directed graph. Compute
- *    Strongly Connected Components (Tarjan/Kosaraju), condense into a DAG, then
- *    propagate the union of available keys from sources to sinks via topological
- *    order. A lock is unlockable iff its key number appears in any SCC reachable
- *    backwards from the lock owner's SCC.
- *
- * 2. What if keys were single-use (each key unlocks at most one lock)?
- *    Answer: Within each component, build a multiset of available keys and a
- *    multiset of locks; the count of unlockable locks equals the sum over key
- *    numbers x of min(count_of_locks_x, count_of_keys_x). The current solution
- *    treats keys as reusable, so a single key x covers all locks numbered x.
- *
- * 3. What if friendships changed over time and we needed to answer queries online?
- *    Answer: For union-only updates, maintain a DSU keyed by component-root that
- *    tracks the set of keys per component (small-to-large merging gives
- *    O(n log n) total). For deletions, switch to Link-Cut Trees or offline
- *    processing with reverse-time DSU.
- *
- * @author Sandeep Chauhan
+ * Related: Number of Provinces (547), Accounts Merge (721), Connected Components.
  */
 public class UnlockableLocks {
 
@@ -234,39 +202,20 @@ public class UnlockableLocks {
 
   public static void main(String[] args) {
     UnlockableLocks solver = new UnlockableLocks();
+    int[] locks1 = {1, 2, 3, 4};
+    int[] keys1 = {2, 1, 4, 5};
+    int[][] friends1 = {{0, 1}, {1, 2}};
+    int[] locks2 = {1, 2};
+    int[] keys2 = {1, 3};
+    int[][] friends2 = {};
 
-    // Example 1 -> 2
-    System.out.println(solver.maxUnlockedLocks(
-        new int[]{1, 2, 3, 4},
-        new int[]{2, 1, 4, 5},
-        new int[][]{{0, 1}, {1, 2}}));
-
-    // Example 2 -> 4
-    System.out.println(solver.maxUnlockedLocks(
-        new int[]{1, 2, 3, 4},
-        new int[]{4, 3, 2, 1},
-        new int[][]{{0, 1}, {1, 2}, {2, 3}}));
-
-    // Edge case: no friendships, every person isolated
-    // locks=[1,2], keys=[1,3] -> only person 0 can unlock their own lock -> 1
-    System.out.println(solver.maxUnlockedLocks(
-        new int[]{1, 2},
-        new int[]{1, 3},
-        new int[][]{}));
-
-    // BFS variant should produce identical results
-    System.out.println("--- BFS variant ---");
-    System.out.println(solver.maxUnlockedLocksBFS(
-        new int[]{1, 2, 3, 4},
-        new int[]{2, 1, 4, 5},
-        new int[][]{{0, 1}, {1, 2}}));
-    System.out.println(solver.maxUnlockedLocksBFS(
-        new int[]{1, 2, 3, 4},
-        new int[]{4, 3, 2, 1},
-        new int[][]{{0, 1}, {1, 2}, {2, 3}}));
-    System.out.println(solver.maxUnlockedLocksBFS(
-        new int[]{1, 2},
-        new int[]{1, 3},
-        new int[][]{}));
+    System.out.printf("locks=%s keys=%s friends=%s -> dsu=%d bfs=%d  expected=2%n",
+        Arrays.toString(locks1), Arrays.toString(keys1), Arrays.deepToString(friends1),
+        solver.maxUnlockedLocks(locks1, keys1, friends1), solver.maxUnlockedLocksBFS(locks1, keys1, friends1));
+    System.out.printf("locks=%s keys=%s friends=%s -> dsu=%d bfs=%d  expected=1%n",
+        Arrays.toString(locks2), Arrays.toString(keys2), Arrays.deepToString(friends2),
+        solver.maxUnlockedLocks(locks2, keys2, friends2), solver.maxUnlockedLocksBFS(locks2, keys2, friends2));
   }
+
+
 }

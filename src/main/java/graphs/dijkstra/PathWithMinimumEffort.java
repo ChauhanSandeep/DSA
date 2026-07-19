@@ -5,58 +5,41 @@ import java.util.*;
 /**
  * Problem: Path With Minimum Effort
  *
- * You are given a 2D array heights representing the heights of cells in a grid.
- * A route's effort is the maximum absolute difference in heights between two
- * consecutive cells of the route.
+ * Given a grid of heights, a path's effort is the maximum absolute height
+ * difference across any one step on that path. Return the minimum possible effort
+ * from the top-left cell to the bottom-right cell.
  *
- * Return the minimum effort required to travel from the top-left cell (0,0) to
- * the bottom-right cell (rows-1, cols-1).
- *
- * You can move up, down, left, or right (4 directions).
+ * Leetcode: https://leetcode.com/problems/path-with-minimum-effort/ (Medium)
+ * Rating:   1948 (zerotrac Elo)
+ * Pattern:  Graph | Dijkstra on grid | Minimize maximum edge weight
  *
  * Example:
- * Input: heights = [
- *      [1,2,2],
- *      [3,8,2],
- *      [5,3,5]]
- * Output: 2
- * Explanation: The route [1,2,2,5] has effort 2, which is minimum.
- * Path: (0,0)→(0,1)→(0,2)→(1,2),(2,2)
- * Efforts: |1-2|=1, |2-2|=0, |2-5|=3 → max effort = 3 (not optimal)
- * Better path: (0,0)→(1,0)→(2,0)→(2,1)→(2,2) with max effort 2
+ *   Input:  heights = [[1,2,2],[3,8,2],[5,3,5]]
+ *   Output: 2
+ *   Why:    the route through 1,3,5,3,5 never uses an edge with difference greater than 2.
  *
- * Constraints:
- * - rows == heights.length
- * - cols == heights[i].length
- * - 1 <= rows, cols <= 100
- * - 1 <= heights[i][j] <= 10^6
+ * Follow-ups:
+ *   1. Solve without Dijkstra?
+ *      Binary search the answer and BFS/DFS through edges whose difference is within the limit.
+ *   2. Return the actual path?
+ *      Store parent cells when an effort value improves, then reconstruct at the destination.
+ *   3. Allow diagonal movement?
+ *      Add four diagonal directions; the effort relaxation stays the same.
  *
- * LeetCode Problem: https://leetcode.com/problems/path-with-minimum-effort
- *
- * Follow-up Questions:
- *
- * 1. What if you need to return the actual path, not just the effort?
- *    Answer: Track parent pointers during Dijkstra's. After reaching destination,
- *    backtrack from end to start using parent map to reconstruct path.
- *
- * 2. How would you handle if diagonal movement is allowed?
- *    Answer: Add 4 more directions (diagonals). Calculate effort same way.
- *    Dijkstra's handles all directions uniformly.
- *
- * 3. What if there are obstacles you cannot pass through?
- *    Answer: Mark obstacle cells, skip them during BFS/Dijkstra's. Check if cell
- *    is obstacle before adding to queue/heap.
- *
- * 4. Can you find k paths with minimum efforts?
- *    Answer: Modify Dijkstra's to track k best efforts to each cell. Use
- *    priority queue with (effort, row, col, pathId). More complex state tracking.
- *
- * 5. How would you handle if some cells have negative heights?
- *    Answer: Use absolute difference same way. Dijkstra's still works because
- *    edge weights (differences) remain non-negative.
- * LeetCode Contest Rating: 1948
+ * Related: Minimum Cost to Make a Valid Path (1368), Swim in Rising Water (778).
  */
 public class PathWithMinimumEffort {
+
+    public static void main(String[] args) {
+        PathWithMinimumEffort solver = new PathWithMinimumEffort();
+        int[][] heights1 = {{1, 2, 2}, {3, 8, 2}, {5, 3, 5}};
+        int[][] heights2 = {{7}};
+
+        System.out.printf("heights=%s -> %d  expected=2%n",
+            Arrays.deepToString(heights1), solver.minimumEffortPath(heights1));
+        System.out.printf("heights=%s -> %d  expected=0%n",
+            Arrays.deepToString(heights2), solver.minimumEffortPath(heights2));
+    }
 
     private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 
@@ -81,28 +64,23 @@ public class PathWithMinimumEffort {
         }
     }
 
-    /**
-     * Finds minimum effort path using Dijkstra's algorithm with min-heap.
+        /**
+     * Intuition: treat each step's height difference as an edge cost, but a path's
+     * score is the maximum edge on it rather than a sum. Dijkstra still works when
+     * relaxation uses max(current effort, next edge effort), because efforts only
+     * stay the same or increase along a path.
      *
      * Algorithm:
-     * 1. Use priority queue (min-heap) to process cells by minimum effort
-     * 2. Track minimum effort to reach each cell in effort array
-     * 3. For each cell, explore all 4 neighbors:
-     *    - Calculate new effort = max(current effort, height difference to neighbor)
-     *    - If new effort < neighbor's recorded effort, update and add to queue
-     * 4. Return effort to reach bottom-right cell
+     *   1. Fill the effort matrix with infinity and seed the start with 0.
+     *   2. Pop the cell with the smallest current effort from the min-heap.
+     *   3. For each neighbor, compute the max effort needed to extend the path there.
+     *   4. If that improves the neighbor, record it and push the neighbor into the heap.
      *
-     * Key insight: This is a shortest path problem where edge weight is the height
-     * difference. But we track MAXIMUM difference along path (not sum). Dijkstra's
-     * still works because we greedily process minimum effort paths first.
+     * Time:  O(rows * cols * log(rows * cols)) - heap operations over grid cells.
+     * Space: O(rows * cols) - effort matrix and heap entries.
      *
-     * Time Complexity: O(M * N * log(M * N)) where M=rows, N=cols.
-     * Each cell added to heap at most once, heap operations are O(log size).
-     *
-     * Space Complexity: O(M * N) for effort array and heap.
-     *
-     * @param heights 2D array of cell heights
-     * @return minimum effort required to reach bottom-right from top-left
+     * @param heights grid of cell heights
+     * @return minimum possible effort from top-left to bottom-right
      */
     public int minimumEffortPath(int[][] heights) {
         int rows = heights.length;

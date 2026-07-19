@@ -2,51 +2,44 @@ package graphs.topologicalsort;
 
 import java.util.*;
 
-/**
- * LeetCode Problem: Course Schedule II
- * https://leetcode.com/problems/course-schedule-ii/
- *
- * Problem Statement:
- * There are `numCourses` labeled from 0 to numCourses-1. You are given an array `prerequisites`
- * where prerequisites[i] = [ai, bi] indicates that to take course ai you must first take course bi.
- * Return the ordering of courses you should take to finish all courses. If it is not possible, return an empty array.
- *
- * Example:
- * Input: numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
- * Output: [0,2,1,3] or [0,1,2,3]
- *
- * Follow-up Questions:
- * - What if multiple valid orders are possible?
- *   You can return any of them.
- *
- * - How do you detect a cycle in a directed graph?
- *   Using DFS with coloring or Kahn’s algorithm (BFS with in-degrees).
- *
- * - Can you return all valid topological orderings?
- *   Not with this approach. Requires backtracking.
- * LeetCode Contest Rating: Not available (not a contest problem)
- */
+  /**
+   * Intuition: DFS postorder naturally puts a course after all courses that depend
+   * on it in the traversal graph. Reversing that postorder gives a valid course
+   * order, unless a VISITING node is reached again, which proves a cycle.
+   *
+   * Algorithm:
+   *   1. Build the original adjacency list from prerequisite to dependent courses.
+   *   2. DFS every course with UNVISITED, VISITING, and VISITED states.
+   *   3. Add a course to topologicalOrder after all outgoing neighbors are processed.
+   *   4. Reverse the postorder result, or return an empty array if a cycle is found.
+   *
+   * Time:  O(V + E) - each course and edge is visited once.
+   * Space: O(V + E) - adjacency list, recursion stack, state array, and order list.
+   *
+   * @param numCourses number of courses labeled 0 to numCourses - 1
+   * @param prerequisites pairs [course, prerequisite]
+   * @return a valid course order, or an empty array when impossible
+   */
 public class CourseSchedule2 {
   private static final int UNVISITED = 0;
   private static final int VISITING = 1;
   private static final int VISITED = 2;
 
   public static void main(String[] args) {
-    int numCourses = 4;
-    int[][] prerequisites = {
-        {1, 0},
-        {2, 0},
-        {3, 1},
-        {3, 2}
-    };
-
     CourseSchedule2 scheduler = new CourseSchedule2();
-    int[] courseOrderDFS = scheduler.findCourseOrderDFS(numCourses, prerequisites);
-    System.out.println("Course order (DFS): " + Arrays.toString(courseOrderDFS));
+    int[][] prerequisites1 = {{1, 0}, {2, 0}, {3, 1}, {3, 2}};
+    int[][] prerequisites2 = {{1, 0}, {0, 1}};
 
-    int[] courseOrderBFS = scheduler.findCourseOrderUsingKahn(numCourses, prerequisites);
-    System.out.println("Course order (BFS): " + Arrays.toString(courseOrderBFS));
+    System.out.printf("numCourses=4 prerequisites=%s -> dfs=%s kahn=%s  expected dfs=[0, 2, 1, 3] kahn=[0, 1, 2, 3]%n",
+        Arrays.deepToString(prerequisites1),
+        Arrays.toString(scheduler.findCourseOrderDFS(4, prerequisites1)),
+        Arrays.toString(scheduler.findCourseOrderUsingKahn(4, prerequisites1)));
+    System.out.printf("numCourses=2 prerequisites=%s -> dfs=%s kahn=%s  expected=[]%n",
+        Arrays.deepToString(prerequisites2),
+        Arrays.toString(scheduler.findCourseOrderDFS(2, prerequisites2)),
+        Arrays.toString(scheduler.findCourseOrderUsingKahn(2, prerequisites2)));
   }
+
 
   /**
    * Returns a valid course order using DFS + Topological Sort with cycle detection.

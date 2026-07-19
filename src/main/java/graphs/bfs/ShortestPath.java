@@ -2,54 +2,44 @@ package graphs.bfs;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Arrays;
 
 
-/**
- * LeetCode 1091: Shortest Path in Binary Matrix
- * https://leetcode.com/problems/shortest-path-in-binary-matrix/
- *
- * Problem Statement:
- * - Given an n x n binary grid:
- *   - 0 → empty cell
- *   - 1 → obstacle
- * - Find the shortest path from top-left (0,0) to bottom-right (n-1,n-1).
- * - Movement is allowed in 8 directions (horizontal, vertical, diagonal).
- * - Return the length of the shortest path, or -1 if no path exists.
- *
- * Example:
- * Input: grid = [[0,0,0],
- *                [1,0,0],
- *                [1,1,0]]
- * Output: 4
- *
- * Approach:
- * - Perform BFS (Breadth-First Search) starting from (0,0).
- * - Track steps by marking grid[x][y] with the distance from the start.
- * - Stop early once bottom-right cell is reached.
- *
- * Time Complexity: O(N^2) – BFS visits each cell once at most.
- * Space Complexity: O(N^2) – Queue may hold up to N^2 elements in worst case.
- *
- * Follow-up Questions:
- * 1. Can we optimize space by not modifying the grid?
- *    - Yes, maintain a visited[][] array or use a HashSet.
- * 2. How to handle weighted grids?
- *    - Use Dijkstra’s algorithm instead of BFS.
- * 3. Can this be solved bidirectionally?
- *    - Yes, bidirectional BFS reduces search space significantly.
- * LeetCode Contest Rating: 1658
- */
+  /**
+   * Intuition: with every move costing one step, BFS is the natural shortest-path
+   * tool. The original code writes the distance directly into grid cells, so the
+   * first time an open cell is reached is also its shortest distance from the start.
+   *
+   * Algorithm:
+   *   1. Reject blocked endpoints and handle the single-cell grid.
+   *   2. Queue the start cell and mark it with distance 1 in the grid.
+   *   3. Pop cells breadth-first and inspect all 8 directions.
+   *   4. Mark each open neighbor with steps + 1, queue it, and return when the target is reached.
+   *
+   * Time:  O(n^2) - each cell is queued at most once.
+   * Space: O(n^2) - the queue can hold a full BFS frontier in the worst case.
+   *
+   * @param grid binary matrix where 0 is open and 1 is blocked; mutated to store distances
+   * @return length of the shortest clear path, or -1 if none exists
+   */
 public class ShortestPath {
 
   // Directions: up, down, left, right, and 4 diagonals
   private static final int[][] DIRECTIONS = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
 
   public static void main(String[] args) {
-    int[][] grid = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}};
     ShortestPath solver = new ShortestPath();
-    int shortestPath = solver.shortestPathBinaryMatrix(grid);
-    System.out.println("Shortest Path: " + shortestPath);
+    int[][] grid1 = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}};
+    int[][] grid2 = {{1, 0}, {0, 0}};
+    int[][] run1 = Arrays.stream(grid1).map(int[]::clone).toArray(int[][]::new);
+    int[][] run2 = Arrays.stream(grid2).map(int[]::clone).toArray(int[][]::new);
+
+    System.out.printf("grid=%s -> %d  expected=3%n",
+        Arrays.deepToString(grid1), solver.shortestPathBinaryMatrix(run1));
+    System.out.printf("grid=%s -> %d  expected=-1%n",
+        Arrays.deepToString(grid2), solver.shortestPathBinaryMatrix(run2));
   }
+
 
   /**
    * Finds the shortest path in a binary matrix using BFS.
