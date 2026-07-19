@@ -5,68 +5,63 @@ import java.util.Arrays;
 
 
 /**
- * Problem: Minimum Path Sum in a Triangle
+ * Problem: Triangle
  *
- * Given a triangle array, find the minimum path sum from **top to bottom**.
- * Each step, you may move to adjacent numbers in the row below.
+ * Given a triangle of numbers, return the minimum path sum from the top to the
+ * bottom. Each move goes to one of the two adjacent positions in the next row.
+ *
+ * Leetcode: https://leetcode.com/problems/triangle/ (Medium)
+ * Rating:   acceptance 59.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Bottom-up triangle DP | In-place compression
  *
  * Example:
- * Input:
- * [
- *      [2],
- *     [3, 4],
- *    [6, 5, 7],
- *   [4, 1, 8, 3]
- * ]
- * Output: 11  (Path: 2 → 3 → 5 → 1)
+ *   Input:  triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]
+ *   Output: 11
+ *   Why:    2 + 3 + 5 + 1 is the cheapest adjacent path from top to bottom.
  *
- * LeetCode Link: https://leetcode.com/problems/triangle/
+ * Follow-ups:
+ *   1. Return the actual minimum path?
+ *      Store the chosen child index at each cell or reconstruct from a separate DP table.
+ *   2. Can the input be left unchanged?
+ *      Copy the last row into a 1D DP array and update it bottom-up.
+ *   3. What if movement can go to any cell in the next row?
+ *      Each state needs the minimum over the whole next row, changing the transition.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you find the actual path, not just the minimum sum?
- *    Answer: Store parent pointers or indices during DP calculation. After computing minimum,
- *    backtrack from bottom to top using stored indices to reconstruct the path.
- *
- * 2. What if you can move to any position in the next row, not just adjacent?
- *    Answer: For each position, consider all positions in next row instead of just two.
- *    Time complexity increases to O(n^3) as we check n positions for each of n^2 cells.
- *
- * 3. How would you solve if you need maximum path sum instead of minimum?
- *    Answer: Change min() to max() in the recurrence relation. The algorithm structure
- *    remains identical, only the comparison operator changes.
- *    Related problem: https://leetcode.com/problems/maximum-path-sum-in-triangle/
- *
- * 4. What if you can move up as well as down (bidirectional)?
- *    Answer: This becomes a graph problem requiring BFS/Dijkstra since you can revisit
- *    positions. Need to track visited states and find shortest path from top to any bottom position.
- *
- * 5. How would you handle very large triangles that don't fit in memory?
- *    Answer: Process row by row from bottom to top, keeping only current and next row in memory.
- *    This is already achieved by the O(n) space solution.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Minimum Path Sum (64), Dungeon Game (174).
  */
 public class MinimumPathSumTriangle {
 
   public static void main(String[] args) {
-    List<List<Integer>> triangle =
-        Arrays.asList(Arrays.asList(2), Arrays.asList(3, 4), Arrays.asList(6, 5, 7), Arrays.asList(4, 1, 8, 3));
-    System.out.println("Optimized DP: " + minimumTotal(triangle));   // 11
-    System.out.println("Memoized Recursion: " + minimumTotalRecursive(triangle)); // 11
+    List<List<Integer>> triangle1 = Arrays.asList(
+        Arrays.asList(2), Arrays.asList(3, 4), Arrays.asList(6, 5, 7), Arrays.asList(4, 1, 8, 3));
+    String input1 = triangle1.toString();
+    int got1 = minimumTotal(triangle1);
+    System.out.printf("triangle=%s -> %d  expected=%d%n", input1, got1, 11);
+
+    List<List<Integer>> triangle2 = Arrays.asList(Arrays.asList(-10));
+    String input2 = triangle2.toString();
+    int got2 = minimumTotal(triangle2);
+    System.out.printf("triangle=%s -> %d  expected=%d%n", input2, got2, -10);
   }
 
-  /**
-   * Approach 1: Bottom-Up Dynamic Programming (In-Place Modification)
+
+    /**
+   * Intuition: after a lower row already stores the cheapest path from each of
+   * its positions to the bottom, a cell in the row above needs only its two
+   * adjacent children. The cheaper child is the best continuation, so adding the
+   * current value turns the current cell into the cheapest bottom-reaching path
+   * from that position.
    *
-   * Steps:
-   * 1. Start from the second-to-last row and move upwards to the top.
-   * 2. For each element, add the minimum of the two adjacent elements from the row below.
-   * 3. By the time we reach the top, the top element contains the minimum path sum.
-   * 
-   * Time Complexity: O(N^2) where N is the number of rows. Each element is processed once.
-   * Space Complexity: O(1) additional space since we modify the triangle in place.
-   * 
-   * @param triangle list of lists representing the triangle
-   * @return minimum path sum from top to bottom
+   * Algorithm:
+   *   1. Start at the second-to-last row because the last row is already its own cost.
+   *   2. For each cell, choose the smaller of the two adjacent values in the row below.
+   *   3. Add that best child cost into the current cell and continue upward to the top.
+   *
+   * Time:  O(n^2) - every triangle element above the last row is updated once.
+   * Space: O(1) - the input triangle itself stores the DP values.
+   *
+   * @param triangle triangle of row lists, modified in place
+   * @return minimum top-to-bottom adjacent path sum
    */
   public static int minimumTotal(List<List<Integer>> triangle) {
         for (int row = triangle.size() - 2; row >= 0; row--) {

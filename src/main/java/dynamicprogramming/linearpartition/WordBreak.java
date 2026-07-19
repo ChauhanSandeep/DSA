@@ -5,25 +5,46 @@ import java.util.*;
 
 /**
  * Problem: Word Break
- * LeetCode: https://leetcode.com/problems/word-break/
  *
- * Problem Statement:
- * Given a non-empty string `s` and a dictionary of words `wordDict`, determine whether `s`
- * can be segmented into a space-separated sequence of one or more dictionary words.
- * The same word from the dictionary may be reused multiple times in the segmentation.
+ * Given a string and a dictionary, decide whether the string can be split into
+ * one or more dictionary words. Words may be reused, and the split must cover
+ * the full string.
+ *
+ * Leetcode: https://leetcode.com/problems/word-break/ (Medium)
+ * Rating:   acceptance 49.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Linear partition | Dictionary lookup
  *
  * Example:
- * Input: s = "leetcode", wordDict = ["leet", "code"]
- * Output: true
- * Explanation: "leetcode" can be segmented as "leet code".
+ *   Input:  str = "leetcode", wordDict = ["leet", "code"]
+ *   Output: true
+ *   Why:    the split "leet code" covers the full string with dictionary words.
  *
- * Follow-Up Questions:
- * - Return all possible segmentations (see: https://leetcode.com/problems/word-break-ii/)
- * - Minimize the number of segments
- * - Count total number of ways to segment
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return all valid sentences?
+ *      Use memoized DFS that returns sentence lists for each start index.
+ *   2. Count the number of segmentations?
+ *      Replace booleans with counts and sum valid predecessor counts.
+ *   3. Minimize the number of words used?
+ *      Store minimum segment counts instead of reachability booleans.
+ *
+ * Related: Word Break II (140), Concatenated Words (472).
  */
 public class WordBreak {
+
+  public static void main(String[] args) {
+    WordBreak solver = new WordBreak();
+    String[] strings = { "leetcode", "catsandog" };
+    List<List<String>> dictionaries = Arrays.asList(
+        Arrays.asList("leet", "code"),
+        Arrays.asList("cats", "dog", "sand", "and", "cat"));
+    boolean[] expected = { true, false };
+
+    for (int i = 0; i < strings.length; i++) {
+      boolean got = solver.wordBreakIterativeApproach(strings[i], dictionaries.get(i));
+      System.out.printf("str=%s wordDict=%s -> %s  expected=%s%n",
+          strings[i], dictionaries.get(i), got, expected[i]);
+    }
+  }
 
   /**
    * Top-Down Dynamic Programming using Recursion + Memoization
@@ -65,16 +86,23 @@ public class WordBreak {
     return false;
   }
 
-  /**
-   * Bottom-Up Dynamic Programming
+    /**
+   * Intuition: dp[i] means the prefix str[0..i-1] can be segmented into
+   * dictionary words. To decide dp[end], try every previous cut position start.
+   * If dp[start] is already true and str[start..end-1] is a dictionary word,
+   * then the whole prefix through end is segmentable.
    *
-   * Steps:
-   * 1. Convert wordDict to a HashSet for fast lookups.
-   * 2. Initialize a dp array where dp[i] means str[0..i-1] is segmentable.
-   * 3. For each i, check every j < i. If dp[j] is true and str[j..i-1] is in dict, mark dp[i] as true.
+   * Algorithm:
+   *   1. Put the dictionary words in a set for fast membership checks.
+   *   2. Mark dp[0] true because the empty prefix needs no words.
+   *   3. For each end index, try all starts and mark dp[end] once a valid final word is found.
    *
-   * Time Complexity: O(N^2)
-   * Space Complexity: O(N)
+   * Time:  O(n^2) - every start/end cut pair can be checked.
+   * Space: O(n) - the DP array stores reachability for each prefix length.
+   *
+   * @param str string to segment
+   * @param wordDict dictionary of reusable words
+   * @return true if str can be fully segmented into dictionary words
    */
   public boolean wordBreakIterativeApproach(String str, List<String> wordDict) {
     Set<String> wordSet = new HashSet<>(wordDict);

@@ -6,18 +6,41 @@ import java.util.Arrays;
 /**
  * Problem: Longest Common Substring
  *
- * Given two strings, find the length of the longest substring that appears in both strings.
- * (Substring: continuous sequence of characters, unlike subsequence which can be discontinuous.)
+ * Given two strings, return the length of the longest contiguous block of
+ * characters that appears in both strings. Unlike subsequences, substrings must
+ * stay continuous in both inputs.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-length-of-repeated-subarray/ (Medium)
+ * Rating:   not available for this string variant
+ * Pattern:  Dynamic Programming | 2D table | Contiguous suffix length
  *
  * Example:
- * Input:  text1 = "abcde", text2 = "abfce"
- * Output: 2
- * Explanation: The longest common substring is "ab" with length 2.
+ *   Input:  text1 = "abcde", text2 = "abfce"
+ *   Output: 2
+ *   Why:    "ab" is the longest block that appears contiguously in both strings.
  *
- * LeetCode Link: https://leetcode.com/problems/longest-common-substring/ (not direct but similar to "Maximum Length of Repeated Subarray")
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the substring itself?
+ *      Track the ending index whenever maxLength improves.
+ *   2. Can space be reduced to O(min(m, n))?
+ *      Keep only the previous row because matches use the diagonal value.
+ *   3. How would you solve many queries quickly?
+ *      Use suffix automata, suffix arrays, or rolling hashes depending on constraints.
+ *
+ * Related: Longest Common Subsequence (1143), Maximum Length of Repeated Subarray (718).
  */
 public class LongestCommonSubstring {
+
+    public static void main(String[] args) {
+        String[][] cases = { {"abcde", "abfce"}, {"abc", "def"} };
+        int[] expected = { 2, 0 };
+
+        for (int i = 0; i < cases.length; i++) {
+            int got = longestCommonSubstringIterative(cases[i][0], cases[i][1]);
+            System.out.printf("texts=%s -> %d  expected=%d%n",
+                Arrays.toString(cases[i]), got, expected[i]);
+        }
+    }
 
     /**
      * Recursive approach with memoization (Top-Down DP)
@@ -74,22 +97,23 @@ public class LongestCommonSubstring {
         return dp[i][j];
     }
 
-    /**
-     * Iterative approach (Bottom-Up DP)
+        /**
+     * Intuition: dp[i][j] stores the length of the common suffix ending at
+     * text1[i - 1] and text2[j - 1]. If those two characters match, the suffix
+     * extends the diagonal suffix dp[i - 1][j - 1] by one. If they differ, no
+     * common substring can end at both positions, so the cell resets to zero.
      *
-     * Intuition:
-     * - Create a 2D dp array where dp[i][j] represents the length of the longest common substring
-     *   ending at text1[i-1] and text2[j-1].
-     * - If characters match, extend the substring length from previous diagonal dp[i-1][j-1].
-     * - If characters don't match, reset dp[i][j] to 0 (because substrings must be continuous).
+     * Algorithm:
+     *   1. Allocate a (length1 + 1) by (length2 + 1) table initialized to zero.
+     *   2. For every character pair, extend the diagonal value on a match or reset to zero on mismatch.
+     *   3. Track the maximum cell value seen during the fill.
      *
-     * Steps:
-     * 1. Initialize a dp array of size (m+1) x (n+1) with 0s.
-     * 2. Update dp[i][j] based on character match.
-     * 3. Track the maximum value during the iteration.
+     * Time:  O(m * n) - every pair of character positions is checked once.
+     * Space: O(m * n) - the DP table stores one suffix length per prefix pair.
      *
-     * Time Complexity: O(m * n)
-     * Space Complexity: O(m * n)
+     * @param text1 first input string
+     * @param text2 second input string
+     * @return length of the longest common substring
      */
     public static int longestCommonSubstringIterative(String text1, String text2) {
         int length1 = text1.length();
@@ -113,14 +137,5 @@ public class LongestCommonSubstring {
         return maxLength;
     }
 
-    public static void main(String[] args) {
-        String text1 = "abcde";
-        String text2 = "abfce";
 
-        System.out.println("Recursive with Memoization: Length of Longest Common Substring = " +
-            longestCommonSubstringRecursive(text1, text2));
-
-        System.out.println("Iterative DP: Length of Longest Common Substring = " +
-            longestCommonSubstringIterative(text1, text2));
-    }
 }

@@ -1,79 +1,66 @@
 package dynamicprogramming.longestcommonsubsequence;
 
+import java.util.Arrays;
+
 /**
  * Problem: Minimum Window Subsequence
  *
- * Given two strings s1 and s2, return the minimum contiguous substring of s1 such that s2
- * is a subsequence of that substring. If there is no such substring, return an empty string.
+ * Given source and target strings, return the shortest contiguous substring of
+ * source that contains target as a subsequence. If several windows have the same
+ * length, return the leftmost one; if none exists, return the empty string.
  *
- * A subsequence means characters of s2 appear in the substring in the same order but not
- * necessarily consecutively. If multiple substrings of the same minimum length exist,
- * return the one with the leftmost starting index.
+ * Leetcode: https://leetcode.com/problems/minimum-window-subsequence/ (Hard)
+ * Rating:   acceptance 43.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Two pointers | Forward match and backward shrink
  *
  * Example:
- * Input: s1 = "abcdebdde", s2 = "bde"
- * Output: "bcde"
- * Explanation: "bcde" is the answer because it occurs before "bdde" which has the same length.
- * "deb" is not valid because elements of s2 must occur in order in the window.
+ *   Input:  source = "abcdebdde", target = "bde"
+ *   Output: "bcde"
+ *   Why:    both "bcde" and "bdde" contain b, d, e in order, but "bcde" is
+ *           the leftmost minimum-length window.
  *
- * Constraints:
- * - 1 <= s1.length <= 2 * 10^4
- * - 1 <= s2.length <= 100
- * - s1 and s2 consist of lowercase English letters
+ * Follow-ups:
+ *   1. How would you answer many target queries on the same source?
+ *      Precompute next-occurrence positions for each character in source.
+ *   2. Return all minimum windows instead of one?
+ *      Track every window whose length equals the best length after each shrink.
+ *   3. What if target must appear as a substring?
+ *      Use direct substring search or sliding window instead of subsequence matching.
  *
- * LeetCode Problem: https://leetcode.com/problems/minimum-window-subsequence
- *
- * Follow-up Questions:
- *
- * 1. What if s2 can appear multiple times and you need to find all minimum windows?
- *    Answer: Store each minimum window start and length during the search. After finding all,
- *    filter to keep only those with minimum length and return all matching substrings.
- *
- * 2. How would you modify this to find the maximum window instead of minimum?
- *    Answer: Track the maximum window length instead of minimum. The algorithm structure
- *    remains the same but comparison logic reverses to find largest valid window.
- *
- * 3. What if you need to find windows where s2 appears as a substring instead of subsequence?
- *    Answer: Use simpler sliding window with exact character matching. This becomes easier
- *    since we need consecutive matches rather than maintaining order with gaps.
- *    Related problem: https://leetcode.com/problems/minimum-window-substring/
- *
- * 4. Can you solve this if s2 characters can appear in any order (like anagram)?
- *    Answer: Use frequency map and sliding window to track character counts. Expand window
- *    until all characters are found, then shrink to minimize. This is the classic minimum
- *    window substring problem with character frequency matching.
- *
- * 5. How would you optimize for multiple queries with different s2 values on same s1?
- *    Answer: Preprocess s1 to build a next occurrence map for each character at each position.
- *    This allows O(|s2|) lookup per query after O(26 * |s1|) preprocessing.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Minimum Window Substring (76), Longest Common Subsequence (1143).
  */
 public class MinimumWindowSubsequence {
 
-  /**
-   * Finds minimum window using two-pointer forward-backward technique.
+  public static void main(String[] args) {
+    MinimumWindowSubsequence solver = new MinimumWindowSubsequence();
+    String[][] cases = { {"abcdebdde", "bde"}, {"abc", "d"} };
+    String[] expected = { "bcde", "" };
+
+    for (int i = 0; i < cases.length; i++) {
+      String got = solver.minWindow(cases[i][0], cases[i][1]);
+      System.out.printf("strings=%s -> %s  expected=%s%n",
+          Arrays.toString(cases[i]), got, expected[i]);
+    }
+  }
+
+    /**
+   * Intuition: a valid window is found only after every target character has
+   * been matched in order while scanning source. Once that happens, the right
+   * boundary is fixed, so the tightest window ending there is found by walking
+   * backward and matching target in reverse. That backward pass removes every
+   * unnecessary leading character before the next forward scan begins.
    *
    * Algorithm:
-   * 1. Forward scan: Match all characters of target in source sequentially
-   * 2. Once target is fully matched, record the end position
-   * 3. Backward scan: Shrink window from end backwards to find start of minimum window
-   * 4. Match target in reverse order while moving backwards in source
-   * 5. Calculate window length and update minimum if smaller
-   * 6. Continue forward scan from position after current window start
-   * 7. Repeat until entire source is processed
+   *   1. Scan source forward until all target characters are matched in order.
+   *   2. Record the end, then scan backward to find the tightest start for that end.
+   *   3. Update the best window and resume just after the current start.
    *
-   * Key insight: After matching target completely, we shrink backwards to find the tightest
-   * window. This ensures we don't include unnecessary characters at the beginning.
+   * Time:  O(n * m) - repeated forward and backward scans can revisit source characters around each target match.
+   * Space: O(1) - only pointers and best-window indices are stored.
    *
-   * Time Complexity: O(N * M) where N is length of source and M is length of target. In worst case,
-   * for each character in source, we might traverse entire target during forward scan, and go back
-   * M positions during backward scan.
-   *
-   * Space Complexity: O(1) as we only use pointers and variables, no additional data structures.
-   *
-   * @param source the source string to search within
-   * @param target the target subsequence to find
-   * @return minimum window substring containing target as subsequence, or empty string
+   * @param source string to search inside
+   * @param target subsequence that must appear inside the returned window
+   * @return shortest source substring containing target as a subsequence, or empty string
    */
   public String minWindow(String source, String target) {
     int sourceLen = source.length();

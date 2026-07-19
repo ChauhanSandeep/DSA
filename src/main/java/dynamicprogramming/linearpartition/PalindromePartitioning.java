@@ -5,57 +5,61 @@ import java.util.List;
 
 /**
  * Problem: Palindrome Partitioning
- * Leetcode Equivalent: https://leetcode.com/problems/palindrome-partitioning/
  *
- * Problem Statement:
- * Given a string `str`, partition the string such that every substring in the partition is a palindrome.
- * Return all possible palindrome partitionings of the string.
+ * Given a string, return every way to split it into substrings such that every
+ * substring is a palindrome. Each partition must preserve the original character
+ * order and cover the entire string.
+ *
+ * Leetcode: https://leetcode.com/problems/palindrome-partitioning/ (Medium)
+ * Rating:   acceptance 74.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Backtracking | Palindrome cuts
  *
  * Example:
- * Input: "aab"
- * Output: [["a", "a", "b"], ["aa", "b"]]
- * Explanation: The string "aab" can be partitioned into palindromic substrings in two ways:
- * - ["a", "a", "b"]: Each character is a palindrome.
- * - ["aa", "b"]: "aa" is a palindrome, and "b" is a palindrome.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  input = "aab"
+ *   Output: [[a, a, b], [aa, b]]
+ *   Why:    those are the only cuts where every produced substring is a palindrome.
+ *
+ * Follow-ups:
+ *   1. Return the minimum number of cuts?
+ *      Use DP over prefix endpoints after precomputing palindromic substrings.
+ *   2. Count partitions without listing them?
+ *      Use a counting DP so exponential output storage is avoided.
+ *   3. How do you speed up palindrome checks?
+ *      Precompute a boolean palindrome table for all substrings.
+ *
+ * Related: Palindrome Partitioning II (132), Palindrome Partitioning III (1278).
  */
 public class PalindromePartitioning {
 
     public static void main(String[] args) {
-        PalindromePartitioning solution = new PalindromePartitioning();
-        
-        // Test backtracking approach
-        List<List<String>> result1 = solution.partition("aab");
-        System.out.println("Backtracking approach: " + result1);
-        
-        // Test bottom-up DP approach
-        List<List<String>> result2 = solution.partitionBottomUp("aab");
-        System.out.println("Bottom-Up DP approach: " + result2);
+        PalindromePartitioning solver = new PalindromePartitioning();
+        String[] inputs = { "aab", "" };
+        String[] expected = { "[[a, a, b], [aa, b]]", "[[]]" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<String>> got = solver.partition(inputs[i]);
+            System.out.printf("input=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Intuition:
-     * - A palindrome reads the same forward and backward. To solve this problem, we need to explore all possible
-     *   partitions of the string and check if each substring in the partition is a palindrome.
-     * - Use backtracking to generate all possible partitions and validate each substring for being a palindrome.
+
+        /**
+     * Intuition: a partition is built by choosing the first cut, then solving
+     * the same problem for the remaining suffix. If input[startIndex..breakIndex]
+     * is a palindrome, it is safe to place that substring next in the current
+     * partition and recurse from breakIndex + 1. Backtracking removes that choice
+     * so the next possible cut can be tried.
      *
-     * Approach:
-     * 1. Use a helper function to recursively explore all partitions starting from the current index.
-     * 2. For each substring starting from the current index, check if it is a palindrome.
-     * 3. If it is a palindrome, add it to the current path and recursively explore further partitions.
-     * 4. Backtrack by removing the last added substring and continue exploring other possibilities.
-     * 5. Add the valid partition to the result when the end of the string is reached.
+     * Algorithm:
+     *   1. Start with an empty currentPartition and explore cuts from index 0.
+     *   2. For every end index, add the substring only if it is a palindrome.
+     *   3. When startIndex reaches the end, copy the completed partition into result.
      *
-     * Time Complexity: O(n * 2^n)
-     * - There are 2^n possible partitions of the string.
-     * - Checking if a substring is a palindrome takes O(n) in the worst case.
-     * - Copying the current partition to the result takes O(n) as well.
+     * Time:  O(n * 2^n) - there can be exponentially many partitions and palindrome checks cost up to n.
+     * Space: O(n) - the recursion path holds at most n substrings, excluding output.
      *
-     * Space Complexity: O(n)
-     * - The recursion stack and the path list can take up to O(n) space.
-     *
-     * @param input the input string to be partitioned
-     * @return a list of all possible palindromic partitions of the input string
+     * @param input string to partition
+     * @return all palindromic partitions of input
      */
     public List<List<String>> partition(String input) {
         List<List<String>> result = new ArrayList<>();
