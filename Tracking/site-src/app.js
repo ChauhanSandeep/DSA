@@ -361,18 +361,18 @@
   }
 
   function updatePrismTheme(theme) {
-    const dawn = document.getElementById("prism-dawn");
-    const moon = document.getElementById("prism-moon");
-    if (!dawn || !moon) return;
+    const light = document.getElementById("prism-light");
+    const dark = document.getElementById("prism-dark");
+    if (!light || !dark) return;
     if (theme === "dark") {
-      dawn.media = "not all";
-      moon.media = "all";
+      light.media = "not all";
+      dark.media = "all";
     } else if (theme === "light") {
-      dawn.media = "all";
-      moon.media = "not all";
+      light.media = "all";
+      dark.media = "not all";
     } else {
-      dawn.media = "(prefers-color-scheme: light)";
-      moon.media = "(prefers-color-scheme: dark)";
+      light.media = "(prefers-color-scheme: light)";
+      dark.media = "(prefers-color-scheme: dark)";
     }
   }
 

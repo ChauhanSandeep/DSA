@@ -1,0 +1,77 @@
+/*!
+ * github-light.css — Prism.js theme mirroring GitHub's default (light)
+ * source rendering. Colors sourced from primer/github-vscode-theme.
+ *
+ * Palette (GitHub Light Default):
+ *   fg          #24292f   base text
+ *   muted       #6e7781   comment / punctuation
+ *   red         #cf222e   keyword / control flow
+ *   blue        #0550ae   constant / builtin / number
+ *   dark-blue   #0a3069   string
+ *   purple      #8250df   function name / annotation
+ *   orange      #953800   variable / class name
+ *   green       #116329   type name
+ */
+
+pre[class*="language-"],
+code[class*="language-"] {
+  color: #24292f;
+  background: none;
+  font-family: var(--font-code);
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.6;
+  tab-size: 4;
+  hyphens: none;
+  font-size: 13px;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata          { color: #6e7781; font-style: italic; }
+.token.punctuation    { color: #24292f; }
+.token.namespace      { opacity: 0.75; }
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.constant,
+.token.symbol,
+.token.deleted,
+.token.number         { color: #0550ae; }
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted       { color: #0a3069; }
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string  { color: #cf222e; }
+
+.token.atrule,
+.token.attr-value,
+.token.keyword        { color: #cf222e; }
+
+.token.function,
+.token.class-name     { color: #8250df; }
+
+.token.regex,
+.token.variable       { color: #953800; }
+
+.token.important,
+.token.bold           { font-weight: 700; }
+.token.italic         { font-style: italic; }
+
+/* Java-specific niceties */
+.language-java .token.class-name,
+.language-java .token.generics     { color: #953800; }
+.language-java .token.annotation   { color: #8250df; font-style: italic; }

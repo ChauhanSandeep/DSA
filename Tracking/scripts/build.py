@@ -136,12 +136,12 @@ FONT_LINKS = (
 # so there's no light-flash-on-dark-load.
 THEME_INIT = """<script>(function(){try{var t=localStorage.getItem('dsa-tracker.theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>"""
 
-# Prism.js highlighter + rose-pine themes (assets copied by build).
+# Prism.js highlighter + GitHub themes (assets copied by build).
 PRISM_LINKS = (
-    '<link rel="stylesheet" href="{root}assets/prism/rose-pine-dawn.css" '
-    'media="(prefers-color-scheme: light)" id="prism-dawn">'
-    '<link rel="stylesheet" href="{root}assets/prism/rose-pine-moon.css" '
-    'media="(prefers-color-scheme: dark)" id="prism-moon">'
+    '<link rel="stylesheet" href="{root}assets/prism/github-light.css" '
+    'media="(prefers-color-scheme: light)" id="prism-light">'
+    '<link rel="stylesheet" href="{root}assets/prism/github-dark.css" '
+    'media="(prefers-color-scheme: dark)" id="prism-dark">'
 )
 
 

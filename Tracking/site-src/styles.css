@@ -495,6 +495,29 @@ h2 {
 
 /* --- "Reveal my solution" ----------------------------------------------- */
 
+/* The full problem statement block (rendered as <pre class="doc"> so
+   whitespace / line breaks from the Javadoc are preserved). We deliberately
+   use the body font at the normal body size — not the mono default that
+   <pre> would otherwise inherit — so it reads like prose. */
+.doc {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  margin: 8px 0 24px;
+  color: var(--fg-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.doc.mono {
+  font-family: var(--font-code);
+  font-size: 13px;
+}
+
 details.reveal {
   margin-top: 20px;
   background: var(--bg-surface);
