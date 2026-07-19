@@ -2,61 +2,69 @@ package stacksandqueues;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Arrays;
 
 
 /**
  * Problem: Sum of Subarray Minimums
- * Given an array of integers, return the sum of the minimum value of all possible contiguous subarrays.
+ *
+ * For every contiguous subarray, take its minimum value and return the sum of
+ * all those minimums modulo 1,000,000,007. The key is counting how many
+ * subarrays choose each index as their representative minimum.
+ *
+ * Leetcode: https://leetcode.com/problems/sum-of-subarray-minimums/ (Medium)
+ * Rating:   zerotrac 1976
+ * Pattern:  Monotonic stack | Contribution counting | Previous/next smaller
  *
  * Example:
- * Input: arr = [3,1,2,4]
- * Output: 17
- * Explanation:
- * Subarrays = [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4]
- * Minimums =   3,   1,   2,   4,   1,     1,      2,      1,       1,        1
- * Total = 17
+ *   Input:  arr = [3,1,2,4]
+ *   Output: 17
+ *   Why:    the minimums across all ten subarrays add up to 17, with 1 contributing most of them.
  *
- * LeetCode Link: https://leetcode.com/problems/sum-of-subarray-minimums/
+ * Follow-ups:
+ *   1. Sum subarray maximums instead?
+ *      Flip the comparisons and use a monotonic decreasing stack.
+ *   2. Sum subarray ranges, max minus min?
+ *      Compute sum of maximums minus sum of minimums with two contribution passes.
+ *   3. Need stable ownership when equal values repeat?
+ *      Use strict comparison on one side and non-strict on the other to avoid double counting.
+ *   4. Values arrive online and queries ask the current total?
+ *      Maintain a stack of (value,count) groups and the running sum of suffix minimums.
  *
- * Follow-up Questions:
- * 1. Can we find the sum of maximums in subarrays using similar approach?
- *    - Yes, just reverse the comparison logic (use monotonic decreasing stack).
- *    - Related: https://leetcode.com/problems/sum-of-subarray-ranges/
- * 2. Can we do it without stack?
- *    - Naively yes, but that takes O(N²) time. Stack is optimal O(N).
- * 3. Can we find how many subarrays each element is the minimum for?
- *    - Yes. That's the core of this approach using left and right spans.
- * LeetCode Contest Rating: 1976
+ * Related: Sum of Subarray Ranges (2104), Largest Rectangle in Histogram (84).
  */
 public class MinSubarraySum {
 
   private static final int MODULO = (int) 1e9 + 7;
-
   public static void main(String[] args) {
-    int[] nums = {3, 5, 4, 12, 8, 10, 11, 4};
-    System.out.println("Sum of Subarray Minimums: " + new MinSubarraySum().sumSubarrayMins(nums));
+    MinSubarraySum solver = new MinSubarraySum();
+    int[][] inputs = { {}, {3, 1, 2, 4}, {11, 81, 94, 43, 3}, {2, 2, 2} };
+    int[] expected = {0, 17, 444, 12};
+    for (int i = 0; i < inputs.length; i++) {
+      int got = solver.sumSubarrayMins(inputs[i]);
+      System.out.printf("arr=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Computes the sum of the minimum values across all subarrays of the input array.
+    /**
+   * Intuition: count each value by how many subarrays choose it as the minimum.
+   * When an index is popped from the increasing stack, the new top is its left
+   * smaller boundary and the current index is its right smaller boundary, so its
+   * contribution is value * left choices * right choices.
    *
-   * Approach:
-   * - Use a monotonic increasing stack to determine, for each element:
-   *   - The previous smaller element index (left boundary)
-   *   - The next smaller element index (right boundary)
-   * - For an element at index `i`, the total number of subarrays where it is the minimum is:
-   *      (i - previousSmallerIndex) * (nextSmallerIndex - i)
-   * - Its total contribution is:
-   *      nums[i] * leftCount * rightCount
-   * - Sum all such contributions modulo 1e9+7.
+   * Algorithm:
+   *   1. Use an increasing stack of indices with a -1 sentinel.
+   *   2. Pop while the stack top value is greater than the current value.
+   *   3. Add each popped index's contribution from its left and right boundaries.
+   *   4. Flush remaining stack entries using nums.length as the right boundary.
    *
-   * Time Complexity: O(N) — each element is pushed and popped once from the stack.
-   * Space Complexity: O(N) — space used by the stack and intermediate variables.
+   * Time:  O(n) - every index is pushed and popped at most once.
+   * Space: O(n) - the stack can hold all indices.
    *
-   * @param nums the input array
-   * @return sum of subarray minimums modulo 1e9+7
+   * @param nums input array
+   * @return sum of all subarray minimums modulo 1,000,000,007
    */
-  public int sumSubarrayMins(int[] nums) {
+public int sumSubarrayMins(int[] nums) {
       if (nums == null || nums.length == 0) {
           return 0;
       }
@@ -89,13 +97,7 @@ public class MinSubarraySum {
     return (int) totalSum;
   }
 
-    /**
-     * Helper method to compute the contribution of an element at index `midIndex` being the minimum
-     * in all subarrays between indices `leftIndex` and `rightIndex`.
-     *
-     * Formula: value * (number of subarrays where it is minimum)
-     *  ie. value * (midIndex - leftIndex) * (rightIndex - midIndex)
-     */
+    /** Computes one value's contribution from its left and right boundaries. */
     private long computeContribution(int value, int leftIndex, int midIndex, int rightIndex) {
         int leftCombinations = midIndex - leftIndex;
         int rightCombinations = rightIndex - midIndex;

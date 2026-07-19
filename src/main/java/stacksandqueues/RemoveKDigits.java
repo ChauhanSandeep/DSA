@@ -3,43 +3,55 @@ package stacksandqueues;
 import java.util.Stack;
 
 /**
- * Given string num representing a non-negative integer num, and an integer k,
- * return the smallest possible integer after removing k digits from num.
+ * Problem: Remove K Digits
  *
- * Example 1:
- * Input: num = "1432219", k = 3
- * Output: "1219"
- * Explanation: Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest.
+ * Given a non-negative integer as a string, remove exactly k digits so the
+ * remaining number is as small as possible. The output must not contain leading
+ * zeros unless the number itself is zero.
  *
- * Example 2:
- * Input: num = "10200", k = 1
- * Output: "200"
- * Explanation: Remove the leading 1 to form 200.
+ * Leetcode: https://leetcode.com/problems/remove-k-digits/ (Medium)
+ * Rating:   acceptance 37.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Monotonic stack | Greedy digit removal | Leading zero trim
  *
- * LeetCode: https://leetcode.com/problems/remove-k-digits/
+ * Example:
+ *   Input:  num = "1432219", k = 3
+ *   Output: "1219"
+ *   Why:    removing 4, 3, and one 2 lets the smaller digits form 1219, the smallest remaining order.
  *
- * Follow-up Questions:
- * 1. How would you handle very large input strings (e.g., 1,000,000 digits)?
- *    - The stack-based solution is O(n) time and O(n) space, which is efficient enough.
- * 2. What if we need to remove exactly k digits to form the largest possible number?
- *    - We would modify the algorithm to remove smaller digits when a larger digit is found.
- * 3. How would you modify the solution to work with negative numbers?
- *    - We would need to handle the negative sign separately and apply similar logic to the digits.
+ * Follow-ups:
+ *   1. Remove k digits to make the largest possible number?
+ *      Reverse the stack comparison and pop smaller previous digits before larger current digits.
+ *   2. Need lexicographically smallest string with non-digit characters too?
+ *      Use the same monotonic deletion idea with the target ordering over characters.
+ *   3. Need to process a million digits with low overhead?
+ *      Use a char array as the stack and build the answer by slicing it.
+ *   4. Need exactly m digits kept instead of k removed?
+ *      Set k = n - m and run the same greedy removal.
  *
- * Related Problems:
- * - Create Maximum Number (https://leetcode.com/problems/create-maximum-number/)
- * - Monotone Increasing Digits (https://leetcode.com/problems/monotone-increasing-digits/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Create Maximum Number (321), Monotone Increasing Digits (738).
  */
 public class RemoveKDigits {
-    /**
-     * Removes k digits from the number to form the smallest possible number.
+        /**
+     * Intuition: smaller earlier digits make the whole number smaller. When a
+     * new digit is smaller than the stack top, removing that larger previous
+     * digit improves the prefix immediately. Leftover removals are cheapest at
+     * the end of the number.
      *
-     * @param num String representation of the number
-     * @param k Number of digits to remove
-     * @return The smallest possible number as a string after removing k digits
+     * Algorithm:
+     *   1. Handle k = 0 and removing every digit.
+     *   2. Pop larger previous digits while k remains.
+     *   3. Push each current digit.
+     *   4. Remove leftover digits from the tail.
+     *   5. Build the result and trim leading zeros.
+     *
+     * Time:  O(n) - each digit is pushed and popped at most once.
+     * Space: O(n) - stack and result builder store digits.
+     *
+     * @param num non-negative integer represented as a string
+     * @param k number of digits to remove
+     * @return smallest possible number after removing k digits
      */
-    public String removeKdigits(String num, int k) {
+public String removeKdigits(String num, int k) {
         // Edge cases
         if (k == 0) return num;
         if (num.length() == k) return "0";
@@ -145,5 +157,16 @@ public class RemoveKDigits {
 
         // Recurse with k-1
         return removeKdigitsRecursive(newNum, k - 1);
+    }
+
+    public static void main(String[] args) {
+        RemoveKDigits solver = new RemoveKDigits();
+        String[] nums = {"10", "1432219", "10200", "9", "112"};
+        int[] kValues = {2, 3, 1, 1, 1};
+        String[] expected = {"0", "1219", "200", "0", "11"};
+        for (int i = 0; i < nums.length; i++) {
+            String got = solver.removeKdigits(nums[i], kValues[i]);
+            System.out.printf("num=%s k=%d -> %s  expected=%s%n", nums[i], kValues[i], got, expected[i]);
+        }
     }
 }

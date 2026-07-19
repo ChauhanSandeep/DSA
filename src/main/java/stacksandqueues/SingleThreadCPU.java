@@ -7,50 +7,53 @@ import java.util.PriorityQueue;
 /**
  * Problem: Single-Threaded CPU
  *
- * You are given a list of tasks where each task is represented by an array [enqueueTime, processingTime].
- * The CPU can process only one task at a time, and tasks are processed in the following order:
- *   1. The task with the shortest processing time is selected.
- *   2. If multiple tasks have the same processing time, choose the task with the smallest index.
- * The CPU is initially idle. If no tasks are available at the current time, it fast-forwards to the next task’s enqueue time.
+ * A CPU receives tasks [enqueueTime, processingTime] and can run one task at a
+ * time. Whenever it is free, it chooses the available task with the shortest
+ * processing time, breaking ties by original index. Return the processing order.
  *
- * Return the order in which the CPU will process the tasks.
+ * Leetcode: https://leetcode.com/problems/single-threaded-cpu/ (Medium)
+ * Rating:   zerotrac 1798
+ * Pattern:  Sorting | Priority queue | Event simulation
  *
  * Example:
- * Input: tasks = [[1,2],[2,4],[3,2],[4,1]]
- * Output: [0,2,3,1]
+ *   Input:  tasks = [[1,2],[2,4],[3,2],[4,1]]
+ *   Output: [0,2,3,1]
+ *   Why:    after task 0, the CPU always picks the shortest available task, breaking ties by index.
  *
- * Explanation:
- * - Task 0 arrives at t=1 and is processed first (2 units).
- * - Task 2 and 3 arrive during this time; task 2 has smaller processing time and is picked next.
- * - Then task 3.
- * - Finally, task 1 is processed.
+ * Follow-ups:
+ *   1. Tasks are preemptible when a shorter task arrives?
+ *      Simulate shortest-remaining-time-first with remaining durations and arrival events.
+ *   2. Tasks have priority levels before duration?
+ *      Put priority before processing time in the heap comparator.
+ *   3. Multiple identical CPUs are available?
+ *      Use one heap for available tasks and another for machine availability times.
+ *   4. Need average waiting time too?
+ *      Record each task's start time when popped and accumulate start - enqueueTime.
  *
- * Leetcode Link: https://leetcode.com/problems/single-threaded-cpu/
- *
- * Follow-up Questions:
- * 1. What if tasks can have priority levels?
- *    - Use a custom comparator to include priority in heap logic.
- * 2. What if tasks can be interrupted (preemption)?
- *    - Requires simulation using a priority queue with current job tracking.
- * LeetCode Contest Rating: 1798
+ * Related: Task Scheduler (621), Meeting Rooms II (253).
  */
 public class SingleThreadCPU {
 
-    /**
-     * Returns the order in which the CPU will process the tasks.
+        /**
+     * Intuition: the CPU can choose only among tasks that have arrived. Sorting
+     * by enqueue time reveals when tasks become available, and the priority queue
+     * holds currently available tasks by shortest processing time and then index.
+     * If the queue is empty, the CPU jumps to the next enqueue time.
      *
      * Algorithm:
-     * 1. Sort all tasks by enqueue time.
-     * 2. Use a min-heap (PriorityQueue) to simulate task picking based on:
-     *    - Shortest processing time.
-     *    - Then, smallest index in case of tie.
-     * 3. Track current CPU time and push all eligible tasks into the heap.
-     * 4. Process from heap, updating current time and result list.
+     *   1. Wrap each task with its original index.
+     *   2. Sort wrapped tasks by enqueue time.
+     *   3. Add all tasks available at `currentTime` to the heap.
+     *   4. If the heap is empty, jump `currentTime` to the next task.
+     *   5. Poll the best task, record its index, and advance time.
      *
-     * Time Complexity: O(N log N) — sorting and heap operations
-     * Space Complexity: O(N) — heap + result array
+     * Time:  O(n log n) - sorting and heap operations dominate.
+     * Space: O(n) - wrapped tasks, heap, and result array.
+     *
+     * @param tasks tasks[i] = [enqueueTime, processingTime]
+     * @return original task indices in processing order
      */
-    public int[] getOrder(int[][] tasks) {
+public int[] getOrder(int[][] tasks) {
         int taskCount = tasks.length;
         int[] result = new int[taskCount];
 
@@ -121,6 +124,16 @@ public class SingleThreadCPU {
         @Override
         public int hashCode() {
             return Objects.hash(index, enqueueTime, processingTime);
+        }
+    }
+
+    public static void main(String[] args) {
+        SingleThreadCPU solver = new SingleThreadCPU();
+        int[][][] inputs = { {}, { {1, 2}, {2, 4}, {3, 2}, {4, 1} }, { {7, 10}, {7, 12}, {7, 5}, {7, 4}, {7, 2} } };
+        String[] expected = {"[]", "[0, 2, 3, 1]", "[4, 3, 2, 0, 1]"};
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.getOrder(inputs[i]);
+            System.out.printf("tasks=%s -> %s  expected=%s%n", Arrays.deepToString(inputs[i]), Arrays.toString(got), expected[i]);
         }
     }
 }

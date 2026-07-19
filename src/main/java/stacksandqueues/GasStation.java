@@ -1,63 +1,57 @@
 package stacksandqueues;
 
+import java.util.Arrays;
+
 /**
- * Gas Station
+ * Problem: Gas Station
  *
- * Problem Statement:
- * There are n gas stations along a circular route, where the amount of gas at station i is gas[i].
- * You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i
- * to its next station (i + 1). You begin the journey with an empty tank at one of the gas stations.
+ * Gas stations form a circular route. At station i you gain gas[i] fuel and
+ * spend cost[i] fuel to drive to the next station. Return the unique start
+ * index that completes the circle, or -1 if total fuel is insufficient.
  *
- * Given two integer arrays gas and cost, return the starting gas station's index if you can travel
- * around the circuit once in the clockwise direction, otherwise return -1.
- * If there exists a solution, it is guaranteed to be unique.
+ * Leetcode: https://leetcode.com/problems/gas-station/ (Medium)
+ * Rating:   acceptance 48.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Prefix deficit | Circular route
  *
  * Example:
- * Input: gas = [1,2,3,4,5], cost = [3,4,5,1,2]
- * Output: 3
- * Explanation: Start at station 3 (index 3) and fill up with 4 unit of gas.
- * Travel to station 4: tank = 0 + 4 - 1 = 3, then add 5 gas: tank = 3 + 5 = 8
- * Travel to station 0: tank = 8 - 2 + 1 = 7
- * Travel to station 1: tank = 7 - 3 + 2 = 6
- * Travel to station 2: tank = 6 - 4 + 3 = 5
- * Travel to station 3: tank = 5 - 5 = 0. Return to starting point with exactly enough gas.
+ *   Input:  gas = [2,3,4], cost = [3,4,3]
+ *   Output: -1
+ *   Why:    total gas is less than total cost, so the car must run out before completing the circle.
  *
- * LeetCode Link: https://leetcode.com/problems/gas-station
+ * Follow-ups:
+ *   1. Return all valid starts when uniqueness is not guaranteed?
+ *      Compute circular prefix minima and collect starts whose rotated prefix never drops below zero.
+ *   2. Tank capacity is limited?
+ *      Simulate with capped fuel; total surplus is no longer sufficient, so binary/search candidates.
+ *   3. Costs change over time from traffic?
+ *      Model cost as edge weights by departure time and solve with time-dependent shortest paths.
+ *   4. Need the minimum initial fuel for a fixed start?
+ *      Track the minimum prefix balance and start with its absolute deficit.
  *
- * Follow-up Questions:
- * 1. What if there are multiple valid starting points?
- *    Answer: Problem guarantees unique solution, but we could modify to return all valid starts.
- * 2. What if we want to find the path that uses minimum gas?
- *    Answer: Use dynamic programming or modify greedy to track minimum consumption path.
- * 3. How would you handle negative gas values (gas leaks)?
- *    Answer: Treat as additional cost and ensure total feasibility check accounts for leaks.
- *    Related: https://leetcode.com/problems/minimum-number-of-refueling-stops/
- * 4. What about optimizing for real-time traffic conditions?
- *    Answer: Use weighted costs and dynamic recalculation as conditions change.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Minimum Number of Refueling Stops (871).
  */
 public class GasStation {
 
-  /**
-   * Finds the starting gas station index using optimal greedy approach.
+    /**
+   * Intuition: total gas decides if any solution exists, while local deficits
+   * decide which starts are impossible. If the tank drops below zero at i, then
+   * every candidate from `startingStation` through i also fails, so the next
+   * possible start is i + 1.
    *
-   * Algorithm: One-Pass Greedy with Total Feasibility Check
-   * Step 1: Check if total gas >= total cost (necessary condition for solution)
-   * Step 2: Traverse stations tracking current fuel balance
-   * Step 3: When balance goes negative, reset start to next station and balance to 0
-   * Step 4: Return the final starting index (guaranteed valid if step 1 passed)
-   * Step 5: Key insight: if we fail at station i starting from j, then j+1...i cannot be valid starts
+   * Algorithm:
+   *   1. Scan stations while accumulating total gas, total cost, and current tank.
+   *   2. Add gas[i] - cost[i] to the current tank.
+   *   3. When current tank is negative, reset start to i + 1 and tank to 0.
+   *   4. Return the start only if total gas is at least total cost.
    *
-   * Time Complexity: O(n) where n is number of gas stations
-   * - Single pass through all stations
-   * - Constant time operations per station
-   * Space Complexity: O(1) using only a few variables
+   * Time:  O(n) - one pass over the stations.
+   * Space: O(1) - only running totals and one candidate start are stored.
    *
-   * @param gas array where gas[i] is amount of gas at station i
-   * @param cost array where cost[i] is gas needed to travel from station i to i+1
-   * @return starting station index if circuit possible, -1 otherwise
+   * @param gas amount of fuel available at each station
+   * @param cost fuel needed to travel to the next station
+   * @return starting station index if possible, otherwise -1
    */
-  public static int canCompleteCircuit(int[] gas, int[] cost) {
+public static int canCompleteCircuit(int[] gas, int[] cost) {
     if (gas == null || cost == null || gas.length != cost.length) {
       return -1;
     }
@@ -102,12 +96,13 @@ public class GasStation {
     // Step 4: Return result based on total feasibility
     return totalGas >= totalCost ? startingStation : -1;
   }
-
   public static void main(String[] args) {
-    int[] gas = {1, 2, 3, 4, 5};
-    int[] cost = {3, 4, 5, 1, 2};
-
-    int startIndex = canCompleteCircuit(gas, cost);
-    System.out.println("Start Index: " + startIndex); // Expected Output: 3
+    int[][] gasCases = { {2, 3, 4}, {1, 2, 3, 4, 5}, {1}, {5} };
+    int[][] costCases = { {3, 4, 3}, {3, 4, 5, 1, 2}, {2}, {4} };
+    int[] expected = {-1, 3, -1, 0};
+    for (int i = 0; i < gasCases.length; i++) {
+      int got = canCompleteCircuit(gasCases[i], costCases[i]);
+      System.out.printf("gas=%s cost=%s -> %d  expected=%d%n", Arrays.toString(gasCases[i]), Arrays.toString(costCases[i]), got, expected[i]);
+    }
   }
 }

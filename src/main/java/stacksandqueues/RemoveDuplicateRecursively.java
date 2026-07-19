@@ -5,54 +5,61 @@ import java.util.*;
 /**
  * Problem: Remove All Adjacent Duplicates in String II
  *
- * Given a string `s` and an integer `k`, remove all adjacent duplicates in the
- * string where the same character repeats exactly `k` times. Repeat the process
- * until no more k-length adjacent duplicates remain.
+ * Given a string and an integer k, repeatedly remove any adjacent run of exactly
+ * k equal characters until no such run remains. Return the final string after
+ * all cascading removals.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/
+ * Leetcode: https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/ (Medium)
+ * Rating:   zerotrac 1542
+ * Pattern:  Stack | Run-length encoding | Cascading deletion
  *
- * 🧪 Example:
- * Input:  s = "pbbcggttciiippooaais", k = 2
- * Output: "ps"
- * Explanation:
- * - "pbbcggttciiippooaais" → "pcggttciiippooaais" (remove "bb")
- * similar steps continue until no more k-length duplicates remain.
+ * Example:
+ *   Input:  s = "pbbcggttciiippooaais", k = 2
+ *   Output: "ps"
+ *   Why:    removing pairs such as bb, cc, and later joined pairs leaves only p and s.
  *
- * 🎯 Follow-up Questions:
- * 1. What if `k = 1`? ➤ All characters will be removed.
- * 2. What if we want to remove all adjacent duplicates regardless of count? ➤ Use two-pointer approach.
- * 3. Can we do it in-place? ➤ Yes, with character array + index pointer stack.
- * LeetCode Contest Rating: 1542
+ * Follow-ups:
+ *   1. Need to remove runs with length at least k instead of exactly k?
+ *      Continue counting full runs and discard groups whose final count reaches k or more.
+ *   2. Need O(1) extra space besides the character array?
+ *      Use the input char array as a stack plus a parallel count array or encoded counts.
+ *   3. Need all intermediate strings after each removal?
+ *      Store removal events while simulating, but worst-case output can be O(n^2).
+ *   4. The input is a stream?
+ *      Keep the run stack online; output is only safe once future characters cannot merge with the top run.
+ *
+ * Related: Remove All Adjacent Duplicates in String (1047), Remove K Digits (402).
  */
 public class RemoveDuplicateRecursively {
-
     public static void main(String[] args) {
-        String input = "pbbcggttciiippooaais";
-        int k = 2;
-
-        String result = removeAdjacentDuplicates(input, k);
-        System.out.println("After removing duplicates (k = " + k + "): " + result);
+        String[] inputs = {"", "abcd", "deeedbbcccbdaa", "pbbcggttciiippooaais"};
+        int[] kValues = {2, 2, 3, 2};
+        String[] expected = {"", "abcd", "aa", "ps"};
+        for (int i = 0; i < inputs.length; i++) {
+            String got = removeAdjacentDuplicates(inputs[i], kValues[i]);
+            System.out.printf("s=%s k=%d -> %s  expected=%s%n", inputs[i], kValues[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Removes all adjacent duplicates in the input string where a character appears exactly `k` times.
+        /**
+     * Intuition: the only run that can change is the run at the top of the stack.
+     * Store each surviving run as character plus count; when a count reaches k,
+     * pop it so neighboring runs can become adjacent and cascade naturally.
      *
      * Algorithm:
-     * - Use a stack to track characters and their frequencies.
-     * - On encountering a character:
-     *    • If it matches the top, increment frequency.
-     *    • If frequency == k, pop from stack (remove).
-     *    • Else, push new character with count = 1.
-     * - Build the result by repeating each character by its frequency.
+     *   1. Return empty string for null, empty, or k <= 1.
+     *   2. Merge each character with the top run when it matches.
+     *   3. Pop a run as soon as its count reaches k.
+     *   4. Rebuild the string from the remaining stack entries.
      *
-     * @param str The input string.
-     * @param k   The number of adjacent duplicates to remove.
-     * @return A string with all adjacent k-length duplicates removed.
+     * Time:  O(n) - each character is processed once.
+     * Space: O(n) - the stack can store all characters.
      *
-     * Time Complexity: O(N), where N = str.length()
-     * Space Complexity: O(N), for the stack storing char-count pairs.
+     * @param str input string
+     * @param k run length to remove
+     * @return string after all adjacent k-duplicate removals
      */
-    public static String removeAdjacentDuplicates(String str, int k) {
+public static String removeAdjacentDuplicates(String str, int k) {
         if (str == null || str.isEmpty() || k <= 1) {
             return ""; // Edge case: nothing to process if k ≤ 1 or input is invalid
         }

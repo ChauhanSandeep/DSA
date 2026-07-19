@@ -3,50 +3,63 @@ package stacksandqueues;
 import java.util.*;
 
 /**
- * This class provides solutions to find the first non-repeating character in a given string.
- * - A non-repeating character is a character that appears only once in the string.
+ * Problem: First Non-Repeating Character
  *
- * <p><b>Approach:</b></p>
- * - The `findFirstUniqueCharacter` method finds the first non-repeating character in a string
- *   using a LinkedHashMap for maintaining insertion order.
- * - The `findFirstUniqueInStream` method finds the first non-repeating character in a real-time
- *   streaming fashion using a HashMap and a Queue.
+ * Given characters in a fixed string or in arrival order from a stream, report
+ * the earliest character whose frequency is exactly one. The fixed-string
+ * version returns that character; the stream version reports the current first
+ * unique character after every input character.
  *
- * <p><b>Time Complexity:</b></p>
- * - `findFirstUniqueCharacter`: O(N) (single pass for counting, single pass for lookup)
- * - `findFirstUniqueInStream`: O(N) (each character is processed at most twice)
  *
- * <p><b>Space Complexity:</b> O(N) for storing character counts.</p>
+ * Leetcode: https://leetcode.com/problems/first-unique-character-in-a-string/ (Easy)
+ * Pattern:  Hash map | Queue | Insertion order
  *
- * <p>LeetCode Problem Link:
- * <a href="https://leetcode.com/problems/first-unique-character-in-a-string/">First Unique Character in a String</a>
- * </p>
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  stream = "aabc"
+ *   Output: "a#bb"
+ *   Why:    after the second 'a' there is no unique character, so that prefix outputs '#'.
+ *
+ * Follow-ups:
+ *   1. Need Unicode code points instead of Java char units?
+ *      Iterate over code points and store Integer keys rather than Character keys.
+ *   2. The stream is infinite and memory must be bounded?
+ *      Exact answers need all candidates; approximate only with eviction or sketches.
+ *   3. Need deletion events as well as insertions?
+ *      Maintain counts plus a linked order structure that can re-activate old characters.
+ *   4. Need the first unique index instead of character?
+ *      Store each character's first index with its count and scan insertion order.
  */
 public class FirstNonRepeating {
-
     public static void main(String[] args) {
-        System.out.println(findFirstUniqueCharacter("abcdefghija")); // Output: b
-        System.out.println(findFirstUniqueCharacter("hello"));       // Output: h
-        System.out.println(findFirstUniqueCharacter("Java"));        // Output: J
-        System.out.println(findFirstUniqueCharacter("simplest"));    // Output: i
-
-        processCharacterStream("aabc");
+        String[] inputs = {"abcdefghija", "hello", "aabb"};
+        String[] expected = {"b", "h", "throws"};
+        for (int i = 0; i < inputs.length; i++) {
+            String got;
+            try { got = String.valueOf(findFirstUniqueCharacter(inputs[i])); }
+            catch (NoSuchElementException ex) { got = "throws"; }
+            System.out.printf("input=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Finds the first non-repeating character in a given string.
-     * Approach:
-     * - Use a LinkedHashMap to keep track of character frequencies while preserving insertion order.
-     * - Iterate through the map to find the first character with a frequency of 1.
+        /**
+     * Intuition: the answer needs final frequency and original order. A
+     * LinkedHashMap counts characters while preserving first-seen order, so the
+     * first entry with count one after counting is the first non-repeating
+     * character.
      *
-     * Time complexity: O(N) for counting characters and O(N) for finding the first unique character.
+     * Algorithm:
+     *   1. Count every character in a LinkedHashMap.
+     *   2. Iterate entries in first-seen order.
+     *   3. Return the first character whose count is one.
+     *   4. Throw when no unique character exists.
      *
-     * @param input The input string.
-     * @return The first non-repeating character.
-     * @throws NoSuchElementException If no unique character is found.
+     * Time:  O(n) - one count pass plus one distinct-character scan.
+     * Space: O(u) - one entry per distinct character.
+     *
+     * @param input input string to inspect
+     * @return first character that appears exactly once
      */
-    public static char findFirstUniqueCharacter(String input) {
+public static char findFirstUniqueCharacter(String input) {
         // LinkedHashMap is used because it maintains insertion order and allows O(1) access
         // It do it by using a doubly linked list internally which is used to maintain the order
         Map<Character, Integer> charFrequency = new LinkedHashMap<>();

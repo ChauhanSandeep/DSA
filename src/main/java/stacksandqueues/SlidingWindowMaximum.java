@@ -2,54 +2,57 @@ package stacksandqueues;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Arrays;
 
 /**
- * You are given an array of integers nums, there is a sliding window of size k
- * which is moving from the very left of the array to the very right.
- * You can only see the k numbers in the window. Each time the sliding window moves
- * right by one position. Return the max sliding window.
+ * Problem: Sliding Window Maximum
  *
- * Example 1:
- * Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
- * Output: [3,3,5,5,6,7]
- * Explanation:
- * Window position                Max
- * ---------------               -----
- * [1  3  -1] -3  5  3  6  7       3
- *  1 [3  -1  -3] 5  3  6  7       3
- *  1  3 [-1  -3  5] 3  6  7       5
- *  1  3  -1 [-3  5  3] 6  7       5
- *  1  3  -1  -3 [5  3  6] 7       6
- *  1  3  -1  -3  5 [3  6  7]      7
+ * A window of size k moves from left to right across an integer array. For each
+ * window position, return the maximum value visible inside that window. The
+ * output has one value for every full window.
  *
- * Example 2:
- * Input: nums = [1,-1], k = 1
- * Output: [1,-1]
+ * Leetcode: https://leetcode.com/problems/sliding-window-maximum/ (Hard)
+ * Rating:   acceptance 49.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Monotonic deque | Sliding window | Range maximum
  *
- * LeetCode: https://leetcode.com/problems/sliding-window-maximum/
+ * Example:
+ *   Input:  nums = [1,3,-1,-3,5,3,6,7], k = 3
+ *   Output: [3,3,5,5,6,7]
+ *   Why:    the six length-3 windows have maximums 3, 3, 5, 5, 6, and 7 in order.
  *
- * Follow-up Questions:
- * 1. How would you modify your solution to find the minimum in each sliding window?
- *    - We can use a similar approach but maintain a monotonically increasing deque.
- * 2. What if we need to find both min and max in each window efficiently?
- *    - We can use two deques to track both min and max simultaneously.
- * 3. How would you handle very large input arrays that don't fit in memory?
- *    - We could process the array in chunks that fit in memory.
+ * Follow-ups:
+ *   1. Need sliding window minimum instead?
+ *      Reverse the deque comparison to keep values increasing.
+ *   2. Need both min and max in each window?
+ *      Maintain two deques, one decreasing for max and one increasing for min.
+ *   3. Need arbitrary range maximum queries after preprocessing?
+ *      Use a sparse table for static arrays or a segment tree for updates.
+ *   4. The input is a stream?
+ *      Keep the same deque of candidate indices and expire indices older than k.
  *
- * Related Problems:
- * - Minimum Window Substring (https://leetcode.com/problems/minimum-window-substring/)
- * - Longest Substring Without Repeating Characters (https://leetcode.com/problems/longest-substring-without-repeating-characters/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Sliding Window Median (480), Constrained Subsequence Sum (1425).
  */
 public class SlidingWindowMaximum {
-    /**
-     * Finds the maximum in each sliding window using a deque.
+        /**
+     * Intuition: any smaller value behind a newer larger value can never become
+     * the window maximum. The deque stores candidate indices in decreasing value
+     * order, so its front is always the maximum for the current window.
      *
-     * @param nums The input array of integers
-     * @param k The size of the sliding window
-     * @return An array containing the maximum of each window
+     * Algorithm:
+     *   1. Scan indices from left to right.
+     *   2. Remove indices that are outside the current window.
+     *   3. Remove smaller values from the back of the deque.
+     *   4. Add the current index.
+     *   5. Record the front value once the first full window exists.
+     *
+     * Time:  O(n) - each index enters and leaves the deque at most once.
+     * Space: O(k) - the deque stores candidates from the window.
+     *
+     * @param nums input array
+     * @param k window size
+     * @return maximum value for each full window
      */
-    public int[] maxSlidingWindow(int[] nums, int k) {
+public int[] maxSlidingWindow(int[] nums, int k) {
         if (nums == null || k <= 0) {
             return new int[0];
         }
@@ -236,5 +239,16 @@ public class SlidingWindowMaximum {
         }
 
         return minLength == Integer.MAX_VALUE ? 0 : minLength;
+    }
+
+    public static void main(String[] args) {
+        SlidingWindowMaximum solver = new SlidingWindowMaximum();
+        int[][] inputs = { {1}, {1, 3, -1, -3, 5, 3, 6, 7}, {9, 11}, {4, -2} };
+        int[] kValues = {1, 3, 2, 1};
+        String[] expected = {"[1]", "[3, 3, 5, 5, 6, 7]", "[11]", "[4, -2]"};
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.maxSlidingWindow(inputs[i], kValues[i]);
+            System.out.printf("nums=%s k=%d -> %s  expected=%s%n", Arrays.toString(inputs[i]), kValues[i], Arrays.toString(got), expected[i]);
+        }
     }
 }

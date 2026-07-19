@@ -1,48 +1,47 @@
 package stacksandqueues;
 
 import java.util.Stack;
+import java.util.Arrays;
 
 
 /**
- * Leetcode Problem: https://leetcode.com/problems/implement-queue-using-stacks/
+ * Problem: Implement Queue Using Stacks
  *
- * Problem Statement:
- * Implement a first-in-first-out (FIFO) queue using only two stacks.
- * The implemented queue should support all the standard operations of a queue:
- * `push(x)`, `pop()`, `peek()`, and `empty()`.
+ * Implement a FIFO queue using only stack operations. `push` adds to the back,
+ * while `pop` and `peek` must return the oldest still-present element. This
+ * implementation returns -1 for pop/peek on an empty queue.
+ *
+ * Leetcode: https://leetcode.com/problems/implement-queue-using-stacks/ (Easy)
+ * Rating:   acceptance 70.1% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Stack | Amortized analysis | Two-stack queue
  *
  * Example:
- * Input:
- * QueueUsingStacks q = new QueueUsingStacks();
- * q.push(1);
- * q.push(2);
- * q.pop();   // returns 1
- * q.empty(); // returns false
+ *   Input:  push(1), push(2), peek(), pop(), empty()
+ *   Output: 1, 1, false
+ *   Why:    peek and pop both return 1 because moving to the output stack reverses [1,2] into FIFO order.
  *
- * Follow-up Questions:
- * 1. Can we optimize to have both push and pop in O(1) worst case?
- *    → No. If you want to keep operations purely stack-based, one of the operations will take O(n) in the worst case.
- * 2. Can we do this using a single stack?
- *    → It's also possible to implement a queue using just **one stack** by leveraging **recursion**
- *    to simulate FIFO behavior.
+ * Follow-ups:
+ *   1. Can every operation be O(1) worst-case with only two ordinary stacks?
+ *      Not with the simple transfer model; use incremental rebuilding for real-time queues.
+ *   2. Implement the queue with one stack?
+ *      Use recursion to reach the bottom element, then rebuild while unwinding.
+ *   3. Make it thread-safe?
+ *      Guard both stacks with one lock or use a concurrent queue instead.
+ *   4. Support `size()` in O(1)?
+ *      Maintain a counter updated on successful push/pop.
  *
- *    ➤ Core Idea:
- *    - To perform `pop()` or `peek()`, make recursive call to pop elements until reaching the **bottom-most element**
- *      (which is the front of the queue).
- *    - Return that element and **rebuild the stack** while unwinding the recursion.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Implement Stack using Queues (225), Design Circular Queue (622).
  */
 public class QueueUsingStack {
-
   public static void main(String[] args) {
+    QueueUsingStacks emptyQueue = new QueueUsingStacks();
+    Object[] emptyOutputs = {emptyQueue.pop(), emptyQueue.peek(), emptyQueue.empty()};
+    System.out.printf("operations=pop,peek,empty -> %s  expected=[-1, -1, true]%n", Arrays.toString(emptyOutputs));
     QueueUsingStacks queue = new QueueUsingStacks();
-    queue.push(2);
-    queue.push(3);
-    System.out.println(queue.pop()); // Expected: 2
-    queue.push(10);
-    System.out.println(queue.pop()); // Expected: 3
-    System.out.println(queue.pop()); // Expected: 10
-    System.out.println(queue.pop()); // Expected: -1 (Empty queue)
+    queue.push(2); queue.push(3); int firstPop = queue.pop(); queue.push(10);
+    int firstPeek = queue.peek(); int secondPop = queue.pop(); int thirdPop = queue.pop(); int fourthPop = queue.pop();
+    int[] outputs = {firstPop, firstPeek, secondPop, thirdPop, fourthPop};
+    System.out.printf("operations=push2,push3,pop,push10,peek,pop,pop,pop -> %s  expected=[2, 3, 3, 10, -1]%n", Arrays.toString(outputs));
   }
 }
 

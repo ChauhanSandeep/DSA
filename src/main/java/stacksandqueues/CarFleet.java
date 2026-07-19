@@ -5,35 +5,30 @@ import java.util.Arrays;
 /**
  * Problem: Car Fleet
  *
- * There are n cars going to the same destination along a one-lane road. The destination is target miles away.
- * You are given two integer arrays position and speed of length n, where position[i] is the position of the ith car
- * and speed[i] is the speed of the ith car (in miles per hour).
- * A car cannot pass another car, but it can catch up and drive bumper to bumper at the same speed.
- * The faster car will slow down to match the slower car's speed. The distance between these two cars is ignored.
- * A car fleet is a car or cars driving next to each other. The speed of the car fleet is the speed of the slowest car in the fleet.
- * Return the number of car fleets that will arrive at the destination.
+ * There are n cars going to the same destination along a one-lane road. A car
+ * cannot pass another car, but it can catch up and drive bumper to bumper at
+ * the slower car's speed. Return how many car fleets arrive at the destination.
+ *
+ * Leetcode: https://leetcode.com/problems/car-fleet/ (Medium)
+ * Rating:   zerotrac 1678
+ * Pattern:  Sorting | Greedy from target | Fleet merge by arrival time
  *
  * Example:
- * Input: target = 12, 
- * position = [10,8, 0, 5, 3], 
- * speed =    [2, 4, 1, 1, 3]
- * Output: 3
- * Explanation: Cars starting at 10 and 8 become a fleet, meeting at 12. Car at 0 forms fleet 1.
- * Cars at 5 and 3 become a fleet, meeting before 12. So there are 3 fleets.
+ *   Input:  target = 12, position = [10,8,0,5,3], speed = [2,4,1,1,3]
+ *   Output: 3
+ *   Why:    cars at 10 and 8 merge, cars at 5 and 3 merge, and car at 0 arrives as its own fleet.
  *
- * LeetCode: https://leetcode.com/problems/car-fleet
+ * Follow-ups:
+ *   1. Need the composition of each fleet, not just the count?
+ *      Store fleet members while scanning cars from nearest to farthest.
+ *   2. Cars may change lanes and pass?
+ *      The greedy merge no longer applies; model lanes and passing rules as a simulation.
+ *   3. Speeds can change over time?
+ *      Replace constant arrival time with piecewise travel-time functions and compare catch-up events.
+ *   4. Need collision times between fleets?
+ *      Use the same reverse scan as Car Fleet II with a stack of candidate fleets.
  *
- * Follow-up Questions:
- * 1. What if cars can change lanes to overtake?
- *    Answer: Problem becomes significantly more complex, requiring simulation of lane changes.
- *
- * 2. How would you handle different target destinations for different cars?
- *    Answer: Track each car's individual journey and group by common destinations.
- *
- * 3. What if cars have different acceleration capabilities?
- *    Answer: Use physics equations with variable acceleration instead of constant speed.
- *    Related: https://leetcode.com/problems/race-car/
- * LeetCode Contest Rating: 1678
+ * Related: Car Fleet II (1776), Asteroid Collision (735).
  */
 public class CarFleet {
 
@@ -86,25 +81,27 @@ public class CarFleet {
         return fleets;
     }
 
-    /**
-     * Optimized single-pass approach after sorting.
-     * * Algorithm:
-     * 1. Create an array of indices from 0 to n-1.
-     * 2. Sort this index array based on the values of the `position` array in descending order. This allows us to process
-     * cars from closest to furthest away from the destination without creating new objects or arrays for position and speed.
-     * 3. Initialize a fleet counter to 0 and a variable `lastFleetTime` to track the time of the last confirmed fleet leader.
-     * 4. Iterate through the sorted indices. For each index, calculate the time for that car to reach the target.
-     * 5. Compare the current car's time with `lastFleetTime`. If the current car's time is strictly greater, it means it will
-     * arrive later and form a new, independent fleet.
-     * 6. If a new fleet is formed, increment the fleet counter and update `lastFleetTime` to the current car's time.
-     * 7. If the current car's time is less than or equal to `lastFleetTime`, it will eventually join the existing fleet. No
-     * action is needed other than continuing the loop.
-     * 8. Return the total number of fleets counted.
+        /**
+     * Intuition: after sorting cars from closest to farthest from the target,
+     * each car only cares about the fleet directly ahead. If its solo arrival
+     * time is less than or equal to `lastFleetTime`, it catches that fleet; if it
+     * is larger, it cannot catch up and becomes a new fleet.
      *
-     * Time Complexity: O(n log n) due to sorting
-     * Space Complexity: O(n) for the index array
+     * Algorithm:
+     *   1. Build indices 0..n-1.
+     *   2. Sort indices by position descending.
+     *   3. Compute each car's time to target in that order.
+     *   4. Count a new fleet whenever timeToTarget exceeds `lastFleetTime`.
+     *
+     * Time:  O(n log n) - sorting dominates the scan.
+     * Space: O(n) - the index array stores all cars.
+     *
+     * @param target destination position
+     * @param position starting position for each car
+     * @param speed speed for each car
+     * @return number of fleets reaching the target
      */
-    public int carFleetOptimized(int target, int[] position, int[] speed) {
+public int carFleetOptimized(int target, int[] position, int[] speed) {
         int size = position.length;
         if (size <= 1) return size;
 
@@ -142,6 +139,18 @@ public class CarFleet {
         Car(double position, double timeToTarget) {
             this.position = position;
             this.timeToTarget = timeToTarget;
+        }
+    }
+
+    public static void main(String[] args) {
+        CarFleet solver = new CarFleet();
+        int[] targets = {12, 10, 100};
+        int[][] positions = { {10, 8, 0, 5, 3}, {3}, {0, 2, 4} };
+        int[][] speeds = { {2, 4, 1, 1, 3}, {3}, {4, 2, 1} };
+        int[] expected = {3, 1, 1};
+        for (int i = 0; i < targets.length; i++) {
+            int got = solver.carFleetOptimized(targets[i], positions[i], speeds[i]);
+            System.out.printf("target=%d position=%s speed=%s -> %d  expected=%d%n", targets[i], Arrays.toString(positions[i]), Arrays.toString(speeds[i]), got, expected[i]);
         }
     }
 }
