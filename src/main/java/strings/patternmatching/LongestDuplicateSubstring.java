@@ -3,44 +3,66 @@ package strings.patternmatching;
 import java.util.*;
 
 /**
- * 1044. Longest Duplicate Substring
+ * Problem: Longest Duplicate Substring
  *
- * Problem: Given a string s, return any duplicate substring that has the longest length.
- * If no duplicate substring exists, return empty string.
+ * Given a string, return any longest substring that appears at least twice. The
+ * two occurrences may overlap. If no duplicate substring exists, return the
+ * empty string.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-duplicate-substring/ (Hard)
+ * Rating:   contest Elo 2429
+ * Pattern:  Strings | Binary search on answer | Rolling hash
  *
  * Example:
- * Input: s = "banana"
- * Output: "ana"
+ *   Input:  s = "banana"
+ *   Output: "ana"
+ *   Why:    "ana" appears at indices 1 and 3, and no longer substring repeats.
  *
- * LeetCode: https://leetcode.com/problems/longest-duplicate-substring
+ * Follow-ups:
+ *   1. How do you avoid hash-collision risk completely?
+ *      Use a suffix array or suffix automaton and compare neighboring suffixes.
+ *   2. How would you return all maximum duplicate substrings?
+ *      Collect every verified duplicate at the final maximum length.
+ *   3. How can this extend to many strings?
+ *      Build a generalized suffix array/tree and require suffixes from different strings.
  *
- * Follow-up questions:
- * Q: How to handle very large strings efficiently?
- * A: Use suffix arrays with LCP (Longest Common Prefix) arrays for O(n) space.
- *
- * Q: Can we find all duplicate substrings above a certain length?
- * A: Use rolling hash with different moduli or suffix array techniques.
- *
- * Q: How to extend to multiple strings (longest common substring)?
- * A: Generalize suffix array approach or use advanced string matching.
- * LeetCode Contest Rating: 2429
+ * Related: Repeated DNA Sequences (187), Longest Common Substring.
  */
 public class LongestDuplicateSubstring {
+
+    public static void main(String[] args) {
+        LongestDuplicateSubstring solver = new LongestDuplicateSubstring();
+
+        String[] inputs = {"banana", "abcd", "aaaaa"};
+        String[] expected = {"ana", "", "aaaa"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.longestDupSubstring(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n",
+                inputs[i], got, expected[i]);
+        }
+    }
 
     private static final int BASE = 256;
     private static final long MOD = 1000000007L;
 
-    /**
-     * Binary search + Rolling hash approach - optimal for this problem.
+        /**
+     * Intuition: if a duplicate substring of length L exists, then some duplicate
+     * also exists for every smaller length. That monotonic fact lets us binary
+     * search the answer length, while rolling hash checks one fixed length quickly
+     * and verifies equal strings to guard against collisions.
      *
-     * Algorithm: Binary search on length + Rabin-Karp rolling hash
-     * - Binary search on substring length from 1 to n-1
-     * - For each length, use rolling hash to find duplicates in O(n) time
-     * - Rolling hash allows O(1) hash updates when sliding window
-     * - Use modular arithmetic to handle large hash values
+     * Algorithm:
+     *   1. Binary-search candidate lengths from 1 to n - 1.
+     *   2. For each length, call findDuplicateOfLength to look for a repeated window.
+     *   3. Keep the duplicate and search right when one exists; otherwise search left.
+     *   4. Return the longest duplicate found.
      *
-     * Time Complexity: O(n log n) average case, O(n²) worst case (hash collisions)
-     * Space Complexity: O(n) for hash storage
+     * Time:  O(n log n) average - each length check scans the string once.
+     * Space: O(n) - hashes and start indices are stored for one length at a time.
+     *
+     * @param s Input string.
+     * @return Any longest duplicated substring, or "" if none exists.
      */
     public String longestDupSubstring(String s) {
         int n = s.length();

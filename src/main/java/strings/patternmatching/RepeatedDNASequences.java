@@ -8,41 +8,58 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The DNA sequence is composed of a series of nucleotides abbreviated as 'A', 'C', 'G', and 'T'.
- * For example, "ACGAATTCCG" is a DNA sequence.
+ * Problem: Repeated DNA Sequences
  *
- * Given a string s that represents a DNA sequence, return all the 10-letter-long sequences (substrings)
- * that occur more than once in the DNA molecule. You may return the answer in any order.
+ * Given a DNA string made of A, C, G, and T, return every 10-letter substring
+ * that appears more than once. The answer may be returned in any order.
  *
- * Example 1:
- * Input: s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"
- * Output: ["AAAAACCCCC","CCCCCAAAAA"]
+ * Leetcode: https://leetcode.com/problems/repeated-dna-sequences/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Fixed-size sliding window | Hashing
  *
- * Example 2:
- * Input: s = "AAAAAAAAAAAAA"
- * Output: ["AAAAAAAAAA"]
+ * Example:
+ *   Input:  s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"
+ *   Output: ["AAAAACCCCC","CCCCCAAAAA"]
+ *   Why:    each listed 10-letter DNA sequence occurs at least twice.
  *
- * LeetCode: https://leetcode.com/problems/repeated-dna-sequences/
+ * Follow-ups:
+ *   1. What if the repeated length is k instead of 10?
+ *      Make the window size configurable and update the rolling hash mask.
+ *   2. How do you reduce memory for very large DNA strings?
+ *      Encode each nucleotide in two bits and store integer hashes.
+ *   3. How would you process streaming DNA data?
+ *      Maintain only the last k characters and update counts as the stream advances.
  *
- * Follow-up Questions:
- * 1. How would you handle very large input strings (e.g., 1,000,000 characters)?
- *    - The rolling hash solution is efficient with O(n) time and O(n) space.
- * 2. What if we need to find sequences of length k instead of 10?
- *    - We can make the sequence length a parameter and adjust the solution accordingly.
- * 3. How would you optimize for memory usage if the input is extremely large?
- *    - We could use a sliding window with a rolling hash to process the string in chunks.
- *
- * Related Problems:
- * - Substring with Concatenation of All Words (https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
- * - Find All Anagrams in a String (https://leetcode.com/problems/find-all-anagrams-in-a-string/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Find All Anagrams in a String (438), Substring with Concatenation of All Words (30).
  */
 public class RepeatedDNASequences {
-    /**
-     * Finds all 10-letter-long sequences that occur more than once in the DNA molecule.
+
+    public static void main(String[] args) {
+        RepeatedDNASequences solver = new RepeatedDNASequences();
+
+        String[] inputs = {"AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT", "AAAAAAAAAAAAA", "ACGT"};
+        String[] expected = {"[AAAAACCCCC, CCCCCAAAAA]", "[AAAAAAAAAA]", "[]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<String> got = solver.findRepeatedDnaSequences(inputs[i]);
+            java.util.Collections.sort(got);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
+    }
+        /**
+     * Intuition: every answer is a fixed 10-character window. Count each window
+     * string, then report the windows whose count is greater than one.
      *
-     * @param s DNA sequence string
-     * @return List of repeated 10-letter sequences
+     * Algorithm:
+     *   1. Return an empty list when fewer than 10 characters are available.
+     *   2. Slide a length-10 window and count each sequence in a map.
+     *   3. Add every sequence whose final count is greater than one.
+     *
+     * Time:  O(n) - there are n - 9 windows and each has fixed length 10.
+     * Space: O(n) - distinct 10-letter sequences are stored in the map.
+     *
+     * @param s DNA sequence string.
+     * @return Repeated 10-letter DNA sequences.
      */
     public List<String> findRepeatedDnaSequences(String s) {
         List<String> result = new ArrayList<>();

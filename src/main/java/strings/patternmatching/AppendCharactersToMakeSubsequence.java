@@ -1,51 +1,64 @@
 package strings.patternmatching;
 
 /**
- * Problem Statement:
- * Given two strings `s` and `t`, return the minimum number of characters that need to be appended to the end of `s`
- * so that `t` becomes a subsequence of `s`.
- * A subsequence is a sequence that can be derived from another string
- * by deleting some or no characters without changing the order of the remaining characters.
+ * Problem: Append Characters to String to Make Subsequence
+ *
+ * Given source and target, append the fewest characters to the end of source so
+ * that target becomes a subsequence. Characters already matched in order do not
+ * need to be appended; only the unmatched suffix of target is missing.
+ *
+ * Leetcode: https://leetcode.com/problems/append-characters-to-string-to-make-subsequence/ (Medium)
+ * Rating:   contest Elo 1363
+ * Pattern:  Strings | Two pointers | Subsequence scan
  *
  * Example:
- * Input: s = "coaching", t = "coding"
- * Output: 4
- * Explanation: We can append "ding" to the end of "coaching" to form "coachingding", where "coding" is a subsequence.
+ *   Input:  source = "coaching", target = "coding"
+ *   Output: 4
+ *   Why:    "co" is matched inside source, so only "ding" must be appended.
  *
- * Leetcode URL:
- * https://leetcode.com/problems/append-characters-to-string-to-make-subsequence
- *
- * Follow-up Questions:
- * 1. How would your solution change if you were allowed to insert characters anywhere, not just at the end?
- *    → You’d likely need a dynamic programming solution based on Longest Common Subsequence (LCS).
- *    → Ref: https://leetcode.com/problems/edit-distance/
- *
- * 2. Can this problem be extended to handle wildcard characters in `t` (e.g., '?', '*')?
- *    → It becomes similar to pattern matching or wildcard matching.
- *    → Ref: https://leetcode.com/problems/wildcard-matching/
- * LeetCode Contest Rating: 1363
+ * Follow-ups:
+ *   1. What if characters may be inserted anywhere?
+ *      Use longest common subsequence; the answer is target.length() - LCS.
+ *   2. What if target contains wildcard characters?
+ *      Replace the equality check with wildcard matching state transitions.
+ *   3. What if many targets are queried against one source?
+ *      Preprocess source positions by character and binary-search each target.
  */
 
 public class AppendCharactersToMakeSubsequence {
 
-    /**
-     * Finds the minimum number of characters that need to be appended to source
-     * so that target becomes a subsequence of source.
+    public static void main(String[] args) {
+        AppendCharactersToMakeSubsequence solver = new AppendCharactersToMakeSubsequence();
+
+        String[] sources = {"coaching", "abcde", ""};
+        String[] targets = {"coding", "a", "abc"};
+        int[] expected = {4, 0, 3};
+
+        for (int i = 0; i < sources.length; i++) {
+            int got = solver.appendCharacters(sources[i], targets[i]);
+            System.out.printf("source=%s target=%s -> %d  expected=%d%n",
+                sources[i], targets[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: scan source once and greedily match the earliest possible
+     * characters of target. Any target character matched now can only help later
+     * characters, because subsequences care about order, not contiguity. After
+     * source is exhausted, the unmatched tail of target is exactly what must be
+     * appended.
      *
      * Algorithm:
-     * - Use two pointers: i for source, j for target.
-     * - Traverse through both strings.
-     * - If characters match, move both pointers forward.
-     * - If not, move pointer i only.
-     * - At the end, j represents the number of characters from target that matched in order.
-     * - The remaining characters (target.length() - j) need to be appended to source.
+     *   1. Keep sourceIndex on source and targetIndex on the next target character to match.
+     *   2. Advance through source, moving targetIndex only when the characters match.
+     *   3. Return target.length() - targetIndex for the still-unmatched target suffix.
      *
-     * Time Complexity: O(n), where n = length of source
-     * Space Complexity: O(1), constant space
+     * Time:  O(n) - source is scanned once, with targetIndex only moving forward.
+     * Space: O(1) - only two indices are stored.
      *
-     * @param source Source string
-     * @param target Target string (to become a subsequence)
-     * @return Minimum number of characters to append to make target a subsequence of source
+     * @param source Source string scanned for a subsequence match.
+     * @param target Target string that should become a subsequence.
+     * @return Minimum number of target characters to append to source.
      */
     public int appendCharacters(String source, String target) {
         // Handle null inputs explicitly

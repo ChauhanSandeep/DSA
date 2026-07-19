@@ -1,49 +1,63 @@
 package strings.patternmatching;
 
 /**
- * ✅ GFG Problem: Check if String is Rotated by Two Places
- * 🔗 https://practice.geeksforgeeks.org/problems/check-if-string-is-rotated-by-two-places-1587115620/1
+ * Problem: Check if String Is Rotated by Two Places
  *
- * 🔹 Problem Statement:
- * Given two strings `str1` and `str2`, determine whether `str2` can be obtained by rotating `str1`
- * exactly two places either clockwise or anticlockwise.
+ * Given two strings, decide whether the second can be obtained by rotating the
+ * first exactly two places in either direction. Both strings must have equal
+ * length, and short strings are only valid when they are already equal.
  *
- * 🔸 Example:
- * Input: str1 = "amazon", str2 = "azonam"
- * Output: true
- * Explanation: Clockwise rotation of "amazon" by 2 → "azonam"
+ * Source: https://practice.geeksforgeeks.org/problems/check-if-string-is-rotated-by-two-places-1587115620/1
+ * Rating: contest Elo 1167
+ * Pattern: Strings | Rotation | Substring construction
  *
- * 🔍 Follow-up Questions:
- * - Can this be done without creating new string objects? (Yes, using character comparison with modular indexing)
- * Answer: Yes, by comparing characters at calculated indices.
- * - How would you extend this to check for **k-place** rotations?
- *  Answer: Use modular arithmetic to check indices based on k.
- * - Can this logic be applied to circular buffer pattern matching?
- *  Answer: Yes, it can be adapted for circular buffer checks.
- * - What if the rotation is not fixed
- *  Answer: https://leetcode.com/problems/rotate-string/ solved in canBeRotated method.
- * LeetCode Contest Rating: 1167
+ * Example:
+ *   Input:  str1 = "amazon", str2 = "azonam"
+ *   Output: true
+ *   Why:    moving the first two characters of "amazon" to the end gives "azonam".
+ *
+ * Follow-ups:
+ *   1. How would you check rotation by exactly k places?
+ *      Compare against the left-k and right-k rotations using k modulo n.
+ *   2. How can you avoid allocating rotated strings?
+ *      Compare characters with modular indices for both directions.
+ *   3. How do you check any rotation, not just two places?
+ *      Test whether target is contained in source + source.
+ *
+ * Related: Rotate String (796).
  */
 public class RotatedString {
 
   public static void main(String[] args) {
-    System.out.println(isRotationByTwo("amazon", "azonam"));          // true
-    System.out.println(isRotationByTwo("geeksforgeeks", "geeksgeeksfor")); // false
+    String[] sources = {"amazon", "geeksforgeeks", "a"};
+    String[] targets = {"azonam", "geeksgeeksfor", "a"};
+    boolean[] expected = {true, false, true};
+
+    for (int i = 0; i < sources.length; i++) {
+      boolean got = isRotationByTwo(sources[i], targets[i]);
+      System.out.printf("str1=%s str2=%s -> %b  expected=%b%n",
+          sources[i], targets[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Checks if `str2` is a rotation of `str1` by exactly two places.
+
+    /**
+   * Intuition: exactly two-place rotation has only two possible results: move the
+   * first two characters to the end, or move the last two characters to the front.
+   * Build those candidates and compare them with str2.
    *
-   * 🔹 Steps:
-   * - Return false immediately if inputs are null or of unequal length.
-   * - If length < 2, only identical strings can be valid.
-   * - Generate:
-   *    - Clockwise rotated string → rotate left by 2
-   *    - Anticlockwise rotated string → rotate right by 2
-   * - Check if either matches str2.
+   * Algorithm:
+   *   1. Reject null or unequal-length inputs.
+   *   2. For length below 2, only identical strings can match.
+   *   3. Build the left-two and right-two rotations of str1.
+   *   4. Return whether str2 equals either rotation.
    *
-   * ⏱ Time Complexity: O(N), due to substring and equals comparisons.
-   * 🧠 Space Complexity: O(N), due to new strings created via substring concatenation.
+   * Time:  O(n) - substring creation and equality checks scan the strings.
+   * Space: O(n) - the two rotated strings are allocated.
+   *
+   * @param str1 Original string.
+   * @param str2 Candidate rotated string.
+   * @return true when str2 is a two-place rotation of str1.
    */
   private static boolean isRotationByTwo(String str1, String str2) {
     if (str1 == null || str2 == null || str1.length() != str2.length()) {

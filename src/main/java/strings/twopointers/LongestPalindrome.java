@@ -1,60 +1,62 @@
 package strings.twopointers;
 
 /**
- * Given a string s, return the longest palindromic substring in s.
- * A palindrome is a string that reads the same forward and backward.
+ * Problem: Longest Palindromic Substring
+ *
+ * Given a string, return the longest contiguous substring that reads the same
+ * forward and backward. If multiple answers have the same length, returning any
+ * one of them is acceptable.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-palindromic-substring/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Two pointers | Expand around center
  *
  * Example:
- * Input: s = "babad"
- * Output: "bab" or "aba"
- * Explanation:
- * Both "bab" and "aba" are valid answers as they are the longest palindromes.
+ *   Input:  s = "babad"
+ *   Output: "bab"
+ *   Why:    "bab" is a length-3 palindrome; "aba" is also valid with the same length.
  *
- * LeetCode link: https://leetcode.com/problems/longest-palindromic-substring/
+ * Follow-ups:
+ *   1. Can this be solved in O(n) time?
+ *      Yes, Manacher's algorithm finds all palindrome radii in linear time.
+ *   2. How would you return all longest palindromic substrings?
+ *      Collect every substring whose expanded length equals the current best.
+ *   3. What if you need many palindrome-range queries?
+ *      Precompute DP or rolling hashes to answer each query quickly.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - Can you achieve O(n) time complexity?
- *    → Yes, Manacher's algorithm achieves O(n) but is complex to implement.
- *  - What if you need to return all longest palindromic substrings?
- *    → Track all substrings with maximum length during expansion.
- *  - How would you handle very long strings (millions of characters)?
- *    → Manacher's algorithm is best, or consider approximate/streaming solutions.
- *  - Can you detect if entire string is a palindrome in O(1) after preprocessing?
- *    → Use rolling hash or Manacher's preprocessing, then O(1) query.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 647 (Palindromic Substrings): https://leetcode.com/problems/palindromic-substrings/
- *  - LeetCode 516 (Longest Palindromic Subsequence): https://leetcode.com/problems/longest-palindromic-subsequence/
- *  - LeetCode 214 (Shortest Palindrome): https://leetcode.com/problems/shortest-palindrome/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Palindromic Substrings (647), Longest Palindromic Subsequence (516).
  */
 public class LongestPalindrome {
     public static void main(String[] args) {
-        String input = "kjqlrfzzfmlvyoshiktodnsjjp";
+        LongestPalindrome solver = new LongestPalindrome();
 
-        System.out.println("Longest Palindromic Substring (DP Approach): " + longestPalindromeDP(input));
-        System.out.println("Longest Palindromic Substring (Expand Around Center Approach): " + new LongestPalindrome().longestPalindrome(input));
+        String[] inputs = {"babad", "cbbd", ""};
+        String[] expected = {"bab", "bb", ""};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.longestPalindrome(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n",
+                inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Main method: Expand Around Center approach (Optimal for interviews).
-     * Step-by-step:
-     *  1. For each position in string, treat it as potential palindrome center
-     *  2. Expand around center in two cases:
-     *     a. Odd-length palindrome: single character as center (i, i)
-     *     b. Even-length palindrome: two characters as center (i, i+1)
-     *  3. For each center, expand outward while characters match
-     *  4. Track longest palindrome found (start index and length)
-     *  5. Return substring using tracked indices
+
+        /**
+     * Intuition: every palindrome expands from a center. The center can be one
+     * character for odd lengths or the gap between two characters for even lengths,
+     * so trying both centers at each index finds every candidate palindrome.
      *
-     * Key Insight:
-     * Every palindrome has a center. We try each possible center and expand
-     * outward while characters match. Need to check both odd-length (single center)
-     * and even-length (two-character center) palindromes.
+     * Algorithm:
+     *   1. Return "" for null or empty input.
+     *   2. For every index, expand around the odd and even centers.
+     *   3. Keep the start and length when a longer palindrome is found.
+     *   4. Return the substring described by the best start and length.
      *
-     * Algorithm: Expand Around Center.
-     * Time Complexity: O(n²), where n is string length. For each of n centers, expand takes O(n).
-     * Space Complexity: O(1), only storing indices and result.
+     * Time:  O(n^2) - each center can expand across the string.
+     * Space: O(1) - only indices and lengths are stored.
+     *
+     * @param str Input string.
+     * @return Longest palindromic substring, or "" for null/empty input.
      */
     public String longestPalindrome(String str) {
         if (str == null || str.length() < 1) {
@@ -85,14 +87,7 @@ public class LongestPalindrome {
         return str.substring(start, start + maxLen);
     }
 
-    /**
-     * Helper: Expands around center and returns length of palindrome.
-     * 
-     * @param str Input string
-     * @param left Left pointer (center or left of center)
-     * @param right Right pointer (center or right of center)
-     * @return Length of palindrome found by expanding from center
-     */
+        /** Expands from left and right and returns the palindrome length found. */
     private int expandAroundCenter(String str, int left, int right) {
         // Expand while within bounds and characters match
         while (left >= 0 && right < str.length() && str.charAt(left) == str.charAt(right)) {

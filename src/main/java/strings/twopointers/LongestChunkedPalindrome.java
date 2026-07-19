@@ -5,60 +5,59 @@ import java.util.List;
 
 
 /**
- * GeeksforGeeks Problem: https://www.geeksforgeeks.org/longest-possible-chunked-palindrome/
+ * Problem: Longest Chunked Palindrome Decomposition
  *
- * Problem Statement:
- * Given a string, split it into the **maximum number of non-empty palindromic chunks** such that:
- * - Concatenating the chunks gives the original string.
- * - Each chunk forms a prefix-suffix mirror (the chunk itself does not need to be an internal palindrome).
+ * Split a string into the maximum number of non-empty chunks such that the chunk
+ * sequence reads the same from the front and back. Individual chunks do not need
+ * to be palindromes; matching prefix and suffix chunks are enough.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-chunked-palindrome-decomposition/ (Hard)
+ * Rating:   no contest Elo listed
+ * Pattern:  Strings | Two-sided prefix-suffix matching | Recursion
  *
  * Example:
- * Input: "ghiabcdefhelloadamhelloabcdefghi"
- * Output: 7, Chunks = ["ghi", "abcdef", "hello", "adam", "hello", "abcdef", "ghi"]
+ *   Input:  text = "ghiabcdefhelloadamhelloabcdefghi"
+ *   Output: 7
+ *   Why:    ["ghi","abcdef","hello","adam","hello","abcdef","ghi"] mirrors by chunks.
  *
- * Input: "merchant"
- * Output: 1, Chunks = ["merchant"]
- *
- * Input: "antaprezatepzapreanta"
- * Output: 11, Chunks = ["a","nt","a","pre","za","tpe","za","pre","a","nt","a"]
- *
- * Follow-up Questions (FAANG-style):
- * 1. Can this be solved iteratively?
- *    - Yes, use two pointers and compare sliding window substrings from both ends.
- * 2. What if we want the actual chunks rather than just the count?
- *    - Store the chunks whenever a matching prefix-suffix is found.
- * 3. Does this relate to classic string matching or palindrome finding algorithms?
- *    - Yes, prefix-suffix matching is the key aspect as in KMP/Z-algorithm.
+ * Follow-ups:
+ *   1. How would you make the comparison iterative?
+ *      Grow left and right buffers with two pointers until they match.
+ *   2. How can substring comparisons be accelerated?
+ *      Use rolling hashes or KMP-style prefix-suffix information.
+ *   3. How would you return only the count with less memory?
+ *      Count matches directly and avoid storing the chunk list.
  */
 public class LongestChunkedPalindrome {
 
   public static void main(String[] args) {
-    Result result1 = getMaxChunks("ghiabcdefhelloadamhelloabcdefghi");
-    System.out.println("Max chunks: " + result1.count + ", Chunks: " + result1.chunks);
+    String[] inputs = {"ghiabcdefhelloadamhelloabcdefghi", "merchant", ""};
+    int[] expected = {7, 1, 0};
 
-    Result result2 = getMaxChunks("merchant");
-    System.out.println("Max chunks: " + result2.count + ", Chunks: " + result2.chunks);
-
-    Result result3 = getMaxChunks("antaprezatepzapreanta");
-    System.out.println("Max chunks: " + result3.count + ", Chunks: " + result3.chunks);
-
-    Result result4 = getMaxChunks("volvo");
-    System.out.println("Max chunks: " + result4.count + ", Chunks: " + result4.chunks);
+    for (int i = 0; i < inputs.length; i++) {
+      Result got = getMaxChunks(inputs[i]);
+      System.out.printf("text=%s -> %d  expected=%d chunks=%s%n",
+          inputs[i], got.count, expected[i], got.chunks);
+    }
   }
 
-  /**
-   * Returns both the maximum number of palindromic chunks and the list of chunks (recursive approach).
+
+    /**
+   * Intuition: to maximize chunks, take the smallest matching prefix and suffix
+   * whenever possible, then solve the middle independently. If no matching pair
+   * exists, the whole remaining substring must be one chunk.
    *
-   * Steps of Solution:
-   * - At each recursive step, try to match a prefix-suffix of length from 1 up to half the current substring.
-   * - If a match is found, add matched prefix and suffix chunks to the result and recurse into the substring between these chunks.
-   * - If no match is found, the entire substring is one chunk.
+   * Algorithm:
+   *   1. Return an empty result for null or empty input.
+   *   2. Recursively search for the shortest equal prefix and suffix in the range.
+   *   3. Add that pair around the recursively solved middle.
+   *   4. Use the full range as one chunk when no pair matches.
    *
-   * Time Complexity: O(N^2) worst-case (due to substring equality checks at each recursive step)
-   * Space Complexity: O(N) for recursion stack and storing chunks
+   * Time:  O(n^2) - substring comparisons can rescan characters across recursion levels.
+   * Space: O(n) - recursion and the returned chunk list can grow with the string.
    *
-   * @param str Input string to be split
-   * @return Result object containing count and list of chunked palindrome segments
+   * @param str Input string to decompose.
+   * @return Result containing the maximum chunk count and chunk list.
    */
   public static Result getMaxChunks(String str) {
     if (str == null || str.isEmpty()) {
@@ -67,14 +66,7 @@ public class LongestChunkedPalindrome {
     return countChunksAndStore(str, 0, str.length());
   }
 
-  /**
-   * Recursive helper for chunk counting and retrieval.
-   *
-   * @param str   Original string
-   * @param left  Start index (inclusive) of current substring
-   * @param right End index (exclusive) of current substring
-   * @return Result object with chunk count and actual chunk strings
-   */
+    /** Recursively decomposes str[left, right) into mirrored chunks. */
   private static Result countChunksAndStore(String str, int left, int right) {
     int length = right - left;
     Result result = new Result();

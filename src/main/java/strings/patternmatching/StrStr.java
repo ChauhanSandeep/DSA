@@ -1,32 +1,60 @@
 package strings.patternmatching;
 
 /**
- * Implement the "strStr()" function that finds the index of the first occurrence of a substring.
- * For example : strStr("GeeksForGeeks", "For") will return 5.
- * Explanation: The substring "For" starts at index 5 in the string "GeeksForGeeks".
+ * Problem: Implement strStr()
  *
- * LeetCode Equivalent: https://leetcode.com/problems/implement-strstr/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Given text and pattern, return the first index where pattern occurs in text,
+ * or -1 if it is absent. This file keeps both a direct comparison approach and
+ * a KMP approach.
+ *
+ * Leetcode: https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/ (Easy)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Brute force matching | KMP
+ *
+ * Example:
+ *   Input:  text = "GeeksForGeeks", pattern = "For"
+ *   Output: 5
+ *   Why:    the substring starting at index 5 is exactly "For".
+ *
+ * Follow-ups:
+ *   1. How do you handle many patterns at once?
+ *      Use Aho-Corasick to share prefix work across patterns.
+ *   2. How can matching be made case-insensitive?
+ *      Normalize both strings or compare normalized characters while scanning.
+ *   3. How would you search a stream?
+ *      Keep KMP state between chunks and continue from the saved pattern index.
  */
 public class StrStr {
   public static void main(String[] args) {
-    String text = "GeeksForGeeks";
-    String pattern = "For";
+    String[] texts = {"GeeksForGeeks", "mississippi", "abc"};
+    String[] patterns = {"For", "issip", ""};
+    int[] expected = {5, 4, 0};
 
-    System.out.println(findSubstringBruteForce(text, pattern)); // 5
-    System.out.println(findSubstringKMP(text, pattern)); // 5
+    for (int i = 0; i < texts.length; i++) {
+      int got = findSubstringKMP(texts[i], patterns[i]);
+      System.out.printf("text=%s pattern=%s -> %d  expected=%d%n",
+          texts[i], patterns[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Brute Force Approach: Finds the first occurrence of a substring in a string.
-   * Approach:
-   * 1. Iterate through the main string.
-   * 2. For each character, check if the substring matches starting from that index.
-   * 3. If a match is found, return the starting index.
-   * * If no match is found after checking all possible starting indices, return -1.
+
+    /**
+   * Intuition: the direct baseline tries every possible start in text. A start can
+   * only match when its first character equals pattern's first character, and then
+   * isMatch verifies the remaining characters.
    *
-   * Time complexity: O(N * M) where N is the length of the text and M is the length of the pattern.
-   * Space complexity: O(1) since no extra space is used except for variables.
+   * Algorithm:
+   *   1. Reject null inputs and the empty-pattern case used by this brute method.
+   *   2. Try each start index where pattern can still fit.
+   *   3. Return the first start whose substring matches pattern.
+   *   4. Return -1 if no start matches.
+   *
+   * Time:  O(n * m) - up to m characters are compared at each start.
+   * Space: O(1) - only indices are stored.
+   *
+   * @param text Text to search inside.
+   * @param pattern Pattern to find.
+   * @return First starting index, or -1 when absent.
    */
   public static int findSubstringBruteForce(String text, String pattern) {
       if (text == null || pattern == null || pattern.isEmpty()) {
@@ -44,9 +72,7 @@ public class StrStr {
     return -1;
   }
 
-  /**
-   * Helper function to check if a substring starting at a given index matches the pattern.
-   */
+    /** Checks whether pattern matches text starting exactly at index. */
   private static boolean isMatch(String text, String pattern, int index) {
     int patternLength = pattern.length();
       if (index + patternLength > text.length()) {
@@ -61,14 +87,23 @@ public class StrStr {
     return true;
   }
 
-  /**
-   * Optimized Approach: Finds the first occurrence using the KMP (Knuth-Morris-Pratt) Algorithm.
+    /**
+   * Intuition: KMP remembers how much of pattern is still reusable after a
+   * mismatch. The LPS array lets j jump to the next best prefix length without
+   * moving i backward in text.
    *
-   * Time complexity: O(N + M) where N is the length of the text and M is the length of the pattern.
-   * Space complexity: O(M) for the LPS (Longest Prefix Suffix) array.
-   * @param text The main string.
-   * @param pattern The substring to search for.
-   * @return The index of the first occurrence, or -1 if not found.
+   * Algorithm:
+   *   1. Return 0 for an empty pattern.
+   *   2. Build the LPS array for pattern.
+   *   3. Scan text with i and pattern with j, advancing both on matches.
+   *   4. On mismatch, jump j by LPS or advance i when j is zero.
+   *
+   * Time:  O(n + m) - each pointer advances or jumps through its string linearly.
+   * Space: O(m) - the LPS array stores one entry per pattern character.
+   *
+   * @param text Text to search inside.
+   * @param pattern Pattern to find.
+   * @return First starting index, or -1 when absent.
    */
   public static int findSubstringKMP(String text, String pattern) {
       if (pattern.isEmpty()) {
@@ -103,12 +138,7 @@ public class StrStr {
     return -1; // No match found
   }
 
-  /**
-   * Computes the LPS (Longest Prefix Suffix) array for the KMP algorithm.
-   *
-   * @param pattern The pattern for which LPS is computed.
-   * @return The LPS array.
-   */
+    /** Builds the longest-prefix-suffix array for KMP matching. */
   private static int[] computeLPSArray(String pattern) {
     int length = pattern.length();
     int[] lps = new int[length];

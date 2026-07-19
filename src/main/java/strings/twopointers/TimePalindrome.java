@@ -1,52 +1,58 @@
 package strings.twopointers;
 
 /**
- * Next Palindromic Time Generator (Mathematical Reverse-Based Approach)
+ * Problem: Next Mirrored Time
  *
- * Problem Statement:
- * Given a time in 24-hour "HH:MM" format, return the next time (same day or next)
- * such that the hour and minute mirror each other. In other words, MM == reverse(HH).
+ * Given a time in HH:MM format, return the next time later on the same day where
+ * the minute equals the reverse of the hour. If no such time exists before the
+ * day ends, this implementation returns "-1".
  *
- * This is slightly different from generic palindrome (e.g., 12:21), instead it uses the
- * property: reverse(HH) == MM.
+ * Source: https://www.geeksforgeeks.org/dsa/given-a-number-find-next-smallest-palindrome-larger-than-this-number/
+ * Pattern: Strings | Time parsing | Digit reversal
  *
  * Example:
- * Input: "21:12"
- * Output: "22:00"
- * Explanation: Reverse of 22 is 22, which gives 22:22, but it exceeds MM range (59), so 22:00 is chosen.
+ *   Input:  time = "05:49"
+ *   Output: "05:50"
+ *   Why:    reversing hour 05 gives minute 50, which is later than 05:49.
  *
- * GeeksforGeeks Link:
- * https://www.geeksforgeeks.org/dsa/given-a-number-find-next-smallest-palindrome-larger-than-this-number/
- *
- * Follow-Up Questions:
- * 1. How is this different from full palindromic time check?
- *    - This only ensures `reverse(HH) == MM`, not full "HH:MM" string being a palindrome.
- * 2. Can this be used to generate mirrored display times?
- *    - Yes, this is useful in digital clocks with symmetry logic.
+ * Follow-ups:
+ *   1. How would you wrap to the next day?
+ *      Continue from 00:00 after 23:59 instead of returning "-1".
+ *   2. How is this different from a full HH:MM palindrome?
+ *      It only requires MM to be reverse(HH), not a character palindrome including ':'.
+ *   3. How would you list all mirrored times in a day?
+ *      Check each hour, reverse its digits, and keep minutes below 60.
  */
 
 public class TimePalindrome {
 
   public static void main(String[] args) {
-    String currentTime = "21:12";
-    String nextMirrorTime = getNextMirroredTime(currentTime);
-    System.out.println(nextMirrorTime);
+    String[] inputs = {"21:12", "23:59", "05:49"};
+    String[] expected = {"22:22", "-1", "05:50"};
+
+    for (int i = 0; i < inputs.length; i++) {
+      String got = getNextMirroredTime(inputs[i]);
+      System.out.printf("time=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Returns the next valid mirrored time where MM = reverse(HH).
+
+    /**
+   * Intuition: for any hour, the only mirrored minute is the hour's digit
+   * reversal. Check the current hour first, then later hours, and accept the
+   * first reversed minute that is valid and later than the input time.
    *
-   * Steps:
-   * 1. Extract hour and minute from input.
-   * 2. Check if reverse(hour) is greater than current minute → same hour is valid.
-   * 3. Else, increment hour and compute reverse of new hour.
-   * 4. Return HH:MM if mirror is valid; else continue to next valid hour.
+   * Algorithm:
+   *   1. Parse hour and minute from HH:MM.
+   *   2. Reverse the hour digits to form the candidate minute.
+   *   3. Return the candidate when it is below 60 and later than the input.
+   *   4. Otherwise increment the hour until the same-day range is exhausted.
    *
-   * Time Complexity: O(1) – maximum 24 checks (bounded by 24 hours)
-   * Space Complexity: O(1)
+   * Time:  O(1) - at most 24 hours are checked.
+   * Space: O(1) - only parsed integers are stored.
    *
-   * @param time Current time in "HH:MM" format
-   * @return Next mirror time as "HH:MM" string or "-1" if no such time exists today
+   * @param time Current time in HH:MM format.
+   * @return Next same-day mirrored time, or "-1" if none exists.
    */
   public static String getNextMirroredTime(String time) {
     int hour = Integer.parseInt(time.substring(0, 2));
@@ -66,10 +72,7 @@ public class TimePalindrome {
     return "-1"; // No mirrored time available today
   }
 
-  /**
-   * Utility to reverse a 2-digit number.
-   * For example, 12 → 21, 08 → 80
-   */
+    /** Reverses the two decimal digits of an hour value. */
   private static int reverseDigits(int num) {
     int tens = num / 10;
     int units = num % 10;

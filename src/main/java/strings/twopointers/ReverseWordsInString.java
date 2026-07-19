@@ -5,45 +5,57 @@ import java.util.stream.Collectors;
 
 
 /**
- * ✅ LeetCode Problem: Reverse Words in a String
- * 🔗 https://leetcode.com/problems/reverse-words-in-a-string/
+ * Problem: Reverse Words in a String
  *
- * 🔹 Problem Statement:
- * Given a string `sentence`, reverse the order of words. A word is defined as a sequence of non-space characters.
- * The final string should have exactly one space between words and no leading/trailing spaces.
+ * Given a sentence, reverse the order of its words. The output should have a
+ * single space between words and no leading or trailing spaces.
  *
- * 🔸 Example:
- * Input:  "I like this code very much"
- * Output: "much very code this like I"
+ * Leetcode: https://leetcode.com/problems/reverse-words-in-a-string/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Split and rebuild | Two pointers variant
  *
- * 🔍 Follow-up Questions:
- * - Can you reverse the words **in-place** if given as a character array?
- *   🔗 https://leetcode.com/problems/reverse-words-in-a-string-ii/
- * - What if multiple spaces exist between words? (Already handled via `split("\\s+")`)
- * - How would you implement this with O(1) extra space if allowed to modify the original string?
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  sentence = "I like this code very much"
+ *   Output: "much very code this like I"
+ *   Why:    the words keep their internal spelling, but their order is reversed.
+ *
+ * Follow-ups:
+ *   1. How would you do it in place in a character array?
+ *      Reverse the whole array, then reverse each word segment.
+ *   2. How should multiple spaces be handled?
+ *      Trim the ends and split on one or more whitespace characters.
+ *   3. How would you stream words from a file?
+ *      Push words onto a stack or write chunks in reverse if random access is available.
  */
 public class ReverseWordsInString {
 
     public static void main(String[] args) {
-        String sentence = "I like this code very much";
-        String reversedSentence = reverseWords(sentence);
-        System.out.println(reversedSentence);  // Output: "much very code this like I"
+        String[] inputs = {"I like this code very much", "  hello   world  ", ""};
+        String[] expected = {"much very code this like I", "world hello", ""};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = reverseWords(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Reverses the words in a sentence while preserving the character order within each word.
+
+        /**
+     * Intuition: after trimming and splitting, each word is an independent token.
+     * The desired output is those tokens read from right to left with one space
+     * inserted between adjacent words.
      *
-     * @param sentence The original input string containing words separated by spaces.
-     * @return A new string with words in reversed order and trimmed spaces.
+     * Algorithm:
+     *   1. Return null or empty input unchanged.
+     *   2. Trim the sentence and split it on one or more spaces.
+     *   3. Append words from the last index down to the first.
+     *   4. Add spaces only between words to avoid a trailing space.
      *
-     * 🔹 Steps:
-     * - Trim leading/trailing spaces.
-     * - Split the string by one or more spaces using regex `\\s+`.
-     * - Append words in reverse order using a StringBuilder.
+     * Time:  O(n) - splitting and rebuilding touch the sentence characters linearly.
+     * Space: O(n) - the words array and output builder store the result.
      *
-     * ⏱ Time Complexity: O(N), where N = total number of characters in the sentence.
-     * 🧠 Space Complexity: O(N), to store the split words and result string.
+     * @param sentence Input sentence.
+     * @return Sentence with word order reversed and spacing normalized.
      */
     private static String reverseWords(String sentence) {
         if (sentence == null || sentence.isEmpty()) {

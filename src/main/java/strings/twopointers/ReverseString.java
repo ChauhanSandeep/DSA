@@ -1,44 +1,59 @@
 package strings.twopointers;
 
 /**
- * LeetCode 344. Reverse String
+ * Problem: Reverse String
  *
- * Write a function that reverses a string. The input string is given as an array of characters s.
- * You must do this by modifying the input array in-place with O(1) extra memory.
+ * Reverse a character array in place. The input is mutable, so the method should
+ * swap characters inside the same array and use only constant extra memory.
  *
- * Example 1:
- * Input: s = ['h','e','l','l','o']
- * Output: ['o','l','l','e','h']
+ * Leetcode: https://leetcode.com/problems/reverse-string/ (Easy)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Two pointers | In-place swap
  *
- * Example 2:
- * Input: s = ['H','a','n','n','a','h']
- * Output: ['h','a','n','n','a','H']
+ * Example:
+ *   Input:  s = ['h','e','l','l','o']
+ *   Output: ['o','l','l','e','h']
+ *   Why:    each character is swapped with its mirror position from the other end.
  *
- * LeetCode Link: https://leetcode.com/problems/reverse-string/
- *
- * Follow-up Questions:
- * - How would you reverse only alphabetic characters? (Skip non-alphabetic during swapping)
- * - Can you implement recursively? (Use recursive helper with left/right pointers)
- * - How would you reverse words in a sentence instead of characters? (Different problem with word boundaries)
- * - What if the array contains Unicode characters? (Current approach works for any characters)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How would you reverse only vowels or letters?
+ *      Move pointers until both sides point to eligible characters, then swap.
+ *   2. Can this be implemented recursively?
+ *      Recurse on left + 1 and right - 1 after swapping the ends.
+ *   3. What changes for Unicode code points?
+ *      Work over code points or grapheme clusters rather than Java char units.
  */
 public class ReverseString {
 
-    /**
-     * Reverses string in-place using two pointers approach.
+    public static void main(String[] args) {
+        ReverseString solver = new ReverseString();
+
+        char[][] inputs = { {'h', 'e', 'l', 'l', 'o'}, {'a'}, {} };
+        String[] expected = {"[o, l, l, e, h]", "[a]", "[]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            char[] current = inputs[i].clone();
+            solver.reverseString(current);
+            System.out.printf("s=%s -> %s  expected=%s%n",
+                java.util.Arrays.toString(inputs[i]), java.util.Arrays.toString(current), expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: the first character belongs where the last character is, the
+     * second belongs where the second-last is, and so on. Swapping mirrored pairs
+     * from the outside inward reverses the array in place.
      *
      * Algorithm:
-     * 1. Initialize two pointers: left at start, right at end
-     * 2. Swap characters at left and right positions
-     * 3. Move left pointer forward and right pointer backward
-     * 4. Continue until pointers meet in the middle
-     * 5. Array is reversed in-place with O(1) space complexity
+     *   1. Return for null, empty, or single-character arrays.
+     *   2. Place left at the start and right at the end.
+     *   3. Swap input[left] with input[right].
+     *   4. Move both pointers inward until they meet.
      *
-     * Time Complexity: O(n) where n is length of character array
-     * Space Complexity: O(1) - only uses constant extra space for swapping
+     * Time:  O(n) - each character is swapped at most once.
+     * Space: O(1) - the reversal uses one temporary character.
      *
-     * @param input Character array to reverse in-place
+     * @param input Character array mutated in place.
      */
     public void reverseString(char[] input) {
         if (input == null || input.length <= 1) {
