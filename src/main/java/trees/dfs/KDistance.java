@@ -5,62 +5,78 @@ import trees.Node;
 import java.util.ArrayList;
 
 /**
- * Given a binary tree, this class finds all the nodes that are at a distance `K` from a target node.
- * The tree is traversed to locate the target node, and from there, nodes at the specified distance `K` are found.
+ * Problem: All Nodes Distance K in Binary Tree
  *
- * Leetcode link: https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/
+ * Given a binary tree, a target node value, and a distance k, return all node
+ * values exactly k edges away from the target. Distance may go downward into the
+ * target subtree or upward through ancestors and into opposite subtrees.
  *
- * For example:
- *         3
- *        /  \
- *       5    1
- *      / \   / \
- *     6   2  0   8
- *        / \
- *       7   4
- *       If the target node is 5 and K is 2, the output will be [7, 4, 1].
- * LeetCode Contest Rating: 1663
+ * Leetcode: https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/ (Medium)
+ * Rating:   1663
+ * Pattern:  Trees | DFS | Distance bubbling | Opposite-subtree search
+ *
+ * Example:
+ *   Input:  root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, k = 2
+ *   Output: [7, 4, 1]
+ *   Why:    7 and 4 are two edges below 5, and 1 is reached through parent 3.
+ *
+ * Follow-ups:
+ *   1. How would you support repeated distance queries?
+ *      Build parent pointers once, then BFS from each target.
+ *   2. What if target is a node reference instead of a value?
+ *      Compare object identity and avoid relying on unique values.
+ *   3. What if edges have weights?
+ *      Use Dijkstra from the target on the implicit parent-child graph.
+ *
+ * Related: Amount of Time for Binary Tree to Be Infected (2385).
  */
 public class KDistance {
 
-    public static void main(String[] args) {
-        // Constructing the example tree:
-        //        0
-        //         \
-        //          1
-        //           \
-        //            2
-        //             \
-        //              3
-        TreeNode root = new TreeNode(0);
-        root.right = new trees.TreeNode(1);
-        root.right.right = new TreeNode(2);
-        root.right.right.right = new TreeNode(3);
+        public static void main(String[] args) {
+        TreeNode root = new TreeNode(3);
+        root.left = new TreeNode(5);
+        root.right = new TreeNode(1);
+        root.left.left = new TreeNode(6);
+        root.left.right = new TreeNode(2);
+        root.right.left = new TreeNode(0);
+        root.right.right = new TreeNode(8);
+        root.left.right.left = new TreeNode(7);
+        root.left.right.right = new TreeNode(4);
 
-        // Calling the method with target node value 1 and distance 2
-        KDistance kDistance = new KDistance();
-        ArrayList<Integer> nodesAtDistanceK = kDistance.distanceK(root, 1, 2);
+        TreeNode chain = new TreeNode(0);
+        chain.right = new TreeNode(1);
+        chain.right.right = new TreeNode(2);
+        chain.right.right.right = new TreeNode(3);
 
-        // Output the nodes at distance 2 from node with value 1
-        System.out.println(nodesAtDistanceK);
+        KDistance solver = new KDistance();
+        System.out.printf("root=%s target=%d k=%d -> %s  expected=%s%n",
+            "[3,5,1,6,2,0,8,null,null,7,4]", 5, 2,
+            solver.distanceK(root, 5, 2), "[7, 4, 1]");
+        System.out.printf("root=%s target=%d k=%d -> %s  expected=%s%n",
+            "[0,null,1,null,2,null,3]", 1, 2,
+            solver.distanceK(chain, 1, 2), "[3]");
     }
 
-    /**
+
+        /**
+     * Intuition: the target can be found by DFS without building a parent map.
+     * When recursion returns from the target, each ancestor learns how far it is
+     * from target. If the ancestor is not exactly distance away, the missing
+     * distance must be searched in the opposite child subtree.
+     *
      * Algorithm:
-     * 1. Perform a depth-first search (DFS) to find the target node.
-     * 2. Once the target is found, call a helper function (`markChild`) to explore nodes at distance `K`.
-     * 3. Explore both the left and right subtrees while also considering the parent node by traversing upwards.
+     *   1. DFS until the node with value target is found.
+     *   2. From the target, mark descendants at the requested distance.
+     *   3. While unwinding, add an ancestor if its returned distance equals distance.
+     *   4. Otherwise search the opposite subtree with the already-traveled distance.
      *
-     * Time Complexity:
-     * - Finding the target and marking nodes at distance `K` takes O(N), where N is the number of nodes in the binary tree.
+     * Time:  O(n) - every node is visited by at most one search path or child marking.
+     * Space: O(h) - recursion stack height, excluding the result list.
      *
-     * Space Complexity:
-     * - The space complexity is O(H), where H is the height of the binary tree due to recursive calls on the stack.
-     *
-     * @param root The root node of the binary tree.
-     * @param target The value of the target node.
-     * @param distance The distance `K` from the target node.
-     * @return A list of node values that are at distance `K` from the target node.
+     * @param root root of the binary tree
+     * @param target value of the target node
+     * @param distance requested edge distance from target
+     * @return node values exactly distance edges away
      */
     public ArrayList<Integer> distanceK(TreeNode root, int target, int distance) {
         ArrayList<Integer> result = new ArrayList<>();
@@ -68,16 +84,7 @@ public class KDistance {
         return result;
     }
 
-    /**
-     * A helper function that recursively searches for the target node in the binary tree and
-     * calls `markChild` to find nodes at the required distance.
-     *
-     * @param node The current node being explored in the binary tree.
-     * @param target The value of the target node.
-     * @param distance The distance `K` from the target node.
-     * @param result The list to store nodes at distance K from the target.
-     * @return The distance of the target node from the current node. Returns -1 if the target is not found.
-     */
+        // Finds target and returns its distance to ancestors, or -1 when absent.
     private int findNodes(TreeNode node, int target, int distance, ArrayList<Integer> result) {
         if (node == null) return -1; // If current node is null, return -1.
 

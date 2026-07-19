@@ -6,58 +6,64 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Problem: Perform a spiral (zigzag) level-order traversal of a binary tree.
- * Input:
- *          1
- *         / \
- *        2   3
- *       / \ / \
- *      7  6 5  4
- * Output: [1, 3, 2, 7, 6, 5, 4]
+ * Problem: Spiral Traversal of Binary Tree
  *
- * Intuition:
- * The traversal alternates between left-to-right and right-to-left levels.
- * To achieve this, two stacks are used:
- * - One stack for left-to-right level traversal.
- * - Another stack for right-to-left level traversal.
- * The algorithm processes the tree level by level, alternately pushing the nodes
- * into one of the two stacks and popping nodes to create the spiral order output.
+ * Return a zigzag level-order traversal of a binary tree. The first level is
+ * left-to-right, the next level is right-to-left, and direction alternates until
+ * all levels are processed.
  *
- * Algorithm:
- * 1. Start with the root node and push it into `stack1`.
- * 2. For each level, pop nodes from `stack1` (left-to-right) and push their children into `stack2`.
- * 3. Then, pop nodes from `stack2` (right-to-left) and push their children into `stack1`.
- * 4. Repeat this process until both stacks are empty.
+ * Leetcode: n/a (GeeksforGeeks spiral traversal variant)
+ * Rating:   not available
+ * Pattern:  Trees | DFS/BFS traversal | Two stacks | Alternating level order
  *
- * Time Complexity: O(N), where N is the number of nodes in the tree.
- * Space Complexity: O(N), due to the space used by the stacks and the result list.
+ * Example:
+ *   Input:  root = [1,2,3,7,6,5,4]
+ *   Output: [1, 3, 2, 7, 6, 5, 4]
+ *   Why:    level 0 is left-to-right, level 1 is right-to-left, and level 2 flips back.
  *
- * LeetCode Link: https://leetcode.com/problems/spiral-order-traversal-of-binary-tree/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can this be done with one queue?
+ *      Yes, collect each level and reverse alternate levels.
+ *   2. How would you stream output without reversing lists?
+ *      Use two stacks as this implementation does.
+ *   3. How would you return separate levels?
+ *      Start a new list for each stack-draining phase instead of one flat result.
+ *
+ * Related: Binary Tree Zigzag Level Order Traversal (103).
  */
 
 public class SpiralTraversal {
 
-    public static void main(String[] args) {
-        // Constructing the binary tree
+        public static void main(String[] args) {
         Node root = new Node(1);
-        root.left = new Node(2);
-        root.right = new Node(3);
-        root.left.left = new Node(7);
-        root.left.right = new Node(6);
-        root.right.left = new Node(5);
-        root.right.right = new Node(4);
+        root.right = new Node(2);
+        root.right.right = new Node(3);
 
-        // Printing the spiral order traversal
-        System.out.println("Spiral Order traversal of Binary Tree is ");
-        System.out.println(spiralTraversal(root)); // Expected Output: [1, 3, 2, 7, 6, 5, 4]
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[1,null,2,null,3]", spiralTraversal(root), "[1, 2, 3]");
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[]", spiralTraversal(null), "[]");
     }
 
-    /**
-     * Perform a spiral order traversal (zigzag level-order traversal) of a binary tree.
+
+        /**
+     * Intuition: the restored original uses two stacks and alternates which
+     * stack is drained. stack1 drains a level while pushing right then left into
+     * stack2; stack2 drains the next level while pushing left then right back
+     * into stack1.
      *
-     * @param root The root of the binary tree.
-     * @return A list containing the nodes in spiral order.
+     * Algorithm:
+     *   1. Return an empty result for a null root.
+     *   2. Push root into stack1.
+     *   3. Drain stack1, adding node values and pushing right then left into stack2.
+     *   4. Drain stack2, adding node values and pushing left then right into stack1.
+     *   5. Repeat until both stacks are empty.
+     *
+     * Time:  O(n) - each node is pushed and popped once.
+     * Space: O(w) - stacks store nodes from the current frontier.
+     *
+     * @param root root of the binary tree
+     * @return flattened spiral traversal order
      */
     public static List<Integer> spiralTraversal(Node root) {
         List<Integer> result = new ArrayList<>();

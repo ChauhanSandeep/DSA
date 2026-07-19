@@ -3,42 +3,38 @@ package trees.traversal;
 import trees.Node;
 import trees.TreeNode;
 import java.util.Stack;
+import java.util.Arrays;
 
 
 /**
- * TreeTraversal performs various tree traversal methods (Preorder, Inorder, and Postorder)
- * both recursively and iteratively.
+ * Problem: Binary Tree Traversals
  *
- * - Preorder: Visit the root first, then the left subtree, and then the right subtree.
- * - Inorder: Visit the left subtree first, then the root, and then the right subtree.
- * - Postorder: Visit the left subtree first, then the right subtree, and then the root.
+ * Demonstrates preorder, inorder, and postorder traversals of a binary tree in
+ * both recursive and iterative forms. Each traversal visits the same nodes but
+ * changes when the root is processed relative to its children.
  *
- * Intuition:
- * - Recursive traversals are straightforward but can cause stack overflow for large trees.
- * - Iterative approaches use an explicit stack to simulate the recursive calls, preventing stack overflow and providing more control.
+ * Leetcode: https://leetcode.com/tag/tree/ (Traversal fundamentals)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Recursion | Explicit stack traversal
  *
- * Time Complexity:
- * - All traversals: O(N), where N is the number of nodes in the tree, since each node is visited once.
+ * Example:
+ *   Input:  root = [5,4,6,3,14,null,7,null,null,null,null,9,8]
+ *   Output: preorder = 5->4->3->14->6->7->9->8->
+ *   Why:    preorder visits root first, then the left subtree, then the right subtree.
  *
- * Space Complexity:
- * - Recursive traversals: O(H), where H is the height of the tree due to the recursive call stack.
- * - Iterative traversals: O(N), where N is the number of nodes in the tree, as we store the nodes in a stack.
+ * Follow-ups:
+ *   1. Can inorder be done with O(1) extra space?
+ *      Use Morris traversal by temporarily threading predecessor links.
+ *   2. How would you return lists instead of printing?
+ *      Append to a List<Integer> at each visit point instead of printing.
+ *   3. How would you traverse an n-ary tree?
+ *      Generalize child iteration order and stack pushes over each node's children.
  *
- * LeetCode Link: https://leetcode.com/tag/tree/
+ * Related: Binary Tree Preorder Traversal (144), Inorder Traversal (94), Postorder Traversal (145).
  */
 public class TreeTraversal {
 
-    public static void main(String[] args) {
-        // Sample binary tree structure
-        /*
-                5
-               /  \
-             4     6
-            / \     \
-           3  14     7
-                    / \
-                   9   8
-        */
+        public static void main(String[] args) {
         TreeNode root = new TreeNode(5);
         root.left = new TreeNode(4);
         root.left.right = new TreeNode(14);
@@ -48,27 +44,30 @@ public class TreeTraversal {
         root.right.right.left = new TreeNode(9);
         root.right.right.right = new TreeNode(8);
 
-        System.out.println("Postorder traversal (recursive):");
-        postorder(root);
-
-        System.out.println("\nInorder traversal (iterative):");
-        inorderIterative(root);
-
-        System.out.println("\nPreorder traversal (recursive):");
+        System.out.printf("preorder root=%s -> ", Arrays.toString(new int[] {5, 4, 6, 3, 14, 7, 9, 8}));
         preorder(root);
-
-        System.out.println("\nPostorder traversal (iterative):");
-        postorderIterative(root);
-
-        System.out.println("\nPreorder traversal (iterative):");
-        preorderIterative(root);
+        System.out.printf("  expected=%s%n", "5->4->3->14->6->7->9->8->");
+        System.out.printf("inorder root=%s -> ", Arrays.toString(new int[] {5, 4, 6, 3, 14, 7, 9, 8}));
+        inorder(root);
+        System.out.printf("  expected=%s%n", "3->4->14->5->6->9->7->8->");
     }
 
-    /**
-     * Recursive Postorder Traversal.
-     * In Postorder, the left subtree is visited first, followed by the right subtree, and then the root.
+
+        /**
+     * Intuition: postorder delays visiting a node until both child subtrees have
+     * been completely processed. The recursive call stack naturally remembers
+     * where to return after left and right traversal.
      *
-     * @param root The current node.
+     * Algorithm:
+     *   1. Return immediately for a null node.
+     *   2. Traverse the left subtree.
+     *   3. Traverse the right subtree.
+     *   4. Print the current root value.
+     *
+     * Time:  O(n) - each node is printed once.
+     * Space: O(h) - recursion stack height.
+     *
+     * @param root current subtree root
      */
     static void postorder(TreeNode root) {
         if (root == null) return;

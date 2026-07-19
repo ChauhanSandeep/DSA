@@ -8,55 +8,64 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * This class provides a solution to print the left view of a binary tree.
- * The left view consists of the nodes visible when the tree is viewed from the left side.
+ * Problem: Left View of Binary Tree
  *
- * Intuition:
- * - To determine the left view of a binary tree, we need to print the first node at each level (from top to bottom).
- * - This can be achieved by using a level-order traversal (BFS) and selecting the first node encountered at each level.
+ * Return the nodes visible when the tree is viewed from the left side. That is
+ * the first node encountered at each depth when levels are scanned from left to
+ * right.
  *
- * Algorithm:
- * 1. Use a queue to implement level-order traversal of the tree.
- * 2. For each level, capture the first node and add it to the result list.
- * 3. Continue the traversal until all levels are processed.
+ * Leetcode: n/a (GeeksforGeeks left view of binary tree)
+ * Rating:   not available
+ * Pattern:  Trees | BFS | Level-order traversal | First node per level
  *
- * Time Complexity:
- * - O(N), where N is the number of nodes in the tree. Each node is processed once.
+ * Example:
+ *   Input:  root = [10,2,3,7,8,12,15,null,null,null,null,null,null,14]
+ *   Output: [10, 2, 7, 14]
+ *   Why:    those are the first nodes reached at levels 0 through 3.
  *
- * Space Complexity:
- * - O(W), where W is the width of the tree (the maximum number of nodes at any level). The queue will store up to W nodes at a time.
+ * Follow-ups:
+ *   1. How would you compute the right view?
+ *      Capture the last node at each BFS level.
+ *   2. Can DFS compute the left view?
+ *      Traverse left before right and record the first value seen at each depth.
+ *   3. How would you return both views together?
+ *      Store first and last node from each BFS level.
  */
 public class LeftView {
 
-    public static void main(String[] args) {
-        // Constructing the binary tree:
-        //        10
-        //       /  \
-        //      2    3
-        //     / \    / \
-        //    7   8  12  15
-        //               /
-        //             14
+        public static void main(String[] args) {
         TreeNode root = new TreeNode(10);
         root.left = new TreeNode(2);
         root.right = new TreeNode(3);
         root.left.left = new TreeNode(7);
         root.left.right = new TreeNode(8);
-        root.right.right = new TreeNode(15);
         root.right.left = new TreeNode(12);
+        root.right.right = new TreeNode(15);
         root.right.right.left = new TreeNode(14);
 
-        // Print the left view of the tree
-        List<Integer> leftNodes = printLeftView(root);
-        System.out.println(leftNodes);  // Output: [10, 2, 7, 14]
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[10,2,3,7,8,12,15,null,null,null,null,null,null,14]", printLeftView(root), "[10, 2, 7, 14]");
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[]", printLeftView(null), "[]");
     }
 
-    /**
-     * Prints the left view of the binary tree.
-     * The left view consists of the nodes visible when the tree is viewed from the left side.
+
+        /**
+     * Intuition: the left view is the first node removed from each BFS level.
+     * Because children are enqueued left before right, index 0 in every levelSize
+     * loop is the visible node for that depth.
      *
-     * @param root The root node of the binary tree.
-     * @return A list containing the left view of the binary tree.
+     * Algorithm:
+     *   1. Return an empty list for a null root.
+     *   2. Queue root and process one level at a time.
+     *   3. Add node.val when i == 0 for the current level.
+     *   4. Enqueue left child before right child for the next level.
+     *
+     * Time:  O(n) - each node is processed once.
+     * Space: O(w) - queue size is bounded by the maximum width.
+     *
+     * @param root root of the binary tree
+     * @return left-view values from top to bottom
      */
     public static List<Integer> printLeftView(TreeNode root) {
         List<Integer> result = new ArrayList<>();

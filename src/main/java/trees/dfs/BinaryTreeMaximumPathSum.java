@@ -3,88 +3,68 @@ package trees.dfs;
 /**
  * Problem: Binary Tree Maximum Path Sum
  *
- * A path in a binary tree is a sequence of nodes where each pair of adjacent nodes
- * has an edge connecting them. A node can only appear in the sequence at most once.
- * Note that the path does not need to pass through the root.
+ * A path can start and end at any nodes as long as it follows parent-child edges
+ * and never repeats a node. Return the largest possible sum of node values along
+ * any non-empty path in the tree.
  *
- * The path sum of a path is the sum of the node's values in the path.
- * Given the root of a binary tree, return the maximum path sum of any non-empty path.
+ * Leetcode: https://leetcode.com/problems/binary-tree-maximum-path-sum/ (Hard)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Postorder DP | Split path versus extendable path
  *
  * Example:
- * Input: root = [1,2,3]
- * Output: 6
- * Explanation: The optimal path is 2 -> 1 -> 3 with a path sum of 2 + 1 + 3 = 6.
+ *   Input:  root = [-10,9,20,null,null,15,7]
+ *   Output: 42
+ *   Why:    the best path is 15 -> 20 -> 7, which sums to 42.
  *
- * Constraints:
- * - The number of nodes in the tree is in the range [1, 3 * 10^4]
- * - -1000 <= Node.val <= 1000
+ * Follow-ups:
+ *   1. How would you return the path, not just the sum?
+ *      Store the best branch nodes and snapshot them when the global sum improves.
+ *   2. What if the path must start and end at leaves?
+ *      Only update a split path when both child branches exist, with leaf-aware bases.
+ *   3. What if you need the top k path sums?
+ *      Keep candidate path sums in a bounded heap while computing branch gains.
  *
- * LeetCode Problem: https://leetcode.com/problems/binary-tree-maximum-path-sum
- *
- * Follow-up Questions:
- *
- * 1. What if the path must start at a leaf and end at a leaf?
- *    Answer: Modify base case to return large negative value for null nodes instead
- *    of 0. Track whether current node is leaf. Only update max when both subtrees
- *    are non-null (ensuring path spans from leaf to leaf through current node).
- *
- * 2. How would you find the actual path, not just the sum?
- *    Answer: Store node references along with sums during DFS. When updating global
- *    maximum, also store the current path (left path + node + right path). Return
- *    the path corresponding to maximum sum found.
- *
- * 3. What if negative values are not allowed in the path?
- *    Answer: Similar to current solution where we use Math.max(0, childSum). Already
- *    handles this by ignoring negative contributions. The solution naturally excludes
- *    negative paths unless all values are negative.
- *
- * 4. How would you handle if each node has a weight/cost to traverse through it?
- *    Answer: Add weight parameter to nodes. Subtract traversal cost when calculating
- *    path sums. The DFS logic remains similar but accounts for costs in addition to
- *    node values.
- *
- * 5. What if you need to find k paths with maximum sums instead of just one?
- *    Answer: Use a min-heap of size k to track top k path sums. During DFS, whenever
- *    calculating a path sum, add to heap. Keep heap size at k by removing minimum
- *    when size exceeds k. Return heap contents at end.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Diameter of Binary Tree (543), Path Sum III (437).
  */
 public class BinaryTreeMaximumPathSum {
-    /**
-     * Finds maximum path sum using array return values.
-     * Returns int[2] where:
-     * - index 0: maximum path sum in entire subtree (can be through node or below)
-     * - index 1: maximum path sum that can extend to parent (single branch only)
+
+    public static void main(String[] args) {
+        BinaryTreeMaximumPathSum solver = new BinaryTreeMaximumPathSum();
+        TreeNode simple = new TreeNode(1, new TreeNode(2), new TreeNode(3));
+        TreeNode mixed = new TreeNode(-10);
+        mixed.left = new TreeNode(9);
+        mixed.right = new TreeNode(20, new TreeNode(15), new TreeNode(7));
+
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            "[1,2,3]", solver.maxPathSum(simple), 6);
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            "[-10,9,20,null,null,15,7]", solver.maxPathSum(mixed), 42);
+    }
+
+        /**
+     * Intuition: every node has two different answers. One path may split
+     * through the node and use both children, but only a one-sided branch can be
+     * extended upward to the parent. calculateMaxPath returns both values so the
+     * parent can combine them correctly.
      *
      * Algorithm:
-     * 1. For each node, calculate both values from left and right subtrees
-     * 2. maxPathSum = max of (path through node, left subtree max, right subtree max)
-     * 3. maxBranchSum = node + max(left branch, right branch, 0)
-     * 4. Return both values as array
+     *   1. Recursively get the best complete path and extendable branch from each child.
+     *   2. Drop negative child branches by comparing each gain with zero.
+     *   3. Compute the best branch that can extend to the parent.
+     *   4. Compute the best complete path in this subtree, including a split through node.
      *
-     * Key insight: We need to track two different values:
-     * - Global maximum (can split at any node)
-     * - Branch maximum (can only go in one direction for parent)
-     *
-     * Time Complexity: O(N) where N is number of nodes. Visit each node once.
-     * Space Complexity: O(H) where H is tree height for recursion stack.
+     * Time:  O(n) - each node is evaluated once.
+     * Space: O(h) - recursion stack follows the tree height.
      *
      * @param root root of the binary tree
-     * @return maximum path sum in the tree
+     * @return maximum sum of any non-empty path
      */
     public int maxPathSum(TreeNode root) {
         int[] result = calculateMaxPath(root);
         return result[0]; // Return the global maximum
     }
 
-    /**
-     * Calculate maximum path sums for a subtree.
-     *
-     * @param node current node being processed
-     * @return int[2] where:
-     *         [0] = maximum path sum in this subtree (global max for this subtree)
-     *         [1] = maximum sum of single branch extending to parent
-     */
+        // Returns {best path in subtree, best single branch that can extend upward}.
     private int[] calculateMaxPath(TreeNode node) {
         // Base case: null node contributes nothing
         if (node == null) {

@@ -5,40 +5,63 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * Binary Tree Level Order Traversal
+ * Problem: Binary Tree Level Order Traversal
  *
- * Problem Statement:
- * Given the root of a binary tree, return the level order traversal of its nodes' values.
- * (i.e., from left to right, level by level).
+ * Return the values of a binary tree level by level from top to bottom. Within
+ * each level, values are listed from left to right.
+ *
+ * Leetcode: https://leetcode.com/problems/binary-tree-level-order-traversal/ (Medium)
+ * Rating:   not available
+ * Pattern:  Trees | BFS | Queue | Level-size boundary
  *
  * Example:
- * Input: root = [3,9,20,null,null,15,7]
- * Output: [[3],[9,20],[15,7]]
- * Explanation: Level 0: [3], Level 1: [9,20], Level 2: [15,7]
+ *   Input:  root = [3,9,20,null,null,15,7]
+ *   Output: [[3], [9, 20], [15, 7]]
+ *   Why:    the queue processes all nodes at one depth before moving to the next.
  *
- * LeetCode Link: https://leetcode.com/problems/binary-tree-level-order-traversal
+ * Follow-ups:
+ *   1. How would you return bottom-up order?
+ *      Reverse the list of levels after BFS or prepend each completed level.
+ *   2. How would you produce zigzag order?
+ *      Reverse every other level or insert values at opposite ends.
+ *   3. Can DFS produce the same grouping?
+ *      Pass the depth and append each node value to result[depth].
  *
- * Follow-up Questions:
- * 1. What if we need reverse level order? - Use Collections.reverse() or build result backwards
- * 2. What about zigzag traversal? - Alternate direction flag with Collections.reverse()
- * 3. How to handle very wide trees? - Consider iterative approach to avoid stack overflow
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Binary Tree Zigzag Level Order Traversal (103), Binary Tree Right Side View (199).
  */
 public class BinaryTreeLevelOrderTraversal {
 
-    /**
-     * Returns level order traversal using BFS with queue.
+    public static void main(String[] args) {
+        BinaryTreeLevelOrderTraversal solver = new BinaryTreeLevelOrderTraversal();
+        TreeNode root = new TreeNode(3);
+        root.left = new TreeNode(9);
+        root.right = new TreeNode(20);
+        root.right.left = new TreeNode(15);
+        root.right.right = new TreeNode(7);
+
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[3,9,20,null,null,15,7]", solver.levelOrder(root), "[[3], [9, 20], [15, 7]]");
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[]", solver.levelOrder(null), "[]");
+    }
+
+
+        /**
+     * Intuition: BFS naturally visits nodes by increasing depth. Capturing the
+     * queue size before a level starts creates a boundary, so all nodes removed
+     * in that loop belong to the same output list.
      *
-     * Algorithm: Breadth-First Search
-     * - Use queue to process nodes level by level
-     * - For each level, process all nodes currently in queue
-     * - Add children of current level to queue for next iteration
+     * Algorithm:
+     *   1. Return an empty result for a null root.
+     *   2. Put root in the queue.
+     *   3. For each level, remove exactly levelSize nodes and collect their values.
+     *   4. Enqueue each removed node's left child before its right child.
      *
-     * Time Complexity: O(n) - visit each node exactly once
-     * Space Complexity: O(w) - where w is maximum width of tree (queue size)
+     * Time:  O(n) - each node is enqueued and dequeued once.
+     * Space: O(w) - the queue can hold the widest level.
      *
-     * @param root root of binary tree
-     * @return list of lists representing level order traversal
+     * @param root root of the binary tree
+     * @return values grouped by depth from top to bottom
      */
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<>();
@@ -91,7 +114,7 @@ public class BinaryTreeLevelOrderTraversal {
         return result;
     }
 
-    // Helper method for DFS approach
+    // Adds each node to the list that corresponds to its depth.
     private void dfsHelper(TreeNode node, int level, List<List<Integer>> result) {
         if (node == null) {
             return;

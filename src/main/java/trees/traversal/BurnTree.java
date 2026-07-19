@@ -4,49 +4,36 @@ import trees.Node;
 import trees.TreeNode;
 
 /**
- * **Burning a Binary Tree from a Leaf Node**
+ * Problem: Burn a Binary Tree from a Leaf
  *
- * Given a binary tree and a leaf node, the fire spreads to all connected nodes (parent, left, right)
- * every second. The goal is to determine the minimum time required to completely burn the tree.
+ * Fire starts at a node value and spreads to connected nodes every second
+ * through parent, left child, and right child links. Return the time required
+ * for the fire to reach every node in the tree.
  *
- * For example:
- * * ```
- *                5
- *               /  \
- *             4     6
- *            / \     \
- *           3  14     7
- *                    / \
- *                   9   8
- * ```
- * If the fire starts at node `14`, it will take `5` seconds to burn the entire tree.
+ * Leetcode: n/a (GeeksforGeeks burning tree variant)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Distance bubbling | Opposite-subtree propagation
  *
- * **Key Points:**
- * - Fire spreads to parent, left, and right nodes.
+ * Example:
+ *   Input:  root = [5,4,6,3,14,null,7,null,null,null,null,9,8], leaf = 14
+ *   Output: 5
+ *   Why:    the farthest nodes, 9 and 8, burn five seconds after node 14.
  *
- * **Approach:**
- * - Perform a postorder traversal to find the leaf node.
- * - As we return back, calculate the depth at which the leaf node is found.
- * - Keep track of the farthest node burning using a **global max time counter**.
- * - Burn child nodes on the opposite subtree after encountering the burning leaf.
+ * Follow-ups:
+ *   1. How would you support any starting node, not only a leaf?
+ *      The same distance-bubbling DFS works as long as values are unique.
+ *   2. How would you return nodes burned at each second?
+ *      Build parent links and run BFS levels from the start node.
+ *   3. What if edges have different burn times?
+ *      Model the tree as a weighted graph and run Dijkstra.
  *
- * **Time Complexity:** **O(N)** (visiting each node once)
- * **Space Complexity:** **O(H)** (recursion stack, worst case O(N) for skewed tree)
+ * Related: Amount of Time for Binary Tree to Be Infected (2385), All Nodes Distance K (863).
  */
 public class BurnTree {
 
     private int maxBurnTime = 0; // Tracks the maximum time taken to burn the tree
 
-    public static void main(String[] args) {
-        /*
-                5
-               /  \
-             4      6
-            / \      \
-           3  14       7
-                      / \
-                     9   8
-        */
+        public static void main(String[] args) {
         TreeNode root = new TreeNode(5);
         root.left = new TreeNode(4);
         root.left.right = new TreeNode(14);
@@ -56,29 +43,41 @@ public class BurnTree {
         root.right.right.left = new TreeNode(9);
         root.right.right.right = new TreeNode(8);
 
-        int leafNode = 14;
-        System.out.println("Time required to burn the tree: " + new BurnTree().burnTree(root, leafNode));
+        TreeNode single = new TreeNode(1);
+        System.out.printf("root=%s leaf=%d -> %d  expected=%d%n",
+            "[5,4,6,3,14,null,7,null,null,null,null,9,8]", 14,
+            new BurnTree().burnTree(root, 14), 5);
+        System.out.printf("root=%s leaf=%d -> %d  expected=%d%n",
+            "[1]", 1, new BurnTree().burnTree(single, 1), 0);
     }
 
-    /**
-     * Computes the minimum time required to burn the entire tree starting from a given leaf node.
+
+        /**
+     * Intuition: once the burning node is found, ancestors learn how many seconds
+     * away they are as recursion unwinds. At each ancestor, fire also enters the
+     * opposite subtree, so propagateFire measures the deepest node reached from
+     * that side with the elapsed time already spent.
      *
-     * @param root The root of the binary tree.
-     * @param leafValue The value of the leaf node where the fire starts.
-     * @return The minimum time required to burn the entire tree.
+     * Algorithm:
+     *   1. DFS left before right to find leafValue.
+     *   2. Return -1 from subtrees that do not contain the burning node.
+     *   3. When a child path contains the start, update maxBurnTime with that distance.
+     *   4. Propagate fire into the opposite child using the known elapsed time.
+     *   5. Return the distance to the parent and finally return maxBurnTime.
+     *
+     * Time:  O(n) - each node is visited by search or propagation a constant number of times.
+     * Space: O(h) - recursion follows tree height.
+     *
+     * @param root root of the binary tree
+     * @param leafValue value where the fire starts
+     * @return seconds needed to burn the whole tree
      */
     public int burnTree(TreeNode root, int leafValue) {
         findBurningNode(root, leafValue);
         return maxBurnTime;
     }
 
-    /**
-     * Recursively finds the burning node and calculates burning times.
-     *
-     * @param node Current node in traversal.
-     * @param leafValue The target leaf node from which the fire starts.
-     * @return The depth of the burning node if found, otherwise -1.
-     */
+        // Finds the start node and returns its distance to each ancestor.
     private int findBurningNode(TreeNode node, int leafValue) {
         if (node == null) return -1;
 
@@ -102,12 +101,7 @@ public class BurnTree {
         return -1; // Leaf node not found in this path
     }
 
-    /**
-     * Burns all child nodes in a subtree at increasing time intervals.
-     *
-     * @param node Current node in the opposite subtree.
-     * @param time Time taken for fire to reach this node.
-     */
+        // Updates maxBurnTime for every node in a subtree reached after time seconds.
     private void propagateFire(TreeNode node, int time) {
         if (node == null) return;
 

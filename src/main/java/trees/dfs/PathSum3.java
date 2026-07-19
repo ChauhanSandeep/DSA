@@ -2,36 +2,77 @@ package trees.dfs;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 /**
- * Given the root of a binary tree and an integer targetSum, count the number of paths where
- * the sum of the values along the path equals targetSum.
- * The path must go downwards (i.e., traveling only from parent nodes to child nodes),
- * and it does not need to start or end at the root or a leaf.
+ * Problem: Path Sum III
  *
- * LeetCode Problem Link: https://leetcode.com/problems/path-sum-iii/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Count downward paths whose node values sum to a target. A path may start at
+ * any node and end at any descendant, but it must always move from parent to
+ * child.
+ *
+ * Leetcode: https://leetcode.com/problems/path-sum-iii/ (Medium)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Prefix sums | Backtracking counts
+ *
+ * Example:
+ *   Input:  root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8
+ *   Output: 3
+ *   Why:    the matching paths are 5 -> 3, 5 -> 2 -> 1, and -3 -> 11.
+ *
+ * Follow-ups:
+ *   1. How would you return the actual paths?
+ *      Store path indices for prefix sums and copy the matching suffixes.
+ *   2. What if many target queries are asked on the same tree?
+ *      Precompute root-to-node prefix sums, but arbitrary descendant queries still need indexing.
+ *   3. What if values can overflow int sums?
+ *      Use long keys for cumulative sums and differences.
+ *
+ * Related: Path Sum II (113), Subarray Sum Equals K (560).
  */
 public class PathSum3 {
+
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(10);
+        root.left = new TreeNode(5);
+        root.right = new TreeNode(-3);
+        root.left.left = new TreeNode(3);
+        root.left.right = new TreeNode(2);
+        root.right.right = new TreeNode(11);
+        root.left.left.left = new TreeNode(3);
+        root.left.left.right = new TreeNode(-2);
+        root.left.right.right = new TreeNode(1);
+
+        TreeNode single = new TreeNode(1);
+        System.out.printf("root=%s targetSum=%d -> %d  expected=%d%n",
+            Arrays.toString(new int[] {10, 5, -3, 3, 2, 11, 3, -2, 1}), 8,
+            new PathSum3().pathSum(root, 8), 3);
+        System.out.printf("root=%s targetSum=%d -> %d  expected=%d%n",
+            Arrays.toString(new int[] {1}), 1, new PathSum3().pathSum(single, 1), 1);
+    }
+
 
     // Variable to store the result (number of paths with sum equal to targetSum)
     private int result;
 
-    /**
-     * This method starts the path sum calculation and initiates the DFS traversal.
+        /**
+     * Intuition: along the current root-to-node path, two prefix sums that differ
+     * by targetSum define one downward path with that sum. sumFrequencyMap stores
+     * only prefixes from the active recursion path, then backtracking removes the
+     * current prefix before returning to siblings.
      *
      * Algorithm:
-     * - We use a depth-first search (DFS) approach to traverse the tree.
-     * - As we traverse, we maintain the cumulative sum (`currSum`) and use a hashmap to track the number of times a particular sum has occurred.
-     * - If at any point the difference between the current sum and the target sum (`currSum - targetSum`) exists in the hashmap,
-     * it means we've found a path that sums up to the target.
+     *   1. Start DFS with currSum 0 and an empty prefix-frequency map.
+     *   2. Add root.val to currSum and count direct root-starting matches.
+     *   3. Add frequencies of currSum - targetSum to result.
+     *   4. Record currSum, recurse left then right, and remove currSum while backtracking.
      *
-     * Time Complexity: O(N), where N is the number of nodes in the tree.
-     * Space Complexity: O(H), where H is the height of the tree (due to recursion stack and hashmap storage).
+     * Time:  O(n) - each node performs constant map work once.
+     * Space: O(h) - the map and recursion hold prefixes on the active path.
      *
-     * @param root The root node of the binary tree.
-     * @param sum The target sum to find paths for.
-     * @return The number of paths where the sum of values equals targetSum.
+     * @param root root of the binary tree
+     * @param sum target path sum
+     * @return number of downward paths that sum to sum
      */
     public int pathSum(TreeNode root, int sum) {
         // Initialize the result and hashmap to store cumulative sums
@@ -44,14 +85,7 @@ public class PathSum3 {
         return result;
     }
 
-    /**
-     * This helper method performs a DFS traversal and checks for paths with sum equal to the target.
-     *
-     * @param root The current node being processed.
-     * @param currSum The cumulative sum from the root to the current node.
-     * @param targetSum The target sum we are trying to find.
-     * @param sumFrequencyMap A hashmap storing the frequency of cumulative sums encountered during traversal like <sum, frequency>.
-     */
+        // DFS helper that maintains prefix-sum frequencies for the current path only.
     private void pathSum(TreeNode root, int currSum, int targetSum, Map<Integer, Integer> sumFrequencyMap) {
         if (root == null) {
             return;

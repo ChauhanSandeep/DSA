@@ -5,54 +5,61 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * Computes the Bottom View of a Binary Tree.
+ * Problem: Bottom View of Binary Tree
  *
- * The Bottom View consists of the last visible nodes when the tree is viewed from the bottom.
+ * Return the nodes visible when a binary tree is viewed from below. Nodes share
+ * a vertical column by horizontal distance; the bottom view keeps the last node
+ * encountered for each column during level-order traversal.
  *
- *          20
- *         /  \
- *       8     22
- *      / \    / \
- *     5   3  4  25
- *        / \
- *      10  14
+ * Leetcode: n/a (GeeksforGeeks bottom view of binary tree)
+ * Rating:   not available
+ * Pattern:  Trees | BFS | Horizontal distance | TreeMap ordering
  *
- *  output : [5, 10, 3, 4, 25]
+ * Example:
+ *   Input:  root = [1,2,3]
+ *   Output: [2, 1, 3]
+ *   Why:    columns -1, 0, and 1 contain nodes 2, 1, and 3 respectively.
  *
- * **Approach:**
- * - Perform a level-order traversal using a queue (BFS).
- * - Maintain a TreeMap to store the last encountered node for each horizontal distance (hd).
- * - Store nodes in a map where the key is `hd` and the value is the last node encountered at that `hd`.
- * - Extract values from the TreeMap to get the final bottom view.
+ * Follow-ups:
+ *   1. How would you compute the top view instead?
+ *      Only write a column the first time it appears in BFS.
+ *   2. How would you break ties by depth and value?
+ *      Store row and value with each column entry and compare explicitly.
+ *   3. Can DFS compute bottom view?
+ *      Track depth for each horizontal distance and replace only with deeper nodes.
  *
- * **Time Complexity:** O(N) - We visit each node once in BFS.
- * **Space Complexity:** O(N) - For storing nodes in a queue and map.
- *
- * **LeetCode Link:** https://www.geeksforgeeks.org/dsa/bottom-view-binary-tree/
+ * Related: Vertical Order Traversal, Top View of Binary Tree.
  */
 public class BottomView {
-    public static void main(String[] args) {
-        // Constructing the binary tree
-        TreeNode root = new TreeNode(20);
-        root.left = new TreeNode(8);
-        root.right = new TreeNode(22);
-        root.left.left = new TreeNode(5);
-        root.left.right = new TreeNode(3);
-        root.right.left = new TreeNode(4);
-        root.right.right = new TreeNode(25);
-        root.left.right.left = new TreeNode(10);
-        root.left.right.right = new TreeNode(14);
+        public static void main(String[] args) {
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
 
-        // Get and print bottom view
-        List<Integer> bottomView = getBottomView(root);
-        System.out.println(bottomView);
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[1,2,3]", getBottomView(root), "[2, 1, 3]");
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[]", getBottomView(null), "[]");
     }
 
-    /**
-     * Computes the bottom view of a binary tree using BFS.
+
+        /**
+     * Intuition: BFS visits shallower nodes before deeper nodes. Replacing the
+     * value for a horizontal distance each time it is seen leaves the deepest,
+     * latest node for that column, and TreeMap emits columns from left to right.
      *
-     * @param root The root node of the tree.
-     * @return A list containing the bottom view of the tree.
+     * Algorithm:
+     *   1. Return an empty list for a null root.
+     *   2. BFS nodes with their horizontalDistance, starting root at zero.
+     *   3. Overwrite bottomViewMap[horizontalDistance] with each visited value.
+     *   4. Enqueue left with distance - 1 and right with distance + 1.
+     *   5. Return the TreeMap values in sorted column order.
+     *
+     * Time:  O(n log n) - each node may update a TreeMap column.
+     * Space: O(n) - the map and queue can store many nodes.
+     *
+     * @param root root of the binary tree
+     * @return bottom-view values from leftmost column to rightmost column
      */
     private static List<Integer> getBottomView(TreeNode root) {
         if (root == null) return Collections.emptyList();

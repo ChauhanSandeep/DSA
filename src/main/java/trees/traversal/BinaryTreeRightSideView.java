@@ -9,64 +9,61 @@ import java.util.Queue;
 /**
  * Problem: Binary Tree Right Side View
  *
- * Given the root of a binary tree, imagine yourself standing on the right side of it.
- * Return the values of the nodes you can see ordered from top to bottom.
+ * Imagine standing to the right of a binary tree. Return the node values visible
+ * from top to bottom, which is one value per depth: the rightmost node at that
+ * level.
+ *
+ * Leetcode: https://leetcode.com/problems/binary-tree-right-side-view/ (Medium)
+ * Rating:   not available
+ * Pattern:  Trees | BFS | Level-order traversal | Last node per level
  *
  * Example:
- * Input: root = [1,2,3,null,5,null,4]
- *          1
- *         / \
- *        2   3
- *         \   \
- *          5   4
- * Output: [1,3,4]
- * Explanation: Looking from the right side, at each level we see: 1 (root), 3 (rightmost at level 1),
- * and 4 (rightmost at level 2). Node 2 is hidden behind 3, and node 5 is hidden behind 4.
+ *   Input:  root = [1,2,3,null,5,null,4]
+ *   Output: [1, 3, 4]
+ *   Why:    at each depth, 1, then 3, then 4 are the rightmost visible nodes.
  *
- * LeetCode Problem: https://leetcode.com/problems/binary-tree-right-side-view
+ * Follow-ups:
+ *   1. How would you return the left side view?
+ *      Capture the first node at each BFS level or DFS left-first by depth.
+ *   2. Can DFS compute the right view?
+ *      Visit right before left and record the first node seen at each depth.
+ *   3. How would you return both side views in one pass?
+ *      Store the first and last values for each BFS level.
  *
- * Follow-up Questions:
- * 1. How would you implement the left side view instead?
- *    Answer: For BFS, capture the first node at each level instead of the last. For DFS,
- *    traverse left child before right child and update the result only when visiting a level
- *    for the first time.
- *
- * 2. What if you need both left and right side views simultaneously?
- *    Answer: During level-order traversal, capture both the first and last nodes at each level.
- *    Store them as pairs or in separate lists. This requires minimal additional logic.
- *    Related discussion: https://leetcode.com/discuss/interview-question/
- *
- * 3. Can you solve this without using a queue?
- *    Answer: Yes, use DFS with depth tracking. Visit right child before left and record the
- *    first node encountered at each depth. This avoids queue overhead while achieving the same result.
- *
- * 4. How would you extend this to return nodes at a specific viewing angle?
- *    Answer: Generalize by assigning horizontal distances to nodes. At each level, return nodes
- *    within a specified horizontal distance range based on the viewing angle.
- *
- * 5. What if the tree is extremely wide but shallow?
- *    Answer: BFS is optimal as it processes one level at a time with O(width) space. DFS would
- *    use less space (O(height)) but the height-to-width ratio makes BFS more practical.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Binary Tree Level Order Traversal (102), Boundary of Binary Tree (545).
  */
 public class BinaryTreeRightSideView {
-  /**
-   * Finds right side view using level-order traversal (BFS).
+
+  public static void main(String[] args) {
+    BinaryTreeRightSideView solver = new BinaryTreeRightSideView();
+    TreeNode root = new TreeNode(1);
+    root.left = new TreeNode(2);
+    root.right = new TreeNode(3);
+    root.left.right = new TreeNode(5);
+    root.right.right = new TreeNode(4);
+
+    System.out.printf("root=%s -> %s  expected=%s%n",
+        "[1,2,3,null,5,null,4]", solver.rightSideView(root), "[1, 3, 4]");
+    System.out.printf("root=%s -> %s  expected=%s%n",
+        "[]", solver.rightSideView(null), "[]");
+  }
+
+    /**
+   * Intuition: a right side view is the last node encountered in normal
+   * left-to-right BFS for each level. The levelSize loop tells us exactly which
+   * node is last before the next level's children begin.
    *
    * Algorithm:
-   * 1. Use queue for level-order traversal of the tree
-   * 2. Process nodes level by level using queue size to track level boundaries
-   * 3. At each level, capture the last node's value (rightmost visible node)
-   * 4. Add children to queue for next level processing
-   * 5. Continue until all levels are processed
+   *   1. Return an empty list for a null root.
+   *   2. Process BFS one level at a time.
+   *   3. Add node.val when i is levelSize - 1.
+   *   4. Enqueue left child, then right child, preserving original level order.
    *
-   * Time Complexity: O(N) where N is the number of nodes. Each node is visited once
-   * during the BFS traversal.
-   * Space Complexity: O(W) where W is the maximum width of the tree. In the worst case
-   * of a complete binary tree, the last level contains N/2 nodes, making it O(N).
+   * Time:  O(n) - each node is processed once.
+   * Space: O(w) - the queue stores the current frontier.
    *
-   * @param root the root node of the binary tree
-   * @return list of values visible from the right side
+   * @param root root of the binary tree
+   * @return values visible from the right side
    */
   public List<Integer> rightSideView(TreeNode root) {
     List<Integer> result = new ArrayList<>();
@@ -122,7 +119,7 @@ public class BinaryTreeRightSideView {
     return result;
   }
 
-  // Helper method for DFS traversal with depth tracking
+  // Right-first DFS helper that records the first node seen at each depth.
   private void dfs(TreeNode node, int depth, List<Integer> result) {
     if (node == null) {
       return;

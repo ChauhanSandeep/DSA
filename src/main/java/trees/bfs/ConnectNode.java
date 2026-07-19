@@ -5,46 +5,63 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Connect Nodes at the Same Level in a Binary Tree
- * 
- * LeetCode: https://leetcode.com/problems/populating-next-right-pointers-in-each-node/
+ * Problem: Populating Next Right Pointers in Each Node
  *
- * The problem requires connecting all nodes at the same level in a binary tree.
- * Specifically, each node should point to its next right node at the same level.
- * If there is no next right node, the pointer should be set to `null`.
+ * Given a binary tree node type with a nextRight pointer, connect every node to
+ * its immediate neighbor on the same level. The last node on each level should
+ * keep nextRight as null.
  *
- * **Approach:**
- * - Perform **level-order traversal** using a queue.
- * - For each level, set the `nextRight` pointer of each node to the next node in the same level.
- * - This is done by using a single queue where each level is processed in sequence.
+ * Leetcode: https://leetcode.com/problems/populating-next-right-pointers-in-each-node/ (Medium)
+ * Rating:   not available
+ * Pattern:  Trees | BFS | Level-order traversal | Queue by level size
  *
- * **Time Complexity:** **O(N)** (Each node is processed once)
- * **Space Complexity:** **O(N)** (Space for queue, at worst when the last level is in the queue)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  root = [1,2,3]
+ *   Output: level links 2 -> 3 and 3 -> null
+ *   Why:    nodes 2 and 3 are adjacent on the same level, while root has no peer.
+ *
+ * Follow-ups:
+ *   1. Can this be solved with O(1) extra space for a perfect tree?
+ *      Walk already-created next pointers level by level.
+ *   2. What changes for an arbitrary binary tree?
+ *      Track the next level's head and tail while scanning current next pointers.
+ *   3. How would you print all levels using nextRight?
+ *      Start from each level's leftmost node and follow nextRight until null.
  */
 public class ConnectNode {
 
-    public static void main(String[] args) {
-        /*
-                10
-               /  \
-             8     2
-            /
-           3
-        */
+        public static void main(String[] args) {
+        Node root = new Node(1);
+        root.left = new Node(2);
+        root.right = new Node(3);
+        connect(root);
+        boolean linkedLevel = root.nextRight == null
+            && root.left.nextRight == root.right
+            && root.right.nextRight == null;
 
-        Node root = new Node(10);
-        root.left = new Node(8);
-        root.right = new Node(2);
-        root.left.left = new Node(3);
+        Node single = new Node(7);
+        connect(single);
+        boolean linkedSingle = single.nextRight == null;
 
-        connect(root);  // Connect nodes at the same level.
+        System.out.printf("root=%s -> %s  expected=%s%n", "[1,2,3]", linkedLevel, true);
+        System.out.printf("root=%s -> %s  expected=%s%n", "[7]", linkedSingle, true);
     }
 
-    /**
-     * Connects nodes at the same level in a binary tree using level-order traversal.
+
+        /**
+     * Intuition: nodes that should be connected are exactly the nodes removed
+     * from the queue during the same BFS level. queue.peek() is the next node on
+     * that level before children for later levels are added.
      *
-     * @param root The root node of the binary tree.
+     * Algorithm:
+     *   1. Put root in a queue and process one level at a time.
+     *   2. For every node except the last at that level, set nextRight to queue.peek().
+     *   3. Enqueue left and right children for the next level.
+     *
+     * Time:  O(n) - each node is dequeued once.
+     * Space: O(w) - the queue stores at most one level of nodes.
+     *
+     * @param root root of the binary tree whose nextRight links are filled
      */
     public static void connect(Node root) {
         if (root == null) return; // If the tree is empty, return immediately.

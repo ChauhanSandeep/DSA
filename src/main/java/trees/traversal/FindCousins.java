@@ -7,24 +7,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Given a binary tree and a target node, find all the cousins of the target node.
- * Cousins are nodes at the same level in the tree, but with different parents.
+ * Problem: Cousins in Binary Tree
  *
- * Steps:
- * - First, perform a DFS traversal to find the target node and record the level of each node.
- * - Store nodes at each level in a map.
- * - Once the target node is found, retrieve the list of nodes at that level from the map,
- *  excluding the target node's sibling.
+ * Given a binary tree and a target value, return the values of nodes on the same
+ * level as the target that do not share its parent. The root has no cousins.
  *
- * Time Complexity:
- * - The time complexity is O(n), where n is the number of nodes in the binary tree.
- *   We visit each node exactly once.
+ * Leetcode: n/a (InterviewBit cousins in binary tree)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Level grouping | Sibling exclusion
  *
- * Space Complexity:
- * - The space complexity is O(n), which is required to store the nodes at each level in a map.
+ * Example:
+ *   Input:  root = [1,2,3,4,5,6,7], target = 5
+ *   Output: [6, 7]
+ *   Why:    nodes 6 and 7 are at node 5's level but have parent 3, not parent 2.
  *
- * InterviewBit Link:
- * https://www.interviewbit.com/problems/cousins-in-binary-tree/
+ * Follow-ups:
+ *   1. How would you return a boolean for two target nodes being cousins?
+ *      Track each target's depth and parent, then compare both fields.
+ *   2. Can BFS make sibling removal simpler?
+ *      Process one level at a time and skip all children of the target's parent.
+ *   3. What if values are not unique?
+ *      Accept a node reference or augment traversal with identity information.
  */
 public class FindCousins {
 
@@ -34,18 +37,7 @@ public class FindCousins {
     // Variable to store the level of the target node
     private int targetNodeLevel;
 
-    /**
-     * Main method to test the FindCousins functionality.
-     */
     public static void main(String[] args) {
-        /**
-         * Construct the following binary tree:
-         *                   1
-         *                  / \
-         *                 2   3
-         *               / \  / \
-         *              4  5 6   7
-         */
         TreeNode root = new TreeNode(1);
         root.left = new TreeNode(2);
         root.left.left = new TreeNode(4);
@@ -54,20 +46,33 @@ public class FindCousins {
         root.right.left = new TreeNode(6);
         root.right.right = new TreeNode(7);
 
-        // Find cousins of node with value 5
         FindCousins finder = new FindCousins();
-        ArrayList<Integer> cousins = finder.solve(root, 5);
-
-        // Print the cousins
-        System.out.println(cousins);
+        System.out.printf("root=%s target=%d -> %s  expected=%s%n",
+            "[1,2,3,4,5,6,7]", 5, finder.solve(root, 5), "[6, 7]");
+        System.out.printf("root=%s target=%d -> %s  expected=%s%n",
+            "[1,2,3,4,5,6,7]", 2, new FindCousins().solve(root, 2), "[]");
     }
 
-    /**
-     * This method returns a list of cousin nodes of the target node.
+
+        /**
+     * Intuition: cousins are just the target's level group after removing the
+     * target and its sibling. traverse fills levelNodesMap while searching for
+     * target; when target is found in one child, the other child value is removed
+     * from the next level's list.
      *
-     * @param root   The root of the binary tree.
-     * @param target The value of the target node.
-     * @return A list of integers representing the cousins of the target node.
+     * Algorithm:
+     *   1. Return an empty list for null root or when target is the root.
+     *   2. Initialize levelNodesMap and targetNodeLevel.
+     *   3. DFS from root, adding non-target nodes to their currentLevel bucket.
+     *   4. When target is found under a parent, remove its sibling from the target level.
+     *   5. Return the bucket stored at targetNodeLevel.
+     *
+     * Time:  O(n) - each node is visited once.
+     * Space: O(n) - levelNodesMap can store every non-target value.
+     *
+     * @param root root of the binary tree
+     * @param target target node value
+     * @return values of target's cousins
      */
     public ArrayList<Integer> solve(TreeNode root, int target) {
         // Edge case: if the root is null or the target node is the root itself
@@ -86,15 +91,7 @@ public class FindCousins {
         return levelNodesMap.get(targetNodeLevel);
     }
 
-    /**
-     * A helper method to perform a DFS traversal of the tree and populate the levelNodesMap.
-     * It also identifies the level of the target node.
-     *
-     * @param node     The current node being visited.
-     * @param target   The value of the target node.
-     * @param currentLevel The current level in the tree.
-     * @return boolean indicating whether the target node was found.
-     */
+        // DFS that records level buckets and signals when target was found below a node.
     private boolean traverse(TreeNode node, int target, int currentLevel) {
         if (node == null) {
             return false;

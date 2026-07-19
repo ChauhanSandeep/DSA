@@ -5,82 +5,70 @@ import java.util.*;
 /**
  * Problem: Amount of Time for Binary Tree to Be Infected
  *
- * You are given the root of a binary tree with unique values, and an integer start.
- * At minute 0, an infection starts from the node with value start.
+ * An infection starts at the node whose value is start. Each minute it spreads
+ * across one parent-child edge to every adjacent uninfected node. Return the
+ * number of minutes needed until every node in the tree is infected.
  *
- * Each minute, a node becomes infected if:
- * - The node is currently uninfected
- * - The node is adjacent to an infected node (parent or child relationship)
- *
- * Return the number of minutes needed for the entire tree to be infected.
+ * Leetcode: https://leetcode.com/problems/amount-of-time-for-binary-tree-to-be-infected/ (Medium)
+ * Rating:   1711
+ * Pattern:  Trees | BFS | Parent map | Undirected graph from a binary tree
  *
  * Example:
- * Input: root = [1,5,3,null,4,10,6,9,2], start = 3
- * Output: 4
- * Explanation:
- * - Minute 0: Node 3
- * - Minute 1: Nodes 1, 10, 6
- * - Minute 2: Node 5
- * - Minute 3: Node 4
- * - Minute 4: Nodes 9, 2
+ *   Input:  root = [1,5,3,null,4,10,6,9,2], start = 3
+ *   Output: 4
+ *   Why:    the farthest nodes, 9 and 2, are four edges away from node 3.
  *
- * Constraints:
- * - The number of nodes in the tree is in the range [1, 10^5]
- * - 1 <= Node.val <= 10^5
- * - Each node has a unique value
- * - A node with a value of start exists in the tree
+ * Follow-ups:
+ *   1. What if there are multiple infection sources?
+ *      Seed the BFS queue with all starts and take the farthest first-reached node.
+ *   2. What if each edge has a different infection time?
+ *      Replace BFS with Dijkstra's algorithm on the parent-child graph.
+ *   3. What if some nodes are immune?
+ *      Skip immune nodes during traversal and report unreachable nodes separately.
+ *   4. What if infection can only move downward?
+ *      Start at the target node and return the height of that subtree.
  *
- * LeetCode Problem: https://leetcode.com/problems/amount-of-time-for-binary-tree-to-be-infected
- *
- * Follow-up Questions:
- *
- * 1. What if infection can only spread downward (parent to children)?
- *    Answer: Use simple BFS from starting node going only to children. Time becomes
- *    the height of subtree rooted at start node. No need to build parent map.
- *
- * 2. How would you modify if some nodes are immune to infection?
- *    Answer: Add immune node values to a set. During BFS, skip nodes in immune set.
- *    The infection stops spreading through immune nodes, potentially leaving parts
- *    of the tree uninfected.
- *
- * 3. What if you need to return which nodes get infected at each minute?
- *    Answer: Store nodes at each BFS level in separate lists. Return list of lists
- *    where result[i] contains all nodes infected at minute i.
- *
- * 4. How would you handle multiple starting infection points?
- *    Answer: Initialize BFS queue with all starting nodes at minute 0. Run BFS
- *    tracking visited nodes. Time is still maximum distance from any start node.
- *
- * 5. What if infection spreads with different speeds (some edges take longer)?
- *    Answer: Use Dijkstra's algorithm instead of BFS. Assign weights to edges based
- *    on infection speed. Find longest shortest path from start node to any other node.
- * LeetCode Contest Rating: 1711
+ * Related: All Nodes Distance K in Binary Tree (863), Burn Tree, Binary Tree Maximum Path Sum (124).
  */
 public class AmountOfTimeForBinaryTreeToBeInfected {
 
-    /**
-     * Finds infection time using graph conversion and BFS.
+    public static void main(String[] args) {
+        AmountOfTimeForBinaryTreeToBeInfected solver = new AmountOfTimeForBinaryTreeToBeInfected();
+
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(5);
+        root.right = new TreeNode(3);
+        root.left.right = new TreeNode(4);
+        root.left.right.left = new TreeNode(9);
+        root.left.right.right = new TreeNode(2);
+        root.right.left = new TreeNode(10);
+        root.right.right = new TreeNode(6);
+
+        TreeNode single = new TreeNode(1);
+        System.out.printf("root=%s start=%d -> %d  expected=%d%n",
+            "[1,5,3,null,4,10,6,9,2]", 3, solver.amountOfTime(root, 3), 4);
+        System.out.printf("root=%s start=%d -> %d  expected=%d%n",
+            "[1]", 1, solver.amountOfTime(single, 1), 0);
+    }
+
+
+        /**
+     * Intuition: once parent links are known, infection is just level-order
+     * expansion in an undirected graph. The first BFS records every node's
+     * parent and finds startNode. The second BFS starts from startNode; each
+     * completed level represents one elapsed minute.
      *
      * Algorithm:
-     * 1. Build parent map using BFS to enable upward traversal
-     * 2. Find the starting infection node during traversal
-     * 3. Run BFS from start node treating tree as undirected graph
-     * 4. Track visited nodes to avoid cycles
-     * 5. Count levels in BFS - each level is one minute
+     *   1. Build parentMap with BFS while remembering the node whose value is start.
+     *   2. Run BFS from startNode and visit parent, left child, and right child.
+     *   3. Count BFS levels and subtract the final extra increment after the queue empties.
      *
-     * Key insight: Binary tree infection spreads like BFS in undirected graph.
-     * Parent pointers allow infection to spread upward. BFS naturally processes
-     * nodes level by level (minute by minute).
-     *
-     * Time Complexity: O(N) where N is number of nodes. First BFS to build parent
-     * map visits all nodes once. Second BFS visits all nodes once.
-     *
-     * Space Complexity: O(N) for parent map, queue, and visited set. Each stores
-     * up to N nodes in worst case.
+     * Time:  O(n) - both traversals visit each node at most once.
+     * Space: O(n) - parentMap, visited, and the queue can each hold many nodes.
      *
      * @param root root of the binary tree
-     * @param start value of node where infection starts
-     * @return minutes needed for entire tree to be infected
+     * @param start value where infection starts
+     * @return minutes needed to infect the entire tree
      */
     public int amountOfTime(TreeNode root, int start) {
         // Build parent map and find start node
@@ -91,7 +79,7 @@ public class AmountOfTimeForBinaryTreeToBeInfected {
         return calculateInfectionTime(startNode, parentMap);
     }
 
-    // Build parent map and return the start node
+    // Builds parent links with BFS and returns the node whose value matches start.
     private TreeNode buildParentMap(TreeNode root, int start, Map<TreeNode, TreeNode> parentMap) {
         Queue<TreeNode> queue = new LinkedList<>();
         queue.offer(root);
@@ -119,7 +107,7 @@ public class AmountOfTimeForBinaryTreeToBeInfected {
         return startNode;
     }
 
-    // Calculate infection time using BFS from start node
+    // Runs BFS from the infected node and returns the number of elapsed levels.
     private int calculateInfectionTime(TreeNode startNode, Map<TreeNode, TreeNode> parentMap) {
         Queue<TreeNode> queue = new LinkedList<>();
         Set<TreeNode> visited = new HashSet<>();
@@ -186,7 +174,7 @@ public class AmountOfTimeForBinaryTreeToBeInfected {
         return dfs(start, graph, visited) - 1;
     }
 
-    // Build undirected graph from binary tree
+    // Adds parent-child edges to an adjacency list representation of the tree.
     private void buildGraph(TreeNode node, TreeNode parent, Map<Integer, List<Integer>> graph) {
         if (node == null) {
             return;
@@ -203,7 +191,7 @@ public class AmountOfTimeForBinaryTreeToBeInfected {
         buildGraph(node.right, node, graph);
     }
 
-    // DFS to find maximum distance from start node
+    // Returns the farthest DFS depth reachable from node without revisiting values.
     private int dfs(int node, Map<Integer, List<Integer>> graph, Set<Integer> visited) {
         visited.add(node);
         int maxDepth = 0;
