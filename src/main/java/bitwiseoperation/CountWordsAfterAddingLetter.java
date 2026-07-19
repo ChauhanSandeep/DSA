@@ -4,34 +4,56 @@ import java.util.*;
 
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/count-words-obtained-after-adding-a-letter/
+ * Problem: Count Words Obtained After Adding a Letter
  *
- * Problem Statement:
- * You are given two string arrays `startWords` and `targetWords`. A target word is valid if it can be obtained
- * by adding exactly one letter to any of the `startWords` and then rearranging the resulting string.
- * Return the number of valid target words.
+ * Given start words and target words, count how many targets can be made by
+ * adding exactly one new letter to a start word and then rearranging the
+ * letters. The bitmask solution assumes each word has unique lowercase letters.
+ *
+ * Leetcode: https://leetcode.com/problems/count-words-obtained-after-adding-a-letter/ (Medium)
+ * Rating:   1828 (zerotrac Elo)
+ * Pattern:  Bit manipulation | Letter-set mask | Reverse one-letter deletion
  *
  * Example:
- * Input: startWords = ["ant", "act", "tack"], targetWords = ["tack", "act", "acti"]
- * Output: 2
- * Explanation:
- * - "tack" can be formed from "act" by adding 'k'.
- * - "acti" can be formed from "ant" by adding 'i'.
+ *   Input:  startWords = ["ant", "act", "tack"], targetWords = ["tack", "act", "acti"]
+ *   Output: 2
+ *   Why:    "tack" can delete k to match "act", and "acti" can delete i to
+ *           match "act"; "act" itself is not one letter longer than any start word.
  *
- * Follow-up Questions:
- * - Can we avoid sorting for each word comparison?
- *   👉 Yes. Use a bitmask (int) to represent the characters in each word for constant-time comparison.
- * - Is it necessary to group words by length?
- *   👉 Not with bitmasking; length grouping is only helpful when comparing sorted strings.
- * LeetCode Contest Rating: 1828
+ * Follow-ups:
+ *   1. What if words may contain duplicate letters?
+ *      Use sorted strings or a 26-count signature because one bit cannot store multiplicity.
+ *   2. Can target words be processed as a stream?
+ *      Keep the start-word masks in a set and test each target independently.
+ *   3. How would you return the matching start word too?
+ *      Map each mask to an example start word and return it when a removed-letter mask matches.
+ *   4. What if the alphabet is larger than 26 letters?
+ *      Use a BitSet or sorted-character signature instead of packing letters into one int.
+ *
+ * Related: Maximum Product of Word Lengths (318), Word Subsets (916).
  */
 public class CountWordsAfterAddingLetter {
 
   public static void main(String[] args) {
-    String[] startWords = {"ant", "act", "tack"};
-    String[] targetWords = {"tack", "act", "acti"};
-    int result = new CountWordsAfterAddingLetter().wordCount(startWords, targetWords);
-    System.out.println(result); // Output: 2
+    CountWordsAfterAddingLetter solver = new CountWordsAfterAddingLetter();
+
+    String[][] startCases = {
+        {"ant", "act", "tack"},
+        {"ab", "a"},
+        {}
+    };
+    String[][] targetCases = {
+        {"tack", "act", "acti"},
+        {"abc", "abcd"},
+        {"a"}
+    };
+    int[] expected = {2, 1, 0};
+
+    for (int i = 0; i < startCases.length; i++) {
+      int output = solver.wordCountUsingBitmask(startCases[i], targetCases[i]);
+      System.out.printf("startWords=%s targetWords=%s -> %d  expected=%d%n",
+          Arrays.toString(startCases[i]), Arrays.toString(targetCases[i]), output, expected[i]);
+    }
   }
 
   /**
@@ -80,12 +102,7 @@ public class CountWordsAfterAddingLetter {
     return validCount;
   }
 
-  /**
-   * Utility method to return sorted version of the input string.
-   *
-   * @param word Input string.
-   * @return Sorted string.
-   */
+  /** Returns the characters of the word in sorted order. */
   private String sortChars(String word) {
     char[] chars = word.toCharArray();
     Arrays.sort(chars);
@@ -93,20 +110,24 @@ public class CountWordsAfterAddingLetter {
   }
 
   /**
-   * Optimized bitmasking approach.
-   * NOTE: Use this only if there are unique characters in the words. If unique characters are not guaranteed,
-   * this method will not work correctly and instead you should use the `wordCount` method above.
+   * Intuition: a word with unique lowercase letters can be represented as a
+   * 26-bit set, where bit i means the word contains the character 'a' + i. A
+   * target is valid if removing exactly one present bit leaves a mask already
+   * seen among the start words. The original loop tries all 26 bit positions,
+   * skips letters absent from the target, and checks each one-letter deletion.
    *
-   * Intuition:
-   * - Each word can be represented as a 26-bit integer where each bit corresponds to a letter from 'a' to 'z'.
-   * - For example, "abc" would be represented as 0b00000000000000000000000000000111 (bits for 'a', 'b', 'c' set).
-   * * Steps:
-   * 1. Convert each startWord to a bitmask.
-   * 2. For each targetWord, generate possible startWord masks by removing one letter.
-   * 3. Check if any of these masks exist in the set of startWord masks.
+   * Algorithm:
+   *   1. Convert every start word to its bitmask and store the masks in a set.
+   *   2. Convert each target word to a mask.
+   *   3. For each of the 26 possible letters, remove it with XOR if present.
+   *   4. Count the target once when the removed-letter mask exists in the start set.
    *
-   * Time Complexity: O(n + m * 26) => O(n), where n = total words, m = average word length.
-   * Space Complexity: O(n)
+   * Time:  O(W * L + T * 26) - each start word is scanned once, and each target tests 26 letter bits.
+   * Space: O(W) - one integer mask is stored for each start word.
+   *
+   * @param startWords words before adding one letter
+   * @param targetWords candidate words after adding one letter and rearranging
+   * @return count of target words that can be formed
    */
   public int wordCountUsingBitmask(String[] startWords, String[] targetWords) {
     Set<Integer> startWordMasks = new HashSet<>();
@@ -146,18 +167,7 @@ public class CountWordsAfterAddingLetter {
     return count;
   }
 
-  /**
-   * Converts a string into a 26-bit integer using bit masking.
-   * Each bit represents one of the lowercase letters 'a' to 'z'.
-   *
-   * For example:
-   *   - "a" -> 0b1             (1 << 0)
-   *   - "b" -> 0b10            (1 << 1)
-   *   - "abc" -> 0b111         (1 << 0 | 1 << 1 | 1 << 2) = 1 + 2 + 4 = 7
-   *
-   * This works because bit positions directly correspond to letter positions
-   * in the alphabet. No duplicate letters assumed.
-   */
+  /** Converts a lowercase word with unique letters into a 26-bit letter mask. */
   private int getBitMask(String word) {
     int mask = 0;
     for (char ch : word.toCharArray()) {
