@@ -1,46 +1,56 @@
 package dynamicprogramming.knapsackbounded;
 
+import java.util.Arrays;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/discuss/143726/C%2B%2BJavaPython-O(N)-Using-Deque
+ * Problem: Shortest Subarray With Sum at Least K
  *
- *  Problem:
- * Given an integer array `nums` and an integer `k`, find the length of the shortest non-empty subarray
- * whose sum is at least `k`. Return -1 if no such subarray exists.
+ * Given an integer array that may contain negative numbers, return the length of
+ * the shortest non-empty contiguous subarray with sum at least k. Return -1 when
+ * no such subarray exists.
  *
- * - Subarray = contiguous elements.
- * - Array can contain positive and negative integers.
+ * Leetcode: https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/
+ * Rating:   2307 (zerotrac Elo)
+ * Pattern:  Prefix sums | Monotonic deque | Shortest valid window with negatives
  *
  * Example:
- * Input: nums = [2,-1,2], k = 3
- * Output: 3
- * Explanation: The subarray [2, -1, 2] has a sum of 3, which is >= k.
- * LeetCode Contest Rating: 2307
+ *   Input:  nums = [2,-1,2], k = 3
+ *   Output: 3
+ *   Why:    the whole array sums to 3, and no shorter subarray reaches 3.
+ *
+ * Follow-ups:
+ *   1. What if all numbers are positive?
+ *      A normal sliding window works because expanding only increases the sum.
+ *   2. Can you return the subarray boundaries?
+ *      Store the best start and end whenever the deque front forms a valid sum.
+ *   3. What if k changes across many queries?
+ *      Precompute prefix sums, but answering arbitrary k efficiently needs a different offline or data-structure approach.
+ *
+ * Related: Minimum Size Subarray Sum (209), Constrained Subsequence Sum (1425).
  */
 public class ShortestSubarraySum {
 
-    public static void main(String[] args) {
-        int[] arr = {2, -1, 2, 3};
-        int target = 4;
-        // result : 2 because Subarray [2, 3] sums to 5.
-        System.out.println("Min subarray length is " + new ShortestSubarraySum().shortestSubarray(arr, target));
-    }
-
-    /**
-     * Simple version when array contains only positive integers.
-     *
-     * Approach: Basic Sliding Window
-     * - Use two pointers to maintain a sliding window.
-     * - Expand the window by moving the right pointer.
-     * - When the sum of the window is >= targetSum, try to shrink it from the left.
-     * - Keep track of the minimum length of valid subarrays.
-     *
-     * Condition: The array contains only positive integers.
-     *
-     * Time: O(N), Space: O(1)
-     */
+      /**
+   * Intuition: with only positive numbers, extending the right end never lowers
+   * the window sum and removing from the left never raises future right positions.
+   * That monotonicity lets a two-pointer window shrink greedily once it is valid.
+   *
+   * Algorithm:
+   *   1. Expand the window by subtracting numbers[windowEnd] from targetSum.
+   *   2. While the adjusted target is non-positive, record the window length.
+   *   3. Shrink from windowStart by adding that value back.
+   *   4. Return 0 when no valid positive-only window was found.
+   *
+   * Time:  O(n) - each pointer moves across the array once.
+   * Space: O(1) - only window boundaries and the best length are stored.
+   *
+   * @param targetSum required sum for the window
+   * @param numbers positive input values
+   * @return shortest positive-only subarray length, or 0 if none exists
+   */
   public int minSubArrayWithOnlyPositives(int targetSum, int[] numbers) {
       int windowStart = 0;
       int arrayLength = numbers.length;
@@ -63,36 +73,24 @@ public class ShortestSubarraySum {
       return minLength == arrayLength + 1 ? 0 : minLength;
   }
 
-    /**
-     * Optimized version using only a Deque of Pair<Index, PrefixSum> when array may contain negative numbers.
+        /**
+     * Intuition: negatives break the normal sliding window because extending can
+     * lower the sum. Prefix sums restore structure: a subarray is valid when the
+     * current prefix minus an earlier prefix is at least k, and smaller earlier
+     * prefixes are always better starts.
      *
-     * Steps:
-     * 1. **Rolling Prefix Sum**:
-     *    - Maintain a running `prefixSum` variable as we iterate through the array.
-     *    - No need to build a full prefix array.
+     * Algorithm:
+     *   1. Keep a rolling prefixSum and a deque of candidate starts in increasing prefix order.
+     *   2. Pop valid starts from the front and update the shortest length.
+     *   3. Pop larger or equal prefix sums from the back because they are worse starts.
+     *   4. Push the current index and prefixSum, then return -1 if no length was found.
      *
-     * 2. **Use a Deque of Pair<Index, PrefixSum>**:
-     *    - Stores potential candidates for start indices of subarrays.
-     *    - Maintains a **monotonic increasing order** of prefix sums.
+     * Time:  O(n) - each prefix enters and leaves the deque at most once.
+     * Space: O(n) - the deque can store all prefix candidates.
      *
-     * 3. **Deque Operations**:
-     *    - **Pop from front** if the current prefixSum - deque.front.prefixSum ≥ k.
-     *      → We found a valid subarray → update minimum length.
-     *    - **Pop from back** if current prefixSum ≤ deque.back.prefixSum.
-     *      → These entries are no longer useful as they represent worse starting points.
-     *    - **Push current index and prefixSum to the back**.
-     *
-     * 4. **Return Result**:
-     *    - If no valid subarray found, return -1.
-     *    - Otherwise, return the shortest valid length.
-     *
-     * Why this works:
-     * - Monotonic queue helps to quickly eliminate suboptimal start points.
-     * - Rolling prefix sum avoids building an extra array.
-     * - Efficient in both time and space: O(N)
-     *
-     * Time complexity: O(N)
-     * Space complexity: O(N)
+     * @param nums input values, possibly negative
+     * @param k required minimum subarray sum
+     * @return shortest subarray length with sum at least k, or -1 if none exists
      */
     public int shortestSubarray(int[] nums, int k) {
         int length = nums.length;
@@ -134,4 +132,19 @@ public class ShortestSubarraySum {
             this.prefixSum = prefixSum;
         }
     }
+
+
+    public static void main(String[] args) {
+        ShortestSubarraySum solver = new ShortestSubarraySum();
+        int[][] inputs = { {3}, {1, 2}, {5, 1, 1} };
+        int[] targets = {3, 5, 5};
+        int[] expected = {1, -1, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.shortestSubarray(inputs[i], targets[i]);
+            System.out.printf("nums=%s k=%d  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), targets[i], output, expected[i]);
+        }
+    }
+
 }

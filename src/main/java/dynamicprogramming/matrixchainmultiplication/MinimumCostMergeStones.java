@@ -4,77 +4,50 @@ import java.util.Arrays;
 
 
 /**
- * Minimum Cost to Merge Stones
+ * Problem: Minimum Cost to Merge Stones
  *
- * There are n piles of stones arranged in a row. The ith pile has stones[i] stones.
- * A move consists of merging exactly k consecutive piles into one pile, and the cost
- * of this move is equal to the total number of stones in these k piles.
+ * Given stone piles in a row, one move merges exactly k consecutive piles and
+ * costs the total stones in those piles. Return the minimum cost to merge all
+ * piles into one pile, or -1 if the exact-k merge rule makes that impossible.
  *
- * Return the minimum cost to merge all piles into one pile. If it is impossible, return -1.
- *
- * Key constraint: You can only merge exactly k consecutive piles at a time.
- * Each merge operation reduces the number of piles by (k-1).
+ * Leetcode: https://leetcode.com/problems/minimum-cost-to-merge-stones/
+ * Rating:   2423 (zerotrac Elo)
+ * Pattern:  Dynamic Programming | Interval DP | k-way merge feasibility
  *
  * Example:
- * Input: stones = [3,2,4,1], k = 2
- * Output: 20
- * Explanation:
- * - Merge [3,2] for cost 5, left with [5,4,1]
- * - Merge [4,1] for cost 5, left with [5,5]
- * - Merge [5,5] for cost 10, left with [10]
- * Total cost: 5 + 5 + 10 = 20
+ *   Input:  stones = [3,2,4,1], k = 2
+ *   Output: 20
+ *   Why:    merge [3,2] for 5, [4,1] for 5, then [5,5] for 10, giving total 20.
  *
- * LeetCode: https://leetcode.com/problems/minimum-cost-to-merge-stones/
+ * Follow-ups:
+ *   1. Why can some inputs never become one pile?
+ *      Each merge reduces pile count by k-1, so n-1 must be divisible by k-1.
+ *   2. Can this handle circular piles?
+ *      Duplicate the array and run interval DP over all length-n windows, taking the minimum valid result.
+ *   3. Can you reconstruct the merge sequence?
+ *      Store the split that minimized each interval and recursively output merges.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if different stone types have different merge costs beyond just weight?
- *    Answer: Extend DP state to include stone type combinations and modify cost calculation.
- * 2. How would you handle circular stone arrangements where ends can connect?
- *    Answer: Use circular DP by considering all possible starting points and circular splits.
- * 3. What if we can merge any consecutive subsequence, not just exactly k piles?
- *    Answer: Modify DP transitions to consider all possible merge sizes from 2 to remaining piles.
- * 4. How to optimize for very large arrays with repeated patterns?
- *    Answer: Use matrix exponentiation or identify repeating subproblems for memoization.
- *
- * Related Problems:
- * - LeetCode 312: Burst Balloons (Interval DP)
- * - LeetCode 1130: Minimum Cost Tree From Leaf Values (Interval DP)
- * - LeetCode 375: Guess Number Higher or Lower II (Interval DP)
- * LeetCode Contest Rating: 2423
+ * Related: Burst Balloons (312), Minimum Cost Tree From Leaf Values (1130).
  */
 public class MinimumCostMergeStones {
 
-  public static void main(String[] args) {
-    MinimumCostMergeStones solver = new MinimumCostMergeStones();
-
-    // Test case for k=2 (binary merge)
-    int[] stones = {3, 2, 4, 1};
-    System.out.println("Min cost (k=2): " + solver.mergeStones(stones, 2)); // Expected: 20
-  }
-
-    /**
-     * Main method: 2D Dynamic Programming with interval optimization.
-     * Step-by-step:
-     *  1. Check feasibility: To merge n piles into 1, we need (n-1) to be divisible by (k-1)
-     *     - Each merge reduces piles by (k-1), so after m merges: n - m*(k-1) = 1
-     *     - This gives: (n-1) % (k-1) == 0
-     *  2. Define DP state: dp[i][j] = minimum cost to merge stones[i..j] into minimum possible piles
-     *     - Minimum piles = ((j-i) % (k-1)) + 1
-     *  3. For each interval [i,j]:
-     *     a. Try all split points: split at i, i+k-1, i+2*(k-1), ... (increment by k-1)
-     *     b. Each split divides into two parts that are optimally merged
-     *     c. If (j-i) is divisible by (k-1), we can merge into 1 pile (add sum cost)
-     *  4. Use prefix sum for O(1) range sum queries
+        /**
+     * Intuition: merging k piles reduces the pile count by k - 1, which determines
+     * which intervals can become one pile. For a valid interval, split points spaced
+     * by k - 1 preserve feasible pile counts on both sides.
      *
-     * Key Insight:
-     * Each merge reduces piles by exactly (k-1). To merge interval into 1 pile, we first
-     * merge into k piles, then do final merge. Split points must be at k-1 intervals to
-     * ensure both sides can be optimally merged. The (n-1) % (k-1) == 0 condition ensures
-     * we can eventually reach 1 pile.
+     * Algorithm:
+     *   1. Reject arrays where (length - 1) is not divisible by k - 1.
+     *   2. Build prefix sums for O(1) interval merge costs.
+     *   3. Fill dp[start][end] by increasing interval length and valid split points.
+     *   4. When an interval can merge into one pile, add its stone sum.
      *
-     * Algorithm: Interval Dynamic Programming.
-     * Time Complexity: O(n³/k), outer loops O(n²), inner loop O(n/k) split points.
-     * Space Complexity: O(n²) for DP table.
+     * Time:  O(n^3 / k) - each interval tries split points spaced by k - 1.
+     * Space: O(n^2) - interval DP table.
+     *
+     * @param stones pile sizes
+     * @param k number of adjacent piles merged at once
+     * @return minimum merge cost, or -1 if impossible
      */
     public int mergeStones(int[] stones, int k) {
         int length = stones.length;
@@ -115,22 +88,23 @@ public class MinimumCostMergeStones {
         return dp[0][length - 1];
     }
 
-    /**
-     * Alternative method: Top-Down DP with Memoization (easier to understand).
-     * Step-by-step:
-     *  1. Use recursion with memoization to compute minimum cost
-     *  2. Base case: if i >= j, cost is 0 (single pile or invalid)
-     *  3. Try all split points at k-1 intervals
-     *  4. Recursively compute cost for left and right parts
-     *  5. If interval length allows merging to 1 pile, add merge cost
+        /**
+     * Intuition: the top-down version asks for the minimum cost of an interval and
+     * uses the same feasible split spacing. Memoization keeps each interval from
+     * being recomputed.
      *
-     * Key Insight:
-     * Same logic as bottom-up but uses recursion with memo for clarity.
-     * Easier to understand the subproblem decomposition.
+     * Algorithm:
+     *   1. Reject impossible global pile counts.
+     *   2. Build prefix sums and an interval memo table.
+     *   3. Recursively try valid split points for each interval.
+     *   4. Add the interval sum when the interval can collapse to one pile.
      *
-     * Algorithm: Top-Down DP with Memoization.
-     * Time Complexity: O(n³/k).
-     * Space Complexity: O(n²) for memoization + O(n) recursion stack.
+     * Time:  O(n^3 / k) - each interval scans valid split points.
+     * Space: O(n^2) - memo table plus recursion depth.
+     *
+     * @param stones pile sizes
+     * @param k number of adjacent piles merged at once
+     * @return minimum merge cost, or -1 if impossible
      */
     public int mergeStonesTopDown(int[] stones, int k) {
         int length = stones.length;
@@ -157,9 +131,7 @@ public class MinimumCostMergeStones {
         return helper(stones, k, 0, length - 1, prefixSum, memo);
     }
 
-    /**
-     * Helper: Recursively computes minimum cost to merge stones[i..j].
-     */
+        /** Recursively returns the minimum merge cost for stones[i..j]. */
     private int helper(int[] stones, int k, int i, int j, 
                       int[] prefixSum, int[][] memo) {
         // Base case: single pile or invalid
@@ -189,4 +161,19 @@ public class MinimumCostMergeStones {
         memo[i][j] = minCost;
         return minCost;
     }
+
+
+    public static void main(String[] args) {
+        MinimumCostMergeStones solver = new MinimumCostMergeStones();
+        int[][] stones = { {3, 2, 4, 1}, {3, 2, 4, 1}, {3} };
+        int[] kValues = {2, 3, 2};
+        int[] expected = {20, -1, 0};
+
+        for (int i = 0; i < stones.length; i++) {
+            int output = solver.mergeStones(stones[i], kValues[i]);
+            System.out.printf("stones=%s k=%d  ->  %d  expected=%d%n",
+                Arrays.toString(stones[i]), kValues[i], output, expected[i]);
+        }
+    }
+
 }

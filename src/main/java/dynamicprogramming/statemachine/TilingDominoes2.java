@@ -1,34 +1,28 @@
 package dynamicprogramming.statemachine;
 
 /**
- * Problem: Tiling a 3 x N Board with 2 x 1 Dominoes
+ * Problem: Tile a 3 x n Board With Dominoes
  *
- * You are given a 3 x N board. Count the number of ways to tile it completely using 2 x 1 dominoes.
- * - Dominoes can be placed either vertically or horizontally.
- * - All cells must be filled. Overlapping and out-of-bound placements are not allowed.
+ * Count the ways to completely cover a 3 x n board using only 2 x 1 dominoes.
+ * Dominoes may be vertical or horizontal, and every cell must be covered exactly
+ * once.
  *
- * Approach: Dynamic Programming with Bitmasking (State Compression)
- * - Represent the state of each column using a 3-bit mask (8 possible states: 0 to 7).
- *   - Bit 0: top row
- *   - Bit 1: middle row
- *   - Bit 2: bottom row
- *   - 1 means filled, 0 means empty
- * - Base state: `prev[7] = 1` (a fully filled column before the first)
- * - Use precomputed transitions from one state to another for each column.
- *
- * Leetcode version (different constraints): N/A
- * Reference: https://www.youtube.com/watch?v=yn2jnmlepY8
+ * Source: Classic state-compression domino tiling problem
+ * Pattern:  Dynamic Programming | State machine | Bitmask frontier DP
  *
  * Example:
- * Input: n = 2 → Output: 3
- * Ways:
- * - Two vertical dominoes in each column
- * - Four horizontal dominoes stacked
- * - Two L-shaped placements (top+middle, middle+bottom)
+ *   Input:  n = 2
+ *   Output: 3
+ *   Why:    the board can be filled with three vertical dominoes or by either of
+ *           the two horizontal-pair patterns across the two columns.
  *
- * Follow-up Questions:
- * - How would this change if trominoes or L-shaped tiles were allowed?
- * - How do you extend this to an M x N board? (Matrix DP with memoization or matrix exponentiation)
+ * Follow-ups:
+ *   1. How would this extend to an m x n board?
+ *      Use masks of m bits and generate transitions by DFS for each column frontier.
+ *   2. What if trominoes are also allowed?
+ *      Add tile placements to the transition generator; the mask DP framework stays the same.
+ *   3. Can n be very large?
+ *      Build the 8 x 8 transition matrix and exponentiate it in O(log n).
  */
 public class TilingDominoes2 {
 
@@ -36,19 +30,23 @@ public class TilingDominoes2 {
   private static final int STATE_COUNT = 8; // 3-bit masks from 000 to 111
   private static final int FULL_MASK = 7;   // 111 in binary — all rows filled
 
-  public static void main(String[] args) {
-    int n = 50;
-    System.out.println("Ways to tile a 3 x " + n + " board: " + countWaysToTile3xN(n));
-  }
-
-  /**
-   * DP with state compression using bitmasks.
+    /**
+   * Intuition: a 3 x n board needs frontier states because a partial column can
+   * have several filled-cell masks. Moving column by column, each mask records
+   * which cells of the current column are already occupied by horizontal dominoes
+   * from the previous column.
    *
-   * Each column can be represented using a 3-bit mask (0–7),
-   * where each bit represents the fill status of a cell (top to bottom).
+   * Algorithm:
+   *   1. Reject odd lengths because a 3 x odd board has odd area.
+   *   2. Keep counts for all eight occupancy masks.
+   *   3. For each column, transition masks by placing vertical and horizontal dominoes.
+   *   4. Return the full-mask count after processing all columns.
    *
-   * Time Complexity: O(N)
-   * Space Complexity: O(1) – constant space for 8 states
+   * Time:  O(length) - a constant number of mask transitions per column.
+   * Space: O(1) - only eight mask states are stored.
+   *
+   * @param length board length
+   * @return number of ways to tile a 3 x length board
    */
   public static int countWaysToTile3xN(int length) {
     if (length <= 0) return 0;
@@ -80,4 +78,16 @@ public class TilingDominoes2 {
 
     return prev[FULL_MASK]; // Final column must be completely filled
   }
+
+
+    public static void main(String[] args) {
+        int[] inputs = {1, 2, 4};
+        int[] expected = {0, 3, 11};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = countWaysToTile3xN(inputs[i]);
+            System.out.printf("n=%d  ->  %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
+    }
+
 }

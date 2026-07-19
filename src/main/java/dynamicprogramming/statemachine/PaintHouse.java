@@ -3,35 +3,30 @@ package dynamicprogramming.statemachine;
 import java.util.Arrays;
 
 /**
- * Problem: Paint House (Leetcode #256)
- * Link: https://leetcode.com/problems/paint-house/
+ * Problem: Paint House
  *
- * Problem Statement:
- * There is a row of n houses, where each house can be painted one of three
- * colors: red, blue, or green.
- * The cost of painting each house with a certain color is given in a `costs`
- * matrix of size n x 3.
- * - costs[i][0] is the cost of painting house i with red,
- * - costs[i][1] with blue,
- * - costs[i][2] with green.
+ * Paint a row of houses using exactly three colors. costs[i][c] gives the cost
+ * of painting house i with color c, and adjacent houses cannot share a color.
+ * Return the minimum total cost.
  *
- * You cannot paint two adjacent houses with the same color.
- * Return the minimum cost to paint all the houses.
+ * Leetcode: https://leetcode.com/problems/paint-house/
+ * Rating:   acceptance 64.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | State machine | Color choice with previous-color constraint
  *
  * Example:
- * Input: costs = [
- * // R, B, G
- * [17,2,17], // House 0
- * [16,16,5], // House 1
- * [14,3,19] // House 2
- * ]
- * Output: 10
- * Explanation:
- * - Paint house 0 with blue (cost = 2)
- * - Paint house 1 with green (cost = 5)
- * - Paint house 2 with blue (cost = 3)
- * Total cost = 2 + 5 + 3 = 10
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Input:  costs = [[17,2,17],[16,16,5],[14,3,19]]
+ *   Output: 10
+ *   Why:    blue, green, blue costs 2 + 5 + 3 and no adjacent houses share a color.
+ *
+ * Follow-ups:
+ *   1. What if there are k colors?
+ *      Use Paint House II and track the minimum and second minimum previous colors.
+ *   2. Can you return the color sequence?
+ *      Store the previous color that produced each minimum and backtrack from the last house.
+ *   3. What if some houses are already painted?
+ *      Restrict the color loop for those houses to the fixed color only.
+ *
+ * Related: Paint House II (265), Paint House III (1473).
  */
 public class PaintHouse {
 
@@ -110,18 +105,22 @@ public class PaintHouse {
     return result;
   }
 
-  /**
-   * Recursive method to compute min cost using top-down DP.
+    /**
+   * Intuition: the only state needed before painting a house is the color used on
+   * the previous house. For each current color, choose the cheapest future among
+   * the two different next colors.
    *
-   * Intuition:
-   * - Try all 3 color choices for each house recursively.
-   * - Use memoization to cache results and avoid recomputation.
+   * Algorithm:
+   *   1. Try each color for the first house.
+   *   2. Recursively paint the next house with any different color.
+   *   3. Add the current painting cost to the best future cost.
+   *   4. Memoize by house index and previous color.
    *
-   * Time Complexity: O(n * 3) => each house * each color
-   * Space Complexity: O(n * 3) for memo table + O(n) recursion stack
+   * Time:  O(n * 3 * 3) - each house/color state tries three colors.
+   * Space: O(n * 3) - memo table plus recursion depth.
    *
-   * @param costs 2D array of painting costs
-   * @return Minimum total cost to paint all houses
+   * @param costs costs[house][color] for three colors
+   * @return minimum cost to paint all houses with no equal adjacent colors
    */
   public int minCostRecursive(int[][] costs) {
     if (costs == null || costs.length == 0)
@@ -142,16 +141,7 @@ public class PaintHouse {
             dfs(0, 2, costs, memo)));
   }
 
-  /**
-   * Recursive helper function with memoization.
-   *
-   * @param houseIndex current house index
-   * @param color      current color (0=R, 1=G, 2=B)
-   * @param costs      cost matrix
-   * @param memo       memoization table
-   * @return minimum cost to paint from house houseIndex to end, starting with
-   *         given color
-   */
+    /** Returns the minimum cost from houseIndex onward after using color previously. */
   private int dfs(int houseIndex, int color, int[][] costs, int[][] memo) {
     if (houseIndex == costs.length)
       return 0;
@@ -174,27 +164,22 @@ public class PaintHouse {
     return minCost;
   }
 
-  /**
-   * Iterative DP approach to compute the minimum cost to paint all houses.
+    /**
+   * Intuition: the cost to paint a house a color is its own cost plus the cheaper
+   * previous-house cost among the other two colors. Updating each row accumulates
+   * the best total ending in each color.
    *
-   * Intuition:
-   * - Start from the first house and move forward.
-   * - At each house, compute the cost of painting it red, green, or blue,
-   * based on the minimum cost of painting the previous house with a different
-   * color.
+   * Algorithm:
+   *   1. Treat each row as minimum total cost ending with that color.
+   *   2. For every house after the first, add the minimum compatible previous color.
+   *   3. Continue in place through the costs matrix.
+   *   4. Return the minimum value in the final row.
    *
-   * Steps:
-   * 1. Iterate from house 1 to house n-1.
-   * 2. For each color, update the cost by adding the minimum cost of the two
-   * other colors from the previous house.
-   * 3. The minimum value in the last row gives the final result.
+   * Time:  O(n) - three color states are updated per house.
+   * Space: O(1) - the input cost matrix stores the DP totals.
    *
-   * Time Complexity: O(n), where n is number of houses
-   * Space Complexity: O(1), in-place update of the input array
-   *
-   * @param costs 2D array of costs to paint each house with red, green, or blue
-   * @return The minimum cost to paint all houses with no two adjacent houses
-   *         having the same color
+   * @param costs costs[house][color] for three colors
+   * @return minimum cost to paint all houses with no equal adjacent colors
    */
   public int minCostIterative(int[][] costs) {
     if (costs == null || costs.length == 0)
@@ -218,9 +203,23 @@ public class PaintHouse {
   }
 
   // For quick testing
-  public static void main(String[] args) {
-    PaintHouse ph = new PaintHouse();
-    int[][] costs = { { 17, 2, 17 }, { 16, 16, 5 }, { 14, 3, 19 } };
-    System.out.println("Minimum cost to paint all houses: " + ph.minCostIterative(costs)); // Expected: 10
-  }
+
+
+    public static void main(String[] args) {
+        PaintHouse solver = new PaintHouse();
+        int[][][] inputs = {
+            {},
+            {{7, 6, 2}},
+            {{17, 2, 17}, {16, 16, 5}, {14, 3, 19}}
+        };
+        int[] expected = {0, 2, 10};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] costsCopy = Arrays.stream(inputs[i]).map(int[]::clone).toArray(int[][]::new);
+            int output = solver.minCostIterative(costsCopy);
+            System.out.printf("costs=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

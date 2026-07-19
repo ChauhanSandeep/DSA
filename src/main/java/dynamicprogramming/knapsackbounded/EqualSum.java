@@ -1,58 +1,49 @@
 package dynamicprogramming.knapsackbounded;
 
+import java.util.Arrays;
+
 /**
- * Problem Statement:
- * Given an array of positive integers nums, return true if you can partition the array into two subsets
- * such that the sum of the elements in both subsets is equal, or false otherwise.
+ * Problem: Partition Equal Subset Sum
+ *
+ * Given positive integers, decide whether they can be split into two subsets
+ * with equal sum. Each element must go into exactly one of the two subsets.
+ *
+ * Leetcode: https://leetcode.com/problems/partition-equal-subset-sum/
+ * Rating:   acceptance 49.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | 0/1 knapsack | Subset sum feasibility
  *
  * Example:
- * Input: nums = [1,5,11,5]
- * Output: true
- * Explanation: The array can be partitioned as [1,5,5] and [11], both summing to 11.
+ *   Input:  nums = [1,5,11,5]
+ *   Output: true
+ *   Why:    [11] and [1,5,5] both sum to 11, so the array can be split evenly.
  *
- * LeetCode Link: https://leetcode.com/problems/partition-equal-subset-sum/
+ * Follow-ups:
+ *   1. How do you minimize the difference instead of requiring equality?
+ *      Compute all reachable subset sums and choose the one closest to total / 2.
+ *   2. How do you partition into k equal-sum subsets?
+ *      Check divisibility by k, then use backtracking with pruning or bitmask DP.
+ *   3. What if negative numbers are allowed?
+ *      Use an offset or hash-set based DP over reachable sums instead of a simple non-negative table.
  *
- * Follow-up Questions:
- * 1. What if we need to minimize the absolute difference between the two subset sums instead of making them equal?
- *    - Use DP to find all possible subset sums and find the one closest to total/2, then compute |total - 2*closest|.
- *      Relevant problem: https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/
- * 2. How to partition into k subsets with equal sums?
- *    - First check if total sum % k == 0, then use backtracking to assign elements to k subsets each summing to sum/k.
- *      Relevant problem: https://leetcode.com/problems/partition-to-k-equal-sum-subsets/
- * 3. What if negative numbers are allowed?
- *    - The problem becomes NP-hard in general, but for small ranges, DP can still work with offset for negatives.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Target Sum (494), Last Stone Weight II (1049).
  */
 public class EqualSum {
-  public static void main(String[] args) {
-    int[] nums = {1, 5, 11, 5};
 
-    System.out.println("Recursive: " + canPartitionRecursive(nums));  // true
-    System.out.println("Iterative: " + canPartitionIterative(nums));  // true
-  }
-
-  /**
-   * Recursive Approach:
-   *
-   * Intuition:
-   * - If total sum is odd, we can't split into two equal parts.
-   * - Else, reduce the problem to checking if subset sum = total / 2 exists (use Subset Sum logic).
+    /**
+   * Intuition: an equal partition exists only when the total sum is even. Then one
+   * side must have sum total / 2, so the task is the classic subset-sum decision
+   * problem with take/skip choices for each number.
    *
    * Algorithm:
-   * 1. Calculate total sum; if odd, return false.
-   * 2. Set target = total / 2.
-   * 3. Use a recursive function with memoization to check if a subset with sum
-   *  equal to target can be formed.
-   *  4. The recursive function explores two choices at each step:
-   *   - Include the current number in the subset (if it doesn't exceed target).
-   *   - Exclude the current number and move to the next.
-   *   5. Base cases:
-   *   - If target is 0, return true (found a valid subset).
-   *   - If index is 0, check if nums[0] equals target.
-   *   6. Store results in a memo table to avoid recomputation.
+   *   1. Compute total and reject odd sums.
+   *   2. Search for a subset that reaches total / 2 from the end of the array.
+   *   3. Memoize each index/target state to avoid recomputing branches.
    *
-   * Time Complexity: O(n * sum)
-   * Space Complexity: O(n * sum) for memo + O(n) recursion stack
+   * Time:  O(n * target) - each index/target state is solved once.
+   * Space: O(n * target) - memo table plus recursion depth.
+   *
+   * @param nums input values
+   * @return true if nums can be split into two equal-sum subsets
    */
   public static boolean canPartitionRecursive(int[] nums) {
     int total = 0;
@@ -64,6 +55,7 @@ public class EqualSum {
     return isSubsetSum(nums, nums.length - 1, target, dp);
   }
 
+  /** Returns whether nums[0..index] can form target using memoized take/skip choices. */
   private static boolean isSubsetSum(int[] nums, int index, int target, Boolean[][] dp) {
     if (target == 0) return true;
     if (index == 0) return nums[0] == target;
@@ -78,27 +70,22 @@ public class EqualSum {
     return dp[index][target] = take || notTake;
   }
 
-  /**
-   * Determines if the array can be partitioned into two subsets with equal sum using space-optimized DP.
-   * This is the optimal approach for O(n * target) time and O(target) space.
+    /**
+   * Intuition: after seeing some prefix of the array, all that matters is which
+   * sums up to total / 2 are reachable. Each new number either keeps an old sum
+   * reachable or extends a smaller reachable sum by its value.
    *
-   * Step-by-step explanation:
-   * 1. Compute total sum; if odd or zero, return false (or true for empty array).
-   * 2. Target = sum / 2.
-   * 3. Use a 2D DP array where dp[i][j] indicates if sum j can be formed using first i elements.
-   * 4. Initialize dp[i][0] = true (sum 0 is always
-   * possible).
-   * 5. Fill the DP table iteratively:
-   *   - For each element, for each possible sum from 1 to target:
-   *   - Check if we can form the sum by either taking or not taking the current element.
-   *   6. The answer will be in dp[n-1][target].
+   * Algorithm:
+   *   1. Compute total and reject odd sums.
+   *   2. Initialize dp[0][0] as reachable.
+   *   3. For every item and sum, carry forward skip and take transitions.
+   *   4. Return whether the target half-sum is reachable after all items.
    *
-   * Algorithm: 0/1 Knapsack DP (Subset Sum)
-   * Time Complexity: O(n * target) - n elements, target up to sum/2.
-   * Space Complexity: O(target) - DP array.
+   * Time:  O(n * target) - every item/sum state is checked once.
+   * Space: O(n * target) - the table stores reachability for each prefix.
    *
-   * @param nums the array of positive integers
-   * @return true if partition is possible, false otherwise
+   * @param nums input values
+   * @return true if nums can be split into two equal-sum subsets
    */
   public static boolean canPartitionIterative(int[] nums) {
     int total = 0;
@@ -132,5 +119,16 @@ public class EqualSum {
     return dp[size - 1][sum];
   }
 
+
+    public static void main(String[] args) {
+        int[][] inputs = { {1}, {1, 5, 11, 5}, {1, 2, 3, 5} };
+        boolean[] expected = {false, true, false};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean output = canPartitionIterative(inputs[i]);
+            System.out.printf("nums=%s  ->  %b  expected=%b%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
 
 }

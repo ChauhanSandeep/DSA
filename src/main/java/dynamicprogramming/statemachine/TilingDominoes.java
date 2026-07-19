@@ -1,45 +1,49 @@
 package dynamicprogramming.statemachine;
 
 /**
- * Problem: Count the Number of Ways to Tile a 2 x n Board Using 2 x 1 Dominoes
+ * Problem: Tile a 2 x n Board With Dominoes
  *
- * Given a 2 x n board, count the number of ways to completely cover it using 2 x 1 dominoes.
- * Dominoes can be placed either vertically (covering one column) or horizontally (covering two adjacent columns).
+ * Count the ways to completely cover a 2 x n board using 2 x 1 dominoes. A
+ * domino may be placed vertically in one column or horizontally across two
+ * adjacent columns.
  *
- * The problem reduces to a Fibonacci recurrence:
- *   ways[n] = ways[n-1] + ways[n-2]
- *   where:
- *     ways[1] = 1 (only vertical placement)
- *     ways[2] = 2 (either two vertical or two horizontal dominoes)
+ * Source: Classic domino tiling interview problem
+ * Pattern:  Dynamic Programming | State machine | Fibonacci-style full-board state
  *
  * Example:
- *   Input: n = 5
+ *   Input:  n = 5
  *   Output: 8
- *   Explanation: There are 8 ways to tile a 2 x 5 board.
+ *   Why:    the last placement is either one vertical domino after a 2 x 4 board
+ *           or two horizontal dominoes after a 2 x 3 board, giving ways[4] + ways[3].
  *
- * Related Leetcode: https://leetcode.com/problems/domino-and-tromino-tiling/
- * LeetCode Contest Rating: 1830
+ * Follow-ups:
+ *   1. What if the board is 3 x n?
+ *      Use parity-specific recurrences or bitmask state compression.
+ *   2. What if trominoes are also allowed?
+ *      Add partial-board states, as in Domino and Tromino Tiling.
+ *   3. Can n be extremely large?
+ *      Use matrix exponentiation on the Fibonacci recurrence for O(log n) time.
+ *
+ * Related: Domino and Tromino Tiling (790).
  */
 public class TilingDominoes {
 
-    public static void main(String[] args) {
-        int n = 5;
-        System.out.println("Iterative DP: Ways to tile 2 x " + n + " board = " + countWaysIterative(n));
-        System.out.println("Recursive with Memoization: Ways to tile 2 x " + n + " board = " + countWaysRecursive(n));
-    }
-
-    /**
-     * Iterative dynamic programming approach with constant space.
+        /**
+     * Intuition: a 2 x n board can end with one vertical domino after tiling 2 x (n-1)
+     * or with two horizontal dominoes after tiling 2 x (n-2). These two endings are
+     * disjoint, giving the Fibonacci recurrence.
      *
-     * Algorithm
-     * - Use two variables to store the number of ways to tile boards of length n-1 and n-2.
-     * - Iterate from 3 to n, updating these two variables to get the current number of ways.
+     * Algorithm:
+     *   1. Handle n = 0 and n = 1 base widths.
+     *   2. Store ways for widths 0 and 1.
+     *   3. For each larger width, add the previous two widths.
+     *   4. Return ways[n].
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(1)
+     * Time:  O(n) - one recurrence value per width.
+     * Space: O(n) - DP array stores all widths.
      *
-     * @param n the length of the board
-     * @return number of ways to tile the board
+     * @param n board length
+     * @return number of ways to tile a 2 x n board
      */
     public static int countWaysIterative(int n) {
         if (n <= 0) return 0;
@@ -59,11 +63,22 @@ public class TilingDominoes {
         return current;
     }
 
-    /**
-     * Recursive approach with memoization (top-down dynamic programming).
+        /**
+     * Intuition: the same two endings define a recursion: place one vertical domino
+     * at the end or two horizontal dominoes at the end. Memoization stores each
+     * board length after it is computed once.
      *
-     * @param n the length of the board
-     * @return number of ways to tile the board
+     * Algorithm:
+     *   1. Allocate memo values for widths up to n.
+     *   2. Return base widths directly.
+     *   3. Recursively add ways for n - 1 and n - 2.
+     *   4. Cache each width before returning it.
+     *
+     * Time:  O(n) - memoization computes each width once.
+     * Space: O(n) - memo array plus recursion depth.
+     *
+     * @param n board length
+     * @return number of ways to tile a 2 x n board
      */
     public static int countWaysRecursive(int n) {
         if (n <= 0) return 0;
@@ -72,6 +87,7 @@ public class TilingDominoes {
     }
 
     // Helper for recursive approach with memoization
+    /** Returns memoized tiling count for a 2 x n board. */
     private static int countWaysRecursiveHelper(int n, int[] memo) {
         if (n == 1) return 1;
         if (n == 2) return 2;
@@ -81,4 +97,16 @@ public class TilingDominoes {
         memo[n] = countWaysRecursiveHelper(n - 1, memo) + countWaysRecursiveHelper(n - 2, memo);
         return memo[n];
     }
+
+
+    public static void main(String[] args) {
+        int[] inputs = {0, 1, 5};
+        int[] expected = {0, 1, 8};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = countWaysIterative(inputs[i]);
+            System.out.printf("n=%d  ->  %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
+    }
+
 }

@@ -1,56 +1,50 @@
 package dynamicprogramming.knapsackbounded;
 
+import java.util.Arrays;
+
 /**
- * Problem: Minimum Flips to Make Sum Non-negative and Closest to Zero
+ * Problem: Minimum Flips for Non-negative Sum Closest to Zero
  *
- * Given an array of positive integers, you need to flip the sign of some elements such that
- * the resultant sum of the array is minimum non-negative (as close to zero as possible).
- * Return the minimum number of elements that need to be flipped.
+ * Given positive integers, flip the signs of some elements so the final array
+ * sum is non-negative and as small as possible. Among choices that achieve that
+ * closest non-negative sum, return the fewest flipped elements.
+ *
+ * Source: InterviewBit Flip Array
+ * Pattern:  Dynamic Programming | 0/1 knapsack | Closest half-sum with minimum item count
  *
  * Example:
- * Input: arr = [8, 4, 5, 7, 6, 2]
- * Output: 3
- * Explanation: We can flip [8, 4, 5] to get [-8, -4, -5, 7, 6, 2] = -2
- *              But we want non-negative, so we flip [4, 5, 7] to get [8, -4, -5, -7, 6, 2] = 0
- *              Minimum flips needed = 3
+ *   Input:  arr = [8,4,5,7,6,2]
+ *   Output: 3
+ *   Why:    flipping values with sum 16 makes the final sum 32 - 2*16 = 0,
+ *           and one way to do that uses three elements: 4, 5, and 7.
  *
- * GeeksforGeeks Problem Link: https://www.geeksforgeeks.org/minimum-flips-required-such-that-sum-of-array-is-non-negative/
- * InterviewBit Problem Link: https://www.interviewbit.com/problems/flip-array/
- *
- * Follow-up Questions:
- * 1. Q: What if we want exactly zero sum instead of closest to zero?
- *    A: Check if totalSum is even and if we can achieve exactly totalSum/2 using subset sum
- * 2. Q: What if we can add elements instead of just flipping signs?
- *    A: This becomes unbounded knapsack where we can add any positive number
- * 3. Q: Find all possible ways to achieve minimum flips?
- *    A: Use backtracking with DP to enumerate all valid combinations
- * 4. Q: What if elements can be negative initially?
- *    A: Separate positive and negative elements, handle them differently in DP transitions
- * 5. Q: Maximize the sum while using minimum flips?
- *    A: Two-phase DP: first minimize flips, then among minimum flips find maximum sum
+ * Follow-ups:
+ *   1. What if exactly zero is required?
+ *      Check whether total is even and whether target total / 2 is reachable.
+ *   2. Can space be reduced?
+ *      Use a 1D dp array of minimum flip counts and iterate target sums backward.
+ *   3. What if elements may be negative already?
+ *      Normalize the choice as selecting values whose sign changes, or use offset DP over possible sums.
  */
 public class MinimumFlipsForNonNegativeSum {
 
-  /**
-   * Returns the minimum number of flips required to make the sum of the array
-   * non-negative and as close to zero as possible.
+    /**
+   * Intuition: flipping a value subtracts twice that value from the total sum.
+   * To make the final sum as close to zero as possible without going negative,
+   * choose flipped values with sum as close as possible to total / 2; among ties,
+   * choose the fewest values.
    *
-   * Intuition:
-   * Flipping an element `x` changes the total sum by `-2*x`. To minimize the non-negative sum,
-   * we want to flip a subset of elements whose total is as close as possible to `totalSum/2`.
+   * Algorithm:
+   *   1. Compute total and set target to total / 2.
+   *   2. Use dp[sum] as the minimum number of flips needed to reach that sum.
+   *   3. Process each value backward so it is used at most once.
+   *   4. Scan downward from target and return the first reachable flip count.
    *
-   * Approach:
-   * 1. Calculate total sum of the array.
-   * 2. Set target as `totalSum / 2`.
-   * 3. Use a DP table where `dp[i][j]` represents the minimum number of elements needed
-   *    to achieve sum `j` using the first `i` elements.
-   * 4. Fill the DP table considering both taking and not taking each element.
-   * 5. Finally, find the largest achievable sum ≤ target and return the corresponding minimum flips.
+   * Time:  O(n * total) - each value updates sums up to total / 2.
+   * Space: O(total) - one minimum-flip array for reachable half sums.
    *
-   * Time Complexity: O(n * target) where n is number of elements and target is totalSum/2
-   * Space Complexity: O(n * target) for the DP table
-   * @param arr
-   * @return
+   * @param arr non-negative values
+   * @return minimum flips that produce the smallest non-negative final sum
    */
   public static int minFlipsToNonNegativeClosestZero(int[] arr) {
     int size = arr.length;
@@ -97,10 +91,16 @@ public class MinimumFlipsForNonNegativeSum {
     return minFlips;
   }
 
-  public static void main(String[] args) {
 
-    int[] testArray = {8, 4, 5, 7, 6, 2};
-    System.out.println("Minimum flips needed: " + minFlipsToNonNegativeClosestZero(testArray));
-  }
+    public static void main(String[] args) {
+        int[][] inputs = { {}, {1}, {8, 4, 5, 7, 6, 2} };
+        int[] expected = {0, 0, 3};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = minFlipsToNonNegativeClosestZero(inputs[i]);
+            System.out.printf("arr=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
 
 }

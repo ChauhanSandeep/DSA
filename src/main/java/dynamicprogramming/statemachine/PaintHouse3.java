@@ -4,104 +4,55 @@ import java.util.Arrays;
 
 
 /**
+ * Problem: Paint House III
  *
- * There is a row of m houses in a small city. Each house must be painted with one of n colors (labeled from 1 to n).
- * Some houses are already painted (cannot be repainted). You need to paint all remaining houses.
+ * Some houses may already be painted, and unpainted houses can be painted with
+ * one of n colors at given costs. A neighborhood is a maximal consecutive block
+ * of equal colors. Return the minimum cost to end with exactly target neighborhoods.
  *
- * A neighborhood is a maximal group of continuous houses painted with the same color.
- * For example: houses = [1,2,2,3,3,2,1,1] contains 5 neighborhoods [{1}, {2,2}, {3,3}, {2}, {1,1}].
+ * Leetcode: https://leetcode.com/problems/paint-house-iii/
+ * Rating:   2056 (zerotrac Elo)
+ * Pattern:  Dynamic Programming | State machine | House, neighborhoods, previous color
  *
- * Given:
- * - houses: array where houses[i] is the color of house i (0 means unpainted)
- * - cost: 2D array where cost[i][j] is the cost to paint house i with color j+1
- * - m: number of houses
- * - n: number of colors
- * - target: desired number of neighborhoods
+ * Example:
+ *   Input:  houses = [0,0,0,0,0], cost = [[1,10],[10,1],[10,1],[1,10],[5,1]], target = 3
+ *   Output: 9
+ *   Why:    painting [1,1,2,1,1] costs 1 + 1 + 1 + 1 + 5 and forms exactly three neighborhoods.
  *
- * Return the minimum cost to paint all houses such that there are exactly target neighborhoods.
- * If impossible, return -1.
+ * Follow-ups:
+ *   1. Can space be optimized in bottom-up DP?
+ *      Yes; each house only needs the previous house's states, so use two layers.
+ *   2. Can you return the color assignment?
+ *      Store parent color choices for each state and backtrack from the cheapest final state.
+ *   3. What if the objective is at most target neighborhoods?
+ *      Take the minimum over all final neighborhood counts from 1 through target.
  *
- * Input: houses = [0,0,0,0,0], cost = [[1,10],[10,1],[10,1],[1,10],[5,1]], 
- *  m = 5, 
- *  n = 2, 
- * target = 3
- *
- * Output: 9
- * Explanation:
- * Paint houses: [1,2,2,1,1]
- * Neighborhoods: [{1}, {2,2}, {1,1}] = 3 neighborhoods
- * Cost: 1 + 10 + 1 + 1 + 5 = 18... wait, optimal is actually 9
- * Actual optimal: [1,1,2,1,1] with cost 1+1+1+1+5=9 gives [{1,1},{2},{1,1}] = 3 neighborhoods
- *
- *
- * LeetCode: https://leetcode.com/problems/paint-house-iii/
- *
- * Follow-up Questions:
- * 1. Q: What if we want to minimize neighborhoods instead of achieving exact target?
- *    A: Remove target constraint and track minimum neighborhoods formed. Use similar DP structure.
- *
- * 2. Q: How would you handle the case where some colors are forbidden for certain houses?
- *    A: Add validation in color selection loop to skip forbidden colors for each house.
- *
- * 3. Q: Can you solve this with bottom-up DP instead of top-down?
- *    A: Yes, iterate houses from left to right, filling DP table for all states systematically.
- *
- * 4. Q: What if we need to return the actual color assignment, not just the cost?
- *    A: Maintain parent pointers in DP state or reconstruct path from memoization table.
- *
- * 5. Q: How would you optimize space complexity?
- *    A: Use rolling array technique since we only need previous house's state. (LeetCode 256, 265)
- * LeetCode Contest Rating: 2056
+ * Related: Paint House (256), Paint House II (265).
  */
 public class PaintHouse3 {
   private Integer[][][] dp;
   private static final int IMPOSSIBLE_COST = Integer.MAX_VALUE / 2;
 
-  public static void main(String[] args) {
-    PaintHouse3 solution = new PaintHouse3();
-    int[] houses = {0, 0, 0, 0, 0};
-    int[][] paintingCosts = {{1, 10}, {10, 1}, {10, 1}, {1, 10}, {5, 1}};
-    int numHouses = 5, numColors = 2, targetNeighborhoods = 3;
-
-    System.out.println(
-        "Minimum cost: " + solution.minCost(houses, paintingCosts, numHouses, numColors, targetNeighborhoods));
-    System.out.println("Bottom-up solution: " + solution.minCostBottomUp(houses, paintingCosts, numHouses, numColors,
-        targetNeighborhoods));
-  }
-
-  /**
-   * Top-down DP solution to find minimum cost for painting houses
+    /**
+   * Intuition: neighborhoods are created exactly when the current color differs
+   * from the previous color. A DP state must therefore remember the house index,
+   * neighborhoods formed so far, and previous color.
    *
-   * Main method: Finds minimum cost using 3D Dynamic Programming with Memoization.
-   * Step-by-step:
-   *  1. Define DP state: dp[currentHouseIndex][currentNeighborhoods][previousHouseColor] 
-   *     - currentHouseIndex: current house being processed (0 to m)
-   *     - previousHouseColor: color of previous house (0 to n, where 0 means no previous house)
-   *     - currentNeighborhoods: number of neighborhoods formed so far (0 to target)
-   *  2. Base case: When all houses processed (currentHouseIndex == m):
-   *     - Return 0 if currentNeighborhoods == target, otherwise IMPOSSIBLE
-   *  3. For each house:
-   *     a. If already painted: only one choice (existing color)
-   *     b. If unpainted: try all n colors
-   *  4. For each color choice:
-   *     - Calculate new neighborhood count (increment if different from prevColor)
-   *     - Add painting cost (if house was unpainted)
-   *     - Recursively solve for remaining houses
-   *  5. Return minimum cost among all valid solutions.
-   * 
-   * Key Insight:
-   * A new neighborhood is formed when current house color differs from previous house color.
-   * We track neighborhoods incrementally as we paint houses from left to right.
+   * Algorithm:
+   *   1. Initialize memo for house, neighborhood count, and previous color.
+   *   2. If a house is already painted, keep its color and update neighborhoods.
+   *   3. If unpainted, try every color and add its painting cost.
+   *   4. Return the cheapest path that ends with exactly targetNeighborhoods.
    *
-   * Time Complexity: O(m * target * n * n) = O(m * target * n²)
-   * Space Complexity: O(m * target * n) for memoization + O(m) recursion stack
+   * Time:  O(numHouses * targetNeighborhoods * numColors^2) - states try colors.
+   * Space: O(numHouses * targetNeighborhoods * numColors) - memo table plus stack.
    *
-   * @param houses array where 0 means unpainted, >0 means painted with that color
-   * @param paintingCosts cost[i][j] is cost to paint house i with color j+1
+   * @param houses 0 for unpainted, otherwise the fixed color
+   * @param paintingCosts paintingCosts[house][color - 1]
    * @param numHouses number of houses
-   * @param numColors number of available colors
-   * @param targetNeighborhoods exact number of neighborhoods required
-   * @return minimum cost to achieve target neighborhoods, -1 if impossible
+   * @param numColors number of colors
+   * @param targetNeighborhoods required neighborhood count
+   * @return minimum cost, or -1 if impossible
    */
   public int minCost(int[] houses, int[][] paintingCosts, int numHouses, int numColors, int targetNeighborhoods) {
     if (houses == null || paintingCosts == null || numHouses == 0 || numColors == 0 || targetNeighborhoods <= 0) {
@@ -118,9 +69,7 @@ public class PaintHouse3 {
     return (minimumCost >= IMPOSSIBLE_COST) ? -1 : minimumCost;
   }
 
-  /** 
-   * Recursive helper for top-down DP 
-   */
+    /** Returns the cheapest suffix cost from the current neighborhood state. */
   private int findMinimumCostRecursive(int[] houses, int[][] paintingCosts, int currentHouseIndex,
       int currentneighborhoodCount, int previousHouseColor, int targetNeighborhoods, int numColors) {
     // Base case: processed all houses
@@ -172,26 +121,26 @@ public class PaintHouse3 {
     return minimumCostFromCurrentState;
   }
 
-  /**
-   * Bottom-up DP solution for comparison
+    /**
+   * Intuition: the top-down state can be filled left to right. Each table entry
+   * stores the cheapest way to paint through a house with a fixed color and a
+   * fixed neighborhood count.
    *
-   * Steps:
-   * 1. Create 3D DP table: dp[house][neighborhoods][color]
-   * 2. Initialize base cases for first house
-   * 3. Fill table iteratively for each house, neighborhood count, and color
-   * 4. Consider both pre-painted and unpainted houses
-   * 5. Return minimum cost among all valid final states
+   * Algorithm:
+   *   1. Initialize impossible costs and seed the first house.
+   *   2. For each next house, respect pre-painted colors or try all colors.
+   *   3. Carry same-color transitions without adding a neighborhood.
+   *   4. Add a neighborhood when the previous color differs, then take the best final color.
    *
-   * Algorithm: Bottom-Up Dynamic Programming
-   * Time Complexity: O(m * target * n²)
-   * Space Complexity: O(m * target * n)
+   * Time:  O(numHouses * targetNeighborhoods * numColors^2) - transitions compare previous colors.
+   * Space: O(numHouses * targetNeighborhoods * numColors) - full DP table.
    *
-   * @param houses array where 0 means unpainted, >0 means painted with that color
-   * @param paintingCosts cost matrix for painting
+   * @param houses 0 for unpainted, otherwise the fixed color
+   * @param paintingCosts paintingCosts[house][color - 1]
    * @param numHouses number of houses
-   * @param numColors number of available colors
-   * @param targetNeighborhoods exact number of neighborhoods required
-   * @return minimum cost to achieve target neighborhoods, -1 if impossible
+   * @param numColors number of colors
+   * @param targetNeighborhoods required neighborhood count
+   * @return minimum cost, or -1 if impossible
    */
   public int minCostBottomUp(int[] houses, int[][] paintingCosts, int numHouses, int numColors,
       int targetNeighborhoods) {
@@ -280,4 +229,25 @@ public class PaintHouse3 {
 
     return (result >= IMPOSSIBLE_COST) ? -1 : result;
   }
+
+
+    public static void main(String[] args) {
+        PaintHouse3 solver = new PaintHouse3();
+        int[][] houses = { {0}, {0, 0, 0, 0, 0}, {0, 2, 1, 2, 0} };
+        int[][][] costs = {
+            {{5, 3}},
+            {{1, 10}, {10, 1}, {10, 1}, {1, 10}, {5, 1}},
+            {{1, 10}, {10, 1}, {10, 1}, {1, 10}, {5, 1}}
+        };
+        int[] colors = {2, 2, 2};
+        int[] targets = {1, 3, 3};
+        int[] expected = {3, 9, 11};
+
+        for (int i = 0; i < houses.length; i++) {
+            int output = solver.minCostBottomUp(houses[i], costs[i], houses[i].length, colors[i], targets[i]);
+            System.out.printf("houses=%s target=%d  ->  %d  expected=%d%n",
+                Arrays.toString(houses[i]), targets[i], output, expected[i]);
+        }
+    }
+
 }

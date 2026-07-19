@@ -1,60 +1,51 @@
 package dynamicprogramming.statemachine;
 
+import java.util.Arrays;
+
 /**
- * Problem: House Robber (LeetCode #198)
+ * Problem: House Robber
  *
- * Problem Statement:
- * You are a professional robber planning to rob houses along a street. Each house has a certain
- * amount of money stashed. The only constraint stopping you from robbing each of them is that
- * adjacent houses have security systems connected, and it will automatically contact the police
- * if two adjacent houses are broken into on the same night.
+ * Given money in a row of houses, choose houses to rob without choosing two
+ * adjacent houses. Return the maximum money that can be robbed without alerting
+ * the police.
  *
- * Example 1:
- * Input: houseWeights = [1,2,3,1]
- * Output: 4
- * Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
- * Total amount you can rob = 1 + 3 = 4.
+ * Leetcode: https://leetcode.com/problems/house-robber/
+ * Rating:   acceptance 53.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | State machine | Take or skip adjacent items
  *
- * Example 2:
- * Input: houseWeights = [2,7,9,3,1]
- * Output: 12
- * Explanation: Rob house 1 (money = 2), rob house 3 (money = 9), and rob house 5 (money = 1).
- * Total amount you can rob = 2 + 9 + 1 = 12.
+ * Example:
+ *   Input:  nums = [2,7,9,3,1]
+ *   Output: 12
+ *   Why:    robbing 2, 9, and 1 avoids adjacent houses and earns 12, which beats every other valid choice.
  *
- * Approach:
- * We can solve this problem using dynamic programming. At each house, the robber has two choices:
- * 1. Rob the current house and add its value to the amount robbed from houses before the previous one
- * 2. Skip the current house and keep the maximum amount robbed up to the previous house
+ * Follow-ups:
+ *   1. What if houses are arranged in a circle?
+ *      Solve two linear cases: exclude the first house or exclude the last house.
+ *   2. Can you return which houses were robbed?
+ *      Store take/skip decisions in a DP array and backtrack from the final index.
+ *   3. What if this is a binary tree of houses?
+ *      Use tree DP with states for robbing or skipping each node.
  *
- * The recurrence relation is:
- * dp[i] = max(dp[i-1], dp[i-2] + houseWeights[i])
- *
- * We can optimize space by only keeping track of the last two values since we only need them to
- * compute the current value.
- *
- * Time Complexity: O(n) where n is the number of houses
- * Space Complexity: O(1) - We only use constant extra space
- *
- * Follow-up Questions:
- * 1. What if the houses are arranged in a circle?
- *    Answer: We can solve it by taking the maximum of two cases: rob houses[0..n-2] or rob houses[1..n-1],
- *    since the first and last houses are adjacent in a circle.
- *
- * 3. How would you modify your solution to also return which houses to rob?
- *    Answer: We can modify the solution to keep track of the chosen houses by maintaining an array
- *    that stores the indices of the robbed houses at each step. We would need to backtrack through
- *    the DP array to reconstruct the solution.
- *
- * LeetCode: https://leetcode.com/problems/house-robber/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: House Robber II (213), House Robber III (337), Delete and Earn (740).
  */
 public class HouseRobber {
 
-    /**
-     * Calculates the maximum amount of money that can be robbed without alerting the police
+        /**
+     * Intuition: at each house, the only conflict is the immediately previous house.
+     * The best total ending here is either the old best after skipping this house or
+     * this house's value plus the best total from two houses back.
      *
-     * @param houseWeights Array representing the amount of money in each house
-     * @return Maximum amount of money that can be robbed
+     * Algorithm:
+     *   1. Handle empty and one-house inputs.
+     *   2. Keep previousHouse and currentHouse as rolling DP states.
+     *   3. For each value, choose between robbing it and skipping it.
+     *   4. Return the final currentHouse state.
+     *
+     * Time:  O(n) - one pass over the houses.
+     * Space: O(1) - only two rolling states are kept.
+     *
+     * @param houseWeights money in each house
+     * @return maximum amount that can be robbed without adjacent houses
      */
     public int rob(int[] houseWeights) {
         // Handle edge cases
@@ -145,9 +136,7 @@ public class HouseRobber {
         );
     }
 
-    /**
-     * Helper method to calculate maximum robbery amount for houses from start to end index
-     */
+        /** Robs the linear range from start through end with rolling states. */
     private int robHelper(int[] houseWeights, int start, int end) {
         int prevMax = 0;
         int currMax = 0;
@@ -160,4 +149,18 @@ public class HouseRobber {
 
         return currMax;
     }
+
+
+    public static void main(String[] args) {
+        HouseRobber solver = new HouseRobber();
+        int[][] inputs = { {}, {5}, {1, 2, 3, 1}, {2, 7, 9, 3, 1} };
+        int[] expected = {0, 5, 4, 12};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.rob(inputs[i]);
+            System.out.printf("houses=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

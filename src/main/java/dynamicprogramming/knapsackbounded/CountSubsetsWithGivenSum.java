@@ -1,47 +1,59 @@
 package dynamicprogramming.knapsackbounded;
 
+import java.util.Arrays;
+
 /**
- * Problem: Count of Subsets with Given Sum
+ * Problem: Count Subsets With Given Sum
  *
- * Problem Statement:
- * Given an array of positive integers and a target sum, find the number of subsets that add up exactly to the target sum.
+ * Given an array of non-negative integers and a target sum, count how many
+ * subsets add up exactly to the target. Each array element may be used at most
+ * once, so equal values at different indices are still separate choices.
  *
- * Leetcode Equivalent: https://leetcode.com/problems/target-sum/ (related, with + and - signs)
+ * Source: GeeksForGeeks Perfect Sum Problem
+ * Pattern:  Dynamic Programming | 0/1 knapsack | Count subsets by target sum
  *
- * Relation to 0/1 Knapsack:
- * - Classic variation where instead of checking for possibility, we count the number of ways.
- * - Every element has two choices: include or exclude.
+ * Example:
+ *   Input:  arr = [0,1,2,3], target = 3
+ *   Output: 4
+ *   Why:    [3] and [1,2] work, and the zero can be either excluded or included for each.
  *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. What if the answer can be very large?
+ *      Store counts modulo the requested value and apply the modulus after every addition.
+ *   2. Can space be reduced to O(target)?
+ *      Yes; iterate sums backward for each element so every item is used at most once.
+ *   3. What if negative numbers are allowed?
+ *      Use an offset over the possible sum range, or switch to a hash map of sum to count.
+ *
+ * Related: Target Sum (494), Partition Equal Subset Sum (416).
  */
 public class CountSubsetsWithGivenSum {
-    public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 3};
-        int targetSum = 6;
-        System.out.println("Recursive: " + countSubsetsRecursive(arr, arr.length, targetSum));
-        System.out.println("Iterative: " + countSubsetsIterative(arr, arr.length, targetSum));
-    }
 
-    /**
-     * Recursive Approach (with memoization):
+        /**
+     * Intuition: every element has two choices, take it or skip it. The repeated
+     * question is how many subsets from the first index elements can make target,
+     * so memoizing index and target collapses the exponential tree into a table.
      *
-     * Intuition:
-     * - Try including or excluding each number.
-     * - Every time we reach target sum 0, it’s a valid subset.
-     * - Memoize to avoid re-computation
-     * - Base Cases:
-     *  - If target is 0, we found a valid subset (count as 1).
-     *  - If index is 0, check if arr[0] == target (count as 1 if true, else 0).
+     * Algorithm:
+     *   1. Stop at index 0: the empty prefix makes only sum 0.
+     *   2. Reuse dp[index][target] when the same state appears again.
+     *   3. Count ways that skip the current item.
+     *   4. If the current item fits, add ways that take it.
      *
+     * Time:  O(size * targetSum) - each index/target state is solved once.
+     * Space: O(size * targetSum) - memo table plus recursion depth.
      *
-     * Time Complexity: O(size * targetSum)
-     * Space Complexity: O(size * targetSum) for memo + O(size) recursion stack
+     * @param arr non-negative input values
+     * @param size number of values to consider
+     * @param targetSum desired subset sum
+     * @return number of subsets whose sum is targetSum
      */
     public static int countSubsetsRecursive(int[] arr, int size, int targetSum) {
         Integer[][] dp = new Integer[size+1][targetSum+1];
         return countSubsetsHelper(arr, size, targetSum, dp);
     }
 
+    /** Counts target-sum subsets using the first index values. */
     private static int countSubsetsHelper(int[] arr, int index, int target, Integer[][] dp) {
         if (target == 0) return 1;
         if (index == 0) {
@@ -59,18 +71,24 @@ public class CountSubsetsWithGivenSum {
         return dp[index][target];
     }
 
-    /**
-     * Iterative Tabulation Approach:
+        /**
+     * Intuition: the recursive take/skip choices can be read row by row. A cell
+     * dp[itemCount][sum] counts subsets from a prefix that make sum; the next item
+     * either is absent from those subsets or is present and reduces the needed sum.
      *
-     * Intuition:
-     * - dp[i][j] means: number of ways to make sum 'j' using first 'i' elements.
-     * - For each element, we can either include it (if it doesn't exceed current sum) or exclude it.
-     * - Initialize dp[i][0] = 1 for all i (sum 0 is possible with empty subset).
-     * - Fill the dp table iteratively.
-     * - Final answer will be in dp[size][targetSum].
+     * Algorithm:
+     *   1. Seed dp[0][0] = 1 because the empty subset makes sum 0 once.
+     *   2. For each prefix size and target sum, copy the count that skips the item.
+     *   3. If the item value fits, add the count that takes it.
+     *   4. Return dp[size][targetSum].
      *
-     * Time Complexity: O(size * targetSum)
-     * Space Complexity: O(size * targetSum)
+     * Time:  O(size * targetSum) - every table cell is filled once.
+     * Space: O(size * targetSum) - all prefix/sum counts are stored.
+     *
+     * @param arr non-negative input values
+     * @param size number of values to consider
+     * @param targetSum desired subset sum
+     * @return number of subsets whose sum is targetSum
      */
     public static int countSubsetsIterative(int[] arr, int size, int targetSum) {
         int[][] dp = new int[size+1][targetSum+1];
@@ -93,4 +111,18 @@ public class CountSubsetsWithGivenSum {
         }
         return dp[size][targetSum];
     }
+
+
+    public static void main(String[] args) {
+        int[][] inputs = { {}, {1, 2, 3, 3}, {0, 1, 2, 3} };
+        int[] targets = {0, 6, 3};
+        int[] expected = {1, 3, 4};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = countSubsetsIterative(inputs[i], inputs[i].length, targets[i]);
+            System.out.printf("arr=%s target=%d  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), targets[i], output, expected[i]);
+        }
+    }
+
 }

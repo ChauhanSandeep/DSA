@@ -6,47 +6,49 @@ import java.util.Map;
 /**
  * Problem: Scramble String
  *
- * Determines if one string is a scrambled version of another. In a scramble, a
- * string can be transformed by recursively swapping any non-empty substrings.
+ * A string can be scrambled by recursively splitting it into two non-empty parts
+ * and optionally swapping the two parts at each split. Given source and target,
+ * decide whether target can be produced from source by this process.
+ *
+ * Leetcode: https://leetcode.com/problems/scramble-string/
+ * Rating:   acceptance 45.1% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Interval recursion | Split with swap/no-swap states
  *
  * Example:
- * Input: s1 = "great", s2 = "rgeat"
- * Output: true
+ *   Input:  source = "great", target = "rgeat"
+ *   Output: true
+ *   Why:    split "great" as "gr" + "eat", scramble "gr" to "rg", and keep "eat" unchanged.
  *
- * LeetCode: https://leetcode.com/problems/scramble-string/
+ * Follow-ups:
+ *   1. Can this be written bottom-up?
+ *      Yes; dp[length][i][j] tells whether source substring i of that length scrambles to target substring j.
+ *   2. How do you avoid exploring impossible splits?
+ *      Reject states whose character frequencies differ before recursing.
+ *   3. Can you return the actual sequence of swaps?
+ *      Store the winning split and whether it swapped, then recursively rebuild the transformation tree.
  *
- * Follow-up Questions (FAANG-style):
- * 1. Can you optimize further for very long strings?
- * - Use iterative DP table (O(N^4) time, O(N^3) space); see LeetCode editorial.
- * 2. How do you adapt for multiple queries on (s1, s2) pairs?
- * - Use a global memoization map for caching subresults efficiently.
- * 3. Can you check actual transformation sequence?
- * - Trace recursion and record each split/swap used in the transformation.
- * 4. What if swaps must be balanced or minimal?
- * - Add constraints in recursion and minimize swap operations in DP.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Interleaving String (97), Different Ways to Add Parentheses (241).
  */
 public class ScrambleString {
     private final Map<String, Boolean> memo = new HashMap<>();
 
-    /**
-     * Recursive + Memoization Solution
+        /**
+     * Intuition: a scramble split either keeps the two child substrings aligned or
+     * swaps them. Before trying splits, matching character counts prove the two
+     * intervals could contain the same multiset of leaves.
      *
-     * Steps of Solution:
-     * - Base Case: If source equals target, return true.
-     * - Anagram Check: If source and target are not anagrams, return false.
-     * - Recursive Splitting: For each possible split index, check both no-swap and
-     * swap cases recursively.
-     * - Memoization: Cache results for (source, target) pairs to avoid
-     * recomputation.
+     * Algorithm:
+     *   1. Return quickly for equal strings, length mismatch, or anagram mismatch.
+     *   2. Memoize each source#target pair.
+     *   3. Try every split position.
+     *   4. Accept if either the no-swap or swapped recursive pairing works.
      *
-     * Algorithm: Top-down recursion with memoization
-     * Time Complexity: O(N^4) in worst case due to substring operations and splits
-     * Space Complexity: O(N^3) for memoization storage
+     * Time:  O(n^4) - substring states try O(n) splits with substring work.
+     * Space: O(n^3) - memoized substring pairs plus recursion depth.
      *
-     * @param source Source string
-     * @param target Target string
-     * @return
+     * @param source first string
+     * @param target second string
+     * @return true if target is a scramble of source
      */
     public boolean isScramble(final String source, final String target) {
         if (source.equals(target))
@@ -93,14 +95,7 @@ public class ScrambleString {
         return false;
     }
 
-    /**
-     * Check if two strings are anagrams.
-     * Anagrams are strings that can be rearranged to form each other.
-     * 
-     * @param source first string
-     * @param target second string
-     * @return true if they are anagrams, false otherwise
-     */
+        /** Returns whether two strings have identical character counts. */
     private boolean areAnagrams(String source, String target) {
         if (source.length() != target.length())
             return false;
@@ -116,4 +111,18 @@ public class ScrambleString {
         }
         return true;
     }
+
+
+    public static void main(String[] args) {
+        String[][] cases = { {"a", "a"}, {"great", "rgeat"}, {"abcde", "caebd"} };
+        boolean[] expected = {true, true, false};
+
+        for (int i = 0; i < cases.length; i++) {
+            ScrambleString solver = new ScrambleString();
+            boolean output = solver.isScramble(cases[i][0], cases[i][1]);
+            System.out.printf("source=%s target=%s  ->  %b  expected=%b%n",
+                cases[i][0], cases[i][1], output, expected[i]);
+        }
+    }
+
 }

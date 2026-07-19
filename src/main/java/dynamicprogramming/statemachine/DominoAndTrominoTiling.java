@@ -2,61 +2,51 @@ package dynamicprogramming.statemachine;
 
 
 /**
- * Domino and Tromino Tiling
+ * Problem: Domino and Tromino Tiling
  *
- * Problem Statement:
- * You have two types of tiles:
- * 1. A 2 x 1 domino shape (can be rotated to 1 x 2)
- * 2. A tromino shape (L-shaped, can be rotated in 4 ways)
+ * Count the ways to tile a 2 x n board using dominoes and L-shaped trominoes.
+ * Dominoes may be vertical or horizontal, and trominoes may be rotated. Return
+ * the count modulo 1,000,000,007.
  *
- * Given an integer n, return the number of ways to tile a 2 x n board.
- * Since the answer can be large, return it modulo 10^9 + 7.
+ * Leetcode: https://leetcode.com/problems/domino-and-tromino-tiling/
+ * Rating:   1830 (zerotrac Elo)
+ * Pattern:  Dynamic Programming | State machine | Full and partial board states
  *
  * Example:
- * Input: n = 3
- * Output: 5
- * Explanation: The five different ways to tile 2x3 board are:
- * 1. Three 2x1 vertical dominoes
- * 2. One 2x1 vertical domino + two 1x2 horizontal dominoes
- * 3. Two 1x2 horizontal dominoes + one 2x1 vertical domino
- * 4. One L-tromino + one rotated L-tromino
- * 5. Another combination with L-trominos
+ *   Input:  n = 3
+ *   Output: 5
+ *   Why:    three domino-only tilings plus two mirrored tromino tilings cover all valid 2 x 3 boards.
  *
- * Input: n = 1
- * Output: 1 (only one 2x1 vertical domino fits)
+ * Follow-ups:
+ *   1. Can space be reduced to O(1)?
+ *      Yes; each state only depends on the previous two full states and previous partial state.
+ *   2. What if more tile shapes are allowed?
+ *      Track every possible frontier mask and generate transitions for each tile shape.
+ *   3. Can this be solved with matrix exponentiation?
+ *      Yes; encode the state recurrence as a small transition matrix for O(log n) time.
  *
- * LeetCode Link: https://leetcode.com/problems/domino-and-tromino-tiling
- *
- * Follow-up Questions:
- * 1. What if the board dimensions were 3 x n instead of 2 x n?
- *    Answer: Different recurrence relation based on how 3-width tiles can be arranged.
- * 2. How would you handle if we had additional tile shapes (like 2x2 squares)?
- *    Answer: Extend state space to track all possible partial configurations.
- * 3. What if we want to find actual tilings instead of just count?
- *    Answer: Modify DP to store actual configurations instead of just counts.
- * 4. How to optimize space for very large n?
- *    Answer: Since we only need last 3 values, use rolling variables instead of array.
- * LeetCode Contest Rating: 1830
+ * Related: Tiling a Rectangle with the Fewest Squares (1240).
  */
 public class DominoAndTrominoTiling {
 
   private static final int MODULO = 1_000_000_007;
 
-  /**
-   * Using full state DP with explicit tracking of partial tilings.
-   * Step-by-step:
-   *  1. Define two states:
-   *     - fullyTiled[i]: ways to fully tile 2 x i board
-   *     - partiallyTiled[i]: ways to tile with one cell in column i+1 already covered
-   *  2. Base cases: fullyTiled[0] = 1, partiallyTiled[0] = 0
-   *  3. Transitions:
-   *     - fullyTiled[i] = fullyTiled[i-1] + fullyTiled[i-2] + 2 * partiallyTiled[i-1]
-   *     - partiallyTiled[i] = fullyTiled[i-1] + partiallyTiled[i-1]
-   *  4. This approach makes the state transitions more explicit and easier to understand.
+    /**
+   * Intuition: a board prefix can be fully covered or have one missing square at
+   * the next column. Dominoes extend full states, while trominoes move between
+   * full and partial states.
    *
-   * Algorithm: Dynamic Programming with explicit state tracking.
-   * Time Complexity: O(n).
-   * Space Complexity: O(n) for both arrays.
+   * Algorithm:
+   *   1. Track full, top-missing, and bottom-missing counts for each width.
+   *   2. Extend full boards with vertical dominoes or two horizontal dominoes.
+   *   3. Use tromino transitions between full and partial states.
+   *   4. Return the full-board count modulo MOD.
+   *
+   * Time:  O(boardWidth) - each column state is computed once.
+   * Space: O(boardWidth) - DP arrays store states for every width.
+   *
+   * @param boardWidth number of columns in the 2 x n board
+   * @return number of tilings modulo MOD
    */
   public int numTilingsExplicitStates(int boardWidth) {
     // Base cases
@@ -94,4 +84,17 @@ public class DominoAndTrominoTiling {
 
     return (int) fullyTiled[boardWidth];
   }
+
+
+    public static void main(String[] args) {
+        DominoAndTrominoTiling solver = new DominoAndTrominoTiling();
+        int[] inputs = {1, 2, 3, 4};
+        int[] expected = {1, 2, 5, 11};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.numTilingsExplicitStates(inputs[i]);
+            System.out.printf("n=%d  ->  %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
+    }
+
 }
