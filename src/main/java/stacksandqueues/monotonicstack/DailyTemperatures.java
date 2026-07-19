@@ -1,53 +1,59 @@
 package stacksandqueues.monotonicstack;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
  * Problem: Daily Temperatures
  *
- * Given an array of integers temperatures represents the daily temperatures, return an array answer
- * such that answer[i] is the number of days you have to wait after the ith day to get a warmer temperature.
- * If there is no future day for which this is possible, keep answer[i] == 0.
+ * Given daily temperatures, return how many days each day must wait until a
+ * warmer temperature appears. If no warmer future day exists, keep 0 at that
+ * position.
+ *
+ * Leetcode: https://leetcode.com/problems/daily-temperatures/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Monotonic decreasing stack | Next greater index
  *
  * Example:
- * Input: temperatures = [73,74,75,71,69,72,76,73]
- * Output: [1,1,4,2,1,1,0,0]
- * Explanation: For the first day (73°), the next warmer day is tomorrow (74°), so wait 1 day.
+ *   Input:  temperatures = [73,74,75,71,69,72,76,73]
+ *   Output: [1,1,4,2,1,1,0,0]
+ *   Why:    day 2 with 75 waits until day 6 with 76, so its answer is 4.
  *
- * LeetCode: https://leetcode.com/problems/daily-temperatures
+ * Follow-ups:
+ *   1. Return the warmer temperature instead of the wait?
+ *      Store temperatures[i] for each popped index instead of i - prevIndex.
+ *   2. Find next cooler days?
+ *      Reverse the comparison so cooler current temperatures resolve waiting indices.
+ *   3. Make the array circular?
+ *      Traverse 2 * n positions and push indices only during the first pass.
+ *   4. Answer online as temperatures stream in?
+ *      Keep unresolved indices on the same stack and emit answers when future days arrive.
  *
- * Follow-up Questions:
- * 1. What if we need to find the actual temperature of the next warmer day instead of days to wait?
- *    Answer: Modify result to store temperatures[stack.peek()] instead of index differences.
- *
- * 2. How would you solve for "next cooler temperature" instead?
- *    Answer: Change comparison from temperatures[i] > temperatures[stack.peek()] to the opposite.
- *
- * 3. What if we need to find the next warmer temperature in a circular array?
- *    Answer: Process the array twice or use modular arithmetic to simulate circular behavior.
- *    Related: https://leetcode.com/problems/next-greater-element-ii/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Next Greater Element I (496), Next Greater Element II (503), Online Stock Span (901).
  */
+
 public class DailyTemperatures {
 
-    /**
-     * Finds days to wait for warmer temperature using monotonic stack.
+        /**
+     * Intuition: each unresolved day waits on the stack for the first warmer
+     * future day. When temperatures[i] is warmer than the day at stack.peek(),
+     * it is exactly that first warmer day because all days between them were not
+     * warm enough to pop it earlier.
      *
      * Algorithm:
-     * 1. Use stack to maintain indices of temperatures in decreasing order
-     * 2. For each temperature, pop stack while current temperature is warmer
-     * 3. For each popped index, calculate days difference and store in result
-     * 4. Push current index to stack
-     * 5. Remaining indices in stack have no warmer future temperature
+     *   1. Return an empty array for null or empty input.
+     *   2. Scan temperatures from left to right.
+     *   3. While current temperature is warmer than stack top's temperature, pop and record the day difference.
+     *   4. Push the current index as unresolved.
+     *   5. Leave remaining unresolved indices as 0.
      *
-     * Time Complexity: O(n) where n is length of temperatures array
-     * Space Complexity: O(n) for the stack in worst case (decreasing sequence)
+     * Time:  O(n) - each index is pushed once and popped at most once.
+     * Space: O(n) - result and stack can each store n entries.
      *
-     * @param temperatures Array of daily temperatures
-     * @return Array indicating days to wait for each temperature
+     * @param temperatures daily temperatures
+     * @return days to wait for a warmer temperature at each index
      */
+
     public int[] dailyTemperatures(int[] temperatures) {
         if (temperatures == null || temperatures.length == 0) {
             return new int[0];
@@ -150,5 +156,17 @@ public class DailyTemperatures {
         }
 
         return result;
+    }
+
+    public static void main(String[] args) {
+        DailyTemperatures solver = new DailyTemperatures();
+        int[][] inputs = { {73, 74, 75, 71, 69, 72, 76, 73}, {30, 40, 50, 60}, {} };
+        int[][] expected = { {1, 1, 4, 2, 1, 1, 0, 0}, {1, 1, 1, 0}, {} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.dailyTemperatures(inputs[i]);
+            System.out.printf("temperatures=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
     }
 }

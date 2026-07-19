@@ -3,66 +3,68 @@ package stacksandqueues.calculator;
 import java.util.Stack;
 
 /**
- * Basic Calculator III - LeetCode Problem 772
+ * Problem: Basic Calculator III
  *
- * Problem Statement:
- * Implement a basic calculator to evaluate a simple expression string.
- * The expression string contains non-negative integers, +, -, *, /, (, and ).
- * Integer division truncates towards zero. The expression is always valid.
- * All intermediate results are within 32-bit signed integer range.
+ * Evaluate a valid expression containing non-negative integers, +, -, *, /,
+ * parentheses, and spaces. The evaluator must combine normal precedence with
+ * recursive evaluation of parenthesized subexpressions.
+ *
+ * Leetcode: https://leetcode.com/problems/basic-calculator-iii/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Recursion | Operator precedence
  *
  * Example:
- * Input: s = "2*(5+5*2)/3+(6/2+8)"
- * Output: 21
- * Explanation: ((2*(5+10))/3) + (3+8) = (2*15)/3 + 11 = 30/3 + 11 = 10 + 11 = 21
- * This combines operator precedence (* and / before + and -) with parentheses handling.
+ *   Input:  s = "2*(5+5*2)/3+(6/2+8)"
+ *   Output: 21
+ *   Why:    the expression becomes 2 * 15 / 3 + 11, which is 10 + 11.
  *
- * LeetCode Link: https://leetcode.com/problems/basic-calculator-iii/
+ * Follow-ups:
+ *   1. Support floating point values?
+ *      Parse decimals and use double while defining rounding rules explicitly.
+ *   2. Add variables and assignment?
+ *      Tokenize identifiers and evaluate against a symbol table or environment map.
+ *   3. Avoid substring allocation for parentheses?
+ *      Pass a mutable index through recursive calls instead of slicing strings.
+ *   4. Support custom operators?
+ *      Use a precedence table or shunting-yard parser to make operators configurable.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you handle floating point numbers?
- *    Answer: Modify parsing to handle decimal points, use double instead of int.
- *
- * 2. What if we need to support additional operators like ^ (exponentiation)?
- *    Answer: Add new precedence level in recursive descent parser or extend stack approach.
- *    Related: Build expression evaluator with custom operators
- *
- * 3. How would you optimize for repeated evaluation of similar expressions?
- *    Answer: Parse once into AST/bytecode, then evaluate multiple times.
- *
- * 4. What if expressions can have variables (like "2*x + 3*y")?
- *    Answer: Symbol table for variables, modify parser to handle identifiers.
- *    Related: LeetCode 736 - Parse Lisp Expression
- *
- * 5. How would you mplement a version that supports variables and evaluation via a map?
- *    Answer: https://leetcode.com/problems/basic-calculator-iv/
- *
- * 6. How would you handle floating point numbers and operator precedence?
- *    Answer: Consider implementing a Shunting Yard algorithm.
- *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Basic Calculator (224), Basic Calculator II (227), Basic Calculator IV (770).
  */
+
 
 public class BasicCalculator3 {
 
-    public static void main(String[] args) {
-        String expression = "(1-(3*2+2)-3)+(9+8)";
-        System.out.println("Result: " + new BasicCalculator3().calculate(expression));
+        public static void main(String[] args) {
+        BasicCalculator3 solver = new BasicCalculator3();
+        String[] inputs = { "2*(5+5*2)/3+(6/2+8)", "(1-(3*2+2)-3)+(9+8)" };
+        int[] expected = { 21, 7 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.calculate(inputs[i]);
+            System.out.printf("s=\"%s\" -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Evaluates mathematical expression with +, -, *, /, and parentheses.
+        /**
+     * Intuition: the stack stores signed terms exactly like Basic Calculator II.
+     * Parentheses are handled by finding the matching close, recursively reducing
+     * that inner expression to one number, and then applying the pending
+     * lastOperator to that number.
      *
-     * Algorithm: Stack-based approach with operator precedence handling
-     * - Use stack to defer lower precedence operations like +, -
-     * - Handle high precedence operations like *, / immediately
-     * - Process parentheses recursively by finding matching closing parenthesis
-     * - Final result is sum of all stack elements
+     * Algorithm:
+     *   1. Return 0 for a null or empty expression, then remove whitespace.
+     *   2. Parse full numbers and apply them to numberStack with lastOperator.
+     *   3. On '(', find its matching ')' and recursively evaluate the inside.
+     *   4. Update lastOperator whenever an operator character is seen.
+     *   5. Sum numberStack to produce the final result.
      *
-     * Time Complexity: O(n) - single pass through string
-     * Space Complexity: O(n) - stack space for numbers and recursion
+     * Time:  O(n^2) - recursive substring calls can rescan/copy nested portions of the expression.
+     * Space: O(n) - stack entries and recursive calls grow with expression nesting.
      *
+     * @param expression valid arithmetic expression
+     * @return evaluated integer result
      */
+
     public int calculate(String expression) {
         if (expression == null || expression.isEmpty()) {
             return 0; // Handle edge case of empty input
@@ -113,9 +115,8 @@ public class BasicCalculator3 {
         return result;
     }
 
-    /**
-     * Applies the given operator to the stack, modifying it in place.
-     */
+        /** Applies one pending operator to the number stack. */
+
     private void applyToStack(Stack<Integer> stack, char operator, int value) {
         switch (operator) {
             case '+':
@@ -133,9 +134,8 @@ public class BasicCalculator3 {
         }
     }
 
-    /**
-     * Finds the index just after the matching closing parenthesis for the opening parenthesis at startIndex.
-     */
+        /** Finds the index just after the matching closing parenthesis. */
+
     private int findClosingParenthesis(String expression, int startIndex) {
         int parenthesisDepth = 1;
         int index = startIndex + 1;

@@ -1,60 +1,69 @@
 package stacksandqueues.adityavermaplaylist;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
- * Problem: Find the largest rectangle area in a histogram.
- * Given an array of integers heights representing the histogram's bar height where the width of each bar is 1,
- * return the area of the largest rectangle in the histogram.
+ * Problem: Largest Rectangle in Histogram
  *
- * LeetCode Problem Link: https://leetcode.com/problems/largest-rectangle-in-histogram/
+ * Given bar heights of a histogram where every bar has width 1, return the
+ * largest rectangle area that can be formed by choosing one or more adjacent
+ * bars and using the shortest chosen bar as the rectangle height.
  *
- * Example 1:
- * Input: heights = [2,1,5,6,2,3]
- * Output: 10
- * Explanation: The largest rectangle has height 5 and width 2 (bars at index 2 and 3 
- * with heights 5 and 6). The limiting height is 5, giving area = 5 * 2 = 10.
- * 
- * Intuition:
- * - For each bar, the largest rectangle it can form is bounded by the nearest smaller bars on the left and right.
- * - The width of the rectangle is determined by the distance between these bounds.
- * - A monotonic increasing stack helps maintain indices of histogram bars in increasing order of height.
- * This allows efficient determination of the previous smaller element (left bound) and the
- * next smaller element (right bound) for each bar.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Leetcode: https://leetcode.com/problems/largest-rectangle-in-histogram/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Stack | Monotonic increasing stack | Nearest smaller boundaries
+ *
+ * Example:
+ *   Input:  heights = [2,1,5,6,2,3]
+ *   Output: 10
+ *   Why:    bars 5 and 6 form width 2 with limiting height 5, so area 5 * 2 = 10.
+ *
+ * Follow-ups:
+ *   1. Can you solve it in one pass without explicit left and right arrays?
+ *      Keep increasing indices on a stack and compute area when a shorter bar appears.
+ *   2. How do duplicate heights affect the stack condition?
+ *      Use the original >= pop rule for boundary arrays so equal bars collapse consistently.
+ *   3. How would you extend this to a binary matrix?
+ *      Treat each row as the base of a histogram and run this algorithm per row.
+ *   4. Can divide and conquer be competitive?
+ *      Yes with a segment tree for range minimum queries, giving O(n log n).
+ *
+ * Related: Maximal Rectangle (85), Trapping Rain Water (42), Daily Temperatures (739).
  */
+
 public class LargestHistogram {
 
-    public static void main(String[] args) {
-        int[] heights = {2, 1, 5, 6, 2, 3};
-        System.out.println("Max rectangle area: " + largestRectangleArea(heights)); // Expected Output: 10
+        public static void main(String[] args) {
+        int[][] inputs = { {2, 1, 5, 6, 2, 3}, {2, 4}, {} };
+        int[] expected = { 10, 4, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = largestRectangleArea(inputs[i]);
+            System.out.printf("heights=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 
-    /**
-     * Computes the largest rectangular area in a histogram using the concepts of
-     * Nearest Smaller to Left (NSL) and Nearest Smaller to Right (NSR).
+        /**
+     * Intuition: a bar's best rectangle is limited by the first smaller bar on
+     * its left and the first smaller bar on its right. The code precomputes
+     * those two boundaries with monotonic stacks, then tries each bar as the
+     * limiting height of its widest possible rectangle.
      *
-     * Intuition:
-     * - For every bar, we want to know how far we can extend to the left and right without hitting a smaller bar.
-     * - NextSmallerElement tells us the previous bar that is smaller than current bar → left boundary
-     * - PreviousSmallerElement tells us the next bar that is smaller than current bar → right boundary
-     * - Width = (NSR - NSL - 1), Area = height * width
+     * Algorithm:
+     *   1. Initialize previousSmaller to -1 and nextSmaller to length.
+     *   2. Scan right to left, popping heights >= current, to fill nextSmaller.
+     *   3. Scan left to right, popping heights >= current, to fill previousSmaller.
+     *   4. For each bar, compute height * (nextSmaller - previousSmaller - 1).
      *
-     * Approach:
-     * - Compute NSL and NSR indices for each bar.
-     * - For each bar, calculate its maximum area using:
-     *   area = height * (rightSmallerIndex - leftSmallerIndex - 1)
-     * - Track the maximum of all such areas.
+     * Time:  O(n) - each index is pushed and popped at most once per stack pass.
+     * Space: O(n) - boundary arrays and the stack store up to n indices.
      *
-     * Time Complexity: O(n)
-     * - Each element is pushed/popped at most once in each stack.
-     *
-     * Space Complexity: O(n)
-     * - Arrays for NSL, NSR, and stack
-     *
-     * @param heights An array representing heights of histogram bars
-     * @return The area of the largest rectangle that can be formed
+     * @param heights histogram bar heights
+     * @return largest rectangle area in the histogram
      */
+
     public static int largestRectangleArea(int[] heights) {
         int length = heights.length;
 
@@ -142,7 +151,7 @@ public class LargestHistogram {
         for (int currentIndex = 0; currentIndex <= length; currentIndex++) {
             int currentHeight = (currentIndex == length) ? 0 : heights[currentIndex];
 
-            // While current height is less than stack top → time to pop and compute area
+            // While current height is less than stack top -> time to pop and compute area
             while (!stack.isEmpty() && currentHeight < heights[stack.peek()]) {
                 int maxIndex = stack.pop(); // index of the bar with max height in this range
                 int maxHeight = heights[maxIndex];

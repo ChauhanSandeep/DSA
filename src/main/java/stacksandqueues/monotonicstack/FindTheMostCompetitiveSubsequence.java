@@ -3,44 +3,56 @@ package stacksandqueues.monotonicstack;
 import java.util.*;
 
 /**
- * 1673. Find the Most Competitive Subsequence
+ * Problem: Find the Most Competitive Subsequence
  *
- * Problem: Given an integer array nums and a positive integer k, return the most
- * competitive subsequence of nums of size k. A subsequence is competitive if it
- * is lexicographically smaller than any other subsequence of the same size.
+ * Given nums and k, return the lexicographically smallest subsequence of length
+ * k while preserving original order. A smaller earlier value is worth taking
+ * only if enough remaining values still exist to fill the subsequence.
+ *
+ * Leetcode: https://leetcode.com/problems/find-the-most-competitive-subsequence/ (Medium)
+ * Rating:   1802
+ * Pattern:  Stack | Greedy | Monotonic increasing subsequence
  *
  * Example:
- * Input: nums = [3,5,2,6], k = 2
- * Output: [2,6]
- * Explanation: Among all subsequences of size 2, [2,6] is the most competitive.
+ *   Input:  nums = [3,5,2,6], k = 2
+ *   Output: [2,6]
+ *   Why:    2 can replace 3 and 5 while still leaving 6 to complete length 2.
  *
- * LeetCode: https://leetcode.com/problems/find-the-most-competitive-subsequence
+ * Follow-ups:
+ *   1. Return the largest competitive subsequence?
+ *      Reverse the comparison and pop smaller previous values when safe.
+ *   2. What if removals have different costs?
+ *      Track remaining removal budget instead of only remaining element count.
+ *   3. Answer many k values for the same nums?
+ *      Precompute next minimum positions with range-min structures, or rerun the O(n) greedy per k.
+ *   4. Preserve stable choices among equal values?
+ *      Keep the strict > comparison so equal earlier values are not popped.
  *
- * Follow-up questions:
- * Q: What if we need the k-th most competitive subsequence?
- * A: Use backtracking with lexicographic ordering or priority queue approaches.
- *
- * Q: How to handle very large arrays efficiently?
- * A: Current solution is already O(n), can't improve asymptotically.
- *
- * Q: Can we solve this problem in parallel?
- * A: Difficult due to sequential dependencies; stack operations are inherently sequential.
- * LeetCode Contest Rating: 1802
+ * Related: Remove K Digits (402), Create Maximum Number (321), Smallest Subsequence of Distinct Characters (1081).
  */
+
 public class FindTheMostCompetitiveSubsequence {
 
-    /**
-     * Monotonic stack approach to find most competitive subsequence.
+        /**
+     * Intuition: build the answer from left to right, and whenever a smaller
+     * nums[i] appears, remove larger previous choices only if the remaining
+     * numbers can still fill k slots. The stack therefore keeps the best prefix
+     * possible without sacrificing the required length.
      *
-     * Algorithm: Greedy with stack
-     * - Use stack to build result subsequence
-     * - For each element, pop stack elements that are larger and can be replaced
-     * - Only pop if we have enough remaining elements to fill required slots
-     * - Add current element to stack
+     * Algorithm:
+     *   1. Scan nums from left to right.
+     *   2. While stack.peek() > nums[i] and enough elements remain, pop the stack.
+     *   3. Push nums[i] only while the stack has fewer than k values.
+     *   4. Pop the stack into result from right to left to preserve order.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(k) for the stack/result
+     * Time:  O(n) - each value is pushed and popped at most once.
+     * Space: O(k) - the stack and result hold k selected values.
+     *
+     * @param nums input array
+     * @param k required subsequence length
+     * @return lexicographically smallest subsequence of length k
      */
+
     public int[] mostCompetitive(int[] nums, int k) {
         Stack<Integer> stack = new Stack<>();
         int n = nums.length;
@@ -155,7 +167,7 @@ public class FindTheMostCompetitiveSubsequence {
         return result.stream().mapToInt(Integer::intValue).toArray();
     }
 
-    // Recursive helper to find most competitive subsequence
+    /** Explores include/exclude choices for the recursive baseline. */
     private void findMostCompetitive(int[] nums, int index, int k, List<Integer> best, List<Integer> current) {
         if (current.size() == k) {
             if (best.isEmpty() || isLexicographicallySmaller(current, best)) {
@@ -178,7 +190,7 @@ public class FindTheMostCompetitiveSubsequence {
         findMostCompetitive(nums, index + 1, k, best, current);
     }
 
-    // Check if list1 is lexicographically smaller than list2
+    /** Checks whether list1 is lexicographically smaller than list2. */
     private boolean isLexicographicallySmaller(List<Integer> list1, List<Integer> list2) {
         for (int i = 0; i < Math.min(list1.size(), list2.size()); i++) {
             if (list1.get(i) < list2.get(i)) return true;
@@ -205,5 +217,18 @@ public class FindTheMostCompetitiveSubsequence {
         // For this specific problem, the stack approach is optimal
         // Segment tree would be useful if we had multiple queries
         return mostCompetitive(nums, k);
+    }
+
+    public static void main(String[] args) {
+        FindTheMostCompetitiveSubsequence solver = new FindTheMostCompetitiveSubsequence();
+        int[][] inputs = { {3, 5, 2, 6}, {2, 4, 3, 3, 5, 4, 9, 6}, {1} };
+        int[] ks = { 2, 4, 1 };
+        int[][] expected = { {2, 6}, {2, 3, 3, 4}, {1} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.mostCompetitive(inputs[i], ks[i]);
+            System.out.printf("nums=%s k=%d -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), ks[i], Arrays.toString(got), Arrays.toString(expected[i]));
+        }
     }
 }

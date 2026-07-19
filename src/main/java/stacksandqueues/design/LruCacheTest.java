@@ -1,43 +1,38 @@
 package stacksandqueues.design;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * LRU Cache - LeetCode Problem 146
+ * Problem: LRU Cache
  *
- * Problem Statement:
- * Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
- * Implement the LRUCache class with get(key) and put(key, value) operations.
- * When capacity is reached, invalidate the least recently used item before inserting new item.
- * Both operations must run in O(1) average time complexity.
+ * Design a cache with get and put in O(1) average time. When capacity is
+ * exceeded, remove the least recently used key, while every successful get or
+ * put makes that key the most recently used.
+ *
+ * Leetcode: https://leetcode.com/problems/lru-cache/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Design | Hash map | Doubly linked list
  *
  * Example:
- * LRUCache lRUCache = new LRUCache(2);
- * lRUCache.put(1, 1); // cache is {1=1}
- * lRUCache.put(2, 2); // cache is {1=1, 2=2}
- * lRUCache.get(1);    // return 1, cache is {2=2, 1=1} (1 moved to most recent)
- * lRUCache.put(3, 3); // evicts key 2, cache is {1=1, 3=3}
+ *   Input:  capacity 2, put(1,1), put(2,2), get(1), put(3,3), get(2)
+ *   Output: [1,-1]
+ *   Why:    get(1) makes key 1 recent, so put(3,3) evicts key 2.
  *
- * LeetCode Link: https://leetcode.com/problems/lru-cache/
+ * Follow-ups:
+ *   1. Make the cache thread-safe?
+ *      Protect the map and linked list with the same lock or a carefully designed concurrent policy.
+ *   2. Add TTL expiration?
+ *      Store expiry timestamps and purge expired nodes before normal LRU eviction.
+ *   3. Support LFU instead of LRU?
+ *      Add frequency buckets and evict from the minimum-frequency bucket.
+ *   4. Persist the cache after restart?
+ *      Serialize entries in recency order and rebuild the map and list on startup.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you implement a thread-safe LRU cache for concurrent access?
- *    Answer: Use ConcurrentHashMap + synchronized blocks, or lock-free algorithms with atomic operations.
- *    Related: Design thread-safe data structures
- *
- * 2. What if we need LFU (Least Frequently Used) instead of LRU?
- *    Answer: Add frequency counter to nodes, maintain frequency-based ordering.
- *    Related: LeetCode 460 - https://leetcode.com/problems/lfu-cache/
- *
- * 3. How to implement cache with TTL (Time To Live) expiration?
- *    Answer: Add timestamp to nodes, background cleanup thread for expired entries.
- *
- * 4. What if we need to persist cache to disk for recovery?
- *    Answer: Implement write-through or write-back policies with serialization.
- *    Related: Design distributed cache systems
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: LFU Cache (460), Design HashMap (706), All Oone Data Structure (432).
  */
+
 class LRUCache {
   private final int capacity; // Maximum capacity of the cache
   private final Map<Integer, DoublyListNode> keyNodeMap; // mapping between key and node (for O(1) access)
@@ -49,10 +44,24 @@ class LRUCache {
     this.usageOrderList = new DoublyLinkedList();
   }
 
-  /**
-   * Fetch value for the given key.
-   * If key exists, move the corresponding node to the head (most recently used).
+    /**
+   * Intuition: the hash map finds the node in O(1), and the linked list records
+   * recency. A successful read moves that node to the head so future evictions
+   * remove older nodes first.
+   *
+   * Algorithm:
+   *   1. Return -1 when key is absent from keyNodeMap.
+   *   2. Read the mapped node.
+   *   3. Move that node to the head of usageOrderList.
+   *   4. Return node.value.
+   *
+   * Time:  O(1) - map lookup and linked-list relink are constant time.
+   * Space: O(1) - no additional storage grows during get.
+   *
+   * @param key key to read
+   * @return value for key, or -1 if absent
    */
+
   public int get(int key) {
     if (!keyNodeMap.containsKey(key)) {
       return -1;
@@ -63,11 +72,24 @@ class LRUCache {
     return node.value;
   }
 
-  /**
-   * Insert or update the (key, value) pair.
-   * Move the node to the head if it already exists.
-   * If the key is new and capacity is exceeded, evict the least recently used node.
+    /**
+   * Intuition: updating an existing key is also a recent use, so that node moves
+   * to the head. A new key is inserted at the head; if capacity is exceeded, the
+   * tail-side real node is the least recently used and is removed from both data
+   * structures.
+   *
+   * Algorithm:
+   *   1. If key exists, update its value and move its node to the head.
+   *   2. Otherwise create a new node, add it to the head, and put it in keyNodeMap.
+   *   3. If the map size exceeds capacity, removeTail and delete that key from the map.
+   *
+   * Time:  O(1) - hash map operations and list relinks are constant time.
+   * Space: O(capacity) - the map and list store one node per cached key.
+   *
+   * @param key key to insert or update
+   * @param value value to store
    */
+
   public void put(int key, int value) {
     if (keyNodeMap.containsKey(key)) {
       // Key already exists, update value and move to head
@@ -151,9 +173,8 @@ class DoublyLinkedList {
     return lruNode;
   }
 
-  /**
-   * Remove a node from its current position in the list.
-   */
+    /** Unlinks a node from its current list position. */
+
   private void removeNode(DoublyListNode node) {
     node.prev.next = node.next;
     node.next.prev = node.prev;
@@ -161,19 +182,22 @@ class DoublyLinkedList {
 }
 
 public class LruCacheTest {
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     LRUCache cache = new LRUCache(2);
+    cache.put(1, 1);
+    cache.put(2, 2);
+    int first = cache.get(1);
+    cache.put(3, 3);
+    int second = cache.get(2);
+    cache.put(4, 4);
+    int third = cache.get(1);
+    int fourth = cache.get(3);
+    int fifth = cache.get(4);
 
-    cache.put(1, 1); // Cache = [1]
-    cache.put(2, 2); // Cache = [2, 1]
-    System.out.println(cache.get(1)); // Output: 1 (Cache = [1, 2])
-
-    cache.put(3, 3); // Evicts key 2, Cache = [3, 1]
-    System.out.println(cache.get(2)); // Output: -1 (not found)
-
-    cache.put(4, 4); // Evicts key 1, Cache = [4, 3]
-    System.out.println(cache.get(1)); // Output: -1
-    System.out.println(cache.get(3)); // Output: 3
-    System.out.println(cache.get(4)); // Output: 4
+    int[] got = { first, second, third, fourth, fifth };
+    int[] expected = { 1, -1, -1, 3, 4 };
+    System.out.printf("ops=%s -> %s  expected=%s%n",
+        "put(1),put(2),get(1),put(3),get(2),put(4),get(1),get(3),get(4)",
+        Arrays.toString(got), Arrays.toString(expected));
   }
 }
