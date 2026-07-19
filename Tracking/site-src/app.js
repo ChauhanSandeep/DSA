@@ -184,10 +184,35 @@
     if (!handle) handle = await pickStateFile();
     if (!handle) throw new Error("No file handle available");
 
-    const merged = getMergedState();
-    await writeStateFile(handle, merged);
+    // Read the CURRENT state.json from disk first. This is the correct
+    // "source of truth" — pages only have a subset (e.g. problem pages
+    // only inline this problem's entry). We merge the localStorage
+    // overlay on top of the on-disk state so grades made on a problem
+    // page never wipe out other entries.
+    const file = await handle.getFile();
+    const text = await file.text();
+    let stateOnDisk;
+    try {
+      stateOnDisk = JSON.parse(text);
+    } catch (e) {
+      throw new Error("Could not parse state.json on disk: " + e.message);
+    }
+    if (!stateOnDisk || !stateOnDisk.problems) {
+      throw new Error("state.json on disk has unexpected shape.");
+    }
+
+    const pending = loadPending();
+    let applied = 0;
+    for (const [task, patch] of Object.entries(pending)) {
+      if (stateOnDisk.problems[task]) {
+        stateOnDisk.problems[task] = { ...stateOnDisk.problems[task], ...patch };
+        applied++;
+      }
+    }
+
+    await writeStateFile(handle, stateOnDisk);
     clearPending();
-    return true;
+    return applied;
   }
 
   // --------------------------------------------------------------------------

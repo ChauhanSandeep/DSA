@@ -633,6 +633,8 @@ def render_problem_page(problem: dict, today: date) -> str:
       <button class="grade-btn hint"    data-grade="hint">🟡 Hint <span class="key">3</span></button>
       <button class="grade-btn blank"   data-grade="blank">🔴 Blank <span class="key">4</span></button>
     </div>
+
+    <script>window.__STATE__ = {{"problems": {{{json.dumps(task)}: {json.dumps(problem, ensure_ascii=False)}}}}};</script>
     """
 
     return base_layout(problem.get("problemName") or task, body, back_link="../index.html").replace("{root}", "../")
