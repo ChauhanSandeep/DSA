@@ -1,108 +1,68 @@
 package arrays.greedy;
 
+import java.util.Arrays;
+
 /**
- * LeetCode Problem 807: Max Increase to Keep City Skyline
+ * Problem: Max Increase to Keep City Skyline
  *
- * Problem Statement:
- * You have a city represented as an n x n grid where each cell grid[r][c] contains the
- * height of a building at row r and column c. The skyline is what you see when looking
- * at the city from far away in each direction (north, east, south, west).
+ * A city grid stores one building height per cell. Increase building heights as
+ * much as possible while keeping every row skyline and every column skyline
+ * exactly the same from all four directions.
  *
- * When viewing from:
- * - North or South: You see the maximum height in each column
- * - East or West: You see the maximum height in each row
+ * Leetcode: https://leetcode.com/problems/max-increase-to-keep-city-skyline/ (Medium)
+ * Rating:   acceptance 86.5% (Medium) - contest rating 1376
+ * Pattern:  Arrays | Matrix scanning | Row/column maximums
  *
- * You are allowed to increase the heights of buildings by any amount, but the skyline
- * from all four directions must remain unchanged. Return the maximum total sum by which
- * the height of all buildings can be increased without changing any skyline view.
+ * Example:
+ *   Input:  grid = [[3,0,8,4],[2,4,5,7],[9,2,6,3],[0,3,1,0]]
+ *   Output: 35
+ *   Why:    each cell can rise only to min(rowMax, colMax), so all added
+ *           heights sum to 35 without changing any skyline.
  *
- * Example 1:
- * Input: grid = [[3,0,8,4],[2,4,5,7],[9,2,6,3],[0,3,1,0]]
- * Output: 35
- * Explanation:
- * Original grid:
- * [[3, 0, 8, 4],
- *  [2, 4, 5, 7],
- *  [9, 2, 6, 3],
- *  [0, 3, 1, 0]]
+ * Follow-ups:
+ *   1. What if the grid is rectangular instead of n x n?
+ *      Store one maximum per row and one per column; the same formula applies.
+ *   2. What if only some buildings may be increased?
+ *      Compute the same caps, but add increases only for allowed cells.
+ *   3. What if decreases are also allowed?
+ *      Target min(rowMax, colMax) and sum absolute adjustment costs.
  *
- * Row maximums (East/West skyline): [
- *      8,
- *      7,
- *      9,
- *      3
- * ]
- * Column maximums (North/South skyline): [9, 4, 8, 7]
- *
- * For each position (i,j), the maximum height without changing skyline is
- * min(rowMax[i], colMax[j]). The grid after maximum increases:
- * [[8, 4, 8, 7],
- *  [7, 4, 7, 7],
- *  [9, 4, 8, 7],
- *  [3, 3, 3, 3]]
- *
- * Total increase = (8-3) + (4-0) + (0) + (3) + (5) + (0) + (2) + (0) + (0) + (2) + (2) +
- * (4) + (3) + (0) + (2) + (3) = 35
- *
- * Example 2:
- * Input: grid = [[0,0,0],[0,0,0],[0,0,0]]
- * Output: 0
- * Explanation: Increasing any building height will change the skyline from some direction.
- *
- * Constraints:
- * - n == grid.length
- * - n == grid[r].length
- * - 2 <= n <= 50
- * - 0 <= grid[r][c] <= 100
- *
- * LeetCode Link: https://leetcode.com/problems/max-increase-to-keep-city-skyline/
- *
- * Follow-up Questions:
- * 1. Q: How would you solve this if we can decrease building heights as well?
- *    A: The problem becomes finding the total adjustment (absolute difference) to reach
- *    the optimal configuration. Each building should be adjusted to min(rowMax[i], colMax[j]).
- *    Calculate sum of |grid[i][j] - min(rowMax[i], colMax[j])| for all positions.
- *
- * 2. Q: What if there are restrictions on which buildings can be modified?
- *    A: Add a boolean mask array indicating modifiable buildings. When computing the total
- *    increase, only include positions where the mask is true. The skyline computation remains
- *    the same since we need to preserve views from all directions.
- *
- * 3. Q: How would you extend this to a 3D grid (multiple floors)?
- *    A: For 3D with dimensions n x m x h, maintain skyline views from 6 directions (all faces
- *    of the cuboid). Each cell (i,j,k) can increase to min of the maximum values along each
- *    of the three axes through that point. The principle generalizes but requires tracking
- *    3D maximums.
- *
- * 4. Q: What if building increases have different costs per unit height?
- *    A: Model as a maximum profit problem. For each building at (i,j), the maximum increase
- *    is still min(rowMax[i], colMax[j]) - grid[i][j]. Multiply by the unit cost at that
- *    position to get the profit. Sum all profits. Use greedy approach if we have a budget
- *    constraint (sort by cost-effectiveness ratio).
- *
- * 5. Q: How would you solve this if skyline must be maintained after each incremental update?
- *    A: Use dynamic programming or greedy approach. Process buildings in order, maintaining
- *    current row and column maximums. Before increasing a building, check if it would exceed
- *    current skyline constraints. Update maximums incrementally. This is useful for online
- *    scenarios where updates come sequentially.
- * LeetCode Contest Rating: 1376
+ * Related: Trapping Rain Water II (407), Projection Area of 3D Shapes (883).
  */
 public class MaxIncreaseToKeepCitySkyline {
 
+    public static void main(String[] args) {
+        MaxIncreaseToKeepCitySkyline solver = new MaxIncreaseToKeepCitySkyline();
+        int[][][] inputs = {
+            {{3, 0, 8, 4}, {2, 4, 5, 7}, {9, 2, 6, 3}, {0, 3, 1, 0}},
+            {{0, 0}, {0, 0}}
+        };
+        int[] expected = {35, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.maxIncreaseKeepingSkyline(inputs[i]);
+            System.out.printf("grid=%s -> %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Calculates maximum increase while preserving skyline.
+     * Intuition: a building can grow only until it hits one of the skylines that
+     * already constrains it. Its row maximum protects the east/west view and its
+     * column maximum protects the north/south view, so the safe cap for cell
+     * (i, j) is the smaller of rowMax[i] and colMax[j].
      *
      * Algorithm:
-     * 1. Calculate maximum height in each row (south/north skyline)
-     * 2. Calculate maximum height in each column (east/west skyline)
-     * 3. For each position, max possible height = min(row_max, col_max)
-     * 4. Sum all possible increases: (max_possible - current) for all positions
+     *   1. Scan every row to compute rowMax.
+     *   2. Scan every column to compute colMax.
+     *   3. For every cell, add min(rowMax[i], colMax[j]) - grid[i][j].
      *
-     * Time Complexity: O(n²) where n is grid dimension
-     * Space Complexity: O(n) for storing row and column maximums
+     * Time:  O(n^2) - the code scans the n x n grid a constant number of times.
+     * Space: O(n) - rowMax and colMax store one value per row and column.
      *
-     * @param grid n×n matrix of building heights
-     * @return maximum total increase possible
+     * @param grid n x n matrix of building heights
+     * @return maximum total height increase that preserves all skylines
      */
     public int maxIncreaseKeepingSkyline(int[][] grid) {
         int length = grid.length;

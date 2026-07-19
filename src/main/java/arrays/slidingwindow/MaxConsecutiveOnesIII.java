@@ -3,42 +3,62 @@ package arrays.slidingwindow;
 import java.util.*;
 
 /**
- * 1004. Max Consecutive Ones III
+ * Problem: Max Consecutive Ones III
  *
- * Problem: Given a binary array nums and integer k, return the maximum number
- * of consecutive 1s in the array if you can flip at most k 0s.
+ * Given a binary array and k, flip at most k zeroes to ones. Return the longest
+ * contiguous window that can be made all ones after those flips.
+ *
+ * Leetcode: https://leetcode.com/problems/max-consecutive-ones-iii/ (Medium)
+ * Rating:   acceptance 65.0% (Medium) - contest rating 1656
+ * Pattern:  Sliding window | At most k zeroes
  *
  * Example:
- * Input: nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2
- * Output: 6
- * Explanation: [1,1,1,0,0,1,1,1,1,1,1] - flip the two 0s at indices 5 and 10
+ *   Input:  nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2
+ *   Output: 6
+ *   Why:    the best window contains exactly two zeroes, which can both be flipped.
  *
- * LeetCode: https://leetcode.com/problems/max-consecutive-ones-iii
+ * Follow-ups:
+ *   1. Return the window boundaries too?
+ *      Store left and right whenever the best length improves.
+ *   2. What if k is larger than the zero count?
+ *      The whole array is valid, so return nums.length.
+ *   3. Find the shortest window needing exactly k flips?
+ *      Track windows with exactly k zeroes and minimize length instead.
  *
- * Follow-up questions:
- * Q: What if we want to minimize the number of flips for a target length?
- * A: Use binary search on the answer with sliding window validation.
- *
- * Q: Can we handle the case where k is very large?
- * A: If k >= number of zeros, answer is the entire array length.
- *
- * Q: How to find all maximum-length windows?
- * A: Track all windows that achieve the maximum length during traversal.
- * LeetCode Contest Rating: 1656
+ * Related: Max Consecutive Ones (485), Max Consecutive Ones II (487).
  */
 public class MaxConsecutiveOnesIII {
 
+    public static void main(String[] args) {
+        MaxConsecutiveOnesIII solver = new MaxConsecutiveOnesIII();
+        int[][] nums = {{1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0}, {0, 0, 1, 1, 1, 0, 0}, {1, 1, 1}};
+        int[] kValues = {2, 0, 1};
+        int[] expected = {6, 3, 3};
+
+        for (int i = 0; i < nums.length; i++) {
+            int got = solver.longestOnes(nums[i], kValues[i]);
+            System.out.printf("nums=%s k=%d -> %d  expected=%d%n",
+                Arrays.toString(nums[i]), kValues[i], got, expected[i]);
+        }
+    }
+
+
     /**
-     * Sliding window approach counting zeros in current window.
+     * Intuition: a window is valid exactly when it contains at most
+     * maxAllowedZeroes zeroes. Expand right to try longer windows, and whenever
+     * the zero budget is exceeded, move left until the window is valid again.
      *
      * Algorithm:
-     * - Use sliding window [left, right] tracking number of zeros
-     * - Expand right pointer, count zeros encountered
-     * - If zeros > k, shrink window from left until zeros <= k
-     * - Track maximum window size achieved
+     *   1. Move right across nums, counting zeroes added to the window.
+     *   2. While usedZeroes exceeds maxAllowedZeroes, move left and refund zeroes.
+     *   3. Record the largest valid window length.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) constant extra space
+     * Time:  O(n) - each pointer moves across the array once.
+     * Space: O(1) - only counters and pointers are used.
+     *
+     * @param nums binary array
+     * @param maxAllowedZeroes maximum zeroes that may be flipped
+     * @return longest window that can be made all ones
      */
     public int longestOnes(int[] nums, int maxAllowedZeroes) {
         int left = 0, usedZeroes = 0, maxLength = 0;

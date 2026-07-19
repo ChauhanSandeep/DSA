@@ -2,27 +2,66 @@ package arrays.slidingwindow;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Problem: Subarray Sums Divisible by K
  *
- * Given an integer array nums and an integer k, return the number of non-empty subarrays that have a sum divisible by k.
+ * Count non-empty contiguous subarrays whose sum is divisible by k. If two
+ * prefix sums have the same remainder modulo k, the subarray between them has a
+ * sum divisible by k.
  *
- * A subarray is a contiguous part of an array.
+ * Leetcode: https://leetcode.com/problems/subarray-sums-divisible-by-k/ (Medium)
+ * Rating:   acceptance 55.6% (Medium) - contest rating 1676
+ * Pattern:  Prefix sum | Remainder frequency map
  *
  * Example:
- * Input: nums = [4,5,0,-2,-3,1], k = 5
- * Output: 7
- * Explanation: There are 7 subarrays with a sum divisible by k = 5:
- * [4, 5, 0, -2, -3, 1], [5], [5, 0], [5, 0, -2, -3], [0], [0, -2, -3], [-2, -3]
+ *   Input:  nums = [4,5,0,-2,-3,1], k = 5
+ *   Output: 7
+ *   Why:    seven subarrays have prefix remainders that match across their ends.
  *
- * LeetCode: https://leetcode.com/problems/subarray-sums-divisible-by-k
+ * Follow-ups:
+ *   1. Return the actual subarrays?
+ *      Store indices per remainder and emit each matching pair, which can be O(n^2).
+ *   2. What if nums contains negative values?
+ *      Normalize remainders with (sum % k + k) % k.
+ *   3. What if k changes across many queries?
+ *      Preprocessing is hard; answer each k with its own remainder count pass.
  *
- * Time Complexity: O(n) where n is the length of nums
- * Space Complexity: O(k) for the frequency map
- * LeetCode Contest Rating: 1676
+ * Related: Continuous Subarray Sum (523), Subarray Sum Equals K (560).
  */
 public class SubarraySumsDivisibleByK {
+
+    public static void main(String[] args) {
+        SubarraySumsDivisibleByK solver = new SubarraySumsDivisibleByK();
+        int[][] nums = {{4, 5, 0, -2, -3, 1}, {5}, {1, 2, 3}};
+        int[] divisors = {5, 9, 3};
+        int[] expected = {7, 0, 3};
+
+        for (int i = 0; i < nums.length; i++) {
+            int got = solver.subarraysDivByK(nums[i], divisors[i]);
+            System.out.printf("nums=%s k=%d -> %d  expected=%d%n",
+                Arrays.toString(nums[i]), divisors[i], got, expected[i]);
+        }
+    }
+
+    /**
+     * Intuition: a subarray sum is divisible by k when the prefix sums before and
+     * after it have the same remainder. For each new prefix remainder, every
+     * previous occurrence of that remainder forms one valid subarray ending here.
+     *
+     * Algorithm:
+     *   1. Seed remainder 0 with frequency 1 for subarrays starting at index 0.
+     *   2. Scan nums, update prefixSum, and normalize its remainder modulo k.
+     *   3. Add the previous frequency of that remainder, then record the new prefix.
+     *
+     * Time:  O(n) - one pass over nums.
+     * Space: O(k) - at most k different remainders are stored.
+     *
+     * @param nums input array
+     * @param k divisor for subarray sums
+     * @return number of non-empty subarrays whose sum is divisible by k
+     */
     public int subarraysDivByK(int[] nums, int k) {
         // Map to store frequency of remainders
         Map<Integer, Integer> remainderFreq = new HashMap<>();

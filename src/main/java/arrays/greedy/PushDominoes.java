@@ -4,63 +4,61 @@ import java.util.Arrays;
 
 
 /**
- * Push Dominoes - LeetCode Problem 838
+ * Problem: Push Dominoes
  *
- * Problem Statement:
- * There are n dominoes in a line, placed vertically upright. Initially, some dominoes
- * are pushed either to the left or right simultaneously. Each second, falling dominoes
- * push adjacent dominoes in their direction. When a domino receives equal forces from
- * both sides, it remains upright. Find the final state after all dominoes stop moving.
+ * Dominoes begin upright, pushed left, or pushed right. All pushes propagate
+ * simultaneously, and equal opposing forces leave a domino upright. Return the
+ * final string once every force has settled.
+ *
+ * Leetcode: https://leetcode.com/problems/push-dominoes/ (Medium)
+ * Rating:   acceptance 58.3% (Medium) - contest rating 1638
+ * Pattern:  Greedy | Two pointers | Force simulation
  *
  * Example:
- * Input: dominoes = ".L.R...LR..L.."
- * Output: "LL.RR.LLRRLL.."
- * Explanation: The 'L' at position 1 causes dominoes to its left to fall left.
- * The 'R' at position 3 causes dominoes to its right to fall right until they
- * meet the force from 'L' at position 7. Forces balance at position 5, keeping it upright.
+ *   Input:  dominoes = ".L.R...LR..L.."
+ *   Output: "LL.RR.LLRRLL.."
+ *   Why:    left-only and right-only stretches fall one way, while the R...L
+ *           stretch fills inward and can leave the middle upright.
  *
- * LeetCode Link: https://leetcode.com/problems/push-dominoes/
+ * Follow-ups:
+ *   1. What if pushes have different strengths?
+ *      Store force magnitudes and decay them as they propagate.
+ *   2. What if pushes happen at different times?
+ *      Use BFS with timestamps and resolve equal-time collisions.
+ *   3. What if dominoes are in a grid?
+ *      Propagate forces in four directions with multi-source BFS.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you handle if dominoes could be pushed with different strengths?
- *    Answer: Modify force calculation to account for varying initial force magnitudes.
- *
- * 2. What if dominoes could be pushed at different times (not simultaneously)?
- *    Answer: Use BFS/simulation with timestamps to process forces in chronological order.
- *    Related: LeetCode 1136 - Parallel Courses (topological ordering with time)
- *
- * 3. How to extend this to 2D grid of dominoes?
- *    Answer: Similar force propagation but in 4 directions, using BFS from all initial sources.
- *
- * 4. What if we need to minimize the number of initial pushes to achieve a target state?
- *    Answer: Dynamic programming or backtracking to find optimal initial configuration.
- *    Related: LeetCode 1284 - Minimum Number of Flips to Convert Binary Matrix
- * LeetCode Contest Rating: 1638
+ * Related: Shortest Distance from All Buildings (317), Rotting Oranges (994).
  */
 public class PushDominoes {
 
     public static void main(String[] args) {
-        String dominoes = ".L.R...LR..L..";
-        System.out.println("Optimized Output: " + pushDominoesForceBased(dominoes));
+        String[] inputs = {".L.R...LR..L..", "RR.L", "..."};
+        String[] expected = {"LL.RR.LLRRLL..", "RR.L", "..."};
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = pushDominoes(inputs[i]);
+            System.out.printf("dominoes=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
+
+
     /**
-     * Simulates the final state of dominoes after being pushed using an efficient two-pointer approach.
+     * Intuition: settled stretches are determined only by their nearest pushed
+     * boundaries. L...L and R...R fall in one direction, R...L fills inward from
+     * both sides, and L...R leaves the middle upright.
      *
-     * Approach:
-     * 1. Convert the string to a character array for in-place modification.
-     * 2. Traverse the array using a single loop and track the most recent 'L' and 'R' positions.
-     * 3. Handle 3 cases:
-     *    - R...R → fill with 'R'
-     *    - L...L → fill with 'L'
-     *    - R...L → fill from both ends inward (symmetrically)
-     * 4. Return the modified char array as a string.
+     * Algorithm:
+     *   1. Walk the char array while tracking the last seen L and R positions.
+     *   2. When a new boundary is found, fill the stretch according to the boundary pair.
+     *   3. Use the extra loop step at the end to flush a trailing R stretch.
      *
-     * Time Complexity: O(n), where n = length of dominoes
-     * Space Complexity: O(n) to store the char array (input is immutable)
+     * Time:  O(n) - each domino is visited and assigned a constant number of times.
+     * Space: O(n) - the immutable string is copied into a char array.
      *
-     * @param dominoes A string representing the initial state of dominoes with '.', 'L', and 'R'
-     * @return A string representing the final state after all pushes have resolved
+     * @param dominoes initial domino states using '.', 'L', and 'R'
+     * @return final domino state after all pushes settle
      */
     public static String pushDominoes(String dominoes) {
         char[] arr = dominoes.toCharArray();

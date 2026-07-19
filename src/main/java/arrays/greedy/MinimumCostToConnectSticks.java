@@ -1,60 +1,63 @@
 package arrays.greedy;
 
 import java.util.PriorityQueue;
+import java.util.Arrays;
 
 /**
  * Problem: Minimum Cost to Connect Sticks
  *
- * You are given an array of integers representing the lengths of sticks.
- * You can connect any two sticks into one. The cost is equal to the sum of their lengths.
- * The goal is to connect all sticks into one stick with the minimum total cost.
+ * Connect sticks until only one remains. Each merge costs the sum of the two
+ * stick lengths being connected, so short sticks should be merged before they
+ * are repeatedly carried into later costs.
  *
- * Leetcode: https://leetcode.com/problems/minimum-cost-to-connect-sticks/
+ * Leetcode: https://leetcode.com/problems/minimum-cost-to-connect-sticks/ (Medium)
+ * Rating:   acceptance 72.3% (Medium) - contest rating 1482
+ * Pattern:  Greedy | Min heap | Huffman-style merging
  *
  * Example:
- * Input: [1, 8, 3, 5]
- * Output: 30
- * Explanation:
- *  - Combine 1 + 3 = 4 → cost = 4
- *  - Combine 4 + 5 = 9 → cost = 9
- *  - Combine 8 + 9 = 17 → cost = 17
- *  - Total = 4 + 9 + 17 = 30
+ *   Input:  sticks = [1,8,3,5]
+ *   Output: 30
+ *   Why:    merge 1+3=4, then 4+5=9, then 8+9=17; total cost is 30.
  *
- * Follow-up:
- * 1. Why does greedy (always combine smallest two) work?
- *    Huffman coding principle — combining smaller parts early reduces cost growth.
- * 2. Can you avoid using a heap?
- *    No, heap is required for optimality in O(N log N). Without it, solution becomes brute-force.
- * 3. Can this be parallelized?
- *    Only partially. Final result is inherently sequential due to dependency.
- * LeetCode Contest Rating: 1482
+ * Follow-ups:
+ *   1. Why always merge the two shortest sticks?
+ *      Any optimal merge tree can place the two shortest leaves deepest, matching Huffman coding.
+ *   2. Can this be solved without a heap?
+ *      Repeated sorting works but is slower; a heap gives O(n log n).
+ *   3. What if new sticks are streamed in?
+ *      Keep inserting into the same min heap and merge when the batch is finalized.
  */
 public class MinimumCostToConnectSticks {
 
   public static void main(String[] args) {
-    int[] stickLengths = {1, 8, 3, 5};
     MinimumCostToConnectSticks solver = new MinimumCostToConnectSticks();
-    int result = solver.getMinimumCostToConnectSticks(stickLengths);
-    System.out.println("Minimum cost to connect sticks: " + result);
+    int[][] inputs = {{1, 8, 3, 5}, {5}, {2, 4, 3}};
+    int[] expected = {30, 0, 14};
+
+    for (int i = 0; i < inputs.length; i++) {
+      int got = solver.getMinimumCostToConnectSticks(inputs[i]);
+      System.out.printf("sticks=%s -> %d  expected=%d%n",
+          Arrays.toString(inputs[i]), got, expected[i]);
+    }
   }
 
+
+
   /**
-   * Greedy approach using a Min-Heap (PriorityQueue) to minimize total cost.
+   * Intuition: a stick merged early contributes to the cost of every later merge
+   * containing it. To minimize repeated contribution, the smallest sticks should
+   * be buried deepest, exactly like building a Huffman tree.
    *
-   * Steps:
-   * 1. Add all sticks into a min-heap.
-   * 2. While more than one stick exists:
-   *    a. Remove the two smallest sticks.
-   *    b. Add their sum to the total cost.
-   *    c. Insert the combined stick back into the heap.
-   * 3. Return the accumulated cost.
+   * Algorithm:
+   *   1. Put every stick length into a min heap.
+   *   2. Repeatedly remove the two shortest sticks and pay their combined length.
+   *   3. Push the combined stick back until one stick remains.
    *
-   * Algorithm: Greedy + Heap
-   * Time Complexity: O(N log N), where N is the number of sticks.
-   * Space Complexity: O(N), due to heap storage.
+   * Time:  O(n log n) - each heap insertion or removal costs logarithmic time.
+   * Space: O(n) - the heap stores the remaining sticks.
    *
-   * @param sticks Array of stick lengths.
-   * @return Minimum cost to connect all sticks.
+   * @param sticks array of stick lengths
+   * @return minimum total cost to connect all sticks
    */
   public int getMinimumCostToConnectSticks(int[] sticks) {
     if (sticks == null || sticks.length <= 1) return 0;

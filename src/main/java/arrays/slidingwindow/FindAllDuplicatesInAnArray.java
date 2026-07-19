@@ -3,41 +3,65 @@ package arrays.slidingwindow;
 import java.util.*;
 
 /**
- * 442. Find All Duplicates in an Array
+ * Problem: Find All Duplicates in an Array
  *
- * Problem: Given an integer array nums where 1 ≤ nums[i] ≤ n (n = array length),
- * some elements appear twice and others once. Return all integers that appear twice.
+ * Values are in the range 1..n, where n is the array length. Some values appear
+ * twice and others once. Return every value that appears twice.
+ *
+ * Leetcode: https://leetcode.com/problems/find-all-duplicates-in-an-array/ (Medium)
+ * Rating:   acceptance 76.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array as hash table | Sign marking | In-place detection
  *
  * Example:
- * Input: nums = [4,3,2,7,8,2,3,1]
- * Output: [2,3]
+ *   Input:  nums = [4,3,2,7,8,2,3,1]
+ *   Output: [2,3]
+ *   Why:    visiting values 2 and 3 reaches already-negated marker positions.
  *
- * LeetCode: https://leetcode.com/problems/find-all-duplicates-in-an-array
+ * Follow-ups:
+ *   1. What if values may be outside 1..n?
+ *      Use a HashMap or HashSet instead of index-based marking.
+ *   2. What if the array is read-only?
+ *      Use extra space or a sorting copy because sign marking mutates input.
+ *   3. What if values can appear more than twice?
+ *      Count frequencies or use modular counting in the array if constraints allow.
  *
- * Follow-up questions:
- * Q: Can we solve without extra space and in O(n) time?
- * A: Yes, use array indices as hash by negating values at corresponding positions.
- *
- * Q: What if numbers can be outside [1,n] range?
- * A: Use HashMap or Set instead of index-based marking approach.
- *
- * Q: How to handle if array is read-only?
- * A: Cannot use in-place marking; must use extra space with Set/Map.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Find All Numbers Disappeared in an Array (448), First Missing Positive (41).
  */
 public class FindAllDuplicatesInAnArray {
 
+    public static void main(String[] args) {
+        FindAllDuplicatesInAnArray solver = new FindAllDuplicatesInAnArray();
+        int[][] inputs = {{4, 3, 2, 7, 8, 2, 3, 1}, {1}, {1, 1, 2}};
+        List<List<Integer>> expected = Arrays.asList(
+            Arrays.asList(2, 3),
+            Collections.emptyList(),
+            Arrays.asList(1)
+        );
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] input = inputs[i].clone();
+            List<Integer> got = solver.findDuplicates(input);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected.get(i));
+        }
+    }
+
+
     /**
-     * Optimal solution using array indices as hash map.
-     * Negates values to mark visited indices without extra space.
+     * Intuition: values are guaranteed to be in 1..n, so value x can use index
+     * x - 1 as its marker slot. The first visit negates that slot; seeing it
+     * already negative means x has appeared before.
      *
      * Algorithm:
-     * - For each number, use its value as index (subtract 1)
-     * - If number at that index is positive, negate it (first visit)
-     * - If number at that index is negative, it's duplicate (second visit)
+     *   1. For each value, map abs(value) to index abs(value) - 1.
+     *   2. If nums[index] is negative, add the value to the duplicate list.
+     *   3. Otherwise negate nums[index] to mark the value as seen.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(1) excluding output array
+     * Time:  O(n) - each element is processed once.
+     * Space: O(1) - excluding the returned list, marking happens in the input array.
+     *
+     * @param nums array containing values in the range 1..nums.length
+     * @return values that appear twice
      */
     public List<Integer> findDuplicates(int[] nums) {
         List<Integer> result = new ArrayList<>();

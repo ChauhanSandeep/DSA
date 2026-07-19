@@ -1,70 +1,66 @@
 package arrays.greedy;
 
+import java.util.Arrays;
+
 /**
  * Problem: Minimum Domino Rotations For Equal Row
  *
- * In a row of dominoes, tops[i] and bottoms[i] represent the top and bottom halves
- * of the ith domino. A domino is a tile with two numbers from 1 to 6 - one on each
- * half of the tile. We may rotate the ith domino, so that tops[i] and bottoms[i]
- * swap values.
+ * Each domino has a top and bottom value. You may rotate any domino, and the
+ * goal is to make either all tops equal or all bottoms equal using the fewest
+ * rotations, returning -1 if no value can fill a row.
  *
- * Return the minimum number of rotations so that all the values in tops are the same,
- * or all the values in bottoms are the same. If it cannot be done, return -1.
+ * Leetcode: https://leetcode.com/problems/minimum-domino-rotations-for-equal-row/ (Medium)
+ * Rating:   acceptance 54.4% (Medium) - contest rating 1541
+ * Pattern:  Greedy | Candidate pruning | Constant-space counting
  *
  * Example:
- * Input:
- * tops =    [2,1,2,4,2,2],
- * bottoms = [5,2,6,2,3,2]
- * Output: 2
- * Explanation:
- * We can rotate the second and fourth dominoes to make all top values equal to 2.
- * After:  tops=[2,2,2,2,2,2], bottoms=[5,1,6,4,3,2]
+ *   Input:  tops = [2,1,2,4,2,2], bottoms = [5,2,6,2,3,2]
+ *   Output: 2
+ *   Why:    rotating dominoes 1 and 3 makes every top value equal to 2.
  *
- * Input: 
- * tops =    [3, 5, 1, 2, 3], 
- * bottoms = [3, 6, 3, 3, 4]
- * Output: -1
- * Explanation: No single value can fill an entire row after rotations.
+ * Follow-ups:
+ *   1. What if domino values are not limited to 1..6?
+ *      The first-domino candidate check still works without fixed-size arrays.
+ *   2. Return all optimal target rows?
+ *      Evaluate every valid candidate and collect those with the minimum rotations.
+ *   3. What if dominoes can also be reordered?
+ *      Reordering does not affect row equality, only the available top/bottom values matter.
  *
- * LeetCode: https://leetcode.com/problems/minimum-domino-rotations-for-equal-row
- *
- * Follow-up Questions:
- * 1. Q: What if dominoes could have values outside 1-6 range?
- *    A: The algorithm works the same, just need to adjust data structures accordingly.
- *
- * 2. Q: How would you handle the case where multiple solutions exist with same minimum?
- *    A: Current solution returns the minimum count. Could be modified to return all optimal configurations.
- *
- * 3. Q: What if we could rearrange dominoes in addition to rotating them?
- *    A: That would be a different problem requiring sorting/greedy approach for placement.
- *
- * 4. Q: How would you optimize for very large arrays?
- *    A: Current O(n) solution is already optimal. Could use early termination optimizations.
- *
- * Related Problems:
- * - Best Meeting Point: https://leetcode.com/problems/best-meeting-point/
- * - Minimum Moves to Equal Array Elements II: https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/
- * - Flip String to Monotone Increasing: https://leetcode.com/problems/flip-string-to-monotone-increasing/
- * LeetCode Contest Rating: 1541
+ * Related: Couples Holding Hands (765), Minimum Moves to Equal Array Elements II (462).
  */
 public class MinimumDominoRotationsForEqualRow {
 
+    public static void main(String[] args) {
+        MinimumDominoRotationsForEqualRow solver = new MinimumDominoRotationsForEqualRow();
+        int[][] tops = {{2, 1, 2, 4, 2, 2}, {3, 5, 1, 2, 3}};
+        int[][] bottoms = {{5, 2, 6, 2, 3, 2}, {3, 6, 3, 3, 4}};
+        int[] expected = {2, -1};
+
+        for (int i = 0; i < tops.length; i++) {
+            int got = solver.minDominoRotations(tops[i], bottoms[i]);
+            System.out.printf("tops=%s bottoms=%s -> %d  expected=%d%n",
+                Arrays.toString(tops[i]), Arrays.toString(bottoms[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Finds minimum rotations by checking candidate values from first domino.
+     * Intuition: if a value can fill an entire row, it must appear in the first
+     * domino, either on top or bottom. That leaves only two candidates to test.
+     * For each candidate, count the cheaper direction: rotate into all tops or
+     * rotate into all bottoms.
      *
      * Algorithm:
-     * 1. For a solution to exist, the target value must appear in every domino
-     * 2. The only possible target values are tops[0] and bottoms[0] (from first domino)
-     * 3. For each candidate, check if it appears in all dominoes (top or bottom)
-     * 4. Count rotations needed to make all tops or all bottoms equal to candidate
-     * 5. Return minimum rotations among all valid configurations
+     *   1. Use tops[0] and bottoms[0] as the only possible target candidates.
+     *   2. For each candidate, verify every domino contains it.
+     *   3. Return the smaller valid rotation count, or -1 if neither candidate works.
      *
-     * Time Complexity: O(n) where n is number of dominoes
-     * Space Complexity: O(1) using constant extra space
+     * Time:  O(n) - at most two linear candidate checks.
+     * Space: O(1) - only counters and candidate values are used.
      *
-     * @param tops array representing top values of dominoes
-     * @param bottoms array representing bottom values of dominoes
-     * @return minimum rotations needed, or -1 if impossible
+     * @param tops top values of the dominoes
+     * @param bottoms bottom values of the dominoes
+     * @return minimum rotations needed, or -1 if no equal row is possible
      */
     public int minDominoRotations(int[] tops, int[] bottoms) {
         if (tops == null || bottoms == null || tops.length != bottoms.length) {

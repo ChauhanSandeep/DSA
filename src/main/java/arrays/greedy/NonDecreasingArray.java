@@ -1,58 +1,65 @@
 package arrays.greedy;
 
+import java.util.Arrays;
+
 /**
- * Non Decreasing Array
+ * Problem: Non-decreasing Array
  *
- * Problem Statement:
- * Given an array nums with n integers, check if it could become non-decreasing
- * by modifying at most one element. We define an array as non-decreasing if
- * nums[i] <= nums[i + 1] holds for every i (0-based) such that (0 <= i <= n - 2).
+ * Decide whether an integer array can become non-decreasing by modifying at most
+ * one element. A valid final array must satisfy nums[i] <= nums[i + 1] for every
+ * adjacent pair.
+ *
+ * Leetcode: https://leetcode.com/problems/non-decreasing-array/ (Medium)
+ * Rating:   acceptance 24.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Local violation repair
  *
  * Example:
- * Input: nums = [4,2,3]
- * Output: true
- * Explanation: You could modify the first 4 to 1 to get a non-decreasing array [1,2,3].
+ *   Input:  nums = [4,2,3]
+ *   Output: true
+ *   Why:    changing 4 down to 2 gives [2,2,3], which is non-decreasing.
  *
- * Input: nums = [4,2,1]
- * Output: false
- * Explanation: You cannot get a non-decreasing array by modifying at most one element.
+ * Follow-ups:
+ *   1. What if up to k modifications are allowed?
+ *      Count and repair violations greedily, or use DP when choices interact.
+ *   2. What if the array must be strictly increasing?
+ *      Replace <= with < and account for integer gaps between neighbors.
+ *   3. Return the modified array?
+ *      Apply the same local repair and keep the changed value.
  *
- * LeetCode Link: https://leetcode.com/problems/non-decreasing-array/
- *
- * Follow-up Questions:
- * 1. What if we can modify at most k elements instead of just one?
- *    Answer: Use DP or greedy with modification counter, checking feasibility at each step.
- * 2. What if we want to find the minimum number of modifications needed?
- *    Answer: Count all violations and use greedy strategy to fix maximum violations with minimum changes.
- * 3. How would you handle the case where we want strictly increasing array?
- *    Answer: Change condition from nums[i] <= nums[i+1] to nums[i] < nums[i+1].
- * 4. What if the array can be rotated before checking?
- *    Answer: Try all possible rotation points and check each rotated version.
- *
- * Related Problems:
- * - 2289. Steps to Make Array Non-decreasing: https://leetcode.com/problems/steps-to-make-array-non-decreasing/
- * - 2263. Make Array Non-decreasing or Non-increasing
- * - 300. Longest Increasing Subsequence
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Steps to Make Array Non-decreasing (2289), Longest Increasing Subsequence (300).
  */
 public class NonDecreasingArray {
 
+    public static void main(String[] args) {
+        NonDecreasingArray solver = new NonDecreasingArray();
+        int[][] inputs = {{4, 2, 3}, {4, 2, 1}, {1}};
+        boolean[] expected = {true, false, true};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] input = inputs[i].clone();
+            boolean got = solver.checkPossibility(input);
+            System.out.printf("nums=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+
     /**
-     * Checks if array can be made non-decreasing with at most one modification.
+     * Intuition: one drop nums[i] > nums[i + 1] is the only place that may need a
+     * modification. Prefer lowering nums[i] when the left neighbor allows it;
+     * otherwise raise nums[i + 1] if the right neighbor allows it. A second drop
+     * means one change cannot fix the whole array.
      *
      * Algorithm:
-     * 1. Scan array to find violations (nums[i] > nums[i+1])
-     * 2. If more than one violation found, return false
-     * 3. If one violation found, check if we can fix it by:
-     *    a) Modifying nums[i] to be ≤ nums[i+1], or
-     *    b) Modifying nums[i+1] to be ≥ nums[i]
-     * 4. Consider constraints from neighboring elements
+     *   1. Scan adjacent pairs and count violations.
+     *   2. On the first violation, try the local modification that preserves neighbors.
+     *   3. Return false for a second violation or an unfixable local conflict.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(n) - one pass over adjacent pairs.
+     * Space: O(1) - only the violation count is stored.
      *
-     * @param nums input array
-     * @return true if can be made non-decreasing with ≤1 modification
+     * @param nums array to check, modified in place while testing feasibility
+     * @return true if at most one modification can make nums non-decreasing
      */
     public boolean checkPossibility(int[] nums) {
         int size = nums.length;

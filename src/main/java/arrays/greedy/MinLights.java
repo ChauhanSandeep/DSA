@@ -3,56 +3,51 @@ package arrays.greedy;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Arrays;
 
 /**
  * Problem: Minimum Lights to Activate
  *
- * Given a list of integers representing light bulbs in a corridor where 1 indicates
- * a functional bulb and 0 indicates a non-functional bulb, find the minimum number
- * of functional bulbs needed to light the entire corridor. Each bulb at index i
- * can light up positions in the range [i - (range-1), i + (range-1)].
+ * A corridor has working and broken bulbs. A working bulb at index i lights the
+ * interval [i - range + 1, i + range - 1]. Return the fewest working bulbs that
+ * cover every corridor position, or -1 if coverage is impossible.
+ *
+ * Source:   InterviewBit - Minimum Lights to Activate
+ * Pattern:  Greedy | Interval covering | Rightmost useful choice
  *
  * Example:
- * Input: bulbs = [0,0,0,1,0], range = 3
- * Output: 1
- * Explanation: The bulb at index 3 can light positions [1, 5], covering the entire corridor.
+ *   Input:  bulbs = [0,0,1,0,0], range = 3
+ *   Output: 1
+ *   Why:    the bulb at index 2 covers the full corridor after bounds are clipped.
  *
- * Constraints:
- * - 1 <= bulbs.length <= 10^5
- * - 0 <= bulbs[i] <= 1
- * - 1 <= range <= bulbs.length
- *
- * InterviewBit Problem: https://www.interviewbit.com/problems/minimum-lights-to-activate/
- *
- * Follow-up Questions:
- *
- * 1. What if some bulbs have different ranges based on their type?
- *    Answer: Store range with each bulb. When calculating coverage, use the specific
- *    bulb's range instead of the universal range parameter.
- *
- * 2. How would you handle if bulbs can be turned ON or OFF (not fixed)?
- *    Answer: Use dynamic programming where state is (position, bulbsLeft). For each
- *    position, try turning on different bulbs and track minimum needed.
- *
- * 3. What if you need to minimize power consumption (different bulbs use different power)?
- *    Answer: Modify greedy approach to select bulb with minimum power among those
- *    covering current position, instead of rightmost. This requires sorting by power.
- *
- * 4. Can you extend this to 2D grid where each bulb covers a square area?
- *    Answer: Similar greedy approach but process row by row. For each row, find minimum
- *    bulbs to cover it, considering coverage from bulbs above/below within range.
- *
- * 5. What if there's a cost to activate each bulb?
- *    Answer: Use greedy with modified selection criteria. Choose bulb that covers
- *    current position with minimum cost-per-coverage ratio among valid bulbs.
+ * Follow-ups:
+ *   1. What if bulbs have different ranges?
+ *      Convert each working bulb to its own interval and run interval cover greedy.
+ *   2. What if each bulb has an activation cost?
+ *      The problem becomes weighted interval cover and usually needs DP.
+ *   3. What if bulbs can be toggled on or off dynamically?
+ *      Maintain available intervals with a segment tree or balanced interval index.
  */
 public class MinLights {
 
     public static void main(String[] args) {
-        List<Integer> lights = Stream.of(0, 0, 0, 1, 0).collect(Collectors.toList());
-        int result = new MinLights().findMinLights(lights, 3);
-        System.out.println("Minimum lights needed: " + result);
+        MinLights solver = new MinLights();
+        List<List<Integer>> inputs = Arrays.asList(
+            Arrays.asList(0, 0, 1, 0, 0),
+            Arrays.asList(0, 0, 0),
+            Arrays.asList(1, 1, 1, 1)
+        );
+        int[] ranges = {3, 2, 1};
+        int[] expected = {1, -1, 4};
+
+        for (int i = 0; i < inputs.size(); i++) {
+            int got = solver.findMinLightsGreedy(inputs.get(i), ranges[i]);
+            System.out.printf("bulbs=%s range=%d -> %d  expected=%d%n",
+                inputs.get(i), ranges[i], got, expected[i]);
+        }
     }
+
+
 
     /**
      * Finds the minimum number of functional bulbs required to light the entire corridor.
@@ -112,32 +107,22 @@ public class MinLights {
     }
 
     /**
-     * Optimized approach using a greedy strategy.
+     * Intuition: focus on the leftmost position that is still dark. Any valid
+     * solution must turn on a working bulb whose range covers that position; among
+     * those choices, the rightmost bulb covers the farthest suffix and cannot make
+     * a future position harder to cover.
      *
-     * **Approach:**
-     * - We start from the leftmost uncovered position (`position = 0`).
-     * - At each step, we find the rightmost bulb that can cover this position.
-     * - If no such bulb exists, return -1 (lighting the corridor is impossible).
-     * - Otherwise, use that bulb, update the covered position, and continue.
+     * Algorithm:
+     *   1. Keep position as the next unlit corridor index.
+     *   2. Search the bulb range that can cover position from right to left.
+     *   3. If a bulb is found, count it and jump position past its coverage; otherwise return -1.
      *
-     * Steps:
-     * 1. Initialize position = 0 (tracks the leftmost uncovered section).
-     * 2. While position < bulbs.size():
-     *    - Find the rightmost bulb in the range [position - (range-1), position + (range-1)].
-     *    - If found, update position to the next uncovered section.
-     *    - If not found, return -1.
-     * 3. Repeat until the entire corridor is lit.
+     * Time:  O(n) - each search advances the covered boundary and scans bounded ranges.
+     * Space: O(1) - only indexes and counters are stored.
      *
-     * **Time Complexity:** `O(n)`
-     * - We iterate over the list at most once.
-     * - Each bulb is considered at most once.
-     *
-     * **Space Complexity:** `O(1)`
-     * - No extra space is used apart from a few integer variables.
-     *
-     * @param bulbs List representing bulbs (0 -> faulty, 1 -> working)
-     * @param range Range covered by each bulb
-     * @return Minimum bulbs required to light the corridor, or -1 if it's not possible
+     * @param bulbs list where 1 means working bulb and 0 means broken bulb
+     * @param range number of positions a bulb reaches to each side including itself
+     * @return minimum bulbs needed, or -1 if the corridor cannot be fully lit
      */
     public int findMinLightsGreedy(List<Integer> bulbs, int range) {
         int corridorEnd = bulbs.size();

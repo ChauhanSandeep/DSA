@@ -3,75 +3,58 @@ package arrays.greedy;
 /**
  * Problem: Flip String to Monotone Increasing
  *
- * A binary string is monotone increasing if it consists of some number of '0's
- * (possibly zero), followed by some number of '1's (also possibly zero).
+ * A binary string is monotone increasing when every 0 appears before every 1.
+ * Flip the fewest characters so the input can be split into a left block of 0s
+ * and a right block of 1s.
  *
- * You are given a binary string s. You can flip s[i] changing it from '0' to '1'
- * or from '1' to '0'. Return the minimum number of flips to make s monotone increasing.
+ * Leetcode: https://leetcode.com/problems/flip-string-to-monotone-increasing/ (Medium)
+ * Rating:   acceptance 63.1% (Medium) - contest rating 1602
+ * Pattern:  Dynamic programming | Prefix state | Greedy choice per zero
  *
  * Example:
- * Input: s = "00110"
- * Output: 1
- * Explanation: Flip the last digit to get "00111" (1 flip).
+ *   Input:  s = "010110"
+ *   Output: 2
+ *   Why:    flipping to "011111" or "000111" makes all 0s come before all 1s.
  *
- * Example 2:
- * Input: s = "010110"
- * Output: 2
- * Explanation: Flip to get "011111" or alternatively "000111" (2 flips).
+ * Follow-ups:
+ *   1. Return the resulting string, not just the flip count?
+ *      Store parent choices for each position and reconstruct the final string.
+ *   2. What if 0->1 and 1->0 have different costs?
+ *      Replace the unit increments with the corresponding weighted transition costs.
+ *   3. What if the target is monotone decreasing?
+ *      Mirror the state by counting zeros instead of ones.
  *
- * Constraints:
- * - 1 <= s.length <= 10^5
- * - s[i] is either '0' or '1'
- *
- * LeetCode Problem: https://leetcode.com/problems/flip-string-to-monotone-increasing
- *
- * Follow-up Questions:
- *
- * 1. What if you need to return the actual resulting string, not just flip count?
- *    Answer: Track which choice was made at each position during DP. Backtrack from end
- *    to reconstruct the optimal string. Store parent decisions at each state.
- *
- * 2. How would you handle if flipping '0' to '1' costs differently than '1' to '0'?
- *    Answer: Modify DP transitions to use different costs. Instead of +1, use cost[0to1]
- *    or cost[1to0] based on which flip is performed. Track minimum cost instead of count.
- *
- * 3. What if string must be monotone decreasing instead (1's followed by 0's)?
- *    Answer: Reverse the logic. Track number of 0's seen so far. When encountering '1',
- *    choose min of (flipping all previous 0's, or flipping current 1 to 0).
- *
- * 4. Can you extend to allow k transitions (k blocks of 0's and 1's alternating)?
- *    Answer: Use DP with state (position, transitions_used, last_digit). For k=2 (monotone
- *    increasing), we already handle this. Generalize to track k transitions.
- *
- * 5. How would you handle very long strings (streaming scenario)?
- *    Answer: Process in chunks, maintaining state (ones_count, flip_count) between chunks.
- *    Update state incrementally as new characters arrive. Space remains O(1).
- * LeetCode Contest Rating: 1602
+ * Related: Minimum Deletions to Make String Balanced (1653).
  */
 public class MinFlipsToMonotoneIncreasing {
 
   public static void main(String[] args) {
-    String input = "00011000111000";
-    int flips = minFlipsMonoIncrVerbose(input);
-    System.out.println("Minimum flips required: " + flips); // Output: 2
+    String[] inputs = {"00110", "010110", "00000"};
+    int[] expected = {1, 2, 0};
+
+    for (int i = 0; i < inputs.length; i++) {
+      int got = minFlipsMonoIncr(inputs[i]);
+      System.out.printf("s=%s -> %d  expected=%d%n", inputs[i], got, expected[i]);
+    }
   }
 
+
+
   /**
-   * Approach considering all possible split points.
-   * At each position i, consider making everything before i as '0' and after as '1'.
+   * Intuition: after a prefix has been processed, either keep previous 1s and
+   * flip a new 0 to 1, or flip all previous 1s to 0 and keep that 0. The running
+   * onesCount is the cost of the second option; flipCount + 1 is the first.
    *
    * Algorithm:
-   * 1. For each possible split point (0 to n):
-   *    - Count '1's before split (need to flip to '0')
-   *    - Count '0's after split (need to flip to '1')
-   *    - Total flips = leftOnes + rightZeros
-   * 2. Return minimum across all split points
+   *   1. Track onesCount and the best flipCount for the processed prefix.
+   *   2. Increment onesCount for every '1'.
+   *   3. For every '0', keep the cheaper of flipping this 0 or all previous 1s.
    *
-   * Time Complexity: O(N) using prefix sums to avoid recounting.
-   * Space Complexity: O(N) for prefix arrays.
+   * Time:  O(n) - one pass over the string.
+   * Space: O(1) - only two counters are kept.
    *
-   * @param input binary string consisting of '0's and '1's
-   * @return minimum number of flips to make string monotone increasing
+   * @param input binary string consisting only of '0' and '1'
+   * @return minimum flips needed to make input monotone increasing
    */
   public static int minFlipsMonoIncrSplitPoint(String input) {
     int length = input.length();
