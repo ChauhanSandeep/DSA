@@ -4,43 +4,48 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
+ * Problem: Construct Target Array With Multiple Sums
  *
- * You are given an array target of n integers. From a starting array arr consisting of n 1's, 
- * you may perform the following procedure:
- * - Let x be the sum of all elements currently in your array.
- * - Choose index i, such that 0 <= i < n, and set the value of arr at index i to x.
- * - You may repeat this procedure as many times as needed.
- * 
- * Return true if it is possible to construct the target array from arr, otherwise return false.
+ * Start with an array of all 1s. In one operation, choose one index and replace
+ * its value with the current total sum of the array. Given a target array,
+ * decide whether some sequence of operations can construct it.
  *
- * Example 1:
- * Input: target = [9,3,5]
- * Output: true
- * Explanation:
- * Start with arr = [1,1,1], sum = 3
- * Choose index 1: arr = [1,3,1], sum = 5
- * Choose index 2: arr = [1,3,5], sum = 9
- * Choose index 0: arr = [9,3,5], sum = 17
- * We successfully constructed the target array.
+ * Leetcode: https://leetcode.com/problems/construct-target-array-with-multiple-sums/ (Hard)
+ * Rating:   2015 (zerotrac Elo)
+ * Pattern:  Greedy | Reverse simulation | Max heap
  *
+ * Example:
+ *   Input:  target = [9,3,5]
+ *   Output: true
+ *   Why:    the target can be reversed by changing 9 to 1, then 5 to 1,
+ *           then 3 to 1, which reaches the starting array [1,1,1].
  *
- * LeetCode: https://leetcode.com/problems/construct-target-array-with-multiple-sums
+ * Follow-ups:
+ *   1. Return the actual sequence of operations?
+ *      Record each reverse replacement, then reverse that log to get the forward operations.
+ *   2. How would you avoid repeated subtraction on very large values?
+ *      Replace repeated max - rest steps with max % rest, while validating zero remainders.
+ *   3. What if values exceed 64-bit integers?
+ *      Use BigInteger and keep the same reverse max-versus-rest invariant.
+ *   4. What if the starting array has custom positive values?
+ *      Stop the reverse simulation at those values and validate every rollback against them.
  *
- * Follow-up Questions:
- * 1. What if we need to find the actual sequence of operations?
- *    Answer: Track the operations during the reverse simulation and return them in reverse order.
- *
- * 2. How would you handle very large numbers that could cause overflow?
- *    Answer: Use BigInteger or implement modular arithmetic for large number operations.
- *
- * 3. Can this be extended to allow subtraction operations as well?
- *    Answer: Yes, but the problem becomes more complex as we need to track negative values.
- *    Related: https://leetcode.com/problems/reach-a-number/
- *
- * @author Sandeep
- * LeetCode Contest Rating: 2015
+ * Related: Patching Array (330), Reach a Number (754).
  */
 public class ConstructTargetArrayWithMultipleSums {
+
+    public static void main(String[] args) {
+        ConstructTargetArrayWithMultipleSums solver = new ConstructTargetArrayWithMultipleSums();
+        int[][] inputs = { {9, 3, 5}, {1, 1, 1, 2}, {8, 5}, {1}, {2} };
+        boolean[] expected = {true, false, true, true, false};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.isPossibleWithoutModulo(inputs[i].clone());
+            System.out.printf("target=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
 
     /**
      * Recursive approach for understanding the problem structure.
@@ -64,7 +69,7 @@ public class ConstructTargetArrayWithMultipleSums {
         return canConstruct(target, sum);
     }
 
-    // Helper method for recursive approach
+    /** Recursively rolls back the largest value toward an all-ones array. */
     private boolean canConstruct(int[] arr, long sum) {
         // Base case: all elements are 1
         boolean allOnes = true;
@@ -103,30 +108,24 @@ public class ConstructTargetArrayWithMultipleSums {
     }
     
     /**
-     * Optimized Method : Determines if target array can be constructed using reverse simulation with max heap.
+     * Intuition: forward construction branches at every operation, but the last
+     * forward write is forced when viewed backward: it must be the current
+     * maximum value. If the rest of the array sums to remainingSum, the previous
+     * value at that index was maxValue - remainingSum. Repeating that rollback
+     * either reaches all 1s or exposes an impossible state where the maximum
+     * cannot have been produced by adding the rest.
      *
      * Algorithm:
-     *  1. Key insight: Work backwards from target to [1,1,...,1].
-     *     - In each step, the maximum element must have been the one that was replaced.
-     *     - To reverse: max_element = previous_max, so previous_max = max_element - (sum - max_element)
-     *  2. Use max heap (priority queue) to efficiently get largest element.
-     *  3. Calculate total sum of all elements.
-     *  4. Repeatedly:
-     *     a. Extract max element from heap
-     *     b. Calculate sum of other elements: remainingSum = totalSum - maxValue
-     *     c. Reverse the operation: previousValue = maxValue - remainingSum
-     *     d. Handle edge cases: if remainingSum <= 0 or previousValue <= 0, return false
-     *     e. Update sum and reinsert previous value into heap
-     *  5. Continue until all elements become 1.
+     *   1. Put every target value into a max heap and track the total sum.
+     *   2. Repeatedly remove the maximum value while it is greater than 1.
+     *   3. Compute remainingSum and reject states where the maximum cannot shrink.
+     *   4. Replace the maximum with maxValue - remainingSum, update the sum, and continue.
      *
-     * Key Insight:
-     * Working forward is exponential (many choices at each step). Working backward is unique:
-     * only the maximum element could have been the one replaced in the last step.
-     * 
+     * Time:  O(t log n) - t reverse operations are simulated, each with one heap remove and insert.
+     * Space: O(n) - the priority queue stores all target values.
      *
-     * Algorithm: Reverse Simulation with Max Heap 
-     * Time Complexity: O(n * max(target)), can be very slow for large values.
-     * Space Complexity: O(n) for the priority queue.
+     * @param target desired positive target array
+     * @return true if the target can be constructed from all 1s
      */
     public boolean isPossibleWithoutModulo(int[] target) {
         if (target.length == 1) {

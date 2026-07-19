@@ -3,51 +3,67 @@ package greedy;
 import java.util.Arrays;
 
 /**
- * LeetCode 135: Candy Distribution
- * Problem Link: https://leetcode.com/problems/candy/
+ * Problem: Candy Distribution
  *
- * Given an array representing student ratings, distribute the minimum number of candies
- * such that:
- * 1. Each child gets at least one candy.
- * 2. Higher-rated children get more candies than their adjacent lower-rated ones.
+ * Children stand in a line, each with a rating. Give every child at least one
+ * candy, and any child with a higher rating than an adjacent child must get more
+ * candies than that neighbor. Return the minimum total candies.
  *
- * For example
- * Input: [1, 0, 2]
- * Output: 5
- * Explanation: 2 candies for the first child, 1 candy for the second child, and 2 candies for the third child.
+ * Leetcode: https://leetcode.com/problems/candy/ (Hard)
+ * Rating:   acceptance 48.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Greedy | Local neighbor rules | Two passes and slope counting
  *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  ratings = [1,0,2]
+ *   Output: 5
+ *   Why:    candies [2,1,2] is the smallest assignment where both rating-1
+ *           children beat their rating-0 neighbor.
+ *
+ * Follow-ups:
+ *   1. Can this be solved in O(1) extra space?
+ *      Count rising and falling slopes and compensate when the falling slope outgrows its peak.
+ *   2. What if equal ratings must receive equal candies?
+ *      Group equal runs first, then apply the two-pass rule between groups.
+ *   3. What if the line is circular?
+ *      Start from a global minimum rating to break the circle, then solve the line.
+ *   4. What if each child has a candy cap?
+ *      Compute the minimum assignment, then validate whether every value fits under the cap.
+ *
+ * Related: Candy (135), Gas Station (134).
  */
 public class CandyDistribution {
 
     public static void main(String[] args) {
-        int[] ratings = {-255, 369, 319, 77, 128, -202, -147, 282, -26, -489, -443};
-        System.out.println(new CandyDistribution().minimumCandyRequired(ratings));
+        CandyDistribution solver = new CandyDistribution();
+        int[][] inputs = { {}, {1, 0, 2}, {1, 2, 2}, {-255, 369, 319, 77, 128} };
+        int[] expected = {0, 5, 4, 9};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.minimumCandyRequired(inputs[i]);
+            System.out.printf("ratings=%s -> %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 
     /**
-     * Main method: Two-pass greedy algorithm (Optimal for clarity).
-     * Step-by-step:
-     *  1. Initialize candy array with 1 for each child (minimum requirement)
-     *  2. Left-to-right pass:
-     *     - If current child's rating > left neighbor's rating
-     *     - Give current child: leftNeighborCandies + 1
-     *     - This ensures children with higher ratings than left neighbor get more
-     *  3. Right-to-left pass:
-     *     - If current child's rating > right neighbor's rating
-     *     - Update current child: max(current, rightNeighborCandies + 1)
-     *     - This ensures children with higher ratings than right neighbor get more
-     *     - Use max() to satisfy BOTH left and right constraints
-     *  4. Sum all candies and return
+     * Intuition: trying to satisfy both neighbors in one pass is brittle because
+     * a later right-neighbor constraint can invalidate an earlier choice. Split
+     * the rules into two one-sided lower bounds. The left-to-right pass gives the
+     * cheapest candies that satisfy every left edge; the right-to-left pass adds
+     * only what is needed for right edges. Taking max keeps both constraints true
+     * without adding unnecessary candy.
      *
-     * Key Insight:
-     * We can't determine candy count in one pass because a child must satisfy
-     * both left AND right neighbor constraints. Two passes ensure we capture
-     * dependencies from both directions. Taking max() ensures both constraints met.
+     * Algorithm:
+     *   1. Give every child one candy.
+     *   2. Scan left to right and raise candies on increasing rating edges.
+     *   3. Scan right to left and raise candies on decreasing rating edges with max.
+     *   4. Sum the final candy counts.
      *
-     * Algorithm: Two-pass Greedy with max aggregation.
-     * Time Complexity: O(n), two linear passes through array.
-     * Space Complexity: O(n) for candy array.
+     * Time:  O(n) - two linear scans touch each rating a constant number of times.
+     * Space: O(n) - one candy count is stored per child.
+     *
+     * @param ratings child ratings in line order
+     * @return minimum candies needed to satisfy the neighbor rules
      */
     public int minimumCandyRequired(int[] ratings) {
         if (ratings == null || ratings.length == 0) return 0;
@@ -77,24 +93,24 @@ public class CandyDistribution {
     }
 
     /**
-     * Alternative method: Single-pass with slope counting (Space optimized O(1)).
-     * Step-by-step:
-     *  1. Track ascending and descending slopes (runs of increasing/decreasing ratings)
-     *  2. For ascending slope: candies = 1 + 2 + 3 + ... + upCount
-     *  3. For descending slope: candies = 1 + 2 + 3 + ... + downCount
-     *  4. At peak (top of ascending slope before descending):
-     *     - Ensure peak gets max(upCount, downCount) + 1 candies
-     *     - This ensures peak satisfies both up and down neighbors
-     *  5. Handle equal ratings by resetting to baseline
+     * Intuition: the two-pass array is really measuring slopes. A rising run like
+     * 1 < 2 < 3 needs a candy staircase, and a falling run needs the same
+     * staircase from the other side. Counting active up and down slopes lets us
+     * add those staircase costs directly. The only shared point is the peak, so
+     * when the falling slope grows taller than the old peak, one extra candy is
+     * added to keep the peak higher than both sides.
      *
-     * Key Insight:
-     * Ascending/descending runs have predictable candy patterns (1,2,3...).
-     * We can count candies arithmetically without storing array. Peak handling
-     * is critical: must give enough to satisfy both slopes.
+     * Algorithm:
+     *   1. Track current ascending slope, descending slope, and peak height.
+     *   2. Add a growing staircase cost for ascending ratings.
+     *   3. Add descending slope cost, plus one when the down slope exceeds the peak.
+     *   4. Reset slopes and add one candy on equal ratings.
      *
-     * Algorithm: Single-pass with slope arithmetic.
-     * Time Complexity: O(n), single pass through array.
-     * Space Complexity: O(1), only counters used.
+     * Time:  O(n) - one scan processes each adjacent rating pair once.
+     * Space: O(1) - only slope counters and the total are stored.
+     *
+     * @param ratings child ratings in line order
+     * @return minimum candies needed to satisfy the neighbor rules
      */
     public int candyOptimized(int[] ratings) {
         int length = ratings.length;
