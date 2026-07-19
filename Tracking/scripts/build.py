@@ -259,12 +259,24 @@ def render_dashboard(state: dict, today: date) -> str:
             qa = problem.get("qa") or {}
             preview = qa.get("problem") or ""
             preview_html = f'<div class="preview">{esc(preview)}</div>' if preview else ""
+
+            done_today = reviewed_today(problem.get("sm2", {}), today)
+            item_class = "queue-item"
+            index_mark = f"{index:02d}"
+            done_meta = ""
+            if done_today:
+                item_class += " reviewed-today"
+                index_mark = "✓"
+                grade = problem["sm2"].get("lastGrade", "")
+                emoji, label = GRADE_LABELS.get(grade, ("•", grade))
+                done_meta = f'<span class="reviewed-tag">{emoji} {esc(label)} today</span>'
+
             queue_html_parts.append(f"""
-      <div class="queue-item">
-        <div class="index">{index:02d}</div>
+      <div class="{item_class}">
+        <div class="index">{index_mark}</div>
         <div>
           <div class="title"><a href="problems/{esc(task)}.html">{esc(problem.get("problemName") or task)}</a></div>
-          <div class="meta">{esc(task)} · next due {esc(format_next_due(problem["sm2"].get("nextDue")))}</div>
+          <div class="meta">{esc(task)} · next due {esc(format_next_due(problem["sm2"].get("nextDue")))} {done_meta}</div>
           {preview_html}
         </div>
         <div class="badges">{badges_for_problem(problem)}</div>
@@ -575,6 +587,43 @@ def render_qa_card(problem: dict) -> str:
     )
 
 
+GRADE_LABELS = {
+    "trivial": ("⭐", "Trivial"),
+    "solved":  ("✅", "Solved"),
+    "hint":    ("🟡", "Hint"),
+    "blank":   ("🔴", "Blank"),
+}
+
+
+def reviewed_today(sm2: dict, today: date) -> bool:
+    last = sm2.get("lastReviewed")
+    return bool(last) and last == today.isoformat()
+
+
+def format_review_banner(problem: dict, today: date) -> str:
+    """Small callout shown on a problem page when it was graded today."""
+    sm2 = problem.get("sm2", {})
+    if not reviewed_today(sm2, today):
+        return ""
+    grade = sm2.get("lastGrade", "")
+    emoji, label = GRADE_LABELS.get(grade, ("•", grade or "unknown"))
+    next_due = sm2.get("nextDue")
+    next_pretty = "—"
+    if next_due:
+        try:
+            d = date.fromisoformat(next_due)
+            next_pretty = d.strftime("%a, %d %b %Y")
+        except ValueError:
+            next_pretty = next_due
+    return (
+        '<div class="reviewed-banner">'
+        f'<span class="reviewed-banner-emoji">{emoji}</span>'
+        f'<span>Reviewed today · marked <strong>{esc(label)}</strong> · '
+        f'next review <strong>{esc(next_pretty)}</strong></span>'
+        '</div>'
+    )
+
+
 def render_problem_page(problem: dict, today: date) -> str:
     task = problem["task"]
     java_file = REPO_ROOT / problem["javaFile"]
@@ -613,6 +662,8 @@ def render_problem_page(problem: dict, today: date) -> str:
       </div>
       <div class="meta" style="margin-top:8px">{" · ".join(meta_bits)}</div>
     </div>
+
+    {format_review_banner(problem, today)}
 
     {render_qa_card(problem)}
 
