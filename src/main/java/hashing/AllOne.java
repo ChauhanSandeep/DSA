@@ -3,49 +3,52 @@ package hashing;
 import java.util.*;
 
 /**
- * AllOne.java
+ * Problem: All O`one Data Structure
  *
- * Problem Statement:
- * Design a data structure to store strings' count with the ability to return the strings 
- * with minimum and maximum counts. Implement the AllOne class:
- * - AllOne(): Initializes the object of the data structure
- * - inc(String key): Increments the count of the string key by 1. If key does not exist, insert it with count 1
- * - dec(String key): Decrements the count of the string key by 1. If count becomes 0, remove it. Assumes key exists
- * - getMaxKey(): Returns one of the keys with the maximal count. If no element exists, return empty string
- * - getMinKey(): Returns one of the keys with the minimum count. If no element exists, return empty string
+ * Design a structure that tracks string counts and can return any key with the
+ * current maximum or minimum count. Increment, decrement, max lookup, and min
+ * lookup must all run in average O(1) time.
  *
- * All operations must be O(1) average time complexity.
+ * Leetcode: https://leetcode.com/problems/all-oone-data-structure/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Hashing | Doubly linked list | Frequency buckets
  *
  * Example:
- * AllOne allOne = new AllOne();
- * allOne.inc("hello");       // "hello" count = 1
- * allOne.inc("hello");       // "hello" count = 2
- * allOne.getMaxKey();        // return "hello"
- * allOne.getMinKey();        // return "hello"
- * allOne.inc("world");       // "world" count = 1
- * allOne.getMinKey();        // return "world"
- * allOne.dec("hello");       // "hello" count = 1
- * allOne.getMaxKey();        // return "hello" or "world" (both have count 1)
+ *   Input:  inc("hello"), inc("hello"), inc("world"), getMaxKey(), getMinKey()
+ *   Output: "hello", "world"
+ *   Why:    hello has count 2 and world has count 1, so they are the unique max
+ *           and min keys.
  *
- * LeetCode link: https://leetcode.com/problems/all-oone-data-structure/
+ * Follow-ups:
+ *   1. How would you make the structure thread-safe?
+ *      Protect bucket moves and map updates with one lock or finer-grained bucket locks.
+ *   2. How would you return all max-count keys instead of one arbitrary key?
+ *      Return a copy or view of the key set stored in the tail bucket.
+ *   3. How would you support top-k keys?
+ *      Walk buckets from the tail until k keys are collected, or maintain extra top-k state.
+ *   4. What changes if ordered min/max by key is required?
+ *      Store keys inside each bucket in a TreeSet, trading O(1) arbitrary choice for ordering cost.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - How would you handle concurrent access to this data structure?
- *    → Add synchronization/locks on critical sections or use concurrent data structures.
- *  - What if we need to support range queries (keys with count in range [min, max])?
- *    → Maintain additional TreeMap mapping counts to keys for range queries.
- *  - Can you extend this to support top-K frequent keys efficiently?
- *    → Maintain pointer to kth bucket from tail, update on each operation.
- *  - How would memory usage scale with millions of keys?
- *    → Current design uses O(n) space; could optimize by using arrays instead of HashSets for buckets.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 146 (LRU Cache): https://leetcode.com/problems/lru-cache/
- *  - LeetCode 460 (LFU Cache): https://leetcode.com/problems/lfu-cache/
- *  - LeetCode 895 (Maximum Frequency Stack): https://leetcode.com/problems/maximum-frequency-stack/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: LRU Cache (146), LFU Cache (460), Maximum Frequency Stack (895).
  */
 public class AllOne {
+
+    public static void main(String[] args) {
+        AllOne empty = new AllOne();
+        System.out.printf("input=%s -> max=%s min=%s  expected=max= min=%n",
+            "[]", empty.getMaxKey(), empty.getMinKey());
+
+        AllOne allOne = new AllOne();
+        allOne.inc("hello");
+        allOne.inc("hello");
+        allOne.inc("world");
+        System.out.printf("input=%s -> max=%s min=%s  expected=max=hello min=world%n",
+            "[inc(hello), inc(hello), inc(world)]", allOne.getMaxKey(), allOne.getMinKey());
+
+        allOne.dec("world");
+        System.out.printf("input=%s -> max=%s min=%s  expected=max=hello min=hello%n",
+            "[dec(world)]", allOne.getMaxKey(), allOne.getMinKey());
+    }
 
     /**
      * Main solution: Doubly Linked List of frequency buckets with HashMap.
@@ -81,8 +84,20 @@ public class AllOne {
         keyToNodeMap = new HashMap<>();
     }
 
-    /**
-     * Increments the count of the string key by 1. If key does not exist, insert it with count 1.
+        /**
+     * Intuition: each key lives in exactly one frequency bucket. Incrementing a
+     * key only moves it one bucket to the right, so the structure either reuses
+     * the adjacent count+1 bucket or creates that bucket in place.
+     *
+     * Algorithm:
+     *   1. If the key is new, put it in the count-1 bucket after the head.
+     *   2. Otherwise move it from its current bucket to the adjacent count+1 bucket.
+     *   3. Remove the old bucket when it becomes empty.
+     *
+     * Time:  O(1) - map lookup plus constant linked-list updates.
+     * Space: O(1) - no extra space beyond the stored key and possible new bucket.
+     *
+     * @param key string whose count is increased by one
      */
     public void inc(String key) {
         if (!keyToNodeMap.containsKey(key)) {
@@ -127,9 +142,21 @@ public class AllOne {
         }
     }
 
-    /**
-     * Decrements the count of the string key by 1. If count becomes 0, remove it.
-     * Assumes key exists.
+        /**
+     * Intuition: decrement is the mirror of increment. A key either disappears
+     * when its count reaches zero, or moves one bucket to the left into the
+     * adjacent count-1 bucket.
+     *
+     * Algorithm:
+     *   1. Read the key's current bucket and compute the decremented count.
+     *   2. Remove the key entirely if the new count is zero.
+     *   3. Otherwise move it to the previous count bucket, creating that bucket if needed.
+     *   4. Delete the old bucket if it has no remaining keys.
+     *
+     * Time:  O(1) - map lookup plus constant linked-list updates.
+     * Space: O(1) - no extra space beyond a possible adjacent bucket.
+     *
+     * @param key existing string whose count is decreased by one
      */
     public void dec(String key) {
         Node currentBucket = keyToNodeMap.get(key);
@@ -162,9 +189,18 @@ public class AllOne {
         }
     }
 
-    /**
-     * Returns one of the keys with the maximum count.
-     * If no keys exist, returns an empty string.
+        /**
+     * Intuition: buckets stay sorted by count, so the bucket before the tail
+     * sentinel always stores keys with the maximum count.
+     *
+     * Algorithm:
+     *   1. Return an empty string when the list has no real buckets.
+     *   2. Otherwise return any key from the tail-side bucket.
+     *
+     * Time:  O(1) - reads one bucket and one key iterator.
+     * Space: O(1) - no auxiliary data structures are allocated.
+     *
+     * @return any key with the maximum count, or an empty string when empty
      */
     public String getMaxKey() {
         if (tail.prev == head) {
@@ -173,9 +209,18 @@ public class AllOne {
         return tail.prev.keys.stream().findAny().get();
     }
 
-    /**
-     * Returns one of the keys with the minimum count.
-     * If no keys exist, returns an empty string.
+        /**
+     * Intuition: buckets stay sorted by count, so the bucket after the head
+     * sentinel always stores keys with the minimum count.
+     *
+     * Algorithm:
+     *   1. Return an empty string when the list has no real buckets.
+     *   2. Otherwise return any key from the head-side bucket.
+     *
+     * Time:  O(1) - reads one bucket and one key iterator.
+     * Space: O(1) - no auxiliary data structures are allocated.
+     *
+     * @return any key with the minimum count, or an empty string when empty
      */
     public String getMinKey() {
         if (head.next == tail) {

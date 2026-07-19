@@ -3,42 +3,64 @@ package hashing;
 import java.util.*;
 
 /**
- * 532. K-diff Pairs in an Array
+ * Problem: K-diff Pairs in an Array
  *
- * Problem: Given an array of integers nums and an integer k, return the number
- * of unique k-diff pairs in the array. A k-diff pair is (nums[i], nums[j])
- * where i != j and |nums[i] - nums[j]| = k.
+ * Count unique value pairs whose absolute difference is exactly k. The same
+ * pair value should be counted once even if it appears at multiple indices.
+ *
+ * Leetcode: https://leetcode.com/problems/k-diff-pairs-in-an-array/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Hashing | Frequency map | Unique pair counting
  *
  * Example:
- * Input: nums = [3,1,4,1,5], k = 2
- * Output: 2
- * Explanation: There are two 2-diff pairs: (1, 3) and (3, 5)
+ *   Input:  nums = [3,1,4,1,5], k = 2
+ *   Output: 2
+ *   Why:    the unique pairs are (1,3) and (3,5); the duplicate 1 does not
+ *           create another unique pair.
  *
- * LeetCode: https://leetcode.com/problems/k-diff-pairs-in-an-array
+ * Follow-ups:
+ *   1. What changes when k is zero?
+ *      Count values whose frequency is at least two, because both values in the pair match.
+ *   2. How would you return the actual pairs?
+ *      Store each qualifying pair in a list after enforcing one canonical ordering.
+ *   3. How would you solve it if mutating the input is allowed but memory is tight?
+ *      Sort the array and use two pointers while skipping duplicate values.
+ *   4. Can the asymptotic time be better than O(n)?
+ *      No, every value may need to be inspected at least once.
  *
- * Follow-up questions:
- * Q: What if k can be negative?
- * A: Since we use absolute difference, negative k is same as positive k.
- *
- * Q: How to find all pairs instead of just counting?
- * A: Store pairs in set instead of counting, return list of pairs.
- *
- * Q: Can we optimize for very large arrays?
- * A: Use HashMap approach which is already O(n), can't improve asymptotically.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Two Sum (1), Two Sum II (167), 3Sum (15).
  */
 public class KDiffPairsInAnArray {
 
-    /**
-     * HashMap approach for O(n) solution.
+    public static void main(String[] args) {
+        KDiffPairsInAnArray solver = new KDiffPairsInAnArray();
+        int[][] nums = { {3, 1, 4, 1, 5}, {1, 3, 1, 5, 4}, {} };
+        int[] kValues = { 2, 0, 1 };
+        int[] expected = { 2, 1, 0 };
+
+        for (int i = 0; i < nums.length; i++) {
+            int got = solver.findPairs(nums[i], kValues[i]);
+            System.out.printf("nums=%s k=%d -> %d  expected=%d%n",
+                Arrays.toString(nums[i]), kValues[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: uniqueness is about values, not indices. A frequency map lets
+     * k == 0 ask which values appear twice, while k > 0 asks whether each value's
+     * value+k partner exists.
      *
      * Algorithm:
-     * - Count frequency of each number
-     * - For k = 0: count numbers that appear more than once
-     * - For k > 0: for each unique number, check if number + k exists
+     *   1. Return zero for negative k because an absolute difference cannot be negative.
+     *   2. Count how many times each value appears.
+     *   3. For k == 0 count values with frequency above one; otherwise count values whose num + k exists.
      *
-     * Time Complexity: O(n)
-     * Space Complexity: O(n)
+     * Time:  O(n) - one pass builds counts and one pass scans unique values.
+     * Space: O(n) - the frequency map may store every value.
+     *
+     * @param nums input values
+     * @param k required absolute difference
+     * @return number of unique k-diff value pairs
      */
     public int findPairs(int[] nums, int k) {
         if (k < 0) return 0;

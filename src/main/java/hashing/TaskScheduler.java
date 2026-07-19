@@ -6,51 +6,67 @@ import java.util.*;
 /**
  * Problem: Task Scheduler
  *
- * LeetCode Link: https://leetcode.com/problems/task-scheduler/
+ * Given CPU tasks represented by capital letters and a cooldown n, return the
+ * minimum number of time units needed to run all tasks so equal letters are at
+ * least n time units apart.
  *
- * Given a list of CPU tasks (denoted by capital letters A-Z), and a cooldown period 'n',
- * return the least number of time units the CPU will take to finish all the given tasks
- * such that the same task type has at least `n` time units between two executions.
+ * Leetcode: https://leetcode.com/problems/task-scheduler/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Hashing | Greedy | Max heap | Counting formula
  *
  * Example:
- * Input: tasks = ['A','A','A','A','A','B','B','C'], n = 2
- * Output: 16
- * Explanation:
- * - Schedule: A B idle A B idle A C idle A
+ *   Input:  tasks = [A,A,A,B,B,B], n = 2
+ *   Output: 8
+ *   Why:    one optimal schedule is A B idle A B idle A B, which uses two idle slots.
  *
- * Follow-up Questions:
- * - What if tasks are not all capital English letters? (Need a Map instead of an array)
- * - What if multiple CPUs are available? (Extend to multi-threaded version)
- * - What if tasks have different execution times or cooldown periods?
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How would you support arbitrary task names?
+ *      Count frequencies in a map instead of a 26-slot array.
+ *   2. How would different cooldowns per task change the simulation?
+ *      Store each task's own next available time in the cooldown queue.
+ *   3. How would multiple CPUs change the answer?
+ *      Simulate up to c available executions per time unit while respecting cooldowns.
+ *   4. How would you output one valid schedule?
+ *      Use the heap simulation and append either the chosen task or idle at each time step.
+ *
+ * Related: Reorganize String (767), Rearrange String k Distance Apart (358).
  */
 public class TaskScheduler {
 
   public static void main(String[] args) {
-    char[] tasks = {'A', 'A', 'A', 'A', 'A', 'B', 'B', 'C'};
     TaskScheduler scheduler = new TaskScheduler();
+    char[][] tasks = { {'A', 'A', 'A', 'B', 'B', 'B'}, {'A', 'B', 'C'} };
+    int[] cooldowns = { 2, 0 };
+    int[] expected = { 8, 3 };
 
-    int timeUsingHeap = scheduler.leastIntervalUsingHeap(tasks, 2);
-    System.out.println("\nTotal CPU time required (Heap-Based): " + timeUsingHeap);
+    for (int i = 0; i < tasks.length; i++) {
+      int gotHeap = scheduler.leastIntervalUsingHeap(tasks[i], cooldowns[i]);
+      System.out.printf("%ntasks=%s n=%d method=heap -> %d  expected=%d%n",
+          Arrays.toString(tasks[i]), cooldowns[i], gotHeap, expected[i]);
 
-    int timeUsingMath = scheduler.leastIntervalUsingMath(tasks, 2);
-    System.out.println("Total CPU time required (Math-Based): " + timeUsingMath);
+      int gotMath = scheduler.leastIntervalUsingMath(tasks[i], cooldowns[i]);
+      System.out.printf("tasks=%s n=%d method=math -> %d  expected=%d%n",
+          Arrays.toString(tasks[i]), cooldowns[i], gotMath, expected[i]);
+    }
   }
 
-  /**
-   * Approach 1: Max Heap + Cooldown Queue
+    /**
+   * Intuition: when simulating time, always run the task type with the most
+   * remaining work that is not cooling down. A max heap selects that task, and a
+   * queue holds tasks until their next valid time.
    *
-   * Strategy:
-   * - Use a max heap to always select the task with the highest remaining frequency.
-   * - Use a cooldown queue to track tasks that are on cooldown and reintroduce them when ready.
-   * - Simulate task execution one time unit at a time.
+   * Algorithm:
+   *   1. Count task frequencies and push each task into a max heap.
+   *   2. At each time unit, move ready cooldown tasks back to the heap.
+   *   3. Execute the highest-frequency available task or idle if none is ready.
+   *   4. Requeue unfinished tasks with their next available time.
    *
-   * Time Complexity: O(N log N), where N is the number of tasks (heap operations dominate).
-   * Space Complexity: O(N) for task frequencies, heap, and cooldown queue.
+   * Time:  O(N log U) - each execution can update the heap of U task types.
+   * Space: O(U) - the heap, queue, and frequency map store task types.
    *
-   * @param tasks Array of task characters (A-Z)
-   * @param cooldown Cooldown period `n` between two same tasks
-   * @return Minimum time units required to finish all tasks
+   * @param tasks array of task identifiers
+   * @param cooldown required gap between equal tasks
+   * @return minimum time units required by the simulation
    */
   public int leastIntervalUsingHeap(char[] tasks, int cooldown) {
     Map<Character, Integer> frequencyMap = new HashMap<>(); // Mapping of task to its frequency
@@ -98,107 +114,23 @@ public class TaskScheduler {
     return currentTime;
   }
 
-  /**
-   * Approach 2: Optimized Math Formula
+    /**
+   * Intuition: the most frequent task creates the tightest spacing constraint.
+   * Place its copies first, leaving cooldown-sized gaps, then fill those gaps
+   * with other tasks. If there are enough other tasks, the raw task count wins.
    *
-   * Formula: result = max( (maxFreq - 1) * (cooldown + 1) + tasksWithMaxFreq,  tasks.length )
+   * Algorithm:
+   *   1. Count how often each capital-letter task appears.
+   *   2. Find the maximum frequency and how many task types share it.
+   *   3. Compute the frame forced by the most frequent tasks.
+   *   4. Return the larger of that frame and the total number of tasks.
    *
-   * ─────────────────────────────────────────────────────────────────────────
-   * Derivation from first principles:
-   * ─────────────────────────────────────────────────────────────────────────
+   * Time:  O(N) - one pass counts tasks and the 26-slot frequency array is scanned.
+   * Space: O(1) - the frequency array has fixed size.
    *
-   * Step 1 — The bottleneck is the most frequent task.
-   *   Let `maxFreq` be the highest count of any single task. Two executions
-   *   of the same task must be separated by at least `cooldown` time units,
-   *   so the task with the highest count dictates the *minimum* schedule
-   *   length. No other task can be scheduled tighter than this one.
-   *
-   * Step 2 — Build a "skeleton" using only the most frequent task.
-   *   Place the most-frequent task `maxFreq` times, leaving exactly
-   *   `cooldown` empty slots between consecutive occurrences:
-   *
-   *     A _ _ _ A _ _ _ A _ _ _ A     (maxFreq = 4, cooldown = 3)
-   *     └──┬──┘ └──┬──┘ └──┬──┘
-   *      block   block   block        ← (maxFreq - 1) * blocks
-   *
-   *   Each block has size (cooldown + 1): the task itself + cooldown gaps.
-   *   There are (maxFreq - 1) full blocks, plus one final occurrence of A.
-   *
-   *   Skeleton length so far = (maxFreq - 1) * (cooldown + 1) + 1
-   *
-   * Step 3 — Account for ties at the top frequency.
-   *   If multiple tasks share `maxFreq` (say A and B both appear 4 times),
-   *   they all face the same bottleneck. They can ride alongside A in the
-   *   *final partial block* without extending earlier blocks:
-   *
-   *     A B _ _ A B _ _ A B _ _ A B   (A and B both appear 4 times)
-   *
-   *   So instead of adding only 1 trailing slot, we add `tasksWithMaxFreq`
-   *   trailing slots — one for each task tied at the maximum frequency.
-   *
-   *   Frame length = (maxFreq - 1) * (cooldown + 1) + tasksWithMaxFreq
-   *
-   * Step 4 — Try to fill remaining tasks into idle gaps.
-   *   The skeleton has a fixed number of idle slots:
-   *
-   *     idleCapacity = (maxFreq - 1) * cooldown
-   *
-   *   (i.e. `cooldown` empties between each of the (maxFreq - 1) blocks).
-   *
-   *   Two sub-cases arise:
-   *
-   *   (4a) Remaining tasks fit inside idleCapacity.
-   *        Each non-max task has frequency ≤ maxFreq - 1, so its copies
-   *        can be spread one-per-block-column without violating its own
-   *        cooldown. We just replace "_" with a real task — schedule
-   *        length is unchanged. The frameSize formula is exact.
-   *
-   *   (4b) Remaining tasks overflow idleCapacity.
-   *        Example: A=3, B=C=D=E=F=G=H=1, cooldown=2
-   *          Skeleton: A _ _ A _ _ A           (length 7)
-   *          idleCapacity = (3-1) * 2 = 4
-   *          Tasks to place in gaps = 7  →  overflow of 3.
-   *
-   *        Once every idle slot is consumed, A is no longer the
-   *        bottleneck — the remaining tasks have low frequency, so they
-   *        can be appended back-to-back with no idles needed:
-   *
-   *          A B C A D E A F G H               (length 10)
-   *
-   *        The schedule simply grows to hold every task with zero idle
-   *        time, giving length = tasks.length.
-   *
-   *   Combining (4a) and (4b): the schedule is at least frameSize
-   *   *and* at least tasks.length, whichever is larger.
-   *
-   * Step 5 — Final formula.
-   *
-   *     result = max(frameSize, tasks.length)
-   *
-   *   - When (4a) applies: tasks.length ≤ frameSize, so the max is
-   *     frameSize (the cooldown bound is binding).
-   *   - When (4b) applies: tasks.length > frameSize, so the max is
-   *     tasks.length (the bottleneck task gets "diluted" by the many
-   *     other tasks and cooldown becomes free).
-   *
-   * ─────────────────────────────────────────────────────────────────────────
-   * Worked example: tasks = [A,A,A,A,A,B,B,C], cooldown = 2
-   *   maxFreq = 5 (A), tasksWithMaxFreq = 1
-   *   frameSize = (5-1) * (2+1) + 1 = 13
-   *   tasks.length = 8
-   *   result = max(13, 8) = 13... wait, the LeetCode answer is 16? See note*.
-   *
-   *   *Note: the doc-header example "16" assumes a different task list.
-   *   For [A×5, B×2, C×1] with cooldown=2 the correct answer is indeed
-   *   max((5-1)*3 + 1, 8) = 13, schedule: A B C A B _ A _ _ A _ _ A.
-   * ─────────────────────────────────────────────────────────────────────────
-   *
-   * Time Complexity: O(N), where N is the number of tasks (single pass to count).
-   * Space Complexity: O(1), fixed array of size 26.
-   *
-   * @param tasks Array of task characters (A-Z)
-   * @param cooldown Cooldown period `n`
-   * @return Minimum time units required to finish all tasks
+   * @param tasks array of capital-letter task identifiers
+   * @param cooldown required gap between equal tasks
+   * @return minimum time units required by the counting formula
    */
   public int leastIntervalUsingMath(char[] tasks, int cooldown) {
     int[] taskFreqArr = new int[26];

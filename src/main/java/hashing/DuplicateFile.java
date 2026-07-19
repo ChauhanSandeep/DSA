@@ -3,47 +3,78 @@ package hashing;
 import java.util.*;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/find-duplicate-file-in-system/
+ * Problem: Find Duplicate File in System
  *
- * Given a list of directory paths, file names, and content, this program groups files
- * with duplicate content together.
+ * Given directory descriptions containing filenames and file contents, group
+ * full file paths whose contents are identical. Only groups with at least two
+ * files are returned.
  *
- * Example Input:
- *   paths = ["root/a 1.txt(abcd) 2.txt(efgh)",
- *            "root/c 3.txt(abcd)",
- *            "root/c/d 4.txt(efgh)",
- *            "root 4.txt(efgh)"]
+ * Leetcode: https://leetcode.com/problems/find-duplicate-file-in-system/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Hashing | String parsing | Group by content
  *
- * Output:
- *   [["root/a/1.txt", "root/c/3.txt"], ["root/a/2.txt", "root/c/d/4.txt", "root/4.txt"]]
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  ["root/a 1.txt(abcd) 2.txt(efgh)", "root/c 3.txt(abcd)"]
+ *   Output: [["root/a/1.txt", "root/c/3.txt"]]
+ *   Why:    both files store the same content token "(abcd)", so their paths
+ *           belong in the same duplicate group.
+ *
+ * Follow-ups:
+ *   1. How would you handle huge files without reading all content into memory?
+ *      First group by size, then hash chunks, and finally verify byte-by-byte.
+ *   2. How would you avoid false positives from hash collisions?
+ *      Treat hashes as candidates and compare the original contents before returning.
+ *   3. How would you stream directory entries from a filesystem crawler?
+ *      Update the content-to-path map incrementally and emit groups after traversal.
+ *   4. How would you handle paths whose filenames contain spaces?
+ *      Use a parser for the exact input grammar instead of splitting on whitespace alone.
+ *
+ * Related: Group Anagrams (49), Find Duplicate Subtrees (652).
  */
 public class DuplicateFile {
 
     public static void main(String[] args) {
-        String[] paths = {
-            "root/a 1.txt(abcd) 2.txt(efgh)",   // 1.txt and 2.txt in location root/a
-            "root/c 3.txt(abcd)",               // 3.txt in location root/c
-            "root/c/d 4.txt(efgh)",             // 4.txt in location root/c/d
-            "root 4.txt(efgh)"};                // 4.txt in location root
+        DuplicateFile solver = new DuplicateFile();
+        String[][] cases = {
+            {
+                "root/a 1.txt(abcd) 2.txt(efgh)",
+                "root/c 3.txt(abcd)",
+                "root/c/d 4.txt(efgh)",
+                "root 4.txt(efgh)"
+            },
+            { "root/a 1.txt(abcd)", "root/b 2.txt(efgh)" }
+        };
+        String[] expected = {
+            "[[root/4.txt, root/a/2.txt, root/c/d/4.txt], [root/a/1.txt, root/c/3.txt]]",
+            "[]"
+        };
 
-        List<List<String>> duplicates = new DuplicateFile().findDuplicate(paths);
-        System.out.println(duplicates);
+        for (int i = 0; i < cases.length; i++) {
+            List<List<String>> got = solver.findDuplicate(cases[i]);
+            for (List<String> group : got) {
+                Collections.sort(group);
+            }
+            got.sort(Comparator.comparing(group -> group.get(0)));
+            System.out.printf("paths=%s -> %s  expected=%s%n",
+                Arrays.toString(cases[i]), got, expected[i]);
+        }
     }
 
-    /**
-     * Finds duplicate files by grouping them based on identical content.
-     * Approach:
-     * 1. Parse each directory path and its files.
-     * 2. For each file, extract the file name and its content.
-     * 3. Use a map to associate file content with a list of file paths.
-     * 4. Collect and return lists of file paths that have the same content.
+        /**
+     * Intuition: files with equal content are duplicates regardless of where
+     * they live. Use the content token as a hash-map key and collect every full
+     * path that points to that same content.
      *
-     * Time Complexity: O(N * M), where N is the number of directories and M is the average number of files per directory.
-     * Space Complexity: O(N * M) for storing file paths.
+     * Algorithm:
+     *   1. Parse each directory entry into its root path and file(content) tokens.
+     *   2. Extract each filename and content, then append the full path to that content's group.
+     *   3. Return only groups whose size is greater than one.
      *
-     * @param paths An array of directory paths with file names and contents.
-     * @return A list of file groups where each group contains files with the same content.
+     * Time:  O(T) - each character in the directory descriptions is parsed a constant number of times.
+     * Space: O(T) - the map stores the generated file paths grouped by content.
+     *
+     * @param paths directory descriptions containing files and content tokens
+     * @return groups of full paths that share identical content
      */
     public List<List<String>> findDuplicate(String[] paths) {
         List<List<String>> result = new ArrayList<>();

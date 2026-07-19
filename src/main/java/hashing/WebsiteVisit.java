@@ -4,58 +4,75 @@ import java.util.*;
 
 /**
  * Problem: Analyze User Website Visit Pattern
- * https://leetcode.com/problems/analyze-user-website-visit-pattern/
  *
- * Given the visit history of multiple users, find the most frequently visited 3-sequence pattern.
- * If multiple sequences have the same frequency, return the lexicographically smallest one.
- * Input:
- * username = ["joe", "joe", "joe", "james", "james", "james", "james", "mary", "mary", "mary"],
- * timestamp = [1,2,3,4,5,6,7,8,9,10],
- * website = ["home", "about", "career", "home", "cart", "maps", "home", "home" ,"about" , "career"]
- * Output: ["home", "about", "career"]
+ * Given users, timestamps, and websites, find the 3-website sequence visited by
+ * the largest number of users. If multiple sequences have the same score, return
+ * the lexicographically smallest sequence.
  *
- * Explanation: The tuples in this example are:
- * ["joe", "home", 1], ["joe", "about" ,2], ["joe", "career", 31, ["james", "home", 4], ["james", "cart", 5],
- * ["james", "maps", 6], ["james", "home", 7], ["mary", "home" ,8], ["mary", "about", 9], and ["mary", "career", 10].
+ * Leetcode: https://leetcode.com/problems/analyze-user-website-visit-pattern/ (Medium)
+ * Rating:   1851
+ * Pattern:  Hashing | Sorting | Combination generation | Tie-breaking
  *
- * The pattern ("home", "about", "career") has score 2 (joe and mary) .
- * The pattern ("home", "cart", "maps") has score 1 (james).
- * The pattern ("home", "cart", "home") has score 1 (james).
- * The pattern ("home", "maps", "home") has score 1 (james).
- * The pattern ("cart", "maps", "home") has score 1 (james).
- * The pattern ("home", "home", "home") has score 0 (no user visited home 3 times)
+ * Example:
+ *   Input:  joe visits home, about, career; mary visits home, about, career
+ *   Output: [home, about, career]
+ *   Why:    two distinct users have that 3-sequence, giving it the highest score.
  *
  * Follow-ups:
- * Question: How would you handle large datasets where the number of users and visits is very high?
- * Answer: We could use a more memory-efficient data structure, such as a Trie, to store patterns and their frequencies.
+ *   1. How would you handle users with thousands of visits?
+ *      Generate combinations carefully, deduplicate per user, and consider pruning or streaming counts.
+ *   2. How would you support k-sequences instead of only length 3?
+ *      Replace the triple loop with backtracking or iterative combination generation of size k.
+ *   3. How would real-time updates be supported?
+ *      Keep each user's ordered visits and update only new sequences formed by the latest visit.
+ *   4. How would you break ties by earliest occurrence instead?
+ *      Store the tie metadata alongside each pattern count and compare it before lexicographic order.
  *
- * Question: How would you optimize the solution for real-time updates?
- * Answer: We could maintain a sliding window of recent visits and update the pattern counts incrementally.
- *
- * LeetCode Contest Rating: 1851
+ * Related: Top K Frequent Words (692), Design In-Memory File System (588).
  */
 public class WebsiteVisit {
 
     public static void main(String[] args) {
-        String[] username = {"u1", "u1", "u1", "u2", "u2", "u2"};
-        String[] website = {"a", "b", "a", "a", "b", "c"};
-        int[] timestamp = {1, 2, 3, 4, 5, 6};
+        WebsiteVisit solver = new WebsiteVisit();
+        String[][] usernames = {
+            {"joe", "joe", "joe", "james", "james", "james", "james", "mary", "mary", "mary"},
+            {"u1", "u1", "u1", "u2", "u2", "u2"}
+        };
+        int[][] timestamps = {
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+            {1, 2, 3, 4, 5, 6}
+        };
+        String[][] websites = {
+            {"home", "about", "career", "home", "cart", "maps", "home", "home", "about", "career"},
+            {"a", "b", "c", "a", "b", "d"}
+        };
+        String[] expected = { "[home, about, career]", "[a, b, c]" };
 
-        List<String> result = new WebsiteVisit().mostVisitedPattern(username, timestamp, website);
-        System.out.println(result); // Expected Output: [a, b, a]
+        for (int i = 0; i < usernames.length; i++) {
+            List<String> got = solver.mostVisitedPattern(usernames[i], timestamps[i], websites[i]);
+            System.out.printf("username=%s website=%s -> %s  expected=%s%n",
+                Arrays.toString(usernames[i]), Arrays.toString(websites[i]), got, expected[i]);
+        }
     }
 
-    /**
-     * Steps:
-     * 1: Store visits in a Map where key = username, value = list of (timestamp, website).
-     * 2: Sort each user's visit list by timestamp.
-     * 3: Generate all unique 3-sequence patterns per user.
-     * 4: Count the occurrences of each pattern across all users.
-     * 5: Find the most frequent pattern (break ties lexicographically).
+        /**
+     * Intuition: a pattern's score counts users, not visits, so each user should
+     * contribute at most once to the same 3-sequence. Sort each user's history by
+     * time, generate that user's unique sequences, then count them globally.
      *
-     *  Time Complexity: O(N log N) (sorting) + O(U * V^3) (pattern generation), where N is size of input, U is number of users and V is average number of visits per user
-     *  Approx ≈ O(N log N) for typical cases
-     *  Space Complexity: O(N) for storing user visits.
+     * Algorithm:
+     *   1. Group each visit by username with its timestamp and website.
+     *   2. Sort every user's visits by timestamp.
+     *   3. Generate all unique 3-sequences per user and add one global count for each.
+     *   4. Return the highest-count sequence, breaking ties lexicographically.
+     *
+     * Time:  O(N log N + U * V^3) - sorting visits plus triples per user.
+     * Space: O(N + P) - stores visits and generated pattern counts.
+     *
+     * @param username usernames for each visit
+     * @param timestamp timestamps for each visit
+     * @param website websites for each visit
+     * @return most frequent 3-website pattern with lexicographic tie-break
      */
     public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
         Map<String, List<Pair>> userVisits = new HashMap<>(); // Map of username to list of (timestamp, website) pairs
