@@ -3,68 +3,52 @@ package dynamicprogramming.matrixchainmultiplication;
 import java.util.Arrays;
 
 /**
- * Problem: Egg Drop Problem (Super Egg Drop)
+ * Problem: Super Egg Drop
  *
- * https://leetcode.com/problems/super-egg-drop/
+ * Given eggs and floors, find the minimum number of drops needed in the worst
+ * case to identify the highest safe floor. If an egg breaks, it cannot be used
+ * again; if it survives, it can be used on higher floors.
  *
- * Problem Statement:
- * Given `k` eggs and `n` floors, determine the minimum number of trials
- * required
- * to find out the highest floor from which an egg can be dropped without
- * breaking.
- *
- * You want to minimize the number of trials in the worst case.
+ * Leetcode: https://leetcode.com/problems/super-egg-drop/
+ * Rating:   2377 (zerotrac Elo)
+ * Pattern:  Dynamic Programming | Interval decision DP | Binary-search transition
  *
  * Example:
- * Input: k = 3, n = 14
- * Output: 4
- * Explanation: With 3 eggs and 14 floors, the minimum number of trials in the
- * worst case is 4.
- * One optimal strategy is:
- * - Drop from floor 4: If it breaks, check floors 1-3 with 2 eggs (3 trials).
- * - If it doesn't break, drop from floor 8: If it breaks, check floors 5-7 with
- * 2 eggs (3 trials).
- * - If it doesn't break, drop from floor 11: If it breaks, check floors 9-10
- * with 2 eggs (3 trials).
- * - If it doesn't break, drop from floor 14: If it breaks, check floors 12-13
- * with 2 eggs (3 trials).
- * In all scenarios, the worst-case number of trials is 4.
+ *   Input:  eggs = 2, floors = 10
+ *   Output: 4
+ *   Why:    four drops are enough with the classic 4, 7, 9, 10 style strategy,
+ *           while three drops can distinguish at most six floors with two eggs.
  *
- * Follow-up Questions:
- * 1. Can we optimize using Binary Search in the recursion?
- * → Yes. Use binary search on the floor to reduce time complexity.
- * → Problem Link: https://leetcode.com/problems/super-egg-drop/
- *
- * 2. Can we solve it using moves instead of floors?
- * → Yes. Another approach uses DP with states (moves, eggs).
- * → Problem Link:
- * https://leetcode.com/problems/super-egg-drop/solutions/123831/dp-using-binary-search-over-answer/
- * LeetCode Contest Rating: 2377
+ * Follow-ups:
+ *   1. Can the state be based on moves instead of floors?
+ *      Yes; dp[moves][eggs] counts how many floors can be tested, then find the
+ *      first moves where that coverage reaches floors.
+ *   2. Why can binary search be used inside the recurrence?
+ *      As the drop floor rises, the break case grows and the no-break case shrinks,
+ *      so the worst case is minimized near their crossing point.
+ *   3. How would you return an actual dropping plan?
+ *      Store the selected drop floor for each state and follow the branch based on
+ *      whether the egg breaks during execution.
  */
 public class EggDropProblem {
 
-  public static void main(String[] args) {
-    EggDropProblem solver = new EggDropProblem();
-
-    int eggs = 2, floors = 10;
-
-    System.out.println("Minimum Trials (Recursive DP): " + solver.minTrialsRecursive(eggs, floors));
-    System.out.println("Minimum Trials (Iterative DP): " + solver.minTrialsIterative(eggs, floors));
-    System.out.println("Minimum Trials (Optimized DP - Binary Search): " + solver.superEggDrop(eggs, floors));
-  }
-
-  /**
-   * Recursive DP (Top-down with Memoization and Binary Search)
-   * 1. Use binary search to find optimal drop floor instead of linear scan.
-   * 2. Use memoization to cache results for overlapping subproblems.
-   * 3. Choose the minimum number of trials from all worst-case outcomes.
+    /**
+   * Intuition: after dropping from a floor, the egg either breaks and the answer
+   * is below with one fewer egg, or it survives and the answer is above with the
+   * same eggs. We minimize the worst of those two outcomes.
    *
-   * Time Complexity: O(eggs * floors * log(floors))
-   * Space Complexity: O(eggs * floors) (Memoization table + recursion stack).
+   * Algorithm:
+   *   1. Memoize states by eggs and floors.
+   *   2. Handle base cases for zero/one floor and one egg.
+   *   3. Binary search the drop floor because break cost rises while survive cost falls.
+   *   4. Store the minimum worst-case attempts.
    *
-   * @param eggs   Number of eggs.
-   * @param floors Number of floors.
-   * @return Minimum number of attempts required.
+   * Time:  O(eggs * floors * log floors) - each state binary-searches floors.
+   * Space: O(eggs * floors) - memo table plus recursion depth.
+   *
+   * @param eggs number of eggs available
+   * @param floors number of floors to test
+   * @return minimum worst-case attempts
    */
   public int minTrialsRecursive(int eggs, int floors) {
     int[][] memo = new int[eggs + 1][floors + 1]; // memo[i][j] = min trials for i eggs and j floors
@@ -74,9 +58,7 @@ public class EggDropProblem {
     return minTrialsRecHelper(eggs, floors, memo);
   }
 
-  /**
-   * Recursive function with memoization and binary search optimization.
-   */
+    /** Solves the memoized worst-case state for eggs and floors. */
   private int minTrialsRecHelper(int eggs, int floors, int[][] memo) {
     // Base cases
     if (floors == 0 || floors == 1) {
@@ -127,35 +109,23 @@ public class EggDropProblem {
     return memo[eggs][floors] = minAttempts;
   }
 
-  /**
-   * Iterative DP (Bottom-up with Linear Scan)
-   * Steps:
-   * 1. Create DP table: dp[i][j] represents the minimum trials needed with i eggs
-   * and j floors.
-   * 2. Base cases:
-   * - 0 floors → 0 trials (nothing to check)
-   * - 1 floor → 1 trial (just drop once)
-   * - 1 egg → j trials (must check linearly from bottom: floor 1, 2, ..., j)
-   * 3. For each state (currentEgg, currentFloor):
-   * - Try dropping from every possible floor (dropFloor = 1 to currentFloor)
-   * - For each drop, calculate worst-case trials:
-   * a. Egg breaks: We lose 1 egg, check floors below (1 to dropFloor-1)
-   * → Subproblem: dp[currentEgg - 1][dropFloor - 1]
-   * b. Egg survives: Keep same eggs, check floors above (dropFloor+1 to
-   * currentFloor)
-   * → Subproblem: dp[currentEgg][currentFloor - dropFloor]
-   * c. Worst case: max(breakCase, noBreakCase) + 1 (for current drop)
-   * - Track the minimum across all possible drop floors
+    /**
+   * Intuition: the recursive worst-case choice can be tabulated for every smaller
+   * egg/floor state. For each possible first drop, the cost is one attempt plus
+   * the worse of the break and no-break subproblems.
    *
-   * 4. Result: dp[eggs][floors] gives the answer.
+   * Algorithm:
+   *   1. Initialize base rows for zero/one floor and one egg.
+   *   2. For each egg count and floor count, try every dropFloor.
+   *   3. Combine break and no-break states with max plus one current drop.
+   *   4. Keep the minimum worst-case value in dp[eggs][floors].
    *
-   * Time Complexity: O(eggs * floors²) - For each state, we try all floors
-   * linearly.
-   * Space Complexity: O(eggs * floors) - DP table storage.
+   * Time:  O(eggs * floors^2) - each state scans all possible drop floors.
+   * Space: O(eggs * floors) - DP table for all states.
    *
-   * @param eggs   Number of eggs available.
-   * @param floors Number of floors in the building.
-   * @return Minimum number of trials required in the worst case.
+   * @param eggs number of eggs available
+   * @param floors number of floors to test
+   * @return minimum worst-case attempts
    */
   public int minTrialsIterative(int eggs, int floors) {
     int[][] dp = new int[eggs + 1][floors + 1]; // dp[i][j] = min trials for i eggs and j floors
@@ -195,20 +165,23 @@ public class EggDropProblem {
     return dp[eggs][floors];
   }
 
-  /**
-   * Optimized DP using Binary Search
+    /**
+   * Intuition: in a fixed egg/floor state, the break branch grows as the drop
+   * floor rises while the no-break branch shrinks. Binary search moves toward the
+   * balance point instead of scanning every floor.
    *
-   * Steps:
-   * 1. Replace linear scan with binary search to find optimal drop floor.
-   * 2. Compare break vs no-break cases and adjust range accordingly.
-   * 3. Use memoization table to avoid recomputation.
+   * Algorithm:
+   *   1. Initialize base cases in the DP table.
+   *   2. For each state, binary-search the candidate drop floor.
+   *   3. Compare break and no-break costs to move the search range.
+   *   4. Store the smallest worst-case attempt count.
    *
-   * Time Complexity: O(eggs * floors * log (floors))
-   * Space Complexity: O(eggs * floors)
+   * Time:  O(eggs * floors * log floors) - each state binary-searches floors.
+   * Space: O(eggs * floors) - DP table for all states.
    *
-   * @param eggs   Number of eggs
-   * @param floors Number of floors
-   * @return Minimum number of trials in worst case
+   * @param eggs number of eggs available
+   * @param floors number of floors to test
+   * @return minimum worst-case attempts
    */
   public int superEggDrop(int eggs, int floors) {
     int[][] dp = new int[eggs + 1][floors + 1];
@@ -256,4 +229,18 @@ public class EggDropProblem {
     }
     return dp[eggs][floors];
   }
+
+
+    public static void main(String[] args) {
+        EggDropProblem solver = new EggDropProblem();
+        int[][] cases = { {1, 5}, {2, 10}, {3, 14} };
+        int[] expected = {5, 4, 4};
+
+        for (int i = 0; i < cases.length; i++) {
+            int output = solver.superEggDrop(cases[i][0], cases[i][1]);
+            System.out.printf("eggs=%d floors=%d  ->  %d  expected=%d%n",
+                cases[i][0], cases[i][1], output, expected[i]);
+        }
+    }
+
 }

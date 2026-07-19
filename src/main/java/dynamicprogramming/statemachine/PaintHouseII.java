@@ -3,42 +3,49 @@ package dynamicprogramming.statemachine;
 import java.util.*;
 
 /**
- * 265. Paint House II
+ * Problem: Paint House II
  *
- * Problem: There are n houses and k different colors. The cost of painting house i
- * with color j is cost[i][j]. Find the minimum cost to paint all houses such that
- * no two adjacent houses have the same color.
+ * Paint n houses using k colors. Adjacent houses cannot share a color, and
+ * costs[i][j] gives the cost of color j for house i. Return the minimum total
+ * painting cost.
+ *
+ * Leetcode: https://leetcode.com/problems/paint-house-ii/
+ * Rating:   acceptance 57.2% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | State machine | Minimum and second-minimum color states
  *
  * Example:
- * Input: costs = [[1,5,3],[2,9,4]]
- * Output: 5
- * Explanation: Paint house 0 with color 0 and house 1 with color 2. Total cost = 1 + 4 = 5.
+ *   Input:  costs = [[1,5,3],[2,9,4]]
+ *   Output: 5
+ *   Why:    color 0 then color 2 costs 1 + 4, and the adjacent colors differ.
  *
- * LeetCode: https://leetcode.com/problems/paint-house-ii
+ * Follow-ups:
+ *   1. Can you return the actual color sequence?
+ *      Store parent choices for each state or rerun transitions from the final minimum.
+ *   2. What if the no-same-color rule extends to the last d houses?
+ *      The state must remember the previous d colors, or use a bitmask when d is small.
+ *   3. What if costs stream one house at a time?
+ *      The optimized rolling min/second-min state can process rows online.
  *
- * Follow-up questions:
- * Q: What if some houses have color restrictions or preferences?
- * A: Add constraint validation in DP transitions and modify state space.
- *
- * Q: How to handle very large number of colors efficiently?
- * A: Use data structures to maintain minimum and second minimum efficiently.
- *
- * Q: Can we support different constraint patterns (e.g., no same color in k-neighborhood)?
- * A: Extend DP state to track more complex constraint patterns.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Paint House (256), Paint House III (1473).
  */
 public class PaintHouseII {
 
-    /**
-     * Dynamic Programming approach - basic O(nk²) solution.
+        /**
+     * Intuition: painting a house color c needs the cheapest previous total from a
+     * different color. The straightforward DP tries every previous color for each
+     * current color.
      *
-     * Algorithm: State-based DP
-     * - dp[i][j] = minimum cost to paint houses 0..i with house i having color j
-     * - Transition: dp[i][j] = cost[i][j] + min(dp[i-1][c]) for all c != j
-     * - Answer: min(dp[n-1][j]) for all j
+     * Algorithm:
+     *   1. Let dp[house][color] be the cheapest total ending with that color.
+     *   2. Initialize the first house from costs.
+     *   3. For each later house/color, scan all different previous colors.
+     *   4. Return the smallest total in the last row.
      *
-     * Time Complexity: O(n*k²) where n is houses, k is colors
-     * Space Complexity: O(k) using rolling array optimization
+     * Time:  O(n * k^2) - each house/color checks all previous colors.
+     * Space: O(n * k) - DP table stores all totals.
+     *
+     * @param costs costs[house][color]
+     * @return minimum painting cost with no equal adjacent colors
      */
     public int minCostII(int[][] costs) {
         if (costs == null || costs.length == 0) return 0;
@@ -69,13 +76,22 @@ public class PaintHouseII {
         return Arrays.stream(dp).min().getAsInt();
     }
 
-    /**
-     * Optimized O(nk) approach using min/second-min tracking.
+        /**
+     * Intuition: only the best and second-best previous colors matter. If the best
+     * previous color equals the current color, use the second-best; otherwise use
+     * the best.
      *
-     * Algorithm: Min/SecondMin optimization
-     * - Instead of checking all previous colors, track minimum and second minimum
-     * - If current color != min color, use min; otherwise use second min
-     * - Reduces inner loop from O(k) to O(1)
+     * Algorithm:
+     *   1. Track the minimum and second minimum totals from the previous row.
+     *   2. For each current color, add the compatible previous minimum.
+     *   3. Update the new minimum and second minimum for this row.
+     *   4. Return the final row minimum.
+     *
+     * Time:  O(n * k) - every house/color is processed once.
+     * Space: O(1) - only rolling minimum states are stored.
+     *
+     * @param costs costs[house][color]
+     * @return minimum painting cost with no equal adjacent colors
      */
     public int minCostIIOptimized(int[][] costs) {
         if (costs == null || costs.length == 0) return 0;
@@ -192,6 +208,7 @@ public class PaintHouseII {
             build(1, 0, n - 1);
         }
 
+        /** Builds a segment-tree node over a color-cost range. */
         private void build(int node, int start, int end) {
             if (start == end) {
                 tree[node] = arr[start];
@@ -213,6 +230,7 @@ public class PaintHouseII {
             return query(1, 0, n - 1, left, right);
         }
 
+        /** Queries the segment tree for the minimum cost in a color range. */
         private int query(int node, int start, int end, int left, int right) {
             if (right < start || end < left) return Integer.MAX_VALUE;
             if (left <= start && end <= right) return tree[node];
@@ -396,6 +414,7 @@ public class PaintHouseII {
     }
 
     // Check if house has specific color in optimal solution (simplified)
+    /** Returns whether a DP row currently has a finite cost for color. */
     private boolean hasColor(int[][] dp, int house, int color) {
         // This is a simplified check - full implementation would track actual colors
         return false;
@@ -547,4 +566,22 @@ public class PaintHouseII {
                                totalCost, minSingleCost, maxSingleCost, avgCost, totalPaintings);
         }
     }
+
+
+    public static void main(String[] args) {
+        PaintHouseII solver = new PaintHouseII();
+        int[][][] inputs = {
+            {},
+            {{8}},
+            {{1, 5, 3}, {2, 9, 4}}
+        };
+        int[] expected = {0, 8, 5};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.minCostIIOptimized(inputs[i]);
+            System.out.printf("costs=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

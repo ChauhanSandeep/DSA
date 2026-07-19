@@ -5,53 +5,48 @@ import java.util.Arrays;
 /**
  * Problem: Target Sum
  *
- * Problem Statement:
- * You are given an array of integers and a target sum.
- * You can assign either a '+' or '-' sign to each element.
- * Find the number of ways to assign symbols to make the sum equal to the target.
+ * Given integers nums and a target, place either a plus or minus sign before
+ * each number. Count how many sign assignments make the final expression equal
+ * target.
  *
- * Leetcode Equivalent: https://leetcode.com/problems/target-sum/
+ * Leetcode: https://leetcode.com/problems/target-sum/
+ * Rating:   acceptance 52.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | 0/1 knapsack | Convert signs to subset count
  *
- * Relation to 0/1 Knapsack:
- * - This problem is **almost identical** to "Count of Subsets with Given Difference".
- * - Think of '+' assigned elements as S1 and '-' assigned elements as S2.
- * - The problem reduces to:
- *      -> Find the number of subsets whose sum is (target + total_sum) / 2
- *      -> Same as Count of Subsets with Given Difference.
+ * Example:
+ *   Input:  nums = [1,1,1,1,1], target = 3
+ *   Output: 5
+ *   Why:    exactly one of the five 1s must receive a minus sign, so there are five choices.
  *
- * Important Concept:
- * - Assume two groups S1 and S2, then:
- *     S1 - S2 = target
- *     S1 + S2 = total_sum
+ * Follow-ups:
+ *   1. How do zeros affect the count?
+ *      Each zero can be +0 or -0, doubling the number of assignments without changing the sum.
+ *   2. Can this be solved without the algebra transform?
+ *      Yes; use a map from running sum to count after each number.
+ *   3. What if nums may contain negative values?
+ *      The subset transform no longer applies directly; use offset or hash-map DP over sums.
  *
- * Adding the equations:
- *     2S1 = target + total_sum
- *     S1 = (target + total_sum)/2
- *
- * - Hence, the problem reduces to **counting the number of subsets with sum = (target + total_sum)/2**.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Count Subsets With Given Difference, Partition Equal Subset Sum (416).
  */
 public class TargetSum {
-    public static void main(String[] args) {
-        int[] arr = {1, 1, 2, 3};
-        int target = 1;
-        System.out.println(findTargetSumWays(arr, target));
-    }
 
-    /**
-     * Main method to find number of ways to assign '+' and '-' to achieve target sum.
+        /**
+     * Intuition: assigning plus signs to subset P and minus signs to subset N gives
+     * sum(P) - sum(N) = target and sum(P) + sum(N) = total. Therefore sum(P) must be
+     * (total + target) / 2, so the task becomes counting subsets with that sum.
      *
-     * Intuition:
-     * Reduce the Target Sum problem into a Subset Sum counting problem.
-     * Find subsets with sum = (target + total_sum)/2.
+     * Algorithm:
+     *   1. Sum the array and reject impossible target/parity combinations.
+     *   2. Use a subset-count DP table over item prefixes and sums.
+     *   3. For each value, add counts from skipping it and taking it when possible.
+     *   4. Return the count for the transformed positive subset sum.
      *
-     * Approach:
-     * - Calculate total sum of array.
-     * - Check if (target + total_sum) is odd or negative; if yes, return 0.
-     * - Otherwise, count subsets with sum = (target + total_sum)/2.
+     * Time:  O(n * subsetSum) - every item/sum state is filled once.
+     * Space: O(n * subsetSum) - the DP table stores all prefix counts.
      *
-     * Time Complexity: O(n * subsetSum)
-     * Space Complexity: O(n * subsetSum)
+     * @param arr input values
+     * @param target desired signed sum
+     * @return number of plus/minus assignments that reach target
      */
     public static int findTargetSumWays(int[] arr, int target) {
         int totalSum = Arrays.stream(arr).sum();
@@ -64,4 +59,18 @@ public class TargetSum {
         int subsetSum = (target + totalSum) / 2;
         return CountSubsetsWithGivenSum.countSubsetsIterative(arr, arr.length, subsetSum); // already solved
     }
+
+
+    public static void main(String[] args) {
+        int[][] inputs = { {}, {1, 1, 1, 1, 1}, {0, 0, 1} };
+        int[] targets = {0, 3, 1};
+        int[] expected = {1, 5, 4};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = findTargetSumWays(inputs[i], targets[i]);
+            System.out.printf("nums=%s target=%d  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), targets[i], output, expected[i]);
+        }
+    }
+
 }

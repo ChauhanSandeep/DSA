@@ -1,54 +1,51 @@
 package dynamicprogramming.statemachine;
 
+import java.util.Arrays;
+
 /**
  * Problem: Delete and Earn
  *
- * Given an integer array nums, maximize the number of points you can earn by performing the following operation:
- * - Choose any number nums[i], earn nums[i] points, and delete all occurrences of nums[i] - 1 and nums[i] + 1.
- * - Repeat the process to maximize the total points.
+ * Choose values from nums to earn points. Taking value x earns x points for each
+ * occurrence of x, but deletes every x-1 and x+1. Return the maximum points that
+ * can be earned.
  *
- * Example 1:
- * Input: [3, 4, 2]
- * Output: 6
- * Explanation: Take 4 → earn 4 → delete 3; take 2 → earn 2 → total = 6
+ * Leetcode: https://leetcode.com/problems/delete-and-earn/
+ * Rating:   acceptance 57.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | State machine | House Robber on values
  *
- * Example 2:
- * Input: [2, 2, 3, 3, 3, 4]
- * Output: 9
- * Explanation: Take 3 → earn 3*3 = 9 → delete 2 and 4
+ * Example:
+ *   Input:  nums = [2,2,3,3,3,4]
+ *   Output: 9
+ *   Why:    taking all 3s earns 9 and deletes 2s and 4; any plan using 2 or 4 earns less.
  *
- * LeetCode Link: https://leetcode.com/problems/delete-and-earn/
+ * Follow-ups:
+ *   1. Can this be solved with memoized recursion?
+ *      Yes; recurse on value v with choices take v and skip v-1, or skip v.
+ *   2. What if choosing x also deletes x-2 and x+2?
+ *      Change the recurrence so the take transition jumps back three value positions.
+ *   3. What if values are huge but sparse?
+ *      Sort the distinct values and run a compressed House Robber DP over gaps.
  *
- * Follow-up Questions (FAANG-style):
- * 1. Can this be solved using memoization instead of tabulation?
- *    - Yes. Use top-down recursion with memoization over the "points" index.
- * 2. How would the solution change if you could also delete `nums[i] ± 2`?
- *    - You would modify the DP recurrence to skip two indices ahead.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: House Robber (198), Target Sum (494).
  */
 public class DeleteAndEarn {
 
-  public static void main(String[] args) {
-    int[] example1 = {3, 4, 2};
-    System.out.println("Max Points: " + getMaxPoints(example1)); // Expected: 6
-
-    int[] example2 = {2, 2, 3, 3, 3, 4};
-    System.out.println("Max Points: " + getMaxPoints(example2)); // Expected: 9
-  }
-
-  /**
-   * Solves the Delete and Earn problem using dynamic programming (bottom-up tabulation).
+    /**
+   * Intuition: taking value x deletes x - 1 and x + 1, just like robbing adjacent
+   * houses in value order. First compress all equal values into total points for
+   * that value, then run the take/skip recurrence across values.
    *
-   * Steps:
-   * 1. Create a frequency-weighted points array where points[i] = i * count(i).
-   * 2. Reduce to the "House Robber" pattern — where adjacent values (i ± 1) cannot be selected together.
-   * 3. Mutate the points[] array to store max earnings up to each i.
+   * Algorithm:
+   *   1. Accumulate total points available for each value.
+   *   2. Sweep values from low to high with include and exclude states.
+   *   3. Include the current value only after excluding the previous value.
+   *   4. Return the better final state.
    *
-   * Time Complexity: O(N), where N = max(nums), as we scan through 0 to maxVal (max 10^4).
-   * Space Complexity: O(N), due to the points[] array.
+   * Time:  O(n + maxValue) - count input values and scan the value range.
+   * Space: O(maxValue) - points stored by numeric value.
    *
-   * @param nums Input array of integers
-   * @return Maximum points that can be earned
+   * @param nums input values
+   * @return maximum points obtainable
    */
   public static int getMaxPoints(int[] nums) {
     if (nums == null || nums.length == 0) {
@@ -73,4 +70,17 @@ public class DeleteAndEarn {
 
     return points[maxVal];
   }
+
+
+    public static void main(String[] args) {
+        int[][] inputs = { {}, {3, 4, 2}, {2, 2, 3, 3, 3, 4} };
+        int[] expected = {0, 6, 9};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = getMaxPoints(inputs[i]);
+            System.out.printf("nums=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

@@ -5,36 +5,47 @@ import java.util.Arrays;
 /**
  * Problem: Minimum Subset Sum Difference
  *
- * Problem Statement:
- * Given a set of positive integers, partition it into two subsets such that the absolute difference of their sums is minimized.
+ * Given positive integers, split them into two subsets so the absolute
+ * difference between the subset sums is as small as possible. Return that
+ * minimum difference.
  *
- * Leetcode Equivalent: Direct Leetcode not available, but it’s a **classic** DP interview problem.
+ * Source: Classic minimum subset sum difference problem
+ * Pattern:  Dynamic Programming | 0/1 knapsack | Reachable subset sums
  *
- * Relation to 0/1 Knapsack:
- * - We try to divide the set into two subsets as equally as possible.
- * - Based on subset sums (similar to Subset Sum problem), find minimum possible difference.
+ * Example:
+ *   Input:  arr = [1,6,11,5]
+ *   Output: 1
+ *   Why:    subsets [1,5,6] and [11] have sums 12 and 11, which differ by only 1.
+ *
+ * Follow-ups:
+ *   1. Can you return the actual subsets?
+ *      Store choices or backtrack through the reachable-sum table from the best sum.
+ *   2. Can space be reduced to O(totalSum)?
+ *      Yes; use a 1D boolean array and iterate sums backward for each element.
+ *   3. What if negative numbers are allowed?
+ *      Use offset DP or a set of reachable sums instead of indexing only non-negative sums.
+ *
+ * Related: Partition Equal Subset Sum (416), Last Stone Weight II (1049).
  */
 public class MinimumSubsetSumDifference {
-    public static void main(String[] args) {
-        int[] arr = {1, 6, 11, 5};
-        System.out.println("Recursive: " + minSubsetSumDiffRecursive(arr, arr.length));
-        System.out.println("Iterative: " + minSubsetSumDiffIterative(arr, arr.length));
-    }
 
-    /**
-     * Recursive Approach (with memoization):
+        /**
+     * Intuition: once one subset has currentSum, the other subset has totalSum - currentSum.
+     * The difference at the end is fixed by that one tracked sum, so recursion only
+     * needs index and currentSum.
      *
-     * Intuition:
-     * - Try every subset, calculate sum of one subset, other is (totalSum - subsetSum).
-     * - Minimize absolute difference.
-     * - Memoize to avoid recalculations.
+     * Algorithm:
+     *   1. Compute totalSum.
+     *   2. Recursively decide whether to add each item to the tracked subset.
+     *   3. At the end, compare currentSum against totalSum - currentSum.
+     *   4. Memoize index/currentSum states and return the minimum difference.
      *
-     * Approach:
-     * - Base Case: If index == 0, either take or not take the first element.
-     * - Choices: include or exclude current element into subset1.
+     * Time:  O(size * totalSum) - each index/sum state is solved once.
+     * Space: O(size * totalSum) - memo table plus recursion depth.
      *
-     * Time Complexity: O(n * totalSum)
-     * Space Complexity: O(n * totalSum) + recursion stack O(n)
+     * @param arr input values
+     * @param size number of values to consider
+     * @return minimum possible absolute subset-sum difference
      */
     public static int minSubsetSumDiffRecursive(int[] arr, int size) {
         int totalSum = Arrays.stream(arr).sum();
@@ -42,6 +53,7 @@ public class MinimumSubsetSumDifference {
         return findMinDiff(arr, 0, 0, totalSum, dp);
     }
 
+    /** Returns the best final difference after deciding items up to index. */
     private static int findMinDiff(int[] arr, int index, int currentSum, int totalSum, Integer[][] dp) {
         if (index == arr.length) { // base case
             int remainingSum = totalSum - currentSum; // sum of the remaining subset
@@ -60,19 +72,23 @@ public class MinimumSubsetSumDifference {
         return dp[index][currentSum];
     }
 
-    /**
-     * Iterative Tabulation Approach:
+        /**
+     * Intuition: the best partition is determined by the subset sum closest to half
+     * of the total. A boolean subset-sum table tells which sums are reachable from
+     * each prefix, then the closest reachable half gives the minimum difference.
      *
-     * Intuition:
-     * - Find all possible subset sums.
-     * - Among those, pick the sum which gives minimum absolute difference with (totalSum - sum).
+     * Algorithm:
+     *   1. Compute totalSum and initialize reachable sum 0 for every prefix.
+     *   2. Fill dp[itemCount][sum] using skip or take transitions.
+     *   3. Search backward from totalSum / 2 for the largest reachable sum.
+     *   4. Convert that sum into totalSum - 2 * sum.
      *
-     * Approach:
-     * - Use Subset Sum DP idea to fill possible sums.
-     * - Then check minimum difference.
+     * Time:  O(size * totalSum) - fill the table and scan half the sum range.
+     * Space: O(size * totalSum) - reachability table for prefixes and sums.
      *
-     * Time Complexity: O(size * totalSum)
-     * Space Complexity: O(size * totalSum)
+     * @param arr input values
+     * @param size number of values to consider
+     * @return minimum possible absolute subset-sum difference
      */
     public static int minSubsetSumDiffIterative(int[] arr, int size) {
         int totalSum = Arrays.stream(arr).sum();
@@ -105,4 +121,17 @@ public class MinimumSubsetSumDifference {
         }
         return minDiff;
     }
+
+
+    public static void main(String[] args) {
+        int[][] inputs = { {}, {1, 6, 11, 5}, {1, 2, 7} };
+        int[] expected = {0, 1, 4};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = minSubsetSumDiffIterative(inputs[i], inputs[i].length);
+            System.out.printf("arr=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

@@ -1,45 +1,53 @@
 package dynamicprogramming.matrixchainmultiplication;
 
+import java.util.Arrays;
+
 import java.util.Stack;
 
 /**
- * Given an array arr of positive integers, consider all binary trees such that:
- * 1. Each node has either 0 or 2 children
- * 2. The values of arr correspond to the values of each leaf in an in-order traversal of the tree.
- * 3. The value of each non-leaf node is equal to the product of the largest leaf value in its left and right subtree.
+ * Problem: Minimum Cost Tree From Leaf Values
  *
- * Return the minimum possible sum of the values of each non-leaf node.
+ * Given leaf values in inorder order, build a binary tree where every internal
+ * node has value max(left leaves) * max(right leaves). Return the minimum
+ * possible sum of internal-node values.
  *
- * Example 1:
- * Input: arr = [6,2,4]
- * Output: 32
- * Explanation: There are two possible trees. The first has non-leaf node sum 36, the second has 32.
+ * Leetcode: https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/
+ * Rating:   1919 (zerotrac Elo)
+ * Pattern:  Dynamic Programming | Interval DP | Monotonic decreasing stack
  *
- * Example 2:
- * Input: arr = [4,11]
- * Output: 44
+ * Example:
+ *   Input:  arr = [6,2,4]
+ *   Output: 32
+ *   Why:    pairing 2 with 4 first costs 8, then pairing that subtree with 6
+ *           costs 24, for total 32 instead of 36.
  *
- * LeetCode: https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/
+ * Follow-ups:
+ *   1. Can you also return the tree structure?
+ *      Use the interval DP split table or keep parent links while applying the stack idea.
+ *   2. Why does the stack solution work for positive values?
+ *      Each smaller leaf should be multiplied by the smaller of its first greater neighbors.
+ *   3. What if leaf values may be negative?
+ *      The greedy stack property no longer holds; interval DP needs min and max subtree values.
  *
- * Follow-up Questions:
- * 1. How would you handle negative numbers in the array?
- *    - The problem states that all numbers are positive, but if negatives were allowed, we'd need to track both min and max products.
- * 2. What if the array is very large (e.g., length 1000)?
- *    - The O(n) stack-based solution should handle this efficiently.
- * 3. How would you modify the solution to also return the structure of the optimal tree?
- *    - We could extend the solution to also track the tree structure during the stack operations.
- *
- * Related Problems:
- * - Unique Binary Search Trees (https://leetcode.com/problems/unique-binary-search-trees/)
- * - Binary Tree Maximum Path Sum (https://leetcode.com/problems/binary-tree-maximum-path-sum/)
- * LeetCode Contest Rating: 1919
+ * Related: Minimum Cost to Merge Stones (1000), Burst Balloons (312).
  */
 public class MinimumCostTreeFromLeafValues {
-    /**
-     * Calculates the minimum possible sum of the values of each non-leaf node.
+        /**
+     * Intuition: every non-leaf cost charges two leaf values when the smaller one is
+     * finally paired with a greater neighbor. A decreasing stack lets each leaf pay
+     * with the cheaper of its nearest greater neighbors.
      *
-     * @param arr Array of positive integers representing leaf values
-     * @return Minimum possible sum of non-leaf node values
+     * Algorithm:
+     *   1. Keep a decreasing stack of leaf values.
+     *   2. When a new value is larger, pop smaller leaves and charge them with the cheaper neighbor.
+     *   3. Push the new value onto the stack.
+     *   4. Merge the remaining stack values from the top down.
+     *
+     * Time:  O(n) - each value is pushed and popped at most once.
+     * Space: O(n) - stack of decreasing leaf values.
+     *
+     * @param arr leaf values in inorder order
+     * @return minimum possible non-leaf sum
      */
     public int mctFromLeafValues(int[] arr) {
         int result = 0;
@@ -64,8 +72,22 @@ public class MinimumCostTreeFromLeafValues {
         return result;
     }
 
-    /**
-     * Dynamic Programming solution for reference (O(n^3) time, O(n^2) space)
+        /**
+     * Intuition: for any interval, choosing the root split joins the best tree on
+     * the left with the best tree on the right. The added non-leaf value is the max
+     * leaf on the left times the max leaf on the right.
+     *
+     * Algorithm:
+     *   1. Precompute maxLeaf[i][j] for every interval.
+     *   2. Fill dp[start][end] by increasing interval length.
+     *   3. Try each split as the final join of two subtrees.
+     *   4. Store the minimum cost for the full interval.
+     *
+     * Time:  O(n^3) - every interval tries every split.
+     * Space: O(n^2) - DP and max-leaf tables.
+     *
+     * @param arr leaf values in inorder order
+     * @return minimum possible non-leaf sum
      */
     public int mctFromLeafValuesDP(int[] arr) {
         int n = arr.length;
@@ -99,4 +121,18 @@ public class MinimumCostTreeFromLeafValues {
 
         return dp[0][n - 1];
     }
+
+
+    public static void main(String[] args) {
+        MinimumCostTreeFromLeafValues solver = new MinimumCostTreeFromLeafValues();
+        int[][] inputs = { {4, 11}, {6, 2, 4}, {7, 12, 8, 10} };
+        int[] expected = {44, 32, 284};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.mctFromLeafValues(inputs[i]);
+            System.out.printf("arr=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

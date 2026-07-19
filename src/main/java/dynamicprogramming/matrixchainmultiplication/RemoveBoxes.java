@@ -1,50 +1,54 @@
 package dynamicprogramming.matrixchainmultiplication;
 
+import java.util.Arrays;
+
 /**
- * You are given several boxes with different colors represented by different positive numbers.
- * You may experience several rounds to remove boxes until there is no box left. Each time you can
- * choose some continuous boxes with the same color (i.e., composed of k boxes, k >= 1), remove them
- * and get k * k points.
+ * Problem: Remove Boxes
  *
- * Return the maximum points you can get.
+ * Given colored boxes in a row, each move removes one contiguous group of equal
+ * colors and scores groupSize * groupSize. Remove every box while maximizing the
+ * total score.
  *
- * Example 1:
- * Input: boxes = [1,3,2,2,2,3,4,3,1]
- * Output: 23
- * Explanation:
- * [1, 3, 2, 2, 2, 3, 4, 3, 1]
- * ----> [1, 3, 3, 4, 3, 1] (3*3=9 points)
- * ----> [1, 3, 3, 3, 1] (1*1=1 points)
- * ----> [1, 1] (3*3=9 points)
- * ----> [] (2*2=4 points)
+ * Leetcode: https://leetcode.com/problems/remove-boxes/
+ * Rating:   acceptance 49.6% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Interval DP with carry state | Merge matching colors
  *
- * Example 2:
- * Input: boxes = [1,1,1]
- * Output: 9
+ * Example:
+ *   Input:  boxes = [1,3,2,2,2,3,4,3,1]
+ *   Output: 23
+ *   Why:    delaying some 3s lets them merge into a larger group later, and the
+ *           carry state remembers those same-color boxes so the square score is counted correctly.
  *
- * LeetCode: https://leetcode.com/problems/remove-boxes/
+ * Follow-ups:
+ *   1. Can you output the removal sequence?
+ *      Store which branch won for each state and replay those choices recursively.
+ *   2. What if scoring were linear instead of square?
+ *      Then delaying merges gives no benefit, and the problem becomes much simpler.
+ *   3. What if non-contiguous equal colors could be removed together?
+ *      The interval independence breaks; the state must model global color counts or chosen subsets.
  *
- * Follow-up Questions:
- * 1. How would you modify the solution if we could remove non-contiguous boxes of the same color?
- *    - The problem would become a variation of the subset sum problem, which can be solved with dynamic programming.
- * 2. What if the input size is very large (e.g., 1000 boxes)?
- *    - The memoization with DP state (l, r, k) helps, but for very large inputs, we might need further optimizations.
- * 3. How would you find the sequence of moves that gives the maximum points?
- *    - We could modify the solution to track the sequence of moves that leads to the maximum score.
- *
- * Related Problems:
- * - Burst Balloons (https://leetcode.com/problems/burst-balloons/)
- * - Strange Printer (https://leetcode.com/problems/strange-printer/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Burst Balloons (312), Strange Printer (664).
  */
 public class RemoveBoxes {
     private int[][][] memo;
 
-    /**
-     * Calculates the maximum points that can be obtained by removing boxes.
+        /**
+     * Intuition: boxes of the same color become more valuable when removed together.
+     * The carry k records how many boxes equal to boxes[l] are already attached on
+     * the left, so the interval can either remove that group now or merge it with a
+     * matching color later.
      *
-     * @param boxes Array of box colors
-     * @return Maximum points
+     * Algorithm:
+     *   1. Use dfs(l, r, k) for boxes[l..r] with k same-colored boxes carried in.
+     *   2. Remove boxes[l] plus its carry immediately as one option.
+     *   3. Try matching boxes[l] with each later equal color before removing it.
+     *   4. Memoize the best score for every l, r, and k.
+     *
+     * Time:  O(n^4) - three state dimensions plus a scan for matching colors.
+     * Space: O(n^3) - memo table for interval and carry states.
+     *
+     * @param boxes box colors
+     * @return maximum score obtainable
      */
     public int removeBoxes(int[] boxes) {
         int n = boxes.length;
@@ -53,15 +57,7 @@ public class RemoveBoxes {
         return dfs(boxes, 0, n - 1, 0);
     }
 
-    /**
-     * Helper method that performs DFS with memoization to find the maximum points.
-     *
-     * @param boxes Array of box colors
-     * @param l Left index of current subarray
-     * @param r Right index of current subarray
-     * @param k Number of boxes with the same color as boxes[r] that are before l
-     * @return Maximum points for the current subproblem
-     */
+        /** Returns the best score for boxes[l..r] with k carried boxes matching boxes[l]. */
     private int dfs(int[] boxes, int l, int r, int k) {
         if (l > r) {
             return 0;
@@ -151,6 +147,7 @@ public class RemoveBoxes {
         return dfsOptimized(boxes, 0, n - 1, 0, memo);
     }
 
+    /** Returns the optimized carried-interval score for boxes[l..r]. */
     private int dfsOptimized(int[] boxes, int l, int r, int k, int[][][] memo) {
         if (l > r) {
             return 0;
@@ -183,4 +180,18 @@ public class RemoveBoxes {
         memo[l][r][k] = maxScore;
         return maxScore;
     }
+
+
+    public static void main(String[] args) {
+        RemoveBoxes solver = new RemoveBoxes();
+        int[][] inputs = { {}, {1, 1, 1}, {1, 3, 2, 2, 2, 3, 4, 3, 1} };
+        int[] expected = {0, 9, 23};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.removeBoxes(inputs[i]);
+            System.out.printf("boxes=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
 }

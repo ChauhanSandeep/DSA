@@ -3,38 +3,49 @@ package dynamicprogramming.matrixchainmultiplication;
 import java.util.Arrays;
 
 /**
- * LeetCode Problem: Boolean Parenthesization (Similar to https://leetcode.com/problems/parsing-a-boolean-expression/)
+ * Problem: Boolean Parenthesization
  *
- * Given a boolean expression containing 'T' (true), 'F' (false), and operators '&' (AND), '|' (OR), and '^' (XOR),
- * calculates the number of ways to parenthesize the expression so that it evaluates to true.
- * For example:
- * - Input: "T|F&T^F"
- * - Output: 4
- * - Explanation: The expression can be parenthesized in 4 different ways to evaluate to true.
- * - Parenthesizations: 1) ((T|F)&T^F), 2) (T|(F&T^F)), 3) (T|((F&T)^F)), 4) ((T|F)&(T^F))
+ * Given an expression made of T, F, and the binary operators &, |, and ^, count
+ * how many ways to add parentheses so the whole expression evaluates to true.
+ * The order of operands and operators must stay unchanged.
  *
- * Approach:
- * - The expression is evaluated using a recursive function with memoization.
- * - Each operator is processed separately, and the number of ways to evaluate the left and right segments
- *   are combined based on the operator's behavior.
+ * Source: GeeksForGeeks Boolean Parenthesization
+ * Pattern:  Dynamic Programming | Interval DP | Count true and false outcomes
  *
- * Time Complexity: O(N^3) (Since each subproblem takes O(N) and there are O(N^2) subproblems)
- * Space Complexity: O(N^2) (For memoization storage)
- * LeetCode Contest Rating: 1880
+ * Example:
+ *   Input:  expression = "T|F&T"
+ *   Output: 2
+ *   Why:    (T|F)&T and T|(F&T) both evaluate to true, so both valid binary
+ *           parenthesizations count.
+ *
+ * Follow-ups:
+ *   1. What if the count can be huge?
+ *      Return counts modulo a given value and apply the modulus after every multiplication and addition.
+ *   2. Can this be written bottom-up?
+ *      Yes; fill true/false counts for increasing expression lengths and split on every operator.
+ *   3. What if operators include implication or equivalence?
+ *      Keep the same interval state and add a truth-table combination rule for each new operator.
+ *
+ * Related: Different Ways to Add Parentheses (241), Parsing A Boolean Expression (1106).
  */
 public class EvaluateTrue {
-    public static void main(String[] args) {
-        String expression = "F&F^T^F";
-        EvaluateTrue evaluator = new EvaluateTrue();
-        int waysToEvaluateTrue = evaluator.countWaysToEvaluateTrue(expression);
-        System.out.println("Number of ways to evaluate to true: " + waysToEvaluateTrue);
-    }
 
-    /**
-     * Calculates the number of ways to parenthesize the boolean expression so that it evaluates to true.
+        /**
+     * Intuition: each operator splits the expression into left and right parts.
+     * A parenthesization is counted by combining how many ways each side becomes
+     * true or false, according to the operator truth table.
      *
-     * @param expression Boolean expression containing 'T', 'F', '&', '|', and '^'.
-     * @return Number of ways to evaluate the expression to true.
+     * Algorithm:
+     *   1. Use interval DP with a boolean target: true or false.
+     *   2. For every operator position, solve left and right intervals for both outcomes.
+     *   3. Add combinations that make the requested outcome.
+     *   4. Memoize by left index, right index, and desired truth value.
+     *
+     * Time:  O(n^3) - intervals try every operator split and truth combination.
+     * Space: O(n^2) - memo states for true and false outcomes.
+     *
+     * @param expression boolean expression with T, F, &, |, and ^
+     * @return number of ways to parenthesize expression to true
      */
     public int countWaysToEvaluateTrue(String expression) {
         int length = expression.length();
@@ -50,16 +61,7 @@ public class EvaluateTrue {
         return countWays(expression, 0, length - 1, true, dp);
     }
 
-    /**
-     * Recursive function with memoization to count the number of ways to evaluate the expression.
-     *
-     * @param expression The boolean expression.
-     * @param left       Start index of the expression segment.
-     * @param right      End index of the expression segment.
-     * @param evaluateTo True if evaluating for true cases, false otherwise.
-     * @param dp         Memoization table to store results.
-     * @return Number of ways the expression evaluates to the desired value.
-     */
+        /** Counts parenthesizations for an interval and desired truth value. */
     private int countWays(String expression, int left, int right, boolean evaluateTo, int[][][] dp) {
         if (left > right) return 0;
 
@@ -128,4 +130,17 @@ public class EvaluateTrue {
         dp[left][right][isTrue] = ways;
         return ways;
     }
+
+
+    public static void main(String[] args) {
+        EvaluateTrue solver = new EvaluateTrue();
+        String[] inputs = {"T", "T|F&T", "F&F^T^F"};
+        int[] expected = {1, 2, 2};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.countWaysToEvaluateTrue(inputs[i]);
+            System.out.printf("expression=%s  ->  %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
+    }
+
 }

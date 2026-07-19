@@ -3,46 +3,48 @@ package dynamicprogramming.matrixchainmultiplication;
 import java.util.Arrays;
 
 /**
- * Given a string s, partition s such that every substring of the partition is a palindrome.
- * Return the minimum cuts needed for a palindrome partitioning of s.
+ * Problem: Palindrome Partitioning II
+ *
+ * Given a string, split it into palindromic substrings using as few cuts as
+ * possible. Return only the minimum cut count, not the actual partition.
+ *
+ * Leetcode: https://leetcode.com/problems/palindrome-partitioning-ii/
+ * Rating:   acceptance 37.5% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Palindrome interval DP | Prefix partition DP
  *
  * Example:
- * Input: s = "aab"
- * Output: 1
- * Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cut.
+ *   Input:  s = "aab"
+ *   Output: 1
+ *   Why:    the prefix "aa" is a palindrome and "b" is a palindrome, so one cut is enough.
  *
- * LeetCode Link: https://leetcode.com/problems/palindrome-partitioning-ii
+ * Follow-ups:
+ *   1. Can you return all minimum-cut partitions?
+ *      Store every previous index that attains the best cut count and backtrack through those choices.
+ *   2. Can you answer many substring queries?
+ *      Keep the palindrome table and a separate range-DP or query structure for requested intervals.
+ *   3. What if each cut has a custom cost?
+ *      Replace the fixed +1 transition with that boundary cost and minimize total cost.
  *
- * Follow-up Questions:
- * 1. What if we want to return one of the actual partitions achieving the minimum cuts?
- *    Answer: Track the chosen split index for each prefix in a parent array, then backtrack from minCuts[length].
- * 2. How would you reduce the space complexity?
- *    Answer: Replace the 2D palindrome table with Manacher's algorithm or expand-around-center to get O(N) extra space.
- * 3. What if cuts had non-uniform costs (e.g., cost depends on position)?
- *    Answer: Replace the "+1" in the recurrence with the position-specific cut cost and minimize total cost.
- * 4. How would you extend this to allow at most K non-palindromic segments?
- *    Answer: Add a second dimension minCuts[i][k] tracking remaining allowance of non-palindromic pieces.
- * 5. What if the string is streamed and you must answer queries online?
- *    Answer: Use incremental palindrome tracking (e.g., Eertree/palindromic tree) along with DP updates per new character.
- *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Palindrome Partitioning (131), Palindrome Partitioning III (1278).
  */
 public class PalindromePartitioningII {
 
-    /**
-     * Finds the minimum number of cuts needed for a palindrome partitioning of a string.
-     * * STEPS TO SOLVE:
-     * 1. Precompute Palindromes (Interval DP Pattern):
-     * - Use a 2D boolean table 'isPalindrome[left][right]' to store whether substring
-     * from index 'left' to 'right' is a palindrome.
-     * - Use the 'gap' strategy to fill this table in O(N^2) time.
-     * * 2. Calculate Minimum Cuts (Linear Partition DP Pattern):
-     * - Define 'minCuts[i]' as the minimum cuts needed for the prefix of length 'i' (substring [0...i-1]).
-     * - For each position 'i', iterate through all possible 'j' (where j is the start of the last potential palindrome).
-     * - If 'input[j...i-1]' is a palindrome, then:
-     * cuts for prefix 'i' = min(current_value, cuts for prefix 'j' + 1).
-     * * @param input The string to be partitioned
-     * @return The minimum number of cuts needed
+        /**
+     * Intuition: once palindrome substrings are known, the last cut before position
+     * end can be tried directly. If input[start..end] is a palindrome, then it can
+     * be the final block after the best partition ending at start - 1.
+     *
+     * Algorithm:
+     *   1. Precompute palindrome[start][end] for all substrings.
+     *   2. Let cuts[end] be the minimum cuts for the prefix ending at end.
+     *   3. Use zero cuts when the whole prefix is a palindrome.
+     *   4. Otherwise minimize cuts[start - 1] + 1 over palindromic suffixes.
+     *
+     * Time:  O(n^2) - palindrome and cut tables scan substring pairs.
+     * Space: O(n^2) - palindrome table plus cuts array.
+     *
+     * @param input string to partition
+     * @return minimum cuts so every piece is a palindrome
      */
     public int minCut(String input) {
         if (input == null || input.length() <= 1) {
@@ -99,4 +101,17 @@ public class PalindromePartitioningII {
 
         return minCuts[length];
     }
+
+
+    public static void main(String[] args) {
+        PalindromePartitioningII solver = new PalindromePartitioningII();
+        String[] inputs = {"a", "aab", "aba", "abcde"};
+        int[] expected = {0, 1, 0, 4};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.minCut(inputs[i]);
+            System.out.printf("s=%s  ->  %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
+    }
+
 }

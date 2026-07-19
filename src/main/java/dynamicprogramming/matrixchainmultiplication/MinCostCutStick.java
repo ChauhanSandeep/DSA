@@ -4,54 +4,51 @@ import java.util.Arrays;
 
 
 /**
- * Problem Statement:
- * Given a wooden stick of length n units and an array cuts where cuts[i] is the position to perform a cut.
- * You can change the order of the cuts. The cost of one cut on a stick is the length of the current stick.
- * After a cut, the stick is split into two smaller sticks. Return the minimum total cost of the cuts.
+ * Problem: Minimum Cost to Cut a Stick
+ *
+ * Given a stick length and cut positions, choose the order of cuts. Each cut
+ * costs the length of the current piece being cut, and after cutting that piece
+ * splits into two smaller pieces. Return the minimum total cost.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-cost-to-cut-a-stick/
+ * Rating:   2116 (zerotrac Elo)
+ * Pattern:  Dynamic Programming | Interval DP | Choose the first cut in a segment
  *
  * Example:
- * Input: n = 9, cuts = [5,6,1,4,2]
- * Output: 22
+ *   Input:  n = 7, cuts = [1,3,4,5]
+ *   Output: 16
+ *   Why:    cutting at 3 first pays 7, then the left piece costs 3 and the
+ *           right piece can be cut for 6 total, giving 16.
  *
- * Explanation: If you try the given cuts ordering the cost will be 25.
- * There are much ordering with total cost <= 25, for example, the order [4, 6, 5, 2, 1] has total cost = 22 which is the minimum possible.
+ * Follow-ups:
+ *   1. Can you reconstruct the cut order?
+ *      Store the best first cut for each interval and recursively output that cut before its children.
+ *   2. What if duplicate or boundary cuts are present?
+ *      Sort, remove duplicates, and ignore cuts at 0 or n before running the same DP.
+ *   3. What if cutting cost is not segment length?
+ *      Keep the interval split, but replace the segment-length term with the supplied cost function.
  *
- * LeetCode Link: https://leetcode.com/problems/minimum-cost-to-cut-a-stick/
- *
- * Follow-up Questions:
- * 1. How to modify for maximum cost? - Change min to max in DP, similar to burst balloons.
- * 2. What if cuts are not unique or include 0/n? - Need to handle duplicates by sorting uniquely, but problem says unique.
- * 3. How does this relate to matrix chain multiplication? - It's analogous: cuts are like dimensions, cost is like multiplication cost.
- * Relevant follow-up problem: https://leetcode.com/problems/burst-balloons/ (similar interval DP but maximization).
- * LeetCode Contest Rating: 2116
+ * Related: Burst Balloons (312), Matrix Chain Multiplication.
  */
 public class MinCostCutStick {
 
-    /**
-     * Solves the Minimum Cost to Cut a Stick problem using recursion with memoization.
+        /**
+     * Intuition: after choosing the first cut inside a stick segment, the left and
+     * right pieces become independent, and the current segment length is paid once.
+     * Sorting cuts and adding boundaries turns the problem into interval DP.
      *
-     * Intuition:
-     * - Every time we cut the stick, we pay a cost equal to its current length.
-     * - We want to choose the order of cuts that minimizes the total cost.
-     * - Try placing each cut as the first cut, recursively solve for left and right pieces.
+     * Algorithm:
+     *   1. Build allCuts with 0, every cut, and stickLength, then sort it.
+     *   2. Recursively choose each cut index inside the current interval.
+     *   3. Add current segment length plus left and right subproblem costs.
+     *   4. Memoize the minimum cost for each boundary-index pair.
      *
-     *  Why Greedy (cutting at the middle) does NOT work:
-     * - The cost of a cut is the length of the stick at the time of the cut.
-     * - Cutting early changes the size of future sub-sticks, affecting their cost.
-     * - A locally optimal cut (like cutting at the middle) may lead to expensive future cuts.
-     * - Greedy does not consider the global impact of early decisions.
+     * Time:  O(c^3) - O(c^2) intervals each try O(c) cuts.
+     * Space: O(c^2) - memo table plus recursion depth.
      *
-     * Steps:
-     * 1. Add virtual boundaries 0 and stickLength to the cuts array.
-     * 2. Sort the array so we can treat segments properly.
-     * 3. Use memoization to avoid recalculating overlapping subproblems.
-     *
-     * Time Complexity: O(m^3), where m is the number of cuts, because
-     * Space Complexity: O(m^2) for memo + O(m) for call stack (recursive depth)
-     *
-     * @param stickLength the length of the stick
-     * @param cuts the positions where cuts need to be made
-     * @return the minimum total cost to perform all cuts
+     * @param stickLength length of the stick
+     * @param cuts cut positions
+     * @return minimum total cutting cost
      */
     public int minCost(int stickLength, int[] cuts) {
         int numberOfCuts = cuts.length;
@@ -76,15 +73,7 @@ public class MinCostCutStick {
         return findMinCost(allCuts, 0, numberOfCuts + 1, memo);
     }
 
-    /**
-     * Recursive helper to find the minimum cost to cut the stick between allCuts[left] and allCuts[right].
-     *
-     * @param allCuts the sorted cuts array with boundaries included
-     * @param leftCutIndex the index of the left cut
-     * @param rightCutIndex the index of the right cut
-     * @param memo memoization table
-     * @return minimum cost to cut this segment
-     */
+        /** Returns the minimum cutting cost between two boundary cut indexes. */
     private int findMinCost(int[] allCuts, int leftCutIndex, int rightCutIndex, int[][] memo) {
       // Base case: No more cuts possible between left and right
       if (leftCutIndex + 1 == rightCutIndex) {
@@ -113,25 +102,23 @@ public class MinCostCutStick {
       return minCost;
     }
 
-  /**
-   * Computes the minimum cost to cut the stick at all given positions.
+    /**
+   * Intuition: a segment cost depends on smaller left and right cut intervals.
+   * Filling intervals from short to long makes every candidate first cut available
+   * before the containing segment is evaluated.
    *
-   * Step-by-step Explanation:
-   * 1. Add boundaries 0 and stickLength to cuts, sort them.
-   * 2. Initialize 2D DP where dp[i][j] is min cost to cut between cuts[i] and cuts[j].
-   * 3. For interval lengths from 2 to m-1 (m = cuts.size after adding boundaries).
-   * 4. For each interval [i,j], try every possible first cut k between i+1 and j-1.
-   * 5. Cost = dp[i][k] + dp[k][j] + (cuts[j] - cuts[i]).
-   * 6. Take the min over all k for dp[i][j].
-   * 7. Result is dp[0][m-1].
+   * Algorithm:
+   *   1. Sort cuts with 0 and stickLength as boundaries.
+   *   2. Iterate intervals by increasing distance between boundary indexes.
+   *   3. Try every cut inside the interval as the first cut.
+   *   4. Store the minimum cost for the full boundary interval.
    *
-   * Algorithm: Bottom-up Dynamic Programming (interval DP).
-   * Time Complexity: O(m^3), where m is cuts.length + 2 (three nested loops).
-   * Space Complexity: O(m^2), for DP table.
+   * Time:  O(c^3) - every interval scans its possible first cuts.
+   * Space: O(c^2) - interval DP table.
    *
-   * @param stickLength the length of the stick
-   * @param cuts array of cut positions
-   * @return minimum total cost
+   * @param stickLength length of the stick
+   * @param cuts cut positions
+   * @return minimum total cutting cost
    */
   public int minCostIterative(int stickLength, int[] cuts) {
     // Handle edge case: no cuts
@@ -171,8 +158,17 @@ public class MinCostCutStick {
   }
 
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
         MinCostCutStick solver = new MinCostCutStick();
-        System.out.println("Minimum Cost: " + solver.minCost(7, new int[]{1, 3, 4, 5})); // Output: 16
+        int[] lengths = {7, 9, 5};
+        int[][] cuts = { {1, 3, 4, 5}, {5, 6, 1, 4, 2}, {} };
+        int[] expected = {16, 22, 0};
+
+        for (int i = 0; i < lengths.length; i++) {
+            int output = solver.minCostIterative(lengths[i], cuts[i]);
+            System.out.printf("n=%d cuts=%s  ->  %d  expected=%d%n",
+                lengths[i], Arrays.toString(cuts[i]), output, expected[i]);
+        }
     }
+
 }
