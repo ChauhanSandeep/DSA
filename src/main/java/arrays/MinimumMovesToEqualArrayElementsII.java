@@ -5,59 +5,62 @@ import java.util.*;
 /**
  * Problem: Minimum Moves to Equal Array Elements II
  *
- * Given an integer array nums of size n, return the minimum number of moves required to make
- * all array elements equal. In one move, you can increment or decrement an element of the array by 1.
+ * In one move, you may increment or decrement one array element by 1. Return the
+ * minimum total moves needed to make every element equal. The target value may be
+ * any integer, not necessarily one already chosen ahead of time.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/ (Medium)
+ * Rating:   acceptance 62.2% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Sorting | Median minimizes absolute distance
  *
  * Example:
- * Input: nums = [1,2,3]
- * Output: 2
- * Explanation:
- * Only two moves are needed (remember each move increments or decrements one element):
- * [1,2,3] => [2,2,3] => [2,2,2]
+ *   Input:  nums = [1,10,2,9]
+ *   Output: 16
+ *   Why:    any value between the two middle sorted values 2 and 9 is optimal;
+ *           choosing 2 costs 1 + 8 + 0 + 7 = 16 moves.
  *
- * Input: nums = [1,10,2,9]
- * Output: 16
- * Explanation: The median is (2+10)/2 = 6 or we can choose 2 or 10. Using median 2:
- * |1-2| + |10-2| + |2-2| + |9-2| = 1 + 8 + 0 + 7 = 16 moves
+ * Follow-ups:
+ *   1. Find the target without sorting the whole array?
+ *      Use quickselect to find a median in O(n) average time.
+ *   2. What if increment and decrement have different costs?
+ *      The optimal target shifts to a weighted quantile instead of the ordinary median.
+ *   3. Make all elements equal using only increment operations?
+ *      Then the target must be the maximum value, matching Minimum Moves I's complement trick.
  *
- * LeetCode: https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii
- *
- * Follow-up Questions:
- * 1. Q: Why is the median the optimal target value?
- *    A: The median minimizes the sum of absolute deviations. This is a fundamental property
- *       in statistics - any other value would result in more total moves.
- *
- * 2. Q: What if the array has even length - which median to choose?
- *    A: Any value between the two middle elements gives the same result, so we can choose either.
- *
- * 3. Q: How would you handle very large arrays with memory constraints?
- *    A: Use quickselect to find median in O(n) average time without full sorting.
- *
- * 4. Q: What if moves have different costs (increment vs decrement)?
- *    A: Would need to modify the approach to consider asymmetric costs in the optimization.
- *
- * Related Problems:
- * - Minimum Moves to Equal Array Elements: https://leetcode.com/problems/minimum-moves-to-equal-array-elements/
- * - Best Meeting Point: https://leetcode.com/problems/best-meeting-point/
- * - Minimum Operations to Make Array Equal: https://leetcode.com/problems/minimum-operations-to-make-array-equal/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Minimum Moves to Equal Array Elements (453), Best Meeting Point (296).
  */
 public class MinimumMovesToEqualArrayElementsII {
 
+    public static void main(String[] args) {
+        MinimumMovesToEqualArrayElementsII solver = new MinimumMovesToEqualArrayElementsII();
+
+        int[][] inputs = { {1, 2, 3}, {1, 10, 2, 9}, {7} };
+        int[] expected = { 2, 16, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.minMoves2(inputs[i].clone());
+            System.out.printf("nums=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Finds minimum moves using median as optimal target value.
+     * Intuition: the sum of absolute distances is minimized at a median. Moving the
+     * target left of the median leaves more numbers on the right pulling it back, and
+     * moving it right leaves more numbers on the left pulling it back. Sorting exposes
+     * the median, then every element contributes its distance from that target.
      *
      * Algorithm:
-     * 1. Sort the array to easily find the median
-     * 2. Find median element (middle for odd length, either middle for even length)
-     * 3. Calculate sum of absolute differences between each element and median
-     * 4. Each absolute difference represents moves needed for that element
+     *   1. Return 0 for null or single-element input.
+     *   2. Sort nums.
+     *   3. Pick nums[nums.length / 2] as the median target.
+     *   4. Sum absolute differences from the median and return the total.
      *
-     * Time Complexity: O(n log n) due to sorting
-     * Space Complexity: O(1) if sorting in-place, O(n) if creating new sorted array
+     * Time:  O(n log n) - sorting dominates the final linear sum.
+     * Space: O(1) - aside from the in-place sort, only the median and total are stored.
      *
-     * @param nums array of integers to equalize
-     * @return minimum number of moves required
+     * @param nums values to make equal, mutated by sorting
+     * @return minimum number of +/-1 moves needed
      */
     public int minMoves2(int[] nums) {
         if (nums == null || nums.length <= 1) {

@@ -5,69 +5,66 @@ import java.util.*;
 /**
  * Problem: Number of Laser Beams in a Bank
  *
- * Anti-theft security devices are activated inside a bank. You are given a 0-indexed
- * binary string array bank representing the floor plan of the bank, which is an m x n
- * 2D matrix. bank[i] represents the ith row, consisting of '0's and '1's. '0' means
- * the cell is empty, while '1' means the cell has a security device.
+ * Each bank row is a binary string where 1 marks a security device. Beams are
+ * formed only between devices in two different non-empty rows when every row
+ * between them has no devices. Return the total number of beams.
  *
- * There is one laser beam between any two security devices if both of the following
- * conditions are met:
- * - The two devices are located on two different rows: r1 and r2 where r1 < r2
- * - For each row i where r1 < i < r2, there are no security devices in the ith row
- *
- * Laser beams are independent, meaning one beam does not interfere with another.
- * Return the total number of laser beams in the bank.
+ * Leetcode: https://leetcode.com/problems/number-of-laser-beams-in-a-bank/ (Medium)
+ * Rating:   1280 (zerotrac Elo)
+ * Pattern:  Array | String scan | Consecutive non-empty rows
  *
  * Example:
- * Input: bank = ["011001","000000","010100","001000"]
- * Output: 8
- * Explanation:
- * - Row 0: 3 devices, Row 2: 2 devices → 3×2 = 6 beams
- * - Row 2: 2 devices, Row 3: 1 device → 2×1 = 2 beams
- * - Total: 6 + 2 = 8 beams
+ *   Input:  bank = ["011001","000000","010100","001000"]
+ *   Output: 8
+ *   Why:    row 0 has 3 devices and row 2 has 2, making 6 beams; row 2 and row 3
+ *           add 2 more beams, and the empty row is skipped.
  *
- * Input: bank = ["000","111","000"]
- * Output: 0
- * Explanation: No two rows with devices have an empty row between them.
+ * Follow-ups:
+ *   1. Count beams within the same row too?
+ *      Add count * (count - 1) / 2 for each row before handling cross-row beams.
+ *   2. Return the row pairs that contribute beams?
+ *      Store the previous non-empty row index along with its device count.
+ *   3. Optimize for very sparse, very long rows?
+ *      Store device counts per row while parsing sparse positions instead of scanning full strings repeatedly.
  *
- * LeetCode: https://leetcode.com/problems/number-of-laser-beams-in-a-bank/
- *
- * Follow-up Questions:
- * 1. Q: What if laser beams could form within the same row?
- *    A: Would need to add C(n,2) combinations for each row with n devices.
- *
- * 2. Q: How would you handle 3D laser beams between floors?
- *    A: Similar approach but tracking connections between 2D layers instead of 1D rows.
- *
- * 3. Q: What if some devices could block laser beams?
- *    A: Would need more complex path-finding to check if devices can "see" each other.
- *
- * 4. Q: How would you optimize for very sparse matrices?
- *    A: Could precompute row indices with devices and only process those rows.
- *
- * Related Problems:
- * - Number of Islands: https://leetcode.com/problems/number-of-islands/
- * - Pacific Atlantic Water Flow: https://leetcode.com/problems/pacific-atlantic-water-flow/
- * - Battleships in a Board: https://leetcode.com/problems/battleships-in-a-board/
- * LeetCode Contest Rating: 1280
+ * Related: Battleships in a Board (419), Number of Islands (200).
  */
 public class NumberOfLaserBeamsInABank {
 
+    public static void main(String[] args) {
+        NumberOfLaserBeamsInABank solver = new NumberOfLaserBeamsInABank();
+
+        String[][] inputs = {
+            {"011001", "000000", "010100", "001000"},
+            {"000", "111", "000"},
+            {"0"}
+        };
+        int[] expected = { 8, 0, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.numberOfBeams(inputs[i]);
+            System.out.printf("bank=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Counts laser beams using sequential row processing approach.
+     * Intuition: empty rows do not create beams and do not block beams between the
+     * nearest non-empty rows. Therefore only consecutive non-empty rows matter: if the
+     * previous non-empty row has a devices and the current row has b devices, they add
+     * a * b beams.
      *
      * Algorithm:
-     * 1. For each row, count the number of security devices ('1's)
-     * 2. Only consider rows with at least one device (skip empty rows)
-     * 3. Each device in current row forms beam with each device in previous non-empty row
-     * 4. Multiply device counts between consecutive non-empty rows
-     * 5. Sum all beam counts across the entire bank
+     *   1. Return 0 for null or empty input.
+     *   2. Scan each row and count its devices.
+     *   3. For every non-empty row, add previousRowDeviceCount * currentRowDeviceCount.
+     *   4. Update previousRowDeviceCount to the current non-empty row count.
      *
-     * Time Complexity: O(m*n) where m is number of rows and n is row length
-     * Space Complexity: O(1) using constant extra space
+     * Time:  O(r * c) - every character in the bank strings is inspected once.
+     * Space: O(1) - only the previous row count and total are stored.
      *
-     * @param bank array of binary strings representing bank floor plan
-     * @return total number of laser beams between security devices
+     * @param bank binary strings representing bank rows
+     * @return total number of valid laser beams
      */
     public int numberOfBeams(String[] bank) {
         if (bank == null || bank.length == 0) {

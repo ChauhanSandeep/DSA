@@ -3,43 +3,66 @@ package arrays;
 import java.util.*;
 
 /**
- * Add To Array Form Of Integer
+ * Problem: Add to Array-Form of Integer
  *
- * Problem: Given an array representing the digits of a non-negative integer and an integer k,
- * return the array form of the integer num + k.
+ * A non-negative integer is stored as an array of decimal digits, most significant
+ * digit first. Add the integer k to it and return the sum in the same array-form.
+ * The input number may be too large to fit in a primitive numeric type.
  *
- * Example: nums = [1,2,0,0], k = 34 -> Output: [1,2,3,4]
- * The array represents 1200, adding 34 gives 1234.
+ * Leetcode: https://leetcode.com/problems/add-to-array-form-of-integer/ (Easy)
+ * Rating:   1235 (zerotrac Elo)
+ * Pattern:  Array | Digit carry | Right-to-left addition
  *
- * LeetCode: https://leetcode.com/problems/add-to-array-form-of-integer
+ * Example:
+ *   Input:  nums = [2,1,5], k = 806
+ *   Output: [1,0,2,1]
+ *   Why:    215 + 806 = 1021, so the returned digits must include the new
+ *           leading 1 created by the final carry.
  *
- * Follow-up Questions:
- * Que - How would you handle very large numbers that exceed integer limits?
- * Ans - (Use BigInteger or string manipulation)
- * Que - Can you solve this without using extra space?
- * Ans - (Modify the input array if possible, otherwise use a linked list)
- * Que - What if k could be negative?
- * Ans - Need to handle borrowing and negative results, more complex logic required.
- * LeetCode Contest Rating: 1235
+ * Follow-ups:
+ *   1. Add two array-form integers instead of one array and one int?
+ *      Walk both arrays from right to left and carry exactly like elementary addition.
+ *   2. Support negative k?
+ *      Add a sign comparison first, then use borrow-based subtraction when needed.
+ *   3. Stream digits from disk instead of storing the whole number?
+ *      Process from the least significant end if possible, or use a stack/chunked buffer.
+ *
+ * Related: Plus One (66), Add Binary (67), Add Strings (415).
  */
 public class AddToArrayFormOfInteger {
 
+    public static void main(String[] args) {
+        AddToArrayFormOfInteger solver = new AddToArrayFormOfInteger();
+
+        int[][] inputs = { {1, 2, 0, 0}, {2, 1, 5}, {9, 9, 9} };
+        int[] additions = { 34, 806, 1 };
+        String[] expected = { "[1, 2, 3, 4]", "[1, 0, 2, 1]", "[1, 0, 0, 0]" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = solver.addToArrayForm(inputs[i], additions[i]);
+            System.out.printf("nums=%s k=%d  ->  %s  expected=%s%n",
+                java.util.Arrays.toString(inputs[i]), additions[i], got, expected[i]);
+        }
+    }
+
     /**
-     * Adds integer k to a number represented as an array of digits.
+     * Intuition: this is the same addition taught on paper, except one addend is
+     * stored as digits and the other is k. Work from the least significant side,
+     * combine the current array digit, the current decimal digit of k, and carry,
+     * then reverse the collected digits because they were produced from right to left.
      *
      * Algorithm:
-     * 1. Start from the least significant digit (rightmost)
-     * 2. Add carry (initially 0) + current digit + last digit of k
-     * 3. Update carry for next iteration
-     * 4. Continue until all digits processed and no carry remains
-     * 5. Reverse result since we build from right to left
+     *   1. Start at the last digit of nums with carry set to 0.
+     *   2. While nums, k, or carry still has digits, add the current pieces.
+     *   3. Append sum % 10, update carry to sum / 10, and move left.
+     *   4. Reverse the built list so the most significant digit comes first.
      *
-     * Time Complexity: O(max(N, log K)) where N is length of nums array
-     * Space Complexity: O(max(N, log K)) for the result array
+     * Time:  O(max(n, log k)) - one loop consumes one digit from nums and k each time.
+     * Space: O(max(n, log k)) - the returned list stores the sum digits.
      *
-     * @param nums array representing digits of the number
-     * @param k integer to add
-     * @return array form of nums + k
+     * @param nums decimal digits of a non-negative integer
+     * @param k non-negative value to add
+     * @return array-form digits of nums + k
      */
     public List<Integer> addToArrayForm(int[] nums, int k) {
         List<Integer> result = new ArrayList<>();

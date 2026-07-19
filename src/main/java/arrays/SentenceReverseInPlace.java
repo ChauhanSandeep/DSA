@@ -4,46 +4,65 @@ import java.util.Arrays;
 
 
 /**
- * Problem: Reverse the words in a character array (in-place).
+ * Problem: Reverse Words in a String II
  *
- * ✅ Given a character array representing a sentence, reverse the order of the words in-place.
- *    A word is defined as a sequence of non-space characters.
+ * Given a character array that represents a sentence, reverse the order of the
+ * words in place while keeping the characters inside each word in their normal
+ * order. Words are separated by single spaces for the standard version.
  *
- * 🔗 LeetCode Link (similar problem): https://leetcode.com/problems/reverse-words-in-a-string-ii/
+ * Leetcode: https://leetcode.com/problems/reverse-words-in-a-string-ii/ (Medium)
+ * Rating:   acceptance 56.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Reverse whole then reverse words
  *
  * Example:
- * Input:  ['h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd']
- * Output: ['w', 'o', 'r', 'l', 'd', ' ', 'h', 'e', 'l', 'l', 'o']
+ *   Input:  ['h','e','l','l','o',' ','w','o','r','l','d']
+ *   Output: ['w','o','r','l','d',' ','h','e','l','l','o']
+ *   Why:    reversing the full array flips word order but also flips each word,
+ *           so reversing each word again restores the letters.
  *
- * Follow-up Questions:
- * - Q: What if multiple spaces between words?
- *   A: You'll need to handle extra spacing as a separate concern.
- * - Q: Can the array contain punctuation?
- *   A: Yes, punctuation is considered part of a word unless told otherwise.
- * - Q: Can you solve this in O(1) extra space?
- *   A: Yes, current solution does it in-place.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Handle multiple spaces between words?
+ *      Preserve them as separators or normalize them first, depending on the required output.
+ *   2. Do this for a mutable UTF-8 byte buffer?
+ *      Reverse by code point boundaries, not raw bytes, so multibyte characters stay valid.
+ *   3. Return a new string instead of editing in place?
+ *      Split on spaces and append words in reverse order, which uses O(n) extra space.
+ *
+ * Related: Reverse Words in a String (151), Reverse String (344).
  */
 public class SentenceReverseInPlace {
 
-  public static void main(String[] args) {
-    char[] sentence = {'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'};
-    reverseWordsInPlace(sentence);
-    System.out.println(Arrays.toString(sentence)); // Expected: ['w', 'o', 'r', 'l', 'd', ' ', 'h', 'e', 'l', 'l', 'o']
-  }
+    public static void main(String[] args) {
+        char[][] inputs = { "hello world".toCharArray(), "a".toCharArray(), "blue is sky".toCharArray() };
+        String[] expected = { "world hello", "a", "sky is blue" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            char[] chars = inputs[i].clone();
+            reverseWordsInPlace(chars);
+            System.out.printf("chars=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), new String(chars), expected[i]);
+        }
+    }
+
+
 
   /**
-   * Reverses the words in a character array, in-place.
+   * Intuition: reversing the whole sentence puts the words in the desired order but
+   * also reverses the letters inside each word. A second pass over word boundaries
+   * reverses each word back, so the final array has words reordered while each word's
+   * characters read normally.
    *
-   * ✅ Algorithm:
-   *    1. Reverse the entire character array.
-   *    2. Then reverse each individual word back to restore correct word order.
+   * Algorithm:
+   *   1. Return the input unchanged for null or empty arrays.
+   *   2. Reverse the entire character array.
+   *   3. Scan for spaces and array end to find each word.
+   *   4. Reverse each word range in place and return chars.
    *
-   * ✅ Time Complexity: O(N)
-   * ✅ Space Complexity: O(1)
+   * Time:  O(n) - each character participates in a constant number of swaps.
+   * Space: O(1) - all reversals happen in the input array.
    *
-   * @param chars character array representing the sentence
-   * @return same character array with words reversed in-place
+   * @param chars sentence characters with words separated by spaces
+   * @return the same array with word order reversed
    */
   public static char[] reverseWordsInPlace(char[] chars) {
     if (chars == null || chars.length == 0) {

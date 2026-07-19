@@ -4,45 +4,54 @@ import java.util.Arrays;
 
 /**
  * Problem: Merge Two Sorted Arrays Without Extra Space
- * GeeksForGeeks: https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
  *
- * Given two sorted arrays `arr1[]` and `arr2[]`, merge them such that:
- * - The final arrays remain sorted.
- * - No extra space is used (for in-place variant).
+ * Given two sorted arrays, rearrange their values so the first array contains the
+ * smaller prefix of the combined sorted order and the second array contains the
+ * remaining larger suffix. The in-place version must not allocate a third array.
+ *
+ * Source: https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
+ * Pattern:  Array | Two pointers | Gap method
  *
  * Example:
- * Input:
- *   arr1 = [1, 3, 5, 7]
- *   arr2 = [0, 2, 6, 8, 9]
- * Output:
- *   arr1 = [0, 1, 2, 3]
- *   arr2 = [5, 6, 7, 8, 9]
+ *   Input:  first = [1,3,5,7], second = [0,2,6,8,9]
+ *   Output: first = [0,1,2,3], second = [5,6,7,8,9]
+ *   Why:    the combined sorted order is [0,1,2,3,5,6,7,8,9], split back across
+ *           arrays of lengths 4 and 5.
  *
- * ✅ Follow-ups:
- * - Can you merge in-place in O(1) space and better than O(N*M)?
- * - Use GAP method (Shell Sort technique) to solve in O((N+M) log(N+M)) time.
+ * Follow-ups:
+ *   1. Merge when the first array has enough trailing buffer, like Leetcode 88?
+ *      Fill from the back with three pointers so no gap pass is needed.
+ *   2. Return one merged array instead of modifying two arrays?
+ *      Use the standard two-pointer merge with O(n + m) output space.
+ *   3. Merge k sorted arrays in place?
+ *      Usually use a min-heap or divide-and-conquer; true in-place merging is much harder.
+ *
+ * Related: Merge Sorted Array (88), Merge k Sorted Lists (23).
+ *
  */
 public class Merge2Arrays {
 
-  public static void main(String[] args) {
-    long[] arr1 = {1, 3, 5, 7};
-    long[] arr2 = {0, 2, 6, 8, 9};
+    public static void main(String[] args) {
+      Merge2Arrays solver = new Merge2Arrays();
 
-    System.out.println("Before Merge:");
-    System.out.println("Arr1: " + Arrays.toString(arr1));
-    System.out.println("Arr2: " + Arrays.toString(arr2));
+      int[] firstInPlace = {1, 3, 5, 7};
+      int[] secondInPlace = {0, 2, 6, 8, 9};
+      solver.mergeArraysSwapAndSort(firstInPlace, secondInPlace);
+      System.out.printf("first=[1, 3, 5, 7] second=[0, 2, 6, 8, 9]  ->  first=%s second=%s  expected=[0, 1, 2, 3]/[5, 6, 7, 8, 9]%n",
+          Arrays.toString(firstInPlace), Arrays.toString(secondInPlace));
 
-    mergeWithoutExtraSpace(arr1, arr2);
+      int[] merged = mergeWithExtraSpace(new int[] {1, 3, 5}, new int[] {2, 4});
+      System.out.printf("extra-space input=[1, 3, 5]/[2, 4]  ->  %s  expected=[1, 2, 3, 4, 5]%n",
+          Arrays.toString(merged));
 
-    System.out.println("\nAfter Merge (In-place):");
-    System.out.println("Arr1: " + Arrays.toString(arr1));
-    System.out.println("Arr2: " + Arrays.toString(arr2));
+      long[] firstGapEdge = {10};
+      long[] secondGapEdge = {};
+      mergeWithoutExtraSpace(firstGapEdge, secondGapEdge);
+      System.out.printf("gap-edge first=[10] second=[]  ->  first=%s second=%s  expected=[10]/[]%n",
+          Arrays.toString(firstGapEdge), Arrays.toString(secondGapEdge));
+    }
 
-    // Extra-space version
-    int[] a1 = {1, 3, 5, 7};
-    int[] a2 = {0, 2, 6, 8, 9};
-    System.out.println("\nMerged Array (With Extra Space): " + Arrays.toString(mergeWithExtraSpace(a1, a2)));
-  }
+
 
   /**
    * 🔹 Extra-space merge of two sorted arrays.
@@ -110,35 +119,23 @@ public class Merge2Arrays {
   }
 
   /**
-   * Intuition:
-   * The GAP method is a variation of the Shell Sort algorithm that allows us to merge two sorted arrays without using extra space.
-   * This method works by comparing elements at a certain gap distance and swapping them if they are out of order.
-   * The gap is gradually reduced until it reaches 0, at which point the arrays are fully merged.
-   * This approach is efficient and avoids the need for additional space, making it suitable for large datasets.
+   * Intuition: the gap method is Shell-sort style merging over the two arrays as if
+   * they were one combined sorted buffer. Compare elements that are gap positions
+   * apart, swapping across arr1, between arrays, or inside arr2 when they are out of
+   * order. Shrinking the gap eventually checks adjacent positions, leaving both arrays
+   * partitioned in sorted order without a third array.
    *
-   * Why this works:
-   * Instead of merging from left to right (which needs extra space),
-   * we repeatedly push bigger elements toward the end and smaller ones to the beginning
-   * by comparing elements at a distance (gap).
+   * Algorithm:
+   *   1. Start with nextGap(len1 + len2).
+   *   2. Compare and swap pairs inside arr1 that are gap apart.
+   *   3. Compare and swap pairs crossing from arr1 into arr2.
+   *   4. Compare and swap pairs inside arr2, then shrink the gap until it becomes 0.
    *
-   * Steps:
-   * 1. Let total length = N + M.
-   * 2. Set initial gap = ceil((N + M) / 2).
-   * 3. While gap > 0:
-   *    a. Compare and swap elements within `arr1`:
-   *       - For i from 0 to (N - gap), if arr1[i] > arr1[i + gap], swap.
-   *    b. Compare and swap elements between `arr1` and `arr2`:
-   *       - Let i = max(0, gap - N), and j = 0.
-   *       - While i < N and j < M:
-   *           - Compare arr1[i] and arr2[j], swap if arr1[i] > arr2[j].
-   *           - Increment i and j.
-   *    c. Compare and swap elements within `arr2`:
-   *       - For j from 0 to (M - gap), if arr2[j] > arr2[j + gap], swap.
-   *    d. Update gap = ceil(gap / 2) using nextGap().
-   * 4. Repeat until gap == 0. At this point, both arrays are sorted as one.
+   * Time:  O((n + m) log(n + m)) - each gap pass scans the combined length.
+   * Space: O(1) - values are swapped in place.
    *
-   * Time Complexity: O((N + M) log(N + M))
-   * Space Complexity: O(1)
+   * @param arr1 first sorted array, mutated to contain the smaller prefix
+   * @param arr2 second sorted array, mutated to contain the larger suffix
    */
   public static void mergeWithoutExtraSpace(long[] arr1, long[] arr2) {
     int len1 = arr1.length, len2 = arr2.length;

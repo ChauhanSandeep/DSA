@@ -3,74 +3,72 @@ package arrays;
 import java.util.Arrays;
 
 /**
- * Maximum Area of a Piece of Cake After Horizontal and Vertical Cuts
+ * Problem: Maximum Area of a Piece of Cake After Horizontal and Vertical Cuts
  *
- * Problem:
- * Given a rectangular cake with height h and width w, and two arrays of integers horizontalCuts and verticalCuts
- * that specify positions where cuts are made, find the maximum area of a single piece of cake after all cuts.
+ * A rectangular cake has horizontal and vertical cut positions already chosen.
+ * After all cuts are made, return the area of the largest resulting piece modulo
+ * 1,000,000,007. The cake can be huge, so the multiplication must avoid int overflow.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-area-of-a-piece-of-cake-after-horizontal-and-vertical-cuts/ (Medium)
+ * Rating:   1445 (zerotrac Elo)
+ * Pattern:  Array | Sorting | Maximum adjacent gap
  *
  * Example:
- * Input: h = 5, w = 4, horizontalCuts = [1,2,4], verticalCuts = [1,3]
- * Output: 4
- * Explanation: The largest piece has height 2 (between cuts at 2 and 4) and width 2 (between cuts at 1 and 3).
- * Area = 2 * 2 = 4.
+ *   Input:  h = 5, w = 4, horizontalCuts = [1,2,4], verticalCuts = [1,3]
+ *   Output: 4
+ *   Why:    the largest vertical span is 2 and the largest horizontal span is 2,
+ *           so the largest rectangle has area 2 * 2 = 4.
  *
- * Constraints:
- * - 2 <= h, w <= 10^9
- * - 1 <= horizontalCuts.length, verticalCuts.length <= min(h - 1, 10^5)
- * - All cut positions are unique and within bounds
+ * Follow-ups:
+ *   1. Return the smallest non-zero piece area instead?
+ *      Track minimum adjacent gaps in both directions after sorting the cuts.
+ *   2. Handle duplicate cut positions in the input?
+ *      Sort first and ignore repeated neighbours, or deduplicate with a set before sorting.
+ *   3. Extend this to a 3D block with cuts along three axes?
+ *      Find the maximum gap on each axis independently and multiply all three gaps.
  *
- * LeetCode: https://leetcode.com/problems/maximum-area-of-a-piece-of-cake-after-horizontal-and-vertical-cuts/
- *
- * Follow-up Questions:
- * Q1: What if we need to find the minimum area piece instead of maximum?
- * A1: Use the same approach but track minimum gaps instead of maximum gaps between consecutive cuts.
- *
- * Q2: How would you handle the case where cuts are allowed at the same position multiple times?
- * A2: Use a Set to deduplicate cuts before sorting, or sort first and skip duplicate adjacent values.
- *
- * Q3: Can we optimize space if the cut arrays are extremely large?
- * A3: We can sort in-place and process cuts in a single pass without additional data structures.
- *
- * Q4: What if we want to find the k-th largest piece instead?
- * A4: Generate all possible piece dimensions, sort them by area, and return the k-th element (O(N*M) space).
- *
- * Q5: How would you extend this to 3D (a cubic cake with 3 types of cuts)?
- * A5: Apply the same logic to all three dimensions independently, then multiply the three maximum gaps.
- * LeetCode Contest Rating: 1445
+ * Related: Maximum Width Ramp (962), Widest Vertical Area Between Two Points (1637).
  */
 public class BiggestCakePiece {
-    private static final int MOD = 1_000_000_007;
 
     public static void main(String[] args) {
-        int cakeHeight = 5;
-        int cakeWidth = 4;
-        int[] horizontalCuts = {1, 2, 4};
-        int[] verticalCuts = {1, 3};
-        System.out.println("Maximum cake piece area: " + maxArea(cakeHeight, cakeWidth, horizontalCuts, verticalCuts));
+        int[][] horizontalCuts = { {1, 2, 4}, {1} };
+        int[][] verticalCuts = { {1, 3}, {1} };
+        int[] heights = { 5, 2 };
+        int[] widths = { 4, 2 };
+        int[] expected = { 4, 1 };
+
+        for (int i = 0; i < heights.length; i++) {
+            int got = maxArea(heights[i], widths[i], horizontalCuts[i].clone(), verticalCuts[i].clone());
+            System.out.printf("h=%d w=%d horizontal=%s vertical=%s  ->  %d  expected=%d%n",
+                heights[i], widths[i], Arrays.toString(horizontalCuts[i]),
+                Arrays.toString(verticalCuts[i]), got, expected[i]);
+        }
     }
+    private static final int MOD = 1_000_000_007;
+
+
 
     /**
-     * Computes the maximum area of a piece of cake after performing the given cuts.
+     * Intuition: after sorting cut positions, every cake piece dimension is just the
+     * gap between neighbouring cuts, including the cake edges. The largest rectangle
+     * must use the largest vertical gap and the largest horizontal gap independently,
+     * then the area is reduced modulo MOD to avoid overflow in the required answer.
      *
      * Algorithm:
-     * 0. Add boundary cuts (0 and height/width) implicitly
-     * 1. Sort horizontal and vertical cuts to process them in order
-     * 2. Find maximum gap between consecutive horizontal cuts
-     * 3. Find maximum gap between consecutive vertical cuts
-     * 4. Multiply the two maximum gaps to get largest piece area
-     * 5. Return result modulo 10^9 + 7 to prevent overflow
+     *   1. Sort horizontalCuts and verticalCuts.
+     *   2. Find the maximum gap between adjacent horizontal cuts and cake edges.
+     *   3. Find the maximum gap between adjacent vertical cuts and cake edges.
+     *   4. Multiply the two gaps as a long and return the modulo result.
      *
-     * Key Insight: The largest piece is formed by the largest horizontal gap and largest vertical gap.
+     * Time:  O(h log h + v log v) - sorting both cut arrays dominates the scans.
+     * Space: O(1) - aside from the in-place sort, only gap values are stored.
      *
-     * Time Complexity: O(N log N + M log M) - dominated by sorting
-     * Space Complexity: O(1) - only uses a few variables
-     *
-     * @param cakeHeight The height of the cake
-     * @param cakeWidth The width of the cake
-     * @param horizontalCuts Array containing horizontal cut positions
-     * @param verticalCuts Array containing vertical cut positions
-     * @return The maximum piece area modulo 10^9 + 7
+     * @param cakeHeight total cake height
+     * @param cakeWidth total cake width
+     * @param horizontalCuts cut positions measured from the top edge
+     * @param verticalCuts cut positions measured from the left edge
+     * @return largest piece area modulo 1,000,000,007
      */
     public static int maxArea(int cakeHeight, int cakeWidth, int[] horizontalCuts, int[] verticalCuts) {
         Arrays.sort(horizontalCuts);

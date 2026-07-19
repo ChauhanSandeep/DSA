@@ -1,66 +1,68 @@
 package arrays;
 
+import java.util.Arrays;
 /**
- * Minimum Deletion Cost to Avoid Repeating Letters
+ * Problem: Minimum Deletion Cost to Avoid Repeating Letters
  *
- * Problem:
- * Given a string s and an array of integers cost where cost[i] is the cost of deleting the ith character in s,
- * return the minimum cost of deletions such that there are no two identical consecutive letters.
+ * Each character in a string has a deletion cost. Delete characters so that no
+ * two adjacent remaining characters are equal, and return the minimum total cost
+ * paid. Only consecutive groups of the same character matter.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-time-to-make-rope-colorful/ (Medium)
+ * Rating:   1574 (zerotrac Elo)
+ * Pattern:  Array | Greedy | Consecutive group compression
  *
  * Example:
- * Input: s = "abaac", cost = [1,2,3,4,5]
- * Output: 3
- * Explanation: Delete 'a' at index 2 (cost 3) to get "abac" with no consecutive duplicates.
+ *   Input:  s = "abaac", cost = [1,2,3,4,5]
+ *   Output: 3
+ *   Why:    the only bad group is "aa" with costs 3 and 4, so deleting the
+ *           cheaper one costs 3 and leaves no equal neighbours.
  *
- * Constraints:
- * - 1 <= s.length == cost.length <= 10^5
- * - 1 <= cost[i] <= 10^4
- * - s contains only lowercase English letters
+ * Follow-ups:
+ *   1. Keep the minimum-cost character in each group instead?
+ *      Then you are maximizing deletion cost, so delete everything except the cheapest item.
+ *   2. Allow at most k deletions total?
+ *      Use dynamic programming over position, previous kept character, and deletions used.
+ *   3. Remove groups of length three or more instead of adjacent pairs?
+ *      Process each equal-character run and keep up to two highest-cost characters.
  *
- * LeetCode: https://leetcode.com/problems/minimum-deletion-cost-to-avoid-repeating-letters/
- *
- * Follow-up Questions:
- * Q1: What if we need to maximize the cost of deletions instead (keep minimum cost characters)?
- * A1: For each consecutive group, keep the minimum cost character and delete the rest.
- *
- * Q2: How would you handle the case where we can delete at most k characters?
- * A2: Use dynamic programming with state tracking remaining deletions, or greedy approach prioritizing high-cost groups.
- *
- * Q3: What if adjacent characters can differ by at most 1 in ASCII value (e.g., 'a' and 'b' are too close)?
- * A3: Modify the grouping condition to check if abs(s[i] - s[i-1]) <= 1 instead of equality.
- *
- * Q4: Can we solve this problem if we're allowed to swap characters instead of delete them?
- * A4: Use a different greedy approach - try to break consecutive sequences by swapping with distant characters.
- *
- * Q5: How would you extend this to remove groups of 3 or more consecutive identical characters?
- * A5: Same approach but only process groups where count >= 3, keeping the highest-cost character in each group.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Remove All Adjacent Duplicates in String (1047), Candy Crush (723).
  */
 public class DeleteRepeatingLetter {
+
     public static void main(String[] args) {
-        int[] cost = {1, 2, 3, 4, 5};
-        System.out.println("Minimum deletion cost: " + new DeleteRepeatingLetter().minDeletionCost("abaac", cost));
+        DeleteRepeatingLetter solver = new DeleteRepeatingLetter();
+
+        String[] strings = { "abaac", "abc", "aabaa" };
+        int[][] costs = { {1, 2, 3, 4, 5}, {1, 2, 3}, {1, 2, 3, 4, 1} };
+        int[] expected = { 3, 0, 2 };
+
+        for (int i = 0; i < strings.length; i++) {
+            int got = solver.minDeletionCost(strings[i], costs[i]);
+            System.out.printf("s=%s cost=%s  ->  %d  expected=%d%n",
+                strings[i], Arrays.toString(costs[i]), got, expected[i]);
+        }
     }
 
+
     /**
-     * Calculates the minimum deletion cost to remove all adjacent duplicate letters.
+     * Intuition: only consecutive equal-character groups create conflicts. In one such
+     * group, all but one character must be deleted, and keeping the most expensive
+     * character minimizes deletion cost. Track the total cost and maximum cost of the
+     * current group, then pay total minus maximum whenever the group ends.
      *
      * Algorithm:
-     * 1. Iterate through the string tracking consecutive duplicate character groups
-     * 2. For each group of duplicates, sum up all costs and track the maximum cost
-     * 3. Delete all characters except the one with maximum cost (keep highest cost)
-     * 4. Add (groupSum - maxCost) to total deletion cost
-     * 5. Process final group after loop ends
+     *   1. Scan the string while accumulating currentGroupCost and maxCostInGroup.
+     *   2. Continue the group while adjacent characters are equal.
+     *   3. When a new character starts, add currentGroupCost - maxCostInGroup to the answer.
+     *   4. Process the final group after the loop and return the total deletion cost.
      *
-     * Key Insight: For each group of consecutive duplicates, keep the highest-cost character
-     * and delete all others to minimize total deletion cost.
+     * Time:  O(n) - each character and cost is processed once.
+     * Space: O(1) - only current group totals are stored.
      *
-     * Time Complexity: O(N) - single pass through the string
-     * Space Complexity: O(1) - only uses constant extra variables
-     *
-     * @param str Input string containing lowercase letters
-     * @param cost Array where cost[i] is the deletion cost of str.charAt(i)
-     * @return Minimum total cost to remove all adjacent duplicates
+     * @param str input string whose adjacent equal letters must be separated
+     * @param cost deletion cost for each character
+     * @return minimum total deletion cost
      */
     public int minDeletionCost(String str, int[] cost) {
         int strLength = str.length();

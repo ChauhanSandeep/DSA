@@ -1,41 +1,67 @@
 package arrays;
 
+import java.util.Arrays;
 /**
- * Can Place Flowers
+ * Problem: Can Place Flowers
  *
- * Problem: Given a flowerbed (0=empty, 1=flower) and integer n, determine if n new flowers
- * can be planted without violating the no-adjacent-flowers rule.
- * The rule is that no two flowers can be planted in adjacent plots.
+ * A flowerbed is a row of plots where 1 means occupied and 0 means empty. Decide
+ * whether n new flowers can be planted without ever placing flowers in adjacent
+ * plots. Existing flowers already satisfy the rule.
  *
- * Example: flowerbed = [1,0,0,0,1], n = 1 -> Output: true
- * Can plant one flower at index 2: [1,0,1,0,1]
+ * Leetcode: https://leetcode.com/problems/can-place-flowers/ (Easy)
+ * Rating:   acceptance 29.2% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Greedy | Local neighbour check
  *
- * LeetCode: https://leetcode.com/problems/can-place-flowers
+ * Example:
+ *   Input:  flowerbed = [1,0,0,0,1], n = 1
+ *   Output: true
+ *   Why:    the middle plot has empty neighbours on both sides, so planting there
+ *           gives [1,0,1,0,1] without breaking the adjacency rule.
  *
- * Follow-up Questions:
- * - How to find maximum flowers that can be planted? (Count all valid positions)
- * - What if flowers can be adjacent with distance >= 2? (Modify checking condition)
- * - How to handle circular flowerbed? (Check wraparound conditions)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the maximum number of flowers that can be planted?
+ *      Keep the same greedy scan and return the final planted count instead of a boolean.
+ *   2. Make the required distance between flowers k plots instead of one?
+ *      Track the nearest occupied/planted plot and require a gap of at least k + 1.
+ *   3. Handle a circular flowerbed?
+ *      Treat the first and last plots as neighbours and special-case whether either is planted.
+ *
+ * Related: Teemo Attacking (495), Gas Station (134).
  */
 public class CanPlaceFlowers {
 
+    public static void main(String[] args) {
+        CanPlaceFlowers solver = new CanPlaceFlowers();
+
+        int[][] inputs = { {1, 0, 0, 0, 1}, {1, 0, 0, 0, 1}, {0} };
+        int[] flowers = { 1, 2, 1 };
+        boolean[] expected = { true, false, true };
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.canPlaceFlowers(inputs[i].clone(), flowers[i]);
+            System.out.printf("flowerbed=%s n=%d  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), flowers[i], got, expected[i]);
+        }
+    }
+
     /**
-     * Determines if n flowers can be planted without adjacent placement.
+     * Intuition: planting greedily from left to right is safe because a valid flower at
+     * position i can only block position i + 1; it never helps to postpone that flower
+     * to a later plot. For each empty plot, check both neighbours as if out-of-bounds
+     * edges were empty, plant when possible, and stop once all n flowers are placed.
      *
      * Algorithm:
-     * 1. Iterate through each position in flowerbed
-     * 2. For each empty spot, check if neighbors are empty or out of bounds
-     * 3. If valid position found, plant flower and decrement n
-     * 4. Early return true if n becomes 0
-     * 5. Return whether all flowers were successfully placed
+     *   1. Scan flowerbed while flowers still need to be planted.
+     *   2. For each empty plot, check that the left and right neighbours are empty or outside the array.
+     *   3. Plant there by writing 1 and decrement n when both neighbours allow it.
+     *   4. Return whether n reached 0.
      *
-     * Time Complexity: O(m) where m is length of flowerbed
-     * Space Complexity: O(1) - modify input array in place
+     * Time:  O(m) - each plot is inspected at most once.
+     * Space: O(1) - the input flowerbed is modified in place.
      *
-     * @param flowerbed array representing flower positions
-     * @param n number of flowers to plant
-     * @return true if n flowers can be planted
+     * @param flowerbed row of plots where 1 is occupied and 0 is empty
+     * @param n number of new flowers to place
+     * @return true if at least n flowers can be planted without adjacency
      */
     public boolean canPlaceFlowers(int[] flowerbed, int n) {
         int length = flowerbed.length;
