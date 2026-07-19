@@ -5,56 +5,63 @@ import java.util.Map;
 
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/
+ * Problem: Longest Substring with At Least K Repeating Characters
  *
- * Problem Statement:
- * Given a string and an integer k, return the length of the longest substring where
- * every character appears at least k times.
+ * Given a string and k, return the length of the longest substring in which
+ * every distinct character appears at least k times. Any character whose total
+ * frequency is below k cannot be part of a valid substring crossing it.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Divide and conquer | Sliding window by unique count
  *
  * Example:
- * Input: s = "aaabb", k = 3  → Output: 3 ("aaa")
- * Input: s = "ababbc", k = 2 → Output: 5 ("ababb")
+ *   Input:  s = "ababbc", k = 2
+ *   Output: 5
+ *   Why:    "ababb" has a twice and b three times; adding c would violate k.
  *
- * Follow-up Questions (FAANG-style):
- * 1. How can you do this in O(n) time and O(1) space for lowercase alphabets?
- *    - Use sliding window with a unique character count limit and window frequency array.
- * 2. What if you need to return the actual substring?
- *    - Track window positions and return substring corresponding to longest found window.
- * 3. How would you handle Unicode or non-lowercase alphabets?
- *    - Use HashMap for flexible character set, adapt window logic accordingly.
- * 4. What if k can vary for each character?
- *    - Change validation logic in window to handle per-character k constraints.
- * 5. How does top-down divide-and-conquer compare to sliding window for very large strings?
- *    - Sliding window is optimal for constant set sizes, divide & conquer suits variable alphabets.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How do you return the substring itself?
+ *      Store the best start and length instead of only the length.
+ *   2. How does the strategy change for Unicode?
+ *      Use maps for counts and iterate over observed unique-count targets.
+ *   3. What if each character has a different k requirement?
+ *      Validate each frequency against its own threshold during window checks.
  */
 public class LongestSubstringKRepeating {
 
   public static void main(String[] args) {
-    LongestSubstringKRepeating solution = new LongestSubstringKRepeating();
-    String input = "aaabb";
-    int k = 3;
+    LongestSubstringKRepeating solver = new LongestSubstringKRepeating();
 
-    System.out.println("Longest Substring (Divide & Conquer): " + solution.longestSubstringDivideConquer(input, k));
-    System.out.println("Longest Substring (Sliding Window): " + solution.longestSubstringSlidingWindow(input, k));
+    String[] inputs = {"aaabb", "ababbc", ""};
+    int[] ks = {3, 2, 2};
+    int[] expected = {3, 5, 0};
+
+    for (int i = 0; i < inputs.length; i++) {
+      int got = solver.longestSubstringSlidingWindow(inputs[i], ks[i]);
+      System.out.printf("s=%s k=%d -> %d  expected=%d%n",
+          inputs[i], ks[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Approach 1: Divide and Conquer (Recursive Splitting)
+
+    /**
+   * Intuition: a character that appears fewer than k times in the current string
+   * can never be part of a valid substring spanning that character. Split around
+   * such blockers and solve the remaining pieces recursively.
    *
-   * Steps of Solution:
-   * - Count frequency of each character in the string.
-   * - Find the first index where character frequency < k; this is a split point.
-   * - Recursively solve for left and right substrings around each split.
-   * - If all characters are at least k, return substring length.
+   * Algorithm:
+   *   1. Count frequencies in the current string.
+   *   2. Find the first splitIdx whose character frequency is below k.
+   *   3. If no split exists, the whole string is valid.
+   *   4. Recurse on the left part and the next right part after all invalid split characters.
    *
-   * Algorithm: Top-down recursive splitting
-   * Time Complexity: O(n^2) worst case (multiple splits, substring creation)
-   * Space Complexity: O(n) recursion depth for splits
+   * Time:  O(n^2) worst case - repeated substring creation can rescan many characters.
+   * Space: O(n) - recursion depth and substring copies can grow with the input.
    *
-   * @param str Input string
-   * @param k Minimum repeats required for each character
-   * @return Length of the longest valid substring
+   * @param str Input string.
+   * @param k Minimum required frequency for every character in the substring.
+   * @return Length of the longest valid substring.
    */
   public int longestSubstringDivideConquer(String str, int k) {
     int len = str.length();
@@ -93,21 +100,23 @@ public class LongestSubstringKRepeating {
     return Math.max(left, right);
   }
 
-  /**
-   * Approach 2: Sliding Window (Optimized & Interview Preferred)
+    /**
+   * Intuition: for lowercase letters, the number of distinct characters in a
+   * valid answer is between 1 and 26. If we fix that target count, a sliding
+   * window can track both how many distinct characters it has and how many have
+   * already reached k.
    *
-   * Steps of Solution:
-   * - For unique counts from 1 to 26 (lowercase letters): try maintaining a window
-   *   with exactly uniqueTarget characters, all appearing at least k times.
-   * - Expand and contract window as necessary to maintain the invariant.
-   * - Update max length if current window is valid.
+   * Algorithm:
+   *   1. Try each targetUniqueChars value from 1 to 26.
+   *   2. Expand or shrink the window to keep at most that many unique characters.
+   *   3. When every unique character has frequency at least k, update maxLen.
    *
-   * Time Complexity: O(26 * n) = O(n) for lowercase letters
-   * Space Complexity: O(1) (fixed window of 26 chars)
+   * Time:  O(26 * n) - one linear scan for each possible lowercase unique count.
+   * Space: O(1) - the frequency array has 26 slots.
    *
-   * @param str Input string
-   * @param k Minimum repeats required for each character
-   * @return Length of longest valid substring
+   * @param str Input lowercase string.
+   * @param k Minimum required frequency for every character in the substring.
+   * @return Length of the longest valid substring.
    */
   public int longestSubstringSlidingWindow(String str, int k) {
     int maxLen = 0;

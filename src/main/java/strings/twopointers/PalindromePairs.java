@@ -3,42 +3,73 @@ package strings.twopointers;
 import java.util.*;
 
 /**
- * 336. Palindrome Pairs
+ * Problem: Palindrome Pairs
  *
- * Problem: Given a list of unique words, find all pairs of indices (i,j) such that
- * the concatenation of words[i] + words[j] is a palindrome.
+ * Given unique words, return all index pairs (i, j) where words[i] + words[j]
+ * is a palindrome. Empty strings and words whose unmatched suffix/prefix is a
+ * palindrome create the tricky cases.
+ *
+ * Leetcode: https://leetcode.com/problems/palindrome-pairs/ (Hard)
+ * Rating:   no contest Elo listed
+ * Pattern:  Strings | Trie of reversed words | Palindrome suffix checks
  *
  * Example:
- * Input: words = ["abcd","dcba","lls","s","sssll"]
- * Output: [[0,1],[1,0],[3,2],[2,4]]
- * Explanation: ["abcddcba","dcbaabcd","slls","llssssll"] are palindromes
+ *   Input:  words = ["abcd","dcba","lls","s","sssll"]
+ *   Output: [[0,1],[1,0],[3,2],[2,4]]
+ *   Why:    each listed pair concatenates to a string that reads the same both ways.
  *
- * LeetCode: https://leetcode.com/problems/palindrome-pairs
- *
- * Follow-up questions:
- * Q: How to handle very long words efficiently?
- * A: Use rolling hash or suffix structures for faster palindrome detection.
- *
- * Q: Can we optimize for arrays with many short words?
- * A: Use trie-based approach with palindrome suffix/prefix caching.
- *
- * Q: How to extend to k-way palindrome combinations?
- * A: Generalize to k words using dynamic programming with trie traversal.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How can you solve it without a trie?
+ *      Use a map from word to index and test every split with palindrome checks.
+ *   2. How do you reduce repeated palindrome scans?
+ *      Precompute palindrome prefixes/suffixes or use rolling hashes.
+ *   3. How would duplicate words change the output?
+ *      Store all indices per word and emit every valid distinct index pair.
  */
 public class PalindromePairs {
 
-    /**
-     * Trie-based approach with palindrome optimization.
+    public static void main(String[] args) {
+        PalindromePairs solver = new PalindromePairs();
+
+        String[][] inputs = {
+            {"abcd", "dcba", "lls", "s", "sssll"},
+            {"bat", "tab", "cat"},
+            {}
+        };
+        String[] expected = {
+            "[[0, 1], [1, 0], [2, 4], [3, 2]]",
+            "[[0, 1], [1, 0]]",
+            "[]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Integer>> got = solver.palindromePairs(inputs[i]);
+            got.sort((left, right) -> {
+                int byFirst = Integer.compare(left.get(0), right.get(0));
+                return byFirst != 0 ? byFirst : Integer.compare(left.get(1), right.get(1));
+            });
+            System.out.printf("words=%s -> %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: store words reversed in a trie so scanning a word from left to
+     * right can discover words that complete it into a palindrome. Extra trie
+     * metadata records reversed words whose remaining prefix is already a
+     * palindrome, covering pairs where one word is longer than the other.
      *
-     * Algorithm: Modified Trie with palindrome checking
-     * - Build trie of reversed words for efficient suffix matching
-     * - For each word, traverse trie to find potential matches
-     * - Check three cases: exact match, prefix match, suffix match
-     * - Use precomputed palindrome information for optimization
+     * Algorithm:
+     *   1. Insert every word into the trie in reverse order.
+     *   2. During insertion, record indices whose remaining prefix is a palindrome.
+     *   3. Search each word through the trie, emitting matches at word ends and stored lists.
+     *   4. Skip pairs that would use the same word index twice.
      *
-     * Time Complexity: O(n * k²) where n is words, k is average length
-     * Space Complexity: O(n * k) for trie storage
+     * Time:  O(n * L^2) - palindrome checks may scan prefixes while inserting/searching.
+     * Space: O(n * L) - trie nodes store characters from all words.
+     *
+     * @param words Unique words to pair.
+     * @return Index pairs whose concatenation is a palindrome.
      */
     public List<List<Integer>> palindromePairs(String[] words) {
         List<List<Integer>> result = new ArrayList<>();

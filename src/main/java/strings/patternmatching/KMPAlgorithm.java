@@ -1,45 +1,49 @@
 package strings.patternmatching;
 
 /**
- * KMPAlgorithm implements the Knuth-Morris-Pratt string matching algorithm.
+ * Problem: Find the Index of the First Occurrence in a String
  *
- * Problem Statement:
- * Given a string `text` and a string `pattern`, return the index of the first occurrence
- * of `pattern` in `text`. If the pattern is not found, return -1.
+ * Given text and pattern, return the first index where pattern appears in text.
+ * If pattern is absent, return -1. KMP avoids rechecking characters by reusing
+ * prefix-suffix information from the pattern.
  *
- * This is more efficient than the naive O(m*n) pattern matching algorithm by pre-processing
- * the pattern to avoid redundant comparisons.
+ * Leetcode: https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/ (Easy)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | KMP | Prefix function
  *
  * Example:
- * Input: text = "ababcabcabababd", pattern = "ababd"
- * Output: 10
+ *   Input:  text = "ababcabcabababd", pattern = "ababd"
+ *   Output: 10
+ *   Why:    the substring from index 10 through 14 is exactly "ababd".
  *
- * Explanation: The pattern "ababd" is found at index 10 in the text.
- *
- * LeetCode Link: https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How would you search many patterns in one text?
+ *      Build an Aho-Corasick automaton instead of one LPS array per pattern.
+ *   2. How do you support streaming text?
+ *      Keep the current pattern index and feed incoming characters one by one.
+ *   3. How can this find repeated prefixes in one string?
+ *      Reuse the LPS array to identify borders and periodic structure.
  */
 
 public class KMPAlgorithm {
 
-    /**
-     * Finds the first index of the given pattern in the given text using the KMP algorithm.
+        /**
+     * Intuition: when a mismatch happens after matching part of pattern, the
+     * matched prefix may also be a suffix of what we just saw. The LPS array tells
+     * us the longest reusable prefix, so textIndex never moves backward.
      *
-     * Logical Intuition:
-     * - We avoid unnecessary comparisons by pre-processing the pattern to create a "Longest Prefix Suffix" (LPS) array.
-     * - If a mismatch happens, instead of restarting from the next character in the text,
-     *   we use the LPS array to skip ahead in the pattern intelligently.
+     * Algorithm:
+     *   1. Build the LPS array for pattern.
+     *   2. Scan text and pattern together while characters match.
+     *   3. On mismatch, jump patternIndex using LPS or advance textIndex if nothing matched.
+     *   4. Return the start index once patternIndex reaches pattern.length().
      *
-     * Steps:
-     * 1. Build the LPS array from the pattern.
-     * 2. Use the LPS array while scanning the text to avoid redundant comparisons.
+     * Time:  O(n + m) - each text and pattern position is advanced or jumped a bounded number of times.
+     * Space: O(m) - the LPS array stores one value per pattern character.
      *
-     * Time Complexity: O(n + m), where n = length of text, m = length of pattern
-     * Space Complexity: O(m), for storing the LPS array
-     *
-     * @param text    The main string in which we want to search for the pattern.
-     * @param pattern The pattern to search for.
-     * @return The starting index of the pattern in text if found; otherwise, -1.
+     * @param text Text to search inside.
+     * @param pattern Pattern to find.
+     * @return First starting index of pattern in text, or -1 when absent.
      */
     public static int kmpSearch(String text, String pattern) {
       if (pattern.isEmpty()) {
@@ -75,19 +79,7 @@ public class KMPAlgorithm {
         return -1; // Pattern not found
     }
 
-    /**
-     * Builds the Longest Prefix Suffix (LPS) array for the given pattern.
-     * LPS[i] = length of the longest proper prefix of pattern[0..i] which is also a suffix.
-     *
-     * Logical Intuition:
-     * - At each position, LPS tells us how many characters we can reuse after a mismatch.
-     *
-     * Time Complexity: O(m), where m = pattern length
-     * Space Complexity: O(m)
-     *
-     * @param pattern The pattern string.
-     * @return The LPS array.
-     */
+        /** Builds the longest-prefix-suffix table used for KMP fallback jumps. */
     private static int[] buildLPS(String pattern) {
         int[] lps = new int[pattern.length()];
         int length = 0; // length of the previous longest prefix suffix
@@ -115,12 +107,16 @@ public class KMPAlgorithm {
         return lps;
     }
 
-    // Example usage
     public static void main(String[] args) {
-        String text = "ababcabcabababd";
-        String pattern = "ababd";
+        String[] texts = {"ababcabcabababd", "aaaaa", "abc"};
+        String[] patterns = {"ababd", "bba", ""};
+        int[] expected = {10, -1, 0};
 
-        int index = kmpSearch(text, pattern);
-        System.out.println("Pattern found at index: " + index);
+        for (int i = 0; i < texts.length; i++) {
+            int got = kmpSearch(texts[i], patterns[i]);
+            System.out.printf("text=%s pattern=%s -> %d  expected=%d%n",
+                texts[i], patterns[i], got, expected[i]);
+        }
     }
+
 }

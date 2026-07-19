@@ -1,47 +1,59 @@
 package strings.twopointers;
 
 /**
- * Given an integer x, return true if x is a palindrome, and false otherwise.
- * An integer is a palindrome when it reads the same backward as forward.
+ * Problem: Palindrome Number
  *
- * Example 1:
- * Input: x = 121
- * Output: true
- * Explanation: 121 reads as 121 from left to right and from right to left.
+ * Given an integer, return whether its decimal digits read the same forward and
+ * backward. Negative numbers are not palindromes because the minus sign would be
+ * on the wrong side after reversal.
  *
- * Example 2:
- * Input: x = -121
- * Output: false
- * Explanation: From left to right, it reads -121. From right to left, it becomes 121-.
- * Therefore it is not a palindrome.
+ * Leetcode: https://leetcode.com/problems/palindrome-number/ (Easy)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Math | Digit reversal | Two pointers without string
  *
- * LeetCode Link: https://leetcode.com/problems/palindrome-number/
+ * Example:
+ *   Input:  x = 121
+ *   Output: true
+ *   Why:    reversing the digits still gives 121.
  *
- * Follow-up Questions:
- * - How would you solve without converting to string? (Current solution already does this)
- * - Can you optimize for very large numbers? (Only reverse half the number for comparison)
- * - How would you handle overflow in number reversal? (Use long type or half-reversal approach)
- * - What if we need to check palindrome in different bases? (Modify digit extraction logic)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How can you avoid possible overflow?
+ *      Reverse only half of the digits and compare the two halves.
+ *   2. How would this work in another base?
+ *      Replace division and modulo by 10 with division and modulo by that base.
+ *   3. What if the number is too large for primitive types?
+ *      Process it as a string or digit stream from both ends.
  */
 public class PalindromeNumber {
 
-    /**
-     * Checks if number is palindrome by reversing entire number.
+    public static void main(String[] args) {
+        PalindromeNumber solver = new PalindromeNumber();
+
+        int[] inputs = {121, -121, 10, 0};
+        boolean[] expected = {true, false, false, true};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.isPalindrome(inputs[i]);
+            System.out.printf("x=%d -> %b  expected=%b%n", inputs[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: a non-negative palindrome equals its full digit reversal. Build
+     * that reversal from right to left, then compare it with the saved original.
+     * Numbers ending in zero cannot match unless the number is zero itself.
      *
      * Algorithm:
-     * 1. Handle edge cases: negative numbers are not palindromes
-     * 2. Reverse the entire number digit by digit
-     * 3. Compare original number with reversed number
-     * 4. Return true if they match
+     *   1. Reject negatives and nonzero numbers ending in 0.
+     *   2. Save the original value.
+     *   3. Reverse all digits using modulo 10 and division by 10.
+     *   4. Compare the reversed value with the original.
      *
-     * Time Complexity: O(log n) where n is the input number
-     * This is log because we're working in base 10, and the number of digits in a number is proportional to log₁₀ of that number.
+     * Time:  O(log n) - one loop iteration processes one decimal digit.
+     * Space: O(1) - only a few integer variables are used.
      *
-     * Space Complexity: O(1) - only uses constant extra space
-     *
-     * @param x Input integer to check for palindrome
-     * @return true if x is a palindrome, false otherwise
+     * @param x Integer to test.
+     * @return true if x is a decimal palindrome.
      */
     public boolean isPalindrome(int x) {
         // Negative numbers and numbers ending in 0 (except 0 itself) are not palindromes

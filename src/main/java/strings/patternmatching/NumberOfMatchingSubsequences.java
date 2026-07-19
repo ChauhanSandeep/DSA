@@ -3,52 +3,64 @@ package strings.patternmatching;
 import java.util.*;
 
 /**
- * LeetCode 792. Number of Matching Subsequences
+ * Problem: Number of Matching Subsequences
  *
- * Given a string s and an array of strings words, return the number of words[i]
- * that is a subsequence of s. A subsequence of a string is a new string generated
- * from the original string with some characters deleted without changing the relative order.
+ * Given a target string and a list of words, count how many words are
+ * subsequences of the target. A subsequence keeps character order but may skip
+ * target characters.
  *
- * Example 1:
- * Input: s = "abcde", words = ["a","bb","acd","ace"]
- * Output: 3
- * Explanation: There are three strings in words that are a subsequence of s: "a", "acd", "ace".
+ * Leetcode: https://leetcode.com/problems/number-of-matching-subsequences/ (Medium)
+ * Rating:   contest Elo 1695
+ * Pattern:  Strings | Buckets by next needed character | Queues
  *
- * LeetCode Link: https://leetcode.com/problems/number-of-matching-subsequences/
+ * Example:
+ *   Input:  target = "abcde", words = ["a","bb","acd","ace"]
+ *   Output: 3
+ *   Why:    "a", "acd", and "ace" can advance through target in order; "bb" cannot.
  *
- * Follow-up Questions:
- *  - How would you optimize if s is very long (millions of characters)?
- *    → Pre-process s to build position indices for each character, use binary search for matching.
- *  - What if words array contains millions of duplicate words?
- *    → Use HashMap to count word frequencies, process unique words only once.
- *  - Can you support real-time queries (adding new words dynamically)?
- *    → Maintain bucket structure and just add new words to appropriate buckets.
- *  - How would you parallelize this for distributed systems?
- *    → Partition words array across machines, each processes independently and aggregates results.
- *
- * LeetCode Contest Rating: 1695
+ * Follow-ups:
+ *   1. How would you handle millions of duplicate words?
+ *      Count unique words first, then multiply each successful result by frequency.
+ *   2. What if target is fixed for many online queries?
+ *      Preprocess target positions and binary-search the next occurrence for each character.
+ *   3. How can this be parallelized?
+ *      Partition words across workers and sum their local match counts.
  */
 public class NumberOfMatchingSubsequences {
 
-    /**
-     * Bucket-based approach to count matching subsequences.
-     * 
-     * Intuition:
-     * Each character in targetString can be seen as an opportunity to advance the matching progress of words waiting for that character.
-     * By organizing words into buckets based on their current matching character, we can efficiently process targetString in a single pass.
-     * For each character in targetString, we only need to process the words in the corresponding bucket, advancing their matching state.
-     * This avoids redundant checks and allows us to handle large inputs efficiently.
-     * 
+    public static void main(String[] args) {
+        NumberOfMatchingSubsequences solver = new NumberOfMatchingSubsequences();
+
+        String[] targets = {"abcde", "dsahjpjauf"};
+        String[][] words = {
+            {"a", "bb", "acd", "ace"},
+            {"ahjpjau", "ja", "ahbwzgqnuk", "tnmlanowax"}
+        };
+        int[] expected = {3, 2};
+
+        for (int i = 0; i < targets.length; i++) {
+            int got = solver.numMatchingSubseqHashMap(targets[i], words[i]);
+            System.out.printf("target=%s words=%s -> %d  expected=%d%n",
+                targets[i], Arrays.toString(words[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: each word is waiting for exactly one next character. Bucket words
+     * by that needed character; when targetString provides it, advance those words
+     * to their next needed character or count them as complete.
+     *
      * Algorithm:
-     * 1. Create Map of character to Queue of WordIterators (word + current index)
-     * 2. For each character in targetString, process its bucket:
-     *    - For each WordIterator in the bucket, move to next character
-     *    - If end of word reached, increment match count
-     *    - Else, add WordIterator to bucket of its next character 
-     * 3. Return total match count
-     * @param targetString
-     * @param words
-     * @return
+     *   1. Put every word tracker into the bucket for its first character.
+     *   2. Scan targetString and process only the bucket matching the current character.
+     *   3. Advance each tracker, counting finished words and rebucketing unfinished ones.
+     *
+     * Time:  O(T + W) - target characters and total advanced word characters are processed once.
+     * Space: O(W) - one tracker is stored for each word in the bucket map.
+     *
+     * @param targetString String that candidate words must be subsequences of.
+     * @param words Candidate words to count.
+     * @return Number of words that are subsequences of targetString.
      */
     public int numMatchingSubseqHashMap(String targetString, String[] words) {
         Map<Character, Deque<WordIndexTracker>> subsequenceBuckets = new HashMap<>();

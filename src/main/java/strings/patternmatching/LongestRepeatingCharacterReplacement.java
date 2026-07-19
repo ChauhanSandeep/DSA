@@ -3,43 +3,61 @@ package strings.patternmatching;
 import java.util.*;
 
 /**
- * 424. Longest Repeating Character Replacement
+ * Problem: Longest Repeating Character Replacement
  *
- * Problem: Given a string s and integer k, you can choose any character and change it
- * to any other uppercase English letter. Return the length of the longest substring
- * containing the same letter you can get after performing at most k changes.
+ * Given an uppercase string and at most k replacements, return the longest
+ * substring that can be turned into one repeated character. A window is valid
+ * when every non-majority character inside it can be replaced within the budget.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-repeating-character-replacement/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Sliding window | Frequency counting
  *
  * Example:
- * Input: s = "ABAB", k = 2
- * Output: 4
- * Explanation: Replace the two 'A's with 'B's or vice versa.
+ *   Input:  s = "AABABBA", k = 1
+ *   Output: 4
+ *   Why:    "AABA" can become "AAAA" by replacing the single 'B'.
  *
- * LeetCode: https://leetcode.com/problems/longest-repeating-character-replacement
- *
- * Follow-up questions:
- * Q: What if we want to find all possible longest substrings?
- * A: Track all windows that achieve maximum length during sliding window traversal.
- *
- * Q: Can we optimize for very long strings?
- * A: Current O(n) solution is already optimal, can't improve asymptotically.
- *
- * Q: How to handle lowercase letters or other characters?
- * A: Expand the frequency array size or use HashMap for arbitrary characters.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. What if the alphabet is not fixed to uppercase English letters?
+ *      Use a map and recompute or maintain the maximum frequency per window.
+ *   2. How would you return the actual substring?
+ *      Track the best window's start and length whenever the answer improves.
+ *   3. What if replacement costs differ by character?
+ *      Maintain the cheapest target character cost instead of windowSize - maxFreq.
  */
 public class LongestRepeatingCharacterReplacement {
 
-    /**
-     * Sliding window approach with character frequency tracking.
+    public static void main(String[] args) {
+        LongestRepeatingCharacterReplacement solver = new LongestRepeatingCharacterReplacement();
+
+        String[] inputs = {"ABAB", "AABABBA", ""};
+        int[] replacements = {2, 1, 3};
+        int[] expected = {4, 4, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.characterReplacement(inputs[i], replacements[i]);
+            System.out.printf("s=%s k=%d -> %d  expected=%d%n",
+                inputs[i], replacements[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: inside a window, the cheapest way to make every character equal
+     * is to keep the most frequent character and replace the rest. Therefore the
+     * window is valid exactly when window length minus maxFreq is at most k.
      *
      * Algorithm:
-     * - Use sliding window [left, right] with character frequency map
-     * - Maintain maxFreq = frequency of most common character in current window
-     * - If window_size - maxFreq > k, shrink window from left
-     * - Track maximum valid window size encountered
+     *   1. Expand right, updating the frequency count and current maxFreq.
+     *   2. While replacements needed exceed k, shrink from left and recompute maxFreq.
+     *   3. Record the largest valid window length seen.
      *
-     * Time Complexity: O(n) where n is string length
-     * Space Complexity: O(1) for fixed-size frequency array (26 letters)
+     * Time:  O(26 * n) - each shrink recomputes over the fixed uppercase alphabet.
+     * Space: O(1) - the frequency array has 26 slots.
+     *
+     * @param s Uppercase string to edit.
+     * @param k Maximum replacements allowed.
+     * @return Length of the longest replaceable repeating-character substring.
      */
     public int characterReplacement(String s, int k) {
         if (s == null || s.length() == 0) return 0;

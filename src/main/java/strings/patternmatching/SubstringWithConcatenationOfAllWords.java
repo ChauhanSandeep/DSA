@@ -5,22 +5,60 @@ import java.util.*;
 /**
  * Problem: Substring with Concatenation of All Words
  *
- * You are given a string s and an array of strings words of the same length.
- * Return all starting indices of substring(s) in s that is a concatenation of
- * each word in words exactly once, in any order, and without any intervening characters.
+ * Given a string and equal-length words, return every start index where a
+ * contiguous block contains each word exactly once in any order. There can be no
+ * extra characters between words in that block.
+ *
+ * Leetcode: https://leetcode.com/problems/substring-with-concatenation-of-all-words/ (Hard)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Strings | Sliding window by word length | Frequency map
  *
  * Example:
- * Input: s = "barfoothefoobarman", words = ["foo","bar"]
- * Output: [0,9]
- * Explanation: Substrings starting at index 0 and 9 are "barfoo" and "foobar" respectively.
+ *   Input:  s = "barfoothefoobarman", words = ["foo","bar"]
+ *   Output: [0, 9]
+ *   Why:    starts 0 and 9 form "barfoo" and "foobar", each using both words once.
  *
- * LeetCode: https://leetcode.com/problems/substring-with-concatenation-of-all-words
- *
- * Time Complexity: O(n * m * k) where n is the length of s, m is the number of words, and k is the length of each word
- * Space Complexity: O(m) for the frequency map
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. What if words have different lengths?
+ *      Use a trie or DP over word boundaries instead of fixed-size jumps.
+ *   2. How would you handle many duplicate words?
+ *      Keep required counts and shrink the window when one word is overused.
+ *   3. How can this be optimized for repeated queries on the same s?
+ *      Precompute word hashes for each length and reuse them across word sets.
  */
 public class SubstringWithConcatenationOfAllWords {
+
+    public static void main(String[] args) {
+        SubstringWithConcatenationOfAllWords solver = new SubstringWithConcatenationOfAllWords();
+
+        String[] inputs = {"barfoothefoobarman", "barfoofoobarthefoobarman", "wordgoodgoodgoodbestword"};
+        String[][] words = { {"foo", "bar"}, {"bar", "foo", "the"}, {"word", "good", "best", "word"} };
+        String[] expected = {"[0, 9]", "[6, 9, 12]", "[]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = solver.findSubstring(inputs[i], words[i]);
+            System.out.printf("s=%s words=%s -> %s  expected=%s%n",
+                inputs[i], Arrays.toString(words[i]), got, expected[i]);
+        }
+    }
+    /**
+     * Intuition: because all words have the same length, valid starts align by
+     * wordLength offsets. For each offset, slide in whole-word jumps, keeping word
+     * counts and shrinking whenever a word appears too many times.
+     *
+     * Algorithm:
+     *   1. Build the required word frequency map and total concatenation length.
+     *   2. For each offset from 0 to wordLength - 1, slide a word-sized window.
+     *   3. Add known words, shrink overused words, and record starts with all words.
+     *   4. Reset the window when an unknown word appears.
+     *
+     * Time:  O(n * w) - each offset scans word-sized chunks across s.
+     * Space: O(m) - maps store counts for the m words in the current window.
+     *
+     * @param s String to search.
+     * @param words Equal-length words that must all appear once.
+     * @return Starting indices of valid concatenations.
+     */
     public List<Integer> findSubstring(String s, String[] words) {
         List<Integer> result = new ArrayList<>();
         if (s == null || s.length() == 0 || words == null || words.length == 0) {

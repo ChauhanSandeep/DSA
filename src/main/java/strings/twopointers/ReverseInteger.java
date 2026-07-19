@@ -1,49 +1,58 @@
 package strings.twopointers;
 
 /**
- * LeetCode 7. Reverse Integer
+ * Problem: Reverse Integer
  *
- * Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes
- * the value to go outside the signed 32-bit integer range [-2^31, 2^31 - 1], then return 0.
+ * Given a signed 32-bit integer, reverse its decimal digits. If the reversed
+ * value would fall outside the signed 32-bit range, return 0 instead.
  *
- * Example 1:
- * Input: x = 123
- * Output: 321
+ * Leetcode: https://leetcode.com/problems/reverse-integer/ (Medium)
+ * Rating:   no contest Elo (pre-contest problem)
+ * Pattern:  Math | Digit extraction | Overflow guard
  *
- * Example 2:
- * Input: x = -123
- * Output: -321
+ * Example:
+ *   Input:  x = -123
+ *   Output: -321
+ *   Why:    digits reverse from 123 to 321 and the sign is preserved by arithmetic.
  *
- * Example 3:
- * Input: x = 120
- * Output: 21
- *
- * LeetCode Link: https://leetcode.com/problems/reverse-integer/
- *
- * Follow-up Questions:
- * - How would you detect overflow without using long? (Check before multiplication and addition)
- * - Can you optimize for numbers with many trailing zeros? (Current approach naturally handles this)
- * - How would you extend to 64-bit integers? (Use BigInteger or similar overflow detection)
- * - What if we need to preserve leading zeros in output? (Return as string instead of integer)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. How do you detect overflow without using long?
+ *      Check against Integer.MAX_VALUE / 10 and Integer.MIN_VALUE / 10 before appending.
+ *   2. What if leading zeros must be preserved?
+ *      Return a string representation instead of an integer.
+ *   3. How would this extend to 64-bit integers?
+ *      Use long bounds or arbitrary-precision arithmetic with equivalent checks.
  */
 public class ReverseInteger {
 
-    /**
-     * Reverses digits of integer with overflow detection.
+    public static void main(String[] args) {
+        ReverseInteger solver = new ReverseInteger();
+
+        int[] inputs = {123, -123, 120, 1534236469};
+        int[] expected = {321, -321, 21, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.reverse(inputs[i]);
+            System.out.printf("x=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: repeatedly peel the last digit from input and append it to the
+     * reversed result. Before multiplying by 10 and adding the digit, compare the
+     * current result with the last safe boundary to avoid overflow.
      *
      * Algorithm:
-     * 1. Handle sign separately by working with absolute values conceptually
-     * 2. Extract digits from right to left using modulo and division
-     * 3. Build reversed number by multiplying result by 10 and adding digit
-     * 4. Check for overflow before each operation to prevent integer overflow
-     * 5. Return 0 if overflow would occur, otherwise return reversed number
+     *   1. Start result at 0.
+     *   2. While input is nonzero, pop its last digit with modulo 10.
+     *   3. Check whether appending that digit would overflow int bounds.
+     *   4. Append the digit and continue with input divided by 10.
      *
-     * Time Complexity: O(log n) where n is the input number (number of digits)
-     * Space Complexity: O(1) - only uses constant extra space
+     * Time:  O(log n) - one iteration handles one decimal digit.
+     * Space: O(1) - only the running result and current digit are stored.
      *
-     * @param input Input integer to reverse
-     * @return Reversed integer, or 0 if overflow would occur
+     * @param input Integer whose digits should be reversed.
+     * @return Reversed integer, or 0 if reversing would overflow.
      */
     public int reverse(int input) {
         int result = 0;

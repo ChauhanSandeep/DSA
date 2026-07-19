@@ -4,63 +4,64 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Longest Substring with At Most K Distinct Characters
+ * Problem: Longest Substring with At Most K Distinct Characters
  *
- * Given a string s and an integer k, find the length of the longest substring
- * that contains at most k distinct characters. A substring is a contiguous
- * sequence of characters within a string.
+ * Given a string and k, return the maximum length of a contiguous substring that
+ * uses no more than k distinct characters. The window may contain fewer than k
+ * distinct characters; it only becomes invalid after crossing that limit.
  *
- * The key challenge is maintaining a window with exactly the constraint while
- * maximizing length. Unlike "exactly k distinct", this allows fewer than k
- * distinct characters, making it slightly more permissive.
- *
- * Example:
- * Input: s = "eceba", k = 2
- * Output: 3
- * Explanation: The longest substring with at most 2 distinct characters is "ece"
- * with length 3. Other valid substrings include "ec", "ce", "eb", but "ece" is longest.
+ * Leetcode: https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/ (Medium)
+ * Rating:   no contest Elo (premium problem)
+ * Pattern:  Strings | Sliding window | Frequency map
  *
  * Example:
- * Input: s = "aa", k = 1
- * Output: 2
- * Explanation: The entire string "aa" has only 1 distinct character, satisfying k=1.
+ *   Input:  s = "eceba", k = 2
+ *   Output: 3
+ *   Why:    "ece" has only e and c, while any longer prefix would add b.
  *
- * LeetCode: https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/
+ * Follow-ups:
+ *   1. What if the requirement is exactly k distinct characters?
+ *      Update the answer only when the frequency map size is exactly k.
+ *   2. How would this work on a stream?
+ *      Keep the same window state and evict from the left as characters arrive.
+ *   3. How do you return the substring instead of its length?
+ *      Track the best start and best length whenever maxLength improves.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we need exactly k distinct characters instead of at most k?
- *    Answer: Modify condition to check len(charMap) == k when updating maxLength.
- * 2. How would you handle streaming data where string length is unknown?
- *    Answer: Use same sliding window but process character by character with buffering.
- * 3. What if k is very large compared to alphabet size?
- *    Answer: Optimization becomes less relevant, but algorithm remains O(n) efficient.
- * 4. How to return the actual substring instead of just length?
- *    Answer: Track bestStart and bestLength variables, update when finding longer valid window.
- *
- * Related Problems:
- * - LeetCode 159: Longest Substring with At Most Two Distinct Characters
- * - LeetCode 3: Longest Substring Without Repeating Characters
- * - LeetCode 424: Longest Repeating Character Replacement
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Longest Substring Without Repeating Characters (3), Fruit Into Baskets (904).
  */
 public class LongestSubstringWithAtMostKDistinctCharacters {
 
-    /**
-     * Finds longest substring with at most maxDistinctAllowed distinct characters using sliding window.
+    public static void main(String[] args) {
+        LongestSubstringWithAtMostKDistinctCharacters solver = new LongestSubstringWithAtMostKDistinctCharacters();
+
+        String[] inputs = {"eceba", "aa", "abc"};
+        int[] ks = {2, 1, 0};
+        int[] expected = {3, 2, 0};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.lengthOfLongestSubstringKDistinct(inputs[i], ks[i]);
+            System.out.printf("s=%s k=%d -> %d  expected=%d%n",
+                inputs[i], ks[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: a window remains valid while its frequency map contains at most
+     * maxDistinctAllowed keys. Expand to explore longer substrings, and only when
+     * the distinct count is too high, remove characters from the left until the
+     * invariant is restored.
      *
      * Algorithm:
-     * 1. Use sliding window technique with left and right pointers
-     * 2. Expand right pointer and add characters to frequency map
-     * 3. When distinct characters exceed maxDistinctAllowed, shrink window from left
-     * 4. Track maximum window size encountered
-     * 5. Return maximum length found
+     *   1. Expand right and add the new character to charFrequency.
+     *   2. While there are too many distinct characters, decrement and remove from the left.
+     *   3. Update maxLength with the current valid window size.
      *
-     * Time Complexity: O(n) where n is length of string str
-     * Space Complexity: O(min(maxDistinctAllowed, alphabet_size)) for the character frequency map
+     * Time:  O(n) - each character enters and leaves the window at most once.
+     * Space: O(k) - the map stores at most maxDistinctAllowed active characters after shrinking.
      *
-     * @param str Input string to search within
-     * @param maxDistinctAllowed Maximum number of distinct characters allowed
-     * @return Length of longest valid substring
+     * @param str Input string.
+     * @param maxDistinctAllowed Maximum number of distinct characters allowed in the window.
+     * @return Length of the longest valid substring.
      */
     public int lengthOfLongestSubstringKDistinct(String str, int maxDistinctAllowed) {
         if (maxDistinctAllowed == 0 || str == null || str.isEmpty()) {

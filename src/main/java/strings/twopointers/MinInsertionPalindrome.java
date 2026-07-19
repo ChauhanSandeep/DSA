@@ -1,56 +1,67 @@
 package strings.twopointers;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/
+ * Problem: Minimum Insertion Steps to Make a String Palindrome
  *
- * Problem Statement:
- * Given a string `s`, find the **minimum number of insertions** needed to make the string a **palindrome**.
- * The insertions can be made at any position in the string.
+ * Given a string, return the fewest characters that must be inserted anywhere
+ * to make it a palindrome. Insertions can mirror unmatched characters from either
+ * side.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/ (Hard)
+ * Rating:   contest Elo 1787
+ * Pattern:  Strings | Dynamic programming | Interval DP
  *
  * Example:
- * Input: "geeks"
- * Output: 3
- * Explanation: Insert 'e', 'e', and 'g' to make "geekskeeg"
+ *   Input:  s = "mbadm"
+ *   Output: 2
+ *   Why:    two insertions can form a palindrome such as "mbdadbm".
  *
- * Follow-up Questions:
- * 1. Can you return the actual palindrome instead of just the count?
- *    - Yes, by reconstructing the result during DP table filling.
- * 2. Can this be solved using LCS (Longest Common Subsequence)?
- *    - Yes. The minimum insertions = len(s) - LCS(s, reverse(s))
- *      Leetcode: https://leetcode.com/problems/longest-palindromic-subsequence/
- * 3. Can space be optimized from O(n²) to O(n)?
- *    - Yes, with rolling 1D arrays since we only need `dp[i+1][j-1]`, `dp[i+1][j]`, and `dp[i][j-1]`
- * LeetCode Contest Rating: 1787
+ * Follow-ups:
+ *   1. How do you reconstruct one resulting palindrome?
+ *      Walk the DP table and append mirrored characters as decisions are made.
+ *   2. How is this related to LCS?
+ *      The answer is n minus the longest palindromic subsequence length.
+ *   3. Can space be reduced to O(n)?
+ *      Yes, keep only the previous interval row/diagonal values needed by DP.
+ *
+ * Related: Longest Palindromic Subsequence (516), Edit Distance (72).
  */
 
 public class MinInsertionPalindrome {
 
   public static void main(String[] args) {
-    String input = "geeks";
+    String[] inputs = {"mbadm", "zzazz", "geeks"};
+    int[] expected = {2, 0, 3};
 
-    System.out.println("Min Insertions (Recursive): " + minInsertionsRecursive(input));
-    System.out.println("Min Insertions (DP): " + minInsertionsDP(input));
+    for (int i = 0; i < inputs.length; i++) {
+      int got = minInsertionsDP(inputs[i]);
+      System.out.printf("s=%s -> %d  expected=%d%n", inputs[i], got, expected[i]);
+    }
   }
 
-  /**
-   * Recursive approach to calculate minimum insertions needed to make a string palindrome.
-   * Inutition behind this approach:
-   * - A palindrome reads the same forwards and backwards.
-   * - To convert a string into a palindrome, we can insert characters at either end.
-   * - The goal is to minimize the number of insertions required.
+
+    /**
+   * Intuition: compare the two ends. Matching ends can stay together, but a
+   * mismatch means one side needs a mirrored insertion, so try both choices and
+   * keep the cheaper one.
    *
-   * Steps:
-   * - Compare characters from both ends.
-   * - If they match, recurse inward.
-   * - If they don’t, insert at either end and recurse. Return the minimum.
+   * Algorithm:
+   *   1. Recurse on the full range.
+   *   2. If the ends cross, no insertion is needed.
+   *   3. If end characters match, recurse inward.
+   *   4. Otherwise insert against the left or right side and take the minimum plus one.
    *
-   * Time Complexity: O(2^n) — exponential due to overlapping subproblems
-   * Space Complexity: O(n) — recursion depth
+   * Time:  O(2^n) - overlapping subproblems are recomputed recursively.
+   * Space: O(n) - recursion depth can reach the string length.
+   *
+   * @param input String to make palindromic.
+   * @return Minimum insertions needed.
    */
   public static int minInsertionsRecursive(String input) {
     return recursiveHelper(input, 0, input.length() - 1);
   }
 
+  /** Solves the minimum-insertion problem for input[left, right]. */
   private static int recursiveHelper(String input, int left, int right) {
     // Base case: string is already a palindrome
       if (left >= right) {
@@ -67,17 +78,22 @@ public class MinInsertionPalindrome {
     return Math.min(insertLeft, insertRight) + 1;
   }
 
-  /**
-   * Optimized Dynamic Programming approach to calculate minimum insertions needed.
+    /**
+   * Intuition: dp[left][right] stores the minimum insertions for one substring.
+   * Matching ends inherit the inside answer; mismatching ends need one insertion
+   * plus the cheaper of skipping the left or right end.
    *
-   * Steps:
-   * - Define dp[i][j] = min insertions to make input[i...j] a palindrome.
-   * - If input[i] == input[j], no insertions needed: dp[i][j] = dp[i+1][j-1]
-   * - Else, insert at i or j: dp[i][j] = min(dp[i+1][j], dp[i][j-1]) + 1
-   * - Fill dp table bottom-up by increasing substring length.
+   * Algorithm:
+   *   1. Create a DP table over substring boundaries.
+   *   2. Fill by increasing substringLength so smaller intervals are ready first.
+   *   3. Copy the inner answer when ends match.
+   *   4. Otherwise take min(left-skipped, right-skipped) + 1.
    *
-   * Time Complexity: O(n²)
-   * Space Complexity: O(n²)
+   * Time:  O(n^2) - every substring interval is evaluated once.
+   * Space: O(n^2) - the DP table stores all intervals.
+   *
+   * @param input String to make palindromic.
+   * @return Minimum insertions needed.
    */
   public static int minInsertionsDP(String input) {
     int length = input.length();
