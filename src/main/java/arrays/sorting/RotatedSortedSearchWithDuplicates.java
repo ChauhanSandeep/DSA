@@ -1,54 +1,65 @@
 package arrays.sorting;
 
+import java.util.Arrays;
 /**
- * Leetcode Problem: https://leetcode.com/problems/search-in-rotated-sorted-array-ii/
+ * Problem: Search in Rotated Sorted Array II
  *
- * Problem Statement:
- * There is an integer array `nums` sorted in non-decreasing order (not necessarily with distinct values)
- * which is rotated at an unknown pivot. Given the array and a target value, determine if the target exists
- * in the array. The array may contain **duplicates**.
+ * Given a rotated sorted array that may contain duplicates, determine whether a
+ * target exists. Duplicates can hide which half is sorted, so the search may need
+ * to shrink both ends.
+ *
+ * Leetcode: https://leetcode.com/problems/search-in-rotated-sorted-array-ii/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Binary search | Duplicates | Ambiguous boundaries
  *
  * Example:
- * Input: nums = [2,5,6,0,0,1,2], target = 0
- * Output: true
+ *   Input:  nums = [2,5,6,0,0,1,2], target = 0
+ *   Output: true
+ *   Why:    binary search reaches one of the zeros after handling the rotated split.
  *
- * Follow-up Questions:
- * 1. Can you achieve better than O(n) in worst-case?
- *    → No. When duplicates are present, binary search degenerates to linear search in the worst case.
- * 2. Can you find the index of the target instead of just checking existence?
- *    → Yes, but with O(n) worst-case due to duplicates.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can worst-case be better than O(n)?
+ *      No; an array of equal values can force boundary shrink one step at a time.
+ *   2. Return an index instead of a boolean?
+ *      Return mid on match, but worst-case complexity remains O(n).
+ *   3. Count all target occurrences?
+ *      Find one match, then expand or run boundary searches with duplicate handling.
+ *
+ * Related: Search in Rotated Sorted Array (33), Find Minimum in Rotated Sorted Array II (154).
  */
 public class RotatedSortedSearchWithDuplicates {
 
     public static void main(String[] args) {
-        int[] nums = {2, 5, 6, 0, 0, 1, 2};
-        int target = 0;
-        boolean found = search(nums, target);
-        System.out.println("Target exists in array: " + found);
+        int[][] inputs = { {2, 5, 6, 0, 0, 1, 2}, {1, 1, 1, 1}, {1, 0, 1, 1, 1} };
+        int[] targets = { 0, 2, 0 };
+        boolean[] expected = { true, false, true };
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = search(inputs[i], targets[i]);
+            System.out.printf("nums=%s target=%d -> output=%s  expected=%s%n",
+                Arrays.toString(inputs[i]), targets[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Searches for the target in a rotated sorted array that may contain duplicates.
-     *
-     * Key insight: Duplicates at boundaries make it impossible to determine which half
-     * is sorted. When nums[left] == nums[mid] == nums[right], we must shrink boundaries.
-     *
-     * Steps:
-     * 1. Initialize `left` and `right` pointers.
-     * 2. Perform binary search.
-     * 3. Handle three cases:
-     *    a. If nums[mid] == target → return true.
-     *    b. If duplicates exist (nums[left] == nums[mid]) → shrink left by one.
-     *    c. Determine which half is sorted, then check if target lies in that half.
-     *
-     * Time Complexity: O(log n) average, O(n) worst-case (when many duplicates)
-     * Space Complexity: O(1)
-     *
-     * @param nums   Rotated sorted array (may contain duplicates)
-     * @param target Integer to find
-     * @return True if target exists, false otherwise
-     */
+/**
+ * Intuition: the unique-values rotated search works unless equal boundary values
+ * make both halves look the same. When nums[left], nums[mid], and nums[right] are
+ * equal and mid is not target, shrinking both ends safely removes duplicates.
+ *
+ * Algorithm:
+ *   1. Return false for null or empty input.
+ *   2. Binary search while left <= right.
+ *   3. Return true when nums[mid] equals target.
+ *   4. Shrink both boundaries when duplicates make the sorted half ambiguous.
+ *   5. Otherwise keep the sorted half that can contain target.
+ *
+ * Time:  O(log n) average, O(n) worst case - duplicates can force linear shrinkage.
+ * Space: O(1) - only binary-search pointers are stored.
+ *
+ * @param nums rotated sorted array that may contain duplicates
+ * @param target value to find
+ * @return true if target exists
+ */
     public static boolean search(int[] nums, int target) {
         if (nums == null || nums.length == 0) {
             return false;

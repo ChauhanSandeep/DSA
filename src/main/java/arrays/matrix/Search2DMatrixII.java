@@ -1,65 +1,72 @@
 package arrays.matrix;
 
+import java.util.Arrays;
 /**
- * Write an efficient algorithm that searches for a target value in an m x n integer matrix.
- * This matrix has the following properties:
- * - Integers in each row are sorted in ascending from left to right.
- * - Integers in each column are sorted in ascending from top to bottom.
+ * Problem: Search a 2D Matrix II
  *
- * Example 1:
- * Input: matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 5
- * Output: true
+ * Given a matrix sorted left-to-right in each row and top-to-bottom in each
+ * column, determine whether target exists. Rows do not form one global sorted
+ * array, so the search must eliminate one row or column at a time.
  *
- * Example 2:
- * Input: matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 20
- * Output: false
+ * Leetcode: https://leetcode.com/problems/search-a-2d-matrix-ii/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Matrix | Staircase search | Monotonic elimination
  *
- * LeetCode: https://leetcode.com/problems/search-a-2d-matrix-ii/
+ * Example:
+ *   Input:  matrix = [[1,4,7,11],[2,5,8,12],[3,6,9,16]], target = 5
+ *   Output: true
+ *   Why:    starting at the top-right, comparisons discard columns or rows until 5 is reached.
  *
- * Follow-up Questions:
- * 1. How would you find all occurrences of the target value?
- *    - We could modify the search to continue after finding a match.
- * 2. What if the matrix is very large and doesn't fit in memory?
- *    - We could implement an external search that loads only necessary rows/columns.
- * 3. How would you find the kth smallest element in this matrix?
- *    - We could use a min-heap or binary search approach.
+ * Follow-ups:
+ *   1. Count all targets?
+ *      Continue the staircase after each match or combine per-row binary searches.
+ *   2. Find the kth smallest value?
+ *      Binary search on value and count values <= mid with the sorted columns.
+ *   3. Search many targets?
+ *      Reuse row ranges or index rows, depending on target distribution.
  *
- * Related Problems:
- * - Search a 2D Matrix (https://leetcode.com/problems/search-a-2d-matrix/)
- * - Kth Smallest Element in a Sorted Matrix (https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Search a 2D Matrix (74), Kth Smallest Element in a Sorted Matrix (378).
  */
 public class Search2DMatrixII {
-  /**
-   * Searches for target in 2D matrix using staircase approach.
-   *
-   * Algorithm:
-   * 1. Start from top-right corner (or bottom-left, both work)
-   * 2. Compare target with current element:
-   *    - If target equals current: return true (found)
-   *    - If target < current: move left
-   *    - If target > current: move down
-   * 3. Continue until found or reach boundary
-   * 4. Return false if boundary reached without finding target
-   *
-   * Key insight: Starting from top-right (or bottom-left) corner ensures that at each
-   * step we can eliminate exactly one row or column. This creates a "staircase" pattern
-   * of elimination.
-   *
-   * Why top-right works:
-   * - Moving left: current element is largest in the row to the left
-   * - Moving down: current element is smallest in column below
-   * - This monotonic property allows us to eliminate regions
-   *
-   * Time Complexity: O(m + n) where m is rows and n is columns.
-   * Worst case: travel from top-right to bottom-left (m + n steps).
-   *
-   * Space Complexity: O(1) using only constant extra variables.
-   *
-   * @param matrix 2D sorted matrix
-   * @param target value to search for
-   * @return true if target found, false otherwise
-   */
+
+    public static void main(String[] args) {
+        Search2DMatrixII solver = new Search2DMatrixII();
+        int[][] matrix = {
+            {1, 4, 7, 11, 15},
+            {2, 5, 8, 12, 19},
+            {3, 6, 9, 16, 22},
+            {10, 13, 14, 17, 24},
+            {18, 21, 23, 26, 30}
+        };
+        int[] targets = { 5, 20, 30 };
+        boolean[] expected = { true, false, true };
+
+        for (int i = 0; i < targets.length; i++) {
+            boolean got = solver.searchMatrix(matrix, targets[i]);
+            System.out.printf("matrix=%s target=%d -> output=%s  expected=%s%n",
+                Arrays.deepToString(matrix), targets[i], got, expected[i]);
+        }
+    }
+
+/**
+ * Intuition: the top-right value is the smallest candidate in its column but the
+ * largest candidate in its row. If it is too large, the whole column below it is
+ * too large; if it is too small, the whole row to its left is too small.
+ *
+ * Algorithm:
+ *   1. Reject null or empty matrices.
+ *   2. Start at row 0 and the last column.
+ *   3. Move left when currentValue is greater than target.
+ *   4. Move down when currentValue is less than target.
+ *   5. Return true on a match, otherwise false when bounds are crossed.
+ *
+ * Time:  O(m + n) - each move removes one row or one column.
+ * Space: O(1) - only the current row and column are stored.
+ *
+ * @param matrix row-wise and column-wise sorted matrix
+ * @param target value to find
+ * @return true if target exists in the matrix
+ */
   public boolean searchMatrix(int[][] matrix, int target) {
     if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
       return false;

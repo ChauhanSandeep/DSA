@@ -1,56 +1,60 @@
 package arrays.sorting;
 
 import java.util.Arrays;
-
 /**
- * Heap Sort Algorithm Implementation
+ * Problem: Heap Sort
  *
- * Heap Sort uses a binary heap (max-heap for ascending order) to sort elements:
- * - Build a max-heap from the input
- * - Repeatedly move the max element (root) to the end
- * - Restore heap property for the reduced heap
+ * Sort an integer array by building a max heap and repeatedly moving the largest
+ * value to the end of the active heap. This implementation returns a sorted copy
+ * and leaves the input unchanged.
  *
- * Time Complexity:
- * - Best Case: O(n log n)
- * - Average Case: O(n log n)
- * - Worst Case: O(n log n)
+ * Pattern:  Sorting | Binary heap | In-place heap operations
  *
- * Space Complexity:
- * - O(1) auxiliary space for in-place heap operations
- * - This implementation returns a copied sorted array to keep input unchanged
+ * Example:
+ *   Input:  [8,7,2,1,0,9,6]
+ *   Output: [0,1,2,6,7,8,9]
+ *   Why:    each heap extraction fixes the next largest value from right to left.
  *
- * Key Characteristics:
- * - Not stable
- * - In-place heap operations
- * - Guaranteed O(n log n) performance
+ * Follow-ups:
+ *   1. Make it sort in place?
+ *      Run the same heap operations directly on the input instead of a copy.
+ *   2. Is heap sort stable?
+ *      No; equal values can be reordered by swaps with the heap root.
+ *   3. Use a min heap for descending order?
+ *      Yes, or keep a max heap and reverse the final sorted array.
+ *
+ * Related: Sort an Array (912), Kth Largest Element in an Array (215).
  */
 public class HeapSort {
 
-    /**
-     * Main method demonstrating Heap Sort usage.
-     */
     public static void main(String[] args) {
-        int[] data = {8, 7, 2, 1, 0, 9, 6};
-        System.out.println("Unsorted Array: " + Arrays.toString(data));
+        int[][] inputs = { {8, 7, 2, 1, 0, 9, 6}, {}, {5, 5, -1, 3} };
+        int[][] expected = { {0, 1, 2, 6, 7, 8, 9}, {}, {-1, 3, 5, 5} };
 
-        int[] sortedData = heapSort(data);
-
-        System.out.println("Original Array (unchanged): " + Arrays.toString(data));
-        System.out.println("Sorted Array in Ascending Order: " + Arrays.toString(sortedData));
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = heapSort(inputs[i]);
+            System.out.printf("input=%s -> output=%s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
     }
 
-    /**
-     * Sorts the input array using Heap Sort and returns a sorted copy.
-     * Intuition: Build a max-heap from the input array and then repeatedly move the max element (root) to the end of the array and restore the heap property for the reduced heap.
-     * 
-     * Algorithm Steps:
-     * 1. Build a max-heap from the input array.
-     * 2. Move the max element (root) to the end of the array and restore the heap property for the reduced heap.
-     * 3. Repeat the process until the entire array is sorted.
-     * 
-     * Time Complexity: O(n log n)
-     * Space Complexity: O(1)
-     */
+/**
+ * Intuition: a max heap can reveal the largest remaining value in O(1) at the
+ * root. Swap that root to the end, shrink the heap, and restore the heap property
+ * so the next largest value rises to the root.
+ *
+ * Algorithm:
+ *   1. Return null or a copy for trivial inputs.
+ *   2. Copy the input and heapify all internal nodes bottom-up.
+ *   3. Repeatedly swap the root with the heap end.
+ *   4. Shrink the heap and heapify the root.
+ *
+ * Time:  O(n log n) - heap construction is linear and each extraction heapifies.
+ * Space: O(n) - this version returns a sorted copy of the input.
+ *
+ * @param arr input array
+ * @return sorted copy of arr, or null for null input
+ */
     public static int[] heapSort(int[] arr) {
         if (arr == null)  return null;
         if (arr.length <= 1) return Arrays.copyOf(arr, arr.length);

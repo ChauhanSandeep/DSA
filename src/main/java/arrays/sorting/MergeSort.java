@@ -1,54 +1,61 @@
 package arrays.sorting;
 
 import java.util.Arrays;
-
 /**
- * Merge Sort Algorithm Implementation
+ * Problem: Merge Sort
  *
- * Merge Sort is a stable, divide-and-conquer sorting algorithm that:
- * - Splits the array into two halves recursively
- * - Sorts each half independently
- * - Merges the two sorted halves into a single sorted segment
+ * Sort an integer array with divide and conquer. Split the array into halves, sort
+ * each half recursively, then merge the sorted halves back into one sorted range.
+ * This implementation mutates and returns the input array.
  *
- * Time Complexity:
- * - Best Case: O(n log n)
- * - Average Case: O(n log n)
- * - Worst Case: O(n log n)
+ * Pattern:  Sorting | Divide and conquer | Stable merge
  *
- * Space Complexity:
- * - O(n) for temporary array used during merge
+ * Example:
+ *   Input:  [8,7,2,1,0,9,6]
+ *   Output: [0,1,2,6,7,8,9]
+ *   Why:    each merge combines two already sorted halves in ascending order.
  *
- * Key Characteristics:
- * - Stable sort
- * - Predictable performance across all cases
- * - Not in-place for array implementation
+ * Follow-ups:
+ *   1. Sort a linked list?
+ *      Split with slow and fast pointers, then merge lists without array copying.
+ *   2. Count inversions?
+ *      During merge, count how many left-side values each right-side value skips.
+ *   3. Make it iterative?
+ *      Merge runs of size 1, then 2, then 4, doubling each pass.
+ *
+ * Related: Sort an Array (912), Count of Smaller Numbers After Self (315).
  */
 public class MergeSort {
 
-    /**
-     * Main method demonstrating Merge Sort usage.
-     */
     public static void main(String[] args) {
-        int[] data = {8, 7, 2, 1, 0, 9, 6};
-        System.out.println("Unsorted Array: " + Arrays.toString(data));
+        int[][] inputs = { {8, 7, 2, 1, 0, 9, 6}, {}, {4, 1, 4, -2} };
+        int[][] expected = { {0, 1, 2, 6, 7, 8, 9}, {}, {-2, 1, 4, 4} };
 
-        data = mergeSort(data);
-
-        System.out.println("Sorted Array in Ascending Order: " + Arrays.toString(data));
+        for (int i = 0; i < inputs.length; i++) {
+            int[] input = inputs[i].clone();
+            int[] got = mergeSort(input);
+            System.out.printf("input=%s -> output=%s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
     }
 
-    /**
-     * Sorts the input array using Merge Sort and returns a sorted copy.
-     * Intuition: Divide the array into two halves, sort each half independently, and then merge the two sorted halves into a single sorted segment.
-     * 
-     * Algorithm Steps:
-     * 1. Divide the array into two halves.
-     * 2. Sort each half independently.
-     * 3. Merge the two sorted halves into a single sorted segment.
-     * 
-     * Time Complexity: O(n log n)
-     * Space Complexity: O(n)
-     */
+/**
+ * Intuition: it is easier to merge two sorted arrays than to sort one unsorted
+ * array directly. Recursively sort smaller halves until each segment is trivial,
+ * then merge the sorted pieces on the way back up.
+ *
+ * Algorithm:
+ *   1. Return immediately for null or length-one input.
+ *   2. Allocate one temporary array reused by all merge calls.
+ *   3. Recursively split the full range until single-element ranges.
+ *   4. Merge each pair of sorted ranges back into the original array.
+ *
+ * Time:  O(n log n) - each level merges n elements across log n levels.
+ * Space: O(n) - the temporary merge buffer stores one array copy.
+ *
+ * @param array input array sorted in place
+ * @return the same array reference after sorting
+ */
     public static int[] mergeSort(int[] array) {
         if (array == null || array.length <= 1) {
             return array;

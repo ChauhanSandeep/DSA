@@ -1,63 +1,74 @@
 package arrays.sorting;
 
 import java.util.*;
-
 /**
- * Sort The Matrix Diagonally
+ * Problem: Sort the Matrix Diagonally
  *
- * A matrix diagonal is a diagonal line of cells starting from some cell in either
- * the topmost row or leftmost column and going in the bottom-right direction until
- * reaching the matrix's end. 
- * Given an m x n matrix mat of integers, sort each
- * matrix diagonal in ascending order and return the resulting matrix.
+ * Given an m x n matrix, sort every top-left to bottom-right diagonal in ascending
+ * order and return the matrix. Each diagonal is independent from every other
+ * diagonal.
  *
- * Example: mat = [
- *      [3,3,1,1],
- *      [2,2,1,2],
- *      [1,1,1,2]
- *  ] ->
- *  [
- *      [1,1,1,1],
- *      [1,2,2,2],
- *      [1,2,3,3]
- *  ]
- * Each diagonal is sorted independently.
+ * Leetcode: https://leetcode.com/problems/sort-the-matrix-diagonally/ (Medium)
+ * Rating:   1548 (Weekly Contest 172)
+ * Pattern:  Matrix | Diagonal grouping | Priority queue
  *
- * LeetCode Link: https://leetcode.com/problems/sort-the-matrix-diagonally/
+ * Example:
+ *   Input:  mat = [[3,3,1,1],[2,2,1,2],[1,1,1,2]]
+ *   Output: [[1,1,1,1],[1,2,2,2],[1,2,3,3]]
+ *   Why:    values are sorted only along cells that share the same row - col diagonal key.
  *
- * Follow-up Questions:
- * 1. What if we need to sort anti-diagonals (top-right to bottom-left) instead?
- *    Answer: Use (i + j) as the diagonal identifier instead of (i - j).
- * 2. How would you sort diagonals in different orders (some ascending, some descending)?
- *    Answer: Add a parameter or pattern to determine sort order for each diagonal.
- * 3. What if we need to sort only specific diagonals based on certain criteria?
- *    Answer: Add filtering logic before sorting to identify which diagonals to process.
- * 4. How to handle very large matrices that don't fit in memory?
- *    Answer: Process diagonals one at a time using streaming/chunking approaches.
+ * Follow-ups:
+ *   1. Sort anti-diagonals?
+ *      Group by row + col instead of row - col.
+ *   2. Sort descending?
+ *      Use a max heap or reverse the sorted diagonal values before writing back.
+ *   3. Matrix too large for memory?
+ *      Stream and sort one diagonal at a time if diagonal access is available.
  *
- * Related Problems:
- * - 498. Diagonal Traverse: https://leetcode.com/problems/diagonal-traverse/
- * - 1572. Matrix Diagonal Sum: https://leetcode.com/problems/matrix-diagonal-sum/
- * - 766. Toeplitz Matrix: https://leetcode.com/problems/toeplitz-matrix/
- * LeetCode Contest Rating: 1548
+ * Related: Diagonal Traverse (498), Toeplitz Matrix (766).
  */
 public class SortTheMatrixDiagonally {
 
-    /**
-     * Sorts matrix diagonally using hash map to group diagonal elements.
-     *
-     * Algorithm:
-     * 1. Group elements by diagonal using coordinate difference (i-j)
-     * 2. Elements on same diagonal have same i-j value
-     * 3. Sort each diagonal group independently
-     * 4. Place sorted elements back in matrix
-     *
-     * Time Complexity: O(m*n*log(min(m,n))) where m,n are matrix dimensions
-     * Space Complexity: O(m*n) for storing diagonal elements
-     *
-     * @param mat input matrix to sort diagonally
-     * @return matrix with sorted diagonals
-     */
+    public static void main(String[] args) {
+        SortTheMatrixDiagonally solver = new SortTheMatrixDiagonally();
+
+        int[][][] inputs = {
+            { {3, 3, 1, 1}, {2, 2, 1, 2}, {1, 1, 1, 2} },
+            { {11, 25, 66, 1}, {23, 55, 17, 45}, {75, 31, 36, 44} }
+        };
+        int[][][] expected = {
+            { {1, 1, 1, 1}, {1, 2, 2, 2}, {1, 2, 3, 3} },
+            { {11, 17, 45, 1}, {23, 36, 25, 66}, {75, 31, 55, 44} }
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] input = new int[inputs[i].length][];
+            for (int row = 0; row < inputs[i].length; row++) {
+                input[row] = inputs[i][row].clone();
+            }
+            int[][] got = solver.diagonalSortPriorityQueue(input);
+            System.out.printf("mat=%s -> output=%s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), Arrays.deepToString(got), Arrays.deepToString(expected[i]));
+        }
+    }
+
+/**
+ * Intuition: every cell on the same diagonal has the same row - col value. Group
+ * those values into min-heaps, then revisit the matrix in row-major order and pop
+ * each diagonal heap to write back values in ascending diagonal order.
+ *
+ * Algorithm:
+ *   1. Create a map from diagonal key to a min-heap of values.
+ *   2. Visit every cell and offer its value to the heap for i - j.
+ *   3. Visit every cell again and poll from its diagonal heap.
+ *   4. Return the mutated matrix.
+ *
+ * Time:  O(m * n * log(min(m, n))) - each cell enters and leaves one diagonal heap.
+ * Space: O(m * n) - heaps store all matrix values by diagonal.
+ *
+ * @param mat matrix whose diagonals are sorted in place
+ * @return the same matrix with sorted diagonals
+ */
     public int[][] diagonalSortPriorityQueue(int[][] mat) {
         int rows = mat.length;
         int cols = mat[0].length;

@@ -1,54 +1,48 @@
 package arrays.sorting;
 
 import java.util.*;
-
 /**
- * Make Lexicographically Smallest Array by Swapping Elements
+ * Problem: Make Lexicographically Smallest Array by Swapping Elements
  *
- * You are given a 0-indexed array of positive integers nums and a positive integer limit.
- * In one operation, you can swap any two indices i and j if
- * |nums[i] - nums[j]| <= limit.
- * Return the lexicographically smallest array that can be obtained by performing
- * the operation any number of times.
+ * Given nums and limit, you may swap two positions whenever their values differ
+ * by at most limit. Return the lexicographically smallest array reachable after
+ * any number of swaps.
+ *
+ * Leetcode: https://leetcode.com/problems/make-lexicographically-smallest-array-by-swapping-elements/ (Medium)
+ * Rating:   2046 (Weekly Contest 373)
+ * Pattern:  Sorting | Connected components | Greedy placement
  *
  * Example:
- *   nums = [1,5,3,9,8], limit = 2  ->  [1,3,5,8,9]
- *   nums = [1,7,6,18,2,1], limit = 3  ->  [1,6,7,18,1,2]
+ *   Input:  nums = [1,5,3,9,8], limit = 2
+ *   Output: [1,3,5,8,9]
+ *   Why:    values within each sorted-by-value component can be assigned to that component's sorted indices.
  *
- * Key Insight:
- *   Swapping is transitive: if a~b and b~c (where x~y means |x-y|<=limit), then a, b, c
- *   are all reachable from each other via a chain of swaps. So sort nums and group
- *   consecutive elements whose adjacent difference is <= limit. All elements in such a
- *   group share the same set of original indices and can be freely permuted among them.
- *   To get the lex smallest result, place the sorted group values into the sorted indices
- *   of that group.
+ * Follow-ups:
+ *   1. limit is zero?
+ *      Only equal values can swap, so the visible array does not change.
+ *   2. Support updates to nums?
+ *      Maintain value-ordered components with a balanced tree and rebuild affected groups.
+ *   3. Need smallest array after at most one swap?
+ *      Greedily test the earliest improvable index under the direct swap rule.
  *
- * LeetCode Link: https://leetcode.com/problems/make-lexicographically-smallest-array-by-swapping-elements/
- *
- * Follow-up Questions:
- * 1. What if limit could be 0?
- *    Answer: Only equal values can be swapped; the answer is essentially nums itself
- *    (equal values swapping does not change the array).
- * 2. What if the array contained negatives or required absolute equivalence classes
- *    defined differently?
- *    Answer: The grouping logic still holds as long as the equivalence is defined by
- *    proximity after sorting.
- * 3. How would you support online updates (insertions/deletions)?
- *    Answer: Maintain a TreeMap/Union-Find keyed on values and recompute affected groups.
- *
- * Related Problems:
- * - 1202. Smallest String With Swaps
- * - 2948. Make Lexicographically Smallest Array by Swapping Elements (this problem)
- *
- * Approaches:
- *   Approach                Method                              Time         Space
- *   ----------------------  ----------------------------------  -----------  ------
- *   DSU on sorted adjacency lexicographicallySmallestArrayDSU   O(n log n)   O(n)
- *   Sort + group (best)     lexicographicallySmallestArray      O(n log n)   O(n)
- *
- * LeetCode Contest Rating: 2046 (Weekly Contest 373)
+ * Related: Smallest String With Swaps (1202), Accounts Merge (721).
  */
 public class MakeLexicographicallySmallestArrayBySwappingElements {
+
+    public static void main(String[] args) {
+        MakeLexicographicallySmallestArrayBySwappingElements solver =
+            new MakeLexicographicallySmallestArrayBySwappingElements();
+
+        int[][] inputs = { {1, 5, 3, 9, 8}, {1, 7, 6, 18, 2, 1}, {5} };
+        int[] limits = { 2, 3, 10 };
+        int[][] expected = { {1, 3, 5, 8, 9}, {1, 6, 7, 18, 1, 2}, {5} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.lexicographicallySmallestArray(inputs[i], limits[i]);
+            System.out.printf("nums=%s limit=%d -> output=%s  expected=%s%n",
+                Arrays.toString(inputs[i]), limits[i], Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
 
     /**
      * Disjoint Set Union approach.
@@ -118,28 +112,24 @@ public class MakeLexicographicallySmallestArrayBySwappingElements {
         return result;
     }
 
-    /**
-     * Sort + group-by-limit approach (recommended).
-     *
-     * Intuition: After sorting values, the equivalence class containing each value
-     * is exactly the maximal run whose adjacent gaps are all <= limit. So the DSU
-     * machinery collapses into a single linear scan: split wherever the gap exceeds
-     * limit, then for each group, place sorted values into sorted original indices.
-     *
-     * Algorithm:
-     * 1. Pair each value with its original index and sort by value.
-     * 2. Walk through the sorted pairs; whenever the gap between consecutive values
-     *    exceeds limit, close the current group and start a new one.
-     * 3. Within a group, collect the original indices, sort them, and assign the
-     *    sorted values back to those sorted indices.
-     *
-     * Time Complexity: O(n log n) for sorting values and indices within groups.
-     * Space Complexity: O(n) for the auxiliary value-index pairs and result array.
-     *
-     * @param nums  input array of positive integers
-     * @param limit maximum allowed absolute difference for a single swap
-     * @return lexicographically smallest array achievable
-     */
+/**
+ * Intuition: after sorting by value, a run whose adjacent gaps are all <= limit
+ * is one connected swap component. To minimize lexicographic order, put the
+ * smallest values of that component into its smallest original indices.
+ *
+ * Algorithm:
+ *   1. Pair every value with its original index and sort pairs by value.
+ *   2. Split the sorted pairs whenever the adjacent value gap exceeds limit.
+ *   3. For each group, sort its original indices.
+ *   4. Assign the already sorted group values to those sorted indices.
+ *
+ * Time:  O(n log n) - sorting values and group indices dominates.
+ * Space: O(n) - value-index pairs, group indices, and result are stored.
+ *
+ * @param nums input array
+ * @param limit maximum value difference allowed for one swap
+ * @return lexicographically smallest reachable array
+ */
     public int[] lexicographicallySmallestArray(int[] nums, int limit) {
         int len = nums.length;
 

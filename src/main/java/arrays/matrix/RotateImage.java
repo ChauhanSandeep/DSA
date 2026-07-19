@@ -1,72 +1,72 @@
 package arrays.matrix;
 
+import java.util.Arrays;
 /**
  * Problem: Rotate Image
  *
- * You are given an n x n 2D matrix representing an image. Rotate the image by 90 degrees (clockwise).
- * You have to rotate the image in-place, which means you have to modify the input 2D matrix directly.
- * DO NOT allocate another 2D matrix and do the rotation.
+ * Given an n x n matrix representing an image, rotate it 90 degrees clockwise.
+ * The rotation must happen in place without allocating another matrix for the
+ * answer.
+ *
+ * Leetcode: https://leetcode.com/problems/rotate-image/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Matrix | Transpose | Reverse rows
  *
  * Example:
- * Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
- * Output: [[7,4,1],[8,5,2],[9,6,3]]
- * Explanation:
- * Original:       Rotated 90° clockwise:
- * 1 2 3           7 4 1
- * 4 5 6     →     8 5 2
- * 7 8 9           9 6 3
+ *   Input:  matrix = [[1,2,3],[4,5,6],[7,8,9]]
+ *   Output: [[7,4,1],[8,5,2],[9,6,3]]
+ *   Why:    each original cell (row, col) moves to (col, n - 1 - row).
  *
- * Input: matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
- * Output: [[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
- * Explanation:
- * Original:          Rotated 90° clockwise:
- * 5  1  9  11        15 13  2  5
- * 2  4  8  10   →    14  3  4  1
- * 13 3  6  7         12  6  8  9
- * 15 14 12 16        16  7 10 11
+ * Follow-ups:
+ *   1. Rotate counter-clockwise?
+ *      Transpose, then reverse each column instead of each row.
+ *   2. Rotate by 180 degrees?
+ *      Reverse every row and then reverse row order, or perform two 90-degree turns.
+ *   3. Rotate a non-square matrix?
+ *      Dimensions change, so a separate n x m output matrix is required.
  *
- * LeetCode: https://leetcode.com/problems/rotate-image/
- *
- * Follow-up Questions:
- * 1. Q: How would you rotate the matrix counter-clockwise instead?
- *    A: Transpose first, then reverse each column instead of each row.
- *
- * 2. Q: What if you needed to rotate by 180 degrees?
- *    A: Could call rotate90 twice, or simply reverse all rows then all columns.
- *
- * 3. Q: How would you handle non-square matrices?
- *    A: Would need to allocate new matrix as dimensions change (m×n becomes n×m).
- *
- * 4. Q: What if rotation angle is arbitrary (not just 90 degrees)?
- *    A: Would require complex geometric transformations and likely extra space.
- *
- * Related Problems:
- * - Rotate Array: https://leetcode.com/problems/rotate-array/
- * - Spiral Matrix: https://leetcode.com/problems/spiral-matrix/
- * - Transpose Matrix: https://leetcode.com/problems/transpose-matrix/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Rotate Array (189), Spiral Matrix (54), Transpose Matrix (867).
  */
 public class RotateImage {
 
-  /**
-   * Rotates matrix 90 degrees clockwise using transpose and reverse approach.
-   *
-   * Algorithm:
-   * 1. Transpose the matrix: swap matrix[i][j] with matrix[j][i]
-   *    - This converts rows to columns
-   * 2. Reverse each row: reverse elements in each row
-   *    - This completes the 90-degree clockwise rotation
-   *
-   * Mathematical proof:
-   * - After transpose: element at (i,j) goes to (j,i)
-   * - After row reversal: element at (j,i) goes to (j,n-1-i)
-   * - Combined: element at (i,j) ends at (j,n-1-i), which is correct for 90° clockwise rotation
-   *
-   * Time Complexity: O(n²) where n is dimension of matrix
-   * Space Complexity: O(1) using constant extra space
-   *
-   * @param matrix n×n 2D matrix to rotate in-place
-   */
+    public static void main(String[] args) {
+        RotateImage solver = new RotateImage();
+
+        int[][][] inputs = {
+            { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} },
+            { {1} }
+        };
+        int[][][] expected = {
+            { {7, 4, 1}, {8, 5, 2}, {9, 6, 3} },
+            { {1} }
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] input = new int[inputs[i].length][];
+            for (int row = 0; row < inputs[i].length; row++) {
+                input[row] = inputs[i][row].clone();
+            }
+            solver.rotate(input);
+            System.out.printf("matrix=%s -> output=%s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), Arrays.deepToString(input), Arrays.deepToString(expected[i]));
+        }
+    }
+
+/**
+ * Intuition: a clockwise rotation can be decomposed into two simpler symmetric
+ * moves. Transpose reflects the matrix across the main diagonal, then reversing
+ * each row pushes every transposed value to its final clockwise column.
+ *
+ * Algorithm:
+ *   1. Return for null, empty, or non-square input.
+ *   2. Transpose the matrix by swapping only cells above the main diagonal.
+ *   3. Reverse every row in place.
+ *
+ * Time:  O(n^2) - transpose and row reversals together visit matrix cells linearly.
+ * Space: O(1) - only temporary swap variables are used.
+ *
+ * @param matrix square matrix rotated in place
+ */
   public void rotate(int[][] matrix) {
     if (matrix == null || matrix.length == 0 || matrix.length != matrix[0].length) {
       return;

@@ -2,75 +2,69 @@ package arrays.prefixsum;
 
 import java.util.*;
 import java.util.stream.IntStream;
-
-
 /**
- * Range Addition
+ * Problem: Range Addition
  *
- * Given an array of length n initialized with all 0's and k update operations,
- * apply all updates and return the modified array. Each operation is represented
- * as a triplet [startIndex, endIndex, inc] which increments each element of
- * subarray from startIndex to endIndex (both inclusive) with inc.
+ * Start with an all-zero array of a given length, apply inclusive range increment
+ * updates, and return the final array. The efficient solution records only where
+ * each increment starts and stops.
  *
- * Key challenge: Efficiently handle potentially many range updates without
- * iterating through each range for every update, which would be O(n*k) complexity.
- *
- * Core insight: Use difference array technique to mark range boundaries instead
- * of updating individual elements. This reduces complexity from O(n*k) to O(n+k).
+ * Leetcode: https://leetcode.com/problems/range-addition/ (Medium)
+ * Rating:   no contest rating (premium problem)
+ * Pattern:  Difference array | Prefix sum | Range updates
  *
  * Example:
- * Input: length = 5, updates = [[1,3,2],[2,4,3],[0,2,-2]]
- * Output: [-2,0,3,5,3]
+ *   Input:  length = 5, updates = [[1,3,2],[2,4,3],[0,2,-2]]
+ *   Output: [-2,0,3,5,3]
+ *   Why:    prefixing the boundary deltas accumulates exactly the active updates at each index.
  *
- * Process:
- * - Initial: [0,0,0,0,0]
- * - After [1,3,2]: [0,2,2,2,0]
- * - After [2,4,3]: [0,2,5,5,3]
- * - After [0,2,-2]: [-2,0,3,5,3]
+ * Follow-ups:
+ *   1. Support online range updates and point queries?
+ *      Use a Fenwick tree over the difference array.
+ *   2. Support range updates and range sum queries?
+ *      Use lazy propagation or two Fenwick trees.
+ *   3. Extend to 2D rectangles?
+ *      Mark four corners in a 2D difference array and take 2D prefix sums.
  *
- * LeetCode: https://leetcode.com/problems/range-addition
- *
- * Follow-up Questions for FAANG Interviews:
- * 1. How to handle 2D range updates on a matrix?
- *    Answer: Extend to 2D difference array with boundary marking at corners of update rectangles.
- * 2. What if updates come in real-time and we need query results immediately?
- *    Answer: Use segment tree with lazy propagation for O(log n) updates and queries.
- * 3. How to optimize when many updates affect overlapping ranges?
- *    Answer: Consider coordinate compression or merge overlapping updates before processing.
- * 4. What if we need to support both range updates and range queries?
- *    Answer: Implement using Fenwick tree or segment tree with lazy propagation.
- *
- * Related Problems:
- * - LeetCode 598: Range Addition II
- * - LeetCode 307: Range Sum Query - Mutable
- * - LeetCode 1109: Corporate Flight Bookings (Same pattern)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Range Addition II (598), Corporate Flight Bookings (1109).
  */
 public class RangeAddition {
 
-    /**
-     * Applies range updates using difference array technique for optimal efficiency.
-     *
-     * Algorithm: Difference Array with Boundary Marking
-     * Core principle: Instead of updating each element in a range, mark only the
-     * boundaries where changes begin and end. Use prefix sum to reconstruct final array.
-     *
-     * Key steps:
-     * 1. For each update [start, end, inc], mark diff[start] += inc (range begins)
-     * 2. Mark diff[end+1] -= inc (range ends, if within bounds)
-     * 3. Compute prefix sum to propagate boundary changes across entire array
-     *
-     * Why this works: When computing prefix sum, the increment at diff[start]
-     * propagates through all subsequent positions until cancelled by decrement
-     * at diff[end+1]. Multiple overlapping ranges automatically combine through addition.
-     *
-     * Time Complexity: O(n + k) where n = array length, k = number of updates
-     * Space Complexity: O(n) for difference array storage
-     *
-     * @param length initial array length (all zeros)
-     * @param updates array of [startIndex, endIndex, increment] operations
-     * @return modified array after applying all range updates
-     */
+    public static void main(String[] args) {
+        RangeAddition solver = new RangeAddition();
+
+        int[] lengths = { 5, 3 };
+        int[][][] updates = {
+            { {1, 3, 2}, {2, 4, 3}, {0, 2, -2} },
+            { }
+        };
+        int[][] expected = { {-2, 0, 3, 5, 3}, {0, 0, 0} };
+
+        for (int i = 0; i < lengths.length; i++) {
+            int[] got = solver.getModifiedArray(lengths[i], updates[i]);
+            System.out.printf("length=%d updates=%s -> output=%s  expected=%s%n",
+                lengths[i], Arrays.deepToString(updates[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
+    }
+
+/**
+ * Intuition: adding inc to every element in [start, end] means the running value
+ * increases at start and decreases just after end. A final prefix sum spreads
+ * each boundary marker across exactly its intended range.
+ *
+ * Algorithm:
+ *   1. Create a differenceArray of the requested length.
+ *   2. For each update, add increment at startIndex.
+ *   3. Subtract increment at endIndex + 1 when that index exists.
+ *   4. Prefix-sum differenceArray to recover the final values.
+ *
+ * Time:  O(length + updates) - each update and each array position is processed once.
+ * Space: O(length) - the returned difference array holds the final values.
+ *
+ * @param length length of the initially zero array
+ * @param updates range updates as [startIndex, endIndex, increment]
+ * @return final array after all updates
+ */
     public int[] getModifiedArray(int length, int[][] updates) {
         // Initialize difference array to track boundary changes
         int[] differenceArray = new int[length];

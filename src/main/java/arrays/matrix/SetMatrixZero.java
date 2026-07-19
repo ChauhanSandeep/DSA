@@ -1,79 +1,71 @@
 package arrays.matrix;
 
 import java.util.Arrays;
-
-
 /**
- * Set Matrix Zeroes
+ * Problem: Set Matrix Zeroes
  *
- * Problem:
- * Given an m x n integer matrix, if an element is 0, set its entire row and column to 0's.
- * You must do it in place (modify the input matrix directly).
+ * Given an m x n matrix, if a cell is zero, set its entire row and column to
+ * zero in place. The challenge is remembering which rows and columns must change
+ * without using O(m + n) extra marker arrays.
+ *
+ * Leetcode: https://leetcode.com/problems/set-matrix-zeroes/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Matrix | In-place markers | Prefix row and column flags
  *
  * Example:
- * Input: matrix = [[1,1,1],[1,0,1],[1,1,1]]
- * Output: [[1,0,1],[0,0,0],[1,0,1]]
+ *   Input:  matrix = [[1,1,1],[1,0,1],[1,1,1]]
+ *   Output: [[1,0,1],[0,0,0],[1,0,1]]
+ *   Why:    the zero at the center clears row 1 and column 1.
  *
- * Example:
- * Input: matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
- * Output: [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+ * Follow-ups:
+ *   1. Allow O(m + n) space?
+ *      Store row and column marker arrays directly, then do one rewrite pass.
+ *   2. Matrix values are all positive?
+ *      A sentinel can mark cells, but first-row and first-column markers are safer.
+ *   3. Stream the matrix row by row?
+ *      Exact in-place behavior is difficult because future zeros can affect past rows.
  *
- * Constraints:
- * - m == matrix.length
- * - n == matrix[0].length
- * - 1 <= m, n <= 200
- * - -2^31 <= matrix[i][j] <= 2^31 - 1
- *
- * LeetCode: https://leetcode.com/problems/set-matrix-zeroes/
- *
- * Follow-up Questions:
- * Q1: What if we're allowed O(m + n) space? How would that simplify the solution?
- * A1: Use two boolean arrays to track which rows and columns need zeroing, making logic simpler.
- *
- * Q2: Can you solve this in O(1) space without using the first row/column as markers?
- * A2: No, we need some storage to remember which rows/columns to zero. First row/col is the optimal choice.
- *
- * Q3: What if the matrix contains only positive numbers? Can we use a marker value?
- * A3: Yes, we could use -1 or any value outside the valid range as a temporary marker.
- *
- * Q4: How would you parallelize this algorithm for very large matrices?
- * A4: Split matrix into chunks, mark zeros in parallel, then synchronize and apply zeros in parallel.
- *
- * Q5: What if we want to set rows/columns to a different value instead of 0?
- * A5: Same algorithm - just change the final value we set from 0 to the desired value.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Game of Life (289), Walls and Gates (286).
  */
 public class SetMatrixZero {
 
   public static void main(String[] args) {
-    int[][] matrix = {{1, 1, 1}, {0, 1, 2}, {1, 3, 1}};
+    int[][][] inputs = {
+        { {1, 1, 1}, {1, 0, 1}, {1, 1, 1} },
+        { {0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5} }
+    };
+    int[][][] expected = {
+        { {1, 0, 1}, {0, 0, 0}, {1, 0, 1} },
+        { {0, 0, 0, 0}, {0, 4, 5, 0}, {0, 3, 1, 0} }
+    };
 
-    setZeroes(matrix);
-
-    System.out.println("Matrix after setting zeroes:");
-    for (int[] row : matrix) {
-      System.out.println(Arrays.toString(row));
+    for (int i = 0; i < inputs.length; i++) {
+      int[][] input = new int[inputs[i].length][];
+      for (int row = 0; row < inputs[i].length; row++) {
+        input[row] = inputs[i][row].clone();
+      }
+            setZeroes(input);
+      System.out.printf("matrix=%s -> output=%s  expected=%s%n",
+          Arrays.deepToString(inputs[i]), Arrays.deepToString(input), Arrays.deepToString(expected[i]));
     }
   }
 
-  /**
-   * Sets entire rows and columns to zero if any cell in them contains a zero.
-   *
-   * Algorithm:
-   * 1. Record whether first row and first column originally contain any zeros
-   * 2. Use first row and column as marker storage for other rows/columns
-   * 3. Scan matrix (excluding first row/col) and mark first row/col when zero found
-   * 4. Zero out cells in the main matrix based on markers in first row/col
-   * 5. Finally, zero out first row and column if they originally had zeros
-   *
-   * Key Insight: Use the matrix itself for storage by repurposing first row and column
-   * as marker arrays. Handle them separately since they serve dual purpose.
-   *
-   * Time Complexity: O(m * n) - scan matrix twice
-   * Space Complexity: O(1) - only two boolean flags for first row/col
-   *
-   * @param matrix Input m x n matrix to modify in-place
-   */
+/**
+ * Intuition: the first row and first column can act as marker arrays for the rest
+ * of the matrix. Because those marker areas are real data too, two booleans first
+ * remember whether they originally needed to be zeroed.
+ *
+ * Algorithm:
+ *   1. Record whether the first row or first column originally contains a zero.
+ *   2. Mark rows and columns by writing zeros into the first column and first row.
+ *   3. Rewrite the inner matrix according to those markers.
+ *   4. Zero the first row and first column if their original flags require it.
+ *
+ * Time:  O(m * n) - the matrix is scanned a constant number of times.
+ * Space: O(1) - only two boolean flags are used.
+ *
+ * @param matrix matrix modified in place
+ */
   public static void setZeroes(int[][] matrix) {
     int numRows = matrix.length;
     int numCols = matrix[0].length;

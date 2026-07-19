@@ -1,42 +1,72 @@
 package arrays.sorting;
 
+import java.util.Arrays;
 /**
- * Merge Sorted Array
+ * Problem: Merge Sorted Array
  *
- * Problem: Merge two sorted arrays into first array in-place. First array has enough space
- * to hold all elements from both arrays.
+ * Given two sorted arrays, merge the second into the first in non-decreasing order.
+ * The first array has enough trailing capacity to hold all values, so the merge
+ * must finish in place.
  *
- * Example: nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3 -> nums1 = [1,2,2,3,5,6]
- * Merge nums2 into nums1 maintaining sorted order.
+ * Leetcode: https://leetcode.com/problems/merge-sorted-array/ (Easy)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Two pointers | Reverse merge | In-place array fill
  *
- * LeetCode: https://leetcode.com/problems/merge-sorted-array
+ * Example:
+ *   Input:  nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+ *   Output: [1,2,2,3,5,6]
+ *   Why:    filling from the back avoids overwriting unmerged nums1 values.
  *
- * Follow-up Questions:
- * - How to merge k sorted arrays? (Use priority queue or divide-and-conquer)
- * - What if arrays are not sorted? (Sort first or use different merging strategy)
- * - Can we solve without extra space? (Current solution is already in-place)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Merge k sorted arrays?
+ *      Use a min-heap or divide-and-conquer merging.
+ *   2. nums1 has no extra capacity?
+ *      Allocate an output array or shift values with extra cost.
+ *   3. Merge descending arrays?
+ *      Mirror the comparisons or fill from the front when free space is at the front.
+ *
+ * Related: Merge Two Sorted Lists (21), Merge k Sorted Lists (23).
  */
 public class MergeSortedArray {
 
-    /**
-     * Merges two sorted arrays into the first array in-place.
-     *
-     * Algorithm:
-     * 1. Use three pointers: end of nums1, end of nums2, and merge position
-     * 2. Work backwards from end to avoid overwriting unprocessed elements
-     * 3. Compare elements and place larger one at merge position
-     * 4. Continue until all elements from nums2 are merged
-     * 5. Remaining elements in nums1 are already in correct position
-     *
-     * Time Complexity: O(len1 + len2) where len1, len2 are lengths of arrays
-     * Space Complexity: O(1) - in-place merging
-     *
-     * @param nums1 first sorted array with extra space at end
-     * @param len1 number of elements in nums1
-     * @param nums2 second sorted array
-     * @param len2 number of elements in nums2
-     */
+    public static void main(String[] args) {
+        MergeSortedArray solver = new MergeSortedArray();
+
+        int[][] nums1Cases = { {1, 2, 3, 0, 0, 0}, {0}, {2, 0} };
+        int[] len1Cases = { 3, 0, 1 };
+        int[][] nums2Cases = { {2, 5, 6}, {1}, {1} };
+        int[] len2Cases = { 3, 1, 1 };
+        int[][] expected = { {1, 2, 2, 3, 5, 6}, {1}, {1, 2} };
+
+        for (int i = 0; i < nums1Cases.length; i++) {
+            int[] input = nums1Cases[i].clone();
+            solver.merge(input, len1Cases[i], nums2Cases[i], len2Cases[i]);
+            System.out.printf("nums1=%s nums2=%s -> output=%s  expected=%s%n",
+                Arrays.toString(nums1Cases[i]), Arrays.toString(nums2Cases[i]),
+                Arrays.toString(input), Arrays.toString(expected[i]));
+        }
+    }
+
+/**
+ * Intuition: the unused space is at the end of nums1, so write the largest
+ * remaining value there first. This preserves all unprocessed nums1 values because
+ * the write pointer never overwrites anything still needed.
+ *
+ * Algorithm:
+ *   1. Validate input arrays and logical lengths.
+ *   2. Handle empty nums2 or empty nums1 prefixes.
+ *   3. Compare the last unmerged values from nums1 and nums2.
+ *   4. Write the larger value at writeIndex and move that pointer left.
+ *   5. Copy any remaining nums2 values.
+ *
+ * Time:  O(len1 + len2) - each logical value is moved at most once.
+ * Space: O(1) - merging writes directly into nums1.
+ *
+ * @param nums1 first sorted array with trailing capacity
+ * @param len1 number of real values currently in nums1
+ * @param nums2 second sorted array
+ * @param len2 number of values to merge from nums2
+ */
     public void merge(int[] nums1, int len1, int[] nums2, int len2) {
         validateInputs(nums1, len1, nums2, len2);
 

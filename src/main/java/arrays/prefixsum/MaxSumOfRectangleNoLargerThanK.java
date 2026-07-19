@@ -1,45 +1,69 @@
 package arrays.prefixsum;
 
 import java.util.*;
-
 /**
- * 363. Max Sum of Rectangle No Larger Than K
+ * Problem: Max Sum of Rectangle No Larger Than K
  *
- * Problem: Given a non-empty 2D matrix and an integer k, find the max sum of a
- * rectangle in the matrix such that its sum is no larger than k.
+ * Given a non-empty matrix and an integer k, find the largest rectangle sum that
+ * is at most k. Rectangles can have any height and width as long as their sum does
+ * not exceed the limit.
+ *
+ * Leetcode: https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/ (Hard)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  2D prefix compression | Ordered prefix sums | TreeSet
  *
  * Example:
- * Input: matrix = [[1,0,1],[0,-2,3]], k = 2
- * Output: 2
- * Explanation: Rectangle [[0,1],[-2,3]] has sum = 2.
+ *   Input:  matrix = [[1,0,1],[0,-2,3]], k = 2
+ *   Output: 2
+ *   Why:    rectangle [[0,1],[-2,3]] sums to 2, exactly meeting the limit.
  *
- * LeetCode: https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k
+ * Follow-ups:
+ *   1. Return rectangle coordinates too?
+ *      Track the best row pair and subarray boundaries when updating the maximum.
+ *   2. Optimize when rows exceed columns?
+ *      Compress along the smaller dimension to reduce the squared factor.
+ *   3. Need exact sum k only?
+ *      Use prefix sums with a hash set and stop as soon as k is found.
  *
- * Follow-up questions:
- * Q: What if k is very large or very small?
- * A: For very large k, find max sum rectangle. For very small k, handle negative values carefully.
- *
- * Q: Can we optimize for sparse matrices?
- * A: Use coordinate compression and sparse representations for mostly zero matrices.
- *
- * Q: How to handle very large matrices?
- * A: Use divide-and-conquer or approximation algorithms for massive datasets.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Max Sum of Submatrix (LCCI 17.24), Range Sum Query 2D Immutable (304).
  */
 public class MaxSumOfRectangleNoLargerThanK {
 
-    /**
-     * Optimized approach using prefix sums and TreeSet for range queries.
-     *
-     * Algorithm:
-     * - Fix top and bottom rows, reduce 2D problem to 1D
-     * - For each column range, find max subarray sum <= k
-     * - Use prefix sums + TreeSet to find largest valid prefix difference
-     * - For each prefix sum, find largest smaller prefix using ceiling operation
-     *
-     * Time Complexity: O(m²n log n) where m is rows, n is columns
-     * Space Complexity: O(n) for temporary arrays and TreeSet
-     */
+    public static void main(String[] args) {
+        MaxSumOfRectangleNoLargerThanK solver = new MaxSumOfRectangleNoLargerThanK();
+
+        int[][][] matrices = {
+            { {1, 0, 1}, {0, -2, 3} },
+            { {2, 2, -1} }
+        };
+        int[] limits = { 2, 3 };
+        int[] expected = { 2, 3 };
+
+        for (int i = 0; i < matrices.length; i++) {
+            int got = solver.maxSumSubmatrix(matrices[i], limits[i]);
+            System.out.printf("matrix=%s k=%d -> output=%d  expected=%d%n",
+                Arrays.deepToString(matrices[i]), limits[i], got, expected[i]);
+        }
+    }
+
+/**
+ * Intuition: fixing a top and bottom row compresses the rectangle problem into a
+ * 1D array of column sums. Then the best left-to-right span no larger than k is
+ * the classic prefix-sum problem solved with an ordered set.
+ *
+ * Algorithm:
+ *   1. Fix every top row and grow every bottom row below it.
+ *   2. Maintain colSum so each column stores the sum between top and bottom.
+ *   3. Find the best subarray sum no larger than k inside colSum.
+ *   4. Update the global result and stop early if it reaches k.
+ *
+ * Time:  O(m^2 * n log n) - every row pair runs an ordered-prefix scan over columns.
+ * Space: O(n) - colSum and the TreeSet store column-prefix information.
+ *
+ * @param matrix input matrix
+ * @param k maximum allowed rectangle sum
+ * @return largest rectangle sum that is no larger than k
+ */
     public int maxSumSubmatrix(int[][] matrix, int k) {
         int m = matrix.length, n = matrix[0].length;
         int result = Integer.MIN_VALUE;
