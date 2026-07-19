@@ -5,63 +5,61 @@ import java.util.List;
 
 
 /**
-* You are given a string s. Partition the string into as many parts as possible so that 
- * each letter appears in at most one part.
- * 
- * Return a list of integers representing the size of these parts.
+ * Problem: Partition Labels
+ *
+ * Split a string into as many parts as possible so that each character appears
+ * in at most one part. Return the size of each partition in left-to-right order.
+ *
+ * Leetcode: https://leetcode.com/problems/partition-labels/ (Medium)
+ * Rating:   1443
+ * Pattern:  Hashing | Greedy | Last occurrence boundary
  *
  * Example:
- * Input: s = "ababcbacadefegdehijhklij"
- * Output: [9,7,8]
- * Explanation:
- * The partition is "ababcbaca", "defegde", "hijhklij".
- * - "ababcbaca": 'a', 'b', 'c' appear only in this partition
- * - "defegde": 'd', 'e', 'f', 'g' appear only in this partition
- * - "hijhklij": 'h', 'i', 'j', 'k', 'l' appear only in this partition
- * This is the maximum number of partitions possible.
+ *   Input:  s = "ababcbacadefegdehijhklij"
+ *   Output: [9,7,8]
+ *   Why:    the first cut must wait until the last a, b, and c are included;
+ *           the same rule then forms the next two maximal cuts.
  *
- * LeetCode link: https://leetcode.com/problems/partition-labels/
+ * Follow-ups:
+ *   1. How would you return the substrings instead of their lengths?
+ *      Store each start and end boundary and slice the original string at the end.
+ *   2. How would you support arbitrary Unicode characters?
+ *      Replace the fixed 26-slot array with a map from character to last index.
+ *   3. What if you wanted at most k partitions?
+ *      Build the greedy partitions first, then merge adjacent partitions as needed.
+ *   4. Can this be viewed as an interval problem?
+ *      Yes, each character defines an interval from first to last occurrence, and overlapping intervals merge.
  *
- * Follow-up Questions FAANG Interviews Might Ask:
- *  - Can you return the actual partitions instead of just their sizes?
- *    → Store substring start/end indices and extract substrings at the end.
- *  - What if we need to minimize the number of partitions instead?
- *    → Merge adjacent partitions greedily while maintaining the constraint.
- *  - How would you handle Unicode characters or case sensitivity?
- *    → Use HashMap instead of array for last occurrence mapping.
- *  - What if multiple valid maximum partitions exist?
- *    → Problem guarantees unique solution due to greedy nature, but could track alternatives.
- *
- * Relevant Follow-up Problems:
- *  - LeetCode 56 (Merge Intervals): https://leetcode.com/problems/merge-intervals/
- *  - LeetCode 435 (Non-overlapping Intervals): https://leetcode.com/problems/non-overlapping-intervals/
- *  - LeetCode 1024 (Video Stitching): https://leetcode.com/problems/video-stitching/
- * LeetCode Contest Rating: 1443
+ * Related: Merge Intervals (56), Non-overlapping Intervals (435).
  */
 public class PartitionLabels {
 
-   /**
-     * Main method: Finds maximum partitions using Greedy approach with last occurrence tracking.
-     * Step-by-step:
-     *  1. Pre-process: Record last occurrence index of each character in string
-     *  2. Initialize partition tracking variables:
-     *     - partitionStart: beginning of current partition
-     *     - partitionEnd: farthest last occurrence seen so far in current partition
-     *  3. Iterate through string:
-     *     a. For each character, update partitionEnd to max(partitionEnd, lastOccurrence[char])
-     *     b. This ensures partition extends to include all occurrences of seen characters
-     *     c. When current index reaches partitionEnd: all characters in partition won't appear later
-     *     d. Record partition size and start new partition
-     *  4. Return list of partition sizes
+    public static void main(String[] args) {
+        PartitionLabels solver = new PartitionLabels();
+        String[] inputs = { "ababcbacadefegdehijhklij", "eccbbbbdec" };
+        String[] expected = { "[9, 7, 8]", "[10]" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = solver.partitionLabels(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
+    }
+
+       /**
+     * Intuition: once a partition contains a character, it must extend at least
+     * to that character's last occurrence. Track the farthest last occurrence of
+     * all characters seen so far; when the scan reaches it, the partition can end.
      *
-     * Key Insight:
-     * A partition can end at position i if and only if all characters from partition start to i
-     * have their last occurrences at or before i. We track the farthest last occurrence seen so far,
-     * and when we reach that position, we know no character will appear later - safe to partition.
+     * Algorithm:
+     *   1. Record the last index of each lowercase character.
+     *   2. Scan the string while expanding the current partition end to each character's last index.
+     *   3. When the scan reaches the partition end, record its size and start the next partition.
      *
-     * Algorithm: Greedy with Last Occurrence Map.
-     * Time Complexity: O(n), where n is string length. Two passes: one to build map, one to partition.
-     * Space Complexity: O(1), fixed-size array of 26 characters (or O(k) for k unique characters).
+     * Time:  O(n) - one pass records last positions and one pass builds partitions.
+     * Space: O(1) - the last-occurrence array has 26 slots.
+     *
+     * @param input lowercase string to partition
+     * @return sizes of the maximum number of valid partitions
      */
     public List<Integer> partitionLabels(String input) {
         int length = input.length();

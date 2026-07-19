@@ -3,33 +3,60 @@ package hashing;
 import java.util.*;
 
 /**
- * Problem: Given a list of unique words, find all pairs of distinct indices (i,
- * j)
- * such that the concatenation of words[i] + words[j] forms a palindrome.
+ * Problem: Palindrome Pairs
+ *
+ * Given a list of unique words, find all ordered index pairs (i, j) where
+ * i != j and words[i] + words[j] is a palindrome. Empty strings and words with
+ * palindromic prefixes or suffixes need special care.
+ *
+ * Leetcode: https://leetcode.com/problems/palindrome-pairs/ (Hard)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Hashing | Trie | Palindromic prefix/suffix splits
  *
  * Example:
- * Input: ["abcd", "dcba", "lls", "s", "sssll"]
- * Output: [[0, 1], [1, 0], [3, 2], [2, 4]]
- * Explanation:
- * - "abcd" + "dcba" = "abcddcba" (palindrome)
+ *   Input:  ["abcd", "dcba", "lls", "s", "sssll"]
+ *   Output: [[0,1], [1,0], [3,2], [2,4]]
+ *   Why:    each listed ordered pair concatenates to a palindrome, such as
+ *           "abcd" + "dcba" = "abcddcba".
  *
- * Leetcode Link: https://leetcode.com/problems/palindrome-pairs/
+ * Follow-ups:
+ *   1. How can the repeated reverse lookups be optimized?
+ *      Insert reversed words into a trie and carry palindrome-suffix indices at each node.
+ *   2. How would duplicates in words change the result?
+ *      Map each word to all of its indices instead of a single index.
+ *   3. How would you reduce repeated palindrome checks?
+ *      Precompute palindromic prefixes and suffixes for each word.
+ *   4. How do empty strings affect the answer?
+ *      The empty string pairs with every non-empty word that is already a palindrome.
  *
- * Follow-up Questions:
- * 1. Can we do this in O(n * k) where k = average word length? (Trie-based
- * optimization possible)
- * Leetcode follow-up ref:
- * https://leetcode.com/problems/palindrome-pairs/solutions/79215/o-n-k-2-java-solution-with-trie-structure/
- * 2. How to handle duplicates in the list? (Not required here as words are
- * unique)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Longest Palindromic Substring (5), Palindrome Partitioning (131).
  */
 public class PalindromePairs {
 
     public static void main(String[] args) {
-        String[] words = { "abcd", "dcba", "lls", "s", "sssll" };
-        System.out.println(new PalindromePairs().findPalindromePairs(words));
-        System.out.println(new PalindromePairs().findPalindromePairsUsingTrie(words));
+        PalindromePairs solver = new PalindromePairs();
+        String[][] cases = {
+            { "abcd", "dcba", "lls", "s", "sssll" },
+            { "a", "" }
+        };
+        String[] expected = {
+            "[[0, 1], [1, 0], [2, 4], [3, 2]]",
+            "[[0, 1], [1, 0]]"
+        };
+
+        for (int i = 0; i < cases.length; i++) {
+            List<List<Integer>> got = solver.findPalindromePairs(cases[i]);
+            got.sort(Comparator.<List<Integer>>comparingInt(pair -> pair.get(0))
+                .thenComparingInt(pair -> pair.get(1)));
+            System.out.printf("words=%s method=hash -> %s  expected=%s%n",
+                Arrays.toString(cases[i]), got, expected[i]);
+
+            List<List<Integer>> gotTrie = solver.findPalindromePairsUsingTrie(cases[i]);
+            gotTrie.sort(Comparator.<List<Integer>>comparingInt(pair -> pair.get(0))
+                .thenComparingInt(pair -> pair.get(1)));
+            System.out.printf("words=%s method=trie -> %s  expected=%s%n",
+                Arrays.toString(cases[i]), gotTrie, expected[i]);
+        }
     }
 
     /**
@@ -51,29 +78,22 @@ public class PalindromePairs {
         }
     }
 
-    /**
-     * Trie-based solution for finding palindrome pairs.
-     * 
-     * Key Insight:
-     * - Build a Trie with REVERSED words
-     * - For each word, traverse the Trie character by character
-     * - At each step, check if we can form a palindrome pair
+        /**
+     * Intuition: a word can form a palindrome with another word when the unmatched
+     * part left after a reverse-prefix match is itself a palindrome. A trie of
+     * reversed words makes those reverse-prefix matches explicit while storing
+     * which remaining prefixes are palindromic.
      *
-     * Three cases to consider:
-     * 1. Word1 length == Word2 length: Complete reverse match
-     * 2. Word1 shorter: Remaining part of Word2 (in Trie) must be palindrome
-     * 3. Word1 longer: Remaining part of Word1 must be palindrome
+     * Algorithm:
+     *   1. Insert every word into a trie in reverse order, recording palindrome-prefix indices along the path.
+     *   2. For each original word, walk the trie and add pairs when the rest of the word is palindromic.
+     *   3. After the word is consumed, pair it with trie words whose remaining part is palindromic.
      *
-     * Time Complexity: O(n * k^2) where n = number of words, k = average word
-     * length
-     * - Building Trie: O(n * k^2) due to palindrome checks
-     * - Searching: O(n * k^2) due to palindrome checks
-     * Space Complexity: O(n * k) for Trie structure
+     * Time:  O(n * k^2) - each of n words may run palindrome checks across k split positions.
+     * Space: O(n * k) - the trie stores characters from all words plus index lists.
      *
-     * Advantages over HashMap approach:
-     * - Cleaner logic and more intuitive
-     * - Better cache locality
-     * - Easier to extend for prefix/suffix patterns
+     * @param words unique input words
+     * @return ordered index pairs whose concatenation is a palindrome
      */
     public List<List<Integer>> findPalindromePairsUsingTrie(String[] words) {
         List<List<Integer>> palindromePairs = new ArrayList<>();
@@ -168,25 +188,21 @@ public class PalindromePairs {
         }
     }
 
-    /**
-     * Problem: Given a list of unique words, find all pairs of distinct indices (i,
-     * j)
-     * such that the concatenation of words[i] + words[j] forms a palindrome.
+        /**
+     * Intuition: split each word into a prefix and suffix. If one side is already
+     * a palindrome, the reverse of the other side can be attached on the opposite
+     * side to make the whole concatenation a palindrome.
      *
-     * Approach:
-     * 1. Store words in a HashMap with their corresponding indices for O(1)
-     * lookups.
-     * 2. Check for three cases:
-     * - Direct reverse match (word1 == reverse(word2)).
-     * - Palindromic prefix with a corresponding reversed suffix.
-     * - Palindromic suffix with a corresponding reversed prefix.
+     * Algorithm:
+     *   1. Map every word to its index for constant-time reverse lookups.
+     *   2. Add direct reverse matches for whole words.
+     *   3. Add matches from palindromic prefixes and palindromic suffixes.
      *
-     * Complexity:
-     * - Time complexity : O(n * k^2) where n is number of words and k is average
-     * length of words.
-     * - because for each word we may check all prefixes and suffixes (k) and
-     * palindrome check (k).
-     * - Space complexity: O(n) for storing words in the HashMap.
+     * Time:  O(n * k^2) - each word has k splits and palindrome/reverse work can cost k.
+     * Space: O(n * k) - the map and generated split strings store word content.
+     *
+     * @param words unique input words
+     * @return ordered index pairs whose concatenation is a palindrome
      */
     public List<List<Integer>> findPalindromePairs(String[] words) {
         Map<String, Integer> wordIndexMap = new HashMap<>(); // mapping between word and its index

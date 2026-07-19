@@ -1,35 +1,61 @@
 package hashing;
 
 /**
- * LeetCode Problem: https://leetcode.com/problems/reconstruct-original-digits-from-english/
+ * Problem: Reconstruct Original Digits from English
  *
- * Given a string `s` containing an out-of-order English representation of digits 0-9,
- * this function reconstructs the original digits in ascending order.
+ * Given a scrambled string made by concatenating English digit words, rebuild
+ * the original digits in ascending numeric order. The input may contain many
+ * copies of the same digit word mixed together.
  *
- * Example Input: "owoztneoer"
- * Output: "012"
- * Explanation: The string contains the words for "zero", "one", and "two" in a jumbled form.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Leetcode: https://leetcode.com/problems/reconstruct-original-digits-from-english/ (Medium)
+ * Rating:   not available (not a contest problem)
+ * Pattern:  Hashing | Character counts | Unique-letter elimination
+ *
+ * Example:
+ *   Input:  "owoztneoer"
+ *   Output: "012"
+ *   Why:    the letters can be rearranged into "zero", "one", and "two".
+ *
+ * Follow-ups:
+ *   1. How would you validate malformed inputs?
+ *      After deriving digit counts, subtract all chosen words and ensure no letter count is negative or leftover.
+ *   2. How would you support another language?
+ *      Build an elimination order from letters that uniquely identify remaining words.
+ *   3. What if output order should match the original spoken order?
+ *      The counts alone are insufficient; positional information would be required.
+ *   4. How would you handle uppercase or mixed-case input?
+ *      Normalize characters before counting, or keep separate buckets for each case.
+ *
+ * Related: Find Anagrams (438), Sort Characters By Frequency (451).
  */
 public class OriginalDigits {
 
     public static void main(String[] args) {
-        String result = new OriginalDigits().originalDigits("owoztneoer");
-        System.out.println(result); // Expected output: "012"
+        OriginalDigits solver = new OriginalDigits();
+        String[] inputs = { "owoztneoer", "fviefuro" };
+        String[] expected = { "012", "45" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.originalDigits(inputs[i]);
+            System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * Reconstructs the original digits from a shuffled English representation.
+        /**
+     * Intuition: some digit words contain letters no other digit word has, such
+     * as z for zero and w for two. Count those unique letters first, then use the
+     * known digits to subtract overlaps for the remaining words.
      *
-     * Approach:
-     * - Identify unique characters that appear in only one digit.
-     * - Use a frequency map to determine counts of each digit.
-     * - Construct the final sorted number sequence.
+     * Algorithm:
+     *   1. Count every lowercase letter in the scrambled string.
+     *   2. Determine digits with unique markers, then derive the overlapping digits.
+     *   3. Append each digit count times from 0 through 9.
      *
-     * Time Complexity: O(N), where N is the length of the input string.
-     * Space Complexity: O(1), since we use a fixed array of size 26.
-     * @param str Input string containing scrambled digit words.
-     * @return A string containing digits in ascending order.
+     * Time:  O(n) - counting scans the input once and output construction writes each digit once.
+     * Space: O(1) - the letter and digit arrays have fixed sizes.
+     *
+     * @param str scrambled concatenation of English digit words
+     * @return reconstructed digits in ascending order
      */
     public String originalDigits(String str) {
         int[] charCount = new int[26]; // Frequency array for letters 'a' to 'z'

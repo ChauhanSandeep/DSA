@@ -3,43 +3,70 @@ package hashing;
 import java.util.*;
 
 /**
- * 1169. Invalid Transactions
+ * Problem: Invalid Transactions
  *
- * Problem: A transaction is invalid if: amount exceeds $1000, or it occurs within
- * 60 minutes of another transaction in a different city by the same person.
- * Return a list of invalid transactions.
+ * A transaction is invalid when its amount is over 1000, or when another
+ * transaction by the same person occurs within 60 minutes in a different city.
+ * Return every transaction string that satisfies either invalid condition.
+ *
+ * Leetcode: https://leetcode.com/problems/invalid-transactions/ (Medium)
+ * Rating:   1659
+ * Pattern:  Hashing | Parsing | Pair comparison by user
  *
  * Example:
- * Input: transactions = ["alice,20,800,mtv","alice,50,100,beijing"]
- * Output: ["alice,20,800,mtv","alice,50,100,beijing"]
- * Explanation: First transaction is valid. Second is invalid (different city within 60 minutes).
+ *   Input:  ["alice,20,800,mtv", "alice,50,100,beijing"]
+ *   Output: ["alice,20,800,mtv", "alice,50,100,beijing"]
+ *   Why:    the same person appears in different cities only 30 minutes apart,
+ *           so both transactions are invalid.
  *
- * LeetCode: https://leetcode.com/problems/invalid-transactions
+ * Follow-ups:
+ *   1. How would you scale this when each user has many transactions?
+ *      Group by user, sort by time, and compare only transactions inside a 60-minute window.
+ *   2. How would you support real-time fraud alerts?
+ *      Keep recent transactions per user in a time-indexed sliding window.
+ *   3. How would you preserve output order?
+ *      Track invalid indices in a boolean array and scan the original input at the end.
+ *   4. How should time zones be handled in production data?
+ *      Normalize all event times to one canonical timeline before applying the rule.
  *
- * Follow-up questions:
- * Q: How to optimize for millions of transactions?
- * A: Use time-based indexing, spatial hashing, or sliding window approaches.
- *
- * Q: What if we need real-time fraud detection?
- * A: Use streaming algorithms with time-window data structures.
- *
- * Q: How to handle timezone differences?
- * A: Normalize all timestamps to UTC before processing.
- * LeetCode Contest Rating: 1659
+ * Related: Alert Using Same Key-Card Three or More Times in a One Hour Period (1604).
  */
 public class InvalidTransactions {
 
-    /**
-     * Validates transactions based on amount and location/time constraints.
+    public static void main(String[] args) {
+        InvalidTransactions solver = new InvalidTransactions();
+        String[][] cases = {
+            { "alice,20,800,mtv", "alice,50,100,beijing" },
+            { "bob,689,1910,barcelona" }
+        };
+        String[] expected = {
+            "[alice,20,800,mtv, alice,50,100,beijing]",
+            "[bob,689,1910,barcelona]"
+        };
+
+        for (int i = 0; i < cases.length; i++) {
+            List<String> got = solver.invalidTransactions(cases[i]);
+            Collections.sort(got);
+            System.out.printf("transactions=%s -> %s  expected=%s%n",
+                Arrays.toString(cases[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: every invalid rule can be checked after parsing the transaction
+     * fields. The amount rule is local to one transaction, while the city rule
+     * compares that transaction against every other transaction by the same name.
      *
      * Algorithm:
-     * - Parse each transaction into structured data
-     * - Check amount > 1000 for immediate invalidation
-     * - For each transaction, check others by same person within 60 minutes
-     * - If different cities within time window, mark both invalid
+     *   1. Parse every transaction string into a Transaction object.
+     *   2. Mark transactions whose amount is greater than 1000.
+     *   3. Compare each pair and mark both when name matches, city differs, and times are within 60 minutes.
      *
-     * Time Complexity: O(n^2) where n is number of transactions
-     * Space Complexity: O(n) for parsing and result storage
+     * Time:  O(n^2) - every transaction may be compared with every other transaction.
+     * Space: O(n) - parsed transactions and the invalid set grow with the input.
+     *
+     * @param transactions raw transaction strings in name,time,amount,city format
+     * @return transaction strings that are invalid by either rule
      */
     public List<String> invalidTransactions(String[] transactions) {
         List<Transaction> parsed = new ArrayList<>();
