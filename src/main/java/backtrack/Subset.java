@@ -1,151 +1,144 @@
 package backtrack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Subsets
+ * Problem: Subsets
  *
- * Given an integer array nums of unique elements, return all possible subsets (the power set).
- * The solution set must not contain duplicate subsets. Return the answer in any order.
+ * Given an integer array with unique elements, return the full power set: every
+ * subset from the empty subset to the full array. The answer may be returned in
+ * any order, and no duplicate subsets are possible because input values are unique.
  *
- * A subset is a collection that can be formed by including or excluding each element from
- * the original array. The empty subset and the full array itself are both valid subsets.
+ * Leetcode: https://leetcode.com/problems/subsets/
+ * Rating:   acceptance 82.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Power set | Include next choices
  *
  * Example:
- * Input: nums = [1,2,3]
- * Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
- * Explanation: All 2^3 = 8 subsets of [1,2,3]. Each element can either be included or excluded,
- * creating binary choices that result in 2^n total subsets.
+ *   Input:  [1,2,3]
+ *   Output: [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
+ *   Why:    each of the three values is either included or excluded, giving
+ *           2^3 = 8 subsets including the empty set and the full set.
  *
- * LeetCode: https://leetcode.com/problems/subsets/
+ * Follow-ups:
+ *   1. Input contains duplicates?
+ *      Sort first and skip equal sibling choices at the same recursion depth.
+ *   2. Return only subsets of size k?
+ *      Add a target size and record only when currentSubset.size() == k.
+ *   3. Generate the k-th subset in lexicographic order?
+ *      Use combinatorial counts to skip include/exclude blocks.
+ *   4. Count subsets whose sum equals target?
+ *      Use subset-sum DP for counts, or DFS with pruning when all numbers are non-negative.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you handle duplicate elements in the input array?
- *    Answer: Sort array first, then skip consecutive duplicates during backtracking (LeetCode 90).
- * 2. What if you need only subsets of a specific size k?
- *    Answer: Add size parameter to backtracking and stop when current subset reaches size k.
- * 3. How to optimize memory usage when generating millions of subsets?
- *    Answer: Use iterative approaches, streaming, or generate subsets on-demand without storing all.
- * 4. What if you need to find subsets with specific sum or property?
- *    Answer: Add constraint checking during backtracking with pruning for invalid branches.
+ * Related: Subsets II (90), Combinations (77), Combination Sum (39).
  *
- * Related Problems:
- * - LeetCode 90: Subsets II (With duplicates)
- * - LeetCode 77: Combinations (Subsets of specific size)
- * - LeetCode 39: Combination Sum (Subsets with target sum)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Approach           Method                   Time      Space (extra)
+ *   -----------------  -----------------------  --------  -------------
+ *   Iterative build    subsetsIterativeApproach O(n*2^n) O(1)
+ *   Backtracking       subsets                  O(n*2^n) O(n)
  */
 public class Subset {
-    public static void main(String[] args) {
-        int[] nums = {1, 2, 3};
-
-        Subset subset = new Subset();
-        // Backtracking Approach
-        System.out.println("Backtracking Subsets: " + subset.subsetsRecursiveApproach(nums));
-
-        // Iterative Approach
-        System.out.println("Iterative Subsets: " + subset.subsetsIterativeApproach(nums));
-    }
 
     /**
-     * Generates all possible subsets using backtracking approach.
+     * Intuition: the power set doubles every time we introduce a new number. Any
+     * subset built so far has two futures: keep it as-is, or make a copy that also
+     * includes the new number. Starting from just the empty subset and repeating
+     * that copy-and-append round creates every include/exclude combination exactly
+     * once. Because the input values are unique, no duplicate-subset cleanup is needed.
      *
-     * Algorithm: Backtracking with Binary Choices
-     * For each element at index i, we have exactly two choices:
-     * 1. Exclude the element: move to next index without adding current element
-     * 2. Include the element: add to current subset, recurse, then backtrack
+     * Algorithm:
+     *   1. Return an empty answer for null input; otherwise seed the answer with the empty subset.
+     *   2. For each number, remember how many subsets existed before processing it.
+     *   3. Copy each of those existing subsets, append the current number to the copy, and add it to the answer.
+     *   4. Leave the newly added subsets for future rounds, so later numbers can be
+     *      combined with both old and newly extended choices.
      *
-     * Key insights:
-     * - Each element has binary choice (include/exclude) forming decision tree
-     * - 2^n total subsets generated from n elements with binary choices
-     * - Backtracking ensures all combinations explored without duplicates
-     * - Copy current subset when base case reached to preserve state
+     * Time:  O(n*2^n) - each of 2^n subsets may copy up to n values.
+     * Space: O(1) extra beyond the output.
      *
-     * Time Complexity: O(n * 2^n) - generate 2^n subsets, each copy operation takes O(n)
-     * Space Complexity: O(n) - recursion stack depth and temporary subset storage
-     *
-     * @param nums array of unique integers
-     * @return list of all possible subsets
-     */
-    public List<List<Integer>> subsetsRecursiveApproach(int[] nums) {
-        List<List<Integer>> allSubsets = new ArrayList<>();
-        List<Integer> currentSubset = new ArrayList<>();
-
-        generateSubsetsBacktrack(nums, 0, currentSubset, allSubsets);
-        return allSubsets;
-    }
-
-    /**
-     * Recursive helper function implementing backtracking logic.
-     *
-     * Algorithm Steps:
-     * 1. Base case: if reached end of array, add current subset copy to results
-     * 2. Exclude current element: recurse with next index
-     * 3. Include current element: add to subset, recurse, then remove (backtrack)
-     *
-     * The order of operations is crucial:
-     * - First explore "exclude" branch to maintain systematic traversal
-     * - Then explore "include" branch with proper backtracking cleanup
-     */
-    private void generateSubsetsBacktrack(int[] nums, int startIndex, List<Integer> currentSubset,
-        List<List<Integer>> allSubsets) {
-        // Base case: processed all elements, add current subset to results
-        if (startIndex == nums.length) {
-            // Critical: create copy since currentSubset will be modified further
-            allSubsets.add(new ArrayList<>(currentSubset));
-            return;
-        }
-
-        // Choice 1: Exclude current element from subset
-        generateSubsetsBacktrack(nums, startIndex + 1, currentSubset, allSubsets);
-
-        // Choice 2: Include current element in subset
-        currentSubset.add(nums[startIndex]);
-        generateSubsetsBacktrack(nums, startIndex + 1, currentSubset, allSubsets);
-
-        // Backtrack: restore state by removing added element
-        currentSubset.remove(currentSubset.size() - 1);
-    }
-
-    /**
-     * Cascading approach that builds subsets iteratively level by level.
-     * Starts with empty subset and progressively adds each element to existing subsets.
-     *
-     * Algorithm: Iterative Expansion
-     * 1. Start with empty subset [[]]
-     * 2. For each element, double the subsets by adding element to copies of existing subsets
-     * 3. After processing element i, we have all subsets using elements [0...i]
-     *
-     * Example progression for [1,2,3]:
-     * Start: [[]]
-     * Add 1: [[], [1]]
-     * Add 2: [[], [1], [2], [1,2]]
-     * Add 3: [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]
-     *
-     * Time Complexity: O(n * 2^n) - for each element, copy and extend 2^i existing subsets
-     * Space Complexity: O(1) - excluding output space, builds result incrementally
-     *
-     * @param nums array of unique integers
-     * @return list of all possible subsets
+     * @param nums unique integers
+     * @return all subsets of nums
      */
     public List<List<Integer>> subsetsIterativeApproach(int[] nums) {
         List<List<Integer>> allSubsets = new ArrayList<>();
-        allSubsets.add(new ArrayList<>()); // Start with empty subset
+        if (nums == null) return allSubsets;
 
-        // Process each element and expand existing subsets
-        for (int currentElement : nums) {
-            int currentSubsetSize = allSubsets.size();
-
-            // For each existing subset, create new subset by adding current element
-            for (int subsetIndex = 0; subsetIndex < currentSubsetSize; subsetIndex++) {
-                List<Integer> existingSubset = allSubsets.get(subsetIndex);
-                List<Integer> newSubset = new ArrayList<>(existingSubset);
-                newSubset.add(currentElement);
-                allSubsets.add(newSubset);
+        allSubsets.add(new ArrayList<>());
+        for (int num : nums) {
+            int existingSubsetCount = allSubsets.size();
+            for (int i = 0; i < existingSubsetCount; i++) {
+                List<Integer> extendedSubset = new ArrayList<>(allSubsets.get(i));
+                extendedSubset.add(num);
+                allSubsets.add(extendedSubset);
             }
         }
-
         return allSubsets;
+    }
+
+    /**
+     * Intuition (interview default): imagine a decision tree where a path is the
+     * subset chosen so far. Unlike permutations, we do not need to wait for a leaf:
+     * every node is already a valid subset, including the empty subset at the root.
+     * From a node, we may append any later value and continue from the next index,
+     * which prevents reusing a value or producing the same subset in a different
+     * order.
+     *
+     * Algorithm:
+     *   1. Return an empty answer for null input and start DFS with an empty current subset.
+     *   2. On entering each recursive call, copy the current subset into the answer.
+     *   3. From the current start index, try each remaining value as the next value to include.
+     *   4. Add the value, recurse from the next index, then remove it before trying
+     *      the next candidate at the same level.
+     *
+     * Time:  O(n*2^n) - 2^n subsets, each copied in O(n).
+     * Space: O(n) recursion depth and current-subset buffer, excluding output.
+     *
+     * @param nums unique integers
+     * @return all subsets of nums
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> allSubsets = new ArrayList<>();
+        if (nums == null) return allSubsets;
+
+        backtrack(nums, 0, new ArrayList<>(), allSubsets);
+        return allSubsets;
+    }
+
+    /** Records the current subset, then grows it with each later value. */
+    private void backtrack(int[] nums, int start,
+                           List<Integer> currentSubset,
+                           List<List<Integer>> allSubsets) {
+        allSubsets.add(new ArrayList<>(currentSubset));
+
+        for (int i = start; i < nums.length; i++) {
+            currentSubset.add(nums[i]);
+            backtrack(nums, i + 1, currentSubset, allSubsets);
+            currentSubset.remove(currentSubset.size() - 1);
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        Subset solver = new Subset();
+
+        int[][] inputs = {
+            {},
+            {1},
+            {1, 2, 3}
+        };
+        String[] expected = {
+            "[[]]",
+            "[[], [1]]",
+            "[[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Integer>> got = solver.subsets(inputs[i]);
+            System.out.printf("nums=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
 }

@@ -5,126 +5,112 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
- * Problem:
- * Given a pattern string and a target string, determine if there exists a bijective mapping
- * from pattern characters to non-empty substrings of the target string such that the pattern
- * is fully matched.
+ * Problem: Word Pattern II
+ *
+ * Given a pattern and a target string, decide whether each pattern character can
+ * map to a non-empty substring so expanding the pattern equals the target. The
+ * mapping must be bijective: no two pattern characters may use the same substring.
+ *
+ * Leetcode: https://leetcode.com/problems/word-pattern-ii/
+ * Rating:   acceptance 49.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Bijection | Try substring assignments
  *
  * Example:
- * Input: pattern = "abab", str = "redblueredblue"
- * Output: true
- * Explanation:
- *   'a' -> "red", 'b' -> "blue"
+ *   Input:  pattern = "abab", s = "redblueredblue"
+ *   Output: true
+ *   Why:    mapping a to "red" and b to "blue" expands "abab" into
+ *           "redblueredblue" with a different substring for each pattern char.
  *
- * LeetCode Link: https://leetcode.com/problems/word-pattern-ii/
+ * Follow-ups:
+ *   1. Return the actual mapping instead of boolean?
+ *      Return/copy the map when both indexes reach the end.
+ *   2. Return all valid mappings?
+ *      Do not stop at the first success; collect every complete bijection.
+ *   3. Minimize total mapped substring length under wildcard patterns?
+ *      This becomes an optimization DFS with branch-and-bound over assignments.
+ *   4. Avoid substring allocation for large strings?
+ *      Store start/end ranges and compare with regionMatches before materializing.
  *
- * Follow-up Questions (FAANG Style):
- * 1. What if multiple mappings are possible? → Return any one valid mapping.
- * 2. Can we return all possible mappings? → Yes, use a list to store mappings instead of boolean.
- * 3. How would you handle overlapping mappings? → Not possible here due to bijection constraint.
- * 4. Can you optimize substring creation? → Use `StringBuilder` with backtracking to avoid excessive string creation.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Word Pattern (290), Regular Expression Matching (10).
  */
 public class WordPattern2 {
 
-  public static void main(String[] args) {
-    String pattern = "abab";
-    String str = "redblueredblue";
-    System.out.println("Word matches pattern? " + wordPatternMatch(pattern, str));
-  }
+    /**
+     * Intuition: each pattern character must consistently stand for one non-empty
+     * substring, and two different characters cannot share a substring. When a
+     * character already has a mapping, there is no choice: the target must start
+     * with that mapped word at the current position. When it is new, we try every
+     * possible next substring and backtrack if that assignment prevents the rest
+     * of the pattern from matching. The map plus used-substring set enforce the
+     * bijection in both directions.
+     *
+     * Algorithm:
+     *   1. Return false for null inputs and start DFS at the beginning of both strings.
+     *   2. If the current pattern character is already mapped, require the target
+     *      to have that mapped substring at the current target index.
+     *   3. If the character is unmapped, try every non-empty candidate substring
+     *      that leaves enough characters for the remaining pattern.
+     *   4. Assign an unused candidate to the character, recurse after it, and undo
+     *      the assignment if the rest of the pattern cannot match.
+     *   5. Succeed only when both the pattern and target are consumed at the same time.
+     *
+     * Time:  O(n^m) - each of m pattern characters may try many substrings from the length-n target.
+     * Space: O(m + n) for mappings, used substrings, and recursion depth.
+     *
+     * @param pattern pattern characters to map
+     * @param str target string to match
+     * @return true if a bijective mapping exists
+     */
+    public static boolean wordPatternMatch(String pattern, String str) {
+        if (pattern == null || str == null) return false;
 
-  /**
-   * Determines if a bijective mapping exists between pattern characters and substrings of the given string.
-   *
-   * Intuition & Steps:
-   * 1. We use a recursive backtracking approach with:
-   *    - `Map<Character, String>`: Maps each pattern character to a specific substring.
-   *    - `Set<String>`: Tracks substrings already mapped to avoid duplicates.
-   * 2. If a pattern character already has a mapping:
-   *    - Check if the current position in the string matches the mapped substring.
-   *    - If yes, move forward in both pattern and string.
-   *    - If no, return false.
-   * 3. If no mapping exists:
-   *    - Try every possible substring starting from the current position.
-   *    - Assign mapping, recurse, and if recursion fails, backtrack.
-   * 4. Success occurs when both the pattern and string are fully processed.
-   *
-   * Time Complexity: O(N^M) where:
-   *      N = length of the string, M = length of the pattern.
-   *      Because we need to try all possible substrings of length M in the string of length N.
-   * Space Complexity: O(M) for the mapping and visited set, plus recursion depth.
-   *
-   * @param pattern the pattern string (e.g., "abab")
-   * @param str the target string (e.g., "redblueredblue")
-   * @return true if a valid bijection mapping exists, false otherwise
-   */
-  public static boolean wordPatternMatch(String pattern, String str) {
-    return backtrack(pattern, 0, str, 0, new HashMap<>(), new HashSet<>());
-  }
-
-  /**
-   * Recursive helper function for backtracking.
-   *
-   * @param pattern pattern string
-   * @param pIndex current index in pattern
-   * @param target target string
-   * @param tIndex current index in string
-   * @param mapping stores current mapping from pattern chars to substrings
-   * @param usedSubstrings tracks substrings already assigned to avoid duplicates
-   * @return true if a valid mapping is found
-   */
-  private static boolean backtrack(String pattern, int pIndex, String target, int tIndex, Map<Character, String> mapping,
-      Set<String> usedSubstrings) {
-
-    // Base case: both pattern and string fully matched
-    if (pIndex == pattern.length() && tIndex == target.length()) {
-      return true;
+        return backtrack(pattern, 0, str, 0, new HashMap<>(), new HashSet<>());
     }
 
-    // Mismatch in length (one finished but the other not)
-    if (pIndex >= pattern.length() || tIndex >= target.length()) {
-      return false;
-    }
+    /** Tries substring assignments for pattern characters while preserving a bijection. */
+    private static boolean backtrack(String pattern, int patternIndex,
+                                     String target, int targetIndex,
+                                     Map<Character, String> charToWord,
+                                     Set<String> usedWords) {
+        if (patternIndex == pattern.length() && targetIndex == target.length()) return true;
+        if (patternIndex == pattern.length() || targetIndex == target.length()) return false;
 
-    char currentChar = pattern.charAt(pIndex);
+        char patternChar = pattern.charAt(patternIndex);
+        String mappedWord = charToWord.get(patternChar);
+        if (mappedWord != null) {
+            return target.startsWith(mappedWord, targetIndex)
+                && backtrack(pattern, patternIndex + 1, target, targetIndex + mappedWord.length(),
+                    charToWord, usedWords);
+        }
 
-    // Case 1: Already mapped character
-    if (mapping.containsKey(currentChar)) {
-      String mappedValue = mapping.get(currentChar);
+        int remainingPatternChars = pattern.length() - patternIndex - 1;
+        int lastCandidateEnd = target.length() - remainingPatternChars;
+        for (int end = targetIndex + 1; end <= lastCandidateEnd; end++) {
+            String candidate = target.substring(targetIndex, end);
+            if (usedWords.contains(candidate)) continue;
 
-      // Check if the substring at tIndex matches mapped value
-      if (!target.startsWith(mappedValue, tIndex)) {
+            charToWord.put(patternChar, candidate);
+            usedWords.add(candidate);
+            if (backtrack(pattern, patternIndex + 1, target, end, charToWord, usedWords)) return true;
+            usedWords.remove(candidate);
+            charToWord.remove(patternChar);
+        }
         return false;
-      }
-
-      // Continue to the next pattern character
-      return backtrack(pattern, pIndex + 1, target, tIndex + mappedValue.length(), mapping, usedSubstrings);
     }
 
-    // Case 2: New mapping needed
-    for (int end = tIndex + 1; end <= target.length(); end++) {
-      String candidate = target.substring(tIndex, end);
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        String[] patterns = {"abab", "aaaa", "aabb", ""};
+        String[] strings = {"redblueredblue", "asdasdasdasd", "xyzabcxzyabc", ""};
+        boolean[] expected = {true, true, false, true};
 
-      // Skip if substring already used for another mapping
-      if (usedSubstrings.contains(candidate)) {
-        continue;
-      }
-
-      // Assign and recurse
-      mapping.put(currentChar, candidate);
-      usedSubstrings.add(candidate);
-
-      if (backtrack(pattern, pIndex + 1, target, end, mapping, usedSubstrings)) {
-        return true;
-      }
-
-      // Backtrack: undo assignment
-      mapping.remove(currentChar);
-      usedSubstrings.remove(candidate);
+        for (int i = 0; i < patterns.length; i++) {
+            boolean got = wordPatternMatch(patterns[i], strings[i]);
+            System.out.printf("pattern=%s str=%s  ->  %s  expected=%s%n",
+                patterns[i], strings[i], got, expected[i]);
+        }
     }
-
-    return false;
-  }
 }

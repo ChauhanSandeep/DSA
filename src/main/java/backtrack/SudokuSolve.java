@@ -1,199 +1,191 @@
 package backtrack;
 
+import java.util.Arrays;
+
 /**
- * Sudoku Solver using Backtracking
+ * Problem: Sudoku Solver
  *
- * Sudoku is a 9×9 grid-based number puzzle where the objective is to fill the grid
- * so that each row, column, and 3×3 sub-grid contains all digits from 1 to 9.
+ * Fill a partially completed 9 x 9 Sudoku board in place. Empty cells are '.',
+ * and every row, column, and 3 x 3 box must contain digits 1..9 without
+ * repetition in the solved board.
  *
- * Algorithm: Backtracking
- * This solution uses backtracking to systematically try all possible valid placements
- * until a solution is found or all possibilities are exhausted.
+ * Leetcode: https://leetcode.com/problems/sudoku-solver/
+ * Rating:   acceptance 65.6% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Constraint tracking | Fill empty cells
  *
- * Key Optimization: Constraint Tracking
- * Instead of validating constraints on every placement attempt, this implementation
- * maintains three boolean arrays to track which digits are already used in:
- * 1. Each row (rowDigit)
- * 2. Each column (colDigit)
- * 3. Each 3×3 block (blockDigit)
+ * Example:
+ *   Input:  top row [5,3,.,.,7,.,.,.,.]
+ *   Output: top row [5,3,4,6,7,8,9,1,2]
+ *   Why:    the completed board fills every empty cell while keeping each row,
+ *           column, and 3 x 3 box free of repeated digits.
  *
- * This reduces validation time from O(1) checks (instead of O(9) checks per placement).
+ * Follow-ups:
+ *   1. Choose the next cell with minimum candidates instead of row-major order?
+ *      Scan empty cells each step and branch on the one with the fewest legal digits.
+ *   2. Count all possible solutions?
+ *      Continue DFS after one solution and increment a counter at each completed board.
+ *   3. Detect invalid given boards before solving?
+ *      During constraint initialization, reject any duplicate digit in a row/column/box.
+ *   4. Solve larger Sudoku variants?
+ *      Parameterize board size and box dimensions, then replace fixed arrays with size-based masks.
  *
- * Backtracking Process:
- * 1. Find next empty cell (marked with '.')
- * 2. Try placing digits 1-9 in that cell
- * 3. For each digit, check if it violates constraints
- * 4. If valid, place the digit and recurse to next cell
- * 5. If recursion succeeds, solution found
- * 6. If recursion fails, backtrack (undo placement) and try next digit
- * 7. If all digits fail, return false (no solution from this state)
- *
- * Time Complexity: O(9^(n*n)) in worst case, where n=9 (grid size)
- * - In practice, much faster due to constraint pruning
- * - Most cells have limited valid choices
- *
- * Space Complexity: O(n*n) for constraint tracking arrays + recursion stack
- *
- * LeetCode Problem: https://leetcode.com/problems/sudoku-solver/
- *
- * Related Problems:
- * - N-Queens Problem (similar backtracking pattern)
- * - Valid Sudoku (checking if a board is valid)
- * - Combination Sum (backtracking with constraints)
- *
- * @author Sandeep Chauhan
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Valid Sudoku (36), N-Queens (51).
  */
 public class SudokuSolve {
-    private static final int SIZE = 9; // Standard Sudoku size (9x9 grid)
+    private static final int SIZE = 9;
+    private static final int BOX_SIZE = 3;
+    private static final char EMPTY = '.';
 
-    // Constraint tracking arrays for fast validation
-    private static boolean[][] rowDigit = new boolean[SIZE][SIZE];    // rowDigit[i][d] = true if digit d is used in row i
-    private static boolean[][] colDigit = new boolean[SIZE][SIZE];    // colDigit[j][d] = true if digit d is used in column j
-    private static boolean[][] blockDigit = new boolean[SIZE][SIZE];  // blockDigit[b][d] = true if digit d is used in block b
-
-    /**
-     * Main method demonstrating Sudoku solver usage.
-     * Uses a standard Sudoku puzzle as input.
-     */
-    public static void main(String[] args) {
-        char[][] board =
-                {
-                        {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
-                        {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
-                        {'.', '9', '8', '.', '.', '.', '.', '6', '.'},
-                        {'8', '.', '.', '.', '6', '.', '.', '.', '3'},
-                        {'4', '.', '.', '8', '.', '3', '.', '.', '1'},
-                        {'7', '.', '.', '.', '2', '.', '.', '.', '6'},
-                        {'.', '6', '.', '.', '.', '.', '2', '8', '.'},
-                        {'.', '.', '.', '4', '1', '9', '.', '.', '5'},
-                        {'.', '.', '.', '.', '8', '.', '.', '7', '9'}
-                };
-
-        if (solveSudoku(board)) {
-            printBoard(board);
-        } else {
-            System.out.println("No solution exists!");
-        }
-    }
+    private static boolean[][] rowDigit = new boolean[SIZE][SIZE];
+    private static boolean[][] colDigit = new boolean[SIZE][SIZE];
+    private static boolean[][] boxDigit = new boolean[SIZE][SIZE];
 
     /**
-     * Solves the given Sudoku board using backtracking.
+     * Intuition: Sudoku backtracking is about trying digits, but the trick is to
+     * make legality checks instant. A digit is legal in a cell only if it has not
+     * appeared in that row, that column, or that 3 x 3 box. Three boolean tables
+     * track those facts, so placing a digit also updates the future constraints.
+     * If a later cell gets stuck, we undo the placement and try another digit.
      *
-     * @param board 9x9 character array representing Sudoku board ('.' for empty cells, '1'-'9' for filled cells)
-     * @return true if solution found and board is modified with solution, false if no solution exists
+     * Algorithm:
+     *   1. Reject boards that are not 9 x 9 or that already contain duplicate fixed digits.
+     *   2. Initialize row, column, and box constraint tables from the prefilled cells.
+     *   3. Visit cells in row-major order and skip cells that were already filled.
+     *   4. For an empty cell, try digits 1..9 that are absent from its row, column, and box tables.
+     *   5. Place a legal digit and mark its constraints; if solving the rest fails,
+     *      restore the dot and unmark the digit before trying the next one.
+     *
+     * Time:  O(9^e) - each empty cell may need to try up to 9 digits before constraints prune it.
+     * Space: O(1) for fixed-size constraint tables plus O(e) recursion depth.
+     *
+     * @param board 9 x 9 Sudoku board, mutated in place when solvable
+     * @return true if a solution exists
      */
     public static boolean solveSudoku(char[][] board) {
-        if (board == null || board.length != SIZE || board[0].length != SIZE) {
-            return false; // Invalid board dimensions
-        }
+        if (!hasValidShape(board)) return false;
+        if (!initializeConstraints(board)) return false;
 
-        initializeConstraints(board);
         return solve(0, board);
     }
 
-    /**
-     * Initializes constraint tracking arrays based on pre-filled cells.
-     *
-     * Processes the initial board state and marks which digits are already used
-     * in each row, column, and 3×3 block. This initialization allows O(1) constraint
-     * checking during the solving process.
-     *
-     * Block Indexing:
-     * - Blocks are numbered 0-8 from left to right, top to bottom
-     * - Block number = (row / 3) * 3 + (col / 3)
-     * - Example: cell (4,5) is in block (4/3)*3 + (5/3) = 1*3 + 1 = 4 (center block)
-     *
-     * @param board The Sudoku board to analyze
-     */
-    private static void initializeConstraints(char[][] board) {
+    /** Checks that the board is a non-null 9 x 9 grid. */
+    private static boolean hasValidShape(char[][] board) {
+        if (board == null || board.length != SIZE) return false;
+        for (char[] row : board) {
+            if (row == null || row.length != SIZE) return false;
+        }
+        return true;
+    }
+
+    /** Initializes row, column, and box digit tables from the fixed cells. */
+    private static boolean initializeConstraints(char[][] board) {
         rowDigit = new boolean[SIZE][SIZE];
         colDigit = new boolean[SIZE][SIZE];
-        blockDigit = new boolean[SIZE][SIZE];
+        boxDigit = new boolean[SIZE][SIZE];
 
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] != '.') {
-                    int num = board[i][j] - '1';
-                    int block = (i / 3) * 3 + (j / 3); // (i / 3) * 3 gives the row of the block and (j / 3) gives the column of the block
-                    rowDigit[i][num] = colDigit[j][num] = blockDigit[block][num] = true;
-                }
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                char cell = board[row][col];
+                if (cell == EMPTY) continue;
+                if (cell < '1' || cell > '9') return false;
+
+                int digit = cell - '1';
+                int box = boxIndex(row, col);
+                if (rowDigit[row][digit] || colDigit[col][digit] || boxDigit[box][digit]) return false;
+
+                rowDigit[row][digit] = true;
+                colDigit[col][digit] = true;
+                boxDigit[box][digit] = true;
             }
         }
+        return true;
     }
 
-    /**
-     * Recursive backtracking function to solve Sudoku.
-     *
-     * This function processes cells in row-major order (left to right, top to bottom).
-     * For each empty cell, it tries placing digits 1-9 and recursively attempts to
-     * solve the rest of the board.
-     *
-     * Backtracking Strategy:
-     * 1. Base case: If index reaches 81 (9*9), all cells filled successfully
-     * 2. Skip cells that are already filled (pre-filled or solved earlier)
-     * 3. For empty cells, try each digit 1-9
-     * 4. Check if digit violates row, column, or block constraints
-     * 5. If valid, place digit and mark it as used in constraint arrays
-     * 6. Recursively try to solve remaining cells
-     * 7. If recursion succeeds, propagate success upward
-     * 8. If recursion fails, backtrack: remove digit and unmark constraints
-     * 9. If all digits fail, return false (dead end, need to backtrack further)
-     *
-     * @param index Current cell position (0-80, calculated as row*9 + col)
-     * @param board The Sudoku board being solved
-     * @return true if solution found from this state, false otherwise
-     */
-    private static boolean solve(int index, char[][] board) {
-        if (index == SIZE * SIZE) return true; // Base case: All cells filled successfully
+    /** Fills empty cells in row-major order using the current constraint tables. */
+    private static boolean solve(int cellIndex, char[][] board) {
+        if (cellIndex == SIZE * SIZE) return true;
 
-        int row = index / SIZE;    // Convert linear index to 2D coordinates
-        int col = index % SIZE;
-        int block = (row / 3) * 3 + (col / 3); // Calculate which 3×3 block this cell belongs to
+        int row = cellIndex / SIZE;
+        int col = cellIndex % SIZE;
+        if (board[row][col] != EMPTY) return solve(cellIndex + 1, board);
 
-        if (board[row][col] != '.') {
-            return solve(index + 1, board); // Cell already filled, move to next
+        int box = boxIndex(row, col);
+        for (char digitChar = '1'; digitChar <= '9'; digitChar++) {
+            int digit = digitChar - '1';
+            if (rowDigit[row][digit] || colDigit[col][digit] || boxDigit[box][digit]) continue;
+
+            board[row][col] = digitChar;
+            rowDigit[row][digit] = true;
+            colDigit[col][digit] = true;
+            boxDigit[box][digit] = true;
+
+            if (solve(cellIndex + 1, board)) return true;
+
+            board[row][col] = EMPTY;
+            rowDigit[row][digit] = false;
+            colDigit[col][digit] = false;
+            boxDigit[box][digit] = false;
         }
-
-        // Try placing each digit 1-9
-        for (char c = '1'; c <= '9'; c++) {
-            int num = c - '1'; // Convert character to index (0-8)
-
-            // Check if placing this digit violates any constraints
-            if (!rowDigit[row][num] && !colDigit[col][num] && !blockDigit[block][num]) {
-                // CHOOSE: Place the digit and mark constraints
-                board[row][col] = c;
-                rowDigit[row][num] = colDigit[col][num] = blockDigit[block][num] = true;
-
-                // EXPLORE: Recursively try to solve rest of the board
-                if (solve(index + 1, board)) return true; // Solution found!
-
-                // UNCHOOSE (Backtrack): Remove digit and unmark constraints
-                board[row][col] = '.';
-                rowDigit[row][num] = colDigit[col][num] = blockDigit[block][num] = false;
-            }
-        }
-        return false; // No valid digit found for this cell, need to backtrack
+        return false;
     }
 
-    /**
-     * Prints the Sudoku board in a formatted grid.
-     * Includes visual separators for the 3×3 sub-grids.
-     *
-     * @param board The Sudoku board to print
-     */
-    private static void printBoard(char[][] board) {
-        for (int i = 0; i < SIZE; i++) {
-            if (i % 3 == 0 && i != 0) {
-                System.out.println("------+-------+------");
-            }
-            for (int j = 0; j < SIZE; j++) {
-                if (j % 3 == 0 && j != 0) {
-                    System.out.print("| ");
-                }
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-        }
+    /** Returns the 3 x 3 box index for a cell. */
+    private static int boxIndex(int row, int col) {
+        return (row / BOX_SIZE) * BOX_SIZE + (col / BOX_SIZE);
+    }
+
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        char[][] puzzle = {
+            {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
+            {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
+            {'.', '9', '8', '.', '.', '.', '.', '6', '.'},
+            {'8', '.', '.', '.', '6', '.', '.', '.', '3'},
+            {'4', '.', '.', '8', '.', '3', '.', '.', '1'},
+            {'7', '.', '.', '.', '2', '.', '.', '.', '6'},
+            {'.', '6', '.', '.', '.', '.', '2', '8', '.'},
+            {'.', '.', '.', '4', '1', '9', '.', '.', '5'},
+            {'.', '.', '.', '.', '8', '.', '.', '7', '9'}
+        };
+        char[][] solved = {
+            {'5', '3', '4', '6', '7', '8', '9', '1', '2'},
+            {'6', '7', '2', '1', '9', '5', '3', '4', '8'},
+            {'1', '9', '8', '3', '4', '2', '5', '6', '7'},
+            {'8', '5', '9', '7', '6', '1', '4', '2', '3'},
+            {'4', '2', '6', '8', '5', '3', '7', '9', '1'},
+            {'7', '1', '3', '9', '2', '4', '8', '5', '6'},
+            {'9', '6', '1', '5', '3', '7', '2', '8', '4'},
+            {'2', '8', '7', '4', '1', '9', '6', '3', '5'},
+            {'3', '4', '5', '2', '8', '6', '1', '7', '9'}
+        };
+        char[][] invalid = {
+            {'5', '5', '.', '.', '7', '.', '.', '.', '.'},
+            {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
+            {'.', '9', '8', '.', '.', '.', '.', '6', '.'},
+            {'8', '.', '.', '.', '6', '.', '.', '.', '3'},
+            {'4', '.', '.', '8', '.', '3', '.', '.', '1'},
+            {'7', '.', '.', '.', '2', '.', '.', '.', '6'},
+            {'.', '6', '.', '.', '.', '.', '2', '8', '.'},
+            {'.', '.', '.', '4', '1', '9', '.', '.', '5'},
+            {'.', '.', '.', '.', '8', '.', '.', '7', '9'}
+        };
+
+        char[][] puzzleCopy = copyBoard(puzzle);
+        boolean solvedResult = solveSudoku(puzzleCopy);
+        System.out.printf("board=puzzle  ->  solved=%s output=%s  expected=%s%n",
+            solvedResult, Arrays.deepToString(puzzleCopy), Arrays.deepToString(solved));
+
+        char[][] invalidCopy = copyBoard(invalid);
+        boolean invalidResult = solveSudoku(invalidCopy);
+        System.out.printf("board=invalid  ->  solved=%s  expected=false%n", invalidResult);
+    }
+
+    /** Copies a Sudoku board for demo cases so inputs are not shared. */
+    private static char[][] copyBoard(char[][] board) {
+        char[][] copy = new char[board.length][];
+        for (int i = 0; i < board.length; i++) copy[i] = board[i].clone();
+        return copy;
     }
 }

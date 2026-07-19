@@ -1,188 +1,129 @@
 package backtrack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 216. Combination Sum III
+ * Problem: Combination Sum III
  *
- * Problem: Find all valid combinations of k numbers that sum up to n such that:
- * - Only numbers 1-9 are used
- * - Each number is used at most once
- * - Return a list of all possible valid combinations
+ * Choose exactly k distinct numbers from 1..9 so their sum is n. Each number
+ * may be used at most once, and the answer contains combinations, not ordered
+ * permutations.
+ *
+ * Leetcode: https://leetcode.com/problems/combination-sum-iii/
+ * Rating:   acceptance 73.5% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Fixed-size combinations | Sum pruning
  *
  * Example:
- * Input: k = 3, n = 7
- * Output: [[1,2,4]]
- * Explanation: 1 + 2 + 4 = 7, there are no other valid combinations.
+ *   Input:  k = 3, n = 9
+ *   Output: [[1, 2, 6], [1, 3, 5], [2, 3, 4]]
+ *   Why:    each listed triple uses distinct digits from 1..9 and sums to 9;
+ *           every other 3-digit choice is either too small or too large.
  *
- * LeetCode: https://leetcode.com/problems/combination-sum-iii
+ * Follow-ups:
+ *   1. Return the k-th valid combination in lexicographic order?
+ *      Count feasible suffixes with bounded subset-sum DP and skip whole blocks.
+ *   2. Expand the digit range to 1..m where m is large?
+ *      Keep the same DFS, but prune with arithmetic-series min/max bounds.
+ *   3. Count valid combinations without listing them?
+ *      Use DP over (next number, remaining picks, remaining sum).
+ *   4. Allow repeated numbers like Combination Sum?
+ *      Recurse without advancing the start after choosing a candidate.
  *
- * Follow-up questions:
- * Q: What if we allow numbers to be used multiple times?
- * A: Modify backtracking to not increment start index when recursing.
- *
- * Q: How to handle larger ranges (e.g., 1-100)?
- * A: Same algorithm works, just adjust the upper bound in the loop.
- *
- * Q: Can we optimize using mathematical constraints?
- * A: Yes, early termination when sum exceeds target or remaining numbers can't reach target.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Combination Sum (39), Combination Sum II (40), Combinations (77).
  */
 public class CombinationSumIII {
+    private static final int MIN_DIGIT = 1;
+    private static final int MAX_DIGIT = 9;
 
     /**
-     * Finds all combinations of k unique numbers from 1-9 that sum to n.
+     * Intuition: this is a fixed-size combination search with a running sum.
+     * We choose digits in increasing order so the same set is never produced in
+     * a different order. The key pruning is arithmetic: if the smallest possible
+     * remaining digits already exceed the target, or the largest possible
+     * remaining digits still fall short, that branch can never recover. Because
+     * digits are positive and limited to 1..9, these bounds are cheap and exact.
      *
-     * Algorithm: Backtracking
-     * - Try each number from 1-9 as potential candidates
-     * - For each number, recursively find combinations with remaining count and target
-     * - Backtrack by removing current number and trying next
-     * - Prune branches when impossible to reach target
+     * Algorithm:
+     *   1. Reject k/n pairs that are outside the global smallest and largest sums
+     *      any k distinct digits from 1..9 can make.
+     *   2. Start a DFS at digit 1, carrying how many slots remain and how much sum
+     *      is still needed.
+     *   3. Before expanding a DFS state, compare the remaining target with the
+     *      smallest and largest suffix sums possible from the current start digit.
+     *   4. Try each candidate digit that leaves enough larger digits for the rest;
+     *      add it, recurse with one fewer slot, then remove it before trying the next.
      *
-     * Time Complexity: O(C(9,k)) - combinations of k items from 9 numbers
-     * Space Complexity: O(k) for recursion stack and current combination
+     * Time:  O(C(9,k) * k) - valid combinations are copied, and pruning cuts dead branches.
+     * Space: O(k) recursion depth and current-combination buffer, excluding output.
+     *
+     * @param k number of distinct digits to choose
+     * @param n target sum
+     * @return all valid combinations of k digits summing to n
      */
     public List<List<Integer>> combinationSum3(int k, int n) {
-        List<List<Integer>> result = new ArrayList<>();
-        List<Integer> current = new ArrayList<>();
+        List<List<Integer>> allCombinations = new ArrayList<>();
+        if (k < 0 || k > MAX_DIGIT) return allCombinations;
 
-        backtrack(result, current, k, n, 1);
-        return result;
+        int minPossible = arithmeticSum(MIN_DIGIT, k);
+        int maxPossible = arithmeticSum(MAX_DIGIT - k + 1, k);
+        if (n < minPossible || n > maxPossible) return allCombinations;
+
+        backtrack(k, n, MIN_DIGIT, new ArrayList<>(), allCombinations);
+        return allCombinations;
     }
 
-    // Backtracking helper
-    private void backtrack(List<List<Integer>> result, List<Integer> current, int k, int target, int start) {
-        // Base cases
-        if (k == 0 && target == 0) {
-            result.add(new ArrayList<>(current));
+    /** Builds valid digit combinations while tracking remaining slots and target sum. */
+    private void backtrack(int remainingSlots, int remainingTarget, int startDigit,
+                           List<Integer> currentCombination,
+                           List<List<Integer>> allCombinations) {
+        if (remainingSlots == 0) {
+            if (remainingTarget == 0) allCombinations.add(new ArrayList<>(currentCombination));
             return;
         }
 
-        if (k == 0 || target < 0) {
-            return;
-        }
+        if (!canReachTarget(startDigit, remainingSlots, remainingTarget)) return;
 
-        // Try numbers from start to 9
-        for (int i = start; i <= 9; i++) {
-            // Early termination: if current number exceeds target, no point continuing
-            if (i > target) {
-                break;
-            }
-
-            // Early termination: check if remaining numbers can reach target
-            if (!canReachTarget(i + 1, k - 1, target - i)) {
-                break;
-            }
-
-            current.add(i);
-            backtrack(result, current, k - 1, target - i, i + 1);
-            current.remove(current.size() - 1);
+        int lastUsefulDigit = MAX_DIGIT - remainingSlots + 1;
+        for (int digit = startDigit; digit <= lastUsefulDigit && digit <= remainingTarget; digit++) {
+            // select -> work -> un-select : the backtracking template
+            currentCombination.add(digit);
+            backtrack(remainingSlots - 1, remainingTarget - digit, digit + 1,
+                currentCombination, allCombinations);
+            currentCombination.remove(currentCombination.size() - 1);
         }
     }
 
-    // Check if it's possible to reach target with remaining numbers
-    private boolean canReachTarget(int start, int count, int target) {
-        if (count == 0) {
-            return target == 0;
-        }
-
-        // Minimum possible sum with 'count' numbers starting from 'start'
-        int minSum = 0;
-        for (int i = 0; i < count && start + i <= 9; i++) {
-            minSum += start + i;
-        }
-
-        // Maximum possible sum with 'count' numbers ending at 9
-        int maxSum = 0;
-        for (int i = 0; i < count; i++) {
-            maxSum += 9 - i;
-        }
-
+    /** Checks whether the smallest and largest possible suffix sums can still hit the target. */
+    private boolean canReachTarget(int startDigit, int count, int target) {
+        int minSum = arithmeticSum(startDigit, count);
+        int maxSum = arithmeticSum(MAX_DIGIT - count + 1, count);
         return target >= minSum && target <= maxSum;
     }
 
-    /**
-     * Optimized version with better pruning conditions.
-     * Includes more aggressive early termination.
-     */
-    public List<List<Integer>> combinationSum3Optimized(int k, int n) {
-        List<List<Integer>> result = new ArrayList<>();
-
-        // Early check: minimum possible sum is 1+2+...+k, maximum is (10-k)+...+9
-        int minPossible = k * (k + 1) / 2;
-        int maxPossible = k * (19 - k) / 2;
-
-        if (n < minPossible || n > maxPossible) {
-            return result;
-        }
-
-        backtrackOptimized(result, new ArrayList<>(), k, n, 1);
-        return result;
+    /** Returns the sum of count consecutive integers starting at firstValue. */
+    private int arithmeticSum(int firstValue, int count) {
+        return (2 * firstValue + count - 1) * count / 2;
     }
 
-    // Optimized backtracking with better pruning
-    private void backtrackOptimized(List<List<Integer>> result, List<Integer> current, int k, int target, int start) {
-        if (k == 0) {
-            if (target == 0) {
-                result.add(new ArrayList<>(current));
-            }
-            return;
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        CombinationSumIII solver = new CombinationSumIII();
+
+        int[] ks = {3, 4, 3};
+        int[] targets = {9, 1, 7};
+        String[] expected = {
+            "[[1, 2, 6], [1, 3, 5], [2, 3, 4]]",
+            "[]",
+            "[[1, 2, 4]]"
+        };
+
+        for (int i = 0; i < ks.length; i++) {
+            List<List<Integer>> got = solver.combinationSum3(ks[i], targets[i]);
+            System.out.printf("k=%d n=%d  ->  %s  expected=%s%n",
+                ks[i], targets[i], got, expected[i]);
         }
-
-        // Calculate bounds for remaining numbers
-        int minRemaining = (2 * start + k - 1) * k / 2;
-        int maxRemaining = (2 * 9 - k + 1) * k / 2;
-
-        if (target < minRemaining || target > maxRemaining) {
-            return;
-        }
-
-        for (int i = start; i <= 9 && i <= target; i++) {
-            // Skip if impossible to complete with remaining slots
-            int remainingTarget = target - i;
-            int remainingCount = k - 1;
-
-            if (remainingCount > 0) {
-                int minForRemaining = (2 * (i + 1) + remainingCount - 1) * remainingCount / 2;
-                int maxForRemaining = (2 * 9 - remainingCount + 1) * remainingCount / 2;
-
-                if (remainingTarget < minForRemaining || remainingTarget > maxForRemaining) {
-                    continue;
-                }
-            }
-
-            current.add(i);
-            backtrackOptimized(result, current, k - 1, target - i, i + 1);
-            current.remove(current.size() - 1);
-        }
-    }
-
-    /**
-     * Alternative iterative approach using bit manipulation.
-     * Generates all possible combinations and filters valid ones.
-     */
-    public List<List<Integer>> combinationSum3Iterative(int k, int n) {
-        List<List<Integer>> result = new ArrayList<>();
-
-        // Generate all possible combinations using bitmask
-        for (int mask = 0; mask < (1 << 9); mask++) {
-            if (Integer.bitCount(mask) == k) {
-                List<Integer> combination = new ArrayList<>();
-                int sum = 0;
-
-                for (int i = 0; i < 9; i++) {
-                    if ((mask & (1 << i)) != 0) {
-                        combination.add(i + 1);
-                        sum += i + 1;
-                    }
-                }
-
-                if (sum == n) {
-                    result.add(combination);
-                }
-            }
-        }
-
-        return result;
     }
 }

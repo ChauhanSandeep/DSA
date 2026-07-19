@@ -3,138 +3,136 @@ package backtrack;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * LeetCode: https://leetcode.com/problems/gray-code/
+ * Problem: Gray Code
  *
- * The Gray Code is a binary numeral system in which two successive values differ in only one bit.
- * Given a non-negative integer n representing the total number of bits in the code,
- * return the sequence of Gray Code, starting from 0.
+ * Gray code is a binary ordering in which two successive values differ in only
+ * one bit. Given a non-negative integer n (the number of bits), return the Gray
+ * code sequence, starting from 0.
+ *
+ * Leetcode: https://leetcode.com/problems/gray-code/
+ * Rating:   acceptance 65.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Bit manipulation | Reflected binary code
  *
  * Example:
- * Input: n = 2
- * Output: [0, 1, 3, 2]
- * Explanation: In binary, this corresponds to: 00, 01, 11, 10.
+ *   Input:  n = 2
+ *   Output: [0, 1, 3, 2]
+ *   Why:    in binary that is 00, 01, 11, 10 - every neighbouring pair flips
+ *           exactly one bit, and the last (10) also differs from the first (00)
+ *           by one bit, so the sequence is a valid single-bit-change ordering.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. Can you generate Gray Code without recursion?
- *    - Yes, by iteratively generating the sequence using the reflection method.
- * 2. Can you generate directly in integer form without using strings?
- *    - Yes, using the formula: grayCode(i) = i ^ (i >> 1). Solved in method 2.
- * 3. How would you adapt this for very large n?
- *    - Use bit manipulation to generate integers directly, avoiding string operations.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Produce the i-th Gray code without generating the prefix?
+ *      Use i ^ (i >> 1), which converts binary rank directly to Gray rank.
+ *   2. Convert a Gray-coded value back to its binary rank?
+ *      Repeatedly xor the value with itself shifted right until the shift becomes 0.
+ *   3. Generate a cyclic Hamiltonian path for a restricted bit graph?
+ *      This becomes a graph backtracking problem instead of the simple reflection formula.
+ *   4. Stream values for very large n?
+ *      Iterate rank from 0 upward and emit rank ^ (rank >> 1) lazily.
+ *
+ * Related: Circular Permutation in Binary Representation (1238).
+ *
+ *   Approach                Method                     Time    Space (extra)
+ *   ----------------------  -------------------------  ------  -------------
+ *   Reflection strings      generateGrayCodeRecursive  O(2^n)  O(2^n)
+ *   Direct bit formula      generateGrayCode           O(2^n)  O(1)
  */
 public class GrayCode {
-  public static void main(String[] args) {
-    List<Integer> grayCodeSequence = generateGrayCode(4);
-    for (Integer num : grayCodeSequence) {
-      System.out.println(Integer.toBinaryString(num));  // Print as binary representation
-    }
-  }
 
-  /**
-   * Generates the Gray Code sequence for a given number of bits.
-   *
-   * Approach:
-   * 1. Gray Code of size num can be derived from Gray Code of size num-1.
-   * 2. Take the sequence for num-1 bits:
-   *    - Prefix '0' to all codes (first half).
-   *    - Prefix '1' to the reversed sequence (second half).
-   * 3. Convert binary strings to integers before returning.
-   *
-   * Algorithm: Recursive generation + reflection method.
-   * Time Complexity: O(2^num) — Each sequence has length 2^num.
-   * Space Complexity: O(2^num) — To store all Gray codes.
-   *
-   * @param bitsCount Number of bits.
-   * @return List of integers representing the Gray Code sequence.
-   */
-  public static List<Integer> generateGrayCode(int bitsCount) {
-      // binaryGrayCode = ["0", "1", "11", "10"]
-    List<String> binaryGrayCode = generateGrayCodeRecursive(bitsCount);
-        
-    // grayCodeNumbers = [0, 1, 3, 2]
-    List<Integer> grayCodeNumbers = new ArrayList<>(binaryGrayCode.size());
+    /**
+     * Intuition: build the n-bit sequence out of the (n-1)-bit one by
+     * "reflecting" it. Take the shorter sequence, write it once with a 0 stuck on
+     * the front, then write it again in reverse with a 1 on the front. Within each
+     * half only the low bits change (they already form a valid Gray sequence), and
+     * at the seam between the halves the mirror image means the low bits are
+     * identical, so only the new leading bit flips - so every neighbour, including
+     * the join, differs by exactly one bit.
+     *
+     * Algorithm:
+     *   1. Recursively build the reflected binary strings for n bits.
+     *   2. First half: copy the previous sequence in order, prefixing each with 0.
+     *   3. Second half: copy the previous sequence in reverse, prefixing each
+     *      with 1 (the reversal is what keeps the seam a single-bit change).
+     *   4. Parse each binary string into its integer value.
+     *
+     * Time:  O(2^n * n) - there are 2^n codes and building/parsing each one is an
+     *        n-character string, so O(n) work per code.
+     * Space: O(2^n * n) for the intermediate strings.
+     *
+     * @param bitsCount number of bits
+     * @return Gray code sequence as integers
+     */
+    public static List<Integer> generateGrayCodeRecursive(int bitsCount) {
+        List<Integer> grayCodes = new ArrayList<>();
+        if (bitsCount < 0) return grayCodes;
 
-    for (String binaryCode : binaryGrayCode) {
-        // radix 2 means binary conversion. similarly radix 8 for octal. Without radix, it will be decimal
-      grayCodeNumbers.add(Integer.parseInt(binaryCode, 2));
-    }
-    return grayCodeNumbers;
-  }
-
-  /**
-   * Recursively generates Gray Code sequence in binary string format.
-   *
-   * Steps:
-   * 1. Base case for n=0: ["0"], for n=1: ["0","1"].
-   * 2. Recursively generate Gray Code for (n-1) bits.
-   * 3. From the Gray code of (n-1) bits:
-   *    1. First half: prefix '0' to each code.
-   *    2. Second half: reverse the previous sequence and prefix '1'.
-   *
-   * @param bitsCount Number of bits.
-   * @return List of binary strings representing the Gray Code sequence.
-   */
-  private static List<String> generateGrayCodeRecursive(int bitsCount) {
-    if (bitsCount == 0) {
-      List<String> baseCase = new ArrayList<>();
-      baseCase.add("0");
-      return baseCase;
-    }
-    if (bitsCount == 1) {
-      List<String> baseCase = new ArrayList<>();
-      baseCase.add("0");
-      baseCase.add("1");
-      return baseCase;
+        List<String> binaryCodes = buildReflectedCodes(bitsCount);
+        for (String binaryCode : binaryCodes) {
+            grayCodes.add(Integer.parseInt(binaryCode, 2));
+        }
+        return grayCodes;
     }
 
-    List<String> previousGrayCode = generateGrayCodeRecursive(bitsCount - 1);
-    List<String> currentGrayCode = new ArrayList<>(previousGrayCode.size() * 2);
+    /** Builds the reflected binary Gray codes for n bits as zero/one strings. */
+    private static List<String> buildReflectedCodes(int bitsCount) {
+        List<String> codes = new ArrayList<>();
+        if (bitsCount == 0) {
+            codes.add("0");
+            return codes;
+        }
 
-    // Prefix '0' to first half
-    for (String code : previousGrayCode) {
-      currentGrayCode.add("0" + code);
+        List<String> previousCodes = buildReflectedCodes(bitsCount - 1);
+        for (String code : previousCodes) codes.add("0" + code);
+        for (int i = previousCodes.size() - 1; i >= 0; i--) codes.add("1" + previousCodes.get(i));
+        return codes;
     }
 
-    // Prefix '1' to reversed second half
-    for (int i = previousGrayCode.size() - 1; i >= 0; i--) {
-      currentGrayCode.add("1" + previousGrayCode.get(i));
+    /**
+     * Intuition (interview default): there is a direct formula, so no recursion is
+     * needed. If you count normally in binary, going from one number to the next
+     * can flip several bits at once (a carry ripples through a run of 1s). The
+     * trick rank ^ (rank >> 1) xors each number with itself shifted right by one:
+     * that cancels every bit that matches its higher neighbour and keeps only the
+     * places where bits change, which for consecutive numbers always works out to
+     * a single differing bit. So we can just count 0, 1, 2, ... and convert each.
+     *
+     * Algorithm:
+     *   1. Reject a negative bit count.
+     *   2. The sequence has 2^n values, so compute that size once.
+     *   3. For each rank from 0 upward, append rank ^ (rank >> 1).
+     *
+     * Time:  O(2^n) - one Gray value per rank, and each is a single O(1) xor/shift.
+     * Space: O(1) extra beyond the output.
+     *
+     * @param bitsCount number of bits
+     * @return Gray code sequence as integers
+     */
+    public static List<Integer> generateGrayCode(int bitsCount) {
+        List<Integer> grayCodes = new ArrayList<>();
+        if (bitsCount < 0) return grayCodes;
+
+        int sequenceSize = 1 << bitsCount;
+        for (int rank = 0; rank < sequenceSize; rank++) {
+            grayCodes.add(rank ^ (rank >> 1));
+        }
+        return grayCodes;
     }
 
-    return currentGrayCode;
-  }
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        int[] inputs = {0, 2, 3};
+        String[] expected = {
+            "[0]",
+            "[0, 1, 3, 2]",
+            "[0, 1, 3, 2, 6, 7, 5, 4]"
+        };
 
-  /**
-   * Optimized iterative solution using bit manipulation.
-   *
-   * Intuition:
-   * Gray code of an integer i can be computed as i ^ (i >> 1).
-   *
-   * | i (Decimal) | i (Binary) | i >> 1 (Binary) | XOR Result | Gray Code (Binary) |
-   * | ----------- | ---------- | --------------- | ---------- | ------------------ |
-   * | 0           | 000        | 000             | 000        | 000                |
-   * | 1           | 001        | 000             | 001        | 001                |
-   * | 2           | 010        | 001             | 011        | 011                |
-   * | 3           | 011        | 001             | 010        | 010                |
-   * | 4           | 100        | 010             | 110        | 110                |
-   * | 5           | 101        | 010             | 111        | 111                |
-   * | 6           | 110        | 011             | 101        | 101                |
-   * | 7           | 111        | 011             | 100        | 100                |
-   * | ----------- | ---------- | --------------- | ---------- | ------------------ |
-   * 
-   * Time Complexity: O(2^num)
-   * Space Complexity: O(1) extra space (excluding output list).
-   *
-   * @param num Number of bits.
-   * @return List of integers representing the Gray Code sequence.
-   */
-  public static List<Integer> generateGrayCodeOptimized(int num) {
-    List<Integer> result = new ArrayList<>(1 << num); // means that the size of the list will be 2^num
-    for (int i = 0; i < (1 << num); i++) {
-      result.add(i ^ (i >> 1));
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = generateGrayCode(inputs[i]);
+            System.out.printf("n=%d  ->  %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
-    return result;
-  }
 }

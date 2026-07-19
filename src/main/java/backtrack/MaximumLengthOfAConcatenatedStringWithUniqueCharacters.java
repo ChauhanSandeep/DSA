@@ -1,412 +1,194 @@
 package backtrack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * 1239. Maximum Length of a Concatenated String with Unique Characters
+ * Problem: Maximum Length of a Concatenated String with Unique Characters
  *
- * Problem: Given an array of strings arr, return the maximum possible length of a
- * string formed by concatenating a subsequence of arr that has unique characters.
+ * Given an array of lowercase strings, choose any subsequence and concatenate it.
+ * Return the maximum possible length such that every character in the final
+ * string is unique.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-length-of-a-concatenated-string-with-unique-characters/
+ * Rating:   zerotrac 1719
+ * Pattern:  Backtracking | Subsequence search | Bitmask character sets
  *
  * Example:
- * Input: arr = ["un","iq","ue"]
- * Output: 4
- * Explanation: All possible concatenations are "", "un", "iq", "ue", "uniq", "ique".
- * Maximum length is 4.
+ *   Input:  ["cha", "r", "act", "ers"]
+ *   Output: 6
+ *   Why:    "cha" + "ers" forms "chaers" with six distinct characters; adding
+ *           "r" or "act" would repeat a character.
  *
- * LeetCode: https://leetcode.com/problems/maximum-length-of-a-concatenated-string-with-unique-characters
+ * Follow-ups:
+ *   1. Return all maximum-length concatenations?
+ *      Track strings beside masks and collect ties when length equals the best.
+ *   2. Support uppercase/larger alphabets beyond 26 lowercase letters?
+ *      Use BitSet or long masks split across multiple words instead of one int.
+ *   3. Count valid subsequences rather than the maximum length?
+ *      DFS over masks and increment for every reachable state, or DP by mask.
+ *   4. Optimize when arr is long but many strings conflict?
+ *      Pre-filter duplicate-character strings and memoize by (index, mask).
  *
- * Follow-up questions:
- * Q: What if the array is very large?
- * A: Use pruning techniques and memoization to avoid redundant computations.
+ * Related: Subsets (78), Maximum Product of Word Lengths (318).
  *
- * Q: Can we optimize space usage?
- * A: Use bit manipulation to represent character sets more compactly.
- *
- * Q: How to find all maximum-length combinations?
- * A: Modify backtracking to collect all solutions that achieve maximum length.
- * LeetCode Contest Rating: 1720
+ *   Approach                 Method             Time    Space (extra)
+ *   -----------------------  -----------------  ------  -------------
+ *   Set backtracking         maxLengthSetBased  O(2^n)  O(n + alphabet)
+ *   Bitmask backtracking     maxLength          O(2^n)  O(n)
  */
 public class MaximumLengthOfAConcatenatedStringWithUniqueCharacters {
+    private static final int ALPHABET_SIZE = 26;
 
     /**
-     * Backtracking approach exploring all possible combinations.
+     * Intuition: the final string is valid only if every chosen character is new.
+     * A set makes that rule very literal: it contains the characters already used
+     * by the current concatenation. For each later string, either it conflicts
+     * with the set and cannot be chosen, or it adds only new characters and is safe
+     * to explore. We filter out strings that already contain duplicates because
+     * they can never be part of a valid answer.
      *
-     * Algorithm: Depth-First Search with pruning
-     * - For each string, decide whether to include it or not
-     * - Use Set to track used characters and ensure uniqueness
-     * - Prune branches where current string has duplicate chars with existing set
-     * - Return maximum length found across all valid combinations
+     * Algorithm:
+     *   1. Return 0 for null input and keep only strings whose own characters are unique.
+     *   2. Start DFS at index 0 with an empty set of used characters.
+     *   3. At each index, try every later string that has no character already in the set.
+     *   4. For a safe string, copy the used-character set, add the string's characters,
+     *      recurse after that string, and keep the best length found.
      *
-     * Time Complexity: O(2^n) where n is number of strings
-     * Space Complexity: O(1) excluding recursion stack
+     * Time:  O(2^n * L) - each string is either chosen or skipped, and checking a choice scans its characters.
+     * Space: O(n + alphabet) recursion depth and used-character set.
+     *
+     * @param arr candidate strings
+     * @return maximum unique-character concatenation length
+     */
+    public int maxLengthSetBased(List<String> arr) {
+        if (arr == null) return 0;
+
+        List<String> validStrings = new ArrayList<>();
+        for (String value : arr) {
+            if (isUnique(value)) validStrings.add(value);
+        }
+        return backtrackWithSet(validStrings, 0, new HashSet<>());
+    }
+
+    /** Explores valid concatenations while storing used characters in a set. */
+    private int backtrackWithSet(List<String> strings, int index, Set<Character> usedChars) {
+        int bestLength = usedChars.size();
+        for (int i = index; i < strings.size(); i++) {
+            String candidate = strings.get(i);
+            if (!canAdd(candidate, usedChars)) continue;
+
+            Set<Character> nextUsedChars = new HashSet<>(usedChars);
+            for (char ch : candidate.toCharArray()) nextUsedChars.add(ch);
+            bestLength = Math.max(bestLength, backtrackWithSet(strings, i + 1, nextUsedChars));
+        }
+        return bestLength;
+    }
+
+    /** Returns true when a string has no repeated characters. */
+    private boolean isUnique(String value) {
+        if (value == null) return false;
+
+        Set<Character> seenChars = new HashSet<>();
+        for (char ch : value.toCharArray()) {
+            if (!seenChars.add(ch)) return false;
+        }
+        return true;
+    }
+
+    /** Checks whether a string has no character already present in the current set. */
+    private boolean canAdd(String value, Set<Character> usedChars) {
+        for (char ch : value.toCharArray()) {
+            if (usedChars.contains(ch)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Intuition (interview default): since the strings are lowercase, each string's
+     * character set fits in one integer mask. A 1 bit means that character is
+     * present. Two strings are compatible exactly when their masks have no common
+     * 1 bits, which is a single AND check. That turns the same choose-or-skip
+     * search into a much cheaper bit operation, while still exploring every valid
+     * subsequence that could be the maximum.
+     *
+     * Algorithm:
+     *   1. Return 0 for null input and convert each duplicate-free lowercase string into a bitmask.
+     *   2. DFS through the mask list, carrying the combined mask of the current concatenation.
+     *   3. Treat the bit count of the current mask as the current valid length.
+     *   4. For each later mask with no overlapping bits, recurse with it OR'ed into
+     *      the current mask and keep the largest length returned.
+     *
+     * Time:  O(2^n) - after masks are built, each branch checks compatibility with one bit operation.
+     * Space: O(n) for masks and recursion depth.
+     *
+     * @param arr candidate lowercase strings
+     * @return maximum unique-character concatenation length
      */
     public int maxLength(List<String> arr) {
-        // Filter out strings that have duplicate characters within themselves
-        List<String> validStrings = new ArrayList<>();
-        for (String s : arr) {
-            if (isUnique(s)) {
-                validStrings.add(s);
-            }
-        }
+        if (arr == null) return 0;
 
-        return backtrack(validStrings, 0, new HashSet<>());
-    }
-
-    // Check if string has all unique characters
-    private boolean isUnique(String s) {
-        Set<Character> chars = new HashSet<>();
-        for (char c : s.toCharArray()) {
-            if (!chars.add(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Backtracking to find maximum length
-    private int backtrack(List<String> arr, int index, Set<Character> usedChars) {
-        int maxLen = usedChars.size();
-
-        for (int i = index; i < arr.size(); i++) {
-            String current = arr.get(i);
-
-            // Check if current string can be added (no overlapping characters)
-            if (canAdd(current, usedChars)) {
-                // Add characters from current string
-                Set<Character> newUsedChars = new HashSet<>(usedChars);
-                for (char c : current.toCharArray()) {
-                    newUsedChars.add(c);
-                }
-
-                // Recursive call
-                int length = backtrack(arr, i + 1, newUsedChars);
-                maxLen = Math.max(maxLen, length);
-            }
-        }
-
-        return maxLen;
-    }
-
-    // Check if string can be added without character conflicts
-    private boolean canAdd(String s, Set<Character> usedChars) {
-        for (char c : s.toCharArray()) {
-            if (usedChars.contains(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Bit manipulation approach for efficient character set operations.
-     * Uses integers as bitmasks to represent character sets.
-     */
-    public int maxLengthBitMask(List<String> arr) {
         List<Integer> masks = new ArrayList<>();
-        List<Integer> lengths = new ArrayList<>();
-
-        // Convert strings to bitmasks
-        for (String s : arr) {
-            int mask = stringToMask(s);
-            if (mask != -1) { // Valid string (no duplicates)
-                masks.add(mask);
-                lengths.add(s.length());
-            }
+        for (String value : arr) {
+            int mask = toMask(value);
+            if (mask != -1) masks.add(mask);
         }
-
-        return backtrackBitMask(masks, lengths, 0, 0);
+        return backtrackWithMask(masks, 0, 0);
     }
 
-    // Convert string to bitmask (-1 if has duplicates)
-    private int stringToMask(String s) {
+    /** Explores compatible string masks and returns the best bit count reachable. */
+    private int backtrackWithMask(List<Integer> masks, int index, int currentMask) {
+        int bestLength = Integer.bitCount(currentMask);
+        for (int i = index; i < masks.size(); i++) {
+            int nextMask = masks.get(i);
+            if ((currentMask & nextMask) != 0) continue;
+
+            bestLength = Math.max(bestLength, backtrackWithMask(masks, i + 1, currentMask | nextMask));
+        }
+        return bestLength;
+    }
+
+    /** Converts a lowercase unique-character string to a bitmask, or -1 when invalid. */
+    private int toMask(String value) {
+        if (value == null) return -1;
+
         int mask = 0;
-        for (char c : s.toCharArray()) {
-            int bit = 1 << (c - 'a');
-            if ((mask & bit) != 0) {
-                return -1; // Duplicate character
-            }
+        for (char ch : value.toCharArray()) {
+            int offset = ch - 'a';
+            if (offset < 0 || offset >= ALPHABET_SIZE) return -1;
+
+            int bit = 1 << offset;
+            if ((mask & bit) != 0) return -1;
             mask |= bit;
         }
         return mask;
     }
 
-    // Backtracking with bitmasks
-    private int backtrackBitMask(List<Integer> masks, List<Integer> lengths, int index, int currentMask) {
-        int maxLen = Integer.bitCount(currentMask);
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        MaximumLengthOfAConcatenatedStringWithUniqueCharacters solver =
+            new MaximumLengthOfAConcatenatedStringWithUniqueCharacters();
 
-        for (int i = index; i < masks.size(); i++) {
-            int stringMask = masks.get(i);
+        List<List<String>> inputs = new ArrayList<>();
+        inputs.add(listOf("un", "iq", "ue"));
+        inputs.add(listOf("cha", "r", "act", "ers"));
+        inputs.add(listOf("aa", "bb"));
+        int[] expected = {4, 6, 0};
 
-            // Check if string can be added (no overlapping bits)
-            if ((currentMask & stringMask) == 0) {
-                int newMask = currentMask | stringMask;
-                int length = backtrackBitMask(masks, lengths, i + 1, newMask);
-                maxLen = Math.max(maxLen, length);
-            }
-        }
-
-        return maxLen;
-    }
-
-    /**
-     * Dynamic Programming approach using memoization.
-     * Caches results for subproblems to avoid recomputation.
-     */
-    public int maxLengthDP(List<String> arr) {
-        List<String> validStrings = new ArrayList<>();
-        for (String s : arr) {
-            if (isUnique(s)) {
-                validStrings.add(s);
-            }
-        }
-
-        Map<String, Integer> memo = new HashMap<>();
-        return dpHelper(validStrings, 0, "", memo);
-    }
-
-    // DP helper with memoization
-    private int dpHelper(List<String> arr, int index, String current, Map<String, Integer> memo) {
-        String key = index + ":" + current;
-        if (memo.containsKey(key)) {
-            return memo.get(key);
-        }
-
-        int maxLen = current.length();
-
-        for (int i = index; i < arr.size(); i++) {
-            String candidate = arr.get(i);
-            String newString = current + candidate;
-
-            if (isUnique(newString)) {
-                int length = dpHelper(arr, i + 1, newString, memo);
-                maxLen = Math.max(maxLen, length);
-            }
-        }
-
-        memo.put(key, maxLen);
-        return maxLen;
-    }
-
-    /**
-     * Iterative approach using breadth-first search.
-     * Builds all possible valid combinations level by level.
-     */
-    public int maxLengthIterative(List<String> arr) {
-        List<Set<Character>> validCombinations = new ArrayList<>();
-        validCombinations.add(new HashSet<>()); // Empty combination
-
-        for (String s : arr) {
-            if (!isUnique(s)) continue;
-
-            List<Set<Character>> newCombinations = new ArrayList<>();
-
-            for (Set<Character> existing : validCombinations) {
-                // Try adding current string to existing combination
-                if (canAdd(s, existing)) {
-                    Set<Character> newCombination = new HashSet<>(existing);
-                    for (char c : s.toCharArray()) {
-                        newCombination.add(c);
-                    }
-                    newCombinations.add(newCombination);
-                }
-            }
-
-            validCombinations.addAll(newCombinations);
-        }
-
-        int maxLen = 0;
-        for (Set<Character> combination : validCombinations) {
-            maxLen = Math.max(maxLen, combination.size());
-        }
-
-        return maxLen;
-    }
-
-    /**
-     * Optimized backtracking with early pruning.
-     * Includes additional optimizations to reduce search space.
-     */
-    public int maxLengthOptimized(List<String> arr) {
-        // Sort strings by length descending for better pruning
-        List<String> validStrings = new ArrayList<>();
-        for (String s : arr) {
-            if (isUnique(s)) {
-                validStrings.add(s);
-            }
-        }
-
-        validStrings.sort((a, b) -> Integer.compare(b.length(), a.length()));
-
-        int[] maxPossible = new int[validStrings.size()];
-        int total = 0;
-        for (int i = validStrings.size() - 1; i >= 0; i--) {
-            total += validStrings.get(i).length();
-            maxPossible[i] = total;
-        }
-
-        return backtrackOptimized(validStrings, 0, new HashSet<>(), maxPossible);
-    }
-
-    // Optimized backtracking with pruning
-    private int backtrackOptimized(List<String> arr, int index, Set<Character> usedChars, int[] maxPossible) {
-        int currentLen = usedChars.size();
-
-        // Pruning: if current + remaining possible <= best found so far
-        if (index < arr.size() && currentLen + maxPossible[index] <= currentLen) {
-            return currentLen;
-        }
-
-        int maxLen = currentLen;
-
-        for (int i = index; i < arr.size(); i++) {
-            String current = arr.get(i);
-
-            if (canAdd(current, usedChars)) {
-                Set<Character> newUsedChars = new HashSet<>(usedChars);
-                for (char c : current.toCharArray()) {
-                    newUsedChars.add(c);
-                }
-
-                int length = backtrackOptimized(arr, i + 1, newUsedChars, maxPossible);
-                maxLen = Math.max(maxLen, length);
-            }
-        }
-
-        return maxLen;
-    }
-
-    /**
-     * Returns all maximum-length combinations instead of just the length.
-     * Extension that provides actual string combinations.
-     */
-    public List<String> maxLengthCombinations(List<String> arr) {
-        List<String> validStrings = new ArrayList<>();
-        for (String s : arr) {
-            if (isUnique(s)) {
-                validStrings.add(s);
-            }
-        }
-
-        List<String> allCombinations = new ArrayList<>();
-        findAllCombinations(validStrings, 0, new StringBuilder(), new HashSet<>(), allCombinations);
-
-        int maxLen = allCombinations.stream().mapToInt(String::length).max().orElse(0);
-
-        return allCombinations.stream()
-                .filter(s -> s.length() == maxLen)
-                .collect(java.util.stream.Collectors.toList());
-    }
-
-    // Find all valid combinations
-    private void findAllCombinations(List<String> arr, int index, StringBuilder current,
-                                   Set<Character> usedChars, List<String> results) {
-        results.add(current.toString());
-
-        for (int i = index; i < arr.size(); i++) {
-            String candidate = arr.get(i);
-
-            if (canAdd(candidate, usedChars)) {
-                // Add string
-                current.append(candidate);
-                Set<Character> newUsedChars = new HashSet<>(usedChars);
-                for (char c : candidate.toCharArray()) {
-                    newUsedChars.add(c);
-                }
-
-                findAllCombinations(arr, i + 1, current, newUsedChars, results);
-
-                // Remove string (backtrack)
-                current.setLength(current.length() - candidate.length());
-            }
+        for (int i = 0; i < inputs.size(); i++) {
+            int got = solver.maxLength(inputs.get(i));
+            System.out.printf("arr=%s  ->  %d  expected=%d%n", inputs.get(i), got, expected[i]);
         }
     }
 
-    /**
-     * Parallel processing approach for large inputs.
-     * Uses parallel streams to explore different branches concurrently.
-     */
-    public int maxLengthParallel(List<String> arr) {
-        List<String> validStrings = arr.stream()
-                .filter(this::isUnique)
-                .collect(java.util.stream.Collectors.toList());
-
-        if (validStrings.isEmpty()) return 0;
-
-        // Use parallel processing for first-level branches
-        return validStrings.parallelStream()
-                .mapToInt(s -> {
-                    Set<Character> initialChars = new HashSet<>();
-                    for (char c : s.toCharArray()) {
-                        initialChars.add(c);
-                    }
-
-                    List<String> remaining = validStrings.stream()
-                            .filter(str -> !str.equals(s))
-                            .collect(java.util.stream.Collectors.toList());
-
-                    return Math.max(s.length(),
-                                  s.length() + backtrack(remaining, 0, initialChars));
-                })
-                .max()
-                .orElse(0);
-    }
-
-    /**
-     * Trie-based approach for efficient string matching.
-     * Uses trie structure to optimize character conflict detection.
-     */
-    public int maxLengthTrie(List<String> arr) {
-        TrieNode root = new TrieNode();
-
-        // Build combinations using trie
-        for (String s : arr) {
-            if (isUnique(s)) {
-                insertCombinations(root, s, 0, new StringBuilder(), new HashSet<>());
-            }
-        }
-
-        return findMaxLength(root);
-    }
-
-    // Trie node structure
-    private static class TrieNode {
-        Map<String, TrieNode> children = new HashMap<>();
-        boolean isEnd = false;
-        int length = 0;
-    }
-
-    // Insert all valid combinations starting with given string
-    private void insertCombinations(TrieNode node, String s, int index, StringBuilder current, Set<Character> used) {
-        // Mark current combination
-        node.isEnd = true;
-        node.length = Math.max(node.length, current.length());
-
-        for (int i = index; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (!used.contains(c)) {
-                current.append(c);
-                used.add(c);
-
-                String key = current.toString();
-                node.children.putIfAbsent(key, new TrieNode());
-
-                insertCombinations(node.children.get(key), s, i + 1, current, used);
-
-                current.deleteCharAt(current.length() - 1);
-                used.remove(c);
-            }
-        }
-    }
-
-    // Find maximum length in trie
-    private int findMaxLength(TrieNode node) {
-        int maxLen = node.length;
-
-        for (TrieNode child : node.children.values()) {
-            maxLen = Math.max(maxLen, findMaxLength(child));
-        }
-
-        return maxLen;
+    /** Builds a mutable list for compact demo inputs. */
+    private static List<String> listOf(String... values) {
+        List<String> list = new ArrayList<>();
+        for (String value : values) list.add(value);
+        return list;
     }
 }

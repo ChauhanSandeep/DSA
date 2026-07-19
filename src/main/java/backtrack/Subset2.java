@@ -4,142 +4,171 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
- * Given an integer array nums that may contain duplicates, return all possible subsets
- * (the power set). The solution set must not contain duplicate subsets. Return the
- * answer in any order.
+ * Problem: Subsets II
  *
- * The key challenge is handling duplicate elements in the input array to avoid
- * generating duplicate subsets. Unlike the basic subsets problem, we need special
- * logic to skip consecutive duplicates during backtracking.
+ * Given an integer array `nums` that MAY contain duplicates, return all possible
+ * subsets (the power set). The solution set must not contain duplicate subsets,
+ * and may be returned in any order.
+ *
+ * Leetcode: https://leetcode.com/problems/subsets-ii/
+ * Rating:   acceptance 61.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Subsets/Power set | Sort-to-dedupe
  *
  * Example:
- * Input: nums = [1,2,2]
- * Output: [[],[1],[1,2],[1,2,2],[2],[2,2]]
- * Explanation: Notice we don't have two [1,2] subsets even though there are two 2's.
- * The algorithm groups duplicates and skips them appropriately to avoid redundant subsets.
+ *   Input:  [1,2,2]
+ *   Output: [[], [1], [1,2], [1,2,2], [2], [2,2]]
+ *   Why:    every distinct choice of elements shows up once; the two 2's are
+ *           interchangeable, so [1,2] is listed a single time, not twice.
  *
- * LeetCode: https://leetcode.com/problems/subsets-ii/
+ * Follow-ups:
+ *   1. Return the K-th subset in lexicographic order WITHOUT generating all 2^n?
+ *      Walk the sorted distinct values, at each step counting how many subsets
+ *      the remaining suffix can form and skipping whole blocks (combinatorial rank).
+ *   2. nums has up to 10^5 duplicates of few distinct values - 2^n is impossible.
+ *      Collapse to (value,count) pairs; a "subset" is a choice of 0..count per value,
+ *      so the answer count is product(count_i + 1) and can be built without recursion.
+ *   3. Count distinct subsets whose sum == target with duplicates, memory-bounded?
+ *      Group-knapsack DP over (value,count) with a bounded-count transition, not backtracking.
+ *   4. Stream subsets lazily (an iterator) instead of materializing the full list?
+ *      Encode state as the include/skip decision stack and advance on next().
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you modify this to find subsets of a specific size k with duplicates?
- *    Answer: Add size parameter to backtracking and stop when currentSubset.size() == k.
- * 2. What if you need to return subsets in lexicographic order?
- *    Answer: Current approach already provides lexicographic order due to sorting and systematic exploration.
- * 3. How to optimize memory usage when input contains many duplicates?
- *    Answer: Use count-based approach or iterative generation with space-efficient representations.
- * 4. What if we need to generate subsets with specific constraints (sum, product, etc.)?
- *    Answer: Add constraint validation during backtracking with early pruning for invalid branches.
+ * Related: Subsets (78), Combination Sum II (40), Permutations II (47).
  *
- * Related Problems:
- * - LeetCode 78: Subsets (Without duplicates)
- * - LeetCode 40: Combination Sum II (Sum with duplicates)
- * - LeetCode 47: Permutations II (Permutations with duplicates)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Approach              Method                    Time        Space (extra)
+ *   --------------------  ------------------------  ----------  -------------
+ *   Iterative build       subsetsWithDupIterative   O(n*2^n)    O(1)
+ *   Backtracking (best)   subsetsWithDup            O(n*2^n)    O(n)
  */
 public class Subset2 {
 
-  public static void main(String[] args) {
-    int[] nums = {2, 1, 2};
-    List<List<Integer>> subsets = subsetsWithDup(nums);
-    System.out.println(subsets);
-  }
+    /**
+     * Intuition: the power set doubles every time you introduce a new value -
+     * every existing subset can either take the new value or skip it. So we build
+     * the answer in rounds: start with just the empty subset, and for each value
+     * copy every subset we already have and append the value to the copy. The
+     * only wrinkle is duplicates: if the same value appears again and we extend
+     * ALL current subsets, we recreate subsets the previous copy of that value
+     * already made. The fix is to remember where last round's new subsets began
+     * and, for a repeated value, extend only those - so each duplicate adds
+     * exactly the genuinely new subsets and nothing already seen.
+     *
+     * Algorithm:
+     *   1. Sort the array so equal values sit next to each other (this is what
+     *      lets us recognise a repeat by comparing with the previous value).
+     *   2. Seed the result with the empty subset.
+     *   3. For each value, copy a range of existing subsets and append the value
+     *      to each copy.
+     *   4. If this value repeats the previous one, start that range at the first
+     *      subset created last round; otherwise extend every existing subset.
+     *
+     * Time:  O(n*2^n) - there are up to 2^n subsets and copying each one to
+     *        extend it costs up to O(n).
+     * Space: O(1) extra beyond the output.
+     *
+     * @param nums input array that may contain duplicates
+     * @return all unique subsets
+     */
+    public List<List<Integer>> subsetsWithDupIterative(int[] nums) {
+        List<List<Integer>> allSubsets = new ArrayList<>();
+        allSubsets.add(new ArrayList<>());
+        if (nums == null || nums.length == 0) return allSubsets;
 
-  /**
-   * Generates all unique subsets from the given array, even when it contains duplicates.
-   *
-   * Intuition & Steps:
-   * 1. Sort the array → Ensures duplicates are adjacent, making them easy to skip.
-   * 2. Backtracking:
-   *    - At each step, decide whether to include the current element.
-   *    - Add the current subset to the result list at every call.
-   * 3. Skip duplicates:
-   *    - When encountering the same element at the same recursion level, skip it.
-   *    - Condition: `if (i > index && nums[i] == nums[i - 1]) continue;`
-   * 4. Backtrack:
-   *    - After exploring one path, remove the last added element before exploring the next.
-   *
-   * Time Complexity: O(2^N) — Each element has two choices: include or exclude.
-   * Space Complexity: O(N) — Recursion stack depth and temporary subset storage.
-   *
-   * @param nums Input array containing possible duplicates.
-   * @return List of unique subsets.
-   */
-  public static List<List<Integer>> subsetsWithDup(int[] nums) {
-    List<List<Integer>> allSubsets = new ArrayList<>();
-    Arrays.sort(nums); // Sorting helps in easily detecting duplicates
-    generateUniqueSubsets(nums, 0, new ArrayList<>(), allSubsets);
-    return allSubsets;
-  }
+        // --- Step 1: sort to group duplicates -----------------------------
+        Arrays.sort(nums);
 
-  /**
-   * Recursive helper to generate subsets, skipping duplicates.
-   */
-  private static void generateUniqueSubsets(int[] nums, int index, List<Integer> currentSubset, List<List<Integer>> allSubsets) {
-    allSubsets.add(new ArrayList<>(currentSubset));
+        // --- Step 2 & 3: extend subsets value by value --------------------
+        int previousRoundStart = 0;
+        for (int i = 0; i < nums.length; i++) {
+            // a duplicate must only extend subsets born in the previous round,
+            // otherwise re-expanding older subsets double-counts it
+            int extendFrom = (i > 0 && nums[i] == nums[i - 1]) ? previousRoundStart : 0;
+            int extendTo = allSubsets.size();
 
-    for (int i = index; i < nums.length; i++) {
-      // Skip duplicates in the same recursion branch, because the same number is already in subset using nums[i - 1]
-      if (i > index && nums[i] == nums[i - 1]) {
-        continue;
-      }
-
-      // Include nums[i] in current subset
-      currentSubset.add(nums[i]);
-
-      // Recurse for the next element
-      generateUniqueSubsets(nums, i + 1, currentSubset, allSubsets);
-
-      // Backtrack: remove last added element
-      currentSubset.remove(currentSubset.size() - 1);
+            previousRoundStart = extendTo;
+            for (int j = extendFrom; j < extendTo; j++) {
+                List<Integer> extended = new ArrayList<>(allSubsets.get(j));
+                extended.add(nums[i]);
+                allSubsets.add(extended);
+            }
+        }
+        return allSubsets;
     }
-  }
 
-  /**
-   * Iterative approach to generate all unique subsets from the given array with duplicates.
-   * Steps:
-   * 1. Sort the array to group duplicates together.
-   * 2. Start with an empty subset.
-   * 3. For each number, add it to all existing subsets to create new subsets.
-   * 4. If the current number is a duplicate of the previous, only add it to subsets
-   *    created in the previous step to avoid duplicates.
-   *
-   * Example
-   * input [1, 2, 2]
-   * 	1.	Sort → [1, 2, 2]
-   * 	2.	Start: [[]]
-   * 	3.	Add 1 → [[], [1]]
-   * 	4.	Add 2 (first 2): expand all [[], [1]] → [[], [1], [2], [1,2]]
-   * 	5.	Add 2 (second 2): it’s duplicate, so expand only subsets created in last step ([2], [1,2]) → [[], [1], [2], [1,2], [2,2], [1,2,2]]
-   *
-   * Time Complexity: O(2^N) - Each element can either be included or excluded.
-   * Space Complexity: O(2^N) - Storing all subsets.
-   */
-  public List<List<Integer>> subsetsWithDupIterative(int[] nums) {
-    Arrays.sort(nums); // Step 1: sort to group duplicates together
+    /**
+     * Intuition (interview default): think of building a subset as a walk down a
+     * decision tree - at each index you decide which value to append next, and
+     * every node you pass through is itself a valid subset (that is why we record
+     * on entry, not just at the leaves). The trap is duplicates: once the array
+     * is sorted, equal values are neighbours, and choosing the second, third, ...
+     * copy of a value at the SAME position in the tree would rebuild the exact
+     * subsets the first copy already produced. So at each level we let a value in
+     * only the first time it appears and skip its equal siblings - that single
+     * skip is what turns "all subsets" into "all UNIQUE subsets".
+     *
+     * Algorithm:
+     *   1. Sort so duplicates are adjacent (this is what makes the skip check work).
+     *   2. On entering each recursive call, record the current subset - every node
+     *      of the tree is a valid answer, including the empty one.
+     *   3. From the current index, try each remaining value as the next pick, but
+     *      skip a value equal to its left neighbour within this same loop, since
+     *      the first sibling already covered those subsets.
+     *   4. For each kept value, add it, recurse from the next index, then remove
+     *      it before trying the next candidate.
+     *
+     * Time:  O(n*2^n) - there are 2^n subsets and copying each into the result
+     *        costs O(n).
+     * Space: O(n) recursion depth + current-subset buffer (excluding output).
+     *
+     * @param nums input array that may contain duplicates
+     * @return all unique subsets
+     */
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        List<List<Integer>> allSubsets = new ArrayList<>();
+        if (nums == null) return allSubsets;
 
-    List<List<Integer>> allSubsets = new ArrayList<>();
-    allSubsets.add(new ArrayList<>());
-
-    int startIndex = 0, endIndex = 0;
-
-    for (int i = 0; i < nums.length; i++) {
-      startIndex = 0;
-
-      // Step 2: if current element is duplicate, only expand subsets created in the previous iteration
-      if (i > 0 && nums[i] == nums[i - 1]) {
-        startIndex = endIndex + 1;
-      }
-
-      endIndex = allSubsets.size() - 1;
-
-      for (int j = startIndex; j <= endIndex; j++) {
-        List<Integer> newSubset = new ArrayList<>(allSubsets.get(j));
-        newSubset.add(nums[i]);
-        allSubsets.add(newSubset);
-      }
+        Arrays.sort(nums);
+        backtrack(nums, 0, new ArrayList<>(), allSubsets);
+        return allSubsets;
     }
-    return allSubsets;
-  }
+
+    /** Grows the current subset one index at a time, skipping duplicate siblings so each set is emitted once. */
+    private void backtrack(int[] nums, int index,
+                           List<Integer> currentSubset,
+                           List<List<Integer>> allSubsets) {
+        // every node in the recursion tree is itself a valid subset
+        allSubsets.add(new ArrayList<>(currentSubset));
+
+        for (int i = index; i < nums.length; i++) {
+            // `i > index` means this is not the first choice at this level, so an
+            // equal value would repeat a sibling branch already explored -> skip
+            if (i > index && nums[i] == nums[i - 1]) continue;
+
+            // select -> work -> un-select : the backtracking template
+            currentSubset.add(nums[i]);
+            backtrack(nums, i + 1, currentSubset, allSubsets);
+            currentSubset.remove(currentSubset.size() - 1);
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        Subset2 solver = new Subset2();
+
+        int[][] inputs = { {}, {0}, {1, 2, 2}, {2, 2, 2} };
+        String[] expected = {
+            "[[]]",
+            "[[], [0]]",
+            "[[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]",
+            "[[], [2], [2, 2], [2, 2, 2]]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Integer>> got = solver.subsetsWithDup(inputs[i].clone());
+            System.out.printf("nums=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 }

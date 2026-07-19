@@ -1,105 +1,108 @@
 package backtrack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-
 /**
- * Problem: Generate all possible permutations of an array of distinct integers.
+ * Problem: Permutations
  *
- * 🔗 Leetcode: https://leetcode.com/problems/permutations/
+ * Given an array of distinct integers, return every possible ordering of those
+ * integers. Each input value must appear exactly once in each permutation.
  *
- * 🔍 Example:
- * Input: [1, 2, 3]
- * Output: [
- *   [1, 2, 3],
- *   [1, 3, 2],
- *   [2, 1, 3],
- *   [2, 3, 1],
- *   [3, 1, 2],
- *   [3, 2, 1]
- * ]
+ * Leetcode: https://leetcode.com/problems/permutations/
+ * Rating:   acceptance 82.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Permutations | Prune-on-used
  *
- * 🧠 Intuition:
- * - Fix each number at the current index and permute the remaining numbers recursively.
- * - Use backtracking to build permutations step-by-step and undo the choice afterward.
+ * Example:
+ *   Input:  [0,1,2]
+ *   Output: [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]]
+ *   Why:    three distinct values have 3! = 6 possible orderings, and each
+ *           output uses 0, 1, and 2 exactly once.
  *
- * ✅ Constraints:
- * - Input contains distinct integers.
+ * Follow-ups:
+ *   1. Input can contain duplicates?
+ *      Sort and skip duplicate siblings, or use a frequency map (Permutations II).
+ *   2. Generate permutations lazily instead of storing n! results?
+ *      Implement an iterator over next-permutation order or keep a DFS stack.
+ *   3. Return the k-th permutation directly?
+ *      Use factorial unranking instead of backtracking through earlier permutations.
+ *   4. Restrict permutations by adjacency constraints?
+ *      Add a validity check before choosing the next value, or model it as Hamiltonian path DFS.
  *
- * 📌 Follow-up Questions (FAANG-style):
- * 1. What if input has duplicates? Can you return only unique permutations?
- *    - Use a frequency map or boolean + sort + skip duplicates.
- *    - Related: https://leetcode.com/problems/permutations-ii/
- *
- * 2. How would you generate permutations lazily (on-demand)?
- *    - Implement an iterator or generator to yield permutations one-by-one.
- *
- * 3. Can you solve this iteratively?
- *    - Yes, using a queue or dynamic programming-like approach to build permutations level-by-level.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Permutations II (47), Permutation Sequence (60), Next Permutation (31).
  */
 public class Permutation {
 
-  public static void main(String[] args) {
-    int[] input = {1, 2, 3};
-    List<List<Integer>> allPermutations = generateAllPermutations(input);
-    System.out.println(allPermutations);
-  }
+    /**
+     * Intuition: a permutation is built by filling positions from left to right.
+     * For each position, any value not already used can go there. A boolean array
+     * remembers which input indexes are already in the current path, so every
+     * value appears exactly once. When the path length reaches n, it is a complete
+     * ordering; because each level tries all unused values, every possible ordering
+     * is reached exactly once.
+     *
+     * Algorithm:
+     *   1. Return an empty answer for null input and start with an empty current permutation.
+     *   2. If the current permutation has length n, copy it into the answer.
+     *   3. Otherwise, scan every input index and skip indexes already marked used.
+     *   4. Add the unused value, mark it used, recurse to fill the next position,
+     *      then unmark and remove it before trying another value.
+     *
+     * Time:  O(n*n!) - there are n! permutations, and copying each one takes n values.
+     * Space: O(n) recursion depth, used array, and current permutation, excluding output.
+     *
+     * @param nums distinct integers
+     * @return all permutations of nums
+     */
+    public static List<List<Integer>> generateAllPermutations(int[] nums) {
+        List<List<Integer>> allPermutations = new ArrayList<>();
+        if (nums == null) return allPermutations;
 
-  /**
-   * Generates all possible permutations of a given array of distinct integers using backtracking.
-   *
-   * Steps:
-   * 1. Use a boolean array to track which elements are used in the current permutation.
-   * 2. Recursively build the permutation list by picking unused elements.
-   * 3. Backtrack after each recursive call to explore other possibilities.
-   *
-   * Time Complexity: O(N!) → Total number of permutations. Because each permutation takes O(N) time to construct.
-   * Space Complexity: O(N) → For recursion stack and boolean tracking.
-   *
-   * @param nums array of distinct integers
-   * @return list of all possible permutations
-   */
-  public static List<List<Integer>> generateAllPermutations(int[] nums) {
-    List<List<Integer>> result = new ArrayList<>();
-    boolean[] isUsed = new boolean[nums.length];
-    backtrackPermutations(nums, new ArrayList<>(), result, isUsed);
-    return result;
-  }
-
-  /**
-   * Recursive helper function to build permutations using backtracking.
-   *
-   * @param nums     original input array
-   * @param current  current partial permutation
-   * @param result   list of all complete permutations
-   * @param isUsed   tracks whether a number is already used in current permutation
-   */
-  private static void backtrackPermutations(int[] nums, List<Integer> current, List<List<Integer>> result,
-      boolean[] isUsed) {
-    // Base condition: permutation is complete
-    if (current.size() == nums.length) {
-      result.add(new ArrayList<>(current));
-      return;
+        backtrack(nums, new boolean[nums.length], new ArrayList<>(), allPermutations);
+        return allPermutations;
     }
 
-    // Explore each unused number
-    for (int i = 0; i < nums.length; i++) {
-        if (isUsed[i]) {
-            continue;
+    /** Builds permutations by filling the next slot with each unused input value. */
+    private static void backtrack(int[] nums, boolean[] used,
+                                  List<Integer> currentPermutation,
+                                  List<List<Integer>> allPermutations) {
+        if (currentPermutation.size() == nums.length) {
+            allPermutations.add(new ArrayList<>(currentPermutation));
+            return;
         }
 
-      // Choose
-      current.add(nums[i]);
-      isUsed[i] = true;
+        for (int i = 0; i < nums.length; i++) {
+            if (used[i]) continue;
 
-      // Explore
-      backtrackPermutations(nums, current, result, isUsed);
-
-      // Un-choose (backtrack)
-      current.remove(current.size() - 1);
-      isUsed[i] = false;
+            // select -> mark -> work -> unmark -> un-select
+            currentPermutation.add(nums[i]);
+            used[i] = true;
+            backtrack(nums, used, currentPermutation, allPermutations);
+            used[i] = false;
+            currentPermutation.remove(currentPermutation.size() - 1);
+        }
     }
-  }
+
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        int[][] inputs = {
+            {0, 1, 2},
+            {},
+            {1}
+        };
+        String[] expected = {
+            "[[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]]",
+            "[[]]",
+            "[[1]]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<List<Integer>> got = generateAllPermutations(inputs[i]);
+            System.out.printf("nums=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 }
