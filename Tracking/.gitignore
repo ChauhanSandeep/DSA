@@ -1,0 +1,9 @@
+# Legacy Google Sheet export — kept locally as an archive reference only,
+# not tracked. Regenerate by re-exporting from Google Sheets if needed.
+Problems.html
+resources/
+
+# Generated static site — safe to regenerate anytime via `python scripts/build.py`.
+# Tracked snapshot (if any) is committed selectively; ignore the working copy
+# to keep diffs clean.
+site/
