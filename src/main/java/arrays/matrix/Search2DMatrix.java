@@ -1,78 +1,65 @@
 package arrays.matrix;
 
+import java.util.Arrays;
 /**
  * Problem: Search a 2D Matrix
  *
- * You are given an m x n integer matrix with the following two properties:
- * - Each row is sorted in non-decreasing order
- * - The first integer of each row is greater than the last integer of the previous row
+ * Given an m x n matrix where each row is sorted and each row starts after the
+ * previous row ends, determine whether target exists. Those rules make the whole
+ * matrix behave like one sorted array.
  *
- * Given an integer target, return true if target is in matrix or false otherwise.
- * You must write a solution in O(log(m * n)) time complexity.
+ * Leetcode: https://leetcode.com/problems/search-a-2d-matrix/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Binary search | Matrix as virtual array
  *
  * Example:
- * Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
- * Output: true
- * Explanation: 3 exists in the first row of the matrix.
+ *   Input:  matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
+ *   Output: true
+ *   Why:    index 1 in the virtual sorted array maps to matrix[0][1] == 3.
  *
- * Constraints:
- * - m == matrix.length
- * - n == matrix[i].length
- * - 1 <= m, n <= 100
- * - -10^4 <= matrix[i][j], target <= 10^4
+ * Follow-ups:
+ *   1. Rows and columns sorted independently only?
+ *      Use the staircase search from the top-right or bottom-left corner.
+ *   2. Return insertion position?
+ *      Run the same virtual binary search and map the final left pointer back to coordinates.
+ *   3. Matrix stored on disk?
+ *      Binary search still needs only O(log(mn)) random element reads.
  *
- * LeetCode Problem: https://leetcode.com/problems/search-a-2d-matrix
- *
- * Follow-up Questions:
- *
- * 1. What if rows are sorted but first element of a row is NOT guaranteed greater than last of previous?
- *    Answer: Use different approach - start from top-right or bottom-left corner. Move left if
- *    target is smaller, down if larger. This gives O(m+n) time.
- *    Related problem: https://leetcode.com/problems/search-a-2d-matrix-ii/
- *
- * 2. How would you modify this to find all occurrences if duplicates exist?
- *    Answer: After finding target with binary search, expand left and right to find all
- *    occurrences in that row, then check adjacent rows. Or collect all matching positions
- *    during a modified binary search.
- *
- * 3. What if matrix is extremely large and stored on disk, not in memory?
- *    Answer: Use external memory algorithms. Binary search still works as it only needs
- *    to access O(log n) positions. Fetch required rows/elements from disk on demand.
- *
- * 4. Can you find the kth smallest element in this matrix efficiently?
- *    Answer: Use binary search on value range, not on indices. For each mid value, count
- *    elements ≤ mid using the sorted property. Adjust range until finding kth smallest.
- *    Related problem: https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
- *
- * 5. How would you handle if matrix dimensions are not known in advance?
- *    Answer: Exponential search to find bounds first. Start with small range, double until
- *    finding element out of bounds, then apply binary search on discovered range.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Search a 2D Matrix II (240), Kth Smallest Element in a Sorted Matrix (378).
  */
 public class Search2DMatrix {
 
-    /**
-     * Searches for target using single binary search by treating 2D matrix as 1D sorted array.
-     *
-     * Algorithm:
-     * 1. Treat m×n matrix as sorted array of length m*n
-     * 2. Map 1D index to 2D coordinates: row = index/n, col = index%n
-     * 3. Apply standard binary search on this virtual 1D array
-     * 4. Return true if target found, false otherwise
-     *
-     * Key insight: Since rows are sorted AND first element of each row > last element
-     * of previous row, entire matrix can be viewed as one sorted sequence. Binary search
-     * works directly with index arithmetic to map between 1D and 2D.
-     *
-     * Time Complexity: O(log(M*N)) where M is rows and N is columns. Standard binary
-     * search over M*N elements.
-     *
-     * Space Complexity: O(1) using only constant extra variables.
-     *
-     * @param matrix 2D sorted matrix
-     * @param target value to search for
-     * @return true if target exists in matrix
-     */
+    public static void main(String[] args) {
+        Search2DMatrix solver = new Search2DMatrix();
+        int[][] matrix = { {1, 3, 5, 7}, {10, 11, 16, 20}, {23, 30, 34, 60} };
+        int[] targets = { 3, 13, 60 };
+        boolean[] expected = { true, false, true };
+
+        for (int i = 0; i < targets.length; i++) {
+            boolean got = solver.searchMatrix(matrix, targets[i]);
+            System.out.printf("matrix=%s target=%d -> output=%s  expected=%s%n",
+                Arrays.deepToString(matrix), targets[i], got, expected[i]);
+        }
+    }
+
+/**
+ * Intuition: because every row starts after the previous row ends, row breaks do
+ * not matter for ordering. Treat positions 0 through rows * cols - 1 as a single
+ * sorted array and convert a midpoint back to row and column when comparing.
+ *
+ * Algorithm:
+ *   1. Reject null or empty matrices.
+ *   2. Binary search the virtual index range [0, rows * cols - 1].
+ *   3. Convert mid to row = mid / cols and col = mid % cols.
+ *   4. Move left or right according to matrix[row][col].
+ *
+ * Time:  O(log(m * n)) - standard binary search over all cells.
+ * Space: O(1) - only search bounds and one mapped coordinate are stored.
+ *
+ * @param matrix row-major sorted matrix
+ * @param target value to find
+ * @return true if target exists in the matrix
+ */
     public boolean searchMatrix(int[][] matrix, int target) {
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
             return false;

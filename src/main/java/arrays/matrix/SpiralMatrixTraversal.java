@@ -2,57 +2,72 @@ package arrays.matrix;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Arrays;
 /**
- * Problem: Print the elements of a 2D matrix in spiral (clockwise) order.
+ * Problem: Spiral Matrix
  *
- * ✅ Starting from the top-left corner, move in the order:
- *    → → → ↓ ↓ ← ← ↑ ... until all elements are visited.
+ * Given a rectangular matrix, return its elements in clockwise spiral order.
+ * Start from the top-left corner, peel the outer border, then continue with the
+ * next inner rectangle until every cell is visited.
  *
- * 🔗 LeetCode Link: https://leetcode.com/problems/spiral-matrix/
+ * Leetcode: https://leetcode.com/problems/spiral-matrix/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Matrix traversal | Boundary shrinking | Simulation
  *
  * Example:
- * Input:
- *  [
- *    [1,  2,  3],
- *    [4,  5,  6],
- *    [7,  8,  9]
- *  ]
- * Output: [1, 2, 3, 6, 9, 8, 7, 4, 5]
+ *   Input:  matrix = [[1,2,3],[4,5,6],[7,8,9]]
+ *   Output: [1,2,3,6,9,8,7,4,5]
+ *   Why:    the traversal takes the outer ring clockwise, then the center cell.
  *
- * Follow-up Questions:
- * - Q: How do we do reverse spiral order?
- *   A: Collect in same spiral order, then reverse the result.
- * - Q: How to do spiral traversal recursively?
- *   A: Yes, define boundaries and recurse on each layer.
- * - Q: What if it's a jagged matrix?
- *   A: Handle each row’s length individually; logic gets trickier.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Generate an n x n spiral matrix?
+ *      Write values while moving with the same shrinking boundaries.
+ *   2. Traverse counter-clockwise?
+ *      Change the direction order and boundary updates.
+ *   3. Handle a jagged matrix?
+ *      Track visited cells explicitly because rectangular boundaries no longer work.
+ *
+ * Related: Spiral Matrix II (59), Spiral Matrix III (885).
  */
 public class SpiralMatrixTraversal {
 
   public static void main(String[] args) {
-    int[][] matrix = {
-        {1, 2, 3, 4},
-        {4, 5, 6, 5},
-        {7, 8, 9, 1},
-        {1, 9, 0, 2},
-        {1, 9, 0, 2}
+    int[][][] inputs = {
+        { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} },
+        { {1, 2, 3, 4} },
+        { {1}, {2}, {3} }
+    };
+    String[] expected = {
+        "[1, 2, 3, 6, 9, 8, 7, 4, 5]",
+        "[1, 2, 3, 4]",
+        "[1, 2, 3]"
     };
 
-    System.out.println(getSpiralOrder(matrix));
+    for (int i = 0; i < inputs.length; i++) {
+            List<Integer> got = getSpiralOrder(inputs[i]);
+      System.out.printf("matrix=%s -> output=%s  expected=%s%n",
+          Arrays.deepToString(inputs[i]), got, expected[i]);
+    }
   }
 
-  /**
-   * Returns a list of elements traversed in spiral order from a 2D matrix.
-   *
-   * ✅ Algorithm: Layer-by-layer traversal using boundary tracking.
-   * ✅ Time Complexity: O(m * n) for m rows and n columns
-   * ✅ Space Complexity: O(1) excluding result list
-   *
-   * @param matrix 2D integer matrix
-   * @return list of integers in spiral order
-   */
+/**
+ * Intuition: the current unvisited cells always form a rectangle. Visit its top
+ * edge, right edge, bottom edge, and left edge, then shrink those four boundaries
+ * inward and repeat.
+ *
+ * Algorithm:
+ *   1. Return an empty result for null or empty input.
+ *   2. Maintain top, bottom, left, and right boundaries.
+ *   3. Traverse top row and right column, then shrink them.
+ *   4. If still valid, traverse bottom row and left column, then shrink them.
+ *   5. Stop when the boundaries cross.
+ *
+ * Time:  O(m * n) - each cell is appended exactly once.
+ * Space: O(1) - excluding the returned list.
+ *
+ * @param matrix input matrix
+ * @return elements in clockwise spiral order
+ */
   public static List<Integer> getSpiralOrder(int[][] matrix) {
     List<Integer> result = new ArrayList<>();
 

@@ -1,55 +1,72 @@
 package arrays.prefixsum;
 
+import java.util.Arrays;
+
 /**
- * Range Sum Query 2D - Immutable
+ * Problem: Range Sum Query 2D - Immutable
  *
- * Problem Statement:
- * Given a 2D matrix, handle multiple queries to calculate the sum of elements
- * within any rectangular region defined by upper left corner (row1, col1) and
- * lower right corner (row2, col2). Both corners are inclusive.
+ * Preprocess a fixed matrix so sumRegion can answer the sum of any inclusive
+ * rectangle quickly. Since the matrix never changes, a 2D prefix sum can pay the
+ * work once during construction.
+ *
+ * Leetcode: https://leetcode.com/problems/range-sum-query-2d-immutable/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  2D prefix sum | Inclusion-exclusion | Immutable queries
  *
  * Example:
- * Input: matrix = [
- *      [3,0,1,4,2],
- *      [5,6,3,2,1],
- *      [1,2,0,1,5],
- *      [4,1,0,1,7],
- *      [1,0,3,0,5]
- * ]
- * sumRegion(2, 1, 4, 3) returns 8
- * Explanation: Sum of elements in rectangle from (2,1) to (4,3) = 2+0+1+1+0+1+0+3+0 = 8
+ *   Input:  sumRegion(2,1,4,3) on the sample matrix
+ *   Output: 8
+ *   Why:    inclusion-exclusion keeps only the rectangle from rows 2..4 and cols 1..3.
  *
- * LeetCode Link: https://leetcode.com/problems/range-sum-query-2d-immutable
+ * Follow-ups:
+ *   1. Support updates?
+ *      Use a 2D Fenwick tree or 2D segment tree.
+ *   2. Many sparse matrices?
+ *      Store non-zero values or sparse prefix structures instead of dense arrays.
+ *   3. 3D range sum queries?
+ *      Extend the prefix-sum table and inclusion-exclusion formula to eight corners.
  *
- * Follow-up Questions:
- * 1. What if the matrix is very large but sparse?
- *    Answer: Use HashMap to store only non-zero prefix sums to save space.
- * 2. What if we need to support updates to matrix elements?
- *    Answer: Use 2D Binary Indexed Tree (Fenwick Tree) for O(log m * log n) updates and queries.
- *    Related: https://leetcode.com/problems/range-sum-query-2d-mutable/
- * 3. How would you handle 3D range sum queries?
- *    Answer: Extend prefix sum concept to 3D using inclusion-exclusion principle.
- * 4. Can we optimize space if queries are sparse?
- *    Answer: Lazy evaluation - compute prefix sums on-demand and cache results.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Range Sum Query 2D Mutable (308), Matrix Block Sum (1314).
  */
 public class RangeSumQuery2DImmutable {
+
+    public static void main(String[] args) {
+        int[][] matrix = {
+            {3, 0, 1, 4, 2},
+            {5, 6, 3, 2, 1},
+            {1, 2, 0, 1, 5},
+            {4, 1, 0, 1, 7},
+            {1, 0, 3, 0, 5}
+        };
+        int[][] queries = { {2, 1, 4, 3}, {1, 1, 2, 2}, {0, 0, 0, 0} };
+        int[] expected = { 8, 11, 3 };
+        RangeSumQuery2DImmutable solver = new RangeSumQuery2DImmutable(matrix);
+
+        for (int i = 0; i < queries.length; i++) {
+            int[] query = queries[i];
+            int got = solver.sumRegion(query[0], query[1], query[2], query[3]);
+            System.out.printf("query=%s -> output=%d  expected=%d%n",
+                Arrays.toString(query), got, expected[i]);
+        }
+    }
+
 
     private final int[][] prefixSum;
 
     /**
-     * Initializes the NumMatrix object with the given 2D matrix.
+     * Intuition: prefixSum[i + 1][j + 1] stores the sum from the origin through
+     * matrix[i][j]. The extra top row and left column turn edge rectangles into the
+     * same formula as every other rectangle.
      *
-     * Algorithm: 2D Prefix Sum Array Construction
-     * Step 1: Create prefixSum array where prefixSum[i][j] represents sum from (0,0) to (i-1,j-1)
-     * Step 2: Use dynamic programming formula:
-     *         prefixSum[i+1][j+1] = prefixSum[i][j+1] + prefixSum[i+1][j] - prefixSum[i][j] + matrix[i][j]
-     * Step 3: Handle boundary conditions by making prefixSum array one size larger
+     * Algorithm:
+     *   1. Use a 1 x 1 prefix table for null or empty input.
+     *   2. Allocate prefixSum with one extra row and column.
+     *   3. Fill each prefix cell from top, left, overlap, and matrix value.
      *
-     * Time Complexity: O(m * n) where m is rows, n is columns
-     * Space Complexity: O(m * n) for the prefix sum array
+     * Time:  O(m * n) - each matrix cell contributes to one prefix cell.
+     * Space: O(m * n) - prefixSum stores the precomputed rectangle totals.
      *
-     * @param matrix the input 2D matrix
+     * @param matrix immutable matrix to preprocess
      */
     public RangeSumQuery2DImmutable(int[][] matrix) {
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
@@ -75,25 +92,24 @@ public class RangeSumQuery2DImmutable {
     }
 
     /**
-     * Returns the sum of elements in the rectangle from (row1, col1) to (row2, col2) inclusive.
+     * Intuition: the prefix sum to the bottom-right corner includes the target
+     * rectangle plus extra area above and left of it. Subtract those extras, then add
+     * the top-left overlap back once.
      *
-     * Algorithm: Inclusion-Exclusion Principle
-     * Step 1: Get total sum from origin to bottom-right corner
-     * Step 2: Subtract the region above the target rectangle
-     * Step 3: Subtract the region to the left of the target rectangle
-     * Step 4: Add back the top-left region that was subtracted twice
+     * Algorithm:
+     *   1. Return 0 for the empty-prefix sentinel.
+     *   2. Read the full prefix sum ending at row2, col2.
+     *   3. Subtract the area above and the area to the left.
+     *   4. Add the top-left overlap that was subtracted twice.
      *
-     * Formula: sum = prefixSum[row2+1][col2+1] - prefixSum[row1][col2+1]
-     *                - prefixSum[row2+1][col1] + prefixSum[row1][col1]
+     * Time:  O(1) - every query uses four prefix table reads.
+     * Space: O(1) - queries allocate no extra data.
      *
-     * Time Complexity: O(1) - constant time lookup
-     * Space Complexity: O(1) - no extra space needed
-     *
-     * @param row1 top boundary row index
-     * @param col1 left boundary column index
-     * @param row2 bottom boundary row index
-     * @param col2 right boundary column index
-     * @return sum of elements in the specified rectangle
+     * @param row1 top row of the query rectangle
+     * @param col1 left column of the query rectangle
+     * @param row2 bottom row of the query rectangle
+     * @param col2 right column of the query rectangle
+     * @return sum of the inclusive rectangle
      */
     public int sumRegion(int row1, int col1, int row2, int col2) {
         // Handle edge cases

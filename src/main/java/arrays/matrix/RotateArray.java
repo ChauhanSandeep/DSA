@@ -1,64 +1,66 @@
 package arrays.matrix;
 
+import java.util.Arrays;
 /**
  * Problem: Rotate Array
  *
- * Given an array, rotate the array to the right by k steps, where k is non-negative.
+ * Given an integer array, rotate it to the right by k steps in place. A value
+ * leaving the end wraps around to the front, and k may be larger than the array
+ * length.
  *
- * You must do this in-place with O(1) extra space.
+ * Leetcode: https://leetcode.com/problems/rotate-array/ (Medium)
+ * Rating:   no contest rating (pre-contest problem)
+ * Pattern:  Array | Reversal | Cyclic replacement
  *
  * Example:
- * Input: nums = [1,2,3,4,5,6,7], k = 3
- * Output: [5,6,7,1,2,3,4]
- * Explanation:
- * - Rotate 1 step: [7,1,2,3,4,5,6]
- * - Rotate 2 steps: [6,7,1,2,3,4,5]
- * - Rotate 3 steps: [5,6,7,1,2,3,4]
+ *   Input:  nums = [1,2,3,4,5,6,7], k = 3
+ *   Output: [5,6,7,1,2,3,4]
+ *   Why:    the last three values wrap to the front in their original order.
  *
- * Input: nums = [-1,-100,3,99], k = 2
- * Output: [3,99,-1,-100]
- * Explanation:
- * - Rotate 1 step: [99,-1,-100,3]
- * - Rotate 2 steps: [3,99,-1,-100]
+ * Follow-ups:
+ *   1. Rotate left by k?
+ *      Rotate right by n - (k % n), or mirror the reversal boundaries.
+ *   2. Prove O(1) extra space?
+ *      Use the three-reversal method so all movement happens inside nums.
+ *   3. Rotate a linked list?
+ *      Find length, connect tail to head, then break at the new tail.
  *
- * LeetCode: https://leetcode.com/problems/rotate-array
- *
- * Follow-up Questions:
- * 1. Q: What if k is much larger than array length?
- *    A: Use k %= n to get effective rotation since rotating by array length gives same array.
- *
- * 2. Q: How would you rotate left instead of right?
- *    A: For left rotation by k, use right rotation by (n - k) steps.
- *
- * 3. Q: What if you could use extra space?
- *    A: Could create new array and copy elements directly to final positions: newArr[(i + k) % n] = arr[i].
- *
- * 4. Q: How would you handle very large arrays efficiently?
- *    A: Current O(1) space solution is already optimal. Could optimize cache performance with blocking.
- *
- * Related Problems:
- * - Rotate Image: https://leetcode.com/problems/rotate-image/
- * - Reverse Words in a String: https://leetcode.com/problems/reverse-words-in-a-string/
- * - Rotate List: https://leetcode.com/problems/rotate-list/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Rotate Image (48), Rotate List (61), Reverse Words in a String (151).
  */
 public class RotateArray {
 
-    /**
-     * Rotates array using three-step reversal algorithm for optimal space efficiency.
-     *
-     * Algorithm:
-     * 1. Handle edge cases and normalize k using modulo operation
-     * 2. Reverse entire array: [1,2,3,4,5,6,7] → [7,6,5,4,3,2,1]
-     * 3. Reverse first k elements: [7,6,5,4,3,2,1] → [5,6,7,4,3,2,1] (k=3)
-     * 4. Reverse remaining n-k elements: [5,6,7,4,3,2,1] → [5,6,7,1,2,3,4]
-     *
-     * Time Complexity: O(n) where n is length of array
-     * Space Complexity: O(1) using constant extra space
-     *
-     * @param nums array to rotate
-     * @param k number of steps to rotate right
-     */
+    public static void main(String[] args) {
+        RotateArray solver = new RotateArray();
+
+        int[][] inputs = { {1, 2, 3, 4, 5, 6, 7}, {-1, -100, 3, 99}, {1} };
+        int[] steps = { 3, 2, 10 };
+        int[][] expected = { {5, 6, 7, 1, 2, 3, 4}, {3, 99, -1, -100}, {1} };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] input = inputs[i].clone();
+            solver.rotate(input, steps[i]);
+            System.out.printf("nums=%s k=%d -> output=%s  expected=%s%n",
+                Arrays.toString(inputs[i]), steps[i], Arrays.toString(input), Arrays.toString(expected[i]));
+        }
+    }
+
+/**
+ * Intuition: a right rotation keeps the final k elements together, but moves
+ * them before the prefix. Reversing the whole array brings those values to the
+ * front, and reversing each side restores the internal order of both groups.
+ *
+ * Algorithm:
+ *   1. Return for null or length-one input, then reduce k modulo length.
+ *   2. Reverse the entire array.
+ *   3. Reverse the first k positions.
+ *   4. Reverse the remaining suffix.
+ *
+ * Time:  O(n) - each reversal touches a disjoint or full linear slice.
+ * Space: O(1) - the array is modified in place.
+ *
+ * @param nums array to rotate in place
+ * @param k number of right-rotation steps
+ */
     public void rotate(int[] nums, int k) {
         if (nums == null || nums.length <= 1) {
             return;

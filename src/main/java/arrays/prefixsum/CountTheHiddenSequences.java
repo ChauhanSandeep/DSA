@@ -1,58 +1,68 @@
 package arrays.prefixsum;
 
 import java.util.*;
-
-
 /**
  * Problem: Count The Hidden Sequences
  *
- * You are given a 0-indexed array of n integers differences, which describes the differences
- * between the adjacent elements of a hidden sequence of length n + 1. More formally, call the
- * hidden sequence hidden, then we have:
- * hidden[i + 1] - hidden[i] == differences[i] for 0 <= i < n
+ * Given adjacent differences and an allowed inclusive range [lower, upper], count
+ * how many starting values can produce a hidden sequence whose every value stays
+ * in range.
  *
- * You are further given two integers lower and upper that describe the inclusive range of values
- * [lower, upper] that the hidden sequence can contain.
- * Return the number of possible hidden sequences that exist. If no such sequence exists, return 0.
+ * Leetcode: https://leetcode.com/problems/count-the-hidden-sequences/ (Medium)
+ * Rating:   1614 (Weekly Contest 277)
+ * Pattern:  Prefix sum | Range intersection | Difference array
  *
  * Example:
- * Input: differences = [1, -3, 4], lower = 1, upper = 6
- * Output: 2
- * Explanation: The hidden sequence is [hidden[0], hidden[0] + 1, hidden[0] - 2, hidden[0] + 2].
- * The two possible sequences are:
- * - [3, 4, 1, 5] if hidden[0] = 3
- * - [4, 5, 2, 6] if hidden[0] = 4
+ *   Input:  differences = [1,-3,4], lower = 1, upper = 6
+ *   Output: 2
+ *   Why:    only starting values 3 and 4 keep all generated values within [1,6].
  *
- * LeetCode: https://leetcode.com/problems/count-the-hidden-sequences
+ * Follow-ups:
+ *   1. Return all valid sequences?
+ *      Enumerate every valid start and rebuild the sequence; output can be large.
+ *   2. Differences arrive as a stream?
+ *      Maintain running offset, minimum offset, and maximum offset online.
+ *   3. Range bounds are huge?
+ *      Use long arithmetic for offset bounds before converting the final count.
  *
- * Follow-up Questions:
- * 1. What if we need to return all possible hidden sequences instead of just the count?
- *    Answer: Generate sequences by iterating through valid starting values and constructing each sequence.
- *
- * 2. How would you handle very large ranges efficiently?
- *    Answer: Current approach is already O(1) for counting, just calculate valid range mathematically.
- *
- * 3. What if differences array can be very large?
- *    Answer: Use prefix sums and optimize memory usage, but time complexity remains O(n).
- *    Related: https://leetcode.com/problems/subarray-sum-equals-k/
- *
- * @author Sandeep
- * LeetCode Contest Rating: 1614
+ * Related: Corporate Flight Bookings (1109), Range Addition (370).
  */
 public class CountTheHiddenSequences {
 
-    /**
-     * Counts how many valid original arrays can produce the given differences array
-     * while keeping every element within [lower, upper].
-     *
-     * Idea:
-     * 1. Build relative offsets using prefix sums of differences.
-     * 2. Track the smallest and largest offset we ever reach.
-     * 3. Let firstElement be the unknown starting value.
-     *    - Every element = firstElement + someOffset.
-     * 4. Constrain firstElement so that all elements stay within [lower, upper].
-     * 5. Count how many integer values of firstElement satisfy all constraints.
-     */
+    public static void main(String[] args) {
+        CountTheHiddenSequences solver = new CountTheHiddenSequences();
+
+        int[][] differences = { {1, -3, 4}, {3, -4, 5, 1, -2}, {} };
+        int[] lowers = { 1, -4, 2 };
+        int[] uppers = { 6, 5, 2 };
+        int[] expected = { 2, 4, 1 };
+
+        for (int i = 0; i < differences.length; i++) {
+            int got = solver.numberOfArrays(differences[i], lowers[i], uppers[i]);
+            System.out.printf("differences=%s lower=%d upper=%d -> output=%d  expected=%d%n",
+                Arrays.toString(differences[i]), lowers[i], uppers[i], got, expected[i]);
+        }
+    }
+
+/**
+ * Intuition: after choosing the first hidden value x, every later value is x plus
+ * a prefix sum of differences. So all constraints collapse to one interval for x:
+ * x + minOffset must be at least lower, and x + maxOffset must be at most upper.
+ *
+ * Algorithm:
+ *   1. Handle the empty differences case as a one-element sequence.
+ *   2. Scan differences to find the minimum and maximum relative offset from the start.
+ *   3. Convert those offsets into the valid interval for the first element.
+ *   4. Return the number of integers in that interval, or 0 if it is empty.
+ *
+ * Time:  O(n) - each difference is scanned once.
+ * Space: O(1) - only offset bounds are stored.
+ *
+ * @param differences adjacent differences of the hidden sequence
+ * @param lower minimum allowed sequence value
+ * @param upper maximum allowed sequence value
+ * @return count of valid hidden sequences
+ */
     public int numberOfArrays(int[] differences, int lower, int upper) {
         if (differences == null || differences.length == 0) {
             // Only one element in the array; it just needs to be within [lower, upper].

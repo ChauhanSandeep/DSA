@@ -1,70 +1,60 @@
 package arrays.sorting;
 
 import java.util.Arrays;
-
 /**
- * QuickSort Algorithm Implementation
+ * Problem: Quick Sort
  *
- * QuickSort is a highly efficient, divide-and-conquer sorting algorithm that works by
- * selecting a 'pivot' element and partitioning the array around it such that:
- * - Elements smaller than pivot are on the left
- * - Elements greater than pivot are on the right
- * - The pivot is in its final sorted position
+ * Sort an integer array with divide and conquer. Choose a pivot, partition the
+ * array so smaller values are on the left and larger values on the right, then
+ * recursively sort both sides. This implementation returns a sorted copy.
  *
- * Algorithm Steps:
- * 1. Choose a pivot element (this implementation uses the rightmost element)
- * 2. Partition the array around the pivot
- * 3. Recursively sort the left and right subarrays
+ * Pattern:  Sorting | Partitioning | Divide and conquer
  *
- * Key Characteristics:
- * - Returns a new sorted array without modifying input
- * - Not stable (relative order of equal elements may change)
- * - Generally faster than merge sort and heap sort in practice
- * - Performance depends on pivot selection
+ * Example:
+ *   Input:  [8,7,2,1,0,9,6]
+ *   Output: [0,1,2,6,7,8,9]
+ *   Why:    each partition places its pivot in final sorted position.
  *
- * Time Complexity:
- * - Best Case: O(n log n) - when pivot divides array into equal halves
- * - Average Case: O(n log n) - with random pivot selection
- * - Worst Case: O(n²) - when array is already sorted and pivot is always smallest/largest
+ * Follow-ups:
+ *   1. Avoid worst-case O(n^2)?
+ *      Randomize the pivot or use median-of-three selection.
+ *   2. Many duplicate values?
+ *      Use three-way partitioning to group values equal to the pivot.
+ *   3. Find kth smallest only?
+ *      Use quickselect and recurse into just one partition.
  *
- * Space Complexity:
- * - O(log n) - for recursion stack in average case
- * - O(n) - for recursion stack in worst case
- *
- * Optimization Techniques:
- * - Randomized pivot selection to avoid worst case
- * - Median-of-three pivot selection
- * - Insertion sort for small subarrays
- * - Three-way partitioning for arrays with many duplicates
- *
- * Related Problems:
- * - Quick Select for finding kth smallest element
- * - Dutch National Flag problem (3-way partitioning)
- *
- * @author Sandeep Chauhan
+ * Related: Sort an Array (912), Kth Largest Element in an Array (215).
  */
 public class QuickSort {
 
-    /**
-     * Main method demonstrating QuickSort usage.
-     * Sorts an example array and prints the result.
-     */
     public static void main(String[] args) {
-        int[] data = {8, 7, 2, 1, 0, 9, 6};
-        System.out.println("Unsorted Array: " + Arrays.toString(data));
+        int[][] inputs = { {8, 7, 2, 1, 0, 9, 6}, {}, {3, 3, 2, -1} };
+        int[][] expected = { {0, 1, 2, 6, 7, 8, 9}, {}, {-1, 2, 3, 3} };
 
-        int[] sortedData = sortArray(data);
-
-        System.out.println("Original Array (unchanged): " + Arrays.toString(data));
-        System.out.println("Sorted Array in Ascending Order: " + Arrays.toString(sortedData));
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = sortArray(inputs[i]);
+            System.out.printf("input=%s -> output=%s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), Arrays.toString(expected[i]));
+        }
     }
 
-    /**
-     * Sorts the given array using QuickSort and returns a sorted copy.
-     *
-     * @param array The input array to sort
-     * @return A new sorted array, leaving input array unchanged
-     */
+/**
+ * Intuition: partitioning around a pivot puts that pivot exactly where it belongs
+ * in the sorted order. Once the pivot is fixed, the left and right sides can be
+ * sorted independently.
+ *
+ * Algorithm:
+ *   1. Return null for null input.
+ *   2. Copy the input so the original array remains unchanged.
+ *   3. Quick-sort the full copied range in place.
+ *   4. Return the sorted copy.
+ *
+ * Time:  O(n log n) average, O(n^2) worst case - depends on pivot balance.
+ * Space: O(n) - the returned copy dominates the recursion stack.
+ *
+ * @param array input array
+ * @return sorted copy of array, or null for null input
+ */
     public static int[] sortArray(int[] array) {
         if (array == null) {
             return null;
