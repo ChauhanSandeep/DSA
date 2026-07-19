@@ -9,6 +9,9 @@ in this repository.
 > grade each in one keystroke, and never let the tracker drift from the
 > code. Everything else follows from that.
 
+**Public dashboard (read-only):** https://chauhansandeep.github.io/DSA/  
+**Operational runbook:** [`Tracking/OPERATIONS.md`](./OPERATIONS.md)
+
 ---
 
 ## Source of truth

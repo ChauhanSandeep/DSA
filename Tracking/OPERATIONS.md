@@ -47,14 +47,35 @@ open http://127.0.0.1:8787/
 
 # 5. When done, stop the server (Ctrl+C in the serve.py terminal).
 
-# 6. Commit progress.
+# 6. Commit progress. This is what "registers" your review with GitHub.
 git add Tracking/data/state.json
 git commit -m "weekend review"
 git push
-#    → GitHub Action posts a summary comment on the pinned "Study log" issue.
 ```
 
-That's the whole ritual. No file pickers, no exports.
+That single `git push` fans out into three automatic effects (see
+section 3 for details): the study-log Action posts a summary comment,
+the Pages Action redeploys the public dashboard, and next Saturday's
+nudge will show the updated queue. If you grade locally but never push,
+none of that fires — you just have uncommitted state on disk.
+
+### Confirm it worked (~90 seconds after push)
+
+```bash
+# Deploy Action should be green.
+gh run list --workflow=deploy-pages.yml --limit 1
+
+# Log Action should be green and the pinned issue should have a fresh comment.
+gh run list --workflow=log-review.yml --limit 1
+gh issue list --label study-log --state open
+
+# The public dashboard reflects the new state.
+open https://chauhansandeep.github.io/DSA/
+```
+
+You should see: `✓ Solved today` chips on the graded queue items, this
+week's dot filled in on the "Last 12 weeks" panel, and the anchor
+health progress bar / warmth tiles nudged toward green.
 
 ---
 
@@ -91,6 +112,7 @@ only the built-in `GITHUB_TOKEN` — no PATs, no secrets.
 - Runs `build.py` on a GitHub runner and publishes the resulting
   `Tracking/site/` to **GitHub Pages** — a public, read-only view of
   your queue, Q/A cards, patterns, and syntax-highlighted source.
+- Live at **https://chauhansandeep.github.io/DSA/**.
 - The published dashboard runs in *read-only mode*: it pings
   `/api/ping` on load, finds no local server, and hides the grade bar
   + shows a banner reminding you that grading needs `serve.py` locally.
