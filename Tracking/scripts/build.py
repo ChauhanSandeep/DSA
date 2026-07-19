@@ -44,6 +44,7 @@ from _queue import pick_queue, coming_saturday, DIFFICULTY_RANK  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "Tracking" / "data"
 SITE_SRC_DIR = REPO_ROOT / "Tracking" / "site-src"
+VENDOR_DIR = REPO_ROOT / "Tracking" / "vendor"
 SITE_DIR = REPO_ROOT / "Tracking" / "site"
 
 STATE_JSON = DATA_DIR / "state.json"
@@ -107,6 +108,43 @@ def esc(text: str) -> str:
     return html.escape(text or "", quote=True)
 
 
+SUN_ICON = (
+    '<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>'
+    '<path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>'
+    '<path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/>'
+    '<path d="m19.07 4.93-1.41 1.41"/></svg>'
+)
+MOON_ICON = (
+    '<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+)
+
+# Google Fonts — Inter, Atkinson Hyperlegible, JetBrains Mono. Matches Quartz.
+FONT_LINKS = (
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+    '<link href="https://fonts.googleapis.com/css2?'
+    'family=Inter:wght@400;500;600;700&'
+    'family=Atkinson+Hyperlegible:wght@400;700&'
+    'family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">'
+)
+
+# Inline early-run script that reads the persisted theme before CSS applies,
+# so there's no light-flash-on-dark-load.
+THEME_INIT = """<script>(function(){try{var t=localStorage.getItem('dsa-tracker.theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>"""
+
+# Prism.js highlighter + rose-pine themes (assets copied by build).
+PRISM_LINKS = (
+    '<link rel="stylesheet" href="{root}assets/prism/rose-pine-dawn.css" '
+    'media="(prefers-color-scheme: light)" id="prism-dawn">'
+    '<link rel="stylesheet" href="{root}assets/prism/rose-pine-moon.css" '
+    'media="(prefers-color-scheme: dark)" id="prism-moon">'
+)
+
+
 def base_layout(title: str, body: str, back_link: str = "") -> str:
     back = ""
     if back_link:
@@ -117,16 +155,22 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{esc(title)}</title>
+  {THEME_INIT}
+  {FONT_LINKS}
   <link rel="stylesheet" href="{{root}}assets/styles.css">
+  {PRISM_LINKS}
 </head>
 <body>
   <div class="container">
     <header class="site-header">
-      <h1><a href="{{root}}index.html" style="color:inherit">🧠 DSA · Weekend review</a></h1>
+      <h1><a href="{{root}}index.html" style="color:inherit">DSA · Weekend review</a></h1>
       <nav>
         {back}
         <a href="{{root}}index.html">Queue</a>
         <a href="{{root}}patterns/index.html">Patterns</a>
+        <button class="theme-toggle" aria-label="Toggle color theme" data-action="toggle-theme">
+          {SUN_ICON}{MOON_ICON}
+        </button>
       </nav>
     </header>
 {body}
@@ -135,7 +179,8 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
       state at <code>{STATE_JSON_REL_FROM_SITE}</code>
     </div>
   </div>
-  <script src="{{root}}assets/app.js"></script>
+  <script src="{{root}}assets/prism/prism.js" defer></script>
+  <script src="{{root}}assets/app.js" defer></script>
 </body>
 </html>
 """
@@ -211,12 +256,16 @@ def render_dashboard(state: dict, today: date) -> str:
         queue_html_parts = []
         for index, problem in enumerate(queue, 1):
             task = problem["task"]
+            qa = problem.get("qa") or {}
+            preview = qa.get("problem") or ""
+            preview_html = f'<div class="preview">{esc(preview)}</div>' if preview else ""
             queue_html_parts.append(f"""
       <div class="queue-item">
         <div class="index">{index:02d}</div>
         <div>
           <div class="title"><a href="problems/{esc(task)}.html">{esc(problem.get("problemName") or task)}</a></div>
           <div class="meta">{esc(task)} · next due {esc(format_next_due(problem["sm2"].get("nextDue")))}</div>
+          {preview_html}
         </div>
         <div class="badges">{badges_for_problem(problem)}</div>
       </div>""")
@@ -286,6 +335,70 @@ def render_dashboard(state: dict, today: date) -> str:
     return html_doc.replace("{root}", "")
 
 
+def render_qa_card(problem: dict) -> str:
+    qa = problem.get("qa") or {}
+    problem_text = qa.get("problem")
+    answer_text = qa.get("answer")
+    complexity = qa.get("complexity")
+    source = qa.get("source", "missing")
+
+    if not problem_text and not answer_text:
+        return (
+            '<div class="qa-card">'
+            '<div class="qa-label">Quick recall</div>'
+            '<div class="qa-body dim">No quick summary yet — see the full problem statement below.</div>'
+            '</div>'
+        )
+
+    problem_block = ""
+    if problem_text:
+        problem_block = (
+            '<div class="qa-section">'
+            '<div class="qa-label">Problem</div>'
+            f'<div class="qa-body">{esc(problem_text)}</div>'
+            '</div>'
+        )
+
+    answer_block = ""
+    reveal_hint = ""
+    if answer_text or complexity:
+        inner_parts = []
+        if answer_text:
+            inner_parts.append(
+                '<div class="qa-label">Answer</div>'
+                f'<div class="qa-body">{esc(answer_text)}</div>'
+            )
+        if complexity:
+            inner_parts.append(
+                f'<div class="qa-complexity">{esc(complexity)}</div>'
+            )
+        answer_block = (
+            '<div class="qa-section qa-answer qa-hidden">' +
+            "".join(inner_parts) +
+            '</div>'
+        )
+        reveal_hint = (
+            '<div class="qa-reveal-hint" role="button" tabindex="0">'
+            '<span>▸ Reveal answer</span> <span class="mono">(Space)</span>'
+            '</div>'
+        )
+
+    source_marker = ""
+    if source and source != "user":
+        label = {"sheet": "from legacy sheet", "javadoc": "from source Javadoc"}.get(source, source)
+        source_marker = f'<div class="qa-reveal-hint dim" style="margin-top:12px" title="{esc(source)}"><span>· {esc(label)}</span></div>'
+
+    return (
+        '<div class="qa-card">'
+        '<div class="qa-label" style="letter-spacing:0.12em">Quick recall</div>'
+        + problem_block
+        + answer_block
+        + reveal_hint
+        + source_marker
+        + '</div>'
+    )
+
+
 def render_problem_page(problem: dict, today: date) -> str:
     task = problem["task"]
     java_file = REPO_ROOT / problem["javaFile"]
@@ -325,13 +438,15 @@ def render_problem_page(problem: dict, today: date) -> str:
       <div class="meta" style="margin-top:8px">{" · ".join(meta_bits)}</div>
     </div>
 
-    <h2>Problem</h2>
+    {render_qa_card(problem)}
+
+    <h2>Full problem statement</h2>
     {doc_html}
 
     <details class="reveal">
-      <summary>Reveal my solution</summary>
+      <summary>Reveal my solution <span class="mono dim" style="margin-left:8px">(Enter)</span></summary>
       <div class="content">
-        <pre class="code">{esc(code_body)}</pre>
+        <pre class="code language-java"><code class="language-java">{esc(code_body)}</code></pre>
       </div>
     </details>
 
@@ -419,6 +534,12 @@ def prepare_site_dir() -> None:
 def copy_assets() -> None:
     for name in ("styles.css", "app.js"):
         shutil.copy2(SITE_SRC_DIR / name, SITE_DIR / "assets" / name)
+    prism_src = VENDOR_DIR / "prism"
+    prism_dst = SITE_DIR / "assets" / "prism"
+    if prism_src.exists():
+        if prism_dst.exists():
+            shutil.rmtree(prism_dst)
+        shutil.copytree(prism_src, prism_dst)
 
 
 def write(path: Path, content: str) -> None:

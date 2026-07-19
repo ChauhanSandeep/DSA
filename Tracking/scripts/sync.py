@@ -350,6 +350,7 @@ def build_state(
                 "history": preserved.get("history", []),
                 "userNotes": preserved.get("userNotes", ""),
                 "flags": preserved.get("flags", {"pinned": False, "skip": False}),
+                "qa": preserved.get("qa"),
             }
             entry["sm2"] = _ensure_sm2_shape(entry["sm2"], today)
         else:
@@ -360,6 +361,7 @@ def build_state(
                 "history": [],
                 "userNotes": "",
                 "flags": {"pinned": False, "skip": False},
+                "qa": None,
             }
             (new_state_entries if nc_entry else new_extras_entries).append(entry)
 

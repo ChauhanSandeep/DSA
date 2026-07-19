@@ -1,0 +1,82 @@
+/*!
+ * rose-pine-moon.css — Prism.js theme mapped to the rose-pine "moon"
+ * palette used by Quartz's Shiki plugin for dark mode.
+ *
+ * Palette (rose-pine-moon):
+ *   base        #e0def4   text
+ *   surface     #232136   background (we let the layout own bg)
+ *   muted       #6e6a86   comment
+ *   subtle      #908caa   punctuation / subdued
+ *   love        #eb6f92   removed / regex
+ *   gold        #f6c177   strings
+ *   rose        #ea9a97   numbers / constants
+ *   pine        #3e8fb0   class / type / builtin
+ *   foam        #9ccfd8   function name
+ *   iris        #c4a7e7   keyword / control flow
+ */
+
+pre[class*="language-"],
+code[class*="language-"] {
+  color: #e0def4;
+  background: none;
+  font-family: var(--font-code);
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.6;
+  tab-size: 4;
+  hyphens: none;
+  font-size: 13px;
+}
+
+/* Tokens */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata      { color: #6e6a86; font-style: italic; }
+.token.punctuation { color: #908caa; }
+.token.namespace   { opacity: 0.75; }
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.constant,
+.token.symbol,
+.token.deleted,
+.token.number      { color: #ea9a97; }
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted    { color: #f6c177; }
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string { color: #e0def4; }
+
+.token.atrule,
+.token.attr-value,
+.token.keyword     { color: #c4a7e7; font-weight: 500; }
+
+.token.function,
+.token.class-name  { color: #9ccfd8; }
+
+.token.regex,
+.token.important,
+.token.variable    { color: #eb6f92; }
+
+.token.important,
+.token.bold        { font-weight: 700; }
+.token.italic      { font-style: italic; }
+
+.language-java .token.class-name,
+.language-java .token.generics     { color: #3e8fb0; }
+.language-java .token.annotation   { color: #c4a7e7; font-style: italic; }
+.language-java .token.keyword.this,
+.language-java .token.keyword.super { color: #eb6f92; }

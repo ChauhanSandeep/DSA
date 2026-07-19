@@ -326,7 +326,92 @@
   document.addEventListener("DOMContentLoaded", () => {
     initProblemPage();
     initDashboard();
+    initThemeToggle();
+    initQaCard();
   });
+
+  // --------------------------------------------------------------------------
+  // Theme toggle. Persists to localStorage; auto-detect via
+  // prefers-color-scheme when no explicit preference is set. Data-theme
+  // attribute on <html> is applied inline BEFORE this script runs to avoid
+  // FOUC (see THEME_INIT in build.py).
+  // --------------------------------------------------------------------------
+  const THEME_KEY = "dsa-tracker.theme";
+
+  function currentTheme() {
+    const explicit = document.documentElement.getAttribute("data-theme");
+    if (explicit) return explicit;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark" : "light";
+  }
+
+  function applyTheme(theme) {
+    if (theme === "dark" || theme === "light") {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem(THEME_KEY, theme);
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.removeItem(THEME_KEY);
+    }
+    updatePrismTheme(theme || currentTheme());
+  }
+
+  function toggleTheme() {
+    applyTheme(currentTheme() === "dark" ? "light" : "dark");
+  }
+
+  function updatePrismTheme(theme) {
+    const dawn = document.getElementById("prism-dawn");
+    const moon = document.getElementById("prism-moon");
+    if (!dawn || !moon) return;
+    if (theme === "dark") {
+      dawn.media = "not all";
+      moon.media = "all";
+    } else if (theme === "light") {
+      dawn.media = "all";
+      moon.media = "not all";
+    } else {
+      dawn.media = "(prefers-color-scheme: light)";
+      moon.media = "(prefers-color-scheme: dark)";
+    }
+  }
+
+  function initThemeToggle() {
+    const btn = document.querySelector("[data-action='toggle-theme']");
+    if (btn) btn.addEventListener("click", toggleTheme);
+    updatePrismTheme(currentTheme());
+  }
+
+  // --------------------------------------------------------------------------
+  // Q/A card reveal (Space → answer, Enter → source solution).
+  // --------------------------------------------------------------------------
+  function initQaCard() {
+    const answerBlock = document.querySelector(".qa-answer");
+    const revealHint = document.querySelector(".qa-reveal-hint");
+    const solution = document.querySelector("details.reveal");
+
+    function revealAnswer() {
+      if (!answerBlock) return;
+      answerBlock.classList.remove("qa-hidden");
+      if (revealHint) revealHint.classList.add("hidden");
+    }
+    function toggleSolution() {
+      if (solution) solution.open = !solution.open;
+    }
+
+    if (revealHint) revealHint.addEventListener("click", revealAnswer);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.target.closest("input, textarea, button")) return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        revealAnswer();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        toggleSolution();
+      }
+    });
+  }
 
   // Expose a small debug surface (visible in DevTools console).
   window.DSATracker = {

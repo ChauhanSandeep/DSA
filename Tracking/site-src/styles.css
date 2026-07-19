@@ -1,129 +1,316 @@
 /* -----------------------------------------------------------------------------
- * Weekly-review dashboard — dark-first, minimal, no-framework CSS.
- * Layout goals:
- *  - Queue page reads like a to-do list of 6 items you finish by Sunday night.
- *  - Problem page hides the solution behind one click, foregrounds the
- *    problem statement, and keeps 4-button grading always in reach.
- *  - Feels like a code editor, not a webapp.
+ * styles.css — DSA Weekend-review dashboard.
+ *
+ * Theme aligned with the FirstPrinciplesEngineering Quartz site:
+ *   - Anthropic-inspired warm palette (Oat / Book Cloth).
+ *   - Typography: Inter (headers/UI), Atkinson Hyperlegible (body),
+ *     JetBrains Mono (code).
+ *   - Callout style: subtle border + accent-mix background.
+ *   - Auto light/dark via prefers-color-scheme, overridable via
+ *     [data-theme="light" | "dark"] on <html>.
+ *
+ * Design tokens are grouped into three semantic layers:
+ *   1. Palette (raw colors, one per role).
+ *   2. Semantic aliases (--bg-page, --fg-primary, etc.) — these are what
+ *      component rules reference. Never reach for a palette color directly
+ *      from a component rule.
+ *   3. Component tokens (radii, spacing, typography).
  * -------------------------------------------------------------------------- */
 
+
+/* =============================================================
+ * 1. Palette — Anthropic warm (matches Quartz light/dark config)
+ * ============================================================= */
+
 :root {
-  color-scheme: dark;
-  --bg:          #0f1115;
-  --bg-elev:    #171a21;
-  --bg-code:    #0b0d11;
-  --fg:          #e6e8ee;
-  --fg-muted:   #9096a4;
-  --fg-dim:     #6b7280;
-  --accent:      #7ea1ff;
-  --accent-dim:  #3b4a7a;
-  --border:      #22262f;
+  color-scheme: light dark;
 
-  --grade-trivial: #78d97a;
-  --grade-solved:  #7ea1ff;
-  --grade-hint:    #f0c060;
-  --grade-blank:   #f07070;
+  /* Light palette (default) */
+  --palette-light:      #f5f1e6;   /* Anthropic Oat — page bg           */
+  --palette-lightgray:  #e6e0cf;   /* warm beige — surfaces / borders   */
+  --palette-gray:       #8c7e6a;   /* warm muted — icons                */
+  --palette-darkgray:   #5a4f40;   /* warm subtext                      */
+  --palette-dark:       #1f1b16;   /* near-black, warm — primary text   */
+  --palette-secondary:  #cc785c;   /* Book Cloth — links / accent       */
+  --palette-tertiary:   #a05a3f;   /* deeper clay — secondary accent    */
+  --palette-highlight:      rgba(204, 120, 92, 0.08);
+  --palette-text-highlight: rgba(204, 120, 92, 0.28);
 
-  --nc150-bg:  #3d2f00;
-  --nc150-fg:  #ffd97a;
-  --blind-bg:  #002b3d;
-  --blind-fg:  #7ac8ff;
+  /* Semantic aliases — light mode */
+  --bg-page:     var(--palette-light);
+  --bg-surface:  var(--palette-lightgray);
+  --bg-code:     #ecdfcf;
+  --fg-primary:  var(--palette-dark);
+  --fg-body:     var(--palette-darkgray);
+  --fg-muted:    var(--palette-gray);
+  --border:      color-mix(in srgb, var(--palette-darkgray) 18%, transparent);
+  --accent:      var(--palette-secondary);
+  --accent-2:    var(--palette-tertiary);
+  --highlight:   var(--palette-highlight);
 
-  --diff-easy:   #78d97a;
-  --diff-medium: #f0c060;
-  --diff-hard:   #f07070;
-  --diff-unknown:#6b7280;
+  /* Grade semantics (kept warm, not competing with primary accent) */
+  --grade-trivial: #6fa96f;
+  --grade-solved:  #4d84c9;
+  --grade-hint:    #cf9a4a;
+  --grade-blank:   #c0554a;
 
-  --radius: 6px;
-  --gap: 16px;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Difficulty badges */
+  --diff-easy:    #6fa96f;
+  --diff-medium:  #cf9a4a;
+  --diff-hard:    #c0554a;
+  --diff-unknown: var(--fg-muted);
+
+  --nc150-bg:  color-mix(in srgb, #d6a24a 15%, transparent);
+  --nc150-fg:  #7a5b12;
+  --blind-bg:  color-mix(in srgb, #4d84c9 15%, transparent);
+  --blind-fg:  #24466f;
+  --pinned-bg: color-mix(in srgb, var(--accent) 18%, transparent);
+  --pinned-fg: var(--accent-2);
+
+  /* Component tokens */
+  --radius:      5px;
+  --radius-lg:   8px;
+  --gap:         16px;
+  --page-max:    960px;
+  --top-space:   4rem;
+
+  --font-header: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body:   "Atkinson Hyperlegible", system-ui, -apple-system, sans-serif;
+  --font-code:   "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
+/* Dark palette — applied when the system asks for dark OR the toggle
+   sets it explicitly. Explicit light override falls back to :root. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --palette-light:      #1a1714;
+    --palette-lightgray:  #2c2823;
+    --palette-gray:       #8b8273;
+    --palette-darkgray:   #b8afa0;
+    --palette-dark:       #ede6d6;
+    --palette-secondary:  #d99077;
+    --palette-tertiary:   #bb7159;
+    --palette-highlight:      rgba(217, 144, 119, 0.12);
+    --palette-text-highlight: rgba(217, 144, 119, 0.32);
+
+    --bg-code:     #22201c;
+
+    --nc150-bg:  color-mix(in srgb, #d9b06a 15%, transparent);
+    --nc150-fg:  #e0c58b;
+    --blind-bg:  color-mix(in srgb, #7ab6ff 15%, transparent);
+    --blind-fg:  #a8d0ff;
+  }
+}
+
+[data-theme="dark"] {
+  --palette-light:      #1a1714;
+  --palette-lightgray:  #2c2823;
+  --palette-gray:       #8b8273;
+  --palette-darkgray:   #b8afa0;
+  --palette-dark:       #ede6d6;
+  --palette-secondary:  #d99077;
+  --palette-tertiary:   #bb7159;
+  --palette-highlight:      rgba(217, 144, 119, 0.12);
+  --palette-text-highlight: rgba(217, 144, 119, 0.32);
+
+  --bg-code:     #22201c;
+
+  --nc150-bg:  color-mix(in srgb, #d9b06a 15%, transparent);
+  --nc150-fg:  #e0c58b;
+  --blind-bg:  color-mix(in srgb, #7ab6ff 15%, transparent);
+  --blind-fg:  #a8d0ff;
+}
+
+
+/* =============================================================
+ * 2. Base
+ * ============================================================= */
+
 * { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  text-size-adjust: none;
+}
 
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--sans);
-  font-size: 15px;
-  line-height: 1.55;
+  background: var(--bg-page);
+  color: var(--fg-body);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+::selection {
+  background: color-mix(in srgb, var(--accent-2) 60%, transparent);
+  color: var(--fg-primary);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+a:hover { color: var(--accent-2); text-decoration: underline; }
 
 .container {
-  max-width: 960px;
+  max-width: var(--page-max);
   margin: 0 auto;
-  padding: 32px 24px 96px;
+  padding: var(--top-space) 24px 96px;
 }
 
-/* --- Header ------------------------------------------------------------- */
+
+/* =============================================================
+ * 3. Header
+ * ============================================================= */
+
 .site-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
 }
+
 .site-header h1 {
   margin: 0;
+  font-family: var(--font-header);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--fg-primary);
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .site-header nav a {
-  margin-left: 20px;
-  color: var(--fg-muted);
-  font-size: 14px;
-}
-.site-header nav a:hover { color: var(--fg); }
-
-/* --- Section titles ----------------------------------------------------- */
-h2 {
-  font-size: 15px;
+  font-family: var(--font-header);
   font-weight: 600;
+  font-size: 14px;
   color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 32px 0 12px;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  transition: color 0.12s ease, background-color 0.12s ease;
+}
+.site-header nav a:hover {
+  color: var(--fg-primary);
+  background: var(--highlight);
+  text-decoration: none;
 }
 
-/* --- Queue cards -------------------------------------------------------- */
-.queue {
-  display: grid;
-  gap: 10px;
-}
-.queue-item {
-  background: var(--bg-elev);
+.theme-toggle {
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 18px;
-  display: grid;
-  grid-template-columns: 24px 1fr auto;
-  gap: 14px;
+  color: var(--fg-muted);
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
-  transition: border-color 0.12s ease;
+  justify-content: center;
+  transition: color 0.12s ease, border-color 0.12s ease;
 }
-.queue-item:hover { border-color: var(--accent-dim); }
-.queue-item .index {
-  font-family: var(--mono);
-  color: var(--fg-dim);
+.theme-toggle:hover {
+  color: var(--fg-primary);
+  border-color: var(--accent);
+}
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon { display: none; }
+:root:not([data-theme="dark"]) .theme-toggle .icon-moon,
+[data-theme="light"] .theme-toggle .icon-moon { display: inline; }
+[data-theme="dark"] .theme-toggle .icon-sun,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: inline; }
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+}
+
+
+/* =============================================================
+ * 4. Typography
+ * ============================================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-header);
+  color: var(--fg-primary);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+h2 {
   font-size: 13px;
+  font-weight: 700;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 40px 0 14px;
 }
-.queue-item .title a {
-  color: var(--fg);
+
+
+/* =============================================================
+ * 5. Queue cards
+ * ============================================================= */
+
+.queue {
+  display: grid;
+  gap: 12px;
+}
+.queue-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  transition: border-color 0.12s ease, transform 0.08s ease;
+}
+.queue-item:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: translateY(-1px);
+}
+.queue-item .index {
+  font-family: var(--font-code);
+  color: var(--fg-muted);
+  font-size: 12px;
   font-weight: 500;
-  font-size: 16px;
 }
+.queue-item .title {
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--fg-primary);
+  margin-bottom: 2px;
+}
+.queue-item .title a { color: inherit; }
+.queue-item .title a:hover { color: var(--accent); text-decoration: none; }
 .queue-item .meta {
   color: var(--fg-muted);
   font-size: 13px;
-  margin-top: 2px;
+}
+.queue-item .preview {
+  margin-top: 6px;
+  color: var(--fg-body);
+  font-size: 14px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.85;
 }
 .queue-item .badges {
   display: flex;
@@ -132,61 +319,89 @@ h2 {
   justify-content: flex-end;
 }
 
-/* --- Badges ------------------------------------------------------------- */
+
+/* =============================================================
+ * 6. Badges
+ * ============================================================= */
+
 .badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
+  font-family: var(--font-header);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  line-height: 1.4;
 }
-.badge.diff-easy    { background: rgba(120,217,122,0.15); color: var(--diff-easy); }
-.badge.diff-medium  { background: rgba(240,192,96,0.15);  color: var(--diff-medium); }
-.badge.diff-hard    { background: rgba(240,112,112,0.15); color: var(--diff-hard); }
-.badge.diff-unknown { background: rgba(107,114,128,0.15); color: var(--diff-unknown); }
-.badge.nc150        { background: var(--nc150-bg);        color: var(--nc150-fg); }
-.badge.blind75      { background: var(--blind-bg);        color: var(--blind-fg); }
-.badge.pinned       { background: rgba(240,192,96,0.15); color: var(--grade-hint); }
-.badge.pattern      { background: #1f2430; color: var(--fg-muted); }
+.badge.diff-easy    { background: color-mix(in srgb, var(--diff-easy) 15%, transparent);    color: var(--diff-easy); }
+.badge.diff-medium  { background: color-mix(in srgb, var(--diff-medium) 15%, transparent);  color: var(--diff-medium); }
+.badge.diff-hard    { background: color-mix(in srgb, var(--diff-hard) 15%, transparent);    color: var(--diff-hard); }
+.badge.diff-unknown { background: color-mix(in srgb, var(--diff-unknown) 15%, transparent); color: var(--diff-unknown); }
+.badge.nc150   { background: var(--nc150-bg);  color: var(--nc150-fg); }
+.badge.blind75 { background: var(--blind-bg);  color: var(--blind-fg); }
+.badge.pinned  { background: var(--pinned-bg); color: var(--pinned-fg); }
+.badge.pattern {
+  background: color-mix(in srgb, var(--fg-muted) 15%, transparent);
+  color: var(--fg-body);
+}
 
-/* --- Stats row ---------------------------------------------------------- */
+
+/* =============================================================
+ * 7. Stats
+ * ============================================================= */
+
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 .stat {
-  background: var(--bg-elev);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 14px;
+  padding: 14px 16px;
 }
 .stat .value {
-  font-size: 22px;
-  font-weight: 600;
+  font-family: var(--font-header);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fg-primary);
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 .stat .label {
   color: var(--fg-muted);
-  font-size: 12px;
+  font-family: var(--font-header);
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-top: 2px;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+  font-weight: 600;
+}
+@media (max-width: 720px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* --- Problem page ------------------------------------------------------- */
+
+/* =============================================================
+ * 8. Problem page
+ * ============================================================= */
+
 .problem-header {
   border-bottom: 1px solid var(--border);
-  padding-bottom: 20px;
-  margin-bottom: 24px;
+  padding-bottom: 24px;
+  margin-bottom: 28px;
 }
 .problem-header .title {
-  font-size: 26px;
-  font-weight: 600;
-  margin: 0 0 10px;
+  font-family: var(--font-header);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--fg-primary);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
 }
 .problem-header .meta {
   display: flex;
@@ -196,69 +411,171 @@ h2 {
   color: var(--fg-muted);
   font-size: 13px;
 }
-.problem-header .meta a { color: var(--accent); }
 
-.doc {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 24px;
-  white-space: pre-wrap;
-  font-family: var(--sans);
+
+/* =============================================================
+ * 9. Callouts (Quartz-style: subtle border + accent-mix bg)
+ * ============================================================= */
+
+.callout {
+  border: 1px solid color-mix(in srgb, var(--callout-color, var(--accent)) 28%, transparent);
+  background: color-mix(in srgb, var(--callout-color, var(--accent)) 7%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 16px 22px;
+  margin: 16px 0;
+}
+.callout .callout-title {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--callout-color, var(--accent));
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.callout.tip      { --callout-color: var(--accent); }
+.callout.info     { --callout-color: var(--accent); }
+.callout.warn     { --callout-color: var(--diff-medium); }
+.callout.answer   { --callout-color: #4d84c9; }
+.callout.recall   { --callout-color: var(--accent-2); }
+
+
+/* --- Quick recall card ------------------------------------------------- */
+
+.qa-card {
+  border: 1px solid color-mix(in srgb, var(--accent-2) 28%, transparent);
+  background: color-mix(in srgb, var(--accent-2) 7%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  margin-bottom: 24px;
+}
+.qa-card .qa-label {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--accent-2);
+  margin-bottom: 8px;
+}
+.qa-card .qa-body {
+  color: var(--fg-primary);
+  font-size: 15.5px;
   line-height: 1.6;
 }
-.doc.mono { font-family: var(--mono); font-size: 13.5px; }
+.qa-card .qa-section {
+  margin-bottom: 14px;
+}
+.qa-card .qa-section:last-child { margin-bottom: 0; }
+.qa-card .qa-hidden { display: none; }
+.qa-card .qa-reveal-hint {
+  font-size: 12px;
+  color: var(--fg-muted);
+  font-family: var(--font-code);
+  margin-top: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.qa-card .qa-reveal-hint:hover { color: var(--accent); }
+.qa-card .qa-complexity {
+  font-family: var(--font-code);
+  font-size: 13px;
+  color: var(--fg-muted);
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--fg-muted) 8%, transparent);
+  border-radius: var(--radius);
+  display: inline-block;
+}
+
+
+/* --- "Reveal my solution" ----------------------------------------------- */
 
 details.reveal {
-  margin-top: 24px;
-  background: var(--bg-elev);
+  margin-top: 20px;
+  background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 details.reveal > summary {
   cursor: pointer;
-  padding: 14px 20px;
+  padding: 14px 22px;
+  font-family: var(--font-header);
   font-weight: 600;
+  font-size: 14px;
   color: var(--accent);
   user-select: none;
   list-style: none;
+  transition: background-color 0.12s ease;
 }
 details.reveal > summary::-webkit-details-marker { display: none; }
 details.reveal > summary::before {
   content: "▸ ";
   color: var(--fg-muted);
-  margin-right: 6px;
+  margin-right: 8px;
 }
 details.reveal[open] > summary::before { content: "▾ "; }
 details.reveal[open] > summary {
   border-bottom: 1px solid var(--border);
-  color: var(--fg);
+  color: var(--fg-primary);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
 }
-details.reveal > .content { padding: 20px 24px; }
+details.reveal > .content { padding: 22px 24px; }
 
+
+/* =============================================================
+ * 10. Code blocks (light styling; syntax colors come from Prism)
+ * ============================================================= */
+
+pre[class*="language-"],
 pre.code {
   margin: 0;
-  padding: 16px 18px;
-  background: var(--bg-code);
+  padding: 18px 20px;
+  background: var(--bg-code) !important;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow-x: auto;
-  font-family: var(--mono);
+  font-family: var(--font-code);
   font-size: 13px;
-  line-height: 1.55;
-  color: #d0d4de;
+  line-height: 1.6;
+  color: var(--fg-primary);
+  tab-size: 4;
+}
+code[class*="language-"] {
+  font-family: var(--font-code);
+  font-size: 13px;
+  background: transparent !important;
+  color: inherit;
+  tab-size: 4;
+}
+:not(pre) > code {
+  font-family: var(--font-code);
+  font-size: 0.9em;
+  padding: 2px 6px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent-2);
+  border-radius: 3px;
 }
 
-/* --- Grade bar (sticky) ------------------------------------------------- */
+
+/* =============================================================
+ * 11. Grade bar (sticky)
+ * ============================================================= */
+
 .grade-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--bg-elev);
+  background: color-mix(in srgb, var(--bg-page) 92%, transparent);
+  backdrop-filter: blur(8px);
   border-top: 1px solid var(--border);
-  padding: 12px 20px;
+  padding: 14px 20px;
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -269,54 +586,61 @@ pre.code {
   color: var(--fg-muted);
   font-size: 13px;
   margin-right: 20px;
+  font-family: var(--font-header);
+  font-weight: 500;
 }
 .grade-btn {
-  background: var(--bg);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
-  color: var(--fg);
+  color: var(--fg-primary);
   padding: 10px 18px;
   border-radius: var(--radius);
   cursor: pointer;
+  font-family: var(--font-header);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--sans);
-  transition: transform 0.08s ease, border-color 0.12s ease;
+  transition: transform 0.08s ease, border-color 0.12s ease, background-color 0.12s ease;
 }
 .grade-btn:hover { transform: translateY(-1px); }
 .grade-btn .key {
-  font-family: var(--mono);
+  font-family: var(--font-code);
   font-size: 12px;
-  color: var(--fg-dim);
+  color: var(--fg-muted);
   border: 1px solid var(--border);
   padding: 1px 6px;
   border-radius: 3px;
+  font-weight: 500;
 }
-.grade-btn.trivial { border-color: rgba(120,217,122,0.35); }
-.grade-btn.solved  { border-color: rgba(126,161,255,0.35); }
-.grade-btn.hint    { border-color: rgba(240,192,96,0.35); }
-.grade-btn.blank   { border-color: rgba(240,112,112,0.35); }
-.grade-btn.trivial:hover { background: rgba(120,217,122,0.10); }
-.grade-btn.solved:hover  { background: rgba(126,161,255,0.10); }
-.grade-btn.hint:hover    { background: rgba(240,192,96,0.10); }
-.grade-btn.blank:hover   { background: rgba(240,112,112,0.10); }
+.grade-btn.trivial { border-color: color-mix(in srgb, var(--grade-trivial) 45%, transparent); }
+.grade-btn.solved  { border-color: color-mix(in srgb, var(--grade-solved) 45%, transparent); }
+.grade-btn.hint    { border-color: color-mix(in srgb, var(--grade-hint) 45%, transparent); }
+.grade-btn.blank   { border-color: color-mix(in srgb, var(--grade-blank) 45%, transparent); }
+.grade-btn.trivial:hover { background: color-mix(in srgb, var(--grade-trivial) 10%, var(--bg-surface)); }
+.grade-btn.solved:hover  { background: color-mix(in srgb, var(--grade-solved) 10%, var(--bg-surface)); }
+.grade-btn.hint:hover    { background: color-mix(in srgb, var(--grade-hint) 10%, var(--bg-surface)); }
+.grade-btn.blank:hover   { background: color-mix(in srgb, var(--grade-blank) 10%, var(--bg-surface)); }
 
-/* --- Toast + pending indicator ----------------------------------------- */
+
+/* =============================================================
+ * 12. Toast + pending banner
+ * ============================================================= */
+
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: var(--bg-elev);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   padding: 12px 18px;
   border-radius: var(--radius);
   max-width: 380px;
-  color: var(--fg);
+  color: var(--fg-primary);
   font-size: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 20%, transparent);
   z-index: 20;
   animation: slideIn 0.18s ease-out;
 }
@@ -328,10 +652,10 @@ pre.code {
 .toast.success { border-left-color: var(--grade-trivial); }
 
 .pending-banner {
-  background: rgba(240,192,96,0.10);
-  border: 1px solid rgba(240,192,96,0.35);
+  background: color-mix(in srgb, var(--grade-hint) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--grade-hint) 35%, transparent);
   color: var(--grade-hint);
-  padding: 10px 14px;
+  padding: 12px 18px;
   border-radius: var(--radius);
   margin-bottom: 20px;
   font-size: 14px;
@@ -342,34 +666,50 @@ pre.code {
 }
 .pending-banner button {
   background: var(--grade-hint);
-  color: #000;
+  color: #fff;
   border: none;
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: 4px;
   cursor: pointer;
+  font-family: var(--font-header);
   font-weight: 600;
+  font-size: 13px;
 }
 
-/* --- Patterns list ------------------------------------------------------ */
+
+/* =============================================================
+ * 13. Patterns grid / table
+ * ============================================================= */
+
 .pattern-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 .pattern-card {
-  background: var(--bg-elev);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 16px;
+  padding: 16px 18px;
+  transition: border-color 0.12s ease, transform 0.08s ease;
 }
-.pattern-card a { color: var(--fg); font-weight: 500; }
+.pattern-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: translateY(-1px);
+}
+.pattern-card a {
+  color: var(--fg-primary);
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 15px;
+}
 .pattern-card .count {
   color: var(--fg-muted);
   font-size: 12px;
   margin-top: 4px;
+  font-family: var(--font-code);
 }
 
-/* --- Table of problems (patterns/*.html) -------------------------------- */
 .problems-table {
   width: 100%;
   border-collapse: collapse;
@@ -378,34 +718,54 @@ pre.code {
 .problems-table th,
 .problems-table td {
   text-align: left;
-  padding: 10px 8px;
+  padding: 12px 10px;
   border-bottom: 1px solid var(--border);
 }
 .problems-table th {
   color: var(--fg-muted);
-  font-weight: 500;
-  font-size: 12px;
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
-.problems-table tr:hover td { background: rgba(126,161,255,0.04); }
-.problems-table td.mono { font-family: var(--mono); font-size: 12px; color: var(--fg-muted); }
+.problems-table tr:hover td {
+  background: var(--highlight);
+}
+.problems-table td.mono {
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--fg-muted);
+}
 
-/* --- Footer / links row ------------------------------------------------- */
+
+/* =============================================================
+ * 14. Footer
+ * ============================================================= */
+
 .footer {
-  margin-top: 60px;
-  color: var(--fg-dim);
+  margin-top: 72px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--fg-muted);
   font-size: 12px;
   text-align: center;
+  font-family: var(--font-header);
 }
 .footer code {
-  background: var(--bg-elev);
-  padding: 2px 6px;
+  background: var(--bg-surface);
+  padding: 2px 8px;
   border-radius: 3px;
-  font-family: var(--mono);
+  font-family: var(--font-code);
+  color: var(--fg-body);
 }
 
-/* --- Utility ------------------------------------------------------------ */
+
+/* =============================================================
+ * 15. Utility
+ * ============================================================= */
+
 .hidden { display: none !important; }
 .dim { color: var(--fg-muted); }
 .right { text-align: right; }
+.mono { font-family: var(--font-code); }
