@@ -3,43 +3,66 @@ package graphs;
 import java.util.*;
 
 /**
- * 802. Find Eventual Safe States
+ * Problem: Find Eventual Safe States
  *
- * Problem: There is a directed graph of n nodes numbered from 0 to n-1.
- * A node is a terminal node if there are no outgoing edges. A node is a safe node
- * if every possible path starting from that node leads to a terminal node.
- * Return an array of all safe nodes sorted in ascending order.
+ * In a directed graph, a node is safe if every possible path starting from it
+ * eventually reaches a terminal node instead of getting trapped in a cycle.
+ * Return all safe nodes in increasing order.
+ *
+ * Leetcode: https://leetcode.com/problems/find-eventual-safe-states/ (Medium)
+ * Rating:   1962 (zerotrac Elo)
+ * Pattern:  Graph | DFS coloring | Cycle detection
  *
  * Example:
- * Input: graph = [[1,2],[2,3],[5],[0],[5],[],[]]
- * Output: [2,4,5,6]
+ *   Input:  graph = [[1,2],[2,3],[5],[0],[5],[],[]]
+ *   Output: [2, 4, 5, 6]
+ *   Why:    nodes 5 and 6 are terminal, nodes 2 and 4 can only flow to terminal
+ *           nodes, and nodes 0, 1, 3 participate in or can reach a cycle.
  *
- * LeetCode: https://leetcode.com/problems/find-eventual-safe-states
+ * Follow-ups:
+ *   1. Solve without recursion?
+ *      Reverse the graph and remove terminal nodes with topological BFS.
+ *   2. Return unsafe nodes grouped by cycle?
+ *      Run strongly connected components and mark cyclic components unsafe.
+ *   3. Support edge deletions over time?
+ *      Maintain reverse edges and outdegree counts to promote newly terminal nodes.
  *
- * Follow-up questions:
- * Q: How to detect if there are cycles efficiently?
- * A: Use DFS with three colors (white, gray, black) or topological sort.
- *
- * Q: Can we optimize for very large graphs?
- * A: Use iterative DFS or BFS with explicit stack to avoid recursion limits.
- *
- * Q: How to handle dynamic updates to the graph?
- * A: Maintain incremental data structures or recompute affected components.
- * LeetCode Contest Rating: 1962
+ * Related: Course Schedule (207), Detect Cycles in 2D Grid (1559).
  */
 public class FindEventualSafeStates {
 
+
+    public static void main(String[] args) {
+        FindEventualSafeStates solver = new FindEventualSafeStates();
+        int[][][] inputs = {
+            {{1, 2}, {2, 3}, {5}, {0}, {5}, {}, {}},
+            {{}, {0, 2, 3, 4}, {3}, {4}, {}}
+        };
+        String[] expected = {"[2, 4, 5, 6]", "[0, 1, 2, 3, 4]"};
+
+        for (int i = 0; i < inputs.length; i++) {
+            List<Integer> output = solver.eventualSafeNodes(inputs[i]);
+            System.out.printf("graph=%s  ->  %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
-     * DFS-based solution using three-color approach.
+     * Intuition: a node is eventually safe if every path from it ends at a terminal
+     * node instead of cycling. DFS colors nodes by state: unvisited, currently in
+     * the recursion path, or confirmed safe. Seeing a node already in the current
+     * path proves a cycle; finishing all neighbors proves safety.
      *
-     * Algorithm: Cycle detection with state tracking
-     * - White (0): Unvisited node
-     * - Gray (1): Currently in DFS path (potential cycle)
-     * - Black (2): Completely processed, safe node
-     * - If we revisit a gray node, there's a cycle
+     * Algorithm:
+     *   1. Keep a state array for every node.
+     *   2. DFS each node that has not already been resolved.
+     *   3. Return false when DFS reaches a node currently in the recursion stack.
+     *   4. Mark nodes safe only after every outgoing neighbor is safe, then collect them in order.
      *
-     * Time Complexity: O(V + E) where V is nodes, E is edges
-     * Space Complexity: O(V) for recursion stack and color array
+     * Time:  O(V+E) - each node and edge is resolved once by DFS.
+     * Space: O(V) - state array and recursion stack.
+     *
+     * @param graph directed adjacency list
+     * @return sorted list of eventually safe node indexes
      */
     public List<Integer> eventualSafeNodes(int[][] graph) {
         int n = graph.length;

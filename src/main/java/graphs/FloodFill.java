@@ -3,43 +3,76 @@ package graphs;
 import java.util.*;
 
 /**
- * 733. Flood Fill
+ * Problem: Flood Fill
  *
- * Problem: Given an image represented as a 2D array of integers, a coordinate (sr, sc)
- * and a new color, perform a flood fill operation starting from the given coordinate.
+ * Given an image grid, a starting cell, and a new color, recolor the whole
+ * four-directionally connected region that has the starting cell's original
+ * color. Return the updated image.
+ *
+ * Leetcode: https://leetcode.com/problems/flood-fill/ (Easy)
+ * Rating:   acceptance 68.6% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | DFS/BFS | Connected component coloring
  *
  * Example:
- * Input: image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, newColor = 2
- * Output: [[2,2,2],[2,2,0],[2,0,1]]
+ *   Input:  image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2
+ *   Output: [[2,2,2],[2,2,0],[2,0,1]]
+ *   Why:    only the 1-cells connected to the center through up, down, left, or
+ *           right are recolored; the diagonal 1 in the corner is not connected.
  *
- * LeetCode: https://leetcode.com/problems/flood-fill
+ * Follow-ups:
+ *   1. Avoid recursion for a huge image?
+ *      Use the BFS method with a queue to avoid stack overflow.
+ *   2. Support diagonal fill?
+ *      Add the four diagonal directions to the neighbor list.
+ *   3. Return the number of recolored pixels too?
+ *      Increment a counter whenever a cell is recolored.
  *
- * Follow-up questions:
- * Q: How to handle very large images efficiently?
- * A: Use iterative BFS/DFS to avoid stack overflow, or process in chunks.
- *
- * Q: What if we need to track the number of pixels changed?
- * A: Add counter variable and increment during traversal.
- *
- * Q: How to optimize for sparse changes (few pixels affected)?
- * A: Check early termination conditions and use efficient data structures.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Number of Islands (200), Max Area of Island (695).
  */
 public class FloodFill {
 
-    private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
+    public static void main(String[] args) {
+        FloodFill solver = new FloodFill();
+        int[][][] images = {
+            {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}},
+            {{0, 0, 0}, {0, 0, 0}}
+        };
+        int[][] starts = {{1, 1}, {0, 0}};
+        int[] colors = {2, 0};
+        String[] expected = {
+            "[[2, 2, 2], [2, 2, 0], [2, 0, 1]]",
+            "[[0, 0, 0], [0, 0, 0]]"
+        };
+
+        for (int i = 0; i < images.length; i++) {
+            int[][] image = Arrays.stream(images[i]).map(int[]::clone).toArray(int[][]::new);
+            int[][] output = solver.floodFill(image, starts[i][0], starts[i][1], colors[i]);
+            System.out.printf("image=%s sr=%d sc=%d color=%d  ->  %s  expected=%s%n",
+                Arrays.deepToString(images[i]), starts[i][0], starts[i][1], colors[i], Arrays.deepToString(output), expected[i]);
+        }
+    }
+    private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     /**
-     * Recursive DFS approach for flood fill.
+     * Intuition: flood fill is a connected-component traversal from the starting
+     * pixel. The original color defines which neighboring pixels belong to the same
+     * component, and recoloring a pixel also marks it visited so recursion does not
+     * bounce back and forth forever.
      *
-     * Algorithm: Depth-First Search
-     * - Start from given coordinate (sr, sc)
-     * - If current cell has original color, change to new color
-     * - Recursively process all 4-directional neighbors
-     * - Stop when reaching boundary or different colored cells
+     * Algorithm:
+     *   1. Read the starting pixel's original color.
+     *   2. Return immediately if the new color is the same as the original color.
+     *   3. DFS through four-direction neighbors that still have the original color.
+     *   4. Recolor each visited pixel to the new color.
      *
-     * Time Complexity: O(m * n) where m and n are image dimensions
-     * Space Complexity: O(m * n) in worst case for recursion stack
+     * Time:  O(m*n) - in the worst case the component contains every cell.
+     * Space: O(m*n) - recursion can use one stack frame per cell in a large component.
+     *
+     * @param image image grid of color values
+     * @param sr starting row
+     * @param sc starting column
+     * @param newColor replacement color
+     * @return the image after flood fill
      */
     public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
         int originalColor = image[sr][sc];

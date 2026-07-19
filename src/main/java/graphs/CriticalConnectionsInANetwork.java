@@ -3,43 +3,68 @@ package graphs;
 import java.util.*;
 
 /**
- * 1192. Critical Connections in a Network
+ * Problem: Critical Connections in a Network
  *
- * Problem: Given n servers numbered 0 to n-1 connected by undirected connections,
- * find all critical connections. A critical connection is a connection whose
- * removal increases the number of connected components.
+ * Given an undirected connected network of n servers, return every edge whose
+ * removal disconnects the network. Such an edge is a bridge: there is no other
+ * route that can carry traffic between its two sides.
+ *
+ * Leetcode: https://leetcode.com/problems/critical-connections-in-a-network/ (Hard)
+ * Rating:   2085 (zerotrac Elo)
+ * Pattern:  Graph | Tarjan bridge finding | DFS low-link values
  *
  * Example:
- * Input: n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]
- * Output: [[1,3]]
- * Explanation: [[3,1]] is also accepted. Removing [1,3] disconnects node 3.
+ *   Input:  n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]
+ *   Output: [[1,3]]
+ *   Why:    nodes 0, 1, and 2 still stay connected through a cycle, but node 3
+ *           has only the edge to node 1, so removing it cuts node 3 off.
  *
- * LeetCode: https://leetcode.com/problems/critical-connections-in-a-network
+ * Follow-ups:
+ *   1. Return articulation points as well as bridges?
+ *      Use the same DFS timestamps, but apply the vertex low-link conditions.
+ *   2. Handle parallel edges between the same two servers?
+ *      Track edge ids so the DFS skips only the exact parent edge, not all same endpoints.
+ *   3. Support online edge insertions and deletions?
+ *      Use dynamic connectivity data structures; Tarjan is for a static snapshot.
  *
- * Follow-up questions:
- * Q: What if the graph is very dense or sparse?
- * A: Algorithm complexity remains O(V+E), but practical performance varies.
- *
- * Q: How to handle dynamic edge additions/removals?
- * A: Use dynamic connectivity data structures or recompute bridges.
- *
- * Q: Can we find critical connections in directed graphs?
- * A: Use strongly connected components and bridge-finding in condensation graph.
- * LeetCode Contest Rating: 2085
+ * Related: Redundant Connection (684), Network Delay Time (743).
  */
 public class CriticalConnectionsInANetwork {
 
+
+    public static void main(String[] args) {
+        CriticalConnectionsInANetwork solver = new CriticalConnectionsInANetwork();
+        List<List<List<Integer>>> inputs = Arrays.asList(
+            Arrays.asList(Arrays.asList(0, 1), Arrays.asList(1, 2), Arrays.asList(2, 0), Arrays.asList(1, 3)),
+            Arrays.asList(Arrays.asList(0, 1))
+        );
+        int[] nodeCounts = {4, 2};
+        String[] expected = {"[[1, 3]]", "[[0, 1]]"};
+
+        for (int i = 0; i < inputs.size(); i++) {
+            List<List<Integer>> output = solver.criticalConnections(nodeCounts[i], inputs.get(i));
+            System.out.printf("n=%d connections=%s  ->  %s  expected=%s%n",
+                nodeCounts[i], inputs.get(i), output, expected[i]);
+        }
+    }
     /**
-     * Tarjan's Bridge-Finding Algorithm.
+     * Intuition: an edge is critical when the child side of a DFS tree cannot reach
+     * the parent or any earlier ancestor without using that edge. Tarjan's discovery
+     * time records when a node is first seen, and low-link records the earliest
+     * discovery time reachable from its subtree through tree edges plus one back edge.
      *
-     * Algorithm: DFS with low-link values
-     * - Use DFS to traverse graph and assign discovery times
-     * - Track low-link values (earliest visited vertex reachable from subtree)
-     * - An edge (u,v) is a bridge if low[v] > disc[u] (v not reachable by back edge)
-     * - Handle parallel edges by tracking parent to avoid false bridges
+     * Algorithm:
+     *   1. Build the original undirected adjacency list from connections.
+     *   2. DFS with discovery time and low-link arrays.
+     *   3. Ignore the edge back to the parent, but use other visited neighbors as back edges.
+     *   4. Report parent-child edges whose child low-link is greater than the parent's discovery time.
      *
-     * Time Complexity: O(V + E) where V is vertices, E is edges
-     * Space Complexity: O(V + E) for adjacency list and arrays
+     * Time:  O(V+E) - DFS processes every node and undirected edge a constant number of times.
+     * Space: O(V+E) - adjacency storage plus DFS arrays and recursion stack.
+     *
+     * @param n number of nodes labeled 0 to n - 1
+     * @param connections undirected edges in the network
+     * @return all bridges whose removal disconnects the network
      */
     public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {
         // Build adjacency list

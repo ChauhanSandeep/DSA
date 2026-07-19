@@ -4,81 +4,73 @@ import java.util.*;
 
 
 /**
- * Problem: Find the top-k highest-ranked items in a grid, based on specific sorting criteria.
+ * Problem: K Highest Ranked Items Within a Price Range
  *
- * Statement:
- * - You are given a grid of items represented by integers (0 = inaccessible cell, >0 = item price).
- * - From a given start position, you need to find the top `k` items within a given price range.
- * - Ranking Criteria (in order of priority):
- *   1. Shortest Manhattan distance from the start position.
- *   2. Lower price.
- *   3. Smaller row index.
- *   4. Smaller column index.
+ * Given a shop grid, a price range, a start cell, and k, return up to k reachable
+ * item coordinates ranked by shortest distance, then lower price, then smaller
+ * row, then smaller column. Blocked cells have value 0.
+ *
+ * Leetcode: https://leetcode.com/problems/k-highest-ranked-items-within-a-price-range/ (Medium)
+ * Rating:   1837 (zerotrac Elo)
+ * Pattern:  Graph | BFS | Level-order ranking
  *
  * Example:
- * Input:
- * grid = [[1,2,0,1],
- *         [1,3,3,1],
- *         [0,2,5,1]]
- * pricing = [2,3], start = [2,3], k = 2
- * Output: [[2,1],[1,1]]
- * Explaination:
+ *   Input:  grid = [[1,2,0,1],[1,3,3,1],[0,2,5,1]], pricing = [2,3], start = [2,3], k = 2
+ *   Output: [[2,1], [1,2]]
+ *   Why:    both returned items are distance two from the start; price 2 at [2,1]
+ *           ranks before price 3 at [1,2].
  *
+ * Follow-ups:
+ *   1. Avoid sorting all found items when k is small?
+ *      Keep a bounded heap of the best k candidates while BFS visits cells.
+ *   2. What if the grid is huge and sparse?
+ *      Store blocked and priced cells in hash maps and generate only reachable neighbors.
+ *   3. Support changing prices between queries?
+ *      Re-run BFS for reachability but query prices from an updated price index.
  *
- * LeetCode Link: https://leetcode.com/problems/k-highest-ranked-items-within-a-price-range/
- *
- * Follow-up Questions:
- * 1. Can this be solved without a priority queue?
- *    - Yes, we can use BFS level-by-level traversal and sort valid items within each level before adding.
- * 2. What if the grid is extremely large (e.g., millions of cells)?
- *    - Use pruning (stop BFS when no further valid items can be found within the required `k`).
- * 3. How to optimize memory if visited array is too large?
- *    - Use a BitSet or encode visited positions into a HashSet with "row*cols+col".
- * LeetCode Contest Rating: 1837
+ * Related: Cut Off Trees for Golf Event (675), Shortest Path in Binary Matrix (1091).
  */
 public class HighestRatedItem {
 
-  public static void main(String[] args) {
-    int[][] grid = {{1, 2, 0, 1}, {1, 3, 3, 1}, {0, 2, 5, 1}};
-    int[] pricing = {2, 3}; // Price range: [min, max]
-    int[] start = {2, 3};   // Starting position
-    int k = 2;              // Number of items to return
 
-    HighestRatedItem solution = new HighestRatedItem();
-    List<List<Integer>> result = solution.highestRankedKItems(grid, pricing, start, k);
 
-    System.out.println("Top-K highest-ranked items: " + result);
-  }
+    public static void main(String[] args) {
+        HighestRatedItem solver = new HighestRatedItem();
+        int[][][] grids = {
+            {{1, 2, 0, 1}, {1, 3, 3, 1}, {0, 2, 5, 1}},
+            {{1, 1, 1}}
+        };
+        int[][] pricing = {{2, 3}, {2, 5}};
+        int[][] starts = {{2, 3}, {0, 0}};
+        int[] kValues = {2, 3};
+        String[] expected = {"[[2, 1], [1, 2]]", "[]"};
 
-  /**
-   * Use heap-based approach. Maintains only top k items during BFS traversal instead of storing all items.
-   *
-   * Algorithm Steps:
-   * 1. Initialize a max heap to store the top k items (worst items at the top)
-   * 2. Start BFS from the given starting position
-   * 3. For each cell in BFS traversal:
-   *    - Check if the cell contains a valid item (within price range)
-   *    - If valid, try to add it to our top-k heap
-   *    - If heap has space (< k items), add directly
-   *    - If heap is full, compare with worst item and replace if better
-   * 4. Continue BFS level by level (maintaining Manhattan distance)
-   * 5. Extract final results from heap and sort them properly
-   *
-   * Ranking Priority (best to worst):
-   * - Shorter Manhattan distance from start
-   * - Lower price
-   * - Smaller row index
-   * - Smaller column index
-   *
-   * Time Complexity: O(mn * log k) - better when k << total valid items
-   * Space Complexity: O(k) - constant space for heap regardless of total items
-   *
-   * @param grid 2D array representing shop layout
-   * @param pricing valid price range [low, high]
-   * @param start starting position [row, col]
-   * @param k number of items to return
-   * @return list of top k item coordinates
-   */
+        for (int i = 0; i < grids.length; i++) {
+            List<List<Integer>> output = solver.highestRankedKItems(grids[i], pricing[i], starts[i], kValues[i]);
+            System.out.printf("grid=%s pricing=%s start=%s k=%d  ->  %s  expected=%s%n",
+                Arrays.deepToString(grids[i]), Arrays.toString(pricing[i]), Arrays.toString(starts[i]), kValues[i], output, expected[i]);
+        }
+    }
+    /**
+     * Intuition: distance is the first ranking key, so BFS from the start naturally
+     * visits cells by increasing distance. Collect reachable items within the price
+     * range, then sort by the remaining tie-breakers: distance, price, row, and column.
+     *
+     * Algorithm:
+     *   1. BFS from the starting cell through non-wall cells.
+     *   2. Record each reachable item whose price is inside the requested range.
+     *   3. Sort recorded items by distance, price, row, then column.
+     *   4. Return the first k item coordinates.
+     *
+     * Time:  O(m*n log(m*n)) - BFS scans the grid and sorting can include many cells.
+     * Space: O(m*n) - visited, queue, and candidate item storage.
+     *
+     * @param grid store grid with 0 as wall and positive values as prices
+     * @param pricing inclusive low/high price range
+     * @param start starting coordinate [row, col]
+     * @param k maximum number of item coordinates to return
+     * @return ranked item coordinates
+     */
   public List<List<Integer>> highestRankedKItems(int[][] grid, int[] pricing, int[] start, int k) {
 
     // Use max heap to maintain top k items (negate values for max heap behavior)

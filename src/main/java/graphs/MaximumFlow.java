@@ -3,40 +3,62 @@ package graphs;
 import java.util.*;
 
 /**
- * Maximum Flow - Ford-Fulkerson Algorithm with Edmonds-Karp Implementation
+ * Problem: Maximum Flow
  *
- * Problem: Given a flow network (directed graph with edge capacities),
- * find the maximum flow from source to sink.
+ * Given a directed capacity graph, a source, and a sink, compute the largest
+ * amount of flow that can be sent from source to sink while respecting edge
+ * capacities and flow conservation at intermediate nodes.
  *
- * Applications:
- * - Network routing and bandwidth optimization
- * - Bipartite matching problems
- * - Min-cut max-flow theorem applications
- * - Image segmentation and computer vision
+ * Pattern:  Graph | Edmonds-Karp | Residual network BFS
  *
- * Follow-up questions:
- * Q: How to handle minimum cost maximum flow?
- * A: Use successive shortest path algorithm or cycle-canceling methods.
+ * Example:
+ *   Input:  capacity = [[0,3,2,0],[0,0,1,2],[0,0,0,4],[0,0,0,0]], source = 0, sink = 3
+ *   Output: 5
+ *   Why:    three units can leave through node 1/2 combinations and two more
+ *           through the other route, saturating all capacity out of the source.
  *
- * Q: Can we solve maximum flow in distributed systems?
- * A: Use push-relabel algorithms adapted for distributed computing.
- *
- * Q: How to extend to multi-commodity flows?
- * A: Formulate as linear programming problem or use specialized algorithms.
+ * Follow-ups:
+ *   1. Need faster performance on dense graphs?
+ *      Use Dinic's algorithm with level graphs and blocking flows.
+ *   2. Need minimum cut edges too?
+ *      After max flow, DFS the residual graph from source and cut edges crossing to unreached nodes.
+ *   3. Add per-edge costs?
+ *      Use min-cost max-flow with shortest augmenting paths on residual costs.
  */
 public class MaximumFlow {
 
+
+    public static void main(String[] args) {
+        MaximumFlow solver = new MaximumFlow();
+        int[][][] capacities = {
+            {{0, 3, 2, 0}, {0, 0, 1, 2}, {0, 0, 0, 4}, {0, 0, 0, 0}},
+            {{0, 0}, {0, 0}}
+        };
+        int[] expected = {5, 0};
+        for (int i = 0; i < capacities.length; i++) {
+            int output = solver.maxFlow(capacities[i], 0, capacities[i].length - 1);
+            System.out.printf("capacity=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(capacities[i]), output, expected[i]);
+        }
+    }
     /**
-     * Edmonds-Karp Algorithm (Ford-Fulkerson with BFS).
+     * Intuition: Ford-Fulkerson repeatedly finds an augmenting path in the residual
+     * graph and pushes as much additional flow as that path allows. BFS makes this
+     * Edmonds-Karp, choosing shortest augmenting paths so the process is polynomial.
      *
-     * Algorithm: Augmenting path with BFS
-     * - Use BFS to find shortest augmenting path from source to sink
-     * - Update residual graph by subtracting flow from forward edges
-     * - Add reverse edges with the flow value for potential backtracking
-     * - Repeat until no augmenting path exists
+     * Algorithm:
+     *   1. Copy capacities into a residual-capacity graph.
+     *   2. Use BFS to find an augmenting path from source to sink.
+     *   3. Compute the bottleneck residual capacity along that path.
+     *   4. Subtract bottleneck capacity forward, add it backward, and accumulate flow.
      *
-     * Time Complexity: O(V*E²) where V is vertices, E is edges
-     * Space Complexity: O(V²) for adjacency matrix representation
+     * Time:  O(V*E^2) - Edmonds-Karp bounds the number of BFS augmentations.
+     * Space: O(V^2) - residual capacity matrix plus BFS parent storage.
+     *
+     * @param capacity capacity[u][v] is edge capacity from u to v
+     * @param source source vertex
+     * @param sink sink vertex
+     * @return maximum flow value from source to sink
      */
     public int maxFlow(int[][] capacity, int source, int sink) {
         int n = capacity.length;

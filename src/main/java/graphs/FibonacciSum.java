@@ -5,48 +5,59 @@ import java.util.List;
 
 /**
  * Problem: Fibonacci Sum
- * InterviewBit: https://www.interviewbit.com/problems/fibonacci-sum/
  *
- * Statement:
- * Given an integer `num`, find the minimum number of Fibonacci numbers whose sum is exactly `num`.
- * A Fibonacci number can be used multiple times.
+ * Given a positive integer, return the minimum number of Fibonacci numbers whose
+ * sum is exactly that integer. The same Fibonacci number may be used more than
+ * once.
+ *
+ * Source: InterviewBit - https://www.interviewbit.com/problems/fibonacci-sum/
+ * Pattern:  Greedy | Fibonacci numbers | Canonical coin system
  *
  * Example:
- * Input: 19
- * Output: 3
- * Explanation: 19 = 13 + 5 + 1
+ *   Input:  num = 19
+ *   Output: 3
+ *   Why:    19 can be written as 13 + 5 + 1, and no two Fibonacci numbers can
+ *           make 19 exactly.
  *
- * Follow-up Questions (FAANG-style):
- * 1. Why does the greedy algorithm always work here?
- *    - Because Fibonacci numbers form a canonical coin system (Zeckendorf’s theorem guarantees a unique representation).
- * 2. Can this be extended to other sequences like Lucas numbers?
- *    - Not necessarily; greedy may fail if the sequence is not canonical.
- * 3. What if negative numbers were allowed?
- *    - Problem constraints break; additional handling or different strategy required.
+ * Follow-ups:
+ *   1. Why does greedy work for Fibonacci numbers?
+ *      Zeckendorf-style structure ensures taking the largest possible Fibonacci number is safe.
+ *   2. What if the coin sequence is arbitrary?
+ *      Use coin-change DP because greedy can fail for non-canonical coin systems.
+ *   3. Count how many minimum representations exist?
+ *      Extend DP to track both best count and number of ways for each sum.
  */
 public class FibonacciSum {
+
+
     public static void main(String[] args) {
         FibonacciSum solver = new FibonacciSum();
-        System.out.println(solver.fibSumGreedy(11)); // Output: 2 (8 + 3)
-        System.out.println(solver.fibSumGreedy(17)); // Output: 3 (13 + 3 + 1)
-        System.out.println(solver.fibSumGreedy(19)); // Output: 3 (13 + 5 + 1)
-        System.out.println(solver.fibSumGreedy(1));  // Output: 1 (1)
-        System.out.println(solver.fibSumGreedy(4));  // Output: 2 (3 + 1)
-    }
+        int[] inputs = {1, 19, 4};
+        int[] expected = {1, 3, 2};
 
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.fibSumGreedy(inputs[i]);
+            System.out.printf("num=%d  ->  %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
+    }
     /**
-     * Greedy Approach to find minimum number of Fibonacci numbers that sum to num.
+     * Intuition: Fibonacci numbers behave like coin denominations where taking the
+     * largest possible value never blocks an optimal answer. Zeckendorf's theorem
+     * guarantees every positive number can be represented as a sum of nonconsecutive
+     * Fibonacci numbers, so repeatedly subtracting the largest available Fibonacci
+     * number minimizes the count.
      *
-     * Approach:
-     * - Generate all Fibonacci numbers up to `num`.
-     * - Greedy strategy: repeatedly subtract the largest Fibonacci number less than or equal to `num`.
-     * - Continue until `num` becomes 0, counting how many Fibonacci numbers were used.
+     * Algorithm:
+     *   1. Generate all Fibonacci numbers up to num.
+     *   2. Repeatedly choose the largest generated Fibonacci number not exceeding the remaining value.
+     *   3. Subtract it and increment the answer count.
+     *   4. Continue until the remaining value becomes zero.
      *
-     * Time Complexity: O(log num) → Fibonacci grows exponentially, so list size is O(log num).
-     * Space Complexity: O(log num) → For storing Fibonacci sequence.
+     * Time:  O(log n) - only logarithmically many Fibonacci numbers are generated and chosen.
+     * Space: O(log n) - the list stores Fibonacci numbers up to num.
      *
-     * @param num target integer
-     * @return minimum count of Fibonacci numbers summing to num
+     * @param num positive number to represent as a Fibonacci sum
+     * @return minimum number of Fibonacci numbers whose sum is num
      */
     public int fibSumGreedy(int num) {
         if (num <= 0) return 0;

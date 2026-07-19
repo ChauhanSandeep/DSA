@@ -3,50 +3,66 @@ package graphs;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.Arrays;
 /**
  * Problem: Find Center of Star Graph
  *
- * There is an undirected star graph consisting of n nodes labeled from 1 to n. A star graph
- * is a graph where there is one center node and exactly n - 1 edges that connect the center
- * node with every other node. You are given a 2D integer array edges where each edges[i] = [ui, vi]
- * indicates that there is an edge between the nodes ui and vi. Return the center of the given star graph.
+ * Given the edges of an undirected star graph, return the center node. In a star,
+ * exactly one node is connected to every other node, and every edge includes that
+ * center.
+ *
+ * Leetcode: https://leetcode.com/problems/find-center-of-star-graph/ (Easy)
+ * Rating:   1287 (zerotrac Elo)
+ * Pattern:  Graph | Degree observation | Constant-time edge intersection
  *
  * Example:
- * Input: edges = [[1,2],[2,3],[4,2]]
- * Output: 2
- * Explanation: Node 2 is connected to every other node, so 2 is the center.
+ *   Input:  edges = [[1,2],[2,3],[4,2]]
+ *   Output: 2
+ *   Why:    node 2 is the only value present in every edge, so it is the hub of
+ *           the star.
  *
- * LeetCode: https://leetcode.com/problems/find-center-of-star-graph
+ * Follow-ups:
+ *   1. Validate that the graph really is a star?
+ *      Count degrees and check for one degree n - 1 node and n - 1 leaf nodes.
+ *   2. Find centers of many star components in one graph?
+ *      Split into connected components and apply the degree check per component.
+ *   3. What if the graph is almost a star with one bad edge?
+ *      Use degree counts to identify the likely center and then report edges not touching it.
  *
- * Follow-up Questions:
- * 1. What if the graph is not guaranteed to be a star graph?
- *    Answer: Validate by checking if exactly one node has degree n-1 and others have degree 1.
- *
- * 2. How would you find the center in a weighted star graph?
- *    Answer: Same approach works - center node still has the highest degree.
- *
- * 3. What if you need to find centers of multiple star graphs in one graph?
- *    Answer: Use connected components and find center for each component.
- *    Related: https://leetcode.com/problems/find-eventual-safe-states/
- *
- * @author Sandeep
- * LeetCode Contest Rating: 1287
+ * Related: Maximal Network Rank (1615), Find the Town Judge (997).
  */
 public class FindCenterOfStarGraph {
 
+
+    public static void main(String[] args) {
+        FindCenterOfStarGraph solver = new FindCenterOfStarGraph();
+        int[][][] inputs = {
+            {{1, 2}, {2, 3}, {4, 2}},
+            {{1, 2}, {5, 1}, {1, 3}, {1, 4}}
+        };
+        int[] expected = {2, 1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.findCenter(inputs[i]);
+            System.out.printf("edges=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     /**
-     * Finds center using the fact that center appears in all edges (optimal O(1) solution).
+     * Intuition: in a star graph, the center appears in every edge. Therefore the
+     * first two edges are enough: the value common to both must be the center, and
+     * no degree array is needed.
      *
      * Algorithm:
-     * 1. In a star graph, the center node appears in every edge
-     * 2. Take first two edges and find the common node
-     * 3. The common node is the center
+     *   1. Read the two endpoints of the first edge.
+     *   2. Compare them with the two endpoints of the second edge.
+     *   3. Return the endpoint from the first edge that appears in the second edge.
      *
-     * Time Complexity: O(1) - only examine first two edges
-     * Space Complexity: O(1) - use constant extra space
+     * Time:  O(1) - only the first two edges are inspected.
+     * Space: O(1) - no extra data structure is used.
      *
-     * @param edges Array of edges in the star graph
-     * @return The center node of the star graph
+     * @param edges edges of a valid star graph
+     * @return label of the center node
      */
     public int findCenter(int[][] edges) {
         // Edge case validation

@@ -2,35 +2,63 @@ package graphs;
 
 import java.util.Stack;
 
+import java.util.Arrays;
 /**
- * LeetCode 695: Max Area of Island
- * Problem Link: https://leetcode.com/problems/max-area-of-island/
+ * Problem: Max Area of Island
  *
- * Given a binary grid where 1 represents land and 0 represents water,
- * the task is to find the maximum area of an island. An island consists
- * of connected 1s in the horizontal or vertical direction.
+ * Given a binary grid, return the largest area of any island. An island is a
+ * four-directionally connected group of 1 cells, and its area is the number of
+ * cells in that group.
  *
- * Approach:
- * 1. Use Depth-First Search (DFS) to explore each island.
- * 2. Mark visited cells to avoid reprocessing.
- * 3. Compute the area of each island and track the maximum found.
+ * Leetcode: https://leetcode.com/problems/max-area-of-island/ (Medium)
+ * Rating:   acceptance 74.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | DFS connected components | Grid traversal
  *
- * Time Complexity: O(M × N) → Visiting each cell once
- * Space Complexity: O(M × N) → For visited array in worst case (all land)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  grid = [[0,1,1,0],[0,1,0,0],[1,0,0,1]]
+ *   Output: 3
+ *   Why:    the upper island has three connected land cells, while the other
+ *           islands have area one.
+ *
+ * Follow-ups:
+ *   1. Return all island areas sorted?
+ *      Record each DFS area in a list and sort it after the scan.
+ *   2. Support diagonal connectivity?
+ *      Add diagonal directions to the neighbor list.
+ *   3. Avoid a separate visited array?
+ *      Mark visited land in the grid by changing 1 to 0 during traversal.
+ *
+ * Related: Number of Islands (200), Making A Large Island (827).
  */
 public class MaxAreaIsland {
-    private static final int[][] DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // Down, Up, Right, Left
 
     public static void main(String[] args) {
-        int[][] grid = {
-            {0, 0, 1, 1, 0},
-            {1, 0, 1, 1, 0},
-            {0, 1, 0, 0, 0},
-            {0, 0, 0, 0, 1}
-        };
-        System.out.println("Max area of island is " + maxAreaOfIsland(grid));
+        int[][][] inputs = {{{0, 1, 1, 0}, {0, 1, 0, 0}, {1, 0, 0, 1}}, {{0, 0}, {0, 0}}};
+        int[] expected = {3, 0};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = maxAreaOfIsland(inputs[i]);
+            System.out.printf("grid=%s  ->  %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
     }
+    private static final int[][] DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // Down, Up, Right, Left
+    /**
+     * Intuition: an island is a connected component of 1-cells. DFS consumes one
+     * component at a time, counting its cells and marking them visited by changing
+     * them to water. The maximum component size seen is the answer.
+     *
+     * Algorithm:
+     *   1. Scan every cell in the grid.
+     *   2. When a land cell is found, DFS its four-direction component.
+     *   3. Mark visited land as water and return the component area.
+     *   4. Keep the largest area over all components.
+     *
+     * Time:  O(m*n) - each cell is visited at most once.
+     * Space: O(m*n) - recursion can span the whole grid in the worst case.
+     *
+     * @param grid binary grid with 1 as land and 0 as water
+     * @return maximum island area
+     */
+
 
     public static int maxAreaOfIsland(int[][] grid) {
         if (grid == null || grid.length == 0) return 0; // Edge case: Empty grid

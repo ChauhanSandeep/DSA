@@ -4,37 +4,69 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 
+import java.util.Arrays;
 /**
- * LeetCode Link: https://leetcode.com/problems/is-graph-bipartite/
+ * Problem: Is Graph Bipartite?
  *
- * Problem Statement:
- * Given an undirected graph, determine whether it is bipartite. A graph is bipartite
- * if its vertices can be divided into two disjoint sets such that every edge connects
- * a vertex from one set to another.
+ * Given an undirected graph as adjacency lists, decide whether its nodes can be
+ * split into two groups so every edge crosses between groups. The graph may be
+ * disconnected, so every component must satisfy the same rule.
  *
- * Approach:
- * We perform a BFS traversal for each unvisited node, treating each connected component
- * independently. During traversal:
- *   - Assign a group number (+1 or -1) when visiting a node.
- *   - Assign the opposite group number to all its neighbors.
- *   - If a neighbor has already been visited and has the same group number, the graph
- *     is not bipartite.
+ * Leetcode: https://leetcode.com/problems/is-graph-bipartite/ (Medium)
+ * Rating:   1625 (zerotrac Elo)
+ * Pattern:  Graph | BFS coloring | Odd-cycle detection
  *
- * This solution avoids using a separate color array and leverages the visited array
- * directly to encode group membership.
+ * Example:
+ *   Input:  graph = [[1,2,3],[0,2],[0,1,3],[0,2]]
+ *   Output: false
+ *   Why:    nodes 0, 1, and 2 form a triangle, so one edge must connect two nodes
+ *           placed in the same group.
  *
- * Time Complexity: O(V + E)
- * Space Complexity: O(V)
- * LeetCode Contest Rating: 1625
+ * Follow-ups:
+ *   1. Return the two partitions when the graph is bipartite?
+ *      Collect nodes by their final color after BFS completes.
+ *   2. Find an actual odd cycle when it is not bipartite?
+ *      Store parents during BFS and reconstruct the conflict path.
+ *   3. Support online edge additions?
+ *      Use a union-find with parity bits to detect contradictions incrementally.
+ *
+ * Related: Possible Bipartition (886), Redundant Connection (684).
  */
 public class Bipartite {
 
-  /**
-   * Checks if the given graph is bipartite using BFS and group assignment.
-   *
-   * @param graph adjacency list representation of an undirected graph
-   * @return true if the graph is bipartite, false otherwise
-   */
+
+    public static void main(String[] args) {
+        Bipartite solver = new Bipartite();
+        int[][][] inputs = {
+            {{1, 3}, {0, 2}, {1, 3}, {0, 2}},
+            {{1, 2, 3}, {0, 2}, {0, 1, 3}, {0, 2}}
+        };
+        boolean[] expected = {true, false};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean output = solver.isBipartite(inputs[i]);
+            System.out.printf("graph=%s  ->  %s  expected=%s%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
+    /**
+     * Intuition: a graph is bipartite when every edge connects opposite colors. BFS
+     * assigns a color to an uncolored start node, pushes that color through the
+     * component, and rejects the graph if an edge ever points to the same color.
+     * Repeating this for unvisited nodes covers disconnected graphs.
+     *
+     * Algorithm:
+     *   1. Keep a color array initialized to uncolored for every node.
+     *   2. Start BFS from each uncolored node and assign it the first color.
+     *   3. For each neighbor, assign the opposite color when it is uncolored.
+     *   4. Return false if any neighbor already has the same color.
+     *
+     * Time:  O(V+E) - each node and adjacency entry is processed by BFS.
+     * Space: O(V) - the color array and queue store graph nodes.
+     *
+     * @param graph adjacency list for an undirected graph
+     * @return true if the graph can be split into two independent sets
+     */
   public boolean isBipartite(int[][] graph) {
     int len = graph.length;
 

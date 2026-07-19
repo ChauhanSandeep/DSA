@@ -4,47 +4,70 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Problem: Find the minimum moves required by a knight to move from source to destination on a chessboard.
+ * Problem: Knight on Chess Board
  *
- * Intuition:
- * - The knight moves in an "L" shape, meaning it can jump to up to **8 possible positions** from a given cell.
- * - We need to find the **shortest path** from `(startX, startY)` to `(endX, endY)`, making **Breadth-First Search (BFS)** the ideal choice.
- * - We use a **queue (FIFO) for BFS traversal** and maintain a **visited matrix** to track visited positions.
+ * Given a board size and one-indexed start and target cells, return the minimum
+ * number of knight moves needed to reach the target. Return -1 when the target
+ * cannot be reached.
  *
- * Algorithm:
- * 1. Use BFS to explore all **valid knight moves** from the start position.
- * 2. Maintain a **visited matrix** to avoid cycles and redundant computations.
- * 3. Return the step count when the destination is reached.
- * 4. If BFS completes and we haven't reached the target, return `-1` (no valid path).
+ * Source: InterviewBit - https://www.interviewbit.com/problems/knight-on-chess-board/
+ * Pattern:  Graph | BFS shortest path | Implicit board graph
  *
- * Time Complexity: O(N * M) - In the worst case, we may visit all cells.
- * Space Complexity: O(N * M) - For the visited matrix and BFS queue.
+ * Example:
+ *   Input:  rows = 8, cols = 8, start = (1,1), target = (8,8)
+ *   Output: 6
+ *   Why:    each knight move is one unweighted edge, and BFS finds the shortest
+ *           sequence of six legal moves across the board.
  *
- * LeetCode Link: [Add relevant problem link if available]
+ * Follow-ups:
+ *   1. Return one actual shortest path?
+ *      Store parent coordinates for each visited square and reconstruct from target.
+ *   2. Handle obstacles on the board?
+ *      Treat blocked squares as invalid neighbors during BFS.
+ *   3. Answer many queries on the same board?
+ *      Precompute BFS distances from common sources or use bidirectional BFS per query.
  */
 public class KnightInChessBoard {
-    public static void main(String[] args) {
-        KnightInChessBoard solution = new KnightInChessBoard();
-        int moves = solution.knightMoves(8, 8, 1, 1, 8, 8);
-        System.out.println("Minimum moves required: " + moves);
-    }
 
+
+    public static void main(String[] args) {
+        KnightInChessBoard solver = new KnightInChessBoard();
+        int[][] inputs = {{8, 8, 1, 1, 8, 8}, {2, 2, 1, 1, 2, 2}};
+        int[] expected = {6, -1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] in = inputs[i];
+            int output = solver.knightMoves(in[0], in[1], in[2], in[3], in[4], in[5]);
+            System.out.printf("rows=%d cols=%d start=(%d,%d) target=(%d,%d)  ->  %d  expected=%d%n",
+                in[0], in[1], in[2], in[3], in[4], in[5], output, expected[i]);
+        }
+    }
     // Possible moves of a Knight in chess (L-shaped moves)
     private static final int[][] MOVES = {
             {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2},
             {2, -1}, {2, 1}, {1, -2}, {1, 2}
     };
-
     /**
-     * Computes the minimum number of moves required for a knight to reach the destination.
+     * Intuition: every knight move has equal cost, so BFS from the starting square
+     * finds the shortest move count. The first time the destination is dequeued is
+     * the minimum number of moves because BFS explores the board level by level.
      *
-     * @param rows   Total rows in the chessboard.
-     * @param cols   Total columns in the chessboard.
-     * @param startX Starting row (1-based index).
-     * @param startY Starting column (1-based index).
-     * @param endX   Destination row (1-based index).
-     * @param endY   Destination column (1-based index).
-     * @return Minimum number of moves required to reach the destination, or -1 if unreachable.
+     * Algorithm:
+     *   1. Enqueue the starting cell with distance 0 and mark it visited.
+     *   2. Repeatedly pop a cell from the queue.
+     *   3. Return its distance when it matches the target cell.
+     *   4. Enqueue every in-bounds, unvisited knight move with distance + 1.
+     *
+     * Time:  O(rows*cols) - each board cell can be visited once.
+     * Space: O(rows*cols) - visited storage and BFS queue.
+     *
+     * @param rows number of board rows
+     * @param cols number of board columns
+     * @param startX starting row
+     * @param startY starting column
+     * @param endX target row
+     * @param endY target column
+     * @return minimum knight moves, or -1 when unreachable
      */
     public int knightMoves(int rows, int cols, int startX, int startY, int endX, int endY) {
         // Edge Case: If start and end positions are the same, return 0 moves.

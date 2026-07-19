@@ -4,80 +4,63 @@ import java.util.*;
 
 
 /**
- * A company is organizing a meeting and has a list of n employees, waiting to be invited.
- * They have arranged for a large circular table, capable of seating any number of employees.
- * The employees are numbered from 0 to n - 1. Each employee has a favorite person and they will
- * attend the meeting only if they can sit next to their favorite person at the table.
- * The favorite person of an employee is not themself.
+ * Problem: Maximum Employees to Be Invited to a Meeting
  *
- * Given a 0-indexed integer array favorite, where favorite[i] denotes the favorite person of
- * the ith employee, return the maximum number of employees that can be invited to the meeting.
+ * Each employee has exactly one favorite employee and will attend only if seated
+ * next to that favorite at a circular table. Return the largest number of
+ * employees that can be invited while satisfying everyone.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/ (Hard)
+ * Rating:   2449 (zerotrac Elo)
+ * Pattern:  Graph | Functional graph | Topological pruning and cycle analysis
  *
  * Example:
- * Input: favorite = [2,2,1,2]
- * Output: 3
- * Explanation: The maximum number of employees that can be invited to the meeting is 3.
- * Employee 0 can sit next to employee 2, employee 1 can sit next to employee 2, and employee 2
- * can sit next to employee 1. This forms a circular arrangement where everyone sits next to their favorite.
+ *   Input:  favorite = [2,2,1,2]
+ *   Output: 3
+ *   Why:    employees 1 and 2 are mutual favorites, and employee 0 can chain into
+ *           employee 2, so three people can be seated as 0,2,1.
  *
- * LeetCode: https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/
+ * Follow-ups:
+ *   1. Return the invited employee set?
+ *      Store chain predecessors and reconstruct either the best large cycle or all mutual-pair chains.
+ *   2. What if each employee accepts several favorites?
+ *      The functional graph property disappears; this becomes a harder seating constraint problem.
+ *   3. Handle dynamic favorite changes?
+ *      Maintain indegrees, cycles, and longest incoming chains for affected components.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if employees have multiple favorite people they can sit next to?
- *    Answer: Use maximum bipartite matching or modify to handle weighted graph preferences.
- * 2. How would you handle dynamic changes to favorite relationships during the meeting?
- *    Answer: Implement incremental graph algorithms with efficient updates to cycle detection.
- * 3. What if the table has limited capacity or specific seating constraints?
- *    Answer: Add constraint satisfaction problem solving with backtracking or integer programming.
- * 4. How to optimize for very large numbers of employees (10^6+)?
- *    Answer: Use parallel processing for independent components, compressed graph representations.
- *
- * Related Problems:
- * - LeetCode 207: Course Schedule (Cycle Detection)
- * - LeetCode 210: Course Schedule II (Topological Sort)
- * - LeetCode 1059: All Paths from Source Lead to Destination
- * LeetCode Contest Rating: 2449
+ * Related: Course Schedule (207), Find Eventual Safe States (802).
  */
 public class MaxInvitations {
 
-  public static void main(String[] args) {
-    int[] favoriteEmployees = {1, 2, 0};
-    MaxInvitations solution = new MaxInvitations();
-    int result = solution.maximumInvitations(favoriteEmployees);
-    System.out.println("Maximum employees that can be invited: " + result);
-  }
 
-  /**
-   * Finds the maximum number of employees that can be invited to the meeting.
-   *
-   * Graph Insight:
-   * - Each employee points to one other → forms a directed graph where each node has 1 outgoing edge.
-   * - This creates:
-   *   → Chains: A → B → C → cycle
-   *   → Cycles: A → B → C → A or A ↔ B
-   *
-   * Two Possibilities in graph:
-   * 1. Big cycle (size > 2): A big cycle is a cycle in the graph with more than two employees, e.g., A → B → C → A.
-   *    You Can seat all of them in a circle. But only one such cycle can be used,
-   *    because multiple disconnected cycles can't be connected together in one big circle.
-   * 2. 2-cycles (A ↔ B): A 2-cycle is a mutual favorite pair, e.g., A ↔ B (A likes B, B likes A).
-   *    You can use multiple such pairs and add longest incoming chains to both A and B.
-   *    These structures can be placed one after another in a larger circular arrangement.
-   *
-   * Steps:
-   * Step 1: Model as directed graph (each person points to their favorite)
-   * Step 2: Remove chains using topological sort to find cycle lengths
-   * Step 3: Calculate longest chains leading into each person
-   * Step 4: Process cycles - either one large cycle OR multiple small cycles with chains
-   * Step 5: Return maximum of the two possibilities
-   * Final answer = max(largest cycle size, sum of all 2-cycles + their incoming chains)
-   *
-   * Time Complexity: O(N)
-   * Space Complexity: O(N)
-   *
-   * @param favoriteArr Array where favorites[i] is the preferred neighbor of employee i
-   * @return Maximum number of employees that can be invited
-   */
+
+    public static void main(String[] args) {
+        MaxInvitations solver = new MaxInvitations();
+        int[][] inputs = {{2, 2, 1, 2}, {1, 2, 0}};
+        int[] expected = {3, 3};
+        for (int i = 0; i < inputs.length; i++) {
+            int output = solver.maximumInvitations(inputs[i]);
+            System.out.printf("favorite=%s  ->  %d  expected=%d%n", Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+    /**
+     * Intuition: the favorite relation is a functional graph: every employee points
+     * to exactly one next employee. The answer is either one large directed cycle,
+     * or the sum of all mutual-pair cycles with the longest incoming chains attached
+     * to each side.
+     *
+     * Algorithm:
+     *   1. Compute indegrees and peel non-cycle nodes with a queue.
+     *   2. Track the longest chain length ending at every node while peeling.
+     *   3. Inspect remaining cycle nodes to find the largest cycle.
+     *   4. Separately sum mutual pairs plus their two best incoming chain lengths.
+     *
+     * Time:  O(n) - each employee is queued or visited a constant number of times.
+     * Space: O(n) - indegree, depth, visited, and queue storage.
+     *
+     * @param favoriteArr favoriteArr[i] is employee i's favorite employee
+     * @return maximum employees that can attend the meeting
+     */
   public int maximumInvitations(int[] favoriteArr) {
     int length = favoriteArr.length;
     boolean[] visited = new boolean[length]; // Node is considered processed when removed in topological sort

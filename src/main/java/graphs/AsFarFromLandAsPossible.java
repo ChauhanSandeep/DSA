@@ -3,44 +3,68 @@ package graphs;
 import java.util.*;
 
 /**
- * 1162. As Far from Land as Possible
+ * Problem: As Far from Land as Possible
  *
- * Problem: Find the maximum distance from any water cell to the nearest land cell
- * in an n x n grid where 1 represents land and 0 represents water.
+ * Given an n by n grid of land cells (1) and water cells (0), choose a water
+ * cell whose distance to the nearest land cell is as large as possible. Return
+ * that distance, or -1 when the grid has no useful land/water mix.
+ *
+ * Leetcode: https://leetcode.com/problems/as-far-from-land-as-possible/ (Medium)
+ * Rating:   1666 (zerotrac Elo)
+ * Pattern:  Graph | Multi-source BFS | Grid shortest distance
  *
  * Example:
- * Input: grid = [[1,0,1],[0,0,0],[1,0,1]]
- * Output: 2
- * Explanation: The cell (1,1) is as far as possible from all the land with distance 2.
+ *   Input:  grid = [[1,0,1],[0,0,0],[1,0,1]]
+ *   Output: 2
+ *   Why:    the center water cell is two steps from every corner land cell, and
+ *           every other water cell is closer to at least one land cell.
  *
- * LeetCode: https://leetcode.com/problems/as-far-from-land-as-possible
+ * Follow-ups:
+ *   1. Return all farthest water cells, not just the distance?
+ *      Keep the cells from the last BFS level and return them with the final distance.
+ *   2. What if obstacles block movement?
+ *      Treat obstacles as non-walkable cells and do not enqueue them during BFS.
+ *   3. What if the grid is very large and sparse?
+ *      Store only land and discovered water in hash sets instead of a dense visited grid.
  *
- * Follow-up questions:
- * Q: What if we need to find all cells with maximum distance?
- * A: During BFS, keep track of maximum distance and collect all cells with that distance.
- *
- * Q: How to optimize for memory when grid is very large?
- * A: Use in-place modification of grid to mark visited cells instead of separate visited array.
- *
- * Q: What if we have obstacles that block paths?
- * A: Modify BFS to skip obstacle cells, treating them like boundaries.
- * LeetCode Contest Rating: 1666
+ * Related: 01 Matrix (542), Rotting Oranges (994), Walls and Gates (286).
  */
 public class AsFarFromLandAsPossible {
 
-    private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
+    public static void main(String[] args) {
+        AsFarFromLandAsPossible solver = new AsFarFromLandAsPossible();
+        int[][][] inputs = {
+            {{1, 0, 1}, {0, 0, 0}, {1, 0, 1}},
+            {{1, 1}, {1, 1}}
+        };
+        int[] expected = {2, -1};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] grid = Arrays.stream(inputs[i]).map(int[]::clone).toArray(int[][]::new);
+            int output = solver.maxDistance(grid);
+            System.out.printf("grid=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
+    private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     /**
-     * Finds the maximum distance from any water cell to the nearest land cell.
+     * Intuition: every land cell is a source with distance 0. Multi-source BFS grows
+     * all islands outward one layer at a time, so the first time a water cell is
+     * reached is by its nearest land. The last water layer reached is therefore as
+     * far from land as possible.
      *
-     * Algorithm: Multi-source BFS
-     * - Start BFS from all land cells simultaneously
-     * - Use queue to process cells level by level
-     * - Each level represents increasing distance from land
-     * - Return the maximum level reached, or -1 if no water cells
+     * Algorithm:
+     *   1. Enqueue every land cell and count how many land cells exist.
+     *   2. Return -1 if the grid is all water or all land.
+     *   3. Run level-order BFS using the original queue and four directions.
+     *   4. Mark reached water as land and return the final BFS level distance.
      *
-     * Time Complexity: O(n^2) where n is the grid size
-     * Space Complexity: O(n^2) for the queue in worst case
+     * Time:  O(n^2) - each grid cell is enqueued at most once.
+     * Space: O(n^2) - the queue can hold a full BFS layer in the worst case.
+     *
+     * @param grid square grid with 1 for land and 0 for water
+     * @return maximum distance from any water cell to nearest land, or -1 if none exists
      */
     public int maxDistance(int[][] grid) {
         int n = grid.length;

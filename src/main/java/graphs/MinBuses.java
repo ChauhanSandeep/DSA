@@ -3,141 +3,104 @@ package graphs;
 import java.util.*;
 
 /**
- * LeetCode 815: Bus Routes
- * Problem Link: https://leetcode.com/problems/bus-routes/
+ * Problem: Bus Routes
  *
- * Problem Statement:
- * Given a list of bus routes where routes[i] represents a bus route covering a sequence of stops,
- * determine the minimum number of buses required to travel from a source stop to a destination stop.
- * If it's impossible to reach the destination, return -1.
+ * Given bus routes, a source stop, and a target stop, return the minimum number
+ * of buses needed to travel from source to target. Riding one route lets you get
+ * off at any stop on that route.
+ *
+ * Leetcode: https://leetcode.com/problems/bus-routes/ (Hard)
+ * Rating:   1964 (zerotrac Elo)
+ * Pattern:  Graph | BFS over stops and routes | Minimum transfers
  *
  * Example:
- *   Input: routes = [
-     *   [7,12], // route is 7 -> 12 -> 7 -> 12
-     *   [4,5,15], // route is 4 -> 5 -> 15 -> 4 -> 5 -> 15
-     *   [6], // route is 6 -> 6
-     *   [15,19],
-     *   [19,12,13]
- *   ], source = 4, destination = 13
- *   Output: 3
- *   Explanation:
- *   4 ->[Bus 1]-> 15 ->[Bus 3]-> 19 ->[Bus 4]-> 13.
+ *   Input:  routes = [[1,2,7],[3,6,7]], source = 1, target = 6
+ *   Output: 2
+ *   Why:    take the first bus from stop 1 to stop 7, then transfer to the second
+ *           bus and ride to stop 6.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. What if we need to find all possible paths with minimum transfers?
- *    Answer: Modify BFS to store all paths at the minimum level before returning.
- * 2. How would you handle dynamic bus routes that change over time?
- *    Answer: Implement event-driven updates to the stop-to-routes mapping and cache invalidation.
- * 3. What if bus routes have different costs or travel times?
- *    Answer: Use Dijkstra's algorithm with priority queue instead of BFS.
- * 4. How to optimize for memory when dealing with very large route networks?
- *    Answer: Use compressed representations, lazy loading, or external storage for route mappings.
+ * Follow-ups:
+ *   1. Return the actual bus sequence?
+ *      Store parent route/stop information when enqueuing stops.
+ *   2. Routes have different fares or travel times?
+ *      Use Dijkstra over route/stop states instead of plain BFS.
+ *   3. Handle route updates in real time?
+ *      Maintain the stop-to-routes index incrementally and invalidate affected searches.
  *
- * Related Problems:
- * - LeetCode 1311: Get Watched Videos by Your Friends: https://leetcode.com/problems/get-watched-videos-by-your-friends/
- * - LeetCode 1129: Shortest Path with Alternating Colors: https://leetcode.com/problems/shortest-path-with-alternating-colors/
- * - LeetCode 847: Shortest Path Visiting All Nodes: https://leetcode.com/problems/shortest-path-visiting-all-nodes/
- * LeetCode Contest Rating: 1964
+ * Related: Shortest Path Visiting All Nodes (847), Open the Lock (752).
  */
 public class MinBuses {
-  public static void main(String[] args) {
-    int[][] routes = {
-        {7, 12},
-        {4, 5, 15},
-        {6},
-        {15, 19},
-        {19, 12, 13}
-    };
-    int source = 4;
-    int destination = 13;
-    MinBuses minBusesSolver = new MinBuses();
-    int minBuses = minBusesSolver.numBusesToDestination(routes, source, destination);
-    System.out.println("Minimum buses required from " + source + " to " + destination + ": " + minBuses);
-  }
 
-  /**
-     * Finds minimum number of buses needed to travel from source to target using BFS.
+
+    public static void main(String[] args) {
+        MinBuses solver = new MinBuses();
+        int[][][] routes = {{{1, 2, 7}, {3, 6, 7}}, {{7}, {8}}};
+        int[][] endpoints = {{1, 6}, {7, 8}};
+        int[] expected = {2, -1};
+        for (int i = 0; i < routes.length; i++) {
+            int output = solver.numBusesToDestination(routes[i], endpoints[i][0], endpoints[i][1]);
+            System.out.printf("routes=%s source=%d target=%d  ->  %d  expected=%d%n",
+                Arrays.deepToString(routes[i]), endpoints[i][0], endpoints[i][1], output, expected[i]);
+        }
+    }
+    /**
+     * Intuition: taking a bus route has unit cost, while stops connect all routes
+     * that serve them. BFS over routes counts how many buses have been boarded; once
+     * a route containing the target stop is reached, that BFS level is the minimum.
      *
      * Algorithm:
-     * 1. Base Case Check:
-     *    - If source equals target, return 0 (already at destination)
+     *   1. Map each stop to all route indexes that visit it.
+     *   2. Enqueue every route containing the source stop with bus count 1.
+     *   3. BFS route by route, visiting connected routes through shared stops.
+     *   4. Return the current bus count when a route reaches the target stop.
      *
-     * 2. Build Stop-to-Buses Mapping:
-     *    - Create a map where key is a bus stop and value is list of all buses serving that stop
-     *    - This allows us to quickly find which buses we can board at any given stop
-     *    - Example: If routes = [[1,2,7],[3,6,7]], then stop 7 -> [bus 0, bus 1]
+     * Time:  O(totalStops) - route-stop entries are processed through the BFS mapping.
+     * Space: O(totalStops) - stop-to-routes map plus visited route/stop tracking.
      *
-     * 3. BFS Initialization:
-     *    - Start from source stop with 0 buses taken
-     *    - Use a queue to store (currentStop, busCount) pairs
-     *    - Track visited stops to avoid revisiting same stop
-     *    - Track visited buses to avoid re-exploring the same bus route
-     *
-     * 4. BFS Exploration:
-     *    - For each stop, find all buses serving that stop
-     *    - For each unvisited bus, board it and explore all stops on that route
-     *    - When boarding a new bus, increment bus count by 1
-     *    - Mark each newly visited stop and add to queue for further exploration
-     *    - If we reach target stop, return the current bus count
-     *
-     * 5. Return Result:
-     *    - If BFS completes without reaching target, return -1 (impossible)
-     *
-     * Key Insight: We treat this as an unweighted shortest path problem. Each "edge" represents
-     * boarding a new bus. BFS guarantees we find the minimum number of buses because it explores
-     * level by level, where each level represents taking one additional bus.
-     *
-     * Time Complexity: O(N + S) where N is total number of stops across all routes (sum of all
-     * route lengths) and S is number of unique stops. We visit each bus route at most once and
-     * each stop at most once. Building the stop-to-buses map takes O(N) time.
-     *
-     * Space Complexity: O(N + S) for the stop-to-buses map, visited sets, and BFS queue.
-     * In worst case, all stops are unique and need to be stored.
-     *
-     * @param routes array of bus routes where routes[i] contains all stops for bus i
-     * @param source starting bus stop
-     * @param target destination bus stop
-     * @return minimum number of buses needed, or -1 if impossible
+     * @param routes routes[i] lists the stops served by bus route i
+     * @param source starting stop
+     * @param target destination stop
+     * @return minimum buses needed, or -1 if unreachable
      */
     public int numBusesToDestination(int[][] routes, int source, int target) {
         // Base case: already at target, no buses needed
         if (source == target) {
             return 0;
         }
-        
+
         // Step 1: Build a mapping from each stop to all buses that serve it
         // This allows us to quickly find which buses we can board at any stop
         Map<Integer, List<Integer>> stopToBuses = new HashMap<>();
-        
+
         for (int busIndex = 0; busIndex < routes.length; busIndex++) {
             for (int stop : routes[busIndex]) {
                 stopToBuses.computeIfAbsent(stop, k -> new ArrayList<>()).add(busIndex);
             }
         }
-        
+
         // Step 2: Initialize BFS data structures
         // Queue stores pairs of (currentStop, numberOfBusesTaken)
         Queue<int[]> queue = new LinkedList<>();
         queue.offer(new int[]{source, 0}); // Start at source with 0 buses taken
-        
+
         // Track visited stops to avoid processing the same stop multiple times
         Set<Integer> visitedStops = new HashSet<>();
         visitedStops.add(source);
-        
+
         // Track visited buses to avoid exploring the same bus route multiple times
         // This is crucial for performance - without it, we might explore the same bus
         // from different stops on its route, leading to redundant work
         Set<Integer> visitedBuses = new HashSet<>();
-        
+
         // Step 3: BFS exploration
         while (!queue.isEmpty()) {
             int[] current = queue.poll();
             int currentStop = current[0];
             int busCount = current[1];
-            
+
             // Get all buses that serve the current stop
             List<Integer> availableBuses = stopToBuses.getOrDefault(currentStop, new ArrayList<>());
-            
+
             // Try boarding each available bus at this stop
             for (int busIndex : availableBuses) {
                 // Skip if we've already explored this bus route
@@ -145,10 +108,10 @@ public class MinBuses {
                 if (visitedBuses.contains(busIndex)) {
                     continue;
                 }
-                
+
                 // Mark this bus as visited before exploring its route
                 visitedBuses.add(busIndex);
-                
+
                 // Explore all stops on this bus route
                 for (int nextStop : routes[busIndex]) {
                     // Check if we reached the target
@@ -157,7 +120,7 @@ public class MinBuses {
                         // and now we're boarding one more bus (busIndex) to reach target
                         return busCount + 1;
                     }
-                    
+
                     // If this stop hasn't been visited, add it to queue for exploration
                     if (!visitedStops.contains(nextStop)) {
                         visitedStops.add(nextStop);
@@ -167,7 +130,7 @@ public class MinBuses {
                 }
             }
         }
-        
+
         // If we exhausted all possibilities without reaching target, it's impossible
         return -1;
     }

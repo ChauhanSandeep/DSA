@@ -2,54 +2,64 @@ package graphs;
 
 import java.util.*;
 /**
- * Given a 2D grid consists of 0s (land) and 1s (water). An island is a maximal 4-directionally
- * connected group of 0s and a closed island is an island totally (all left, top, right, bottom)
- * surrounded by 1s.
+ * Problem: Number of Closed Islands
  *
- * Return the number of closed islands.
+ * Given a grid where 0 is land and 1 is water, count islands of land that are
+ * completely surrounded by water. Any land connected to the border is not closed.
  *
- * Example 1:
- * Input: grid = [
- *   [1,1,1,1,1,1,1,0],
- *   [1,0,0,0,0,1,1,0],
- *   [1,0,1,0,1,1,1,0],
- *   [1,0,0,0,0,1,0,1],
- *   [1,1,1,1,1,1,1,0]]
- * Output: 2
- * Explanation: Islands in gray are closed because they are completely surrounded by water (group of 1s).
+ * Leetcode: https://leetcode.com/problems/number-of-closed-islands/ (Medium)
+ * Rating:   1659 (zerotrac Elo)
+ * Pattern:  Graph | Boundary flood fill | Grid components
  *
- * Example 2:
- * Input: grid = [
- *   [0,0,1,0,0],
- *   [0,1,0,1,0],
- *   [0,1,1,1,0]]
- * Output: 1
+ * Example:
+ *   Input:  grid = [[1,1,1,1,1,1,1,0],[1,0,0,0,0,1,1,0],[1,0,1,0,1,1,1,0],[1,0,0,0,0,1,0,1],[1,1,1,1,1,1,1,0]]
+ *   Output: 2
+ *   Why:    two interior land components are fully enclosed, while the land
+ *           touching the right border is open and does not count.
  *
- * LeetCode: https://leetcode.com/problems/number-of-closed-islands/
+ * Follow-ups:
+ *   1. Return the largest closed island area?
+ *      Count cells during the second flood fill and keep the maximum.
+ *   2. Avoid recursion on large grids?
+ *      Use the BFS implementation style with a queue.
+ *   3. Support multiple land types?
+ *      Flood-fill only cells matching the chosen land type and treat others as boundaries.
  *
- * Follow-up Questions:
- * 1. How would you handle very large grids (e.g., 1000x1000)?
- *    - The DFS/BFS approach is O(mn) which is optimal, but for very large grids, we might need to
- *      consider iterative solutions to avoid stack overflow.
- * 2. What if we need to find the largest closed island?
- *    - We could modify the solution to track the size of each island and return the maximum size.
- * 3. How would you handle grids with more than two values (e.g., different types of land)?
- *    - The solution would need to be adjusted to handle different land types and their specific rules.
- *
- * Related Problems:
- * - Number of Islands (https://leetcode.com/problems/number-of-islands/)
- * - Surrounded Regions (https://leetcode.com/problems/surrounded-regions/)
- * LeetCode Contest Rating: 1659
+ * Related: Surrounded Regions (130), Number of Islands (200).
  */
 public class NumberOfClosedIslands {
+
+    public static void main(String[] args) {
+        NumberOfClosedIslands solver = new NumberOfClosedIslands();
+        int[][][] inputs = {
+            {{1, 1, 1, 1, 1, 1, 1, 0}, {1, 0, 0, 0, 0, 1, 1, 0}, {1, 0, 1, 0, 1, 1, 1, 0}, {1, 0, 0, 0, 0, 1, 0, 1}, {1, 1, 1, 1, 1, 1, 1, 0}},
+            {{0, 0, 1}, {0, 1, 1}, {1, 1, 1}}
+        };
+        int[] expected = {2, 0};
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] grid = Arrays.stream(inputs[i]).map(int[]::clone).toArray(int[][]::new);
+            int output = solver.closedIsland(grid);
+            System.out.printf("grid=%s  ->  %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
+        }
+    }
     // Directions for moving in 4 directions
     private static final int[][] DIRECTIONS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
     /**
-     * Counts the number of closed islands in the given grid.
+     * Intuition: a closed island is a land component that never touches the grid
+     * boundary. DFS explores one land component and returns whether every recursive
+     * branch stays inside the board; touching the boundary makes that component open.
      *
-     * @param grid 2D grid where 0 represents land and 1 represents water
-     * @return Number of closed islands
+     * Algorithm:
+     *   1. Scan only interior cells as possible starts of closed islands.
+     *   2. When land is found, DFS its full four-direction component.
+     *   3. Mark visited land as water to avoid recounting it.
+     *   4. Count the component only if DFS never reaches the boundary.
+     *
+     * Time:  O(m*n) - each cell is visited at most once.
+     * Space: O(m*n) - recursion stack can cover the whole grid in the worst case.
+     *
+     * @param grid binary grid where 0 is land and 1 is water
+     * @return number of closed islands
      */
     public int closedIsland(int[][] grid) {
         if (grid == null || grid.length == 0 || grid[0].length == 0) {

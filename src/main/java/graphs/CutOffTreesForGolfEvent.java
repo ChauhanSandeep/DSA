@@ -3,47 +3,66 @@ package graphs;
 import java.util.*;
 
 /**
- * You are asked to cut off all the trees in a forest for a golf event. The forest is represented as an m x n matrix.
- * In this matrix:
- * - 0 means the cell cannot be walked through.
- * - 1 represents an empty cell that can be walked through.
- * - A number greater than 1 represents a tree in a cell that can be walked through, and this number is the tree's height.
+ * Problem: Cut Off Trees for Golf Event
  *
- * You start from the point (0, 0) and you must cut the trees in order of their heights (increasing order).
+ * Given a forest grid, start at (0,0) and cut every tree in increasing height
+ * order. Cells with 0 are blocked, 1 is walkable ground, and values greater than
+ * 1 are trees. Return the fewest walking steps needed, or -1 if a required tree
+ * cannot be reached.
  *
- * Example 1:
- * Input: forest = [[1,2,3],[0,0,4],[7,6,5]]
- * Output: 6
- * Explanation: The first step is to cut tree at (0,1) for 2, then (0,2) for 3, then (2,2) for 5, and finally (2,1) for 6.
+ * Leetcode: https://leetcode.com/problems/cut-off-trees-for-golf-event/ (Hard)
+ * Rating:   acceptance 36.6% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Graph | BFS shortest path | Sorted targets
  *
- * Example 2:
- * Input: forest = [[1,2,3],[0,0,0],[7,6,5]]
- * Output: -1
- * Explanation: The tree at (2,0) cannot be reached.
+ * Example:
+ *   Input:  forest = [[1,2,3],[0,0,4],[7,6,5]]
+ *   Output: 6
+ *   Why:    the trees are reachable in height order by walking right, right,
+ *           down, down, left, left for six total steps.
  *
- * LeetCode: https://leetcode.com/problems/cut-off-trees-for-golf-event/
+ * Follow-ups:
+ *   1. Speed up pathfinding on very large forests?
+ *      Use A* with Manhattan distance as a heuristic between consecutive trees.
+ *   2. What if multiple trees have the same height?
+ *      Treat equal-height trees as a set of possible next targets and choose the cheapest order.
+ *   3. What if several workers can cut trees?
+ *      This becomes a scheduling and multi-agent shortest-path problem.
  *
- * Follow-up Questions:
- * 1. What if the forest is very large (e.g., 1000x1000)?
- *    - We can optimize by using A* search with a good heuristic instead of BFS for path finding.
- * 2. How would you handle multiple people cutting trees simultaneously?
- *    - We could use a priority queue to coordinate multiple workers and find optimal paths.
- * 3. What if some trees have the same height?
- *    - The problem guarantees all heights are unique.
- *
- * Related Problems:
- * - Shortest Path in Binary Matrix (https://leetcode.com/problems/shortest-path-in-binary-matrix/)
- * - The Maze II (https://leetcode.com/problems/the-maze-ii/)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Shortest Path in Binary Matrix (1091), The Maze II (505).
  */
 public class CutOffTreesForGolfEvent {
-    private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 
+    public static void main(String[] args) {
+        CutOffTreesForGolfEvent solver = new CutOffTreesForGolfEvent();
+        List<List<List<Integer>>> inputs = Arrays.asList(
+            Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(0, 0, 4), Arrays.asList(7, 6, 5)),
+            Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(0, 0, 0), Arrays.asList(7, 6, 5))
+        );
+        int[] expected = {6, -1};
+
+        for (int i = 0; i < inputs.size(); i++) {
+            int output = solver.cutOffTree(inputs.get(i));
+            System.out.printf("forest=%s  ->  %d  expected=%d%n", inputs.get(i), output, expected[i]);
+        }
+    }
+    private static final int[][] DIRECTIONS = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
     /**
-     * Main method to calculate the minimum steps to cut all trees in order.
+     * Intuition: trees must be cut in increasing height order, so the only choice is
+     * the shortest route from the current position to the next tree. BFS gives that
+     * shortest grid distance through walkable cells. If any required tree cannot be
+     * reached, the whole task is impossible.
      *
-     * @param forest The 2D grid representing the forest
-     * @return Minimum steps to cut all trees, or -1 if not possible
+     * Algorithm:
+     *   1. Collect every tree cell and sort trees by height.
+     *   2. Starting at (0,0), BFS to the next tree in sorted order.
+     *   3. Return -1 immediately if a tree is unreachable.
+     *   4. Add each distance and move the current position to the cut tree.
+     *
+     * Time:  O(T*m*n + T log T) - each of T trees may require one BFS plus sorting.
+     * Space: O(m*n + T) - BFS visited/queue storage and the tree list.
+     *
+     * @param forest grid where 0 is blocked, 1 is grass, and values greater than 1 are tree heights
+     * @return minimum steps to cut all trees, or -1 if impossible
      */
     public int cutOffTree(List<List<Integer>> forest) {
         if (forest == null || forest.isEmpty() || forest.get(0).get(0) == 0) {
