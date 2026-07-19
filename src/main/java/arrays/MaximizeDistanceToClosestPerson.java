@@ -4,23 +4,46 @@ import java.util.Arrays;
 
 
 /**
- * Maximize Distance To Closest Person
+ * Problem: Maximize Distance to Closest Person
  *
- * Problem: Find seat that maximizes distance to closest person. Array represents seats
- * where 1 = occupied, 0 = empty. Return index of optimal empty seat.
+ * In a row of seats, 1 means occupied and 0 means empty. Find an empty seat that
+ * maximizes the distance to the nearest occupied seat. This restored implementation
+ * returns the index of such a seat, although the Leetcode problem asks for the distance.
  *
- * Example: seats = [1,0,0,0,1,0,1] -> Output: 2
- * Sitting at index 2 gives distance 2 to nearest person (at indices 0 and 4).
+ * Leetcode: https://leetcode.com/problems/maximize-distance-to-closest-person/ (Medium)
+ * Rating:   1383 (zerotrac Elo)
+ * Pattern:  Array | Distance scan | Best empty seat
  *
- * LeetCode: https://leetcode.com/problems/maximize-distance-to-closest-person
+ * Example:
+ *   Input:  seats = [1,0,0,0,1,0,1]
+ *   Output: 2
+ *   Why:    index 2 is two seats away from both occupied neighbours, which is the
+ *           largest nearest-person distance in this row.
  *
- * Follow-up Questions:
- * - What if multiple seats have same max distance? (Return any one of them)
- * - How to handle all seats occupied? (Problem guarantees at least one empty seat)
- * - Can we solve without finding all distances? (Yes, track segments between occupied seats)
- * LeetCode Contest Rating: 1383
+ * Follow-ups:
+ *   1. Return the maximum distance instead of the seat index?
+ *      Track and return maxDistance rather than bestSeat.
+ *   2. Seat k new people instead of one?
+ *      Use a priority queue of empty segments and repeatedly split the largest effective segment.
+ *   3. Handle a circular row of seats?
+ *      Merge the leading and trailing zero runs because the ends are neighbours.
+ *
+ * Related: Exam Room (855), Can Place Flowers (605).
  */
 public class MaximizeDistanceToClosestPerson {
+
+    public static void main(String[] args) {
+        MaximizeDistanceToClosestPerson solver = new MaximizeDistanceToClosestPerson();
+
+        int[][] inputs = { {1, 0, 0, 0, 1, 0, 1}, {1, 0, 0, 0}, {0, 1} };
+        int[] expected = { 2, 3, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.maxDistToClosest(inputs[i]);
+            System.out.printf("seats=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 
     /**
      * Two-pass approach for clarity (Optimized)
@@ -78,18 +101,22 @@ public class MaximizeDistanceToClosestPerson {
     }
 
     /**
-     * Finds seat that maximizes distance to closest person.
+     * Intuition: this restored method searches for the empty seat index, not the
+     * Leetcode distance value. For each empty seat, it measures the nearest occupied
+     * seat on the left and right, keeps the smaller of those distances, and remembers
+     * the index whose nearest-person distance is largest.
      *
      * Algorithm:
-     * 1. For each empty seat, calculate distance to closest occupied seat
-     * 2. Track seat with maximum such distance
-     * 3. Handle edge cases: seats at beginning/end of array
+     *   1. Scan every seat index.
+     *   2. For each empty seat, call getClosestDistance to measure the nearest occupied seat.
+     *   3. If that distance beats maxDistance, update maxDistance and bestSeat.
+     *   4. Return bestSeat.
      *
-     * Time Complexity: O(n²) where n is number of seats
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(n^2) - each empty seat may scan left and right across the row.
+     * Space: O(1) - only the best index and distance are stored.
      *
-     * @param seats array where 1=occupied, 0=empty
-     * @return index of seat with maximum distance to closest person
+     * @param seats row where 1 is occupied and 0 is empty
+     * @return index of an empty seat with maximum distance to the closest occupied seat
      */
     public int maxDistToClosest(int[] seats) {
         int n = seats.length;

@@ -3,36 +3,65 @@ package arrays;
 import java.util.*;
 
 /**
- * Count Elements With Strictly Smaller And Greater Elements
+ * Problem: Count Elements With Strictly Smaller and Greater Elements
  *
- * Problem: Count elements that have at least one strictly smaller and one strictly greater element.
+ * Count how many numbers in the array have at least one strictly smaller number
+ * and at least one strictly greater number also present in the array. Duplicates
+ * of the minimum or maximum do not count because one side is missing for them.
  *
- * Example: nums = [11,7,2,15] -> Output: 2
- * Elements 7 and 11 satisfy the condition. 2 has no smaller, 15 has no greater.
+ * Leetcode: https://leetcode.com/problems/count-elements-with-strictly-smaller-and-greater-elements/ (Easy)
+ * Rating:   1202 (zerotrac Elo)
+ * Pattern:  Array | Min/max scan | Boundary exclusion
  *
- * LeetCode: https://leetcode.com/problems/count-elements-with-strictly-smaller-and-greater-elements
+ * Example:
+ *   Input:  nums = [11,7,2,15]
+ *   Output: 2
+ *   Why:    7 and 11 sit strictly between the minimum 2 and maximum 15, while the
+ *           endpoints themselves are missing one required side.
  *
- * Follow-up Questions:
- * - How to find the actual elements instead of count? (Store elements in result list)
- * - What if we want elements with at least k smaller/greater? (Modify counting condition)
- * - Can we solve without finding min/max? (Use sorting approach)
- * LeetCode Contest Rating: 1202
+ * Follow-ups:
+ *   1. Return the actual elements instead of the count?
+ *      Add qualifying values to a list during the final scan.
+ *   2. Require at least k smaller and k greater elements?
+ *      Sort the array or use order statistics so duplicates can be counted correctly.
+ *   3. Process a stream where the full array is not stored?
+ *      One pass can find min/max, but exact qualifying output needs a second pass or buffering.
+ *
+ * Related: Count Elements (1426), Find Pivot Index (724).
  */
 public class CountElementsWithStrictlySmallerAndGreaterElements {
 
+    public static void main(String[] args) {
+        CountElementsWithStrictlySmallerAndGreaterElements solver =
+            new CountElementsWithStrictlySmallerAndGreaterElements();
+
+        int[][] inputs = { {11, 7, 2, 15}, {-3, 3, 3, 90}, {5, 5, 5} };
+        int[] expected = { 2, 2, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countElements(inputs[i]);
+            System.out.printf("nums=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Counts elements that have both strictly smaller and greater elements.
+     * Intuition: a number has something strictly smaller and something strictly larger
+     * if and only if it is neither equal to the global minimum nor equal to the global
+     * maximum. Once those two boundaries are known, every interior value qualifies and
+     * all boundary duplicates do not.
      *
      * Algorithm:
-     * 1. Find minimum and maximum values in the array
-     * 2. Count elements that are neither minimum nor maximum
-     * 3. Elements between min and max (exclusive) satisfy the condition
+     *   1. Return 0 immediately when fewer than three values are present.
+     *   2. Scan for the global minimum and maximum.
+     *   3. If they are equal, all values are the same and none qualify.
+     *   4. Count values strictly between the minimum and maximum.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(n) - the stream scans and final count are linear.
+     * Space: O(1) - only min, max, and count are stored.
      *
-     * @param nums input array of integers
-     * @return count of elements with strictly smaller and greater elements
+     * @param nums input values
+     * @return count of elements with both a strictly smaller and strictly greater value present
      */
     public int countElements(int[] nums) {
         if (nums.length <= 2) return 0;

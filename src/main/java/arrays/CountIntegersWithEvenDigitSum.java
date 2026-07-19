@@ -1,36 +1,61 @@
 package arrays;
 
 /**
- * Count Integers With Even Digit Sum
+ * Problem: Count Integers With Even Digit Sum
  *
- * Problem: Count integers from 1 to num (inclusive) that have an even sum of digits.
+ * Given a positive integer num, count how many integers from 1 through num have
+ * an even sum of decimal digits. The answer is exact; do not rely on an
+ * approximation that only says about half of the numbers qualify.
  *
- * Example: num = 4 -> Output: 2
- * Numbers 1,2,3,4 have digit sums 1,2,3,4. Only 2 and 4 are even.
+ * Leetcode: https://leetcode.com/problems/count-integers-with-even-digit-sum/ (Easy)
+ * Rating:   1257 (zerotrac Elo)
+ * Pattern:  Array math | Digit sum | Parity pattern
  *
- * LeetCode: https://leetcode.com/problems/count-integers-with-even-digit-sum
+ * Example:
+ *   Input:  num = 4
+ *   Output: 2
+ *   Why:    the digit sums are 1, 2, 3, and 4, so only 2 and 4 have even sums.
  *
- * Follow-up Questions:
- * - How to count numbers with odd digit sum? (Return num - evenCount)
- * - What if we want digit sum divisible by k? (Modify sum checking condition)
- * - Can we solve without iterating all numbers? (Mathematical approach based on patterns)
- * LeetCode Contest Rating: 1257
+ * Follow-ups:
+ *   1. Count numbers with odd digit sum instead?
+ *      Return num minus the even-count answer.
+ *   2. Count digit sums divisible by k?
+ *      Use digit DP with state for the current remainder modulo k.
+ *   3. Count in a range [low, high]?
+ *      Compute countEven(high) - countEven(low - 1).
+ *
+ * Related: Count Symmetric Integers (2843), Numbers At Most N Given Digit Set (902).
  */
 public class CountIntegersWithEvenDigitSum {
 
+    public static void main(String[] args) {
+        CountIntegersWithEvenDigitSum solver = new CountIntegersWithEvenDigitSum();
+
+        int[] inputs = { 4, 30, 1 };
+        int[] expected = { 2, 14, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.countEven(inputs[i]);
+            System.out.printf("num=%d  ->  %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
     /**
-     * Counts integers from 1 to num with even digit sum.
+     * Intuition: the direct version checks the definition literally. For every number
+     * from 1 to num, compute its decimal digit sum and count it only when that sum is
+     * even. It is slower than the pattern-based variant but easiest to verify.
      *
      * Algorithm:
-     * 1. Iterate through all numbers from 1 to num
-     * 2. For each number, calculate sum of its digits
-     * 3. Count numbers where digit sum is even
+     *   1. Initialize count to 0.
+     *   2. For every integer i from 1 through num, compute getDigitSum(i).
+     *   3. Increment count when the digit sum is even.
+     *   4. Return count.
      *
-     * Time Complexity: O(num * log num) where log num is average digits per number
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(num * d) - each of num numbers may require d decimal digits to sum.
+     * Space: O(1) - only loop counters and digit-sum state are kept.
      *
-     * @param num upper bound (inclusive)
-     * @return count of numbers with even digit sum
+     * @param num upper bound of the inclusive range starting at 1
+     * @return how many integers in [1, num] have an even digit sum
      */
     public int countEven(int num) {
         int count = 0;

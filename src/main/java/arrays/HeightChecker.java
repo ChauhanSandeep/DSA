@@ -5,36 +5,64 @@ import java.util.stream.IntStream;
 
 
 /**
- * Height Checker
+ * Problem: Height Checker
  *
- * Problem: Count students not in correct positions compared to non-decreasing height order.
+ * Students are standing in a line, and the expected line is the same heights in
+ * non-decreasing order. Count how many positions currently have a different
+ * height than they would have in that sorted line.
  *
- * Example: heights = [1,1,4,2,1,3] -> Output: 3
- * Expected order: [1,1,1,2,3,4]. Indices 2,4,5 are incorrect.
+ * Leetcode: https://leetcode.com/problems/height-checker/ (Easy)
+ * Rating:   1303 (zerotrac Elo)
+ * Pattern:  Array | Counting sort | Compare with expected order
  *
- * LeetCode: https://leetcode.com/problems/height-checker
+ * Example:
+ *   Input:  heights = [1,1,4,2,1,3]
+ *   Output: 3
+ *   Why:    the expected order is [1,1,1,2,3,4], so positions 2, 4, and 5 differ.
  *
- * Follow-up Questions:
- * - How to get indices of misplaced students? (Store indices instead of counting)
- * - What if we want students in decreasing order? (Sort in reverse order)
- * - Can we solve without sorting? (Use counting sort since heights are bounded)
- * LeetCode Contest Rating: 1303
+ * Follow-ups:
+ *   1. Return the misplaced indices instead of the count?
+ *      Compare against the expected order and collect each index that differs.
+ *   2. Sort in decreasing height order instead?
+ *      Build the expected sequence from high to low and compare the same way.
+ *   3. Heights are not bounded by 100?
+ *      Fall back to cloning and sorting, or coordinate-compress the values first.
+ *
+ * Related: Sort Array By Parity (905), Relative Sort Array (1122).
+ *
  */
 public class HeightChecker {
 
+    public static void main(String[] args) {
+        HeightChecker solver = new HeightChecker();
+
+        int[][] inputs = { {1, 1, 4, 2, 1, 3}, {5, 1, 2, 3, 4}, {1, 1, 1} };
+        int[] expected = { 3, 5, 0 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.heightChecker(inputs[i]);
+            System.out.printf("heights=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Counts students not in correct height order position.
+     * Intuition: the expected line is simply the current heights sorted in
+     * non-decreasing order. Clone before sorting so the original order remains
+     * available, then compare both arrays position by position; every mismatch is a
+     * student standing at a height different from the expected line.
      *
      * Algorithm:
-     * 1. Create expected array by sorting the heights
-     * 2. Compare original with expected position by position
-     * 3. Count positions where heights don't match
+     *   1. Clone heights into expected.
+     *   2. Sort expected into non-decreasing order.
+     *   3. Compare heights[i] with expected[i] for every position.
+     *   4. Return the mismatch count.
      *
-     * Time Complexity: O(n log n) due to sorting
-     * Space Complexity: O(n) for the expected array
+     * Time:  O(n log n) - sorting the cloned array dominates the comparison.
+     * Space: O(n) - expected stores a full sorted copy.
      *
-     * @param heights array of student heights
-     * @return count of students in wrong positions
+     * @param heights current student heights
+     * @return number of positions that differ from sorted order
      */
     public int heightChecker(int[] heights) {
         int[] expected = heights.clone();

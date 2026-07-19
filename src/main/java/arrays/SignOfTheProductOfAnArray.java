@@ -4,48 +4,64 @@ import java.util.Arrays;
 
 
 /**
- * Sign Of The Product Of An Array
+ * Problem: Sign of the Product of an Array
  *
- * Problem: Return sign of the product of all elements in array.
- * Return 1 if positive, -1 if negative, 0 if zero.
+ * Return the sign of the product of all array elements: 1 for positive, -1 for
+ * negative, and 0 if the product is zero. The actual product may overflow, so it
+ * should not be computed directly.
  *
- * Example: nums = [-1,-2,-3,-4,3,2,1] -> Output: 1
- * Product is positive due to even number of negative values.
+ * Leetcode: https://leetcode.com/problems/sign-of-the-product-of-an-array/ (Easy)
+ * Rating:   1210 (zerotrac Elo)
+ * Pattern:  Array | Sign tracking | Negative parity
  *
- * LeetCode: https://leetcode.com/problems/sign-of-the-product-of-an-array
+ * Example:
+ *   Input:  nums = [-1,-2,-3,-4,3,2,1]
+ *   Output: 1
+ *   Why:    there are four negative numbers, and an even number of negatives
+ *           makes the product positive.
  *
- * Follow-up Questions:
- * 1. What if we need to handle very large arrays where overflow is a concern?
- *    Answer: The current approach already handles this by not computing actual product.
- * 2. How would you modify this to return the actual product instead of just sign?
- *    Answer: Use BigInteger for arbitrary precision arithmetic or implement modular arithmetic.
- * 3. What if we need to find the sign of product of subarrays?
- *    Answer: Use prefix arrays to track sign changes and zero positions for range queries.
- * 4. How would you handle floating point numbers in the array?
- *    Answer: Apply same logic but handle special cases like NaN and infinity.
+ * Follow-ups:
+ *   1. Answer product-sign range queries?
+ *      Precompute prefix counts of zeros and negatives, then answer each range in O(1).
+ *   2. Return the actual product without overflow?
+ *      Use BigInteger or a modular product if exact magnitude is not required.
+ *   3. Handle floating-point values?
+ *      Track signs similarly but define behaviour for NaN, infinity, and negative zero.
  *
- * Related Problems:
- * - 238. Product of Array Except Self: https://leetcode.com/problems/product-of-array-except-self/
- * - 152. Maximum Product Subarray: https://leetcode.com/problems/maximum-product-subarray/
- * - 1464. Maximum Product of Two Elements in an Array: https://leetcode.com/problems/maximum-product-of-two-elements-in-an-array/
- * LeetCode Contest Rating: 1210
+ * Related: Product of Array Except Self (238), Maximum Product Subarray (152).
  */
 public class SignOfTheProductOfAnArray {
 
+    public static void main(String[] args) {
+        SignOfTheProductOfAnArray solver = new SignOfTheProductOfAnArray();
+
+        int[][] inputs = { {-1, -2, -3, -4, 3, 2, 1}, {1, 5, 0, 2, -3}, {-1, 1, -1, 1, -1} };
+        int[] expected = { 1, 0, -1 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.arraySign(inputs[i]);
+            System.out.printf("nums=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Determines sign of product by counting negative numbers.
+     * Intuition: the product's exact magnitude can overflow, but its sign depends only
+     * on whether any zero exists and whether the count of negative numbers is odd or
+     * even. A zero makes the product zero immediately; otherwise each negative flips
+     * the sign.
      *
      * Algorithm:
-     * 1. If any element is zero, product is zero
-     * 2. Count number of negative elements
-     * 3. Even count of negatives → positive, odd count → negative
-     * 4. This avoids potential integer overflow from actual multiplication
+     *   1. Initialize negativeCount to 0.
+     *   2. Scan nums and return 0 immediately if any value is zero.
+     *   3. Count negative values.
+     *   4. Return 1 for an even negative count and -1 for an odd count.
      *
-     * Time Complexity: O(n) where n is array length
-     * Space Complexity: O(1) - only using constant extra space
+     * Time:  O(n) - each number is inspected once until a zero or the end.
+     * Space: O(1) - only the negative count is stored.
      *
-     * @param nums input array of integers
-     * @return 1 if product positive, -1 if negative, 0 if zero
+     * @param nums input values
+     * @return sign of the full product: 1, -1, or 0
      */
     public int arraySign(int[] nums) {
         int negativeCount = 0;

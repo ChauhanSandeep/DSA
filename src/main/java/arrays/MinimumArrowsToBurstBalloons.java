@@ -8,48 +8,72 @@ import java.util.List;
 
 
 /**
- * Problem Statement:
- * Given a list of spherical balloons taped into the wall represented as intervals [xStart, xEnd]
- * You need to burst all balloons using the minimum number of arrows.
- * One arrow can burst all balloons that overlap with the same x-coordinate.
- * Return the minimum number of arrows needed.
+ * Problem: Minimum Number of Arrows to Burst Balloons
+ *
+ * Balloons are intervals on the x-axis. One vertical arrow shot at position x
+ * bursts every balloon whose interval contains x. Return the fewest arrows needed
+ * to burst all balloons.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/ (Medium)
+ * Rating:   acceptance 61.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Greedy | Sort by interval end
  *
  * Example:
- * Input: points = [[10,16],[2,8],[1,6],[7,12]]
- * Output: 2
- * Explanation: Shoot one arrow at x=6 to burst [1,6], [2,8]. 
- * another arrow at x = 11, bursting the balloons [10,16] and [7,12].
+ *   Input:  points = [[10,16],[2,8],[1,6],[7,12]]
+ *   Output: 2
+ *   Why:    shooting at 6 bursts [1,6] and [2,8], then shooting at 12 bursts
+ *           [7,12] and [10,16].
  *
- * Leetcode URL:
- * https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons
+ * Follow-ups:
+ *   1. Return the arrow coordinates too?
+ *      Store each chosen interval end whenever a new arrow is needed.
+ *   2. Minimize cost when arrows have different prices by coordinate?
+ *      This becomes a weighted interval covering problem rather than the simple greedy.
+ *   3. Process intervals online as they arrive?
+ *      Maintain active overlaps with a heap or balanced tree; the offline greedy no longer applies directly.
  *
- * Follow-up Questions:
- * 1. Can you modify the algorithm to return the exact coordinates where arrows should be shot?
- *    → Yes, store each arrow's position (the `end` of current group) in a list and return that.
- *
- * 2. How does the solution change if the balloons are not guaranteed to be non-overlapping?
- *    → No change required; overlapping is already handled by the merging strategy.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Non-overlapping Intervals (435), Merge Intervals (56).
  */
-
 public class MinimumArrowsToBurstBalloons {
 
+    public static void main(String[] args) {
+        MinimumArrowsToBurstBalloons solver = new MinimumArrowsToBurstBalloons();
+
+        int[][][] inputs = {
+            { {10, 16}, {2, 8}, {1, 6}, {7, 12} },
+            { {1, 2} },
+            { {1, 2}, {3, 4}, {5, 6}, {7, 8} }
+        };
+        int[] expected = { 2, 1, 4 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[][] intervals = new int[inputs[i].length][];
+            for (int row = 0; row < inputs[i].length; row++) {
+                intervals[row] = inputs[i][row].clone();
+            }
+            int got = solver.findMinArrowShots(intervals);
+            System.out.printf("points=%s  ->  %d  expected=%d%n",
+                Arrays.deepToString(inputs[i]), got, expected[i]);
+        }
+    }
+
     /**
-     * Returns the minimum number of arrows required to burst all balloons.
+     * Intuition: sort balloons by their ending coordinate and shoot at the earliest end
+     * that is still needed. That position bursts the earliest-ending balloon and gives
+     * maximum chance to also cover later balloons. When a later balloon starts after
+     * the current arrow position, it cannot be covered, so a new arrow is required.
      *
      * Algorithm:
-     * - Sort all balloon intervals based on their end positions.
-     * - Initialize the arrow count to 1 (as at least one balloon exists).
-     * - Use a variable `lastArrowPos` to track the x-coordinate of the last shot arrow.
-     * - For each balloon, check if its start is beyond the reach of the last arrow:
-     *     - If yes, shoot a new arrow and update `lastArrowPos` to current balloon's end.
-     *     - Otherwise, it is already covered by the last arrow.
+     *   1. Return 0 for null or empty intervals.
+     *   2. Sort intervals by end coordinate.
+     *   3. Place the first arrow at the first interval's end.
+     *   4. Scan remaining intervals and add a new arrow whenever the start is beyond lastArrowPos.
      *
-     * Time Complexity: O(n log n) for sorting
-     * Space Complexity: O(1) extra space
+     * Time:  O(n log n) - sorting the intervals dominates the linear scan.
+     * Space: O(1) - intervals are sorted in place and only counters are stored.
      *
-     * @param intervals Array of intervals representing balloon positions
-     * @return Minimum number of arrows needed to burst all balloons
+     * @param intervals balloon intervals as [start, end]
+     * @return minimum number of arrows needed to burst every balloon
      */
     public int findMinArrowShots(int[][] intervals) {
         if (intervals == null || intervals.length == 0) {

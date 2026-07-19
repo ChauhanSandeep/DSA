@@ -3,40 +3,67 @@ package arrays;
 import java.util.*;
 
 /**
- * Fair Candy Swap
+ * Problem: Fair Candy Swap
  *
- * Problem: Alice and Bob have candy boxes. Find one box from each person to swap
- * so that both end up with the same total amount of candy.
+ * Alice and Bob each have boxes of candy with given sizes. Return one box size
+ * from Alice and one box size from Bob that they can swap so both people end up
+ * with the same total candy. The problem guarantees that a valid swap exists.
  *
- * Example: aliceSizes = [1,1], bobSizes = [2,2] -> Output: [1,2]
- * Alice gives 1, Bob gives 2. Both end up with total 2.
+ * Leetcode: https://leetcode.com/problems/fair-candy-swap/ (Easy)
+ * Rating:   1334 (zerotrac Elo)
+ * Pattern:  Array | Hash set | Sum difference balancing
  *
- * LeetCode: https://leetcode.com/problems/fair-candy-swap
+ * Example:
+ *   Input:  aliceSizes = [1,1], bobSizes = [2,2]
+ *   Output: [1,2]
+ *   Why:    Alice moves from total 2 to 3, Bob moves from total 4 to 3, so the
+ *           totals become equal after swapping 1 and 2.
  *
- * Follow-up Questions:
- * - What if multiple valid swaps exist? (Return any one, current solution returns first found)
- * - How to find all possible fair swaps? (Modify to collect all valid pairs)
- * - What if no fair swap exists? (Problem guarantees solution exists)
- * LeetCode Contest Rating: 1334
+ * Follow-ups:
+ *   1. Return all valid swaps?
+ *      Keep scanning Alice's boxes and collect every matching Bob size from the set.
+ *   2. What if no valid swap is guaranteed?
+ *      Return an empty array or optional result after the scan finds no match.
+ *   3. Minimize the absolute size difference among valid swaps?
+ *      Generate valid pairs with the same equation and track the best difference.
+ *
+ * Related: Two Sum (1), Find Common Characters (1002).
  */
 public class FairCandySwap {
 
+    public static void main(String[] args) {
+        FairCandySwap solver = new FairCandySwap();
+
+        int[][] aliceInputs = { {1, 1}, {1, 2, 5}, {2} };
+        int[][] bobInputs = { {2, 2}, {2, 4}, {1, 3} };
+        String[] expected = { "[1, 2]", "[5, 4]", "[2, 3]" };
+
+        for (int i = 0; i < aliceInputs.length; i++) {
+            int[] got = solver.fairCandySwap(aliceInputs[i], bobInputs[i]);
+            System.out.printf("alice=%s bob=%s  ->  %s  expected=%s%n",
+                Arrays.toString(aliceInputs[i]), Arrays.toString(bobInputs[i]),
+                Arrays.toString(got), expected[i]);
+        }
+    }
+
     /**
-     * Finds a fair candy swap between Alice and Bob.
+     * Intuition: after swapping Alice box a with Bob box b, Alice loses a and gains b.
+     * The totals become equal exactly when b = a - (aliceTotal - bobTotal) / 2. Put all
+     * Bob box sizes in a set so each Alice box can ask for its one required partner in
+     * constant time.
      *
      * Algorithm:
-     * 1. Calculate total candies for Alice and Bob
-     * 2. Calculate the difference that needs balancing
-     * 3. For each of Alice's boxes, calculate required Bob's box size
-     * 4. Check if Bob has a box of that size using set lookup
-     * 5. Return first valid swap found
+     *   1. Compute Alice's total, Bob's total, and their half-difference diff.
+     *   2. Store Bob's box sizes in bobSet for fast lookup.
+     *   3. For each aliceBox, compute requiredBobBox = aliceBox - diff.
+     *   4. Return the first pair whose required Bob box exists.
      *
-     * Time Complexity: O(n + m) where n, m are array lengths
-     * Space Complexity: O(m) for storing Bob's box sizes in set
+     * Time:  O(a + b) - both arrays are scanned once.
+     * Space: O(b) - Bob's box sizes are stored in a hash set.
      *
      * @param aliceSizes Alice's candy box sizes
      * @param bobSizes Bob's candy box sizes
-     * @return array [alice_box, bob_box] representing fair swap
+     * @return one valid [aliceBox, bobBox] swap, or [-1, -1] if none is found
      */
     public int[] fairCandySwap(int[] aliceSizes, int[] bobSizes) {
         int aliceTotal = Arrays.stream(aliceSizes).sum();

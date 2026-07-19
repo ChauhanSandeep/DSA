@@ -3,20 +3,47 @@ package arrays;
 import java.util.Arrays;
 
 /**
- * 396. Rotate Function
+ * Problem: Rotate Function
  *
- * Problem Statement:
- * Given an integer array nums of length n, define:
- * F(k) = 0 * arrk[0] + 1 * arrk[1] + ... + (n - 1) * arrk[n - 1]
- * where arrk is nums rotated k positions clockwise.
+ * For an array nums of length n, let F(k) be the weighted sum of nums rotated k
+ * positions clockwise: sum of index * value after that rotation. Return the
+ * maximum value among all rotations.
  *
- * Return the maximum value of F(0), F(1), ..., F(n - 1).
+ * Leetcode: https://leetcode.com/problems/rotate-function/ (Medium)
+ * Rating:   acceptance 54.2% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Recurrence | Rotation delta
  *
- * LeetCode Link: https://leetcode.com/problems/rotate-function/
+ * Example:
+ *   Input:  nums = [4,3,2,6]
+ *   Output: 26
+ *   Why:    the rotation [3,2,6,4] gives 0*3 + 1*2 + 2*6 + 3*4 = 26, which is
+ *           larger than the other rotation scores.
  *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the rotation index that gives the maximum score?
+ *      Track k whenever the best value improves.
+ *   2. Support many point updates to nums?
+ *      Maintain total sum and weighted sum in a Fenwick or segment tree over rotations.
+ *   3. Minimize F(k) instead of maximizing it?
+ *      Use the same recurrence and track the minimum value.
+ *
+ * Related: Rotate Array (189), Maximum Sum Circular Subarray (918).
+ *
  */
 public class RotateFunction {
+
+    public static void main(String[] args) {
+        RotateFunction solver = new RotateFunction();
+
+        int[][] inputs = { {4, 3, 2, 6}, {100}, {-1, -2, -3} };
+        int[] expected = { 26, 0, -5 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.maxRotateFunction(inputs[i]);
+            System.out.printf("nums=%s  ->  %d  expected=%d%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 
     /**
      * Brute-force baseline for understanding and validation.
@@ -43,26 +70,22 @@ public class RotateFunction {
     }
 
     /**
-     * Optimized recurrence-based solution.
-     * Let nums = [a0, a1, ..., a(n-1)].
+     * Intuition: recomputing every rotation wastes work because adjacent rotations are
+     * related. Moving nums[n - k] from the end to the front adds the total array sum to
+     * all shifted values, but that moved value loses n times its contribution. This
+     * turns each next F(k) into a constant-time update from the previous value.
      *
-     * F(0) = 0*a0 + 1*a1 + 2*a2 + ... + (n-1)*a(n-1)
-     * F(1) = 0*a(n-1) + 1*a0 + 2*a1 + ... + (n-1)*a(n-2)
+     * Algorithm:
+     *   1. Compute totalSum and F(0).
+     *   2. Initialize maxValue and previous to F(0).
+     *   3. For each rotation k from 1 to n - 1, apply previous + totalSum - n * nums[n - k].
+     *   4. Track and return the maximum rotation value.
      *
-     * Subtract:
-     * F(1) - F(0)
-     * = (a0 + a1 + ... + a(n-2)) - (n-1)*a(n-1)
-     * = (totalSum - a(n-1)) - (n-1)*a(n-1)
-     * = totalSum - n*a(n-1)
+     * Time:  O(n) - one pass computes F(0) and one pass evaluates rotations.
+     * Space: O(1) - only running sums and maxima are stored.
      *
-     * So:
-     * F(1) = F(0) + totalSum - n*a(n-1)
-     *
-     * Generalizing for k >= 1:
-     * F(k) = F(k-1) + totalSum - n*nums[n-k]
-     * 
-     * Time Complexity: O(n)
-     * Space Complexity: O(1)
+     * @param nums input array
+     * @return maximum rotate-function value
      */
     public int maxRotateFunction(int[] nums) {
         if (nums == null || nums.length == 0) {
@@ -89,15 +112,5 @@ public class RotateFunction {
         return (int) maxValue;
     }
 
-    public static void main(String[] args) {
-        RotateFunction solver = new RotateFunction();
 
-        int[] nums1 = { 4, 3, 2, 6 };
-        int[] nums2 = { 100 };
-        int[] nums3 = { -1, -2, -3, -4, -5 };
-
-        System.out.println("Input: " + Arrays.toString(nums1) + ", Max F(k): " + solver.maxRotateFunction(nums1));
-        System.out.println("Input: " + Arrays.toString(nums2) + ", Max F(k): " + solver.maxRotateFunction(nums2));
-        System.out.println("Input: " + Arrays.toString(nums3) + ", Max F(k): " + solver.maxRotateFunction(nums3));
-    }
 }

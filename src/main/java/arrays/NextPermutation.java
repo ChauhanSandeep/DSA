@@ -4,64 +4,65 @@ import java.util.Arrays;
 
 
 /**
- * LeetCode Problem 31: Next Permutation
- * https://leetcode.com/problems/next-permutation/
+ * Problem: Next Permutation
  *
- * Problem Statement:
- * A permutation of an array of integers is an arrangement of its members into a sequence or linear order.
- * For example, for arr = [1,2,3], the following are all the permutations of arr: [1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1].
- * The next permutation of an array of integers is the next lexicographically greater permutation of its integer.
- * More formally, if all the permutations of the array are sorted in one container according to their lexicographical order,
- * then the next permutation of that array is the permutation that follows it in the sorted container.
- * If such an arrangement is not possible, the array must be rearranged as the lowest possible order (i.e., sorted in ascending order).
+ * Rearrange the array into the next lexicographically greater permutation. If the
+ * current arrangement is already the greatest possible order, rearrange it into
+ * the lowest order instead. The change must happen in place.
+ *
+ * Leetcode: https://leetcode.com/problems/next-permutation/ (Medium)
+ * Rating:   acceptance 45.7% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Two pointers | Right-to-left greedy
  *
  * Example:
- * Input: nums = [1,2,3]
- * Output: [1,3,2]
- * Explanation: The next permutation of [1,2,3] is [1,3,2].
+ *   Input:  nums = [1,3,5,4,2]
+ *   Output: [1,4,2,3,5]
+ *   Why:    the rightmost position that can be increased is 3; swapping it with
+ *           4 and minimizing the suffix gives the smallest greater permutation.
  *
- * Input: nums = [3,2,1]
- * Output: [1,2,3]
- * Explanation: [3,2,1] is the largest permutation, so the next permutation wraps around to the smallest permutation [1,2,3].
+ * Follow-ups:
+ *   1. Generate the previous permutation?
+ *      Mirror the comparisons: find the rightmost drop, swap with the largest smaller value, then reverse the suffix.
+ *   2. Return the k-th next permutation directly?
+ *      Use factorial number system ranking/unranking when all values are distinct.
+ *   3. Generate all unique permutations with duplicates?
+ *      Sort first, then backtrack while skipping equal sibling choices.
  *
- * Follow-up Questions (FAANG interview style):
- * 1. How would you handle duplicate elements in the array?
- *    - The algorithm works correctly with duplicates as it finds the rightmost ascending pair and next larger element properly.
- * 2. Can you implement this without modifying the input array?
- *    - You could return a new array, but the problem specifically asks for in-place modification for O(1) space complexity.
- * 3. How would you generate the previous permutation instead?
- *    - Similar algorithm but find the rightmost descending pair and swap with the largest smaller element, then reverse suffix.
- * 4. What if you need to generate the k-th next permutation efficiently?
- *    - You could use factorial number system or repeatedly apply next permutation k times (less efficient).
- * Related Problems:
- * - Permutations (LeetCode 46): https://leetcode.com/problems/permutations/
- * - Permutations II (LeetCode 47): https://leetcode.com/problems/permutations-ii/
- * - Permutation Sequence (LeetCode 60): https://leetcode.com/problems/permutation-sequence/
- *
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Permutations (46), Permutations II (47), Permutation Sequence (60).
  */
 public class NextPermutation {
 
-  public static void main(String[] args) {
-    int[] nums = {1, 3, 5, 4, 2};
-    getNextPermutation(nums);
-    System.out.println(Arrays.toString(nums));  // Output: [1, 4, 2, 3, 5]
-  }
+    public static void main(String[] args) {
+        NextPermutation solver = new NextPermutation();
+
+        int[][] inputs = { {1, 2, 3}, {3, 2, 1}, {1, 1, 5}, {1, 3, 5, 4, 2} };
+        String[] expected = { "[1, 3, 2]", "[1, 2, 3]", "[1, 5, 1]", "[1, 4, 2, 3, 5]" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] nums = inputs[i].clone();
+            getNextPermutation(nums);
+            System.out.printf("nums=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(nums), expected[i]);
+        }
+    }
+
+
 
   /**
-   * Single Pass Algorithm.
+   * Intuition: to get the next lexicographic order, make the smallest possible
+   * increase as far right as possible. The rightmost dip is the pivot that can grow;
+   * swapping it with the smallest larger value on its right makes the increase, and
+   * reversing the suffix makes the remaining tail as small as possible.
    *
-   * Algorithm Overview:
-   * 1. Find the rightmost character that is smaller than its next character (pivot point).
-   * 2. If no such character exists, the permutation is the last permutation; reverse the entire array.
-   * 3. Find the ceiling of the pivot character in the right part of the array (smallest element greater than pivot).
-   * 4. Swap the pivot character with this ceiling character.
-   * 5. Reverse the suffix after the pivot position to get the next smallest permutation.
+   * Algorithm:
+   *   1. Find the rightmost pivot where nums[pivot] < nums[pivot + 1].
+   *   2. If a pivot exists, find the rightmost value greater than nums[pivot] and swap.
+   *   3. Reverse the suffix after pivot to put it in ascending order.
    *
-   * Time Complexity: O(n) - each element is visited at most twice
-   * Space Complexity: O(1) - in-place modification
+   * Time:  O(n) - the scans and suffix reversal each touch at most n elements.
+   * Space: O(1) - the permutation is rearranged in place.
    *
-   * @param nums the input array to be rearranged to next permutation
+   * @param nums array mutated to its next permutation
    */
   public static void getNextPermutation(int[] nums) {
     int pivot = nums.length - 2;

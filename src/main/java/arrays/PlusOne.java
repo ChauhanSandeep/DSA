@@ -1,44 +1,47 @@
 package arrays;
 
+import java.util.Arrays;
 /**
- * 66. Plus One
+ * Problem: Plus One
  *
- * Problem Statement:
- * You are given a large integer represented as an integer array digits, where each
- * digits[i] is the ith digit of the integer. The digits are ordered from most
- * significant to least significant in left-to-right order. The large integer does
- * not contain any leading zeros. Increment the large integer by one and return
- * the resulting array of digits.
+ * A large non-negative integer is stored as decimal digits from most significant
+ * to least significant. Add one to that integer and return the resulting digits.
+ * The input has no leading zeros except for the number zero itself.
+ *
+ * Leetcode: https://leetcode.com/problems/plus-one/ (Easy)
+ * Rating:   acceptance 50.3% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Digit carry | Right-to-left scan
  *
  * Example:
- * Input: digits = [1,2,3]
- * Output: [1,2,4]
- * Explanation: The array represents the integer 123. Incrementing by one gives
- * 123 + 1 = 124. Thus, the result should be [1,2,4].
+ *   Input:  digits = [9,9]
+ *   Output: [1,0,0]
+ *   Why:    99 + 1 creates a carry past the most significant digit, so a new
+ *           leading 1 is needed.
  *
- * Input: digits = [9,9]
- * Output: [1,0,0]
- * Explanation: 99 + 1 = 100, so we need to add a new leading digit.
+ * Follow-ups:
+ *   1. Add an arbitrary non-negative integer instead of one?
+ *      Use the same carry loop as Add to Array-Form of Integer.
+ *   2. Add two digit arrays?
+ *      Walk both arrays from right to left and build a result with carry.
+ *   3. Support a linked-list digit representation?
+ *      Reverse the list first, or use recursion/stack to process from the tail.
  *
- * LeetCode Link: https://leetcode.com/problems/plus-one/
- *
- * Follow-up Questions:
- * 1. What if we need to add a number other than 1?
- *    Answer: Extend the algorithm to handle carry propagation for any addend, not just 1.
- * 2. How would you handle negative numbers represented as arrays?
- *    Answer: Add sign bit handling and implement subtraction logic for negative results.
- * 3. What if we need to support floating point numbers?
- *    Answer: Split into integer and fractional parts, handle decimal point position.
- * 4. How to optimize for very large arrays with sparse operations?
- *    Answer: Use compressed representations or segment-based processing for efficiency.
- *
- * Related Problems:
- * - 67. Add Binary: https://leetcode.com/problems/add-binary/
- * - 415. Add Strings: https://leetcode.com/problems/add-strings/
- * - 989. Add to Array-Form of Integer: https://leetcode.com/problems/add-to-array-form-of-integer/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Add Binary (67), Add Strings (415), Add to Array-Form of Integer (989).
  */
 public class PlusOne {
+
+    public static void main(String[] args) {
+        PlusOne solver = new PlusOne();
+
+        int[][] inputs = { {1, 2, 3}, {9, 9}, {0} };
+        String[] expected = { "[1, 2, 4]", "[1, 0, 0]", "[1]" };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] got = solver.plusOneOptimized(inputs[i].clone());
+            System.out.printf("digits=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), Arrays.toString(got), expected[i]);
+        }
+    }
 
     /**
      * Implementation with explicit carry tracking
@@ -72,21 +75,22 @@ public class PlusOne {
     }
 
     /**
-     * Optimized for common case of no overflow.
-     * What we need to understand is that the only time we need to
-     * create a new array is when all the digits are 9.
-     * In all other cases, we can simply increment the last digit
-     * that is not 9 and set all following digits to 0. This appraoch uses this insight
-     * to optimize for the common case where no carry is needed.
+     * Intuition: most additions finish at the last digit. If the last digit is below 9,
+     * increment it and return immediately. Otherwise every trailing 9 becomes 0 until a
+     * non-9 digit absorbs the carry; if no such digit exists, all digits were 9 and a
+     * new leading 1 is needed.
      *
      * Algorithm:
-     * 1. Check if the last digit is less than 9, if so increment
-     *   and return.
-     * 2. If last digit is 9, iterate backwards to find first non-9 digit,
-     *   increment it, and set all following digits to 0.
-     * 3. If all digits are 9, create new array with leading 1  and rest 0s.
+     *   1. If the last digit is below 9, increment it and return digits.
+     *   2. Walk backward, turning 9s into 0s until a non-9 digit appears.
+     *   3. Increment the first non-9 digit and return.
+     *   4. If every digit was 9, return a new array with leading 1.
      *
-     * Time Complexity: O(n), Space Complexity: O(1) average case
+     * Time:  O(n) - the all-9s case touches every digit once.
+     * Space: O(1) extra - a new n + 1 array is allocated only on overflow.
+     *
+     * @param digits decimal digits of a non-negative integer
+     * @return digits representing the input integer plus one
      */
     public int[] plusOneOptimized(int[] digits) {
         // Handle most common case: no carry needed
