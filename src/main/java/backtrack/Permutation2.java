@@ -2,178 +2,171 @@ package backtrack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.TreeMap;
 
 /**
- * Problem: Generate all unique permutations of an array of integers that may contain duplicates.
+ * Problem: Permutations II
  *
- * 🔗 Leetcode: https://leetcode.com/problems/permutations-ii/
+ * Given an integer array that may contain duplicate values, return all unique
+ * permutations. The answer must not contain the same ordering more than once.
  *
- * 🔍 Example:
- * Input: [1, 1, 2]
- * Output: [[1, 1, 2], [1, 2, 1], [2, 1, 1]]
+ * Leetcode: https://leetcode.com/problems/permutations-ii/
+ * Rating:   acceptance 63.8% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Unique permutations | Sort-to-skip duplicates
  *
- * 🧠 Intuition:
- * - When elements are repeated, swapping or selecting the same number again can lead to duplicate permutations.
- * - Sorting helps to group duplicates and enables skipping repeated elements during backtracking.
+ * Example:
+ *   Input:  [1,1,2]
+ *   Output: [[1, 1, 2], [1, 2, 1], [2, 1, 1]]
+ *   Why:    the two 1 values are interchangeable, so the only unique choices
+ *           are where the 2 appears: first, second, or third.
  *
- * ✅ Constraints:
- * - The array can contain duplicates.
+ * Follow-ups:
+ *   1. Return the k-th unique permutation with duplicates?
+ *      Use multinomial block counts while choosing each next value.
+ *   2. Count unique permutations without generating them?
+ *      Return n! divided by the factorial of each value frequency.
+ *   3. Generate unique string permutations lazily?
+ *      Keep a sorted char array plus used flags, yielding one leaf at a time.
+ *   4. Avoid sorting when values are streamed with counts?
+ *      Use a frequency map and recurse over keys with positive remaining count.
  *
- * 📌 Follow-up Questions (FAANG-style):
- * 1. How would you extend this to generate unique permutations for strings with duplicate characters?
- *    - Convert the string to a char array, sort it, and apply the same backtracking logic.
+ * Related: Permutations (46), Next Permutation (31), Subsets II (90).
  *
- * 2. Can you solve this without extra space (e.g., without `used[]`)?
- *    - It’s difficult without `used[]`, as index tracking is needed for deduplication.
- *
- * 3. Can you deduplicate on-the-fly while building permutations?
- *    - Yes. Use a set to track duplicates per recursion level (less efficient than `used[]` with sorting).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *   Approach             Method                       Time    Space (extra)
+ *   -------------------  ---------------------------  ------  -------------
+ *   Frequency map        permuteUniqueUsingFreqMap    O(n*n!) O(n)
+ *   Sort + used (best)   generateUniquePermutations   O(n*n!) O(n)
  */
 public class Permutation2 {
 
-  public static void main(String[] args) {
-    int[] input = {3, 3, 0, 3};
-    List<List<Integer>> uniquePermutations = generateUniquePermutations(input);
-    System.out.println(uniquePermutations);
-  }
+    /**
+     * Intuition: duplicates become simple when we count how many copies of each
+     * value remain. Instead of choosing an index, we choose a value with positive
+     * frequency and spend one copy. That means equal values are never treated as
+     * separate sibling choices, so duplicate permutations are never created. A
+     * sorted map keeps the output in a stable, easy-to-read order.
+     *
+     * Algorithm:
+     *   1. Return an empty answer for null input and count how many times each value appears.
+     *   2. Build the permutation one slot at a time from values whose remaining count is positive.
+     *   3. When the current permutation reaches the original length, copy it into the answer.
+     *   4. Choose a value by decrementing its count and appending it, recurse, then
+     *      restore the count and remove the value before trying the next key.
+     *
+     * Time:  O(n * U) - U unique permutations are produced, and copying each one takes n values.
+     * Space: O(n + d) for recursion/current path and d distinct counts, excluding output.
+     *
+     * @param nums integers that may contain duplicates
+     * @return all unique permutations
+     */
+    public List<List<Integer>> permuteUniqueUsingFreqMap(int[] nums) {
+        List<List<Integer>> allPermutations = new ArrayList<>();
+        if (nums == null) return allPermutations;
 
-  /**
-   * Generates all unique permutations of a given array with possible duplicates.
-   *
-   * Steps:
-   * 1. Sort the array to group duplicates.
-   * 2. Use backtracking with a boolean `used[]` array to track which elements are already included.
-   * 3. Skip duplicate elements unless the previous duplicate was used in the current path.
-   *
-   * Time Complexity: O(N * N!) → N! permutations, O(N) to copy each one.
-   * Space Complexity: O(N) → recursion + used array.
-   *
-   * @param nums array of integers (may include duplicates)
-   * @return list of all unique permutations
-   */
-  public static List<List<Integer>> generateUniquePermutations(int[] nums) {
-    List<List<Integer>> result = new ArrayList<>();
-    Arrays.sort(nums); // Sorting is critical to detect and skip duplicates
-    boolean[] used = new boolean[nums.length];
-    backtrackPermutations(nums, new ArrayList<>(), used, result);
-    return result;
-  }
+        Map<Integer, Integer> valueToCount = new TreeMap<>();
+        for (int num : nums) valueToCount.merge(num, 1, Integer::sum);
 
-  /**
-   * Recursive helper function to generate unique permutations via backtracking.
-   *
-   * @param nums         sorted input array
-   * @param current      current permutation being built
-   * @param used         boolean array to track used elements
-   * @param result       list of all unique permutations
-   */
-  private static void backtrackPermutations(int[] nums, List<Integer> current, boolean[] used,
-      List<List<Integer>> result) {
-    if (current.size() == nums.length) {
-      result.add(new ArrayList<>(current));
-      return;
+        backtrackWithCounts(nums.length, valueToCount, new ArrayList<>(), allPermutations);
+        return allPermutations;
     }
 
-    for (int i = 0; i < nums.length; i++) {
-      // Skip used numbers
-      if (used[i]) {
-        continue;
-      }
+    /** Builds unique permutations by spending one remaining count of a value at a time. */
+    private void backtrackWithCounts(int targetLength, Map<Integer, Integer> valueToCount,
+                                     List<Integer> currentPermutation,
+                                     List<List<Integer>> allPermutations) {
+        if (currentPermutation.size() == targetLength) {
+            allPermutations.add(new ArrayList<>(currentPermutation));
+            return;
+        }
 
-      // Skip duplicates: ensure the same number isn't used twice in the same recursion depth
-      // Note: The condition !used[i - 1] ensures that duplicate elements are skipped unless the previous duplicate
-      // element has already been used in the current recursion path. Otherwise, it can lead to same path
-      if (i > 0 && (nums[i] == nums[i - 1] && !used[i - 1])) {
-        continue;
-      }
+        for (Map.Entry<Integer, Integer> entry : valueToCount.entrySet()) {
+            int value = entry.getKey();
+            int remainingCount = entry.getValue();
+            if (remainingCount == 0) continue;
 
-      // Choose
-      used[i] = true;
-      current.add(nums[i]);
-
-      // Explore
-      backtrackPermutations(nums, current, used, result);
-
-      // Un-choose (backtrack)
-      used[i] = false;
-      current.remove(current.size() - 1);
-    }
-  }
-
-  /**
-   * Generates all unique permutations using a frequency counter (HashMap).
-   *
-   * Key idea: Handle duplicates by tracking frequency (count) of each number.
-   * At each step, only pick numbers with count > 0, then backtrack.
-   * This avoids generating duplicate permutations without needing extra sorting or visited[].
-   *
-   * Steps:
-   * 1. Count occurrences of each element using HashMap.
-   * 2. Start backtracking using a combination list and recursively build permutations.
-   * 3. At each step, pick only those elements whose count > 0.
-   *
-   * Time Complexity: O(N * N!) → N! permutations, O(N) to copy each one.
-   * Space Complexity: O(N) → recursion + current combination.
-   *
-   * @param nums input array with possible duplicates
-   * @return list of all unique permutations
-   */
-  public List<List<Integer>> permuteUniqueUsingFreqMap(int[] nums) {
-    List<List<Integer>> result = new ArrayList<>();
-
-    // Step 1: Build frequency map of input elements
-    // freqMap ensures that the duplicates are not counted multiple times because
-    // we will only use each number as many times as it appears in the input.
-    Map<Integer, Integer> freqMap = new HashMap<>();
-    for (int num : nums) {
-      freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+            currentPermutation.add(value);
+            valueToCount.put(value, remainingCount - 1);
+            backtrackWithCounts(targetLength, valueToCount, currentPermutation, allPermutations);
+            valueToCount.put(value, remainingCount);
+            currentPermutation.remove(currentPermutation.size() - 1);
+        }
     }
 
-    // Step 2: Begin recursive backtracking
-    backtrack(new LinkedList<>(), nums.length, freqMap, result);
-    return result;
-  }
+    /**
+     * Intuition (interview default): sorting puts equal values next to each other,
+     * which lets us skip duplicate sibling branches. If nums[i] equals nums[i-1]
+     * and the previous copy is not already used in the current path, choosing this
+     * later copy first would produce the same permutations that the earlier copy
+     * will produce. So we only allow duplicates to be used in a fixed left-to-right
+     * order, which preserves all unique permutations and removes repeats.
+     *
+     * Algorithm:
+     *   1. Return an empty answer for null input, then sort nums so equal values are adjacent.
+     *   2. Build permutations by trying each unused index for the next position.
+     *   3. Skip a duplicate value when its previous equal copy has not been used in
+     *      the current path, because that would repeat a sibling branch.
+     *   4. Add the chosen value, mark its index used, recurse, then unmark and
+     *      remove it before trying the next index.
+     *
+     * Time:  O(n * U) - U unique permutations are produced, and copying each one takes n values.
+     * Space: O(n) recursion depth, used array, and current permutation, excluding output.
+     *
+     * @param nums integers that may contain duplicates
+     * @return all unique permutations
+     */
+    public static List<List<Integer>> generateUniquePermutations(int[] nums) {
+        List<List<Integer>> allPermutations = new ArrayList<>();
+        if (nums == null) return allPermutations;
 
-  /**
-   * Recursive backtracking helper that builds permutations using frequency map.
-   *
-   * @param current     current combination being built
-   * @param totalLength total number of elements to include
-   * @param freqMap     frequency of remaining usable numbers
-   * @param result      final list of unique permutations
-   */
-  private void backtrack(LinkedList<Integer> current, int totalLength, Map<Integer, Integer> freqMap,
-      List<List<Integer>> result) {
-    // Base case: permutation is complete
-    if (current.size() == totalLength) {
-      result.add(new ArrayList<>(current));
-      return;
+        Arrays.sort(nums);
+        backtrackSorted(nums, new boolean[nums.length], new ArrayList<>(), allPermutations);
+        return allPermutations;
     }
 
-    for (Map.Entry<Integer, Integer> entry : freqMap.entrySet()) {
-      int num = entry.getKey();
-      int count = entry.getValue();
+    /** Builds unique permutations from a sorted array while skipping duplicate sibling branches. */
+    private static void backtrackSorted(int[] nums, boolean[] used,
+                                        List<Integer> currentPermutation,
+                                        List<List<Integer>> allPermutations) {
+        if (currentPermutation.size() == nums.length) {
+            allPermutations.add(new ArrayList<>(currentPermutation));
+            return;
+        }
 
-      if (count == 0) {
-        continue;
-      }
+        for (int i = 0; i < nums.length; i++) {
+            if (used[i]) continue;
+            // If the previous equal value is unused, this equal value would duplicate its sibling branch.
+            if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]) continue;
 
-      // Choose
-      current.addLast(num);
-      freqMap.put(num, count - 1);
-
-      // Explore
-      backtrack(current, totalLength, freqMap, result);
-
-      // Backtrack
-      current.removeLast();
-      freqMap.put(num, count);
+            currentPermutation.add(nums[i]);
+            used[i] = true;
+            backtrackSorted(nums, used, currentPermutation, allPermutations);
+            used[i] = false;
+            currentPermutation.remove(currentPermutation.size() - 1);
+        }
     }
-  }
+
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        int[][] inputs = {
+            {1, 1, 2},
+            {3, 3, 0, 3},
+            {}
+        };
+        String[] expected = {
+            "[[1, 1, 2], [1, 2, 1], [2, 1, 1]]",
+            "[[0, 3, 3, 3], [3, 0, 3, 3], [3, 3, 0, 3], [3, 3, 3, 0]]",
+            "[[]]"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int[] nums = inputs[i].clone();
+            List<List<Integer>> got = generateUniquePermutations(nums);
+            System.out.printf("nums=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 }

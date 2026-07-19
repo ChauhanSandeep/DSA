@@ -1,7 +1,7 @@
 # GitHub Copilot Instructions
 
-> Authoritative long‑form spec: [`WARP.md`](../WARP.md). If anything below
-> conflicts with `WARP.md`, follow `WARP.md`.
+> Authoritative long‑form spec: [`AGENT.md`](../AGENT.md). If anything below
+> conflicts with `AGENT.md`, follow `AGENT.md`.
 >
 > **Audience of the generated code:** *future me, revising this problem the
 > night before an interview, and a real interviewer reading the screen.*
@@ -455,5 +455,5 @@ The file must **NOT** contain any of:
 
 ---
 
-If anything here conflicts with `WARP.md`, follow `WARP.md`.
+If anything here conflicts with `AGENT.md`, follow `AGENT.md`.
 

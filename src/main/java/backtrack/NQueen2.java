@@ -3,169 +3,162 @@ package backtrack;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  * Problem: N-Queens II
- * LeetCode: https://leetcode.com/problems/n-queens-ii/
  *
- * Statement:
- * Count the total number of distinct ways to place N queens on an N × N chessboard
- * such that no two queens attack each other (no same row, column, or diagonal).
+ * Count how many distinct ways n queens can be placed on an n x n board so no
+ * two queens share a row, column, or diagonal. Unlike N-Queens I, only the count
+ * is returned.
+ *
+ * Leetcode: https://leetcode.com/problems/n-queens-ii/
+ * Rating:   acceptance 79.0% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Bitmask pruning | Count only
  *
  * Example:
- * Input: n = 4
- * Output: 2
- * Explanation: There are two valid ways to place queens on a 4x4 board.
+ *   Input:  n = 4
+ *   Output: 2
+ *   Why:    n = 4 has exactly the two valid boards from N-Queens I, and this
+ *           version returns only their count.
  *
- * Follow-up Questions:
- * 1. Can you return all configurations?
- *    - Yes, store column placements and convert them to board strings at base case.
- *    - Related Problem: https://leetcode.com/problems/n-queens/
- * 2. Can this be optimized further?
- *    - Yes, by using bit masking instead of HashSet for better performance and less memory. Solved in method 2.
- * 3. Can you solve iteratively?
- *    - Possible, but recursion is cleaner for this problem.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return boards instead of a count?
+ *      Keep column placements and render them at the base case, as in N-Queens I.
+ *   2. Reduce symmetric work?
+ *      Place the first queen only in half the columns and mirror counts, handling the center separately.
+ *   3. Support n beyond integer bit width?
+ *      Use long up to 63 columns, or BigInteger/BitSet for larger boards.
+ *   4. Parallelize the search?
+ *      Split by first-row column choices; each subtree is independent.
+ *
+ * Related: N-Queens (51).
+ *
+ *   Approach             Method                 Time   Space (extra)
+ *   -------------------  ---------------------  -----  -------------
+ *   HashSet attacks      totalNQueensUsingSets  O(n!)  O(n)
+ *   Bitmask attacks      totalNQueens           O(n!)  O(n)
  */
 public class NQueen2 {
 
-  private int boardSize;
+    /**
+     * Intuition: this is N-Queens without needing to store the actual boards. We
+     * still place one queen per row and use sets to remember which columns and
+     * diagonals are attacked. Every time we successfully place queens through the
+     * last row, that path represents exactly one valid board, so the base case
+     * returns 1 instead of copying a board.
+     *
+     * Algorithm:
+     *   1. Return 0 for non-positive board sizes.
+     *   2. DFS row by row with sets for occupied columns, main diagonals, and anti-diagonals.
+     *   3. For the current row, try each column that is not present in any attack set.
+     *   4. Mark the queen's attacks, add the number of solutions from the next row,
+     *      then remove those marks before trying the next column.
+     *   5. Return 1 when all rows have been filled, because one complete arrangement was found.
+     *
+     * Time:  O(n!) - each row chooses from the remaining safe columns, so choices shrink quickly.
+     * Space: O(n) recursion depth and attack sets.
+     *
+     * @param boardSize board size n
+     * @return number of valid queen placements
+     */
+    public int totalNQueensUsingSets(int boardSize) {
+        if (boardSize <= 0) return 0;
 
-  public int totalNQueens(int boardSize) {
-    this.boardSize = boardSize;
-    return backtrack(
-        0,
-        new HashSet<>(), // occupiedMainDiagonals
-        new HashSet<>(), // occupiedAntiDiagonals
-        new HashSet<>()  // occupiedColumns
-    );
-  }
-
-  /**
-   * Backtracking helper to count solutions.
-   *
-   * Steps:
-   * 1. If all rows are processed, count this as one valid solution.
-   * 2. For each column in the current row:
-   *    - Skip if the column or diagonal is already under attack.
-   *    - Place the queen and mark attacked positions.
-   *    - Recurse for the next row.
-   *    - Remove the queen (backtrack) to explore other possibilities.
-   *
-   * Algorithm: Backtracking with pruning.
-   * Time Complexity: O(N!)
-   * Space Complexity: O(N)
-   *
-   * @param currentRow          Current row index.
-   * @param occupiedMainDiagonals  Set of main diagonals under attack.
-   * @param occupiedAntiDiagonals  Set of anti-diagonals under attack.
-   * @param occupiedColumns        Set of columns under attack.
-   * @return Number of valid arrangements from this point.
-   */
-  private int backtrack(int currentRow, Set<Integer> occupiedMainDiagonals, Set<Integer> occupiedAntiDiagonals,
-      Set<Integer> occupiedColumns) {
-
-    // Base case: all queens placed
-    if (currentRow == boardSize) {
-      return 1;
+        return countWithSets(0, boardSize, new HashSet<>(), new HashSet<>(), new HashSet<>());
     }
 
-    int totalSolutions = 0;
+    /** Counts valid queen placements using sets for occupied columns and diagonals. */
+    private int countWithSets(int row, int boardSize,
+                              Set<Integer> occupiedColumns,
+                              Set<Integer> occupiedMainDiagonals,
+                              Set<Integer> occupiedAntiDiagonals) {
+        if (row == boardSize) return 1;
 
-    for (int col = 0; col < boardSize; col++) {
-      int mainDiagonal = currentRow - col;
-      int antiDiagonal = currentRow + col;
+        int totalSolutions = 0;
+        for (int col = 0; col < boardSize; col++) {
+            int mainDiagonal = row - col;
+            int antiDiagonal = row + col;
+            if (occupiedColumns.contains(col)
+                || occupiedMainDiagonals.contains(mainDiagonal)
+                || occupiedAntiDiagonals.contains(antiDiagonal)) {
+                continue;
+            }
 
-      // Skip if under attack
-      if (occupiedColumns.contains(col)
-          || occupiedMainDiagonals.contains(mainDiagonal)
-          || occupiedAntiDiagonals.contains(antiDiagonal)) {
-        continue;
-      }
-
-      // Place queen
-      occupiedColumns.add(col);
-      occupiedMainDiagonals.add(mainDiagonal);
-      occupiedAntiDiagonals.add(antiDiagonal);
-
-      // Explore next row
-      totalSolutions += backtrack(currentRow + 1,
-          occupiedMainDiagonals,
-          occupiedAntiDiagonals,
-          occupiedColumns
-      );
-
-      // Backtrack
-      occupiedColumns.remove(col);
-      occupiedMainDiagonals.remove(mainDiagonal);
-      occupiedAntiDiagonals.remove(antiDiagonal);
+            occupiedColumns.add(col);
+            occupiedMainDiagonals.add(mainDiagonal);
+            occupiedAntiDiagonals.add(antiDiagonal);
+            totalSolutions += countWithSets(row + 1, boardSize,
+                occupiedColumns, occupiedMainDiagonals, occupiedAntiDiagonals);
+            occupiedColumns.remove(col);
+            occupiedMainDiagonals.remove(mainDiagonal);
+            occupiedAntiDiagonals.remove(antiDiagonal);
+        }
+        return totalSolutions;
     }
 
-    return totalSolutions;
-  }
+    /**
+     * Intuition (interview default): the three attack sets can be compressed into
+     * bitmasks. A 1 bit means that column position is blocked for the current row.
+     * OR'ing the column and diagonal masks gives all unsafe positions, and the
+     * remaining 1 bits are exactly the legal places for the next queen. Picking
+     * the lowest set bit explores one legal column, then shifting diagonal masks
+     * prepares the attacks for the next row.
+     *
+     * Algorithm:
+     *   1. Return 0 for non-positive board sizes and build a mask with the lowest n bits set.
+     *   2. At each row, compute available positions by removing occupied columns
+     *      and diagonals from the full board mask.
+     *   3. While legal positions remain, take one set bit as the queen's column and remove it from available.
+     *   4. Recurse with that column marked occupied and both diagonal masks shifted
+     *      to represent their attacks on the next row.
+     *   5. Return 1 when the occupied-column mask equals the full board mask, meaning n queens were placed.
+     *
+     * Time:  O(n!) - each row tries only currently available bit positions.
+     * Space: O(n) recursion depth.
+     *
+     * @param boardSize board size n
+     * @return number of valid queen placements
+     */
+    public int totalNQueens(int boardSize) {
+        if (boardSize <= 0) return 0;
 
-  /**
-   * Entry method to count total N-Queens solutions.
-   *
-   * Optimized Approach:
-   * - Use bitwise operations to track column and diagonal attacks.
-   * - Bit masks for:
-   *   1. occupiedColumns → Tracks columns already under attack.
-   *   2. occupiedMainDiagonals → Tracks main diagonals (row - col constant).
-   *   3. occupiedAntiDiagonals → Tracks anti-diagonals (row + col constant).
-   * - Each mask is updated recursively, giving O(1) checking and updating.
-   *
-   * Time Complexity: O(N!) — At most N possibilities for first queen, decreasing thereafter.
-   * Space Complexity: O(N) — Recursion depth and bit mask storage.
-   *
-   * @param boardSize Size of the chessboard (N).
-   * @return Total count of valid arrangements.
-   */
-  public int countNQueensUsingBitWiseOperation(int boardSize) {
-    return countNQueensUsingBitWiseOperationRec(0, boardSize, 0, 0, 0);
-  }
-
-  /**
-   * Recursive helper to count solutions.
-   *
-   * @param currentRow             Current row index being processed.
-   * @param boardSize              Size of the chessboard (N).
-   * @param occupiedColumns        Bitmask for occupied columns.
-   * @param occupiedMainDiagonals  Bitmask for occupied main diagonals.
-   * @param occupiedAntiDiagonals  Bitmask for occupied anti-diagonals.
-   * @return Number of valid solutions from this state.
-   */
-  private int countNQueensUsingBitWiseOperationRec(int currentRow, int boardSize,
-      int occupiedColumns, int occupiedMainDiagonals, int occupiedAntiDiagonals) {
-
-    // Base case: All queens placed successfully
-    if (currentRow == boardSize) {
-      return 1;
+        int allColumnsMask = (1 << boardSize) - 1;
+        return countWithBits(allColumnsMask, 0, 0, 0);
     }
 
-    // Determine free positions for the current row
-    int availablePositions = ((1 << boardSize) - 1) & ~(occupiedColumns | occupiedMainDiagonals | occupiedAntiDiagonals);
+    /** Counts valid queen placements using bitmasks for columns and diagonals. */
+    private int countWithBits(int allColumnsMask, int occupiedColumns,
+                              int occupiedMainDiagonals, int occupiedAntiDiagonals) {
+        if (occupiedColumns == allColumnsMask) return 1;
 
-    int totalSolutions = 0;
+        int availablePositions = allColumnsMask
+            & ~(occupiedColumns | occupiedMainDiagonals | occupiedAntiDiagonals);
+        int totalSolutions = 0;
 
-    // Try placing queen in each free position
-    while (availablePositions != 0) {
-      // Pick the rightmost available position
-      int position = availablePositions & -availablePositions;
-
-      // Mark this position as used
-      availablePositions ^= position;
-
-      // Recurse to the next row with updated attack masks
-      totalSolutions += countNQueensUsingBitWiseOperationRec(
-          currentRow + 1,
-          boardSize,
-          occupiedColumns | position,
-          (occupiedMainDiagonals | position) << 1,
-          (occupiedAntiDiagonals | position) >> 1
-      );
+        while (availablePositions != 0) {
+            int position = availablePositions & -availablePositions;
+            availablePositions ^= position;
+            totalSolutions += countWithBits(
+                allColumnsMask,
+                occupiedColumns | position,
+                (occupiedMainDiagonals | position) << 1,
+                (occupiedAntiDiagonals | position) >> 1
+            );
+        }
+        return totalSolutions;
     }
 
-    return totalSolutions;
-  }
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        NQueen2 solver = new NQueen2();
+
+        int[] inputs = {1, 4, 5};
+        int[] expected = {1, 2, 10};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.totalNQueens(inputs[i]);
+            System.out.printf("n=%d  ->  %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
 }

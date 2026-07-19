@@ -1,105 +1,116 @@
 package backtrack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Problem: Combinations
  *
- * Given two integers n and k, return all possible combinations of k numbers
- * chosen from the range [1, n]. You may return the answer in any order.
+ * Given integers n and k, return every size-k combination chosen from the
+ * numbers 1..n. Order inside a combination is increasing, and [1,2] is the
+ * same choice as [2,1], so each set of k numbers appears once.
+ *
+ * Leetcode: https://leetcode.com/problems/combinations/
+ * Rating:   acceptance 74.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Combinations | Increasing start index
  *
  * Example:
- * Input: n = 4, k = 2
- * Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
- * Explanation: There are 4 numbers, we need to choose 2 => 6 total combinations.
- * Note that combinations are unordered, i.e., [1,2] and [2,1] are the same.
+ *   Input:  n = 5, k = 3
+ *   Output: [[1, 2, 3], [1, 2, 4], [1, 2, 5], [1, 3, 4], [1, 3, 5],
+ *            [1, 4, 5], [2, 3, 4], [2, 3, 5], [2, 4, 5], [3, 4, 5]]
+ *   Why:    there are exactly 10 ways to choose 3 numbers from 1..5, and
+ *           each list is written in increasing order so duplicates like [2,1,3] do not appear.
  *
- * Constraints:
- * - 1 <= n <= 20
- * - 1 <= k <= n
+ * Follow-ups:
+ *   1. Generate the k-th combination directly without building all C(n,k)?
+ *      Use combinatorial ranking: count blocks that start with each candidate
+ *      and skip whole blocks until the desired rank lands inside one.
+ *   2. Allow each number to be used more than once?
+ *      Recurse with the same candidate as the next start, then bound by sum or
+ *      length depending on the variant.
+ *   3. Stream combinations lazily for huge n?
+ *      Keep the current increasing index vector and advance it like an odometer.
+ *   4. Count combinations under extra constraints, such as sum <= target?
+ *      Add pruning from sorted candidates, or use DP if only the count is needed.
  *
- * LeetCode Problem: https://leetcode.com/problems/combinations
- *
- * Follow-up Questions:
- *
- * 1. How would you generate combinations with repetition allowed?
- *    Answer: Remove the restriction of starting from start+1. In the recursive call,
- *    use start instead of start+1, allowing the same number to be picked multiple times.
- *    Related problem: https://leetcode.com/problems/combination-sum/
- *
- * 2. What if you need to generate all possible subsets (all lengths) instead of just k?
- *    Answer: Don't wait for current.size() == k. Add current to result at every
- *    recursive call, giving all subsets from size 0 to n.
- *    Related problem: https://leetcode.com/problems/subsets/
- *
- * 3. How would you optimize for very large n with small k?
- *    Answer: The pruning optimization is crucial. Also consider iterative approach
- *    with bit manipulation for small k, or use combinatorial formulas to generate
- *    the i-th combination directly without generating all previous ones.
- *
- * 4. Can you generate combinations in lexicographical order without sorting?
- *    Answer: Yes, the backtracking approach with start pointer naturally generates
- *    combinations in lexicographical order as we always proceed in increasing order.
- *
- * 5. How would you modify this to handle negative numbers or arbitrary ranges?
- *    Answer: Instead of using [1, n], accept an array of numbers as input. Iterate
- *    through array indices instead of number values. The backtracking structure remains same.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Subsets (78), Combination Sum (39), Combination Sum III (216).
  */
 public class Combinations {
 
     /**
-     * Generates all k-sized combinations using backtracking with pruning.
+     * Intuition: a combination is about which numbers are chosen, not the order
+     * they are chosen in. The simple way to enforce that is to build every list
+     * in increasing order: after choosing x, later choices must be greater than x.
+     * That single start pointer prevents duplicates like [2,1]. We also stop the
+     * loop early when there are not enough numbers left to fill the remaining
+     * slots, because no later candidate can fix that shortage.
      *
      * Algorithm:
-     * 1. Start with empty combination and first number (1)
-     * 2. At each step, try adding numbers from current position to n
-     * 3. When combination reaches size k, add to result
-     * 4. Backtrack by removing last added number and trying next option
-     * 5. Prune branches where remaining numbers can't form k-sized combination
+     *   1. Return an empty answer for impossible input, and return the single
+     *      empty combination when k is zero.
+     *   2. Keep a current combination plus the first number still allowed to be chosen.
+     *   3. At each level, compute the last candidate that still leaves enough
+     *      larger numbers to complete a size-k combination.
+     *   4. For each useful candidate, add it, recurse with candidate + 1 as the
+     *      next start, then remove it before trying the next candidate.
      *
-     * Key insight: Use start pointer to avoid duplicates. Once we pick number i,
-     * all future picks must be > i. Pruning check: if (n - start + 1 < k - current.size()),
-     * we don't have enough numbers left, so skip this branch.
+     * Time:  O(C(n,k) * k) - each valid combination is copied once.
+     * Space: O(k) recursion depth and current-combination buffer, excluding output.
      *
-     * Time Complexity: O(C(n,k) * k) where C(n,k) is binomial coefficient n!/(k!(n-k)!).
-     * We generate C(n,k) combinations, each requiring O(k) to copy to result.
-     *
-     * Space Complexity: O(C(n,k) * k) for storing all combinations. Recursion depth
-     * is O(k) for the call stack.
-     *
-     * @param n upper bound of range [1, n]
+     * @param n upper bound of the range 1..n
      * @param k size of each combination
-     * @return list of all k-sized combinations
+     * @return all size-k combinations from 1..n
      */
     public List<List<Integer>> combine(int n, int k) {
-        List<List<Integer>> result = new ArrayList<>();
-        backtrack(n, k, 1, new ArrayList<>(), result);
-        return result;
+        List<List<Integer>> allCombinations = new ArrayList<>();
+        if (n < 0 || k < 0 || k > n) return allCombinations;
+        if (k == 0) {
+            allCombinations.add(new ArrayList<>());
+            return allCombinations;
+        }
+
+        backtrack(n, k, 1, new ArrayList<>(), allCombinations);
+        return allCombinations;
     }
 
-    private void backtrack(int maxNumber, int combinationSize, int start, List<Integer> current, List<List<Integer>> result) {
-        // Base case: found a valid combinationSize-sized combination
-        if (current.size() == combinationSize) {
-            result.add(new ArrayList<>(current));
+    /** Grows combinations by choosing the next larger candidate until the target size is reached. */
+    private void backtrack(int maxNumber, int combinationSize, int start,
+                           List<Integer> currentCombination,
+                           List<List<Integer>> allCombinations) {
+        if (currentCombination.size() == combinationSize) {
+            allCombinations.add(new ArrayList<>(currentCombination));
             return;
         }
 
-        // Pruning: if not enough numbers remaining, stop early
-        int numbersStillNeeded = combinationSize - current.size();
-        int numbersAvailable = maxNumber - start + 1;
+        int numbersStillNeeded = combinationSize - currentCombination.size();
+        int lastUsefulCandidate = maxNumber - numbersStillNeeded + 1;
+        for (int candidate = start; candidate <= lastUsefulCandidate; candidate++) {
+            // select -> work -> un-select : the backtracking template
+            currentCombination.add(candidate);
+            backtrack(maxNumber, combinationSize, candidate + 1, currentCombination, allCombinations);
+            currentCombination.remove(currentCombination.size() - 1);
+        }
+    }
 
-        for (int i = start; i <= maxNumber; i++) {
-            // Optimization: stop if remaining numbers insufficient
-            if (numbersAvailable < numbersStillNeeded) {
-                break;
-            }
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        Combinations solver = new Combinations();
 
-            current.add(i);
-            backtrack(maxNumber, combinationSize, i + 1, current, result);
-            current.remove(current.size() - 1);
+        int[] ns = {4, 1, 5};
+        int[] ks = {2, 1, 0};
+        String[] expected = {
+            "[[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]",
+            "[[1]]",
+            "[[]]"
+        };
 
-            numbersAvailable--;
+        for (int i = 0; i < ns.length; i++) {
+            List<List<Integer>> got = solver.combine(ns[i], ks[i]);
+            System.out.printf("n=%d k=%d  ->  %s  expected=%s%n",
+                ns[i], ks[i], got, expected[i]);
         }
     }
 }

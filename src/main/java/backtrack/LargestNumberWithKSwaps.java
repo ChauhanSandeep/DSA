@@ -1,120 +1,113 @@
 package backtrack;
 
 /**
- * Problem: Largest Number in K Swaps
+ * Problem: Largest Number With K Swaps
  *
- * Given a number represented as a string and an integer `k`, find the largest number possible by making at most `k` swaps of digits.
+ * Given a non-negative integer as a string and an integer k, return the largest
+ * number that can be formed using at most k swaps of any two digits. The number
+ * length stays fixed, so lexicographic comparison matches numeric comparison.
+ *
+ * Pattern:  Backtracking | Greedy candidate choice | Try all best swaps
  *
  * Example:
- * Input: number = "934651", k = 2
- * Output: "965431"
+ *   Input:  number = "934651", k = 2
+ *   Output: "965341"
+ *   Why:    swapping 3 with 6 and then 4 with 5 gives 965341; with only two
+ *           swaps, no larger digit can be moved earlier without losing that prefix.
  *
- * Link: https://www.geeksforgeeks.org/find-maximum-number-possible-by-doing-at-most-k-swaps/
- *
- * Follow-up Questions (Asked in FAANG interviews):
- * 1. Can this be solved using a greedy algorithm?
- *    - No. A greedy approach might give a suboptimal solution due to premature swaps. Backtracking is needed to explore all promising branches.
- * 2. Can we reduce the recursive calls using memoization?
- *    - Not directly, since the problem state is highly dynamic (string + remaining swaps) and memoization overhead may outweigh benefits.
- * 3. Can this be modified to return the minimum number instead?
- *    - Yes. Similar logic applies, but we aim to minimize digits rather than maximize.
+ * Follow-ups:
+ *   1. Return the minimum number instead?
+ *      Mirror the search by choosing the smallest suffix digit, while preserving leading-zero rules if needed.
+ *   2. Find the fewest swaps needed to reach the maximum possible number?
+ *      BFS by swap distance gives shortest swaps, or DFS with iterative deepening.
+ *   3. Handle very large k and many repeated digits efficiently?
+ *      Memoize (digitString, remainingSwaps, index) states and skip swapping equal digits.
+ *   4. Return all maximum numbers reachable in exactly k swaps?
+ *      Continue search after finding a max and collect ties at depth k.
  */
 public class LargestNumberWithKSwaps {
+    private String bestNumber;
 
-  /**
-   * Main method to find the largest number after at most K swaps.
-   *
-   * Algorithm:
-   * - Use backtracking to explore all swap options.
-   * - At each recursive level, pick the max digit from remaining suffix.
-   * - Swap only if it improves the number and we have swaps left.
-   * - Track the max number globally.
-   *
-   * Time Complexity: O((n^2)^k) in worst case where n is number of digits.
-   * Space Complexity: O(n) for recursion depth.
-   *
-   * @param numberStr the input number represented as a string
-   * @param maxSwaps  maximum number of swaps allowed
-   * @return the largest possible number as a string after at most k swaps
-   */
-  public String findLargestNumberAfterKSwaps(String numberStr, int maxSwaps) {
-    if (numberStr == null || numberStr.length() == 0 || maxSwaps <= 0) {
-      return numberStr;
+    /**
+     * Intuition: to make the number as large as possible, the leftmost digits
+     * matter the most. At position i, the best improvement is to bring the largest
+     * digit from the suffix into that position. If that largest digit appears more
+     * than once, different occurrences can leave different suffixes, so we try all
+     * of those best swaps. This is still backtracking, but it prunes away swaps
+     * that could never improve the current most-important position.
+     *
+     * Algorithm:
+     *   1. Return the original string for null, empty, or zero-swap input.
+     *   2. Track the best number seen while recursively fixing one index at a time.
+     *   3. Find the maximum digit from the current index to the end; spend a swap
+     *      only if that digit is bigger than the current digit.
+     *   4. Swap the current index with each occurrence of that maximum digit, update
+     *      the best answer, recurse to the next index, and then swap back.
+     *
+     * Time:  O(n^k) - for each of k improving positions, tied max digits can create up to n branches.
+     * Space: O(n) recursion depth and digit array.
+     *
+     * @param numberStr input number represented as digits
+     * @param maxSwaps maximum swaps allowed
+     * @return largest number reachable with at most maxSwaps swaps
+     */
+    public String findLargestNumberAfterKSwaps(String numberStr, int maxSwaps) {
+        if (numberStr == null || numberStr.length() == 0 || maxSwaps <= 0) return numberStr;
+
+        char[] digits = numberStr.toCharArray();
+        bestNumber = numberStr;
+        backtrack(digits, maxSwaps, 0);
+        return bestNumber;
     }
 
-    char[] digits = numberStr.toCharArray();
-    MAX_NUMBER = numberStr;
+    /** Fixes one digit position at a time by trying every best suffix swap. */
+    private void backtrack(char[] digits, int remainingSwaps, int currentIndex) {
+        if (remainingSwaps == 0 || currentIndex == digits.length) return;
 
-    backtrack(digits, maxSwaps, 0);
-    return MAX_NUMBER;
-  }
+        char maxDigitInSuffix = findMaxDigitFromIndex(digits, currentIndex);
+        int swapsAfterChoosing = maxDigitInSuffix == digits[currentIndex] ? remainingSwaps : remainingSwaps - 1;
 
-  private String MAX_NUMBER;
+        for (int i = digits.length - 1; i >= currentIndex; i--) {
+            if (digits[i] != maxDigitInSuffix) continue;
 
-  /**
-   * Recursive backtracking function to try all valid swaps.
-   *
-   * @param digits      current digit array
-   * @param remainingSwaps remaining swap operations
-   * @param currentIndex current position to fix
-   */
-  private void backtrack(char[] digits, int remainingSwaps, int currentIndex) {
-    if (remainingSwaps == 0 || currentIndex == digits.length) {
-      return;
-    }
-
-    // Find the maximum digit from current index to the end
-    char maxDigitOnRightOfCurrentIndex = findMaxDigitFromIndex(digits, currentIndex);
-
-    // If max digit to right is not the same as current digit, we can swap
-    if (maxDigitOnRightOfCurrentIndex != digits[currentIndex]) {
-      // this is done before the for loop because we want to swap only if the current digit is not the max
-      remainingSwaps--;
-    }
-
-    // Try swapping with all occurrences of the max digit found
-    for (int i = digits.length - 1; i >= currentIndex; i--) {
-      if (digits[i] == maxDigitOnRightOfCurrentIndex) {
-        swap(digits, currentIndex, i);
-
-        String tentativeMax = new String(digits);
-        if (tentativeMax.compareTo(MAX_NUMBER) > 0) {
-          MAX_NUMBER = tentativeMax;
+            swap(digits, currentIndex, i);
+            String candidateNumber = new String(digits);
+            if (candidateNumber.compareTo(bestNumber) > 0) bestNumber = candidateNumber;
+            backtrack(digits, swapsAfterChoosing, currentIndex + 1);
+            swap(digits, currentIndex, i);
         }
-
-        backtrack(digits, remainingSwaps, currentIndex + 1);
-
-        // Backtrack
-        swap(digits, currentIndex, i);
-      }
     }
-  }
 
-  /**
-   * Finds the maximum digit from the given index to the end of the array.
-   */
-  private char findMaxDigitFromIndex(char[] digits, int index) {
-    char maxDigit = digits[index];
-    for (int i = index + 1; i < digits.length; i++) {
-      if (digits[i] > maxDigit) {
-        maxDigit = digits[i];
-      }
+    /** Finds the largest digit in digits[index..end]. */
+    private char findMaxDigitFromIndex(char[] digits, int index) {
+        char maxDigit = digits[index];
+        for (int i = index + 1; i < digits.length; i++) {
+            if (digits[i] > maxDigit) maxDigit = digits[i];
+        }
+        return maxDigit;
     }
-    return maxDigit;
-  }
 
-  /**
-   * Utility method to swap characters in the digit array.
-   */
-  private void swap(char[] digits, int i, int j) {
-    char temp = digits[i];
-    digits[i] = digits[j];
-    digits[j] = temp;
-  }
+    /** Swaps two digit positions in place. */
+    private void swap(char[] digits, int i, int j) {
+        char swapTemp = digits[i];
+        digits[i] = digits[j];
+        digits[j] = swapTemp;
+    }
 
-  // Example usage
-  public static void main(String[] args) {
-    LargestNumberWithKSwaps solver = new LargestNumberWithKSwaps();
-    System.out.println(solver.findLargestNumberAfterKSwaps("934651", 2)); // Output: 965431
-  }
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        LargestNumberWithKSwaps solver = new LargestNumberWithKSwaps();
+
+        String[] numbers = {"934651", "1234", "129814999"};
+        int[] swaps = {2, 0, 4};
+        String[] expected = {"965341", "1234", "999984211"};
+
+        for (int i = 0; i < numbers.length; i++) {
+            String got = solver.findLargestNumberAfterKSwaps(numbers[i], swaps[i]);
+            System.out.printf("number=%s k=%d  ->  %s  expected=%s%n",
+                numbers[i], swaps[i], got, expected[i]);
+        }
+    }
 }

@@ -3,118 +3,119 @@ package backtrack;
 import java.util.Arrays;
 
 /**
- * 473. Matchsticks to Square
+ * Problem: Matchsticks to Square
  *
- * Problem:
- * Given an integer array matchsticks where matchsticks[i] is the length of the i-th matchstick,
- * return true if you can make one square using all the matchsticks, otherwise return false.
+ * Given matchstick lengths, decide whether every stick can be used exactly once
+ * to form a square. Sticks cannot be broken, so the task is assigning each
+ * length to one of four sides with equal final sums.
  *
- * Notes:
- * - You cannot break any stick.
- * - You must use every matchstick exactly once.
- *
- * LeetCode: https://leetcode.com/problems/matchsticks-to-square/
+ * Leetcode: https://leetcode.com/problems/matchsticks-to-square/
+ * Rating:   acceptance 42.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Backtracking | Four-bucket partition | Symmetry pruning
  *
  * Example:
- * Input: [1,1,2,2,2]
- * Output: true
- * Explanation: One possible square has sides [2,2,2,2].
+ *   Input:  [1,1,2,2,2]
+ *   Output: true
+ *   Why:    the total length is 8, so each side must be 2; the sticks can make
+ *           [2], [2], [1,1], and [2] using every stick once.
  *
- * Follow-up questions:
- * 1. How do we reduce the search space in backtracking?
- *    - Sort sticks in descending order, place larger sticks first, and prune symmetric states.
- * 2. Can this be solved with bitmask DP?
- *    - Yes, subset DP can solve it, but backtracking with pruning is usually simpler and faster in practice.
- * 3. What if we need to construct rectangles instead of only squares?
- *    - Similar partitioning idea, but side constraints change (2 pairs of equal sides for rectangles).
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the actual four sides?
+ *      Carry four lists beside the side sums and copy them at the successful leaf.
+ *   2. Generalize to a rectangle?
+ *      Use two target side lengths, with two buckets for each target.
+ *   3. Avoid repeated DFS states?
+ *      Memoize by (usedMask, currentSideSum, completedSides) or use subset DP.
+ *   4. Count all distinct squares?
+ *      Canonicalize side order and skip equal side-sum branches to avoid permutation duplicates.
+ *
+ * Related: Partition to K Equal Sum Subsets (698), Fair Distribution of Cookies (2305).
  */
 public class MatchsticksToSquare {
+    private static final int SIDE_COUNT = 4;
 
-  public static void main(String[] args) {
-    MatchsticksToSquare solution = new MatchsticksToSquare();
-    System.out.println(solution.makesquare(new int[] {1, 1, 2, 2, 2})); // true
-    System.out.println(solution.makesquare(new int[] {3, 3, 3, 3, 4})); // false
-  }
+    /**
+     * Intuition: making a square is the same as splitting all sticks into four
+     * groups with the same sum. The target side length is forced by the total sum,
+     * so every decision is just, "which side should this stick join?" Trying long
+     * sticks first makes impossible choices fail sooner. Also, the four sides have
+     * no names; putting a stick onto two sides with the same current length creates
+     * the same state, so those symmetric choices can be skipped.
+     *
+     * Algorithm:
+     *   1. Reject inputs with fewer than four sticks or a total length not divisible by four.
+     *   2. Sort the sticks and fail early if the largest stick is longer than the target side.
+     *   3. Starting from the largest stick, try placing it on any side that would not exceed the target.
+     *   4. Skip a side when an earlier side already has the same current length,
+     *      because that branch would be a duplicate with sides renamed.
+     *   5. Add the stick to a side, recurse to the next stick, and remove it if that placement fails.
+     *
+     * Time:  O(4^n) - each stick may be tried on four sides before pruning removes bad branches.
+     * Space: O(n) recursion depth plus four side sums.
+     *
+     * @param matchsticks lengths of all sticks
+     * @return true if the sticks can form one square
+     */
+    public boolean makesquare(int[] matchsticks) {
+        if (matchsticks == null || matchsticks.length < SIDE_COUNT) return false;
 
-  /**
-   * Backtracking + pruning solution.
-   *
-   * Algorithm:
-   * 1. Compute total sum; if not divisible by 4, impossible.
-   * 2. Sort matchsticks in descending order so larger sticks are placed first.
-   * 3. Recursively assign each stick to one of 4 sides if side length does not exceed target.
-   * 4. Try placing the current stick on each side and backtrack.
-   *
-   * Time Complexity: O(4^n) in worst case, but pruning greatly reduces practical runtime.
-   * Space Complexity: O(n) recursion depth + O(1) extra side array.
-   *
-   * @param matchsticks lengths of available matchsticks
-   * @return true if all sticks can form a square, false otherwise
-   */
-  public boolean makesquare(int[] matchsticks) {
-    if (matchsticks == null || matchsticks.length < 4) {
-      return false;
+        int totalLength = 0;
+        for (int stick : matchsticks) totalLength += stick;
+        if (totalLength % SIDE_COUNT != 0) return false;
+
+        int targetSideLength = totalLength / SIDE_COUNT;
+        Arrays.sort(matchsticks);
+        if (matchsticks[matchsticks.length - 1] > targetSideLength) return false;
+
+        return canBuildSquare(matchsticks, matchsticks.length - 1, new int[SIDE_COUNT], targetSideLength);
     }
 
-    int length = matchsticks.length;
-    int sum = 0;
-    for (int stick : matchsticks) {
-      sum += stick;
-    }
-
-    if (sum % 4 != 0) {
-      return false;
-    }
-
-    int target = sum / 4;
-
-    Arrays.sort(matchsticks);
-    if (matchsticks[length - 1] > target) {
-      return false;
-    }
-
-    int[] sideLengths = new int[4];
-    return canBuildSquare(matchsticks, length - 1, sideLengths, target);
-  }
-
-  private boolean canBuildSquare(int[] matchsticks, int index, int[] sideLengths, int target) {
-    if (index == -1) {
-      for (int side = 0; side < 4; side++) {
-        if (sideLengths[side] != target) {
-          return false;
+    /** Assigns matchsticks to side sums from largest to smallest. */
+    private boolean canBuildSquare(int[] matchsticks, int index, int[] sideLengths, int targetSideLength) {
+        if (index == -1) {
+            for (int sideLength : sideLengths) {
+                if (sideLength != targetSideLength) return false;
+            }
+            return true;
         }
-      }
-      return true;
-    }
 
-    int currentStick = matchsticks[index];
-    
-    for (int side = 0; side < 4; side++) {
-      if (sideLengths[side] + currentStick > target) {
-        continue;
-      }
+        int currentStick = matchsticks[index];
+        for (int side = 0; side < SIDE_COUNT; side++) {
+            if (sideLengths[side] + currentStick > targetSideLength) continue;
+            if (hasEquivalentEarlierSide(sideLengths, side)) continue;
 
-      boolean duplicateState = false;
-      for (int prev = 0; prev < side; prev++) {
-        if (sideLengths[prev] == sideLengths[side]) {
-          duplicateState = true;
-          break;
+            sideLengths[side] += currentStick;
+            if (canBuildSquare(matchsticks, index - 1, sideLengths, targetSideLength)) return true;
+            sideLengths[side] -= currentStick;
         }
-      }
-      // Same side length means same path of recursive tree, so skip duplicate branch.
-      if (duplicateState) {
-        continue;
-      }
-
-      sideLengths[side] += currentStick;
-      if (canBuildSquare(matchsticks, index - 1, sideLengths, target)) {
-        return true;
-      }
-      sideLengths[side] -= currentStick;
+        return false;
     }
 
-    return false;
-  }
+    /** Detects whether this side choice duplicates an earlier side with the same current length. */
+    private boolean hasEquivalentEarlierSide(int[] sideLengths, int side) {
+        for (int previousSide = 0; previousSide < side; previousSide++) {
+            if (sideLengths[previousSide] == sideLengths[side]) return true;
+        }
+        return false;
+    }
 
+    // ---------------------------------------------------------------------
+    // Demo
+    // ---------------------------------------------------------------------
+    public static void main(String[] args) {
+        MatchsticksToSquare solver = new MatchsticksToSquare();
+
+        int[][] inputs = {
+            {1, 1, 2, 2, 2},
+            {3, 3, 3, 3, 4},
+            {}
+        };
+        boolean[] expected = {true, false, false};
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.makesquare(inputs[i].clone());
+            System.out.printf("matchsticks=%s  ->  %s  expected=%s%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
+    }
 }
