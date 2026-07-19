@@ -1,40 +1,50 @@
 package dynamicprogramming.gridpath;
 
+import java.util.Arrays;
+
 /**
  * Problem: Dungeon Game
- * LeetCode: https://leetcode.com/problems/dungeon-game/
  *
- * Problem Statement:
- * Given a 2D dungeon grid with each cell representing health points (positive for gain, negative for damage),
- * determine the minimum initial health required for a knight to rescue the princess starting from the top-left
- * corner and reaching the bottom-right. The knight can only move right or down, and health must never drop below 1.
+ * A knight starts in the top-left cell and must reach the bottom-right princess
+ * cell, moving only right or down. Each dungeon cell changes health, and health
+ * must never drop below 1, so return the minimum initial health required.
+ *
+ * Leetcode: https://leetcode.com/problems/dungeon-game/ (Hard)
+ * Rating:   acceptance 41.7% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Grid DP | Reverse minimum-health requirement
  *
  * Example:
- * Input:
- * [
- *   [-2, -3,  3],
- *   [-5,-10,  1],
- *   [10, 30, -5]
- * ]
- * Output: 7
- * Explanation: The knight needs at least 7 health to reach the princess using path
- * (0,0) [-2] -> (0,1) [-3] -> (0,2) [3] -> (1,2) [1] -> (2,2) [-5].
+ *   Input:  dungeon = [[-2,-3,3],[-5,-10,1],[10,30,-5]]
+ *   Output: 7
+ *   Why:    starting with 7 keeps health at least 1 along the best path to the princess.
  *
- * Follow-up Interview Questions:
- * - Can you optimize the space complexity to O(n) using a rolling array? (Yes)
- *   https://leetcode.com/problems/dungeon-game/discuss/52827/O(n)-space-solution
- * - What if knight can move in all four directions? (Cycle detection + memoized DFS)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can space be reduced to O(n)?
+ *      Fill one rolling row from right to left.
+ *   2. What if movement in four directions is allowed?
+ *      Cycles make this a graph shortest-path style problem with state constraints.
+ *   3. What if you need the actual route?
+ *      Store the chosen next cell while filling the DP table and reconstruct from start.
+ *
+ * Related: Minimum Path Sum (64), Cherry Pickup (741).
  */
 public class DungeonGame {
 
   public static void main(String[] args) {
-    int[][] dungeon = {{-2, -3, 3}, {-5, -10, 1}, {10, 30, -5}};
-
     DungeonGame solver = new DungeonGame();
-    System.out.println("Minimum HP (Recursive): " + solver.calculateMinimumHealthRecursiveApproach(dungeon));
-    System.out.println("Minimum HP (Iterative DP): " + solver.calculateMinimumHealthIterativeApproach(dungeon));
+    int[][][] cases = {
+        {{-2, -3, 3}, {-5, -10, 1}, {10, 30, -5}},
+        {{0}}
+    };
+    int[] expected = { 7, 1 };
+
+    for (int i = 0; i < cases.length; i++) {
+      int got = solver.calculateMinimumHealthIterativeApproach(cases[i]);
+      System.out.printf("dungeon=%s -> %d  expected=%d%n",
+          Arrays.deepToString(cases[i]), got, expected[i]);
+    }
   }
+
 
   /**
    * Top-down recursive DFS with memoization to avoid recomputation.
@@ -100,16 +110,23 @@ public class DungeonGame {
     return memo[row][col];
   }
 
-  /**
-   * Bottom-up DP approach that fills a table from destination to start.
+    /**
+   * Intuition: minHealth[row][col] means the minimum health needed before
+   * entering that cell and still being able to reach the princess alive. At the
+   * princess cell, we need enough health to survive that cell and leave at least
+   * 1. For any other cell, the next move can be right or down, so we compute the
+   * entry health required by each valid next cell and keep the smaller one.
    *
-   * Steps:
-   * - Start from bottom-right and move to top-left.
-   * - At each cell, calculate minimum HP needed based on right and down cell.
-   * - Ensure knight always has at least 1 HP after visiting a cell.
+   * Algorithm:
+   *   1. Allocate a rows by cols table for minimum entry health.
+   *   2. Fill cells from bottom-right toward top-left so right and down states are already known.
+   *   3. For each cell, subtract the dungeon value from the chosen next requirement and clamp to at least 1.
    *
-   * Time Complexity: O(m * n)
-   * Space Complexity: O(m * n)
+   * Time:  O(m * n) - every dungeon cell is processed once.
+   * Space: O(m * n) - the DP table stores one health requirement per cell.
+   *
+   * @param dungeon grid of health gains and losses
+   * @return minimum initial health needed at the start
    */
   public int calculateMinimumHealthIterativeApproach(int[][] dungeon) {
       if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) {

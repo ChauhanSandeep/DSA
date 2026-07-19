@@ -5,38 +5,64 @@ import java.util.*;
 
 /**
  * Problem: Word Break II
- * LeetCode: https://leetcode.com/problems/word-break-ii/
  *
- * Problem Statement:
- * Given a string `s` and a dictionary of words `wordDict`, return all possible sentences
- * where each word is a valid word in the dictionary.
+ * Given a string and a dictionary, return every sentence formed by inserting
+ * spaces so each token is a dictionary word. Dictionary words may be reused, and
+ * every returned sentence must cover the full string.
+ *
+ * Leetcode: https://leetcode.com/problems/word-break-ii/ (Hard)
+ * Rating:   acceptance 55.8% (Hard) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Memoized DFS | Sentence generation
  *
  * Example:
- * Input: s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]
- * Output: ["cats and dog","cat sand dog"]
+ *   Input:  str = "catsanddog", wordDict = ["cat", "cats", "and", "sand", "dog"]
+ *   Output: ["cat sand dog", "cats and dog"]
+ *   Why:    those are the two full-string splits where every token is in the dictionary.
  *
- * Approach: Top-Down DP using Recursion + Memoization
- * - For every starting index, try all end indices
- * - If substring from start to end is a valid word, recursively generate sentences from end index onward
- * - Memoize results for each index to avoid recomputation
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Count sentences without constructing them?
+ *      Memoize counts per start index instead of lists of strings.
+ *   2. Return only the shortest sentence?
+ *      Store minimum word counts and reconstruct only optimal splits.
+ *   3. How do you reduce substring overhead?
+ *      Use a trie and scan characters from each start index.
+ *
+ * Related: Word Break (139), Concatenated Words (472).
  */
 public class WordBreak2 {
 
-  /**
-   * Steps:
-   * 1. Convert the wordDict list to a HashSet for O(1) lookups.
-   * 2. Use a recursive helper function that generates sentences starting from a given index.
-   * 3. For each possible end index, check if the substring from start to end is in the word set.
-   * 4. If it is, recursively generate sentences for the remaining substring.
-   * 5. Use a memoization map to store results for already computed start indices to avoid redundant calculations.
+  public static void main(String[] args) {
+    WordBreak2 solver = new WordBreak2();
+    String[] strings = { "catsanddog", "catsandog" };
+    List<List<String>> dictionaries = Arrays.asList(
+        Arrays.asList("cat", "cats", "and", "sand", "dog"),
+        Arrays.asList("cats", "dog", "sand", "and", "cat"));
+    String[] expected = { "[cat sand dog, cats and dog]", "[]" };
+
+    for (int i = 0; i < strings.length; i++) {
+      List<String> got = solver.wordBreakRecursiveApproach(strings[i], dictionaries.get(i));
+      System.out.printf("str=%s wordDict=%s -> %s  expected=%s%n",
+          strings[i], dictionaries.get(i), got, expected[i]);
+    }
+  }
+
+    /**
+   * Intuition: memo[start] stores every valid sentence that can be built from
+   * the suffix str[start..]. For a fixed start, each dictionary prefix is a
+   * possible first word. Every sentence returned by the recursive suffix call
+   * can then be joined after that prefix, giving all sentences for this start.
    *
-   * Time Complexity: O(N^2), where N = length of string str
-   * Space Complexity: O(N), for recursion stack and memo array
+   * Algorithm:
+   *   1. Convert wordDict to a set and start DFS from index 0.
+   *   2. For each start index, try every end index as the next word boundary.
+   *   3. Combine each valid prefix with every memoized suffix sentence and cache the list.
    *
-   * @param str
-   * @param wordDict
-   * @return
+   * Time:  O(n^2 + output) - cut pairs are explored and every produced sentence must be written.
+   * Space: O(n + output) - memo stores sentence lists by start index.
+   *
+   * @param str string to segment into sentences
+   * @param wordDict dictionary of reusable words
+   * @return all valid sentences that cover str
    */
   public List<String> wordBreakRecursiveApproach(String str, List<String> wordDict) {
     Set<String> wordSet = new HashSet<>(wordDict);

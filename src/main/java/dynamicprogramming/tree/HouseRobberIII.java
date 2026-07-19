@@ -3,31 +3,51 @@ package dynamicprogramming.tree;
 import java.util.*;
 
 /**
- * 337. House Robber III
+ * Problem: House Robber III
  *
- * Problem: Houses form a binary tree. Two directly-linked houses cannot be robbed
- * on the same night. Determine the maximum amount of money you can rob without
- * alerting the police.
+ * Houses are arranged as nodes in a binary tree. Adjacent parent-child houses
+ * cannot both be robbed, so return the maximum total money obtainable without
+ * triggering the alarm.
+ *
+ * Leetcode: https://leetcode.com/problems/house-robber-iii/ (Medium)
+ * Rating:   acceptance 56.1% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Tree DP | Rob-or-skip state pair
  *
  * Example:
- * Input: root = [3,2,3,null,3,null,1]
- * Output: 7
- * Explanation: Maximum = 3 + 3 + 1 = 7
+ *   Input:  root = [3,2,3,null,3,null,1]
+ *   Output: 7
+ *   Why:    robbing the root plus the two grandchildren gives 3 + 3 + 1 = 7.
  *
- * LeetCode: https://leetcode.com/problems/house-robber-iii
+ * Follow-ups:
+ *   1. What if the tree is extremely deep?
+ *      Use an explicit post-order stack to avoid recursion depth limits.
+ *   2. What if node values can be negative?
+ *      The rob-or-skip max naturally skips harmful nodes by choosing the not-rob state.
+ *   3. What if houses form a general graph?
+ *      This becomes maximum-weight independent set, which is NP-hard in general graphs.
  *
- * Follow-up questions:
- * Q: What if the tree is very deep?
- * A: Use iterative approach or memoization to avoid stack overflow.
- *
- * Q: How to handle if some houses have negative values?
- * A: Algorithm still works; just skip negative value houses.
- *
- * Q: Can we solve for a general graph instead of tree?
- * A: NP-hard problem; need approximation algorithms or exact exponential solutions.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: House Robber (198), House Robber II (213), Binary Tree Maximum Path Sum (124).
  */
 public class HouseRobberIII {
+
+    public static void main(String[] args) {
+        HouseRobberIII solver = new HouseRobberIII();
+
+        TreeNode root1 = new TreeNode(3);
+        root1.left = new TreeNode(2);
+        root1.right = new TreeNode(3);
+        root1.left.right = new TreeNode(3);
+        root1.right.right = new TreeNode(1);
+        System.out.printf("root=%s -> %d  expected=%d%n", "[3,2,3,null,3,null,1]", solver.rob(root1), 7);
+
+        TreeNode root2 = new TreeNode(3);
+        root2.left = new TreeNode(4);
+        root2.right = new TreeNode(5);
+        root2.left.left = new TreeNode(1);
+        root2.left.right = new TreeNode(3);
+        root2.right.right = new TreeNode(1);
+        System.out.printf("root=%s -> %d  expected=%d%n", "[3,4,5,1,3,null,1]", solver.rob(root2), 9);
+    }
 
     // Definition for binary tree node
     public static class TreeNode {
@@ -37,17 +57,22 @@ public class HouseRobberIII {
         TreeNode(int x) { val = x; }
     }
 
-    /**
-     * Optimal solution using post-order traversal with pair return.
-     * Returns [rob_current, not_rob_current] for each node.
+        /**
+     * Intuition: for each node there are two useful values: the best total if
+     * that node is robbed, and the best total if it is skipped. Robbing the node
+     * forces both children into their skipped states. Skipping the node lets each
+     * child independently choose its better robbed-or-skipped state.
      *
-     * Algorithm: Bottom-up DP
-     * - For each node, calculate max money if we rob it vs if we don't
-     * - If rob current: add current value + max(don't rob children)
-     * - If don't rob current: max(rob or don't rob each child)
+     * Algorithm:
+     *   1. Run a post-order traversal so child state pairs are known before the parent.
+     *   2. For each node, compute robCurrent from skipped children and notRobCurrent from each child's best state.
+     *   3. Return the larger of the root's two states.
      *
-     * Time Complexity: O(n) where n is number of nodes
-     * Space Complexity: O(h) where h is height of tree (recursion stack)
+     * Time:  O(n) - each tree node is processed once.
+     * Space: O(h) - recursion depth is the tree height.
+     *
+     * @param root root of the binary-tree neighborhood
+     * @return maximum money that can be robbed without taking adjacent nodes
      */
     public int rob(TreeNode root) {
         int[] result = robHelper(root);

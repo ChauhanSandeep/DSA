@@ -1,55 +1,60 @@
 package dynamicprogramming.basics;
 
 /**
- * Problem: Fibonacci Number (LeetCode #509)
+ * Problem: Fibonacci Number
  *
- * Problem Statement:
- * The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence,
- * such that each number is the sum of the two preceding ones, starting from 0 and 1.
+ * Return F(n), where F(0) = 0, F(1) = 1, and every later number is the sum of
+ * the previous two. The sequence models any process where the next state depends
+ * only on the two immediately preceding states.
  *
- * Example 1:
- * Input: n = 2
- * Output: 1
- * Explanation: F(2) = F(1) + F(0) = 1 + 0 = 1
+ * Leetcode: https://leetcode.com/problems/fibonacci-number/ (Easy)
+ * Rating:   acceptance 74.4% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Rolling variables | Linear recurrence
  *
- * Example 2:
- * Input: n = 4
- * Output: 3
- * Explanation: F(4) = F(3) + F(2) = 2 + 1 = 3
+ * Example:
+ *   Input:  position = 4
+ *   Output: 3
+ *   Why:    F(4) = F(3) + F(2) = 2 + 1 = 3.
  *
- * Approach:
- * We can solve this problem using multiple approaches:
- * 1. Iterative approach (O(n) time, O(1) space)
- * 2. Matrix exponentiation (O(log n) time, O(1) space)
- * 3. Recursive with memoization (O(n) time, O(n) space)
+ * Follow-ups:
+ *   1. Can this be solved in O(log n) time?
+ *      Use matrix exponentiation on [[1,1],[1,0]].
+ *   2. How do you avoid overflow for huge n?
+ *      Compute modulo a chosen value or use BigInteger.
+ *   3. What if many Fibonacci queries arrive?
+ *      Precompute up to the maximum requested n or memoize results lazily.
  *
- * The iterative approach is the most efficient in terms of both time and space for this problem.
- *
- * Time Complexity: O(n) for iterative approach, O(log n) for matrix exponentiation
- * Space Complexity: O(1) for both approaches
- *
- * Follow-up Questions:
- * 1. Can you solve it using matrix exponentiation for O(log n) time?
- *    Answer: Yes, by raising the matrix [[1,1],[1,0]] to the power of n, we can get F(n) in O(log n) time.
- *
- * 2. What if we want to find the last k digits of the nth Fibonacci number?
- *    Answer: We can use the iterative approach with modulo 10^k at each step to prevent integer overflow
- *    and get the last k digits efficiently.
- *
- * 3. Can you find the nth Fibonacci number modulo m efficiently?
- *    Answer: Yes, we can use the Pisano period property to find F(n) mod m in O(m^2) time, which is
- *    efficient when m is not too large.
- *
- * LeetCode: https://leetcode.com/problems/fibonacci-number/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Climbing Stairs (70), Tribonacci Number (1137).
  */
 public class FibonacciNumber {
 
-    /**
-     * Iterative solution to find the nth Fibonacci number
+    public static void main(String[] args) {
+        FibonacciNumber solver = new FibonacciNumber();
+        int[] inputs = { 0, 4, 7 };
+        int[] expected = { 0, 3, 13 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.fib(inputs[i]);
+            System.out.printf("position=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: the value at each position depends only on the previous two
+     * Fibonacci values. previousNumber holds F(i - 2) and currentNumber holds
+     * F(i - 1) before each loop step. Adding them gives F(i), then the two
+     * variables slide forward one position.
      *
-     * @param position The position in the Fibonacci sequence (0-based)
-     * @return The Fibonacci number at the given position
+     * Algorithm:
+     *   1. Return the position itself for the base cases 0 and 1.
+     *   2. Keep the two previous Fibonacci numbers in rolling variables.
+     *   3. Iterate from 2 through position, computing and shifting the next value.
+     *
+     * Time:  O(n) - one loop iteration per Fibonacci position after the base cases.
+     * Space: O(1) - only two rolling values and one temporary are stored.
+     *
+     * @param position zero-based Fibonacci index
+     * @return Fibonacci number at that position
      */
     public int fib(int position) {
         // Base cases

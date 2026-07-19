@@ -1,59 +1,59 @@
 package dynamicprogramming.linearpartition;
 
 /**
- * Problem: Climbing Stairs (LeetCode #70)
+ * Problem: Climbing Stairs
  *
- * Problem Statement:
- * You are climbing a staircase that has 'totalSteps' steps. Each time you can either climb 1 or 2 steps.
- * In how many distinct ways can you climb to the top?
+ * A staircase has totalSteps steps. Each move climbs either 1 or 2 steps, and
+ * the task is to count how many distinct move sequences reach exactly the top.
  *
- * Example 1:
- * Input: totalSteps = 2
- * Output: 2
- * Explanation: There are two ways to climb to the top:
- * 1. 1 step + 1 step
- * 2. 2 steps
+ * Leetcode: https://leetcode.com/problems/climbing-stairs/ (Easy)
+ * Rating:   acceptance 54.2% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Fibonacci recurrence | Rolling variables
  *
- * Example 2:
- * Input: totalSteps = 3
- * Output: 3
- * Explanation: There are three ways to climb to the top:
- * 1. 1 step + 1 step + 1 step
- * 2. 1 step + 2 steps
- * 3. 2 steps + 1 step
+ * Example:
+ *   Input:  totalSteps = 3
+ *   Output: 3
+ *   Why:    the valid sequences are 1+1+1, 1+2, and 2+1.
  *
- * Approach:
- * This is a classic dynamic programming problem that can be solved using the Fibonacci sequence pattern.
- * The key observation is that the number of ways to reach step n is equal to the sum of ways to reach
- * step (n-1) and step (n-2), since you can take either 1 or 2 steps at a time.
+ * Follow-ups:
+ *   1. What if steps of size 1, 2, or 3 are allowed?
+ *      Use dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3].
+ *   2. What if some steps are broken?
+ *      Set the ways for broken steps to 0 before using the recurrence.
+ *   3. What if each step size has a cost?
+ *      Switch from counting ways to minimizing cost, similar to Min Cost Climbing Stairs.
  *
- * Time Complexity: O(n) - We iterate through n steps once
- * Space Complexity: O(1) - We only use constant extra space
- *
- * Follow-up Questions:
- * 1. What if you can climb 1, 2, or 3 steps at a time?
- *    Answer: The recurrence relation would change to dp[n] = dp[n-1] + dp[n-2] + dp[n-3].
- *    The base cases would be dp[0]=1, dp[1]=1, dp[2]=2.
- *
- * 2. What if some steps are broken and cannot be stepped on?
- *    Answer: We can modify the DP approach to skip the broken steps by setting dp[brokenStep] = 0.
- *    The recurrence would then be dp[i] = 0 if step i is broken, else dp[i-1] + dp[i-2].
- *
- * 3. Can you solve it using O(1) space?
- *    Answer: Yes, we can optimize space by only keeping track of the last two values (prevStep and prevPrevStep)
- *    instead of maintaining a full DP array, as shown in the solution below.
- *
- * LeetCode: https://leetcode.com/problems/climbing-stairs/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Min Cost Climbing Stairs (746), Fibonacci Number (509).
  */
 public class ClimbingStairs {
 
-    /**
-     * Calculates the number of distinct ways to climb 'totalSteps' steps
-     * using 1 or 2 steps at a time.
+    public static void main(String[] args) {
+        ClimbingStairs solver = new ClimbingStairs();
+        int[] inputs = { 1, 3, 5 };
+        int[] expected = { 1, 3, 8 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solver.climbStairs(inputs[i]);
+            System.out.printf("totalSteps=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: to land on step n, the final move must come from step n - 1
+     * with a one-step move or from step n - 2 with a two-step move. These two
+     * sets of sequences do not overlap, so the number of ways is their sum. The
+     * method keeps only the last two counts instead of the whole DP array.
      *
-     * @param totalSteps The total number of steps in the staircase
-     * @return The number of distinct ways to climb to the top
+     * Algorithm:
+     *   1. Return 1 for totalSteps 0 or 1.
+     *   2. Store the known counts for steps 1 and 2 in rolling variables.
+     *   3. For each later step, add the previous two counts and shift the window forward.
+     *
+     * Time:  O(n) - one iteration for each step from 3 through totalSteps.
+     * Space: O(1) - only two previous counts and the current count are stored.
+     *
+     * @param totalSteps number of staircase steps
+     * @return number of distinct ways to reach the top
      */
     public int climbStairs(int totalSteps) {
         // Base cases: 0 or 1 step has only 1 way to climb

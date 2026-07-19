@@ -1,40 +1,66 @@
 package dynamicprogramming.LongestCommonSubsequence;
 
+import java.util.Arrays;
+
 /**
- * Shortest Common Supersequence (SCS)
+ * Problem: Shortest Common Supersequence
  *
- * Problem Statement:
- * Given two strings, find the length of their shortest common supersequence.
- * A supersequence of two strings is the shortest string that contains both as subsequences.
+ * Given two strings, return the length of the shortest string that contains both
+ * input strings as subsequences. Shared matching characters can be used once;
+ * non-matching characters from either string must still be included.
+ *
+ * Leetcode: https://leetcode.com/problems/shortest-common-supersequence/ (Hard)
+ * Rating:   zerotrac 1977 (Q4, weekly-contest-141)
+ * Pattern:  Dynamic Programming | 2D table | Supersequence reconstruction
  *
  * Example:
- * Input: str1 = "abac", str2 = "cab"
- * Output: 5
- * Explanation: One possible result is "cabac".
+ *   Input:  str1 = "abac", str2 = "cab"
+ *   Output: 5
+ *   Why:    "cabac" contains both strings as subsequences, and no length-4
+ *           string can contain all required characters in order.
  *
- * LeetCode link: https://leetcode.com/problems/shortest-common-supersequence/
- * LeetCode Contest Rating: 1977
+ * Follow-ups:
+ *   1. Return the actual shortest supersequence?
+ *      Backtrack through the dp table, appending a matching character once.
+ *   2. Can the length be derived from LCS?
+ *      Yes, length is str1.length + str2.length - LCS(str1, str2).
+ *   3. How would you solve for three strings?
+ *      Use a 3D DP table, though memory grows quickly.
+ *
+ * Related: Longest Common Subsequence (1143), Delete Operation for Two Strings (583).
  */
 public class ShortestCommonSupersequence {
 
-    /**
-     * Recursive approach with memoization (Top-down DP).
+    public static void main(String[] args) {
+        String[][] cases = { {"abac", "cab"}, {"abc", "abc"} };
+        int[] expected = { 5, 3 };
+
+        for (int i = 0; i < cases.length; i++) {
+            int got = shortestCommonSupersequenceRecursive(cases[i][0], cases[i][1]);
+            System.out.printf("strings=%s -> %d  expected=%d%n",
+                Arrays.toString(cases[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: dp[i][j] means the minimum supersequence length needed for the
+     * suffixes str1[i..] and str2[j..]. If one suffix is empty, every remaining
+     * character of the other suffix must be appended. If the current characters
+     * match, one character covers both suffixes and both indices move. Otherwise,
+     * the supersequence must take either str1[i] or str2[j], then pay the cheaper
+     * remaining cost.
      *
-     * Intuition:
-     * - If the characters match, add 1 and move both indices forward.
-     * - If characters don't match, we have two choices:
-     *    1. Include str1[i] and move i forward.
-     *    2. Include str2[j] and move j forward.
-     * - Take the minimum of the two choices +1.
+     * Algorithm:
+     *   1. Allocate a length1 by length2 memo table and initialize every cell to -1.
+     *   2. Recursively solve from indices (0, 0), returning remaining length when one string ends.
+     *   3. On a match, add one diagonal step; otherwise add one plus the smaller skip choice.
      *
-     * Steps:
-     * 1. Start from (i = 0, j = 0).
-     * 2. If i == str1.length, we need to add all remaining characters of str2.
-     * 3. If j == str2.length, we need to add all remaining characters of str1.
-     * 4. Otherwise, follow the intuition above.
+     * Time:  O(m * n) - each pair of suffix indices is solved once.
+     * Space: O(m * n) - the memo table stores one result per suffix pair.
      *
-     * Time Complexity: O(m * n)
-     * Space Complexity: O(m * n) for dp array
+     * @param str1 first input string
+     * @param str2 second input string
+     * @return length of the shortest common supersequence
      */
     public static int shortestCommonSupersequenceRecursive(String str1, String str2) {
         int length1 = str1.length();
@@ -152,11 +178,5 @@ public class ShortestCommonSupersequence {
         System.out.println(builder.reverse().toString());
     }
 
-    public static void main(String[] args) {
-        String str1 = "abac";
-        String str2 = "cab";
 
-        System.out.println("Recursive Memoized Approach: SCS length = " + shortestCommonSupersequenceRecursive(str1, str2));
-        System.out.println("Iterative DP Approach: SCS length = " + shortestCommonSuperSequenceIterative(str1, str2));
-    }
 }

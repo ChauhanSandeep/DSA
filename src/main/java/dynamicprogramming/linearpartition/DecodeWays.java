@@ -4,38 +4,42 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Given a string of digits representing an encoded message, determine the number of ways it can be decoded
- * using the mapping: 'A' -> 1, 'B' -> 2, ..., 'Z' -> 26. Leading zeroes are invalid.
+ * Problem: Decode Ways
+ *
+ * A digit string encodes letters using 1 -> A through 26 -> Z. Return how many
+ * valid decodings exist, where leading zeroes and standalone zeroes are invalid.
+ *
+ * Leetcode: https://leetcode.com/problems/decode-ways/ (Medium)
+ * Rating:   acceptance 38.3% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Linear partition | One- or two-digit choices
  *
  * Example:
- * Input: "226"
- * Output: 3
- * Explanation: "2 2 6" -> B B F, "22 6" -> V F, "2 26" -> B Z
+ *   Input:  input = "226"
+ *   Output: 3
+ *   Why:    it can be split as 2-2-6, 22-6, or 2-26.
  *
- * LeetCode: https://leetcode.com/problems/decode-ways/
+ * Follow-ups:
+ *   1. What if '*' can represent digits 1 through 9?
+ *      Count all valid expansions per position and take results modulo 1e9+7.
+ *   2. Return all decoded strings?
+ *      Use backtracking and emit each valid one- or two-digit choice.
+ *   3. Can space be reduced to O(1)?
+ *      Keep only dp[i - 1] and dp[i - 2] while scanning.
  *
- * Follow-up Questions (FAANG-style):
- * 1. If `*` can be used as any digit 1-9, how would you adapt the computation?
- *    - For each `*`, consider all valid mappings and use DP to aggregate possibilities.
- *    - See: https://leetcode.com/problems/decode-ways-ii/
- * 2. What if the alphabet mapping is changed or generalized?
- *    - Adapt DP logic to respect new mapping rules and valid substring lengths.
- * 3. How to return all possible decoded strings, instead of just the count?
- *    - Use backtracking (DFS) to generate all valid parses.
- * 4. How can you optimize for very long strings (e.g., streaming input)?
- *    - Use rolling DP array/variables to reduce space.
- * 5. Can the problem be solved in O(1) space?
- *    - Yes, use two rolling variables by iterating from the right to left.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Decode Ways II (639), Restore IP Addresses (93).
  */
 public class DecodeWays {
 
     public static void main(String[] args) {
-        System.out.println("Recursive Memoization: " + numDecodeRecursive("226")); // 3
-        System.out.println("Iterative DP: " + numDecodingIterative("226"));            // 3
-        System.out.println("Iterative DP: " + numDecodingIterative("206"));            // 1
-        System.out.println("Iterative DP: " + numDecodingIterative("228"));            // 2
+        String[] inputs = { "226", "06", "206" };
+        int[] expected = { 3, 0, 1 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = numDecodingIterative(inputs[i]);
+            System.out.printf("input=%s -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
+
 
     /**
      * Recursive + Memoization Solution
@@ -76,16 +80,23 @@ public class DecodeWays {
         return ways;
     }
 
-    /**
-     * Decodes a string of numbers into letters (1='A', 2='B', ..., 26='Z').
-     * * STEPS TO SOLVE:
-     * 1. Define State: dp[i] is the number of ways to decode the prefix of length 'i'.
-     * 2. Base Case: An empty string (length 0) has 1 way to be decoded (doing nothing).
-     * 3. Linear Transition:
-     * - Check the last 1 digit: If it's valid (1-9), add dp[i-1] to dp[i].
-     * - Check the last 2 digits: If they form a valid number (10-26), add dp[i-2] to dp[i].
-     * 4. The "Last Piece" Logic: At each step 'i', we only look back at the most recent 
-     * possible valid segments (of length 1 and 2).
+        /**
+     * Intuition: dp[i] means the number of ways to decode the prefix input[0..i-1].
+     * The last decoded letter of that prefix must use either the final one digit
+     * or the final two digits. If the one-digit piece is valid, every decoding of
+     * the prefix before it contributes dp[i - 1]. If the two-digit piece is
+     * between 10 and 26, every decoding before those two digits contributes dp[i - 2].
+     *
+     * Algorithm:
+     *   1. Reject null, empty, or leading-zero input.
+     *   2. Initialize dp[0] for the empty prefix and dp[1] for the first valid digit.
+     *   3. For each prefix length, add ways from valid one-digit and two-digit final pieces.
+     *
+     * Time:  O(n) - each prefix length is processed once.
+     * Space: O(n) - the DP array stores one count per prefix length.
+     *
+     * @param input encoded digit string
+     * @return number of valid decodings
      */
     public static int numDecodingIterative(String input) {
         if (input == null || input.length() == 0 || input.charAt(0) == '0') {

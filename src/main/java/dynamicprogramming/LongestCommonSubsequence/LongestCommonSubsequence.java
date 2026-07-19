@@ -3,28 +3,64 @@ package dynamicprogramming.longestcommonsubsequence;
 import java.util.Arrays;
 
 
+/**
+ * Problem: Longest Common Subsequence
+ *
+ * Given two strings, return the length of the longest sequence that appears in
+ * both strings in the same relative order. Characters do not need to be
+ * contiguous, but their order must be preserved in both strings.
+ *
+ * Leetcode: https://leetcode.com/problems/longest-common-subsequence/ (Medium)
+ * Rating:   acceptance 59.4% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | 2D table | Prefix matching
+ *
+ * Example:
+ *   Input:  text1 = "abcde", text2 = "ace"
+ *   Output: 3
+ *   Why:    "ace" appears in both strings in order, and no longer common
+ *           subsequence exists.
+ *
+ * Follow-ups:
+ *   1. Return the actual subsequence, not just its length?
+ *      Backtrack through the filled dp table from dp[m][n].
+ *   2. Can space be reduced to O(min(m, n))?
+ *      Keep only the previous and current rows when only the length is needed.
+ *   3. How would you handle three strings?
+ *      Use a 3D DP table over the three prefix lengths.
+ *
+ * Related: Shortest Common Supersequence (1092), Delete Operation for Two Strings (583).
+ */
 public class LongestCommonSubsequence {
 
-  /**
-   * Problem: Longest Common Subsequence
-   * Statement: Given two strings, find the length of their longest common subsequence.
+  public static void main(String[] args) {
+    String[][] cases = { {"abcde", "ace"}, {"abc", "def"} };
+    int[] expected = { 3, 0 };
+
+    for (int i = 0; i < cases.length; i++) {
+      int got = findLcsRecursive(cases[i][0], cases[i][1]);
+      System.out.printf("texts=%s -> %d  expected=%d%n",
+          Arrays.toString(cases[i]), got, expected[i]);
+    }
+  }
+
+    /**
+   * Intuition: dp[i][j] caches the LCS length for the suffixes starting at
+   * text1[i] and text2[j]. If the two current characters match, that character
+   * must contribute one to the answer and both indices advance. Otherwise, the
+   * best subsequence must skip either text1[i] or text2[j], so the recurrence
+   * keeps the larger of those two choices.
    *
-   * Intuition:
-   * - A subsequence is a sequence derived from another sequence where some elements may be deleted.
-   * - The longest common subsequence (LCS) is the longest sequence that appears in both strings in the same order.
+   * Algorithm:
+   *   1. Allocate a memo table for every pair of indices and fill it with -1.
+   *   2. Recursively solve from indices (0, 0), stopping when either string ends.
+   *   3. On a match, take 1 plus the diagonal subproblem; otherwise take the max of the two skip choices.
    *
-   * Recursive Approach:
-   * - Use recursion to explore all possible subsequences.
-   * - If the character matches, make recursive calls for the next characters in both strings.
-   * - If they don't match, explore both possibilities: skipping a character from either string.
+   * Time:  O(m * n) - each pair of indices is computed at most once.
+   * Space: O(m * n) - the memo table stores one value per index pair.
    *
-   * Time Complexity: O(M * N) (where M and N are lengths of the two strings)
-   * Space Complexity: O(M * N) for memoization + O(M + N) for recursion stack
-   *
-   *
-   * @param text1
-   * @param text2
-   * @return
+   * @param text1 first input string
+   * @param text2 second input string
+   * @return length of the longest common subsequence
    */
   public static int findLcsRecursive(String text1, String text2) {
     // Initialize memoization table with -1 (meaning un calculated)

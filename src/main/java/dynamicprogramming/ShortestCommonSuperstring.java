@@ -10,53 +10,64 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Problem: Shortest Common Superstring
+ * Problem: Find the Shortest Superstring
  *
- * Given an array of strings, find the shortest string that contains all given strings as subsequences
- * while preserving their order.
+ * Given an array of strings, return a shortest string that contains every word
+ * as a substring. The order is not fixed, so the problem is to choose an order
+ * that maximizes saved overlap between consecutive words.
+ *
+ * Leetcode: https://leetcode.com/problems/find-the-shortest-superstring/ (Hard)
+ * Rating:   zerotrac 2186 (Q4, weekly-contest-111)
+ * Pattern:  Dynamic Programming | Bitmask DP | Traveling-salesman style overlap
  *
  * Example:
- * Input: ["abcd", "cdef", "fgh", "de"]
- * Output: 8 ("abcdefgh" is one of the possible shortest superstrings)
+ *   Input:  words = ["abc", "bcd", "cde"]
+ *   Output: "abcde"
+ *   Why:    "abc" overlaps "bcd" by two characters and "bcd" overlaps "cde"
+ *           by two characters, so only five total characters are needed.
  *
- * Leetcode Link: https://leetcode.com/problems/find-the-shortest-superstring/
+ * Follow-ups:
+ *   1. How do you remove words contained inside other words first?
+ *      Sort or compare all pairs and delete any word that is a substring of another.
+ *   2. How would you count all optimal superstrings?
+ *      Track all parents that tie for maximum overlap and backtrack every optimal path.
+ *   3. Can this scale to hundreds of words exactly?
+ *      Not with bitmask DP; use greedy overlap heuristics or approximation algorithms.
  *
- * Follow-up Questions (FAANG-style):
- * 1. Can you return the actual shortest superstring instead of its length?
- *    - Yes. Instead of returning the merged string's length, track and return the final string.
- * 2. Can this problem be solved using DP + Bitmask for optimal result?
- *    - Yes, use DP[i][mask] = shortest string ending with i and mask indicating included words.
- *    - Leetcode link for optimal DP + Bitmask approach: https://leetcode.com/problems/find-the-shortest-superstring/
- * LeetCode Contest Rating: 2186
+ * Related: Longest String Chain (1048), Shortest Common Supersequence (1092).
  */
 public class ShortestCommonSuperstring {
 
-    /**
-     * Finds the shortest superstring using Dynamic Programming with bitmask.
-     * This approach models the problem similar to the Traveling Salesman Problem (TSP).
+    public static void main(String[] args) {
+        ShortestCommonSuperstring solver = new ShortestCommonSuperstring();
+        String[][] cases = { {"abc", "bcd", "cde"}, {"alone"} };
+        String[] expected = { "abcde", "alone" };
+
+        for (int i = 0; i < cases.length; i++) {
+            String got = solver.shortestSuperstring(cases[i]);
+            System.out.printf("words=%s -> %s  expected=%s%n",
+                Arrays.toString(cases[i]), got, expected[i]);
+        }
+    }
+
+        /**
+     * Intuition: once the last word is known, the only history that matters is
+     * which words have already been used and how much overlap has been saved.
+     * maxOverlapDP[mask][lastWord] stores the best total saved characters for
+     * exactly that state. To append lastWord, the previous state is mask without
+     * lastWord, and every possible previousWord offers one candidate transition
+     * by adding overlap[previousWord][lastWord].
      *
      * Algorithm:
-     * 1. Precompute overlap matrix: For each pair of words (i, j), calculate how many
-     *    characters from the end of word[i] match the beginning of word[j].
-     *    Example: overlap("abc", "bcd") = 2 because "bc" matches
-     * 2. Use DP with bitmask: dp[mask][lastWord] represents the maximum total overlap achievable
-     *    when we've used the words indicated by the mask and the last word used is lastWord.
-     *    The mask is a bit representation where bit i is 1 if word i has been used.
-     * 3. Track parent pointers to reconstruct the optimal path showing which word came before.
-     * 4. Build the result by following the optimal path and merging words with their overlaps.
+     *   1. Precompute overlap[i][j], the characters saved by placing words[j] after words[i].
+     *   2. Fill maxOverlapDP by mask and lastWord, recording parentWord for reconstruction.
+     *   3. Choose the best final word, reconstruct the path, and merge words using the overlaps.
      *
-     * Key Insight: By maximizing overlap, we minimize the total length of the superstring.
-     * The bitmask DP ensures we try all possible orderings efficiently without n! complexity.
+     * Time:  O(n^2 * 2^n + n^2 * m) - DP checks word pairs for every mask after overlap preprocessing.
+     * Space: O(n * 2^n + n^2) - parent and overlap tables dominate memory.
      *
-     * Time Complexity: O(n^2 * 2^n + n^2 * m) where n is the number of words and m is max word length.
-     * - O(n^2 * m) for computing overlaps between all pairs of words
-     * - O(n^2 * 2^n) for DP computation (for each of 2^n masks, we check n possible last words
-     *   and n possible previous words)
-     *
-     * Space Complexity: O(n^2 + 2^n * n) for overlap matrix and DP tables.
-     *
-     * @param words array of strings to find superstring for
-     * @return the shortest superstring containing all words
+     * @param words strings that must all appear in the result
+     * @return a shortest superstring containing every word
      */
     public String shortestSuperstring(String[] words) {
         int numWords = words.length;

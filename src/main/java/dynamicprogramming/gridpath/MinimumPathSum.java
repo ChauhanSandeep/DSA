@@ -1,62 +1,68 @@
 package dynamicprogramming.gridpath;
 
+import java.util.Arrays;
+
 /**
  * Problem: Minimum Path Sum
  *
- * Given an m x n grid filled with non-negative numbers, find a path from the top-left to the
- * bottom-right, which minimizes the sum of all numbers along its path.
- * Note: You can only move either down or right at any point in time.
+ * Given a grid of non-negative numbers, move from the top-left cell to the
+ * bottom-right cell using only right or down moves. Return the minimum possible
+ * sum of values along such a path.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-path-sum/ (Medium)
+ * Rating:   acceptance 68.6% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Dynamic Programming | Grid DP | Prefix minimum path cost
  *
  * Example:
- * Input: grid = [[1,3,1],
- *                [1,5,1],
- *                [4,2,1]]
- * Output: 7
- * Explanation: Because the path 1 → 3 → 1 → 1 → 1 minimizes the sum.
+ *   Input:  pathGrid = [[1,3,1],[1,5,1],[4,2,1]]
+ *   Output: 7
+ *   Why:    the path 1, 3, 1, 1, 1 has the smallest sum among all right/down paths.
  *
- * LeetCode Problem Link: https://leetcode.com/problems/minimum-path-sum/
+ * Follow-ups:
+ *   1. Return the path, not just the sum?
+ *      Store parent directions while filling the DP table.
+ *   2. Can space be reduced to O(n)?
+ *      Keep one row because each cell needs only the value above and to the left.
+ *   3. What if obstacles are present?
+ *      Treat blocked cells as unreachable and skip their transitions.
  *
- * Follow-up Questions:
- * 1. Q: What if you can move in all 4 directions but cannot revisit cells?
- *    A: Use DFS with backtracking or Dijkstra's algorithm for shortest path
- * 2. Q: Find the actual path, not just the minimum sum?
- *    A: Store parent pointers in DP table and reconstruct path from bottom-right to top-left
- * 3. Q: What if some cells are blocked (obstacles)?
- *    A: Similar to Unique Paths II - mark blocked cells and skip them in DP transitions
- * 4. Q: What if you can move diagonally as well?
- *    A: Extend DP transition to include diagonal move: min(up, left, diagonal) + current
- * 5. Q: Maximum Path Sum instead of minimum?
- *    A: Change Math.min to Math.max in the recurrence relation
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Unique Paths II (63), Dungeon Game (174), Triangle (120).
  */
 public class MinimumPathSum {
 
     public static void main(String[] args) {
-        int[][] pathGrid = {
-            {1, 3, 1},
-            {1, 5, 1},
-            {4, 2, 1}
-        };
         MinimumPathSum solver = new MinimumPathSum();
-        System.out.println("Minimum Path Sum: " + solver.minPathSum(pathGrid));
-        System.out.println("Minimum Path Sum (Space Optimized): " + solver.minPathSumOptimized(pathGrid));
+        int[][][] cases = {
+            {{1, 3, 1}, {1, 5, 1}, {4, 2, 1}},
+            {{5}}
+        };
+        int[] expected = { 7, 5 };
+
+        for (int i = 0; i < cases.length; i++) {
+            int got = solver.minPathSum(cases[i]);
+            System.out.printf("pathGrid=%s -> %d  expected=%d%n",
+                Arrays.deepToString(cases[i]), got, expected[i]);
+        }
     }
 
-    /**
-     * Finds minimum path sum from top-left to bottom-right using 2D dynamic programming.
+
+        /**
+     * Intuition: minSumToCell[row][col] means the cheapest sum needed to reach
+     * that exact cell from the start. The first row can only come from the left,
+     * and the first column can only come from above. Every interior cell has two
+     * possible predecessors, so its best sum is its own value plus the smaller
+     * of those two predecessor sums.
      *
-     * Algorithm Steps:
-     * 1. Initialize DP table where dp[i][j] represents minimum sum to reach cell (i,j)
-     * 2. Fill first row: can only come from left, so cumulative sum
-     * 3. Fill first column: can only come from above, so cumulative sum
-     * 4. Fill remaining cells: min(from above, from left) + current cell value
-     * 5. Return dp[m-1][n-1] as the minimum path sum to bottom-right
+     * Algorithm:
+     *   1. Return 0 for a null or empty grid.
+     *   2. Initialize the start cell, then cumulative sums for the first row and column.
+     *   3. Fill every remaining cell from top-left to bottom-right using min(above, left) plus current value.
      *
-     * Time Complexity: O(m * n) where m is rows and n is columns
-     * Space Complexity: O(m * n) for the DP table
+     * Time:  O(m * n) - every grid cell is filled once.
+     * Space: O(m * n) - the DP table stores one minimum sum per cell.
      *
-     * @param pathGrid 2D grid with non-negative integers
-     * @return Minimum sum of path from top-left to bottom-right
+     * @param pathGrid grid of non-negative path costs
+     * @return minimum sum along a top-left to bottom-right path
      */
     public int minPathSum(int[][] pathGrid) {
         if (pathGrid == null || pathGrid.length == 0 || pathGrid[0].length == 0) {
