@@ -1,39 +1,65 @@
 package linkedlist;
 
 
+import java.util.Arrays;
+
 /**
- * Problem: Find the intersection node of two singly linked lists.
+ * Problem: Intersection of Two Linked Lists
  *
- * Two linked lists intersect if they share a common node (by reference, not by value).
- * The intersection point is defined as the first common node from the end where both lists meet.
+ * Return the first node shared by two singly linked lists by reference, not by
+ * value. If the lists do not share a node, return null without modifying either
+ * list.
+ *
+ * Leetcode: https://leetcode.com/problems/intersection-of-two-linked-lists/ (Easy)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Length alignment | Two pointers
  *
  * Example:
- * List A: 1 -> 2 -> 3 \
- *                       -> 8 -> 9
- * List B:       4 -> 5 /
- * Output: Node with value 8
+ *   Input:  A = [1,2,8,9], B = [4,5,8,9]
+ *   Output: 8
+ *   Why:    both lists point to the same node with value 8.
  *
- * LeetCode Link:
- * https://leetcode.com/problems/intersection-of-two-linked-lists/
+ * Follow-ups:
+ *   1. Can this avoid computing lengths?
+ *      Use two pointers that switch heads when they reach null.
+ *   2. What if a list has a cycle?
+ *      Detect cycle starts first, then handle cyclic intersection cases.
+ *   3. Can you find all shared nodes?
+ *      Once the first shared node is found, every following node is shared.
  *
- * Follow-Up Questions:
- * - Can you solve it with O(1) space and O(n) time without modifying the list? (Yes, use two-pointer approach)
- * - What if the list is extremely long? (Optimize length alignment or use the two-pointer no-length method)
- * - Can you find intersection in case of looped/circular linked lists? (Use Floyd’s cycle detection + intersection logic)
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Linked List Cycle II (142).
  */
 public class IntersectionList {
 
-  /**
-   * Finds the intersection node using length alignment method.
+  public static void main(String[] args) {
+    ListNode shared = new ListNode(8); shared.next = new ListNode(9);
+    ListNode head1 = new ListNode(1); head1.next = new ListNode(2); head1.next.next = shared;
+    ListNode head2 = new ListNode(4); head2.next = new ListNode(5); head2.next.next = shared;
+    ListNode output = getIntersectionByTwoPointer(head1, head2);
+    System.out.printf("listA=%s listB=%s -> %d  expected=%d%n", Arrays.toString(new int[] {1, 2, 8, 9}), Arrays.toString(new int[] {4, 5, 8, 9}), output == null ? -1 : output.val, 8);
+    ListNode noA = new ListNode(1); noA.next = new ListNode(2);
+    ListNode noB = new ListNode(3);
+    ListNode noOutput = getIntersectionByTwoPointer(noA, noB);
+    System.out.printf("listA=%s listB=%s -> %d  expected=%d%n", Arrays.toString(new int[] {1, 2}), Arrays.toString(new int[] {3}), noOutput == null ? -1 : noOutput.val, -1);
+  }
+
+    /**
+   * Intuition: if both pointers have the same remaining distance to the tail,
+   * the first equal reference they encounter is the intersection. Advancing the
+   * longer list by the length difference creates that alignment.
    *
-   * Steps:
-   * - Calculate lengths of both lists.
-   * - Move the head of the longer list ahead by difference in lengths.
-   * - Move both pointers together until they meet or reach end.
+   * Algorithm:
+   *   1. Return null if either list is empty.
+   *   2. Measure len1 and len2.
+   *   3. Advance the longer head by the length difference.
+   *   4. Move both heads together until they match or reach the end.
    *
-   * Time Complexity: O(N + M)
-   * Space Complexity: O(1)
+   * Time:  O(n + m) - each list is traversed a constant number of times.
+   * Space: O(1) - only pointers and lengths are stored.
+   *
+   * @param head1 head of the first linked list
+   * @param head2 head of the second linked list
+   * @return first shared node by reference, or null
    */
   public static ListNode getIntersectionByLengthAlignment(ListNode head1, ListNode head2) {
       if (head1 == null || head2 == null) {

@@ -1,39 +1,57 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Problem: Copy List with Random Pointer
  *
- * A linked list of length n is given such that each node contains an additional random pointer,
- * which could point to any node in the list, or null. Construct a deep copy of the list.
- * The deep copy should consist of exactly n brand new nodes, where each new node has its value
- * set to the value of its corresponding original node. Both the next and random pointer of the
- * new nodes should point to new nodes in the copied list.
+ * Deep-copy a linked list where each node has next and random pointers. Every
+ * copied pointer must target a copied node, never a node from the original list.
+ *
+ * Leetcode: https://leetcode.com/problems/copy-list-with-random-pointer/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Hash map | Deep copy
  *
  * Example:
- * Input: head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
- * Output: [[7,null],[13,0],[11,4],[10,2],[1,0]]
- * Explanation: Each node's random pointer points to the node at the specified index.
+ *   Input:  head = [[7,null],[13,0]]
+ *   Output: [[7,null],[13,0]]
+ *   Why:    the copied 13 node's random pointer targets the copied 7 node.
  *
- * LeetCode: https://leetcode.com/problems/copy-list-with-random-pointer
+ * Follow-ups:
+ *   1. Can this use O(1) extra space?
+ *      Interleave copies with originals, wire random pointers, then detach.
+ *   2. What if random pointers form cycles?
+ *      The node map still prevents duplicate copies and infinite traversal.
+ *   3. How does this extend to graphs?
+ *      Use the same original-to-copy map during DFS or BFS.
  *
- * Follow-up Questions:
- * 1. Can you solve it without using extra space (HashMap)?
- *    Answer: Yes, using the interweaving technique where we place copied nodes between originals.
- *
- * 2. How would you handle cycles in the random pointers?
- *    Answer: The current approach naturally handles cycles since we create all nodes first.
- *
- * 3. What if we needed to copy a graph instead of just a linked list?
- *    Answer: Similar approach with DFS/BFS and HashMap to track visited nodes.
- *    Related: https://leetcode.com/problems/clone-graph/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Clone Graph (133).
  */
 public class CopyListWithRandomPointer {
+
+    public static void main(String[] args) {
+        CopyListWithRandomPointer solver = new CopyListWithRandomPointer();
+        Node head = new Node(7);
+        head.next = new Node(13);
+        head.next.random = head;
+        Node copied = solver.copyRandomList(head);
+        int[][] output = { {copied.val, copied.random == null ? -1 : copied.random.val}, {copied.next.val, copied.next.random.val} };
+        int[][] expected = { {7, -1}, {13, 7} };
+        System.out.printf("head=%s -> %s  expected=%s%n", "[[7,null],[13,0]]", Arrays.deepToString(output), Arrays.deepToString(expected));
+        Node single = new Node(1);
+        single.random = single;
+        Node singleCopy = solver.copyRandomList(single);
+        int[][] singleOutput = { {singleCopy.val, singleCopy.random == singleCopy ? 0 : -1} };
+        int[][] singleExpected = { {1, 0} };
+        System.out.printf("head=%s -> %s  expected=%s%n", "[[1,0]]", Arrays.deepToString(singleOutput), Arrays.deepToString(singleExpected));
+    }
+
+
+
+
 
     // Definition for a Node
     static class Node {
@@ -48,18 +66,22 @@ public class CopyListWithRandomPointer {
         }
     }
 
-    /**
-     * Creates a deep copy of the linked list using HashMap approach.
+                        /**
+     * Intuition: random pointers can point anywhere, including backward, so build
+     * all copied nodes before wiring pointers. The map then translates every
+     * original next/random reference into its copied counterpart.
      *
      * Algorithm:
-     * 1. First pass: Create all new nodes and store mapping from old to new
-     * 2. Second pass: Set next and random pointers using the mapping
+     *   1. Return null for an empty list.
+     *   2. First pass: put each original node and a new copied node in nodeMap.
+     *   3. Second pass: assign copied next and random pointers from nodeMap.
+     *   4. Return nodeMap.get(head).
      *
-     * Time Complexity: O(n) where n is the number of nodes
-     * Space Complexity: O(n) for the HashMap
+     * Time:  O(n) - two passes over the original list.
+     * Space: O(n) - one map entry per original node.
      *
-     * @param head Head of the original linked list
-     * @return Head of the deep copied linked list
+     * @param head head of the original list
+     * @return head of the deep-copied list
      */
     public Node copyRandomList(Node head) {
         if (head == null) return null;

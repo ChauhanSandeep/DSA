@@ -1,37 +1,49 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
  * Problem: Merge Nodes in Between Zeros
  *
- * You are given the head of a linked list, which contains a series of integers separated by 0's.
- * The beginning and end of the linked list will have Node.val == 0.
- * For every two consecutive 0's, merge all the nodes lying in between them into a single node
- * whose value is the sum of all the merged nodes. The modified list should not contain any 0's.
- * Return the head of the modified linked list.
+ * A linked list starts and ends with zero, and values between consecutive zeros
+ * form one segment. Replace each segment with a single node whose value is that
+ * segment sum, and return the list without zeros.
+ *
+ * Leetcode: https://leetcode.com/problems/merge-nodes-in-between-zeros/ (Medium)
+ * Rating:   1333
+ * Pattern:  Linked list | Segment sum | Dummy node
  *
  * Example:
- * Input: head = [0,3,1,0,4,5,2,0]
- * Output: [4,11]
- * Explanation:
- * - The sum of the nodes marked in green: 3 + 1 = 4.
- * - The sum of the nodes marked in red: 4 + 5 + 2 = 11.
+ *   Input:  head = [0,3,1,0,4,5,2,0]
+ *   Output: [4,11]
+ *   Why:    the segment sums are 3 + 1 = 4 and 4 + 5 + 2 = 11.
  *
- * LeetCode: https://leetcode.com/problems/merge-nodes-in-between-zeros
- *
- * Follow-up Questions:
- * 1. What if the list doesn't start or end with 0?
- *    Answer: Add validation or modify logic to handle edge cases.
- *
- * 2. Can we solve this in-place without creating new nodes?
- *    Answer: Yes, reuse existing nodes and modify their values.
- *
- * 3. What if we need to preserve the original structure?
- *    Answer: Create new nodes instead of modifying existing ones.
- *
- * @author Sandeep
- * LeetCode Contest Rating: 1333
+ * Follow-ups:
+ *   1. Can this be done in-place?
+ *      Store each segment sum in the first node of that segment.
+ *   2. What if values can be negative?
+ *      Track whether a segment existed instead of checking sum > 0.
+ *   3. What if boundaries may be missing?
+ *      Validate input or treat list ends as implicit zeros.
  */
 public class MergeNodesInBetweenZeros {
+
+    public static void main(String[] args) {
+        MergeNodesInBetweenZeros solver = new MergeNodesInBetweenZeros();
+        int[][] inputs = { {0, 3, 1, 0, 4, 5, 2, 0}, {0, 1, 0} };
+        int[][] expected = { {4, 11}, {1} };
+        for (int i = 0; i < inputs.length; i++) {
+            ListNode head = null, tail = null;
+            for (int value : inputs[i]) {
+                ListNode node = new ListNode(value);
+                if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+            }
+            ListNode outputHead = solver.mergeNodes(head);
+            int[] output = new int[expected[i].length];
+            for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+            System.out.printf("head=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
 
     // Definition for singly-linked list
     public static class ListNode {
@@ -42,20 +54,22 @@ public class MergeNodesInBetweenZeros {
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
 
-    /**
-     * Merges nodes between zeros by creating new nodes for sums.
+        /**
+     * Intuition: zeros are separators. Start after the leading zero, accumulate
+     * values until the next zero, append one node for that completed sum, then
+     * move past the separator to begin the next segment.
      *
      * Algorithm:
-     * 1. Skip the initial zero node
-     * 2. For each segment between zeros, calculate the sum
-     * 3. Create a new node with the sum value
-     * 4. Connect the new nodes to form the result list
+     *   1. Return null for an empty list or only the leading zero.
+     *   2. Use resultHead/resultTail as a dummy-built output list.
+     *   3. Accumulate sum while current is non-null and current.val is not zero.
+     *   4. Append sum when positive, skip the zero, and continue.
      *
-     * Time Complexity: O(n) where n is the number of nodes
-     * Space Complexity: O(1) excluding the result list
+     * Time:  O(n) - each input node is visited once.
+     * Space: O(1) - excluding output nodes, only pointers and sum are stored.
      *
-     * @param head Head of the linked list starting and ending with 0
-     * @return Head of the modified linked list without zeros
+     * @param head list that starts and ends with zero
+     * @return head of the summed list without zeros
      */
     public ListNode mergeNodes(ListNode head) {
         if (head == null || head.next == null) return null;

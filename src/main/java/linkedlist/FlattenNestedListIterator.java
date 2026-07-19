@@ -7,32 +7,57 @@ import java.util.LinkedList;
 /**
  * Problem: Flatten Nested List Iterator
  *
- * You are given a nested list of integers nestedList. Each element is either an integer or a list
- * whose elements may also be integers or other lists. Implement an iterator to flatten it.
- * Implement the NestedIterator class with next() and hasNext() methods.
+ * Implement an iterator over a nested list where each item is either an integer
+ * or another nested list. Repeated next() calls must return all integers in
+ * left-to-right flattened order.
+ *
+ * Leetcode: https://leetcode.com/problems/flatten-nested-list-iterator/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Stack | Recursion | Iterator design
  *
  * Example:
- * Input: nestedList = [[1,1],2,[1,1]]
- * Output: [1,1,2,1,1]
- * Explanation: By calling next repeatedly until hasNext returns false.
+ *   Input:  nestedList = [[1,1],2,[1,1]]
+ *   Output: [1,1,2,1,1]
+ *   Why:    nested lists expand in place while preserving left-to-right order.
  *
- * LeetCode: https://leetcode.com/problems/flatten-nested-list-iterator
+ * Follow-ups:
+ *   1. Can hasNext() be lazy?
+ *      Keep a stack and expand only the list currently on top.
+ *   2. What if nesting is very deep?
+ *      Prefer the stack iterator to avoid recursive stack overflow.
+ *   3. Can remove() be supported?
+ *      Store parent positions so returned elements can be deleted safely.
  *
- * Follow-up Questions:
- * 1. What if the nested structure is very deep? Would recursion cause stack overflow?
- *    Answer: Yes, we can use iterative approach with stack to avoid deep recursion.
- *
- * 2. How would you handle infinite nested structures?
- *    Answer: Add cycle detection using visited set or limit recursion depth.
- *
- * 3. Can we implement lazy evaluation to save memory?
- *    Answer: Yes, the stack-based approach only processes elements as needed.
- *    Related: https://leetcode.com/problems/mini-parser/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Mini Parser (385), Nested List Weight Sum (339).
  */
 public class FlattenNestedListIterator {
+
+    public static void main(String[] args) {
+        class SimpleNestedInteger implements NestedInteger {
+            private final Integer value;
+            private final List<NestedInteger> list;
+            SimpleNestedInteger(int value) { this.value = value; this.list = null; }
+            SimpleNestedInteger(List<NestedInteger> list) { this.value = null; this.list = list; }
+            public boolean isInteger() { return value != null; }
+            public Integer getInteger() { return value; }
+            public List<NestedInteger> getList() { return list == null ? Collections.emptyList() : list; }
+        }
+        List<NestedInteger> nestedList = Arrays.asList(
+            new SimpleNestedInteger(Arrays.asList(new SimpleNestedInteger(1), new SimpleNestedInteger(1))),
+            new SimpleNestedInteger(2),
+            new SimpleNestedInteger(Arrays.asList(new SimpleNestedInteger(1), new SimpleNestedInteger(1))));
+        NestedIterator iterator = new NestedIterator(nestedList);
+        List<Integer> values = new ArrayList<>();
+        while (iterator.hasNext()) values.add(iterator.next());
+        int[] output = values.stream().mapToInt(Integer::intValue).toArray();
+        int[] expected = {1, 1, 2, 1, 1};
+        System.out.printf("nestedList=%s -> %s  expected=%s%n", "[[1,1],2,[1,1]]", Arrays.toString(output), Arrays.toString(expected));
+        NestedIterator emptyIterator = new NestedIterator(Collections.emptyList());
+        int[] emptyOutput = {};
+        while (emptyIterator.hasNext()) emptyIterator.next();
+        int[] emptyExpected = {};
+        System.out.printf("nestedList=%s -> %s  expected=%s%n", "[]", Arrays.toString(emptyOutput), Arrays.toString(emptyExpected));
+    }
 
     // This is the interface that allows for creating nested lists
     public interface NestedInteger {
@@ -65,11 +90,21 @@ public class FlattenNestedListIterator {
     public static class NestedIterator {
         private Queue<Integer> flattenedList;
 
-        /**
-         * Initialize iterator with the nested list.
-         * Flattens the entire structure during construction.
+                /**
+         * Intuition: next() is simplest when all integers are queued up front.
+         * The constructor recursively walks the nested structure once and stores
+         * integers in the exact order the iterator should return them.
          *
-         * @param nestedList The nested list of integers
+         * Algorithm:
+         *   1. Create flattenedList as an empty queue.
+         *   2. Recursively scan nestedList from left to right.
+         *   3. Offer integers directly and recurse into lists.
+         *   4. next() polls the queue, and hasNext() checks whether it is empty.
+         *
+         * Time:  O(n) - construction visits every nested item once.
+         * Space: O(n) - all flattened integers are stored in the queue.
+         *
+         * @param nestedList nested integer structure to flatten
          */
         public NestedIterator(List<NestedInteger> nestedList) {
             this.flattenedList = new LinkedList<>();
@@ -94,7 +129,7 @@ public class FlattenNestedListIterator {
             return !flattenedList.isEmpty();
         }
 
-        // Recursively flattens the nested list
+        /** Recursively appends integers from nestedList into flattenedList. */
         private void flattenList(List<NestedInteger> nestedList) {
             for (NestedInteger element : nestedList) {
                 if (element.isInteger()) {

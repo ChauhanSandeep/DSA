@@ -1,23 +1,41 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
- * A utility class for singly linked list operations.
+ * Problem: Linked List Utility
  *
- * <p>This class provides support for:
- * - Constructing a linked list with or without an initial node
- * - Adding nodes at the tail
- * - Accessing/modifying head and tail
- * - Printing the entire list for debugging or visualization
+ * A small wrapper around ListNode that tracks head and tail. It supports demos in
+ * this package by appending nodes and printing the current list without repeated
+ * setup code.
  *
- * <p>Example usage:
- * <pre>{@code
- *   LinkedList list = new LinkedList();
- *   list.add(new ListNode(1));
- *   list.add(new ListNode(2));
- *   list.printList(); // Output: 1 -> 2 -> NULL
- * }</pre>
+ * Pattern:  Linked list | Tail pointer | Utility wrapper
+ *
+ * Example:
+ *   Input:  add [1,2,3]
+ *   Output: head = 1, tail = 3
+ *   Why:    each add appends at tail and moves the tail pointer forward.
+ *
+ * Follow-ups:
+ *   1. How would you delete from tail in O(1)?
+ *      Use a doubly linked list or keep more predecessor metadata.
+ *   2. How would you support O(1) size?
+ *      Maintain a size field on every mutation.
+ *   3. How would you make this thread-safe?
+ *      Synchronize mutations or protect head and tail with a lock.
  */
 public class LinkedList {
+
+  public static void main(String[] args) {
+    int[] input = {1, 2, 3};
+    LinkedList list = new LinkedList();
+    for (int value : input) list.add(new ListNode(value));
+    System.out.printf("values=%s -> head=%d tail=%d  expected=head=%d tail=%d%n", Arrays.toString(input), list.getHead().getVal(), list.getTail().getVal(), 1, 3);
+    int[] edgeInput = {};
+    LinkedList empty = new LinkedList();
+    empty.add(null);
+    System.out.printf("values=%s -> head=%s tail=%s  expected=head=%s tail=%s%n", Arrays.toString(edgeInput), empty.getHead(), empty.getTail(), null, null);
+  }
 
   private ListNode head;
   private ListNode tail;

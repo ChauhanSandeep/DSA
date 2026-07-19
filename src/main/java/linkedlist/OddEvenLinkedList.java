@@ -1,59 +1,68 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
- * Problem: Given the head of a singly linked list, group all the nodes with odd indices together
- * followed by the nodes with even indices, and return the reordered list.
+ * Problem: Odd Even Linked List
+ *
+ * Reorder a linked list so nodes at odd positions come first, followed by nodes
+ * at even positions. Positions are 1-based, and relative order inside each group
+ * must be preserved.
+ *
+ * Leetcode: https://leetcode.com/problems/odd-even-linked-list/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | In-place partition | Odd/even pointers
  *
  * Example:
- * Input: 1 -> 2 -> 3 -> 4 -> 5
- * Output: 1 -> 3 -> 5 -> 2 -> 4
+ *   Input:  head = [1,2,3,4,5]
+ *   Output: [1,3,5,2,4]
+ *   Why:    positions 1,3,5 come before positions 2,4.
  *
- * Approach:
- * 1. Find the middle of the linked list using the slow-fast pointer approach.
- * 2. Reverse the second half of the list.
- * 3. Compare the first half with the reversed second half.
- *     - If they are the same, the list is a palindrome.
- *     - If they differ, the list is not a palindrome.
- * 4. Restore the list to its original state (useful in real-world scenarios).
+ * Follow-ups:
+ *   1. Group by value parity instead?
+ *      Build odd-value and even-value chains based on val % 2.
+ *   2. Split into k position classes?
+ *      Maintain k heads and tails, then concatenate them.
+ *   3. Can it stay O(1) space?
+ *      Yes, relink existing odd and even chains in place.
  *
- * Time Complexity: O(N) - Traversing the list multiple times.
- * Space Complexity: O(1) - No extra space used apart from pointers.
- *
- * Edge Cases Considered:
- * - Empty list (returns true).
- * - Single-node list (returns true).
- * - Even and odd-length lists.
- *
- * Link: https://leetcode.com/problems/palindrome-linked-list/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Partition List (86), Split Linked List in Parts (725).
  */
 public class OddEvenLinkedList {
 
   public static void main(String[] args) {
-    ListNode head = new ListNode(1);
-    LinkedList list = new LinkedList(head);
-    list.add(new ListNode(2));
-    list.add(new ListNode(3));
-    list.add(new ListNode(2));
-    list.add(new ListNode(1));
-
-    ListNode newHead = oddEvenList(head);
-    System.out.println("Reordered List: " + newHead);
+    int[][] inputs = { {1, 2, 3, 4, 5}, {1} };
+    int[][] expected = { {1, 3, 5, 2, 4}, {1} };
+    for (int i = 0; i < inputs.length; i++) {
+      ListNode head = null, tail = null;
+      for (int value : inputs[i]) {
+        ListNode node = new ListNode(value);
+        if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+      }
+      ListNode outputHead = oddEvenList(head);
+      int[] output = new int[expected[i].length];
+      for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+      System.out.printf("head=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+    }
   }
 
-  /**
-   * Rearranges the list by grouping odd and even indexed nodes.
+
+    /**
+   * Intuition: odd nodes are already in the desired order if each odd pointer
+   * skips over the next even node. The even chain is built the same way, and its
+   * saved head is attached after the final odd node.
    *
-   * Approach:
-   * 1. Use two pointers: one for odd indexed nodes and another for even indexed nodes.
-   * 2. Traverse the list, linking odd indexed nodes together and even indexed nodes together.
-   * 3. At the end, link the last odd indexed node to the head of the even indexed nodes.
+   * Algorithm:
+   *   1. Return head for an empty or single-node list.
+   *   2. Start odd at head, even at head.getNext(), and save evenHead.
+   *   3. Rewire odd to the next odd and even to the next even while a pair remains.
+   *   4. Attach evenHead after odd and return head.
    *
-   * * Time Complexity: O(N) - where N is the number of nodes in the list.
-   * * Space Complexity: O(1) - no extra space used apart from pointers.
+   * Time:  O(n) - every node is rewired at most once.
+   * Space: O(1) - only a few pointers are stored.
    *
-   * @param head Head of the linked list.
-   * @return Reordered list with odd-indexed nodes first, then even-indexed.
+   * @param head head of the linked list
+   * @return reordered list with odd-indexed nodes first
    */
   public static ListNode oddEvenList(ListNode head) {
       if (head == null || head.getNext() == null) {

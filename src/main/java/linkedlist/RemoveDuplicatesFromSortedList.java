@@ -1,33 +1,51 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
  * Problem: Remove Duplicates from Sorted List
  *
- * Given the head of a sorted linked list, delete all duplicates such that each element appears only once.
- * Return the linked list sorted as well.
+ * Given a sorted linked list, delete repeated nodes so each value appears once.
+ * Since the list is sorted, every duplicate of a value appears directly next to
+ * another copy of that value.
+ *
+ * Leetcode: https://leetcode.com/problems/remove-duplicates-from-sorted-list/ (Easy)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Sorted scan | In-place deletion
  *
  * Example:
- * Input: head = [1,1,2]
- * Output: [1,2]
- * Explanation: Remove one of the duplicate 1s.
+ *   Input:  head = [1,1,2]
+ *   Output: [1,2]
+ *   Why:    the second 1 is adjacent to the first and can be skipped.
  *
- * LeetCode: https://leetcode.com/problems/remove-duplicates-from-sorted-list
+ * Follow-ups:
+ *   1. Remove all duplicated values instead of keeping one?
+ *      Use a dummy node and skip each full duplicate run.
+ *   2. What if the list is unsorted?
+ *      Track seen values with a set, or sort before deduping.
+ *   3. Can this be recursive?
+ *      Deduplicate head.next, then skip matching next nodes.
  *
- * Follow-up Questions:
- * 1. What if we need to remove ALL occurrences of duplicates (not keep one)?
- *    Answer: Use a more complex logic to track duplicates and remove entirely.
- *    Related: https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
- *
- * 2. How would you handle an unsorted linked list?
- *    Answer: Use HashSet to track seen values or sort first.
- *
- * 3. Can we solve this recursively?
- *    Answer: Yes, recursively process the list and skip duplicates.
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Remove Duplicates from Sorted List II (82).
  */
 public class RemoveDuplicatesFromSortedList {
+
+    public static void main(String[] args) {
+        RemoveDuplicatesFromSortedList solver = new RemoveDuplicatesFromSortedList();
+        int[][] inputs = { {1, 1, 2}, {1, 1, 1} };
+        int[][] expected = { {1, 2}, {1} };
+        for (int i = 0; i < inputs.length; i++) {
+            ListNode head = null, tail = null;
+            for (int value : inputs[i]) {
+                ListNode node = new ListNode(value);
+                if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+            }
+            ListNode outputHead = solver.deleteDuplicates(head);
+            int[] output = new int[expected[i].length];
+            for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+            System.out.printf("head=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
 
     // Definition for singly-linked list
     private static class ListNode {
@@ -38,20 +56,22 @@ public class RemoveDuplicatesFromSortedList {
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
 
-    /**
-     * Removes duplicates from sorted linked list using iterative approach.
+        /**
+     * Intuition: in a sorted list, any duplicate of current.val must be current.next.
+     * Keep current fixed while deleting duplicates, and move current only when the
+     * next value is different.
      *
      * Algorithm:
-     * 1. Traverse the list with current pointer
-     * 2. For each node, check if next node has same value
-     * 3. If duplicate found, skip the duplicate node by updating next pointer
-     * 4. Continue until all duplicates are removed
+     *   1. Return head for an empty or single-node list.
+     *   2. Start current at head.
+     *   3. If current and current.next match, skip current.next.
+     *   4. Otherwise advance current to the next unique value.
      *
-     * Time Complexity: O(n) where n is the number of nodes
-     * Space Complexity: O(1) as we only use constant extra space
+     * Time:  O(n) - each node is inspected once.
+     * Space: O(1) - duplicates are removed by pointer rewiring.
      *
-     * @param head Head of the sorted linked list
-     * @return Head of the list with duplicates removed
+     * @param head head of the sorted linked list
+     * @return head with one copy per value
      */
     public ListNode deleteDuplicates(ListNode head) {
         // Handle edge cases

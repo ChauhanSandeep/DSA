@@ -1,75 +1,68 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
- * Swap Nodes in Pairs - LeetCode Problem 24
+ * Problem: Swap Nodes in Pairs
  *
- * Problem Statement:
- * Given a linked list, swap every two adjacent nodes and return its head.
- * You must solve the problem without modifying the values in the list's nodes
- * (i.e., only nodes themselves may be changed).
+ * Swap every two adjacent nodes in a linked list and return the new head. Node
+ * values must not be changed; only next pointers may be rewired.
+ *
+ * Leetcode: https://leetcode.com/problems/swap-nodes-in-pairs/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Pair rewiring | Dummy node
  *
  * Example:
- * Input: head = [1,2,3,4]
- * Output: [2,1,4,3]
- * Explanation: Swap (1,2) to get (2,1), swap (3,4) to get (4,3).
- * The iterative approach uses dummy node to simplify edge cases and three pointers
- * to manage the swapping: prev (before pair), curr (first node), next (second node).
+ *   Input:  head = [1,2,3,4]
+ *   Output: [2,1,4,3]
+ *   Why:    1 swaps with 2, and 3 swaps with 4.
  *
- * LeetCode Link: https://leetcode.com/problems/swap-nodes-in-pairs/
+ * Follow-ups:
+ *   1. Swap every k nodes?
+ *      Generalize to k-group reversal after verifying a full group.
+ *   2. Swap non-adjacent positions?
+ *      Track each node and its previous node, then rewire both neighborhoods.
+ *   3. Doubly linked list version?
+ *      Update both next and prev links for every swapped node.
  *
- * Follow-up Questions for FAANG Interviews:
- * 1. How would you swap every k adjacent nodes instead of pairs?
- *    Answer: Extend the algorithm with k-node groups, use similar pointer manipulation.
- *    Related: LeetCode 25 - https://leetcode.com/problems/reverse-nodes-in-k-group/
- *
- * 2. What if we need to swap nodes at specific positions (not adjacent)?
- *    Answer: Use two-pass approach to locate nodes, then swap with careful pointer updates.
- *    Related: LeetCode 1721 - https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
- *
- * 3. How to handle this for doubly linked list?
- *    Answer: Additional prev pointer maintenance for both directions during swaps.
- *
- * 4. What if we need to reverse pairs instead of swapping?
- *    Answer: Same algorithm works since swapping two nodes effectively reverses the pair.
- *    Related: LeetCode 206 - https://leetcode.com/problems/reverse-linked-list/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Reverse Nodes in k-Group (25), Swapping Nodes in a Linked List (1721).
  */
 public class SwapPairs {
 
   public static void main(String[] args) {
-    ListNode head = new ListNode(1);
-    LinkedList list = new LinkedList(head);
-    list.add(new ListNode(2));
-    list.add(new ListNode(3));
-    list.add(new ListNode(4));
-
-    SwapPairs swapper = new SwapPairs();
-    ListNode resultHead = swapper.swapNodesInPairs(head);
-
-    System.out.println(resultHead);
+    SwapPairs solver = new SwapPairs();
+    int[][] inputs = { {1, 2, 3, 4}, {1, 2, 3} };
+    int[][] expected = { {2, 1, 4, 3}, {2, 1, 3} };
+    for (int i = 0; i < inputs.length; i++) {
+      ListNode head = null, tail = null;
+      for (int value : inputs[i]) {
+        ListNode node = new ListNode(value);
+        if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+      }
+      ListNode outputHead = solver.swapNodesInPairs(head);
+      int[] output = new int[expected[i].length];
+      for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+      System.out.printf("head=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+    }
   }
 
-  /**
-   * Intuition:
-   * Think of swapping in chunks of size 2.
-   * Every iteration we focus on two nodes at a time:
-   *     [first] -> [second] -> [next]
-   * becomes
-   *     [second] -> [first] -> [next]
+
+    /**
+   * Intuition: each iteration owns firstNode and secondNode. previousPairEndNode
+   * connects the processed prefix to secondNode, secondNode points back to
+   * firstNode, and firstNode points to the next pair.
    *
-   * Approach:
-   *  1. Use a dummy node to simplify swapping at the head of the list.
-   *  2. Initialize two pointers:
-   *     - previous: Points to the end of the processed part.
-   *     - head: Points to the current pair’s first node.
-   *  3. Loop while both head and head.next exist:
-   *     - Identify the two nodes to swap.
-   *     - Adjust pointers to swap them.
-   *     - Reconnect the previous group to the new start of the current group.
-   *     - Move `previous` and `head` forward by two nodes.
+   * Algorithm:
+   *   1. Return head for an empty or single-node list.
+   *   2. Create dummy before head and keep previousPairEndNode at the processed tail.
+   *   3. While a full pair remains, name firstNode, secondNode, and nextPairStartNode.
+   *   4. Rewire the three next pointers, then advance to the next pair.
    *
-   * Time Complexity: O(N) – We process every node once.
-   * Space Complexity: O(1) – In-place manipulation with constant space.
+   * Time:  O(n) - every node participates in at most one swap.
+   * Space: O(1) - only a dummy and pair pointers are stored.
+   *
+   * @param head head of the linked list
+   * @return head after swapping adjacent pairs
    */
   public ListNode swapNodesInPairs(ListNode head) {
       if (head == null || head.next == null) {
@@ -99,14 +92,7 @@ public class SwapPairs {
       previousPairEndNode = firstNode;       // previousPairEndNode should point to the end of the newly swapped pair
       head = nextPairStartNode;       // head moves to the start of the next pair
 
-      /*
-       * 1 -> 2 -> 3 -> 4
-       * dummy -> 2 -> 1 -> 3 -> 4
-       * previousPairEndNode = 1, head = 3
-       *
-       * dummy -> 2 -> 1 -> 4 -> 3
-       * previousPairEndNode = 3, head = null (loop ends)
-       */
+      // The old first node is now the processed tail for this pair.
     }
 
     return dummy.next; // The new head after first swap

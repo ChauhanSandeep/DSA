@@ -1,30 +1,53 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
- * 1290. Convert Binary Number in a Linked List to Integer
+ * Problem: Convert Binary Number in a Linked List to Integer
  *
- * Problem: Given head which is a reference node to a singly-linked list where
- * each node contains either 0 or 1, convert the binary number in the linked list to integer.
+ * A linked list stores one binary digit per node from most significant to least
+ * significant. Convert that bit sequence into its decimal integer value without
+ * changing the list.
+ *
+ * Leetcode: https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/ (Easy)
+ * Rating:   1151
+ * Pattern:  Linked list | Binary accumulation | Horner's rule
  *
  * Example:
- * Input: head = [1,0,1]
- * Output: 5
- * Explanation: (101) in base 2 = (5) in base 10
+ *   Input:  head = [1,0,1]
+ *   Output: 5
+ *   Why:    binary 101 equals decimal 5.
  *
- * LeetCode: https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer
+ * Follow-ups:
+ *   1. The list exceeds int range?
+ *      Return a decimal string or BigInteger representation.
+ *   2. Node values may not be binary?
+ *      Validate each value before adding it to the result.
+ *   3. Can this be recursive?
+ *      Carry the accumulated result through recursive calls.
  *
- * Follow-up questions:
- * Q: What if the linked list is very long (exceeds integer range)?
- * A: Use BigInteger or return the result modulo some value, or use string representation.
- *
- * Q: How to handle invalid input (values other than 0 or 1)?
- * A: Add validation to check each node value, throw exception or return error code.
- *
- * Q: Can we solve this in-place without modifying the list?
- * A: Yes, both provided solutions don't modify the original list.
- * LeetCode Contest Rating: 1151
+ * Related: Add Binary (67), Binary Number with Alternating Bits (693).
  */
 public class ConvertBinaryNumberInALinkedListToInteger {
+
+    public static void main(String[] args) {
+        ConvertBinaryNumberInALinkedListToInteger solver = new ConvertBinaryNumberInALinkedListToInteger();
+        int[][] inputs = { {1, 0, 1}, {0}, {1, 1, 1, 1, 1} };
+        int[] expected = { 5, 0, 31 };
+        for (int i = 0; i < inputs.length; i++) {
+            ListNode head = null, tail = null;
+            for (int bit : inputs[i]) {
+                ListNode node = new ListNode(bit);
+                if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+            }
+            int output = solver.getDecimalValue(head);
+            System.out.printf("head=%s -> %d  expected=%d%n", Arrays.toString(inputs[i]), output, expected[i]);
+        }
+    }
+
+
+
+
 
     // Definition for singly-linked list
     public static class ListNode {
@@ -35,16 +58,22 @@ public class ConvertBinaryNumberInALinkedListToInteger {
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
 
-    /**
-     * Converts binary number represented in linked list to decimal integer.
+                        /**
+     * Intuition: reading a binary number left to right, each new bit shifts the
+     * old value one place left. Multiplying result by 2 creates that place, and
+     * adding current.val writes the current bit.
      *
-     * Algorithm: Iterate through list and build decimal value
-     * - Start with result = 0
-     * - For each bit, shift result left (multiply by 2) and add current bit
-     * - Mathematical equivalent: result = result * 2 + current_bit
+     * Algorithm:
+     *   1. Start result at 0 and current at head.
+     *   2. For each node, set result = result * 2 + current.val.
+     *   3. Move current to current.next until the list ends.
+     *   4. Return result.
      *
-     * Time Complexity: O(n) where n is the number of nodes
-     * Space Complexity: O(1) constant extra space
+     * Time:  O(n) - every node is visited once.
+     * Space: O(1) - only result and current are stored.
+     *
+     * @param head first bit of the binary number
+     * @return decimal value represented by the list
      */
     public int getDecimalValue(ListNode head) {
         int result = 0;
@@ -113,7 +142,11 @@ public class ConvertBinaryNumberInALinkedListToInteger {
         return convertRecursive(head, 0);
     }
 
-    // Recursive helper
+    /** Recursively carries the accumulated binary value to the end of the list. */
+    /** Recursively carries the accumulated binary value to the end of the list. */
+    /** Recursively carries the accumulated binary value to the end of the list. */
+    /** Recursively carries the accumulated binary value to the end of the list. */
+    /** Recursively carries the accumulated binary value to the end of the list. */
     private int convertRecursive(ListNode node, int result) {
         if (node == null) {
             return result;
@@ -172,7 +205,11 @@ public class ConvertBinaryNumberInALinkedListToInteger {
         return convertBinaryStringToDecimal(binary.toString());
     }
 
-    // Convert binary string to decimal string for large numbers
+    /** Converts a binary string into a decimal string without integer overflow. */
+    /** Converts a binary string into a decimal string without integer overflow. */
+    /** Converts a binary string into a decimal string without integer overflow. */
+    /** Converts a binary string into a decimal string without integer overflow. */
+    /** Converts a binary string into a decimal string without integer overflow. */
     private String convertBinaryStringToDecimal(String binary) {
         if (binary.isEmpty() || binary.equals("0")) return "0";
 
@@ -190,7 +227,11 @@ public class ConvertBinaryNumberInALinkedListToInteger {
         return result;
     }
 
-    // Helper to add two number strings
+    /** Adds two non-negative decimal strings. */
+    /** Adds two non-negative decimal strings. */
+    /** Adds two non-negative decimal strings. */
+    /** Adds two non-negative decimal strings. */
+    /** Adds two non-negative decimal strings. */
     private String addStrings(String num1, String num2) {
         StringBuilder result = new StringBuilder();
         int carry = 0;
@@ -208,7 +249,11 @@ public class ConvertBinaryNumberInALinkedListToInteger {
         return result.reverse().toString();
     }
 
-    // Helper to multiply string number by 2
+    /** Multiplies a non-negative decimal string by two. */
+    /** Multiplies a non-negative decimal string by two. */
+    /** Multiplies a non-negative decimal string by two. */
+    /** Multiplies a non-negative decimal string by two. */
+    /** Multiplies a non-negative decimal string by two. */
     private String multiplyByTwo(String num) {
         StringBuilder result = new StringBuilder();
         int carry = 0;

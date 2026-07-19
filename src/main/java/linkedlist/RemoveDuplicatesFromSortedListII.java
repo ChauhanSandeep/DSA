@@ -1,66 +1,68 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
- * 82. Remove Duplicates from Sorted List II
+ * Problem: Remove Duplicates from Sorted List II
  *
- * Problem Statement:
- * Given the head of a sorted linked list, delete all nodes that have duplicate
- * numbers, leaving only distinct numbers from the original list. Return the
- * linked list sorted as well.
+ * Given a sorted linked list, remove every value that appears more than once,
+ * leaving only values that were unique in the original list. The result remains
+ * sorted because only nodes are deleted.
+ *
+ * Leetcode: https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/ (Medium)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Dummy node | Duplicate-run skipping
  *
  * Example:
- * Input: head = [1,2,3,3,4,4,5]
- * Output: [1,2,5]
- * Explanation: Remove all nodes with values 3 and 4 (including all occurrences).
+ *   Input:  head = [1,2,3,3,4,4,5]
+ *   Output: [1,2,5]
+ *   Why:    3 and 4 appear in duplicate runs, so all of their nodes are removed.
  *
- * Input: head = [1,1,1,2,3]
- * Output: [2,3]
- * Explanation: Remove all nodes with value 1 (all three occurrences).
+ * Follow-ups:
+ *   1. Keep one copy instead?
+ *      Use the simpler duplicate skip from Leetcode 83.
+ *   2. What if the list is unsorted?
+ *      Count frequencies, then relink nodes with frequency one.
+ *   3. Remove values appearing exactly k times?
+ *      Count frequencies and filter on count != k.
  *
- * Input: head = [1,2,2]
- * Output: [1]
- * Explanation: Remove all nodes with value 2 (both occurrences).
- *
- * LeetCode Link: https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
- *
- * Follow-up Questions:
- * 1. What if we want to keep exactly one occurrence of duplicates instead of removing all?
- *    Answer: This becomes LeetCode 83 - just skip extra duplicates but keep the first one.
- *    Related: https://leetcode.com/problems/remove-duplicates-from-sorted-list/
- * 2. How would you handle an unsorted linked list?
- *    Answer: Use HashMap to track frequencies, then make a second pass to filter.
- * 3. What if we want to remove elements that appear exactly k times?
- *    Answer: Use frequency counting with HashMap, then filter based on count != k.
- * 4. How would you handle very large lists efficiently?
- *    Answer: Stream processing or external sorting with chunked processing.
- *
- * Related Problems:
- * - 83. Remove Duplicates from Sorted List: https://leetcode.com/problems/remove-duplicates-from-sorted-list/
- * - 203. Remove Linked List Elements: https://leetcode.com/problems/remove-linked-list-elements/
- * - 237. Delete Node in a Linked List: https://leetcode.com/problems/delete-node-in-a-linked-list/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Remove Duplicates from Sorted List (83), Remove Linked List Elements (203).
  */
-
 public class RemoveDuplicatesFromSortedListII {
 
-  /**
-   * Removes all nodes that have duplicate values, keeping only unique values.
+  public static void main(String[] args) {
+    RemoveDuplicatesFromSortedListII solver = new RemoveDuplicatesFromSortedListII();
+    int[][] inputs = { {1, 2, 3, 3, 4, 4, 5}, {1, 1, 1, 2, 3} };
+    int[][] expected = { {1, 2, 5}, {2, 3} };
+    for (int i = 0; i < inputs.length; i++) {
+      ListNode head = null, tail = null;
+      for (int value : inputs[i]) {
+        ListNode node = new ListNode(value);
+        if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+      }
+      ListNode outputHead = solver.deleteDuplicates(head);
+      int[] output = new int[expected[i].length];
+      for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+      System.out.printf("head=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+    }
+  }
+
+    /**
+   * Intuition: duplicates in a sorted list form one contiguous run. prev points
+   * to the last confirmed unique node, and dummy protects the real head when the
+   * first run must be deleted.
    *
-   * Algorithm: Dummy head with two-pointer technique
-   * 1. Use dummy head to handle edge cases where head nodes need removal
-   * 2. Use 'prev' pointer to track last confirmed unique node
-   * 3. Use 'curr' pointer to scan and detect duplicate sequences
-   * 4. When duplicates found, skip entire sequence; otherwise keep the unique node
+   * Algorithm:
+   *   1. Return head for an empty or single-node list.
+   *   2. Start dummy before head, prev at dummy, and curr at head.
+   *   3. If curr starts a duplicate run, advance curr past the run and set prev.next.
+   *   4. Otherwise advance prev and curr by one node.
    *
-   * Key insight: Unlike problem 83, we need to remove ALL occurrences of duplicates,
-   * not just keep one. This requires looking ahead to detect if current value
-   * appears multiple times before deciding whether to keep or remove it.
+   * Time:  O(n) - each node is visited as part of one scan or skipped run.
+   * Space: O(1) - only dummy, prev, and curr are stored.
    *
-   * Time Complexity: O(n) where n is number of nodes - single pass through list
-   * Space Complexity: O(1) - only using constant extra space for pointers
-   *
-   * @param head Head of the sorted linked list
-   * @return Head of the list after removing all duplicate nodes
+   * @param head head of the sorted linked list
+   * @return head after removing all duplicated values
    */
   public ListNode deleteDuplicates(ListNode head) {
     // Handle empty or single-node lists

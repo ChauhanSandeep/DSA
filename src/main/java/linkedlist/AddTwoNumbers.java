@@ -1,34 +1,61 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
  * Problem: Add Two Numbers
  *
- * You are given two non-empty linked lists representing two non-negative integers.
- * The digits are stored in reverse order, and each of their nodes contains a single digit.
- * Add the two numbers and return the sum as a linked list.
+ * Add two non-negative integers stored as linked lists in reverse digit order.
+ * Each node stores one decimal digit, and the result must use the same linked
+ * list representation.
+ *
+ * Leetcode: https://leetcode.com/problems/add-two-numbers/ (Medium)
+ * Rating:   acceptance 48.9% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Linked list | Dummy node | Carry propagation
  *
  * Example:
- * Input: l1 = [2,4,3], l2 = [5,6,4]
- * Output: [7,0,8]
- * Explanation: 342 + 465 = 807
+ *   Input:  l1 = [2,4,3], l2 = [5,6,4]
+ *   Output: [7,0,8]
+ *   Why:    342 + 465 = 807, stored in reverse order as 7 -> 0 -> 8.
  *
- * LeetCode: https://leetcode.com/problems/add-two-numbers
+ * Follow-ups:
+ *   1. Digits are stored in forward order?
+ *      Use stacks or recurse by aligned length, as in Add Two Numbers II.
+ *   2. Need bases other than 10?
+ *      Replace modulo and division by that base; carry logic is unchanged.
+ *   3. Need to add many lists?
+ *      Sum one digit column across all active nodes with one carry.
  *
- * Follow-up Questions:
- * 1. What if the digits are stored in normal order (not reversed)?
- *    Answer: Use a stack to reverse or recursively calculate with carry propagation.
- *    Related: https://leetcode.com/problems/add-two-numbers-ii/
- *
- * 2. How would you handle very large numbers that exceed integer limits?
- *    Answer: Continue using the linked list approach as it naturally handles arbitrary precision.
- *
- * 3. What if one list is significantly longer than the other?
- *    Answer: Current solution handles this by checking for null and treating missing digits as 0.
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Add Two Numbers II (445), Plus One Linked List (369).
  */
 public class AddTwoNumbers {
+
+    public static void main(String[] args) {
+        AddTwoNumbers solver = new AddTwoNumbers();
+        int[][] leftInputs = { {2, 4, 3}, {9, 9, 9, 9} };
+        int[][] rightInputs = { {5, 6, 4}, {9, 9, 9} };
+        int[][] expected = { {7, 0, 8}, {8, 9, 9, 0, 1} };
+        for (int i = 0; i < leftInputs.length; i++) {
+            ListNode node1 = null, tail1 = null;
+            for (int digit : leftInputs[i]) {
+                ListNode node = new ListNode(digit);
+                if (node1 == null) { node1 = node; tail1 = node; } else { tail1.next = node; tail1 = node; }
+            }
+            ListNode node2 = null, tail2 = null;
+            for (int digit : rightInputs[i]) {
+                ListNode node = new ListNode(digit);
+                if (node2 == null) { node2 = node; tail2 = node; } else { tail2.next = node; tail2 = node; }
+            }
+            ListNode outputHead = solver.addTwoNumbers(node1, node2);
+            int[] output = new int[expected[i].length];
+            for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+            System.out.printf("l1=%s l2=%s -> %s  expected=%s%n", Arrays.toString(leftInputs[i]), Arrays.toString(rightInputs[i]), Arrays.toString(output), Arrays.toString(expected[i]));
+        }
+    }
+
+
+
+
 
     // Definition for singly-linked list
     public static class ListNode {
@@ -39,23 +66,23 @@ public class AddTwoNumbers {
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
 
-    /**
-     * Adds two numbers represented as linked lists in reverse order.
+                        /**
+     * Intuition: this is ordinary column addition, and the lists already expose
+     * digits from least significant to most significant. A dummyHead gives a
+     * stable place to append every output digit while carry moves to the next column.
      *
      * Algorithm:
-     * 1. Initialize a dummy head to simplify result list construction
-     * 2. Use a carry variable to handle overflow from each digit addition
-     * 3. Traverse both lists simultaneously, adding corresponding digits plus carry
-     * 4. Create new nodes for the result with the sum modulo 10
-     * 5. Update carry to sum divided by 10 for the next iteration
-     * 6. Continue until both lists are processed and no carry remains
+     *   1. Return the other list if one input is null.
+     *   2. Keep current at dummyHead and carry at 0.
+     *   3. Add available node digits plus carry, append sum % 10, and update carry.
+     *   4. Advance any non-null input pointer until both lists and carry are done.
      *
-     * Time Complexity: O(max(m, n)) where m and n are lengths of the two lists
-     * Space Complexity: O(max(m, n)) for the result list
+     * Time:  O(max(m, n)) - each node from the longer list is read once.
+     * Space: O(max(m, n)) - the returned linked list stores the sum digits.
      *
-     * @param node1 First number as linked list in reverse order
-     * @param node2 Second number as linked list in reverse order
-     * @return Sum as linked list in reverse order
+     * @param node1 first number in reverse digit order
+     * @param node2 second number in reverse digit order
+     * @return sum in reverse digit order
      */
     public ListNode addTwoNumbers(ListNode node1, ListNode node2) {
         // Handle edge cases

@@ -1,29 +1,52 @@
 package linkedlist;
 
+import java.util.Arrays;
+
 /**
  * Problem: Reverse Nodes in k-Group
- * LeetCode: https://leetcode.com/problems/reverse-nodes-in-k-group/
- * Problem Statement:
- * Given the head of a linked list, reverse the nodes of the list `k` at a time and return the modified list.
- * If the number of nodes is not a multiple of `k`, then the remaining nodes at the end should remain unchanged.
- * For given the list   1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 and k = 2,
- * the output should be 3 -> 2 -> 1 -> 6 -> 5 -> 4 -> 9 -> 8 -> 7 -> 12 -> 11 -> 10 -> 13
- * LeetCode Contest Rating: Not available (not a contest problem)
+ *
+ * Reverse nodes in consecutive groups of size k. A trailing group with fewer
+ * than k nodes must remain in its original order.
+ *
+ * Leetcode: https://leetcode.com/problems/reverse-nodes-in-k-group/ (Hard)
+ * Rating:   Not available (not a contest problem)
+ * Pattern:  Linked list | Group reversal | Dummy node
+ *
+ * Example:
+ *   Input:  head = [1,2,3,4,5], k = 2
+ *   Output: [2,1,4,3,5]
+ *   Why:    the full pairs [1,2] and [3,4] reverse, while [5] remains.
+ *
+ * Follow-ups:
+ *   1. Reverse groups from the right?
+ *      Compute length, skip the left offset, then reverse full groups.
+ *   2. Vary k by segment?
+ *      Read group sizes from an array and verify each group before reversal.
+ *   3. Can recursion solve it?
+ *      Reverse the first k nodes, then recurse on the rest.
+ *
+ * Related: Reverse Linked List (206), Swap Nodes in Pairs (24).
  */
 public class ReverseListInKGroup {
 
   public static void main(String[] args) {
-    ListNode head = new ListNode(1);
-    LinkedList list = new LinkedList(head);
-    list.add(new ListNode(2));
-    list.add(new ListNode(3));
-    list.add(new ListNode(4));
-    list.add(new ListNode(5));
-
-    int k = 2;
-    ListNode result = new ReverseListInKGroup().reverseInGroupsOfK(head, k);
-    System.out.println("Reversed in groups of " + k + ": " + result);
+    ReverseListInKGroup solver = new ReverseListInKGroup();
+    int[][] inputs = { {1, 2, 3, 4, 5}, {1, 2, 3, 4, 5} };
+    int[] groupSizes = {2, 3};
+    int[][] expected = { {2, 1, 4, 3, 5}, {3, 2, 1, 4, 5} };
+    for (int i = 0; i < inputs.length; i++) {
+      ListNode head = null, tail = null;
+      for (int value : inputs[i]) {
+        ListNode node = new ListNode(value);
+        if (head == null) { head = node; tail = node; } else { tail.next = node; tail = node; }
+      }
+      ListNode outputHead = solver.reverseInGroupsOfK(head, groupSizes[i]);
+      int[] output = new int[expected[i].length];
+      for (int j = 0; j < output.length && outputHead != null; j++, outputHead = outputHead.next) output[j] = outputHead.val;
+      System.out.printf("head=%s k=%d -> %s  expected=%s%n", Arrays.toString(inputs[i]), groupSizes[i], Arrays.toString(output), Arrays.toString(expected[i]));
+    }
   }
+
 
   /**
    * Problem: Reverse nodes in k-group from a singly linked list.
@@ -44,12 +67,23 @@ public class ReverseListInKGroup {
    * Time: O(N), each node is visited once.
    * Space: O(1), in-place reversal with pointers.
    */
-  /**
-   * Reverses nodes in groups of k.
+    /**
+   * Intuition: treat each k-sized block as a closed mini-list with a start and
+   * end. Reverse that block, connect the previous group to its new head, and
+   * connect its old head to the next group.
    *
-   * @param originalHead The head of the original linked list.
-   * @param groupSize    The size of the group to reverse.
-   * @return The head of the modified list after reversing in k-groups.
+   * Algorithm:
+   *   1. Return originalHead when the list is empty or groupSize <= 1.
+   *   2. Use dummyHead, previousGroupEnd, and currentGroupStart to track boundaries.
+   *   3. While a complete group exists, find currentGroupEnd and nextGroupStart.
+   *   4. Reverse the group, reconnect it, and advance to the next group.
+   *
+   * Time:  O(n) - each node is checked and reversed a constant number of times.
+   * Space: O(1) - reversal uses pointer variables only.
+   *
+   * @param originalHead head of the linked list
+   * @param groupSize number of nodes per reversed group
+   * @return head after reversing every complete group
    */
   public ListNode reverseInGroupsOfK(ListNode originalHead, int groupSize) {
     if (originalHead == null || groupSize <= 1) {
