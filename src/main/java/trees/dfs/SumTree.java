@@ -2,57 +2,63 @@ package trees.dfs;
 import trees.Node;
 
 /**
- * Problem: Check if a binary tree is a SumTree.
- * A SumTree is defined as a binary tree where each node's value is equal to the sum of the values of its left and right subtrees.
- * The leaves of the tree are considered SumTrees by default, as they don't have any children.
+ * Problem: Sum Tree
  *
- * Intuition:
- * We can recursively check whether the tree is a SumTree by:
- * - Starting from the leaf nodes, which are trivially SumTrees with their own value.
- * - For each internal node, check if the value of the node is equal to the sum of the values of its left and right subtrees.
- * - If any node fails this condition, the tree is not a SumTree.
+ * A binary tree is a SumTree when every non-leaf node equals the sum of all
+ * values in its left and right subtrees. Empty trees and leaves are considered
+ * valid SumTrees.
  *
- * Algorithm:
- * 1. Recursively traverse the tree, checking if each node is a SumTree.
- * 2. For each node, calculate the sum of its left and right subtrees and compare it with the node's value.
- * 3. Return `true` if the tree is a SumTree and `false` otherwise.
+ * Leetcode: n/a (GeeksforGeeks SumTree practice)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Postorder subtree sums | Failure sentinel by exception
  *
- * Time Complexity: O(N), where N is the number of nodes in the tree, as each node is visited once.
- * Space Complexity: O(H), where H is the height of the tree, due to the recursive call stack.
+ * Example:
+ *   Input:  root = [26,10,3,4,6,null,3]
+ *   Output: true
+ *   Why:    10 = 4 + 6, 3 = 3, and 26 equals the sum of both child subtrees.
  *
- * LeetCode Link: https://leetcode.com/problems/check-if-a-binary-tree-is-a-sum-tree/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can you avoid exceptions for control flow?
+ *      Return a pair of isSumTree and subtree sum from the helper.
+ *   2. What if node values may overflow int totals?
+ *      Return long subtree sums instead of int.
+ *   3. How would you find all nodes that violate the property?
+ *      Continue traversal and collect failing nodes instead of stopping early.
  */
 
 public class SumTree {
 
-    public static void main(String[] args) {
-        // Example binary tree:
-        /*
-                26
-                /  \
-              10     3
-            /    \     \
-          4      6      3
-        */
-        Node root = new Node(26);
-        root.left = new Node(10);
-        root.right = new Node(3);
-        root.left.left = new Node(4);
-        root.left.right = new Node(6);
-        root.right.right = new Node(3);
+        public static void main(String[] args) {
+        Node leaf = new Node(26);
 
-        // Check if the tree is a SumTree
-        System.out.println("Is the tree a SumTree? " + isSumTree(root)); // Expected Output: true
+        Node invalid = new Node(10);
+        invalid.left = new Node(20);
+        invalid.right = new Node(30);
+
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[26]", isSumTree(leaf), true);
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[10,20,30]", isSumTree(invalid), false);
     }
 
-    /**
-     * Checks if the given binary tree is a SumTree.
-     * A SumTree is a binary tree where the value of a node is equal to the sum of the values
-     * of its left and right subtrees.
+
+        /**
+     * Intuition: a node can be checked only after knowing the sums of both
+     * subtrees. isSumTreeRec returns that subtree total for valid subtrees and
+     * throws when it sees a mismatch. The restored original public method then
+     * compares root.data with that returned subtree total.
      *
-     * @param root The root of the binary tree.
-     * @return True if the tree is a SumTree, otherwise false.
+     * Algorithm:
+     *   1. Return true immediately for null input.
+     *   2. Recursively compute leftSum and rightSum for every non-leaf node.
+     *   3. Throw if node.data is not leftSum + rightSum.
+     *   4. Return true only when the root value matches the helper's returned total.
+     *
+     * Time:  O(n) - each node is visited once until a mismatch stops traversal.
+     * Space: O(h) - recursion stack follows the tree height.
+     *
+     * @param root root of the binary tree
+     * @return true if the tree satisfies the SumTree property
      */
     public static boolean isSumTree(Node root) {
         // Base case: An empty tree or a leaf node is trivially a SumTree
@@ -70,13 +76,7 @@ public class SumTree {
         }
     }
 
-    /**
-     * Recursively checks whether a binary tree is a SumTree.
-     *
-     * @param node The current node being checked.
-     * @return The sum of the node's value and its left and right subtrees.
-     * @throws RuntimeException If the tree is not a SumTree.
-     */
+        // Returns the subtree sum if valid, otherwise throws to stop the check.
     private static int isSumTreeRec(Node node) {
         // Base case: If it's a leaf node, its value is the sum itself.
         if (node.left == null && node.right == null) {

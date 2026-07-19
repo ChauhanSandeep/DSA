@@ -3,80 +3,64 @@ package trees.traversal;
 import trees.Node;
 
 /**
- * This class converts a binary tree to a flattened linked list in-place.
- * The flattened list should follow the preorder traversal order of the binary tree.
- * 
- * Leetcode link : https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
+ * Problem: Flatten Binary Tree to Linked List
  *
- * Intuition:
- * - We recursively flatten the left subtree and then attach it to the right side of the current node.
- * - We then attach the original right subtree to the end of the newly flattened left subtree.
- * - Finally, recursively flatten the right subtree.
+ * Rearrange a binary tree in place into a right-child-only linked list. The list
+ * must follow the same order as preorder traversal, and every left pointer must
+ * become null.
  *
- * Algorithm:
- * 1. Recursively flatten the left subtree.
- * 2. Attach the flattened left subtree to the right of the current node.
- * 3. Append the original right subtree to the end of the right subtree.
- * 4. Flatten the right subtree.
+ * Leetcode: https://leetcode.com/problems/flatten-binary-tree-to-linked-list/ (Medium)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Postorder tail return | In-place rewiring
  *
- * Time Complexity:
- * - The time complexity is O(n), where n is the number of nodes in the binary tree.
- *   Each node is visited once during the recursion.
+ * Example:
+ *   Input:  root = [1,2,5,3,4,null,6]
+ *   Output: [1,null,2,null,3,null,4,null,5,null,6]
+ *   Why:    preorder visits 1, 2, 3, 4, 5, 6, which becomes the right-pointer chain.
  *
- * Space Complexity:
- * - The space complexity is O(h), where h is the height of the tree,
- *   due to the recursion stack. In the worst case, this is O(n) for a skewed tree.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can you flatten iteratively with O(1) extra space?
+ *      Use Morris-style rewiring by finding the rightmost node of each left subtree.
+ *   2. How would you produce inorder flattening instead?
+ *      Change the traversal order and keep previous/tail pointers accordingly.
+ *   3. How can you verify no left pointers remain?
+ *      Walk the right chain after flattening and check every left pointer is null.
+ *
+ * Related: Binary Tree Preorder Traversal (144), Convert Binary Search Tree to Sorted Doubly Linked List.
  */
 public class FlattenTree {
 
-    /**
-     * Main method to test the flatten functionality on a sample binary tree.
-     */
     public static void main(String[] args) {
-        // Construct the following binary tree
-        //                1
-        //              /   \
-        //             /     \
-        //            2       3
-        //           / \     /
-        //          4   5   6
-        //                 /
-        //                7
-        //
-        // The resulting flattened tree should look like:
-        // 1 -> 2 -> 4 -> 5 -> 3 -> 6 -> 7
-
         Node root = new Node(1);
         root.left = new Node(2);
-        root.right = new Node(3);
-        root.left.left = new Node(4);
-        root.left.right = new Node(5);
-        root.right.left = new Node(6);
-        root.right.left.left = new Node(7);
+        root.right = new Node(5);
+        root.left.left = new Node(3);
+        root.left.right = new Node(4);
+        root.right.right = new Node(6);
 
-        // Flatten the tree into a linked list
-        FlattenTree treeFlattener = new FlattenTree();
-        treeFlattener.flatten(root);
+        new FlattenTree().flatten(root);
+        StringBuilder flattened = new StringBuilder();
+        for (Node node = root; node != null; node = node.right) {
+            if (flattened.length() > 0) {
+                flattened.append(", ");
+            }
+            flattened.append(node.val);
+        }
 
-        // Print the flattened tree (linked list)
-        printFlattenedList(root);
+        Node single = new Node(7);
+        new FlattenTree().flatten(single);
+        System.out.printf("root=%s -> [%s]  expected=%s%n",
+            "[1,2,5,3,4,null,6]", flattened, "[1, 2, 3, 4, 5, 6]");
+        System.out.printf("root=%s -> [%d]  expected=%s%n",
+            "[7]", single.val, "[7]");
     }
+
 
     public void flatten(Node root) {
         flattenAndReturnTail(root);
     }
 
-    /**
-     * Recursively flattens the tree rooted at 'node' and returns the tail of the
-     * flattened list.
-     *
-     * Idea:
-     * - Recursively flatten left and right subtrees.
-     * - If there is a left subtree:
-     *     - Attach the flattened left list between current node and flattened right list.
-     *     - Move left list to the right and set left to null.
-     */
+        // Flattens node in preorder and returns the tail of the flattened chain.
     private Node flattenAndReturnTail(Node node) {
         if (node == null) {
             return null;

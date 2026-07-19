@@ -5,31 +5,48 @@ import trees.Node;
 import java.util.*;
 
 /**
- * 662. Maximum Width of Binary Tree
+ * Problem: Maximum Width of Binary Tree
  *
- * Problem: Given the root of a binary tree, return the maximum width of the given tree.
- * The width is the length between the end-nodes (the leftmost and rightmost non-null
- * nodes) at the same level, measured as the number of null nodes between them plus 1.
+ * Return the largest width across all levels of a binary tree. Width counts the
+ * positions between the leftmost and rightmost non-null nodes, including any
+ * missing nodes that would appear between them in a complete-tree layout.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-width-of-binary-tree/ (Medium)
+ * Rating:   not available
+ * Pattern:  Trees | BFS | Complete-tree indexing | Level boundaries
  *
  * Example:
- * Input: root = [1,3,2,5,3,null,9]
- * Output: 4
- * Explanation: Level 2 has width 4 ([5,3,null,9]).
+ *   Input:  root = [1,3,2,5,3,null,9]
+ *   Output: 4
+ *   Why:    the third level spans positions 5, 3, null, and 9, so its width is four.
  *
- * LeetCode: https://leetcode.com/problems/maximum-width-of-binary-tree
+ * Follow-ups:
+ *   1. How do you prevent index overflow in a deep tree?
+ *      Normalize indices at every level or use long values.
+ *   2. How would you return the level with maximum width?
+ *      Store the nodes from the level whenever maxWidth improves.
+ *   3. Can DFS compute the same width?
+ *      Remember the first index seen at each depth and compare later indices to it.
  *
- * Follow-up questions:
- * Q: How to handle very deep trees to avoid integer overflow?
- * A: Use coordinate compression or reset indices at each level.
- *
- * Q: What if we need to find the actual nodes at maximum width level?
- * A: Store node references along with positions during traversal.
- *
- * Q: Can we optimize space for very wide trees?
- * A: Use level-by-level processing to avoid storing all positions.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Binary Tree Level Order Traversal (102), Vertical Order Traversal.
  */
 public class MaximumWidthOfBinaryTree {
+
+    public static void main(String[] args) {
+        MaximumWidthOfBinaryTree solver = new MaximumWidthOfBinaryTree();
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(3);
+        root.right = new TreeNode(2);
+        root.left.left = new TreeNode(5);
+        root.left.right = new TreeNode(3);
+        root.right.right = new TreeNode(9);
+
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            "[1,3,2,5,3,null,9]", solver.widthOfBinaryTree(root), 4);
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            "[]", solver.widthOfBinaryTree(null), 0);
+    }
+
 
     // Definition for binary tree node
     public static class TreeNode {
@@ -45,17 +62,22 @@ public class MaximumWidthOfBinaryTree {
         }
     }
 
-    /**
-     * BFS approach with position tracking.
+        /**
+     * Intuition: complete-tree positions preserve the gaps created by missing
+     * children. During BFS, the first and last indices at each level therefore
+     * reveal that level's real width, even when null nodes are not enqueued.
      *
-     * Algorithm: Level-order traversal with indexing
-     * - Use BFS to traverse level by level
-     * - Assign index to each node: left child = 2*i, right child = 2*i+1
-     * - For each level, calculate width as (rightmost_index - leftmost_index + 1)
-     * - Track maximum width across all levels
+     * Algorithm:
+     *   1. Queue each real node together with its complete-tree index.
+     *   2. For one BFS level, track the minimum and maximum indices removed.
+     *   3. Push non-null children with indices 2 * index and 2 * index + 1.
+     *   4. Update maxWidth with rightmost - leftmost + 1.
      *
-     * Time Complexity: O(n) where n is number of nodes
-     * Space Complexity: O(w) where w is maximum width of tree
+     * Time:  O(n) - each non-null node is processed once.
+     * Space: O(w) - the queue holds at most one level of real nodes.
+     *
+     * @param root root of the binary tree
+     * @return maximum width among all levels
      */
     public int widthOfBinaryTree(TreeNode root) {
         if (root == null) return 0;
@@ -114,7 +136,7 @@ public class MaximumWidthOfBinaryTree {
         return dfs(root, 0, 0, leftmostIndex);
     }
 
-    // DFS helper returning maximum width found
+    // Returns the best width below node while recording the first index at each level.
     private int dfs(TreeNode node, int level, int index, Map<Integer, Integer> leftmostIndex) {
         if (node == null) return 0;
 
@@ -228,7 +250,7 @@ public class MaximumWidthOfBinaryTree {
         return maxWidth;
     }
 
-    // Remove trailing null nodes
+    // Removes trailing null placeholders after a level has been expanded.
     private List<TreeNode> trimNulls(List<TreeNode> nodes) {
         int lastNonNull = -1;
         for (int i = nodes.size() - 1; i >= 0; i--) {
@@ -240,7 +262,7 @@ public class MaximumWidthOfBinaryTree {
         return lastNonNull >= 0 ? nodes.subList(0, lastNonNull + 1) : new ArrayList<>();
     }
 
-    // Remove indices corresponding to trimmed nulls
+    // Keeps indices that still correspond to retained placeholders or real nodes.
     private List<Integer> trimNullIndices(List<Integer> indices, List<TreeNode> nodes) {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < Math.min(indices.size(), nodes.size()); i++) {
@@ -253,7 +275,7 @@ public class MaximumWidthOfBinaryTree {
         return result;
     }
 
-    // Check if there are non-null nodes after given index
+    // Reports whether a later entry contains a real node.
     private boolean hasNonNullAfter(List<TreeNode> nodes, int index) {
         for (int i = index + 1; i < nodes.size(); i++) {
             if (nodes.get(i) != null) return true;
@@ -282,7 +304,7 @@ public class MaximumWidthOfBinaryTree {
         return maxWidth;
     }
 
-    // Collect all indices for each level
+    // Collects complete-tree indices for every node grouped by depth.
     private void collectIndices(TreeNode node, int level, int index, Map<Integer, List<Integer>> levelIndices) {
         if (node == null) return;
 

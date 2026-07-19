@@ -5,41 +5,62 @@ import trees.Node;
 import java.util.*;
 
 /**
- * Maximum Depth Of Binary Tree
+ * Problem: Maximum Depth of Binary Tree
  *
- * Problem Statement:
- * Given the root of a binary tree, return its maximum depth.
- * A binary tree's maximum depth is the number of nodes along the longest path
- * from the root node down to the farthest leaf node.
+ * Given the root of a binary tree, return the number of nodes on the longest
+ * path from the root down to any leaf. An empty tree has depth 0.
+ *
+ * Leetcode: https://leetcode.com/problems/maximum-depth-of-binary-tree/ (Easy)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | BFS | Height from children
  *
  * Example:
- * Input: root = [3,9,20,null,null,15,7]
- * Output: 3
- * Explanation: The longest path is 3 -> 20 -> 15 (or 7), which has depth 3
+ *   Input:  root = [3,9,20,null,null,15,7]
+ *   Output: 3
+ *   Why:    the longest root-to-leaf paths contain three nodes, such as 3 -> 20 -> 15.
  *
- * LeetCode Link: https://leetcode.com/problems/maximum-depth-of-binary-tree
+ * Follow-ups:
+ *   1. How would you find minimum depth?
+ *      Stop only at real leaves, because a missing child is not a path.
+ *   2. How would you avoid recursion depth overflow?
+ *      Use the existing BFS or stack-based DFS variants.
+ *   3. How would you return the deepest path itself?
+ *      Store parent links or return both height and path during DFS.
  *
- * Follow-up Questions:
- * 1. What about minimum depth? - Similar approach but careful with incomplete paths
- * 2. How to find diameter? - Maximum depth through any node (not necessarily root)
- * 3. What if tree is extremely deep? - Use iterative approach to avoid stack overflow
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Minimum Depth of Binary Tree (111), Diameter of Binary Tree (543).
  */
 public class MaximumDepthOfBinaryTree {
 
-    /**
-     * Finds maximum depth using recursive DFS.
+    public static void main(String[] args) {
+        MaximumDepthOfBinaryTree solver = new MaximumDepthOfBinaryTree();
+        TreeNode root = new TreeNode(3);
+        root.left = new TreeNode(9);
+        root.right = new TreeNode(20);
+        root.right.left = new TreeNode(15);
+        root.right.right = new TreeNode(7);
+
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            "[3,9,20,null,null,15,7]", solver.maxDepthRecursive(root), 3);
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            "[]", solver.maxDepthRecursive(null), 0);
+    }
+
+
+        /**
+     * Intuition: the depth of a node is one plus the deeper of its two child
+     * depths. A null child contributes zero, so postorder recursion naturally
+     * builds the answer from leaves back to the root.
      *
-     * Algorithm: Post-order DFS
-     * - Base case: null node has depth 0
-     * - Recursively find depth of left and right subtrees
-     * - Return 1 + maximum depth of subtrees
+     * Algorithm:
+     *   1. Return 0 for a null node.
+     *   2. Recursively compute leftDepth and rightDepth.
+     *   3. Return 1 plus the larger child depth.
      *
-     * Time Complexity: O(n) - visit each node once
-     * Space Complexity: O(h) - recursion stack depth where h is tree height
+     * Time:  O(n) - every node contributes one constant-time calculation.
+     * Space: O(h) - recursion depth is the tree height.
      *
-     * @param root root of binary tree
-     * @return maximum depth of tree
+     * @param root root of the binary tree
+     * @return maximum root-to-leaf depth
      */
     public int maxDepthRecursive(TreeNode root) {
         if (root == null) {

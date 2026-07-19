@@ -8,72 +8,61 @@ import java.util.*;
 /**
  * Problem: Binary Tree Paths
  *
- * Given the root of a binary tree, return all root-to-leaf paths in any order.
- * A leaf is a node with no children.
+ * Given a binary tree, return every root-to-leaf path as a string. A valid path
+ * must begin at the root, end at a leaf, and use "->" between node values.
+ *
+ * Leetcode: https://leetcode.com/problems/binary-tree-paths/ (Easy)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Backtracking | Root-to-leaf path building
  *
  * Example:
- * Input: root = [1,2,3,null,5]
- *              1
- *             / \
- *            2   3
- *             \
- *              5
- * Output: ["1->2->5","1->3"]
- * Explanation: All root-to-leaf paths are "1->2->5" and "1->3".
+ *   Input:  root = [1,2,3,null,5]
+ *   Output: ["1->2->5", "1->3"]
+ *   Why:    the tree has exactly two leaves, 5 and 3, so there are two root-to-leaf paths.
  *
- * Constraints:
- * - The number of nodes in the tree is in the range [1, 100]
- * - -100 <= Node.val <= 100
+ * Follow-ups:
+ *   1. What if only paths with a target sum should be returned?
+ *      Carry a running sum and add the path only at matching leaves.
+ *   2. Can this be done iteratively?
+ *      Store node and path-so-far pairs in a stack or queue.
+ *   3. How would you stream paths instead of storing all of them?
+ *      Call a callback when a leaf is reached, then backtrack normally.
  *
- * LeetCode Problem: https://leetcode.com/problems/binary-tree-paths
- *
- * Follow-up Questions:
- *
- * 1. How would you modify this to find paths with a specific sum?
- *    Answer: Add a running sum parameter to the DFS function and check if it equals
- *    target when reaching leaf nodes. Only add paths that match the target sum.
- *    Related problem: https://leetcode.com/problems/path-sum-ii/
- *
- * 2. What if you need to find the path to a specific node, not just leaf nodes?
- *    Answer: Modify the base case to check if current node equals the target node instead
- *    of checking for leaf. Store the path when target is found and return early to avoid
- *    unnecessary traversal.
- *
- * 3. Can you solve this iteratively instead of recursively?
- *    Answer: Yes, use a stack or queue storing pairs of (node, path_string). Pop each pair,
- *    append current node, and push children with updated paths. Collect paths at leaf nodes.
- *
- * 4. How would you optimize if the tree has millions of nodes but only a few leaf nodes?
- *    Answer: The current DFS approach is already optimal as it visits each node once. Early
- *    pruning could help if we have additional constraints (like path sum limits), but for
- *    all paths, we must visit all nodes.
- *
- * 5. What if node values can be multi-digit or contain special characters?
- *    Answer: The current solution handles this correctly. StringBuilder concatenates values
- *    as strings, so multi-digit numbers and special characters are preserved in the output.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Path Sum II (113), Sum Root to Leaf Numbers (129).
  */
 public class BinaryTreePaths {
 
-  /**
-   * Finds all root-to-leaf paths using DFS with backtracking.
+  public static void main(String[] args) {
+    BinaryTreePaths solver = new BinaryTreePaths();
+    TreeNode root = new TreeNode(1);
+    root.left = new TreeNode(2);
+    root.right = new TreeNode(3);
+    root.left.right = new TreeNode(5);
+    TreeNode single = new TreeNode(1);
+
+    System.out.printf("root=%s -> %s  expected=%s%n",
+        "[1,2,3,null,5]", solver.binaryTreePaths(root), "[1->2->5, 1->3]");
+    System.out.printf("root=%s -> %s  expected=%s%n",
+        "[1]", solver.binaryTreePaths(single), "[1]");
+  }
+
+
+    /**
+   * Intuition: a root-to-leaf path is exactly the recursion stack from root to
+   * the current node. Keep that stack in path, add a formatted copy at leaves,
+   * and remove the current value while returning so sibling branches start clean.
    *
    * Algorithm:
-   * 1. Use DFS to traverse tree from root to leaves
-   * 2. Maintain current path as a list of nodes during traversal
-   * 3. When reaching leaf node, convert path to string format and add to result
-   * 4. Backtrack by removing current node after exploring its subtrees
-   * 5. Recursively explore left and right subtrees
+   *   1. Return an empty result for a null root.
+   *   2. DFS from root, appending node values to path.
+   *   3. At a leaf, convert path to "a->b->c" and add it to result.
+   *   4. After exploring children, remove the current node to backtrack.
    *
-   * Key insight: Backtracking allows us to reuse the same path list for different
-   * branches, maintaining correctness while minimizing space usage.
+   * Time:  O(n * h) - each leaf path formatting can copy up to h values.
+   * Space: O(h) - recursion and path hold one root-to-leaf branch, excluding output.
    *
-   * Time Complexity: O(N)
-   * Space Complexity: O(H) for recursion stack where H is tree height. The path list
-   * also uses O(H) space. Output space is O(N) for storing all paths.
-   *
-   * @param root the root node of the binary tree
-   * @return list of all root-to-leaf paths in "a->b->c" format
+   * @param root root of the binary tree
+   * @return all root-to-leaf paths in string form
    */
   public List<String> binaryTreePaths(TreeNode root) {
     List<String> result = new ArrayList<>();
@@ -86,7 +75,7 @@ public class BinaryTreePaths {
     return result;
   }
 
-  // Helper method to perform DFS traversal with backtracking
+  // Traverses root-to-leaf branches while maintaining the current path list.
   private void dfs(TreeNode node, List<Integer> path, List<String> result) {
     if (node == null) {
       return;
@@ -104,7 +93,7 @@ public class BinaryTreePaths {
     path.remove(path.size() - 1);
   }
 
-  // Helper method to build path string from list of node values
+  // Converts the current list of node values into the required arrow format.
   private String buildPath(List<Integer> path) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < path.size(); i++) {

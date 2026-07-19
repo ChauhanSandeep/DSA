@@ -2,33 +2,43 @@ package trees.bfs;
 
 import java.util.*;
 
-/**
- * Problem: Time Needed to Inform All Employees
- *
- * A company has n employees with a unique ID for each employee from 0 to n - 1. The head of the company is the one with headID.
- *
- * Each employee has one direct manager given in the manager array where manager[i] is the direct manager of the i-th employee,
- * manager[headID] = -1. Also, it's guaranteed that the subordination relationships have a tree structure.
- *
- * The head of the company wants to inform all the company employees of an urgent piece of news. He will inform his direct
- * subordinates, and they will inform their subordinates, and so on until all employees know about the news.
- *
- * The i-th employee needs informTime[i] minutes to inform all of his direct subordinates.
- *
- * Return the number of minutes needed to inform all the employees about the news.
- *
- * Example:
- * Input: n = 6, headID = 2, manager = [2,2,-1,2,2,2], informTime = [0,0,1,0,0,0]
- * Output: 1
- * Explanation: The head of the company with id = 2 is the direct manager of all the employees in the company and needs 1 minute to inform them all.
- *
- * LeetCode: https://leetcode.com/problems/time-needed-to-inform-all-employees
- *
- * Time Complexity: O(n) where n is the number of employees
- * Space Complexity: O(n) for the tree structure
- * LeetCode Contest Rating: 1561
- */
+    /**
+     * Intuition: each employee's receive time is its manager's receive time plus
+     * the manager's informTime. A BFS from the head carries that elapsed time to
+     * every subordinate and the answer is the maximum elapsed time seen.
+     *
+     * Algorithm:
+     *   1. Build manager -> direct reports adjacency lists from manager.
+     *   2. Start BFS with headID at time 0.
+     *   3. For each employee, enqueue every report with time + informTime[empId].
+     *   4. Return the largest time removed from the queue.
+     *
+     * Time:  O(n) - every employee and management edge is processed once.
+     * Space: O(n) - adjacency lists and queue store employees.
+     *
+     * @param n number of employees
+     * @param headID id of the root manager
+     * @param manager direct manager for each employee
+     * @param informTime minutes each employee needs to inform direct reports
+     * @return minutes until all employees are informed
+     */
 public class TimeNeededToInformAllEmployees {
+
+    public static void main(String[] args) {
+        TimeNeededToInformAllEmployees solver = new TimeNeededToInformAllEmployees();
+        int[] manager = {2, 2, -1, 2, 2, 2};
+        int[] informTime = {0, 0, 1, 0, 0, 0};
+        int[] singleManager = {-1};
+        int[] singleInformTime = {0};
+
+        System.out.printf("n=%d headID=%d manager=%s informTime=%s -> %d  expected=%d%n",
+            6, 2, Arrays.toString(manager), Arrays.toString(informTime),
+            solver.numOfMinutes(6, 2, manager, informTime), 1);
+        System.out.printf("n=%d headID=%d manager=%s informTime=%s -> %d  expected=%d%n",
+            1, 0, Arrays.toString(singleManager), Arrays.toString(singleInformTime),
+            solver.numOfMinutes(1, 0, singleManager, singleInformTime), 0);
+    }
+
     public int numOfMinutes(int n, int headID, int[] manager, int[] informTime) {
         // Build the tree using adjacency list
         Map<Integer, List<Integer>> tree = new HashMap<>();

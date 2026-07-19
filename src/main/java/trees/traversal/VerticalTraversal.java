@@ -9,36 +9,34 @@ import java.util.Queue;
 import java.util.TreeMap;
 
 /**
- * This class provides methods for performing a vertical order traversal of a binary tree.
+ * Problem: Vertical Order Traversal of Binary Tree
  *
- * Intuition:
- * - A vertical order traversal groups nodes that are aligned vertically along the same
- *   vertical line in the tree. Each node's horizontal distance (hd) from the root is tracked
- *   during the traversal. Nodes with the same horizontal distance are considered in the same vertical column.
- * - There are two ways to implement this traversal:
- *   1. Level order traversal using a queue (Breadth-First Search).
- *   2. Recursion, using the horizontal distance to group nodes.
+ * Group nodes by horizontal distance from the root and return columns from left
+ * to right. This implementation uses BFS, so nodes in the same column appear in
+ * level-order encounter order.
  *
- * Algorithm:
- * - **Method 1 (Using Queue and Level Order Traversal)**:
- *   - Perform a BFS starting from the root.
- *   - Track the horizontal distance (hd) of each node and store them in a map.
- *   - Finally, traverse the map in order of hd to get the vertical order.
+ * Leetcode: https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/ (Hard)
+ * Rating:   1676
+ * Pattern:  Trees | BFS | Horizontal distance | TreeMap columns
  *
- * - **Method 2 (Using Recursion)**:
- *   - Perform DFS traversal and track the horizontal distance of each node.
- *   - Use a map to store nodes based on their horizontal distance, and print them accordingly.
+ * Example:
+ *   Input:  root = [1,2,3,4,5,6,7]
+ *   Output: [4, 2, 1, 5, 6, 3, 7]
+ *   Why:    columns are hd -2, -1, 0, 1, and 2 from left to right.
  *
- * Time Complexity: O(n) - Both methods visit every node once.
- * Space Complexity: O(n) - Storing nodes in the map.
+ * Follow-ups:
+ *   1. How does Leetcode 987's ordering differ?
+ *      It also sorts ties by row and value, so a priority structure is needed.
+ *   2. Can DFS produce vertical order?
+ *      Yes, pass horizontal distance recursively and sort or preserve row data as needed.
+ *   3. How would you return columns as lists?
+ *      Return the TreeMap values without flattening them.
  *
- * LeetCode Problem Link: https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/
- * LeetCode Contest Rating: 1676
+ * Related: Binary Tree Vertical Order Traversal (314), Bottom View of Binary Tree.
  */
 public class VerticalTraversal {
 
-    public static void main(String[] args) {
-        // Example usage: Construct a binary tree and perform vertical order traversal
+        public static void main(String[] args) {
         Node root = new Node(1);
         root.left = new Node(2);
         root.right = new Node(3);
@@ -46,18 +44,31 @@ public class VerticalTraversal {
         root.left.right = new Node(5);
         root.right.left = new Node(6);
         root.right.right = new Node(7);
-        root.right.left.right = new Node(8);
-        root.right.right.right = new Node(9);
 
-        System.out.println("Vertical Order traversal is:");
-        System.out.println(verticalOrder(root)); // Expected output based on tree structure
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[1,2,3,4,5,6,7]", verticalOrder(root), "[4, 2, 1, 5, 6, 3, 7]");
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[]", verticalOrder(null), null);
     }
 
-    /**
-     * Performs vertical order traversal of a binary tree using level order traversal (BFS).
+
+        /**
+     * Intuition: horizontal distance identifies a vertical column: left child is
+     * one column left, right child is one column right. BFS preserves top-to-bottom
+     * encounter order inside each column, and TreeMap keeps columns sorted.
      *
-     * @param root The root node of the binary tree.
-     * @return A list of integers representing the vertical order traversal of the tree.
+     * Algorithm:
+     *   1. Return null for a null root, matching the original method contract.
+     *   2. BFS IndexNode entries containing a node and its horizontal distance.
+     *   3. Append each value to map[hd].
+     *   4. Enqueue left child with hd - 1 and right child with hd + 1.
+     *   5. Flatten TreeMap columns from smallest hd to largest.
+     *
+     * Time:  O(n log n) - each node may update a TreeMap column.
+     * Space: O(n) - queue and map store traversal state.
+     *
+     * @param root root of the binary tree
+     * @return flattened vertical order, or null for an empty tree
      */
     static ArrayList<Integer> verticalOrder(Node root) {
         if (root == null) return null;

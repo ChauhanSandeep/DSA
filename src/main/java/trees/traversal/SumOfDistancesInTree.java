@@ -2,33 +2,40 @@ package trees.traversal;
 
 import java.util.*;
 
-/**
- * Problem: Sum of Distances in Tree
- *
- * There is an undirected connected tree with n nodes labeled from 0 to n - 1 and n - 1 edges.
- * You are given the integer n and the array edges where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree.
- *
- * Return an array answer of length n where answer[i] is the sum of the distances between the ith node in the tree and all other nodes.
- *
- * Example:
- * Input: n = 6, edges = [[0,1],[0,2],[2,3],[2,4],[2,5]]
- * Output: [8,12,6,10,10,10]
- * Explanation: The tree is shown below.
- *       0
- *     /   \
- *    1     2
- *         /|\
- *        3 4 5
- * We can see that dist(0,1) + dist(0,2) + dist(0,3) + dist(0,4) + dist(0,5)
- * equals 1 + 1 + 2 + 2 + 2 = 8.  Hence, answer[0] = 8, and so on.
- *
- * LeetCode: https://leetcode.com/problems/sum-of-distances-in-tree
- *
- * Time Complexity: O(n) where n is the number of nodes
- * Space Complexity: O(n) for the graph and other data structures
- * LeetCode Contest Rating: 2197
- */
+    /**
+     * Intuition: first root the tree at 0. postOrder counts each subtree and
+     * computes distances from 0. Then preOrder reroots across every edge: moving
+     * root from node to child brings count[child] nodes one step closer and the
+     * remaining n - count[child] nodes one step farther away.
+     *
+     * Algorithm:
+     *   1. Build an undirected adjacency structure.
+     *   2. postOrder fills count[node] and res[0] using subtree contributions.
+     *   3. preOrder reroots from each node to each child with the distance formula.
+     *   4. Return res after every node has been used as a root.
+     *
+     * Time:  O(n) - both DFS passes traverse each edge once.
+     * Space: O(n) - adjacency sets, arrays, and recursion stack.
+     *
+     * @param n number of nodes labeled 0 to n - 1
+     * @param edges undirected tree edges
+     * @return sum of distances from each node to all other nodes
+     */
 public class SumOfDistancesInTree {
+
+    public static void main(String[] args) {
+        SumOfDistancesInTree solver = new SumOfDistancesInTree();
+        int[][] edges = {{0, 1}, {0, 2}, {2, 3}, {2, 4}, {2, 5}};
+        int[][] emptyEdges = {};
+
+        System.out.printf("n=%d edges=%s -> %s  expected=%s%n",
+            6, Arrays.deepToString(edges), Arrays.toString(solver.sumOfDistancesInTree(6, edges)),
+            Arrays.toString(new int[] {8, 12, 6, 10, 10, 10}));
+        System.out.printf("n=%d edges=%s -> %s  expected=%s%n",
+            1, Arrays.deepToString(emptyEdges), Arrays.toString(new SumOfDistancesInTree().sumOfDistancesInTree(1, emptyEdges)),
+            Arrays.toString(new int[] {0}));
+    }
+
     private int[] count;
     private int[] res;
     private List<Set<Integer>> tree;
@@ -57,7 +64,7 @@ public class SumOfDistancesInTree {
         return res;
     }
 
-    // Post-order traversal to calculate count and res[0]
+    // Computes subtree sizes and the distance sum for the initial root 0.
     private void postOrder(int node, int parent) {
         for (int child : tree.get(node)) {
             if (child == parent) continue;
@@ -68,7 +75,7 @@ public class SumOfDistancesInTree {
         count[node]++;
     }
 
-    // Pre-order traversal to calculate res for all nodes
+    // Reroots the distance sum from each node to each child.
     private void preOrder(int node, int parent, int n) {
         for (int child : tree.get(node)) {
             if (child == parent) continue;

@@ -1,33 +1,48 @@
 package trees.dfs;
 
+import java.util.Arrays;
+
 /**
- * Binary Tree Cameras
+ * Problem: Binary Tree Cameras
  *
- * Problem Statement:
- * You are given the root of a binary tree. We install cameras on the tree nodes where each camera at a node can
- * monitor its parent, itself, and its immediate children.
- * Return the minimum number of cameras needed to monitor all nodes of the tree.
+ * Place the fewest cameras so every node in a binary tree is monitored. A camera
+ * on one node covers its parent, itself, and its immediate children.
+ *
+ * Leetcode: https://leetcode.com/problems/binary-tree-cameras/ (Hard)
+ * Rating:   2124
+ * Pattern:  Trees | DFS | Postorder states | Greedy coverage
  *
  * Example:
- * Input: root = [0,0,null,0,0]
-                0
-               /
-              0
-            /  \
-           0    0
- * Output: 1
- * Explanation: One camera at the root's left child can monitor all nodes.
+ *   Input:  root = [0,0,null,0,0]
+ *   Output: 1
+ *   Why:    one camera on the internal child covers its parent and both children.
  *
+ * Follow-ups:
+ *   1. What if cameras have range k?
+ *      Track distance-to-camera and distance-to-uncovered states for each node.
+ *   2. What if cameras have different costs?
+ *      Use tree DP states instead of a simple greedy counter.
+ *   3. What if the input is a forest?
+ *      Apply the same root check to each tree and sum the camera counts.
  *
- * LeetCode Link: https://leetcode.com/problems/binary-tree-cameras
- *
- * Follow-up Questions:
- * 1. What if cameras had different ranges? - Use DP with different states for each range
- * 2. What if we want to minimize cost instead of count? - Modify state values to track costs
- * 3. What about forest of trees? - Apply same logic to each tree and sum results
- * LeetCode Contest Rating: 2124
+ * Related: House Robber III (337), Binary Tree Maximum Path Sum (124).
  */
 public class BinaryTreeCameras {
+
+    public static void main(String[] args) {
+        BinaryTreeCameras solver = new BinaryTreeCameras();
+        TreeNode root = new TreeNode(0);
+        root.left = new TreeNode(0);
+        root.left.left = new TreeNode(0);
+        root.left.right = new TreeNode(0);
+
+        TreeNode single = new TreeNode(0);
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            Arrays.toString(new int[] {0, 0, 0, 0}), solver.minCameraCover(root), 1);
+        System.out.printf("root=%s -> %d  expected=%d%n",
+            Arrays.toString(new int[] {0}), solver.minCameraCover(single), 1);
+    }
+
 
     private int cameras = 0;
 
@@ -36,18 +51,23 @@ public class BinaryTreeCameras {
     private static final int HAS_CAMERA = 1;
     private static final int COVERED = 2;
 
-    /**
-     * Finds minimum number of cameras needed to monitor all nodes.
+        /**
+     * Intuition: a leaf should not own a camera if its parent can cover it and
+     * maybe more nodes at the same time. Postorder DFS lets children report
+     * whether they still need coverage; a parent installs a camera exactly when
+     * at least one child is NOT_COVERED.
      *
-     * Algorithm: Post-order DFS with state tracking
-     * - Traverse bottom-up to make optimal decisions
-     * - Each node can be in one of three states: needs camera, has camera, or covered
-     * - Place cameras greedily when a node needs coverage and parent can't provide it
+     * Algorithm:
+     *   1. Reset cameras and run dfs from the root.
+     *   2. In dfs, treat null children as already COVERED.
+     *   3. If any child is NOT_COVERED, place a camera here and return HAS_CAMERA.
+     *   4. If any child HAS_CAMERA, return COVERED; otherwise return NOT_COVERED.
+     *   5. Add one final camera if the root itself returns NOT_COVERED.
      *
-     * Time Complexity: O(n) - visit each node once
-     * Space Complexity: O(h) - recursion stack depth where h is tree height
+     * Time:  O(n) - every node returns one state once.
+     * Space: O(h) - recursion stack height.
      *
-     * @param root root of binary tree
+     * @param root root of the binary tree
      * @return minimum number of cameras needed
      */
     public int minCameraCover(TreeNode root) {
@@ -61,7 +81,7 @@ public class BinaryTreeCameras {
         return cameras;
     }
 
-    // Returns the state of current node after processing
+    // Returns the coverage state of node after processing both children.
     private int dfs(TreeNode node) {
         if (node == null) {
             return COVERED; // null nodes are considered covered

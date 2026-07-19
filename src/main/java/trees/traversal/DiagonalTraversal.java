@@ -6,72 +6,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Diagonal Traversal of a binary tree:
- * Given a binary tree, we perform a diagonal traversal where we traverse the tree
- * diagonally starting from the root node and moving towards the right child nodes.
+ * Problem: Diagonal Traversal of Binary Tree
  *
- * For example, given the following binary tree:
- *             11
- *           /    \
- *          20     12
- *         / \       \
- *        1   15      13
- *           /  \     /
- *          2    17  16
- *           \   /
- *           22 34
- * The diagonal traversal would yield the following order:
- * [11, 12, 13, 20, 15, 17, 16, 1, 2, 22, 34]
+ * Group tree nodes by diagonal and return the groups from top-right to
+ * bottom-left as one flattened list. Moving right stays on the same diagonal;
+ * moving left advances to the next diagonal.
  *
- * Intuition:
- * - Diagonal traversal means grouping nodes that lie in the same diagonal,
- *   where each diagonal consists of nodes that have the same difference in their row and column index.
- * - For each diagonal, we start at the root and traverse down to the right,
- *   adding nodes to a list until we reach a null node.
+ * Leetcode: n/a (InterviewBit diagonal traversal)
+ * Rating:   not available
+ * Pattern:  Trees | DFS | Diagonal index | Flatten grouped traversal
  *
- * Algorithm:
- * 1. Start with the root node, and for each node, explore its left child by moving diagonally down.
- * 2. Move right and add all nodes to the respective diagonal list.
- * 3. Recursively traverse the left and right children to fill the diagonal lists.
+ * Example:
+ *   Input:  root = [1,2,3]
+ *   Output: [1, 3, 2]
+ *   Why:    root 1 and right child 3 share diagonal 0, while left child 2 is on diagonal 1.
  *
- * Time Complexity:
- * - The time complexity is O(n), where n is the number of nodes in the tree, because each node is visited once.
- *
- * Space Complexity:
- * - The space complexity is O(n) due to the storage required for the list of diagonals.
- *
- * InterviewBit Link:
- * https://www.interviewbit.com/problems/diagonal-traversal/
+ * Follow-ups:
+ *   1. Can this be implemented with a queue?
+ *      Push left children as starts of later diagonals while walking right chains.
+ *   2. How would you return separate diagonal groups?
+ *      Return diagonals directly instead of flattening them at the end.
+ *   3. How would anti-diagonal traversal change?
+ *      Swap the roles of left and right when updating the diagonal index.
  */
 public class DiagonalTraversal {
 
-    /**
-     * Main method to test the diagonal traversal on a sample binary tree.
-     */
     public static void main(String[] args) {
-        TreeNode root = new TreeNode(8);
-        root.left = new TreeNode(3);
-        root.right = new TreeNode(10);
-        root.left.left = new TreeNode(1);
-        root.left.right = new TreeNode(6);
-        root.right.right = new TreeNode(14);
-        root.right.right.left = new TreeNode(13);
-        root.left.right.left = new TreeNode(4);
-        root.left.right.right = new TreeNode(7);
+        DiagonalTraversal solver = new DiagonalTraversal();
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
 
-        // Perform diagonal traversal on the tree
-        DiagonalTraversal treeTraversal = new DiagonalTraversal();
-        ArrayList<Integer> result = treeTraversal.solve(root);
-
-        // Print the diagonal traversal result
-        System.out.println(result);
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[1,2,3]", solver.solve(root), "[1, 3, 2]");
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[]", solver.solve(null), "[]");
     }
 
-    /**
-     * Returns a list of values representing the diagonal traversal of the binary tree.
+
+        /**
+     * Intuition: a left edge moves one diagonal farther from the top-right view,
+     * while a right edge stays on the same diagonal. traverse records each value
+     * in diagonals[diagonalNumber], then solve flattens those groups in order.
      *
-     * @param root The root of the binary tree.
-     * @return A list of integers representing the diagonal traversal order.
+     * Algorithm:
+     *   1. Return an empty list for a null root.
+     *   2. DFS with diagonalNumber starting at zero.
+     *   3. Create a diagonal bucket before adding a node to it.
+     *   4. Recurse left with diagonalNumber + 1 and right with diagonalNumber.
+     *   5. Flatten the diagonal buckets into the result list.
+     *
+     * Time:  O(n) - each node is added once and flattened once.
+     * Space: O(n) - diagonal storage plus recursion stack.
+     *
+     * @param root root of the binary tree
+     * @return flattened diagonal traversal order
      */
     public ArrayList<Integer> solve(TreeNode root) {
         // Edge case: if the root is null, return an empty list
@@ -91,13 +80,7 @@ public class DiagonalTraversal {
         return result;
     }
 
-    /**
-     * Recursively traverses the tree and populates the diagonals list with nodes at each diagonal level.
-     *
-     * @param node       The current node being visited.
-     * @param diagonalNumber  The current diagonal index.
-     * @param diagonals The list storing nodes for each diagonal.
-     */
+        // Places node values into buckets according to their diagonal number.
     private void traverse(TreeNode node, int diagonalNumber, List<List<Integer>> diagonals) {
         // Base case: return if the node is null
         if (node == null) return;
