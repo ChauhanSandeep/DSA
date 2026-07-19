@@ -5,42 +5,62 @@ import java.util.Map;
 
 
 /**
- * ✅ Problem: First Unique Character in a String
+ * Problem: First Unique Character in a String
  *
- * Given a string `s`, return the index of the **first non-repeating character** in it.
- * If it doesn't exist, return -1.
+ * Given a lowercase string, return the index of the first character that appears
+ * exactly once. If every character repeats, return -1.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/first-unique-character-in-a-string/
+ * Leetcode: https://leetcode.com/problems/first-unique-character-in-a-string/ (Easy)
+ * Rating:   acceptance 65.9% (Easy) - no contest Elo (pre-contest problem)
+ * Pattern:  Array | Frequency counting | First valid position
  *
- * 🧠 Example:
- * Input:  "loveleetcode"
- * Output: 2 ('v' is the first non-repeating character)
+ * Example:
+ *   Input:  str = "loveleetcode"
+ *   Output: 2
+ *   Why:    'l' and 'o' repeat, while 'v' appears once and is the earliest
+ *           character with frequency one.
  *
- * 🔍 Follow-Up Questions:
- * 1. What if you need to return the first unique *character* instead of index? ➤ Small change in logic
- * 2. Can this be done in one pass? ➤ Not reliably without using LinkedHashMap
- * 3. What if the input stream is continuous? ➤ Use a frequency map + queue to track candidates
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Return the first unique character instead of its index?
+ *      Return str.charAt(i) from the second pass when freq is one.
+ *   2. Process a live stream and query the first unique character anytime?
+ *      Maintain counts plus an ordered queue or linked map of candidates.
+ *   3. Support arbitrary Unicode characters?
+ *      Replace the fixed 26-slot array with a map keyed by code point.
+ *   4. Answer many substring first-unique queries?
+ *      Precompute per-character prefix counts and scan candidate positions per query.
+ *
+ * Related: First Unique Number, Find First Non-Repeating Character in a Stream.
  */
 public class FirstUniqueChar {
 
     public static void main(String[] args) {
-        System.out.println("First unique character is at index: " + findFirstUniqueCharIndex("loveleetcode"));
-        System.out.println("First unique character is at index: " + findFirstUniqueCharIndex("thedailybyte"));
+        String[] inputs = { "loveleetcode", "aabb", "thedailybyte" };
+        int[] expected = { 2, -1, 1 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            int output = findFirstUniqueCharIndex(inputs[i]);
+            System.out.printf("str=%s -> %d  expected=%d%n", inputs[i], output, expected[i]);
+        }
     }
 
     /**
-     * ✅ Optimized approach using frequency array.
+     * Intuition: a character can be the answer only if its final frequency is
+     * one, and "first" depends on the original order. Count every lowercase
+     * letter once, then make a second pass through str so the first frequency-one
+     * position is returned immediately.
      *
-     * Steps:
-     * 1. Count frequency of each character.
-     * 2. In a second pass, return index of the first char with frequency 1.
+     * Algorithm:
+     *   1. Return -1 for a null or empty string.
+     *   2. Count each character of str in the freq array.
+     *   3. Scan str again and return the first index whose count is one.
+     *   4. Return -1 if every character repeats.
      *
-     * Time Complexity: O(n) — two passes over the input string
-     * Space Complexity: O(1) — constant space as char set is fixed (only lowercase a-z)
+     * Time:  O(n) - two linear passes over the string.
+     * Space: O(1) - the 26-slot lowercase frequency array is fixed size.
      *
-     * @param str The input string
-     * @return Index of first unique character or -1 if none exists
+     * @param str lowercase input string
+     * @return index of the first unique character, or -1 when none exists
      */
     public static int findFirstUniqueCharIndex(String str) {
         if (str == null || str.isEmpty()) return -1;
