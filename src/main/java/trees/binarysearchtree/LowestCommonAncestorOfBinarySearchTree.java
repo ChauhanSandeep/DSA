@@ -1,20 +1,32 @@
 package trees.binarysearchtree;
 
 /**
- * Given a Binary Search Tree (BST) and two node values, this program finds the Lowest Common Ancestor (LCA) of the two nodes.
+ * Problem: Lowest Common Ancestor of a Binary Search Tree
  *
- * Intuition:
- * - In a BST, the left child is smaller than the parent node and the right child is greater.
- * - The LCA of two nodes is the deepest node that is an ancestor of both nodes.
- * - If both node values are smaller than the current node, the LCA lies in the left subtree.
- * - If both node values are larger than the current node, the LCA lies in the right subtree.
- * - If one node is on one side and the other is on the opposite side, the current node is their LCA.
+ * Given a BST and two node values, find the lowest node whose subtree contains
+ * both values. The BST ordering lets the search move left, move right, or stop at
+ * the split point.
  *
- * Time Complexity: O(H) where H is the height of the tree. In the worst case, this could be O(N), where N is the number of nodes.
- * Space Complexity: O(1), since we're using only a constant amount of extra space.
+ * Leetcode: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Ordered path search
  *
- * LeetCode Problem Link: https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Example:
+ *   Input:  root = [5,4,6,3,null,null,7,null,null,null,8], n1 = 3, n2 = 8
+ *   Output: 5
+ *   Why:    3 lies to the left of 5 and 8 lies to the right, so 5 is the split point.
+ *
+ * Follow-ups:
+ *   1. What if the values may not exist?
+ *      Search for both values first or return presence flags with the candidate.
+ *   2. How would this work with duplicate values?
+ *      Define a duplicate-side policy and use it consistently in comparisons.
+ *   3. How would you answer many queries?
+ *      Store parent/depth data or preprocess ancestors for faster repeated lookup.
+ *   4. What changes for a plain binary tree?
+ *      You must search both subtrees because ordering no longer prunes a path.
+ *
+ * Related: Lowest Common Ancestor of a Binary Tree (236).
  */
 
 public class LowestCommonAncestorOfBinarySearchTree {
@@ -30,19 +42,7 @@ public class LowestCommonAncestorOfBinarySearchTree {
         }
     }
 
-    public static void main(String[] args) {
-        /*
-            Example Tree:
-                     5
-                   /   \
-                 4      6
-                /        \
-               3          7
-                           \
-                            8
-        */
-
-        // Construct the example tree
+        public static void main(String[] args) {
         Node root = new Node(5);
         root.left = new Node(4);
         root.left.left = new Node(3);
@@ -50,20 +50,30 @@ public class LowestCommonAncestorOfBinarySearchTree {
         root.right.right = new Node(7);
         root.right.right.right = new Node(8);
 
-        // Test case 1: Find LCA of nodes 7 and 8
-        System.out.printf("Lowest common ancestor of 7 and 8 is: %d\n", findLCA(root, 7, 8).data);
-
-        // Test case 2: Find LCA of nodes 3 and 8
-        System.out.printf("Lowest common ancestor of 3 and 8 is: %d\n", findLCA(root, 3, 8).data);
+        System.out.printf("n1=%d n2=%d -> %d  expected=7%n", 7, 8, findLCA(root, 7, 8).data);
+        System.out.printf("n1=%d n2=%d -> %d  expected=5%n", 3, 8, findLCA(root, 3, 8).data);
     }
 
-    /**
-     * Finds the Lowest Common Ancestor (LCA) of two nodes in a Binary Search Tree (BST).
+
+        /**
+     * Intuition: in a BST, a node separates smaller values on the left from larger
+     * values on the right. If both targets are below one side, the LCA must also be on
+     * that side. The first node that does not send both targets the same way is the
+     * lowest split point.
      *
-     * @param root The root node of the BST.
-     * @param n1   The value of the first node.
-     * @param n2   The value of the second node.
-     * @return The LCA node of the two nodes.
+     * Algorithm:
+     *   1. Swap n1 and n2 if needed so n1 <= n2.
+     *   2. Start from root as currentNode.
+     *   3. Move left while currentNode.data is greater than n2.
+     *   4. Move right while currentNode.data is less than n1; otherwise return currentNode.
+     *
+     * Time:  O(h) - one path from root to the split point is traversed.
+     * Space: O(1) - only currentNode and a swap temp are stored.
+     *
+     * @param root root of the BST
+     * @param n1 first target value
+     * @param n2 second target value
+     * @return LCA node, or null if traversal falls off the tree
      */
     static Node findLCA(Node root, int n1, int n2) {
         // Ensure that n1 is always smaller than n2 for clarity in comparison.

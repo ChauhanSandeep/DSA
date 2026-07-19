@@ -5,32 +5,54 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * 173. Binary Search Tree Iterator
+ * Problem: Binary Search Tree Iterator
  *
- * Problem: Implement an iterator over a binary search tree (BST) that will iterate
- * over the BST in in-order traversal (smallest to largest).
+ * Implement an iterator that returns BST values in sorted order. The primary
+ * iterator keeps only the path to the next smallest node instead of materializing
+ * the full inorder traversal up front.
+ *
+ * Leetcode: https://leetcode.com/problems/binary-search-tree-iterator/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Controlled inorder traversal with stack
  *
  * Example:
- * Input: root = [7,3,15,null,null,9,20]
- * BSTIterator iterator = new BSTIterator(root);
- * iterator.next();    // return 3
- * iterator.hasNext(); // return True
- * iterator.next();    // return 7
+ *   Input:  root = [7,3,15,null,null,9,20], calls = next,next,hasNext
+ *   Output: [3,7,true]
+ *   Why:    inorder traversal of a BST visits values in ascending order.
  *
- * LeetCode: https://leetcode.com/problems/binary-search-tree-iterator
- *
- * Follow-up questions:
- * Q: Can you implement with O(1) time for both operations?
- * A: No, amortized O(1) is the best we can do due to tree traversal nature.
- *
- * Q: How to implement previous() method?
- * A: Need to maintain parent pointers or use two stacks (forward/backward).
- *
- * Q: What if we need to support arbitrary position jumping?
- * A: Pre-compute all nodes in array or use augmented BST with size information.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Follow-ups:
+ *   1. Can next and hasNext both be worst-case O(1)?
+ *      Only if all values are precomputed, which costs O(n) space.
+ *   2. How would you add previous()?
+ *      Maintain extra history or a second stack for reverse movement.
+ *   3. How would you support frequent tree updates?
+ *      Use a balanced BST with parent links or restart affected iterator state.
+ *   4. How would you get O(1) extra space?
+ *      Morris traversal can thread the tree temporarily, but it mutates pointers.
  */
 public class BinarySearchTreeIterator {
+
+    public static void main(String[] args) {
+        int[][] expected = { {3, 7, 9, 15, 20}, {1} };
+
+        TreeNode root = new TreeNode(7);
+        root.left = new TreeNode(3);
+        root.right = new TreeNode(15, new TreeNode(9), new TreeNode(20));
+
+        TreeNode single = new TreeNode(1);
+        TreeNode[] roots = { root, single };
+
+        for (int i = 0; i < roots.length; i++) {
+            BSTIterator iterator = new BSTIterator(roots[i]);
+            List<Integer> output = new ArrayList<>();
+            while (iterator.hasNext()) {
+                output.add(iterator.next());
+            }
+            System.out.printf("case=%d -> %s  expected=%s%n",
+                i + 1, output, Arrays.toString(expected[i]));
+        }
+    }
+
 
     // Definition for a binary tree node
     public static class TreeNode {
@@ -46,17 +68,9 @@ public class BinarySearchTreeIterator {
         }
     }
 
-    /**
-     * BST Iterator using controlled inorder traversal with stack.
-     *
-     * Algorithm: Controlled recursion simulation
-     * - Use stack to simulate inorder traversal
-     * - Push all left children of current node to stack
-     * - On next(): pop from stack, process right subtree of popped node
-     * - Maintains O(h) space where h is tree height
-     *
-     * Time Complexity: O(1) amortized for both operations
-     * Space Complexity: O(h) where h is height of tree
+        /**
+     * Primary stack-backed iterator. It simulates the original inorder recursion by
+     * keeping the current root-to-leftmost path on stack.
      */
     public static class BSTIterator {
 

@@ -3,89 +3,104 @@ package trees.segmenttree;
 import java.util.*;
 
 /**
- * My Calendar III
+ * Problem: My Calendar III
  *
- * Problem Statement:
- * A k-booking happens when k events have some non-empty intersection (i.e., there is some time
- * that is common to all k events). You are given some events [start, end), after each given
- * event, return an integer k representing the maximum k-booking between all the previous events.
+ * Book half-open events [start, end) and after each booking return the maximum
+ * number of simultaneous events seen so far. The primary solution records start
+ * and end deltas in sorted order and line-sweeps the prefix sums.
  *
- * Implement the MyCalendarThree class:
- * - MyCalendarThree() Initializes the object.
- * - int book(int start, int end) Returns the largest integer k such that there exists a k-booking.
+ * Leetcode: https://leetcode.com/problems/my-calendar-iii/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Segment tree topic | Line sweep | TreeMap difference timeline
  *
  * Example:
- * Input: ["MyCalendarThree", "book", "book", "book", "book", "book", "book"]
- *        [[], [10,20], [50,60], [10,40], [5,15], [5,10], [25,55]]
- * Output: [null, 1, 1, 2, 3, 3, 3]
- * Explanation:
- * book(10,20) -> 1 (first event, no overlap)
- * book(50,60) -> 1 (second event, no overlap with first)
- * book(10,40) -> 2 (overlaps with [10,20), max overlap is 2)
- * book(5,15) -> 3 (overlaps with previous events, max overlap is 3)
+ *   Input:  book [10,20], [50,60], [10,40], [5,15]
+ *   Output: [1,1,2,3]
+ *   Why:    after [5,15), the time range [10,15) is covered by three events.
  *
- * LeetCode Link: https://leetcode.com/problems/my-calendar-iii
+ * Follow-ups:
+ *   1. How would you improve per-booking time for many events?
+ *      Use a dynamic segment tree with lazy propagation over the coordinate range.
+ *   2. How would you support cancellations?
+ *      Apply the inverse deltas and update the segment tree or timeline counts.
+ *   3. How would you handle arbitrary large timestamps sparsely?
+ *      Use coordinate compression or dynamically allocated segment tree nodes.
+ *   4. How would you return the time interval with max overlap?
+ *      Track the best segment while sweeping or store argmax data in the segment tree.
  *
- * Follow-up Questions:
- * 1. How would you optimize for very large coordinate ranges (0 to 10^9)?
- *    Answer: Use coordinate compression to map coordinates to smaller consecutive ranges.
- * 2. What if we need to support event deletion as well?
- *    Answer: Use segment tree with range updates and maintain counts that can be decremented.
- * 3. How to handle real-time queries with millions of events?
- *    Answer: Use persistent segment trees or fractional cascading for time-travel queries.
- *    Related: https://leetcode.com/problems/my-calendar-ii/
- * 4. What's the space-time tradeoff between TreeMap and Segment Tree approaches?
- *    Answer: TreeMap uses O(n) space with O(n log n) per query, Segment Tree uses O(range) space with O(log range) per query.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: My Calendar I (729), My Calendar II (731).
  */
 public class MyCalendarThree {
 
+    public static void main(String[] args) {
+        MyCalendarThree calendar = new MyCalendarThree();
+        int[][] bookings = { {10, 20}, {50, 60}, {10, 40}, {5, 15}, {5, 10}, {25, 55} };
+        int[] expected = {1, 1, 2, 3, 3, 3};
+        int[] output = new int[bookings.length];
+
+        for (int i = 0; i < bookings.length; i++) {
+            output[i] = calendar.book(bookings[i][0], bookings[i][1]);
+        }
+        System.out.printf("bookings=%s -> %s  expected=%s%n",
+            Arrays.deepToString(bookings), Arrays.toString(output), Arrays.toString(expected));
+
+        MyCalendarThree edge = new MyCalendarThree();
+        System.out.printf("bookings=%s -> %d  expected=1%n",
+            Arrays.deepToString(new int[][] {{1, 2}}), edge.book(1, 2));
+    }
+
+
     private final TreeMap<Integer, Integer> timeline; // <Time, NumOfBookings>
 
-    /**
-     * Initializes the MyCalendarThree object using TreeMap approach.
+        /**
+     * Intuition: a booking only changes overlap counts at its start and end. A sorted
+     * timeline of deltas lets every book call recompute the running active count in
+     * chronological order.
      *
-     * Algorithm: Difference Array with TreeMap
-     * Step 1: Initialize TreeMap to maintain sorted timeline of events
-     * Step 2: Use difference array concept where each start increments count and each end decrements
-     * Step 3: TreeMap automatically maintains sorted order for efficient range processing
+     * Algorithm:
+     *   1. Initialize an empty TreeMap from time to delta count.
+     *   2. Future bookings will add +1 at start and -1 at end.
+     *   3. The sorted map order supports line sweeping.
      *
-     * Time Complexity: O(1) for initialization
-     * Space Complexity: O(1) initially, grows to O(n) where n is number of unique time points
+     * Time:  O(1) - only the map object is created.
+     * Space: O(1) - no bookings have been stored yet.
      */
     public MyCalendarThree() {
         timeline = new TreeMap<>();
     }
 
-    /**
-     * Books a new event and returns the maximum k-booking after this event.
+        /**
+     * Intuition: the maximum overlap is the maximum prefix sum of start/end deltas.
+     * Adding +1 at startTime and -1 at endTime preserves half-open interval behavior
+     * because an event ending at t is removed before later time ranges.
      *
-     * Algorithm: Line Sweep with Difference Array
-     * Step 1: Add start time to timeline with +1 (event begins)
-     * Step 2: Add end time to timeline with -1 (event ends)
-     * Step 3: Perform line sweep through sorted timeline computing prefix sums
-     * Step 4: Track maximum prefix sum encountered (maximum overlapping events)
-     * Step 5: Return the maximum k-booking value
+     * Algorithm:
+     *   1. Increment the delta at startTime.
+     *   2. Decrement the delta at endTime.
+     *   3. Sweep timeline values in sorted order while accumulating activeEvents.
+     *   4. Return the largest activeEvents value seen.
      *
-     * Time Complexity: O(n + log n) where n is number of unique time points
-     * - O(log n) for TreeMap insertions
-     * - O(n) for iterating through all time points to find maximum
-     * Space Complexity: O(n) for storing unique time points in TreeMap
+     * Time:  O(n) - each call sweeps all unique time points after O(log n) updates.
+     * Space: O(n) - timeline stores unique start and end times.
+     *
+     * @param startTime inclusive event start
+     * @param endTime exclusive event end
+     * @return maximum number of overlapping booked events so far
      */
     public int book(int startTime, int endTime) {
         // Update timeline with event start (+1) and end (-1)
         timeline.put(startTime, timeline.getOrDefault(startTime, 0) + 1);
         timeline.put(endTime, timeline.getOrDefault(endTime, 0) - 1);
-        
+
         // Sweep through timeline to find maximum overlap
         int activeEvents = 0;
         int maxBooking = 0;
-        
+
         for (int delta : timeline.values()) {
             activeEvents += delta;
             maxBooking = Math.max(maxBooking, activeEvents);
         }
-        
+
         return maxBooking;
     }
 

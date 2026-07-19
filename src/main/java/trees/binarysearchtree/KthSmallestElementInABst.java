@@ -5,40 +5,69 @@ import trees.TreeNode;
 import java.util.*;
 
 /**
- * Kth Smallest Element In A BST
+ * Problem: Kth Smallest Element in a BST
  *
- * Problem Statement:
- * Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.
+ * Given a BST root and an integer k, return the kth smallest node value using
+ * 1-based indexing. The BST property means inorder traversal lists values from
+ * smallest to largest.
+ *
+ * Leetcode: https://leetcode.com/problems/kth-smallest-element-in-a-bst/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | BST | Inorder traversal with early stop
  *
  * Example:
- * Input: root = [3,1,4,null,2], k = 1
- * Output: 1
- * Explanation: The inorder traversal gives [1,2,3,4], so 1st smallest is 1
+ *   Input:  root = [3,1,4,null,2], k = 1
+ *   Output: 1
+ *   Why:    inorder traversal is [1,2,3,4], so the first value is 1.
  *
- * LeetCode Link: https://leetcode.com/problems/kth-smallest-element-in-a-bst
+ * Follow-ups:
+ *   1. What if the BST changes frequently?
+ *      Store subtree sizes in each node and update them on insert/delete.
+ *   2. How would you return kth largest?
+ *      Traverse right-root-left or convert it to the (n-k+1)th smallest query.
+ *   3. How would you handle many kth queries?
+ *      Precompute inorder values for a static tree or augment nodes for updates.
+ *   4. What if k is invalid?
+ *      Validate k against node count and throw or return a sentinel consistently.
  *
- * Follow-up Questions:
- * 1. What if BST is modified frequently? - Use augmented BST with subtree sizes
- * 2. What about kth largest? - Reverse inorder (right-root-left) or (n-k+1)th smallest
- * 3. How to handle very large k? - Early termination when k is reached
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Binary Tree Inorder Traversal (94), Kth Largest Element in a Stream (703).
  */
 public class KthSmallestElementInABst {
 
-    /**
-     * Finds kth smallest element using iterative inorder traversal.
+    public static void main(String[] args) {
+        KthSmallestElementInABst solver = new KthSmallestElementInABst();
+        TreeNode root = new TreeNode(3);
+        root.left = new TreeNode(1);
+        root.left.right = new TreeNode(2);
+        root.right = new TreeNode(4);
+
+        int[] ks = {1, 3};
+        int[] expected = {1, 3};
+        for (int i = 0; i < ks.length; i++) {
+            int got = solver.kthSmallest(root, ks[i]);
+            System.out.printf("root=[3,1,4,null,2] k=%d -> %d  expected=%d%n",
+                ks[i], got, expected[i]);
+        }
+    }
+
+
+        /**
+     * Intuition: inorder traversal of a BST is sorted. The stack version preserves the
+     * original left-root-right order while letting us stop as soon as the kth visited
+     * node is found.
      *
-     * Algorithm: Iterative Inorder Traversal with Early Termination
-     * - Use stack to simulate inorder traversal
-     * - Count nodes as we visit them
-     * - Return when we reach kth node
+     * Algorithm:
+     *   1. Push left children until the current path is exhausted.
+     *   2. Pop the next inorder node and increment count.
+     *   3. Return current.val when count reaches k.
+     *   4. Continue from current.right if more nodes are needed.
      *
-     * Time Complexity: O(h + k) - where h is tree height, k is target position
-     * Space Complexity: O(h) - stack space for tree height
+     * Time:  O(h + k) - reach the left spine, then visit k nodes.
+     * Space: O(h) - stack stores a root-to-leaf path.
      *
-     * @param root root of binary search tree
-     * @param k target position (1-indexed)
-     * @return kth smallest element value
+     * @param root root of the BST
+     * @param k 1-based target position in sorted order
+     * @return kth smallest value, or -1 if traversal ends first
      */
     public int kthSmallest(TreeNode root, int k) {
         Stack<TreeNode> stack = new Stack<>();
@@ -68,16 +97,8 @@ public class KthSmallestElementInABst {
         return -1; // Should never reach here for valid input
     }
 
-    /**
-     * Recursive approach using inorder traversal.
-     *
-     * Algorithm: Recursive Inorder with Counter
-     * - Use instance variable to track count
-     * - Perform inorder traversal recursively
-     * - Return result when count reaches k
-     *
-     * Time Complexity: O(k) in best case, O(n) in worst case
-     * Space Complexity: O(h) - recursion stack depth
+        /**
+     * Visits nodes in inorder until count reaches k.
      */
     private int count = 0;
     private int result = 0;

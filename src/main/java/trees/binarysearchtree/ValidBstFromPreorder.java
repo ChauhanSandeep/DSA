@@ -2,34 +2,49 @@ package trees.binarysearchtree;
 
 import java.util.Deque;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 
 /**
- * Given a preorder traversal sequence, determine if a valid Binary Search Tree (BST)
- * can be constructed from it.
- * Example: [40, 30, 25, 35, 80, 100]
- * - This sequence can form a valid BST.
- *                    40
- *                  /   \
- *                30    80
- *               /  \     \
- *              25  35    100
+ * Problem: Verify Preorder Sequence in Binary Search Tree
  *
- * LeetCode Link: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Given an integer array, decide whether it can be the preorder traversal of a
+ * BST. Preorder visits root first, then the entire left subtree, then the entire
+ * right subtree.
+ *
+ * Leetcode: https://leetcode.com/problems/verify-preorder-sequence-in-binary-search-tree/ (Medium)
+ * Rating:   not available (premium problem)
+ * Pattern:  Trees | BST | Monotonic stack with lower bound
+ *
+ * Example:
+ *   Input:  preorder = [40,30,25,35,80,100]
+ *   Output: true
+ *   Why:    after leaving the left side of 40, all later right-subtree values stay above 40.
+ *
+ * Follow-ups:
+ *   1. Can this be done in O(1) extra space?
+ *      Reuse the preorder array itself as the stack if mutation is allowed.
+ *   2. How would duplicates be handled?
+ *      Decide whether duplicates go left or right and adjust comparisons.
+ *   3. How would you validate postorder instead?
+ *      Mirror the bounds logic by scanning from the end.
+ *   4. How would you construct the BST if valid?
+ *      Recurse with min/max bounds or use a stack of ancestors.
+ *
+ * Related: Construct BST from Preorder Traversal (1008).
  */
 public class ValidBstFromPreorder {
-    public static void main(String[] args) {
-        /*
-                   40
-                 /   \
-               30    80
-              /  \     \
-             25  35    100
-         */
-        int[] preorderSequence = {40, 30, 25, 35, 80, 100};
-        boolean isValid = new ValidBstFromPreorder().isValidPreorderBST(preorderSequence);
-        System.out.println("Is valid BST? " + isValid);
+        public static void main(String[] args) {
+        ValidBstFromPreorder solver = new ValidBstFromPreorder();
+        int[][] inputs = { {40, 30, 25, 35, 80, 100}, {40, 30, 35, 20, 80} };
+        boolean[] expected = { true, false };
+
+        for (int i = 0; i < inputs.length; i++) {
+            boolean got = solver.isValidPreorderBST(inputs[i]);
+            System.out.printf("preorder=%s -> %b  expected=%b%n",
+                Arrays.toString(inputs[i]), got, expected[i]);
+        }
     }
+
     /**
      * This method checks if the given preorder sequence can form a valid BST.
      * It uses a recursive approach to verify the properties of BST.
@@ -44,8 +59,8 @@ public class ValidBstFromPreorder {
         return verify(preorderSequence, 0, preorderSequence.length - 1);
     }
 
-    /**
-     * Recursive function to verify if the subarray from start to end can form a valid BST preorder.
+        /**
+     * Recursively verifies one preorder slice by splitting left and right subtrees.
      */
     private boolean verify(int[] preorder, int start, int end) {
         if (start >= end) return true; // Empty or one-element subtree is valid
@@ -72,38 +87,23 @@ public class ValidBstFromPreorder {
         return leftValid && rightValid;
     }
 
-    /**
-     * Thinking intuition process (How we came up with this approach?)
+        /**
+     * Intuition: once preorder moves from a node's left subtree into its right
+     * subtree, every future value in that subtree must stay above that node. The stack
+     * keeps ancestors we have not closed yet, and lowerBound records the most recent
+     * ancestor whose right side we entered.
      *
-     *  Logic:
-     * - Use a monotonic stack to track ancestors.
-     * - Maintain a `lowerBound` to track the valid range for the next node.
-     * - If we encounter a node smaller than `lowerBound`, it's invalid.
-     * - This is because all the nodes in right subtree should be greater than the current node.(lowerBound)
-     * - When encountering a larger node, pop from the stack to update the last known root.
+     * Algorithm:
+     *   1. Treat null or empty input as valid.
+     *   2. For each value, reject it if it is below lowerBound.
+     *   3. Pop smaller ancestors while moving into their right subtree and update lowerBound.
+     *   4. Push the current value as a possible ancestor for later nodes.
      *
-     * Dry run:
+     * Time:  O(n) - each value is pushed and popped at most once.
+     * Space: O(n) - stack may hold a decreasing preorder sequence.
      *
-     * - For each node in preorder:
-     *   - Check if it's valid against `lowerBound`.
-     *   - Pop nodes from stack while current node is greater than the top of the stack.
-     *   - Push the current node onto the stack.
-     *
-     * <p>Example:
-     * Given preorder sequence: [40, 30, 25, 35, 80, 100]
-     * - Start with empty stack and `lowerBound = Integer.MIN_VALUE`.
-     * - Process each value:
-     *   - 40: push to stack
-     *   - 30: push to stack
-     *   - 25: push to stack
-     *   - 35: pop 25 (valid), pop 30 (valid), update `lowerBound` to 30, push 35
-     *   - 80: pop all smaller values, update `lowerBound` to 40, push 80
-     *
-     * Time Complexity: O(N), where N is the number of nodes in the sequence.
-     * Space Complexity: O(N) for the stack in the worst case.
-     *
-     * @param preorderSequence The preorder traversal array.
-     * @return true if a valid BST can be formed, otherwise false.
+     * @param preorderSequence preorder values to validate
+     * @return true if the sequence can represent a BST preorder traversal
      */
     public boolean isValidPreorderBST(int[] preorderSequence) {
         if (preorderSequence == null || preorderSequence.length == 0) {

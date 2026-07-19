@@ -4,55 +4,65 @@ import java.util.*;
 
 
 /**
- * The Skyline Problem
+ * Problem: The Skyline Problem
  *
- * Problem Statement:
- * Given the locations and heights of all buildings in a city, compute the skyline formed by these buildings.
- * Each building is represented as [left, right, height] where left and right are x-coordinates of building edges.
- * Return key points where the skyline height changes as [[x1,y1],[x2,y2],...] sorted by x-coordinate.
+ * Given buildings as [left, right, height], return the key points where the outer
+ * skyline height changes. Overlapping buildings require tracking the tallest
+ * active building at each x-coordinate.
+ *
+ * Leetcode: https://leetcode.com/problems/the-skyline-problem/ (Hard)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Segment tree topic | Sweep line | Max heap of active heights
  *
  * Example:
- * Input: buildings = [
- *      [2,  9,  10],
- *      [3,  7,  15],
- *      [5,  12, 12],
- *      [15, 20, 10],
- *      [19, 24, 8]
- * ]
- * Output: [[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]
- * Explanation: At x=2, building starts with height 10. At x=3, taller building (height 15) starts.
- * At x=7, the tallest building ends, height drops to 12. Pattern continues until all buildings end.
+ *   Input:  buildings = [[2,9,10],[3,7,15],[5,12,12]]
+ *   Output: [[2,10],[3,15],[7,12],[12,0]]
+ *   Why:    the visible height changes at starts or ends of buildings only.
  *
- * LeetCode Link: https://leetcode.com/problems/the-skyline-problem
+ * Follow-ups:
+ *   1. How would you handle many buildings with the same x-coordinate?
+ *      Process all events at that x before deciding whether height changed.
+ *   2. How would you avoid heap remove cost?
+ *      Use a TreeMap height multiset for O(log n) deletes.
+ *   3. How would you support online building insertions?
+ *      Use a segment tree over compressed coordinates with range max updates.
+ *   4. How would this extend to 3D city blocks?
+ *      Sweep one dimension and maintain a 2D structure over the other footprint.
  *
- * Follow-up Questions:
- * 1. How would you handle buildings with the same coordinates but different heights?
- *    Answer: Process all building starts before ends at same x-coordinate, and sort by height appropriately.
- * 2. What if we need to find skyline for 3D buildings (with depth)?
- *    Answer: Extend to 3D sweep plane algorithm, maintaining max height for each (x,z) coordinate.
- * 3. How to optimize for very sparse buildings across large coordinate range?
- *    Answer: Use coordinate compression to map x-coordinates to smaller consecutive range.
- * 4. What's the space-time tradeoff between different approaches?
- *    Answer: Segment tree uses more space (4n) but provides flexibility for range operations and updates.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Meeting Rooms II (253), My Calendar III (732).
  */
 public class TheSkylineProblem {
 
-    /**
-     * Returns the skyline formed by the given buildings using sweep line with priority queue.
+    public static void main(String[] args) {
+        TheSkylineProblem solver = new TheSkylineProblem();
+        int[][] buildings = {
+            {2, 9, 10}, {3, 7, 15}, {5, 12, 12}, {15, 20, 10}, {19, 24, 8}
+        };
+        int[][] single = { {1, 2, 1} };
+
+        System.out.printf("buildings=%s -> %s  expected=[[2, 10], [3, 15], [7, 12], [12, 0], [15, 10], [20, 8], [24, 0]]%n",
+            Arrays.deepToString(buildings), solver.getSkyline(buildings));
+        System.out.printf("buildings=%s -> %s  expected=[[1, 1], [2, 0]]%n",
+            Arrays.deepToString(single), solver.getSkyline(single));
+    }
+
+
+        /**
+     * Intuition: skyline changes can only happen when a building starts or ends. Sweep
+     * events from left to right while a max heap stores active heights; when the heap
+     * top changes, the visible skyline height changed.
      *
-     * Algorithm: Sweep Line with Priority Queue
-     * Step 1: Create events for building starts and ends, sort by x-coordinate
-     * Step 2: Process events left to right, maintaining active building heights in max heap
-     * Step 3: At each x-coordinate, update heap and check if max height changed
-     * Step 4: Add key point to result only when skyline height changes
-     * Step 5: Handle edge cases like overlapping buildings and same x-coordinates
+     * Algorithm:
+     *   1. Convert buildings into start and end events.
+     *   2. Sort events by x, with starts before ends at the same x.
+     *   3. Process all events sharing the same x and update the max heap.
+     *   4. Add a key point whenever the current max height differs from currHeight.
      *
-     * Time Complexity: O(n log n) where n is number of buildings
-     * Space Complexity: O(n) for events list and heap storage
+     * Time:  O(n log n) - sorting events and heap updates dominate.
+     * Space: O(n) - events and active heights are stored.
      *
-     * @param buildings array of buildings where each building is [left, right, height]
-     * @return list of key points representing skyline as [x, height] pairs
+     * @param buildings array of [left, right, height] buildings
+     * @return skyline key points as [x, height] pairs
      */
     public List<List<Integer>> getSkyline(int[][] buildings) {
         List<List<Integer>> result = new ArrayList<>();
@@ -107,24 +117,8 @@ public class TheSkylineProblem {
         return result;
     }
 
-    /**
-     * Segment Tree approach with coordinate compression for handling large coordinate ranges.
-     *
-     * Algorithm: Segment Tree with Lazy Propagation and Coordinate Compression
-     * Step 1: Extract all unique x-coordinates from buildings and compress them to 0..k-1 range
-     * Step 2: Build segment tree supporting range maximum update and point/range maximum queries
-     * Step 3: Process buildings in descending height order to handle overlapping correctly
-     * Step 4: For each building, perform range update on compressed coordinate range
-     * Step 5: Query segment tree at all coordinate boundaries to detect height changes
-     * Step 6: Map compressed coordinates back to original values for result
-     *
-     * Time Complexity: O(n log n + k log k) where n is buildings, k is unique coordinates
-     * - O(n log n) for sorting buildings by height
-     * - O(k log k) for segment tree operations across k coordinates
-     * Space Complexity: O(k) for coordinate compression and segment tree storage
-     *
-     * @param buildings array of buildings where each building is [left, right, height]
-     * @return list of key points representing skyline as [x, height] pairs
+        /**
+     * Creates start and end events for every building.
      */
     public List<List<Integer>> getSkylineSegmentTree(int[][] buildings) {
         List<List<Integer>> result = new ArrayList<>();
@@ -218,8 +212,8 @@ public class TheSkylineProblem {
                 return this.isStart ? -1 : 1;
             }
             // For starts, taller buildings first; for ends, shorter buildings first
-            return this.isStart ? 
-                Integer.compare(other.height, this.height) : 
+            return this.isStart ?
+                Integer.compare(other.height, this.height) :
                 Integer.compare(this.height, other.height);
         }
     }

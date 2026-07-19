@@ -1,49 +1,68 @@
 package trees.segmenttree;
 
+import java.util.Arrays;
 /**
- * Range Sum Query - Mutable using Fenwick Tree (Binary Indexed Tree)
+ * Problem: Range Sum Query - Mutable
  *
- * Problem Statement:
- * Given an integer array nums, handle multiple queries of the following types:
- * 1. Update the value of an element in nums
- * 2. Calculate the sum of elements between indices left and right inclusive
+ * Maintain an integer array under point updates and range-sum queries. A Fenwick
+ * Tree stores prefix-sum contributions so each update and query touches only the
+ * indexes reached by the lowest-set-bit jumps.
  *
- * FENWICK TREE APPROACH:
- * - More space efficient than Segment Tree (O(n) vs O(4n))
- * - Simpler implementation with elegant bit manipulation
- * - Excellent for prefix sum queries and point updates
+ * Leetcode: https://leetcode.com/problems/range-sum-query-mutable/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Segment tree topic | Fenwick Tree | Prefix sums with point updates
  *
- * CORE IDEA: Instead of storing individual elements, we store "cumulative contributions"
- * where each index is responsible for a specific range of elements.
+ * Example:
+ *   Input:  nums = [1,3,5], sumRange(0,2), update(1,2), sumRange(0,2)
+ *   Output: [9,8]
+ *   Why:    the total changes from 1+3+5 to 1+2+5 after the point update.
  *
- * RANGE DERIVATION:
- * For any index i, the range it covers is [i - (i & -i) + 1, i]
- * where (i & -i) isolates the lowest set bit, telling us the range size.
+ * Follow-ups:
+ *   1. How would you support range updates too?
+ *      Use two Fenwick Trees or a lazy segment tree.
+ *   2. How would you support range minimum?
+ *      Use a segment tree because Fenwick sums rely on invertible prefix operations.
+ *   3. How would this extend to 2D?
+ *      Maintain a Fenwick Tree of Fenwick Trees over rows and columns.
+ *   4. How would you handle sparse huge indexes?
+ *      Compress coordinates or use hash maps for Fenwick storage.
  *
- * Examples:
- * - Index 4 (100 binary): lowest set bit = 4, range = [4-4+1, 4] = [1,4] (4 elements)
- * - Index 6 (110 binary): lowest set bit = 2, range = [6-2+1, 6] = [5,6] (2 elements)
- * - Index 8 (1000 binary): lowest set bit = 8, range = [8-8+1, 8] = [1,8] (8 elements)
- *
- * Time Complexity: O(log n) for both update and query
- * Space Complexity: O(n)
- *
- * LeetCode: https://leetcode.com/problems/range-sum-query-mutable/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Range Sum Query 2D - Mutable (308).
  */
 public class FenwickTreeRangeSumQuery {
+
+  public static void main(String[] args) {
+    int[] nums = {1, 3, 5};
+    FenwickTreeRangeSumQuery rangeSum = new FenwickTreeRangeSumQuery(nums);
+    int before = rangeSum.sumRange(0, 2);
+    rangeSum.update(1, 2);
+    int after = rangeSum.sumRange(0, 2);
+
+    FenwickTreeRangeSumQuery empty = new FenwickTreeRangeSumQuery(null);
+    System.out.printf("nums=%s -> [%d, %d]  expected=[9, 8]%n",
+        Arrays.toString(nums), before, after);
+    System.out.printf("nums=null sumRange(0,0) -> %d  expected=0%n", empty.sumRange(0, 0));
+  }
+
 
   private final int[] nums;  // Keep track of original array values
   private final FenwickTree fenwickTree;
 
-  /**
-   * Constructs the Fenwick Tree from the input array.
+    /**
+   * Intuition: keep a private copy of nums so an update can be converted into a
+   * delta. Adding that delta at index + 1 updates every Fenwick bucket whose covered
+   * range includes the changed element.
    *
-   * INITIALIZATION STRATEGY:
-   * 1. Keep a copy of original values to calculate deltas during updates
-   * 2. Build Fenwick tree by adding each element at its corresponding position
+   * Algorithm:
+   *   1. For null input, create empty backing arrays.
+   *   2. Clone nums for future delta calculations.
+   *   3. Create a FenwickTree with nums.length capacity.
+   *   4. Add each value at its 1-based Fenwick position.
    *
-   * @param nums the input array to initialize with
+   * Time:  O(n log n) - each initial value is added through Fenwick ancestors.
+   * Space: O(n) - original copy plus Fenwick tree array.
+   *
+   * @param nums initial array values
    */
   public FenwickTreeRangeSumQuery(int[] nums) {
     if (nums == null) {
@@ -61,17 +80,22 @@ public class FenwickTreeRangeSumQuery {
     }
   }
 
-  /**
-   * Updates the value at the specified index to a new value.
+    /**
+   * Intuition: a point update changes all prefix sums that include that index by the
+   * same difference. Fenwick add applies exactly that difference to the affected
+   * buckets.
    *
-   * Instead of rebuilding the tree, we calculate the difference between
-   * new and old values and add this difference to the tree.
+   * Algorithm:
+   *   1. Ignore indexes outside nums.
+   *   2. Compute newValue - oldValue.
+   *   3. Add the difference at index + 1 in the Fenwick tree.
+   *   4. Store newValue in nums.
    *
-   * Time Complexity: O(log n)
-   * Space Complexity: O(1)
+   * Time:  O(log n) - lowest-set-bit jumps visit Fenwick ancestors.
+   * Space: O(1) - only a few scalar values are used.
    *
    * @param index 0-based index to update
-   * @param newValue the new value to set at this index
+   * @param newValue replacement value
    */
   public void update(int index, int newValue) {
     if (index < 0 || index >= nums.length) {
@@ -85,19 +109,23 @@ public class FenwickTreeRangeSumQuery {
     nums[index] = newValue; // Update our stored copy
   }
 
-  /**
-   * Returns the sum of elements in the range [left, right] (both inclusive).
+    /**
+   * Intuition: any inclusive range sum is the difference of two prefix sums. The
+   * Fenwick tree can compute prefix sums quickly, so sum[left..right] becomes
+   * prefix(right + 1) minus prefix(left).
    *
-   * RANGE SUM STRATEGY:
-   * Use the prefix sum property of Fenwick tree:
-   * sum[left, right] = prefixSum[right] - prefixSum[left-1]
+   * Algorithm:
+   *   1. Return 0 for invalid ranges.
+   *   2. Query prefix sum through right + 1.
+   *   3. Query prefix sum before left.
+   *   4. Return their difference.
    *
-   * Time Complexity: O(log n)
-   * Space Complexity: O(1)
+   * Time:  O(log n) - two Fenwick prefix queries.
+   * Space: O(1) - no extra data structure is allocated.
    *
-   * @param left 0-based left boundary (inclusive)
-   * @param right 0-based right boundary (inclusive)
-   * @return sum of elements in the specified range
+   * @param left 0-based inclusive left boundary
+   * @param right 0-based inclusive right boundary
+   * @return sum of nums[left..right]
    */
   public int sumRange(int left, int right) {
     if (left < 0 || right >= nums.length || left > right) {

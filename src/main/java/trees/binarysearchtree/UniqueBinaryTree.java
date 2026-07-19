@@ -4,44 +4,63 @@ import trees.Node;
 import java.util.*;
 
 /**
- * This class calculates the number of unique Binary Search Trees (BSTs)
- * that can be formed with 'n' nodes.
+ * Problem: Unique Binary Search Trees
  *
- * LeetCode Problem Link: https://leetcode.com/problems/unique-binary-search-trees/
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Given n distinct values 1..n, count how many structurally unique BSTs can be
+ * built. Each choice of root splits the values into independent left and right
+ * subtree counts.
+ *
+ * Leetcode: https://leetcode.com/problems/unique-binary-search-trees/ (Medium)
+ * Rating:   not available (pre-contest problem)
+ * Pattern:  Trees | Dynamic programming | Catalan numbers
+ *
+ * Example:
+ *   Input:  n = 3
+ *   Output: 5
+ *   Why:    choosing roots 1, 2, and 3 yields 2 + 1 + 2 valid left/right combinations.
+ *
+ * Follow-ups:
+ *   1. How would you generate the actual trees?
+ *      Recursively combine every possible left and right subtree for each root.
+ *   2. How would you compute very large n modulo M?
+ *      Use DP modulo M or Catalan with modular inverses when M is prime.
+ *   3. How would you count trees with a height limit?
+ *      Add height as a DP state and decrease it for child subtrees.
+ *   4. How would duplicates change the count?
+ *      A fixed duplicate placement policy reduces choices; otherwise structures depend on multiset rules.
+ *
+ * Related: Unique Binary Search Trees II (95).
  */
 public class UniqueBinaryTree {
 
-    public static void main(String[] args) {
-        // Example usage: Find the number of unique BSTs that can be formed with 3 nodes
+        public static void main(String[] args) {
         UniqueBinaryTree solution = new UniqueBinaryTree();
-        
-        int n = 3;
-        System.out.println("Recursive DP: " + solution.numTreesRecursive(n)); // Expected output: 5
-        System.out.println("Iterative DP: " + solution.numTreesIterative(n)); // Expected output: 5
-        System.out.println("Catalan Number: " + solution.numTreesCatalan(n)); // Expected output: 5
+        int[] inputs = {0, 3};
+        int[] expected = {1, 5};
+
+        for (int i = 0; i < inputs.length; i++) {
+            int got = solution.numTreesRecursive(inputs[i]);
+            System.out.printf("n=%d -> %d  expected=%d%n", inputs[i], got, expected[i]);
+        }
     }
 
-    /**
-     * This method calculates the number of unique binary search trees that can be created with 'numNodes' nodes.
-     *
-     * Intuition:
-     * - A binary search tree is constructed by selecting each node as the root
-     *   and recursively constructing left and right subtrees with the remaining nodes.
-     * - The problem is solved using Dynamic Programming (DP) by using a memoization approach to store
-     *   already computed results and avoid redundant computations.
+
+        /**
+     * Intuition: after picking a root, every smaller value must be in the left subtree
+     * and every larger value must be in the right subtree. If left has L shapes and
+     * right has R shapes, that root contributes L * R complete trees.
      *
      * Algorithm:
-     * - For each number of nodes from 1 to 'n', compute the number of BSTs by
-     *   iterating over each node as the root and calculating the product of the number of
-     *   possible left and right subtrees.
-     * - Use a map (memoization) to store the number of unique BSTs for each number of nodes.
+     *   1. Seed memo with 0 nodes and 1 node both having one valid tree.
+     *   2. Recursively ask for the count for numNodes.
+     *   3. For each root position, multiply left and right subtree counts.
+     *   4. Cache and return the total for that node count.
      *
-     * Time Complexity: O(n^2) - For each node count (1 to n), we iterate through all previous nodes.
-     * Space Complexity: O(n) - We store the results in a map of size 'n'.
+     * Time:  O(n^2) - each node count tries every possible root once after memoization.
+     * Space: O(n) - memo stores one count per node count plus recursion stack.
      *
-     * @param numNodes The number of nodes.
-     * @return The number of unique BSTs.
+     * @param numNodes number of distinct values
+     * @return count of structurally unique BSTs
      */
     public int numTreesRecursive(int numNodes) {
         // Memoization map to store already computed results
@@ -54,12 +73,8 @@ public class UniqueBinaryTree {
         return countUniqueBSTs(numNodes, memo);
     }
 
-    /**
-     * Helper method that computes the number of unique BSTs using memoization.
-     *
-     * @param numNodes The number of nodes.
-     * @param memo The memoization map to store results of subproblems.
-     * @return The number of unique BSTs that can be formed with 'numNodes' nodes.
+        /**
+     * Returns the memoized Catalan count for the given number of nodes.
      */
     private int countUniqueBSTs(int numNodes, Map<Integer, Integer> memo) {
         // Return the result from the memoization map if it is already computed
@@ -93,7 +108,7 @@ public class UniqueBinaryTree {
      * 3. For each number of nodes from 2 to numNodes, calculate dp[i]:
      *    - For each node as the root, multiply the number of unique BSTs possible in the left subtree
      *      and the right subtree, and sum these products to get dp[i].
-     * 
+     *
      * Time Complexity: O(numNodes^2)
      * Space Complexity: O(numNodes)
      */
