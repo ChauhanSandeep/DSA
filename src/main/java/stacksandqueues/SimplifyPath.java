@@ -6,33 +6,50 @@ import java.util.Deque;
 /**
  * Problem: Simplify Path
  *
- * Given a string path, which is an absolute path (starting with a slash '/') to a file or directory
- * in a Unix-style file system, convert it to the simplified canonical path.
+ * Convert an absolute Unix-style path into its canonical form. Multiple slashes
+ * collapse to one, "." means stay in the current directory, ".." moves to the
+ * parent when possible, and names like "..." are ordinary directory names.
  *
- * In a Unix-style file system, a period '.' refers to the current directory, a double period '..'
- * refers to the directory up a level, and any multiple consecutive slashes (i.e. '//') are treated
- * as a single slash '/'. For this problem, any other format of periods such as '...' are treated as
- * file/directory names.
- *
- * The canonical path should have the following format:
- * - The path starts with a single slash '/'.
- * - Any two directories are separated by a single slash '/'.
- * - The path does not end with a trailing '/'.
- * - The path only contains the directories on the path from the root directory to the target file or
- *   directory (i.e., no period '.' or double period '..')
+ * Leetcode: https://leetcode.com/problems/simplify-path/ (Medium)
+ * Rating:   acceptance 51.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Stack | Path normalization | Unix filesystem
  *
  * Example:
- * Input: path = "/a/./b/../../c/"
- * Output: "/c"
+ *   Input:  path = "/a/./b/../../c/"
+ *   Output: "/c"
+ *   Why:    ".." cancels b, then another ".." cancels a, leaving only c under root.
  *
- * LeetCode: https://leetcode.com/problems/simplify-path
+ * Follow-ups:
+ *   1. Support relative paths?
+ *      Keep unresolved leading ".." components instead of discarding them at root.
+ *   2. Resolve symbolic links too?
+ *      Requires filesystem metadata and cycle detection for visited link targets.
+ *   3. Normalize Windows paths?
+ *      Add drive roots, backslash separators, and case-sensitivity rules.
+ *   4. Need to process path components as a stream?
+ *      Maintain the directory stack online and emit only after all components are read.
  *
- * Time Complexity: O(n) where n is the length of the path
- * Space Complexity: O(n) for the stack
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Design File System (1166), Design In-Memory File System (588).
  */
 public class SimplifyPath {
-    public String simplifyPath(String path) {
+        /**
+     * Intuition: the canonical path is the stack of directories from root to the
+     * target. Empty components and '.' do nothing, '..' pops one directory when
+     * possible, and every other component is a real directory name.
+     *
+     * Algorithm:
+     *   1. Split the path by '/'.
+     *   2. Skip empty components and '.'.
+     *   3. On '..', remove the last directory if present.
+     *   4. Push normal names and join the stack with single slashes.
+     *
+     * Time:  O(n) - split and rebuild touch the path linearly.
+     * Space: O(n) - the stack stores path components.
+     *
+     * @param path absolute Unix-style path
+     * @return simplified canonical path
+     */
+public String simplifyPath(String path) {
         Deque<String> stack = new ArrayDeque<>();
         String[] components = path.split("/");
 
@@ -61,5 +78,15 @@ public class SimplifyPath {
 
         // Handle empty path case
         return result.length() > 0 ? result.toString() : "/";
+    }
+
+    public static void main(String[] args) {
+        SimplifyPath solver = new SimplifyPath();
+        String[] inputs = {"", "/home//foo/", "/a/./b/../../c/", "/../", "/.../a/../b"};
+        String[] expected = {"/", "/home/foo", "/c", "/", "/.../b"};
+        for (int i = 0; i < inputs.length; i++) {
+            String got = solver.simplifyPath(inputs[i]);
+            System.out.printf("path=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+        }
     }
 }

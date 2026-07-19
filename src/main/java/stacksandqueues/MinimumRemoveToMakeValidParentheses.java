@@ -5,22 +5,41 @@ import java.util.List;
 
 
 /**
- * Removes the minimum number of parentheses to make the string valid.
+ * Problem: Minimum Remove to Make Valid Parentheses
+ *
+ * Remove the fewest parentheses from a string so every remaining '(' has a
+ * later matching ')' and every ')' has an earlier unmatched '('. Letters and
+ * other non-parenthesis characters must keep their original relative order.
+ *
+ * Leetcode: https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/ (Medium)
+ * Rating:   zerotrac 1657
+ * Pattern:  Stack | Parentheses matching | Mark invalid indices
  *
  * Example:
- * Input: s = "lee(t(c)o)de)"
- * Output: "lee(t(c)o)de"
- * Explanation: "lee(t(co)de)" , "lee(t(c)ode)" would also be accepted.
+ *   Input:  s = "lee(t(c)o)de)"
+ *   Output: "lee(t(c)o)de"
+ *   Why:    the trailing ')' has no matching opening parenthesis, so removing it balances the string.
  *
- * LeetCode Problem: https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/
+ * Follow-ups:
+ *   1. Return all valid strings after minimum removals?
+ *      Use BFS by deletion level, stopping at the first level that contains valid strings.
+ *   2. Support multiple bracket types like [] and {}?
+ *      Track opening bracket indices and require type-compatible closings.
+ *   3. Need minimum insertions instead of removals?
+ *      Count unmatched closings and leftover openings, or construct insertions greedily.
+ *   4. Stream the string without storing all characters?
+ *      You can drop invalid closings online, but unmatched openings require buffering positions.
  *
- * LeetCode Contest Rating: 1657
+ * Related: Valid Parentheses (20), Remove Invalid Parentheses (301).
  */
 public class MinimumRemoveToMakeValidParentheses {
-
   public static void main(String[] args) {
-    String str = "lee(t(c)o)de)";
-    System.out.println(minRemoveToMakeValidInSinglePass(str));
+    String[] inputs = {"", "lee(t(c)o)de)", "a)b(c)d", "))(("};
+    String[] expected = {"", "lee(t(c)o)de", "ab(c)d", ""};
+    for (int i = 0; i < inputs.length; i++) {
+      String got = minRemoveToMakeValidInSinglePass(inputs[i]);
+      System.out.printf("s=%s -> %s  expected=%s%n", inputs[i], got, expected[i]);
+    }
   }
 
   /**
@@ -80,20 +99,24 @@ public class MinimumRemoveToMakeValidParentheses {
   }
 
 /**
-   * Intuition:
-   * - If an opening parenthesis ( does not have a matching closing parenthesis ), it is invalid.
-   * - If a closing parenthesis ) does not have a preceding unmatched opening parenthesis (, it is invalid.
-   * - Identify these indices by traversing the string and keeping track of the parentheses which are not matched.
+   * Intuition: invalid parentheses are exactly those that cannot find a match.
+   * `invalidOpenIndices` stores opens waiting for a later close; a close either
+   * consumes the latest open or is invalid immediately. Leftover opens after the
+   * scan are also invalid.
    *
-   * Approach:
-   * -Traverse the string and track indices of misplaced '(' and ')'.
-   * - Remove these indices to generate a valid string.
+   * Algorithm:
+   *   1. Scan and track unmatched '(' indices.
+   *   2. Match valid ')' characters or record invalid close indices.
+   *   3. Combine leftover opens with invalid closes and sort them.
+   *   4. Rebuild the string while skipping indices to remove.
    *
-   * Time Complexity: O(N), where N is the length of the string.
-   * Space Complexity: O(N), as we store indices of invalid parentheses.
+   * Time:  O(n log n) - sorting invalid indices dominates in the worst case.
+   * Space: O(n) - index lists and output builder can grow with the input.
    *
+   * @param str input string containing parentheses and other characters
+   * @return a valid string after minimum removals
    */
-  public static String minRemoveToMakeValidInSinglePass(String str) {
+public static String minRemoveToMakeValidInSinglePass(String str) {
     // opening parenthesis which are not able to closed are stored in invalidOpenIndices
     List<Integer> invalidOpenIndices = new ArrayList<>();
     // closing parenthesis which do not have corresponding opening parenthesis are stored in invalidCloseIndices

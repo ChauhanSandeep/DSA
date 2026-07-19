@@ -5,30 +5,30 @@ import java.util.*;
 /**
  * Problem: Nested List Weight Sum
  *
- * You are given a nested list of integers `nestedList`. Each element is either an integer or a list
- * whose elements may also be integers or other lists.
- * The depth of an integer is the number of lists that it is inside of. For example, the nested list
- * [1,[4,[6]]] has each integer's value multiplied by its depth: 1*1 + 4*2 + 6*3 = 17.
- * Return the sum of each integer in nestedList multiplied by its depth.
+ * A nested list contains integers or more nested lists. Each integer contributes
+ * value * depth, where top-level integers have depth 1 and each nested list
+ * increases depth by one. Return the total weighted sum.
+ *
+ * Leetcode: https://leetcode.com/problems/nested-list-weight-sum/ (Medium)
+ * Rating:   acceptance 86.0% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  DFS | BFS | Depth tracking
  *
  * Example:
- * Input: nestedList = [[1,1],2,[1,1]]
- * Output: 10
- * Explanation: Four 1's at depth 2, one 2 at depth 1: 1*2 + 1*2 + 2*1 + 1*2 + 1*2 = 10
+ *   Input:  nestedList = [[1,1],2,[1,1]]
+ *   Output: 10
+ *   Why:    four 1s each count twice, and the top-level 2 counts once, for 1*2*4 + 2 = 10.
  *
- * LeetCode: https://leetcode.com/problems/nested-list-weight-sum
+ * Follow-ups:
+ *   1. Weight by reverse depth instead?
+ *      First find max depth, then use maxDepth - depth + 1 for each integer.
+ *   2. The nesting depth can exceed the call-stack limit?
+ *      Use the iterative queue/stack traversal and store depth explicitly.
+ *   3. Need to parse from a string like "[123,[4,[6]]]"?
+ *      Build NestedInteger objects with a parser stack, then run the same traversal.
+ *   4. Need repeated queries after updates to nested lists?
+ *      Cache subtree weighted sums and depths, invalidating only changed ancestors.
  *
- * Follow-up Questions:
- * 1. What if we need to weight by reverse depth (deeper elements have less weight)?
- *    Answer: First find max depth, then use (maxDepth - currentDepth + 1) as multiplier.
- *    Related: https://leetcode.com/problems/nested-list-weight-sum-ii/
- *
- * 2. How would you handle cyclic nested structures?
- *    Answer: Use visited set to detect cycles and avoid infinite recursion.
- *
- * 3. What if the nested structure is extremely deep?
- *    Answer: Use iterative approach with explicit stack to avoid stack overflow.
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Nested List Weight Sum II (364), Mini Parser (385).
  */
 public class NestedListWeightSum {
 
@@ -46,22 +46,24 @@ public class NestedListWeightSum {
         public List<NestedInteger> getList();
     }
 
-    /**
-     * Calculates weighted sum using recursive depth-first search.
+        /**
+     * Intuition: recursion mirrors the nested structure. The current call knows
+     * the current depth, adds integer values multiplied by that depth, and sends
+     * child lists to the same logic with depth + 1.
      *
      * Algorithm:
-     * 1. For each element in the nested list, check if it's an integer or list
-     * 2. If integer, multiply by current depth and add to sum
-     * 3. If list, recursively process with incremented depth
-     * 4. Return total weighted sum
+     *   1. Return 0 for null or empty input.
+     *   2. Start depth-first calculation at depth 1.
+     *   3. Add integer value * depth for integers.
+     *   4. Recurse into nested lists with depth + 1.
      *
-     * Time Complexity: O(n) where n is total number of elements (integers + lists)
-     * Space Complexity: O(d) where d is maximum depth (recursion stack)
+     * Time:  O(n) - each nested element is visited once.
+     * Space: O(d) - recursion depth is maximum nesting depth.
      *
-     * @param nestedList List of nested integers
-     * @return Sum of integers weighted by their depth
+     * @param nestedList list of nested integers
+     * @return sum of integers weighted by depth
      */
-    public int depthSum(List<NestedInteger> nestedList) {
+public int depthSum(List<NestedInteger> nestedList) {
         if (nestedList == null || nestedList.isEmpty()) {
             return 0;
         }
@@ -131,6 +133,24 @@ public class NestedListWeightSum {
         NestedIntegerWithDepth(NestedInteger nestedInteger, int depth) {
             this.nestedInteger = nestedInteger;
             this.depth = depth;
+        }
+    }
+
+    public static void main(String[] args) {
+        class SimpleNestedInteger implements NestedInteger {
+            private final Integer value; private final List<NestedInteger> list;
+            SimpleNestedInteger(int value) { this.value = value; this.list = null; }
+            SimpleNestedInteger(List<NestedInteger> list) { this.value = null; this.list = list; }
+            public boolean isInteger() { return value != null; }
+            public Integer getInteger() { return value; }
+            public List<NestedInteger> getList() { return list == null ? Collections.emptyList() : list; }
+        }
+        NestedListWeightSum solver = new NestedListWeightSum();
+        List<List<NestedInteger>> inputs = Arrays.asList(Collections.emptyList(), Arrays.asList(new SimpleNestedInteger(Arrays.asList(new SimpleNestedInteger(1), new SimpleNestedInteger(1))), new SimpleNestedInteger(2), new SimpleNestedInteger(Arrays.asList(new SimpleNestedInteger(1), new SimpleNestedInteger(1)))));
+        int[] expected = {0, 10};
+        for (int i = 0; i < inputs.size(); i++) {
+            int got = solver.depthSum(inputs.get(i));
+            System.out.printf("case=%d -> %d  expected=%d%n", i + 1, got, expected[i]);
         }
     }
 }

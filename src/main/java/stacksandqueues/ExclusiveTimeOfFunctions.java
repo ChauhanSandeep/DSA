@@ -2,59 +2,59 @@ package stacksandqueues;
 
 import java.util.Stack;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Problem: Exclusive Time of Functions
  *
- * On a single-threaded CPU, we execute a program containing n functions. Each function has a unique ID
- * between 0 and n-1. Function calls are stored in a call stack: when a function starts, its ID is pushed
- * onto the stack, and when a function ends, its ID is popped off the stack.
- * The function currently running is always the one at the top of the stack. Each time a function starts
- * or ends, we write a log with the format "{function_id}:{"start" | "end"}:{timestamp}".
- * You are given a list logs, where logs[i] represents the ith log message formatted as a string.
- * For each function, return the total amount of time that the function spends running.
+ * On a single-threaded CPU, function calls are stored in a call stack. A log
+ * has the format "function_id:start/end:timestamp", and the function currently
+ * running is always the one on top of the stack. Return each function's
+ * exclusive running time; end timestamps are inclusive.
+ *
+ * Leetcode: https://leetcode.com/problems/exclusive-time-of-functions/ (Medium)
+ * Rating:   acceptance 66.2% (Medium) - no contest Elo (pre-contest problem)
+ * Pattern:  Stack | Timeline simulation | Inclusive end timestamp
  *
  * Example:
- * Input: n = 2, logs = ["0:start:0","1:start:2","1:end:5","0:end:6"]
- * Output: [3,4]
- * Explanation: Function 0 runs from 0 to 6 (exclusive time = 3), Function 1 runs from 2 to 5 (exclusive time = 4)
+ *   Input:  n = 2, logs = ["0:start:0", "1:start:2", "1:end:5", "0:end:6"]
+ *   Output: [3, 4]
+ *   Why:    function 0 runs during [0,1] and [6,6], while function 1 runs during [2,5].
  *
- * LeetCode: https://leetcode.com/problems/exclusive-time-of-functions
+ * Follow-ups:
+ *   1. Logs arrive as a stream and answers are queried online?
+ *      Maintain the same call stack and partial totals; finalize only completed intervals.
+ *   2. Need wall-clock time plus exclusive CPU time across threads?
+ *      Keep one stack per thread and aggregate by function id.
+ *   3. Logs can be malformed or missing end events?
+ *      Validate stack transitions and report unmatched starts/ends before computing totals.
+ *   4. Need memory profiling instead of time?
+ *      Replace timestamp deltas with allocation deltas and keep the same nested ownership model.
  *
- * Follow-up Questions:
- * 1. How would you handle recursive function calls?
- *    Answer: Current stack-based approach naturally handles recursion as each call is tracked separately.
- *
- * 2. What if we need to track memory usage instead of time?
- *    Answer: Similar approach but track memory allocation/deallocation events instead of time intervals.
- *
- * 3. How would you optimize for real-time profiling with millions of function calls?
- *    Answer: Use sampling-based profiling or compress adjacent calls of the same function.
- *    Related: https://leetcode.com/problems/design-log-storage-system/
- *
- * @author Sandeep
- * LeetCode Contest Rating: Not available (not a contest problem)
+ * Related: Design Log Storage System (635).
  */
 public class ExclusiveTimeOfFunctions {
 
-    /**
-     * Calculates exclusive execution time for each function using stack simulation.
+        /**
+     * Intuition: the stack top owns every timestamp until the next log changes
+     * the active function. `previousTime` marks the first uncharged timestamp.
+     * Start logs charge the old top before pausing it; end logs charge through
+     * the inclusive end timestamp before resuming the parent.
      *
      * Algorithm:
-     * 1. Use stack to track active function calls
-     * 2. For each log entry, parse function ID, operation, and timestamp
-     * 3. On function start: update previous function's time, push to stack
-     * 4. On function end: calculate and add exclusive time, pop from stack
-     * 5. Handle time intervals carefully to avoid double counting
+     *   1. Keep result times, an active function stack, and `previousTime`.
+     *   2. Parse each log into id, operation, and timestamp.
+     *   3. On start, charge the previous stack top and push the new id.
+     *   4. On end, charge and pop the top, then set `previousTime` to timestamp + 1.
      *
-     * Time Complexity: O(m) where m is number of log entries
-     * Space Complexity: O(n) where n is maximum call stack depth
+     * Time:  O(m) - each log is parsed and processed once.
+     * Space: O(d) - stack depth plus the output array.
      *
-     * @param size Number of functions (0 to size-1)
-     * @param logs Array of log entries in format "id:start/end:timestamp"
-     * @return Array of exclusive execution times for each function
+     * @param size number of functions with ids 0 through size - 1
+     * @param logs log entries in "id:start/end:timestamp" format
+     * @return exclusive time for each function id
      */
-    public int[] exclusiveTime(int size, List<String> logs) {
+public int[] exclusiveTime(int size, List<String> logs) {
         if (logs == null || logs.isEmpty()) {
             return new int[size];
         }
@@ -136,7 +136,7 @@ public class ExclusiveTimeOfFunctions {
         return result;
     }
 
-    // Helper method to parse log entry
+    /** Parses one log line into typed fields. */
     private LogEntry parseLog(String log) {
         String[] parts = log.split(":");
         if (parts.length != 3) {
@@ -173,6 +173,17 @@ public class ExclusiveTimeOfFunctions {
             this.functionId = functionId;
             this.lastStartTime = startTime;
             this.accumulatedTime = 0;
+        }
+    }
+
+    public static void main(String[] args) {
+        ExclusiveTimeOfFunctions solver = new ExclusiveTimeOfFunctions();
+        List<List<String>> logCases = Arrays.asList(Arrays.asList("0:start:0", "1:start:2", "1:end:5", "0:end:6"), Arrays.asList("0:start:0", "0:end:0"), Arrays.asList("0:start:0", "0:start:2", "0:end:5", "0:end:6"));
+        int[] sizes = {2, 1, 1};
+        String[] expected = {"[3, 4]", "[1]", "[7]"};
+        for (int i = 0; i < logCases.size(); i++) {
+            int[] got = solver.exclusiveTime(sizes[i], logCases.get(i));
+            System.out.printf("n=%d logs=%s -> %s  expected=%s%n", sizes[i], logCases.get(i), Arrays.toString(got), expected[i]);
         }
     }
 }
