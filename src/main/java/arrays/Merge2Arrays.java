@@ -49,6 +49,12 @@ public class Merge2Arrays {
       mergeWithoutExtraSpace(firstGapEdge, secondGapEdge);
       System.out.printf("gap-edge first=[10] second=[]  ->  first=%s second=%s  expected=[10]/[]%n",
           Arrays.toString(firstGapEdge), Arrays.toString(secondGapEdge));
+
+      long[] firstGap = {1, 5, 9, 10, 15, 20};
+      long[] secondGap = {2, 3, 8, 13};
+      mergeWithoutExtraSpace(firstGap, secondGap);
+      System.out.printf("gap first=[1, 5, 9, 10, 15, 20] second=[2, 3, 8, 13]  ->  first=%s second=%s  expected=[1, 2, 3, 5, 8, 9]/[10, 13, 15, 20]%n",
+          Arrays.toString(firstGap), Arrays.toString(secondGap));
     }
 
 
@@ -152,10 +158,11 @@ public class Merge2Arrays {
       }
 
       // 2. Compare elements between arr1 and arr2
-      int i = Math.max(0, gap - len1);  // starting index in arr2
-      for (int j = 0; i < len1 && j < len2; i++, j++) {
-        if (arr1[i] > arr2[j]) {
-          swap(arr1, arr2, i, j);
+      int i = Math.max(0, len1 - gap);
+      int secondIndex = i + gap - len1;
+      for (; i < len1 && secondIndex < len2; i++, secondIndex++) {
+        if (arr1[i] > arr2[secondIndex]) {
+          swap(arr1, arr2, i, secondIndex);
         }
       }
 

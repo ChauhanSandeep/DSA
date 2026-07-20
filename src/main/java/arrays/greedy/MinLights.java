@@ -35,13 +35,14 @@ public class MinLights {
         List<List<Integer>> inputs = Arrays.asList(
             Arrays.asList(0, 0, 1, 0, 0),
             Arrays.asList(0, 0, 0),
-            Arrays.asList(1, 1, 1, 1)
+            Arrays.asList(1, 1, 1, 1),
+            Arrays.asList(1, 0, 0, 1)
         );
-        int[] ranges = {3, 2, 1};
-        int[] expected = {1, -1, 4};
+        int[] ranges = {3, 2, 1, 2};
+        int[] expected = {1, -1, 4, 2};
 
         for (int i = 0; i < inputs.size(); i++) {
-            int got = solver.findMinLightsGreedy(inputs.get(i), ranges[i]);
+            int got = solver.findMinLights(inputs.get(i), ranges[i]);
             System.out.printf("bulbs=%s range=%d -> %d  expected=%d%n",
                 inputs.get(i), ranges[i], got, expected[i]);
         }
@@ -59,8 +60,8 @@ public class MinLights {
      * - If at any point no bulb is found to extend coverage, return `-1`.
      *
      * **Steps:**
-     * 1. Initialize `rightMostCovered = 0` (tracks the farthest lit position).
-     * 2. Initialize `leftMostCovered = 0` (tracks the start of the next uncovered section).
+     * 1. Initialize `rightMostCovered = -1` (tracks the farthest lit position).
+     * 2. Initialize `leftMostCovered = 0` (tracks the next uncovered position).
      * 3. While the corridor is not fully covered:
      *    - Iterate through the list to find a bulb that covers the current gap and extends coverage maximally.
      *    - If no such bulb is found, return `-1` (impossible case).
@@ -76,12 +77,13 @@ public class MinLights {
      */
     public int findMinLights(List<Integer> bulbs, int range) {
         int corridorEnd = bulbs.size() - 1;
-        int rightMostCovered = 0; // The farthest lit position
+        int rightMostCovered = -1; // The farthest lit position
         int leftMostCovered = 0;  // The starting point of the next uncovered area
         int bulbsUsed = 0;
 
-        while (rightMostCovered < corridorEnd) {
+        while (leftMostCovered <= corridorEnd) {
             int bestBulb = -1;
+            int nextRightMostCovered = rightMostCovered;
 
             // Find the best bulb that can extend coverage
             for (int i = 0; i < bulbs.size(); i++) {
@@ -89,9 +91,9 @@ public class MinLights {
                     int lowerRange = i - range + 1;
                     int upperRange = i + range - 1;
 
-                    if (lowerRange <= leftMostCovered && upperRange > rightMostCovered) {
+                    if (lowerRange <= leftMostCovered && upperRange > nextRightMostCovered) {
                         bestBulb = i;
-                        rightMostCovered = upperRange;
+                        nextRightMostCovered = upperRange;
                     }
                 }
             }
@@ -100,7 +102,8 @@ public class MinLights {
             if (bestBulb == -1) return -1;
 
             bulbsUsed++;
-            leftMostCovered = rightMostCovered; // Move the coverage boundary forward
+            rightMostCovered = nextRightMostCovered;
+            leftMostCovered = rightMostCovered + 1; // Move to the next dark position
         }
 
         return bulbsUsed;

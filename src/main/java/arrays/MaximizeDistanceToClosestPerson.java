@@ -7,8 +7,8 @@ import java.util.Arrays;
  * Problem: Maximize Distance to Closest Person
  *
  * In a row of seats, 1 means occupied and 0 means empty. Find an empty seat that
- * maximizes the distance to the nearest occupied seat. This restored implementation
- * returns the index of such a seat, although the Leetcode problem asks for the distance.
+ * maximizes the distance to the nearest occupied seat. Return that maximum nearest
+ * occupied-seat distance.
  *
  * Leetcode: https://leetcode.com/problems/maximize-distance-to-closest-person/ (Medium)
  * Rating:   1383 (zerotrac Elo)
@@ -17,12 +17,12 @@ import java.util.Arrays;
  * Example:
  *   Input:  seats = [1,0,0,0,1,0,1]
  *   Output: 2
- *   Why:    index 2 is two seats away from both occupied neighbours, which is the
+ *   Why:    sitting at index 2 is two seats away from both occupied neighbours, which is the
  *           largest nearest-person distance in this row.
  *
  * Follow-ups:
- *   1. Return the maximum distance instead of the seat index?
- *      Track and return maxDistance rather than bestSeat.
+ *   1. Return the best seat index instead of the maximum distance?
+ *      Track bestSeat whenever maxDistance improves.
  *   2. Seat k new people instead of one?
  *      Use a priority queue of empty segments and repeatedly split the largest effective segment.
  *   3. Handle a circular row of seats?
@@ -36,7 +36,7 @@ public class MaximizeDistanceToClosestPerson {
         MaximizeDistanceToClosestPerson solver = new MaximizeDistanceToClosestPerson();
 
         int[][] inputs = { {1, 0, 0, 0, 1, 0, 1}, {1, 0, 0, 0}, {0, 1} };
-        int[] expected = { 2, 3, 0 };
+        int[] expected = { 2, 3, 1 };
 
         for (int i = 0; i < inputs.length; i++) {
             int got = solver.maxDistToClosest(inputs[i]);
@@ -52,7 +52,7 @@ public class MaximizeDistanceToClosestPerson {
      * 1. First pass: Calculate distance to closest occupied seat on left
      * 2. Second pass: Calculate distance to closest occupied seat on right
      * 3. For each empty seat, distance to closest person = min(leftDistance, rightDistance)
-     * 4. Track seat with maximum such distance
+     * 4. Track the maximum such distance
      *
      * Time Complexity: O(n),
      * Space Complexity: O(n)
@@ -62,8 +62,8 @@ public class MaximizeDistanceToClosestPerson {
         int[] leftDistance = new int[size]; // Distance to closest person on left
         int[] rightDistance = new int[size]; // Distance to closest person on right
 
-        Arrays.fill(leftDistance, Integer.MAX_VALUE);
-        Arrays.fill(rightDistance, Integer.MAX_VALUE);
+        Arrays.fill(leftDistance, size);
+        Arrays.fill(rightDistance, size);
 
         // Calculate distance to closest person on left
         for (int i = 0; i < size; i++) {
@@ -83,57 +83,52 @@ public class MaximizeDistanceToClosestPerson {
             }
         }
 
-        // Find seat with maximum distance to closest person
+        // Find maximum distance to closest person
         int maxDistance = 0;
-        int bestSeat = 0;
 
         for (int i = 0; i < size; i++) {
             if (seats[i] == 0) {
                 int distance = Math.min(leftDistance[i], rightDistance[i]);
                 if (distance > maxDistance) {
                     maxDistance = distance;
-                    bestSeat = i;
                 }
             }
         }
 
-        return bestSeat;
+        return maxDistance;
     }
 
     /**
-     * Intuition: this restored method searches for the empty seat index, not the
-     * Leetcode distance value. For each empty seat, it measures the nearest occupied
-     * seat on the left and right, keeps the smaller of those distances, and remembers
-     * the index whose nearest-person distance is largest.
+     * Intuition: for each empty seat, measure the nearest occupied seat on the left
+     * and right. The smaller of those distances is how far this seat is from the
+     * closest person, and the answer is the largest such distance.
      *
      * Algorithm:
      *   1. Scan every seat index.
      *   2. For each empty seat, call getClosestDistance to measure the nearest occupied seat.
-     *   3. If that distance beats maxDistance, update maxDistance and bestSeat.
-     *   4. Return bestSeat.
+     *   3. If that distance beats maxDistance, update maxDistance.
+     *   4. Return maxDistance.
      *
      * Time:  O(n^2) - each empty seat may scan left and right across the row.
-     * Space: O(1) - only the best index and distance are stored.
+     * Space: O(1) - only the best distance is stored.
      *
      * @param seats row where 1 is occupied and 0 is empty
-     * @return index of an empty seat with maximum distance to the closest occupied seat
+     * @return maximum distance from an empty seat to the closest occupied seat
      */
     public int maxDistToClosest(int[] seats) {
         int n = seats.length;
         int maxDistance = 0;
-        int bestSeat = 0;
 
         for (int i = 0; i < n; i++) {
             if (seats[i] == 0) { // Empty seat
                 int closestDistance = getClosestDistance(seats, i);
                 if (closestDistance > maxDistance) {
                     maxDistance = closestDistance;
-                    bestSeat = i;
                 }
             }
         }
 
-        return bestSeat;
+        return maxDistance;
     }
 
     // Helper method to find distance to closest occupied seat

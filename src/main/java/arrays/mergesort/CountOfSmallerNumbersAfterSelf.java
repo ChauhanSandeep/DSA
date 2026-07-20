@@ -42,7 +42,7 @@ public class CountOfSmallerNumbersAfterSelf {
         );
 
         for (int i = 0; i < inputs.length; i++) {
-            List<Integer> got = solver.countSmallerBIT(inputs[i]);
+            List<Integer> got = solver.countSmaller(inputs[i]);
             System.out.printf("nums=%s -> %s  expected=%s%n",
                 Arrays.toString(inputs[i]), got, expected.get(i));
         }
@@ -103,7 +103,7 @@ public class CountOfSmallerNumbersAfterSelf {
                 temp[k++] = nums[j++];
             } else {
                 // Count elements from right subarray that are smaller
-                result[nums[i][0]] += j - mid - 1;
+                result[nums[i][1]] += j - mid - 1;
                 temp[k++] = nums[i++];
             }
         }
