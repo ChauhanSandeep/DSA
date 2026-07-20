@@ -1,6 +1,8 @@
 package linkedlist;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Problem: Linked List Cycle II
@@ -38,6 +40,11 @@ public class LinkedListCycleII {
         ListNode acyclic = new ListNode(1); acyclic.next = new ListNode(2);
         ListNode noCycle = solver.detectCycle(acyclic);
         System.out.printf("head=%s pos=%d -> %d  expected=%d%n", Arrays.toString(new int[] {1, 2}), -1, noCycle == null ? -1 : noCycle.val, -1);
+
+        runBitManipulationDemo(solver, new int[] {1, 2}, -1);
+        runBitManipulationDemo(solver, new int[] {3, 2, 0, -4}, 0);
+        runBitManipulationDemo(solver, new int[] {3, 2, 0, -4}, 1);
+        runBitManipulationDemo(solver, new int[] {7}, 0);
     }
 
     // Definition for singly-linked list
@@ -48,6 +55,40 @@ public class LinkedListCycleII {
             val = x;
             next = null;
         }
+    }
+
+    private static void runBitManipulationDemo(LinkedListCycleII solver, int[] values, int cycleEntryIndex) {
+        ListNode[] nodes = buildList(values, cycleEntryIndex);
+        ListNode output = solver.detectCycleBitManipulation(nodes.length == 0 ? null : nodes[0]);
+
+        System.out.printf("detectCycleBitManipulation input=%s pos=%d -> %d  expected=%d%n",
+            Arrays.toString(values), cycleEntryIndex, indexOf(nodes, output), cycleEntryIndex);
+    }
+
+    private static ListNode[] buildList(int[] values, int cycleEntryIndex) {
+        ListNode[] nodes = new ListNode[values.length];
+        for (int i = 0; i < values.length; i++) {
+            nodes[i] = new ListNode(values[i]);
+            if (i > 0) {
+                nodes[i - 1].next = nodes[i];
+            }
+        }
+
+        if (values.length > 0 && cycleEntryIndex >= 0) {
+            nodes[values.length - 1].next = nodes[cycleEntryIndex];
+        }
+
+        return nodes;
+    }
+
+    private static int indexOf(ListNode[] nodes, ListNode target) {
+        for (int i = 0; i < nodes.length; i++) {
+            if (nodes[i] == target) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
         /**
@@ -317,38 +358,24 @@ public class LinkedListCycleII {
     }
 
     /**
-     * Memory-efficient approach for very large lists.
-     * Uses bit manipulation to mark visited nodes.
+     * Intuition: the old value-marking idea was not safe because node values are
+     * part of the input, not scratch space. Changing them can corrupt the list, and
+     * a marker value can collide with a real value. Keep the public method name for
+     * callers, but use Floyd's pointer-only cycle detection so the returned node is
+     * the true cycle entry and the list is left unchanged.
+     *
+     * Algorithm:
+     *   1. Run the standard Floyd cycle-entry routine.
+     *   2. Return the entry node it finds, or null for an acyclic list.
+     *
+     * Time:  O(n) - Floyd's two phases walk only a linear number of nodes.
+     * Space: O(1) - only pointer variables are used.
+     *
+     * @param head head of the linked list
+     * @return cycle entry node, or null if no cycle exists
      */
     public ListNode detectCycleBitManipulation(ListNode head) {
-        // This approach modifies node values temporarily
-        // Only works if node values can be modified and restored
-
-        ListNode current = head;
-        final int VISITED_MARKER = Integer.MIN_VALUE;
-        List<ListNode> modifiedNodes = new ArrayList<>();
-
-        while (current != null) {
-            if (current.val == VISITED_MARKER) {
-                // Restore modified values
-                for (ListNode node : modifiedNodes) {
-                    node.val = ~node.val; // Restore original value
-                }
-                return current;
-            }
-
-            // Mark as visited by storing complement
-            modifiedNodes.add(current);
-            current.val = VISITED_MARKER;
-            current = current.next;
-        }
-
-        // Restore all modified values
-        for (ListNode node : modifiedNodes) {
-            node.val = ~node.val;
-        }
-
-        return null;
+        return detectCycle(head);
     }
 
     /**
