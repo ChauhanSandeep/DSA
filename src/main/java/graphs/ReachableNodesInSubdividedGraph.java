@@ -33,17 +33,32 @@ public class ReachableNodesInSubdividedGraph {
 
     public static void main(String[] args) {
         ReachableNodesInSubdividedGraph solver = new ReachableNodesInSubdividedGraph();
-        int[][][] edges = {{{0, 1, 0}}, {}};
-        int[] moves = {1, 0};
-        int[] nodes = {2, 1};
-        int[] expected = {2, 1};
+        int[][][] edges = {{{0, 1, 10}, {0, 2, 1}, {1, 2, 2}}, {{0, 1, 0}}, {}};
+        int[] moves = {6, 1, 0};
+        int[] nodes = {3, 2, 1};
+        int[] expected = {13, 2, 1};
         for (int i = 0; i < edges.length; i++) {
             int output = solver.reachableNodes(edges[i], moves[i], nodes[i]);
-            System.out.printf("edges=%s M=%d N=%d -> %d  expected=%d%n", Arrays.deepToString(edges[i]), moves[i], nodes[i], output, expected[i]);
+            int optimizedOutput = solver.reachableNodesOptimized(edges[i], moves[i], nodes[i]);
+            System.out.printf("edges=%s M=%d N=%d -> %d optimized=%d  expected=%d%n", Arrays.deepToString(edges[i]), moves[i], nodes[i], output, optimizedOutput, expected[i]);
         }
     }
     /**
-     * Calculates the number of nodes reachable in at most M moves.
+     * Intuition: Dijkstra tells us the most moves left when each original node is
+     * first finalized. From that node, those remaining moves cover only this
+     * direction of each subdivided edge; the opposite endpoint gets its own
+     * independent coverage. The final edge contribution is capped at the number
+     * of inserted nodes so the two directions never double-count the same node.
+     *
+     * Algorithm:
+     *   1. Run max-remaining-moves Dijkstra from node 0 over original nodes.
+     *   2. Count each finalized original node once.
+     *   3. Store directed coverage as min(edge subdivisions, moves left).
+     *   4. Traverse to a neighbor only if moves left can cross all inserted nodes plus the edge.
+     *   5. Add min(left coverage + right coverage, subdivisions) for every original edge.
+     *
+     * Time:  O((N + E) log N) - each useful original-node state is processed by the heap.
+     * Space: O(N + E) - graph, best moves, heap, and directed edge coverage.
      *
      * @param edges Array of edges with subdivision counts
      * @param M Maximum number of moves
@@ -61,7 +76,7 @@ public class ReachableNodesInSubdividedGraph {
 
         // Priority queue for Dijkstra's algorithm
         // [node, moves_remaining]
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> b[1] - a[1]);
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(b[1], a[1]));
         pq.offer(new int[]{0, M});
 
         // Track the maximum moves remaining for each node
@@ -91,28 +106,16 @@ public class ReachableNodesInSubdividedGraph {
                 int neighbor = entry.getKey();
                 int count = entry.getValue();
 
-                // Calculate how many new nodes we can cover on this edge
+                // Calculate how many new nodes we can cover from this endpoint
                 String edgeKey = node + "-" + neighbor;
-                int usedNodes = used.getOrDefault(edgeKey, 0);
-                int remainingNodes = count - usedNodes;
+                int covered = Math.min(count, moves);
+                used.put(edgeKey, Math.max(used.getOrDefault(edgeKey, 0), covered));
 
-                // If we have moves left to cover some nodes
-                if (moves > usedNodes) {
-                    int newMoves = moves - usedNodes - 1;
-
-                    // If we can reach the neighbor with moves remaining
-                    if (newMoves > maxMoves.getOrDefault(neighbor, -1)) {
-                        maxMoves.put(neighbor, newMoves);
-                        pq.offer(new int[]{neighbor, newMoves});
-                    }
-
-                    // Update the used nodes on this edge
-                    int covered = Math.min(remainingNodes, moves - usedNodes);
-                    used.put(edgeKey, usedNodes + covered);
-
-                    // Also update the reverse edge
-                    String reverseKey = neighbor + "-" + node;
-                    used.put(reverseKey, used.getOrDefault(reverseKey, 0) + covered);
+                // If we can reach the neighbor with moves remaining
+                int newMoves = moves - count - 1;
+                if (newMoves >= 0 && newMoves > maxMoves.getOrDefault(neighbor, -1)) {
+                    maxMoves.put(neighbor, newMoves);
+                    pq.offer(new int[]{neighbor, newMoves});
                 }
             }
         }
@@ -129,8 +132,12 @@ public class ReachableNodesInSubdividedGraph {
     }
 
     /**
-     * Alternative solution using BFS with priority queue (Dijkstra's algorithm).
-     * This version uses a 2D array for the graph representation.
+     * Same Dijkstra idea as reachableNodes, but stores the graph and directed
+     * edge coverage in matrices. That trades O(N^2) space for simpler neighbor
+     * lookup when N is small.
+     *
+     * Time:  O(N^2 log N) - every finalized node scans all possible neighbors.
+     * Space: O(N^2) - adjacency and coverage matrices.
      */
     public int reachableNodesOptimized(int[][] edges, int M, int N) {
         // Build adjacency matrix
@@ -142,7 +149,7 @@ public class ReachableNodesInSubdividedGraph {
         }
 
         // Priority queue for Dijkstra's: [node, moves_remaining]
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> b[1] - a[1]);
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(b[1], a[1]));
         pq.offer(new int[]{0, M});
 
         // Track max moves remaining for each node
@@ -175,25 +182,14 @@ public class ReachableNodesInSubdividedGraph {
                 }
 
                 int count = graph[node][neighbor] - 1; // Subtract 1 to get original count
-                int usedNodes = used[node][neighbor];
-                int remainingNodes = count - usedNodes;
+                // Track coverage from this endpoint only; the reverse side is counted separately.
+                used[node][neighbor] = Math.max(used[node][neighbor], Math.min(count, moves));
 
-                // If we have moves left to cover some nodes
-                if (moves > usedNodes) {
-                    int newMoves = moves - usedNodes - 1;
-
-                    // If we can reach the neighbor with moves remaining
-                    if (newMoves > maxMoves[neighbor]) {
-                        maxMoves[neighbor] = newMoves;
-                        pq.offer(new int[]{neighbor, newMoves});
-                    }
-
-                    // Update the used nodes on this edge
-                    int covered = Math.min(remainingNodes, moves - usedNodes);
-                    used[node][neighbor] += covered;
-
-                    // Also update the reverse edge
-                    used[neighbor][node] += covered;
+                // If we can reach the neighbor with moves remaining
+                int newMoves = moves - count - 1;
+                if (newMoves >= 0 && newMoves > maxMoves[neighbor]) {
+                    maxMoves[neighbor] = newMoves;
+                    pq.offer(new int[]{neighbor, newMoves});
                 }
             }
         }

@@ -6,16 +6,16 @@ import java.util.*;
      * Intuition: a normal shortest-path state is just the city, but the stop
      * limit means two arrivals at the same city are not equivalent. This method
      * keeps remaining edges in the heap state, so a path is useful when it reaches
-     * a city with more stops left to continue exploring.
+     * a city with a cheaper cost for that exact remaining-edge budget.
      *
      * Algorithm:
      *   1. Build the exact adjacency list from each flight source to [destination, price].
      *   2. Push [cost, city, stopsLeft] for the source into a min-heap.
      *   3. Pop cheapest states; if destination is popped, return that cost.
-     *   4. When stops remain, push neighbors if this route leaves more stops for that city.
+     *   4. When stops remain, push neighbors if this route improves that city/stops-left state.
      *
-     * Time:  O(E log E) - each accepted state can push outgoing flights into the heap.
-     * Space: O(V + E) - adjacency list, heap states, and minStops map.
+     * Time:  O(K * E log(K * E)) - each stop layer can push outgoing flights into the heap.
+     * Space: O(VK + E) - adjacency list, heap states, and best cost by city/stops-left.
      *
      * @param totalCities number of cities labeled 0 to totalCities - 1
      * @param flights directed flights [from, to, price]
@@ -30,6 +30,7 @@ public class CheapestFlightWithStops {
         CheapestFlightWithStops solver = new CheapestFlightWithStops();
         int[][] flights1 = {{0, 1, 100}, {1, 2, 100}, {0, 2, 50}};
         int[][] flights2 = {{0, 1, 100}};
+        int[][] flights3 = {{0, 1, 100}, {0, 2, 1}, {2, 1, 1}, {1, 3, 1}};
 
         System.out.printf("n=3 flights=%s src=0 dst=2 k=1 -> dijkstra=%d bellman=%d  expected=50%n",
             Arrays.deepToString(flights1),
@@ -39,20 +40,29 @@ public class CheapestFlightWithStops {
             Arrays.deepToString(flights2),
             solver.findCheapestPriceDijkstra(3, flights2, 0, 2, 1),
             solver.findCheapestPriceBellmanFord(3, flights2, 0, 2, 1));
+        System.out.printf("n=4 flights=%s src=0 dst=3 k=2 -> dijkstra=%d bellman=%d  expected=3%n",
+            Arrays.deepToString(flights3),
+            solver.findCheapestPriceDijkstra(4, flights3, 0, 3, 2),
+            solver.findCheapestPriceBellmanFord(4, flights3, 0, 3, 2));
     }
 
 
     /**
-     * Approach 1 : Modified Dijkstra's algorithm that tracks the remaining stops.
+     * Approach 1: Modified Dijkstra's algorithm that tracks remaining flights.
+     *
+     * Intuition: reaching the same city with more stops left is not always better
+     * if it costs much more. Keep cost by (city, flights-left), so a cheaper path
+     * with fewer remaining flights can still continue and win when it has enough
+     * budget to reach the destination.
      *
      * Steps:
      * 1. Build adjacency list of the graph.
      * 2. Use a MinHeap (PriorityQueue) to always expand the lowest-cost route.
-     * 3. Keep track of how many stops remain for each path.
-     * 4. Skip visiting a city if we’ve already reached it with more stops left.
+     * 3. Track the best cost for every city and remaining-flight count.
+     * 4. Push a neighbor only when it improves that exact state.
      *
-     * Time Complexity: O(E log V)
-     * Space Complexity: O(V + E)
+     * Time Complexity: O(K * E log(K * E)) because each stop layer can relax flights.
+     * Space Complexity: O(K * V + E) for best costs, heap states, and graph storage.
      */
     public int findCheapestPriceDijkstra(int totalCities, int[][] flights, int source, int destination, int maxStops) {
         // Step 1: Build the adjacency list {source -> [destination, price]}
@@ -65,9 +75,13 @@ public class CheapestFlightWithStops {
         PriorityQueue<int[]> minHeap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
         minHeap.offer(new int[]{0, source, maxStops + 1}); // Cost, city, stops left
 
-        // Step 3: Track minimum stops needed for each city
-        Map<Integer, Integer> minStops = new HashMap<>();
-        minStops.put(source, maxStops + 1);
+        // Step 3: Track the cheapest known cost for each city and remaining flight count
+        int maxFlights = maxStops + 1;
+        int[][] bestCost = new int[totalCities][maxFlights + 1];
+        for (int[] costsByStopsLeft : bestCost) {
+            Arrays.fill(costsByStopsLeft, Integer.MAX_VALUE);
+        }
+        bestCost[source][maxFlights] = 0;
 
         // Step 4: Process the queue
         while (!minHeap.isEmpty()) {
@@ -80,11 +94,12 @@ public class CheapestFlightWithStops {
                 for (int[] neighbor : graph.getOrDefault(city, Collections.emptyList())) {
                     int nextCity = neighbor[0], flightCost = neighbor[1];
                     int newCost = currentCost + flightCost;
+                    int nextStopsLeft = stopsLeft - 1;
 
-                    // Only proceed if we have a better path or more stops left
-                    if (!minStops.containsKey(nextCity) || stopsLeft - 1 > minStops.get(nextCity)) {
-                        minStops.put(nextCity, stopsLeft - 1);
-                        minHeap.offer(new int[]{newCost, nextCity, stopsLeft - 1});
+                    // Only proceed if this exact city/stops-left state is cheaper
+                    if (newCost < bestCost[nextCity][nextStopsLeft]) {
+                        bestCost[nextCity][nextStopsLeft] = newCost;
+                        minHeap.offer(new int[]{newCost, nextCity, nextStopsLeft});
                     }
                 }
             }

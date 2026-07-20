@@ -34,8 +34,12 @@ public class WaterFlow {
 
   public static void main(String[] args) {
     WaterFlow solver = new WaterFlow();
-    int[][][] inputs = {{{1}}, {{1, 1}}};
-    int[] expected = {1, 2};
+    int[][][] inputs = {
+        {{1, 2, 2, 3, 5}, {3, 2, 3, 4, 4}, {2, 4, 5, 3, 1}, {6, 7, 1, 4, 5}, {5, 1, 1, 2, 4}},
+        {{1}},
+        {{1, 1}}
+    };
+    int[] expected = {7, 1, 2};
     for (int i = 0; i < inputs.length; i++) {
       int output = solver.countPacificAtlanticReachableCells(inputs[i]);
       System.out.printf("heights=%s -> %d  expected=%d%n", Arrays.deepToString(inputs[i]), output, expected[i]);
@@ -51,7 +55,7 @@ public class WaterFlow {
    *
    * --- Steps ---
    * 1. Initialize two boolean matrices: one for Pacific-reachable and one for Atlantic-reachable cells.
-   * 2. For each matrix, start BFS from respective borders (top-left and bottom-right edges).
+   * 2. Mark each ocean border and start BFS from those already-reachable cells.
    * 3. After marking reachable cells, count the intersection (cells reachable from both oceans).
    *
    * --- Algorithm ---
@@ -115,16 +119,8 @@ public class WaterFlow {
    */
   private void performBFS(int[][] heights, Queue<int[]> bfsQueue, boolean[][] visited) {
     while (!bfsQueue.isEmpty()) {
-      // SELECT : Poll the next cell to process
       int[] current = bfsQueue.poll();
       int row = current[0], col = current[1];
-
-      // MARK(*) : Mark the current cell as visited
-      if(visited[row][col]) {
-        continue; // Skip if already visited
-      }
-      visited[row][col] = true;
-      // WORK(*) : Process the current cell. Processing here is just marking it as visited.
 
       for (int[] direction : DIRECTIONS) {
         int nextRow = row + direction[0];

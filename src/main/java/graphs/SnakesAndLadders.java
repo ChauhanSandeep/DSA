@@ -33,8 +33,8 @@ public class SnakesAndLadders {
 
     public static void main(String[] args) {
         SnakesAndLadders solver = new SnakesAndLadders();
-        int[][][] boards = {{{-1, -1}, {-1, 3}}, {{-1, -1}, {-1, -1}}};
-        int[] expected = {1, 1};
+        int[][][] boards = {{{-1}}, {{-1, -1}, {-1, 3}}, {{-1, -1}, {-1, -1}}};
+        int[] expected = {0, 1, 1};
         for (int i = 0; i < boards.length; i++) {
             int output = solver.snakesAndLadders(boards[i]);
             System.out.printf("board=%s -> %d  expected=%d%n", Arrays.deepToString(boards[i]), output, expected[i]);
@@ -45,12 +45,12 @@ public class SnakesAndLadders {
      * Finds minimum moves to reach the end using BFS.
      *
      * Algorithm:
-     * 1. Convert 2D board to 1D array using Boustrophedon numbering
-     * 2. Use BFS to explore all possible dice rolls from each position
-     * 3. For each position, try all dice outcomes (1-6)
-     * 4. If destination has snake/ladder, follow it automatically
-     * 5. Track visited positions to avoid cycles
-     * 6. Return moves when reaching the final square
+     * 1. Return 0 immediately when the start square is already the final square.
+     * 2. Convert 2D board to 1D array using Boustrophedon numbering.
+     * 3. Use BFS to explore all possible dice rolls from each position.
+     * 4. If destination has snake/ladder, follow it automatically.
+     * 5. Track visited positions to avoid cycles.
+     * 6. Return moves when reaching the final square.
      *
      * Time Complexity: O(n²) where n is board dimension
      * Space Complexity: O(n²) for visited array and queue
@@ -65,6 +65,9 @@ public class SnakesAndLadders {
 
         int length = board.length;
         int target = length * length;
+        if (target == 1) {
+            return 0;
+        }
 
         // Convert 2D board to 1D for easier navigation
         int[] flatBoard = convertTo1D(board);
