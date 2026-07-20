@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19",
+  "generatedAt": "2026-07-20",
   "problems": [
     {
       "task": "AddStrings",
@@ -149,11 +149,18 @@
       "pattern": "1-D Dynamic Programming"
     },
     {
-      "task": "CallCounter",
+      "task": "CallCounter__KnapsackUnbounded",
       "className": "CallCounter",
       "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CallCounter.java",
       "leetcodeUrl": "https://leetcode.com/problems/number-of-recent-calls/",
       "pattern": "1-D Dynamic Programming"
+    },
+    {
+      "task": "CallCounter__linkedlist",
+      "className": "CallCounter",
+      "javaFile": "src/main/java/dailybytes/linkedlist/CallCounter.java",
+      "leetcodeUrl": "https://leetcode.com/problems/number-of-recent-calls/",
+      "pattern": "Uncategorized"
     },
     {
       "task": "ChampagneTower",
@@ -182,13 +189,6 @@
       "javaFile": "src/main/java/arrays/matrix/CheckIfMatrixIsXMatrix.java",
       "leetcodeUrl": "https://leetcode.com/problems/check-if-matrix-is-x-matrix/",
       "pattern": "Arrays & Hashing"
-    },
-    {
-      "task": "CoinChange2",
-      "className": "CoinChange2",
-      "javaFile": "src/main/java/dynamicprogramming/KnapsackUnbounded/CoinChange2.java",
-      "leetcodeUrl": "https://leetcode.com/problems/coin-change-2/",
-      "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "CombinationSumIII",
@@ -390,7 +390,7 @@
       "task": "DeleteRepeatingLetter",
       "className": "DeleteRepeatingLetter",
       "javaFile": "src/main/java/arrays/DeleteRepeatingLetter.java",
-      "leetcodeUrl": "https://leetcode.com/problems/minimum-deletion-cost-to-avoid-repeating-letters/",
+      "leetcodeUrl": "https://leetcode.com/problems/minimum-time-to-make-rope-colorful/",
       "pattern": "Arrays & Hashing"
     },
     {
@@ -447,20 +447,6 @@
       "className": "EggDropProblem",
       "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/EggDropProblem.java",
       "leetcodeUrl": "https://leetcode.com/problems/super-egg-drop/",
-      "pattern": "1-D Dynamic Programming"
-    },
-    {
-      "task": "EncodeAndDecodeTinyurl",
-      "className": "EncodeAndDecodeTinyurl",
-      "javaFile": "src/main/java/design/EncodeAndDecodeTinyurl.java",
-      "leetcodeUrl": "https://leetcode.com/problems/design-tinyurl/",
-      "pattern": "Design"
-    },
-    {
-      "task": "EvaluateTrue",
-      "className": "EvaluateTrue",
-      "javaFile": "src/main/java/dynamicprogramming/matrixchainmultiplication/EvaluateTrue.java",
-      "leetcodeUrl": "https://leetcode.com/problems/parsing-a-boolean-expression/",
       "pattern": "1-D Dynamic Programming"
     },
     {
@@ -674,13 +660,6 @@
       "pattern": "Graphs"
     },
     {
-      "task": "IncreasingNDigitNumbers",
-      "className": "IncreasingNDigitNumbers",
-      "javaFile": "src/main/java/backtrack/IncreasingNDigitNumbers.java",
-      "leetcodeUrl": "https://leetcode.com/problems/sequential-digits/",
-      "pattern": "Backtracking"
-    },
-    {
       "task": "InsertDeleteGetrandomO1DuplicatesAllowed",
       "className": "InsertDeleteGetrandomO1DuplicatesAllowed",
       "javaFile": "src/main/java/design/InsertDeleteGetrandomO1DuplicatesAllowed.java",
@@ -821,10 +800,17 @@
       "pattern": "1-D Dynamic Programming"
     },
     {
+      "task": "LongestChunkedPalindrome",
+      "className": "LongestChunkedPalindrome",
+      "javaFile": "src/main/java/strings/twopointers/LongestChunkedPalindrome.java",
+      "leetcodeUrl": "https://leetcode.com/problems/longest-chunked-palindrome-decomposition/",
+      "pattern": "Two Pointers"
+    },
+    {
       "task": "LongestCommonSubstring",
       "className": "LongestCommonSubstring",
       "javaFile": "src/main/java/dynamicprogramming/LongestCommonSubsequence/LongestCommonSubstring.java",
-      "leetcodeUrl": "https://leetcode.com/problems/longest-common-substring/",
+      "leetcodeUrl": "https://leetcode.com/problems/maximum-length-of-repeated-subarray/",
       "pattern": "1-D Dynamic Programming"
     },
     {
@@ -889,6 +875,13 @@
       "javaFile": "src/main/java/arrays/prefixsum/MatrixBlockSum.java",
       "leetcodeUrl": "https://leetcode.com/problems/matrix-block-sum/",
       "pattern": "Arrays & Hashing"
+    },
+    {
+      "task": "MaxBinaryRectangle",
+      "className": "MaxBinaryRectangle",
+      "javaFile": "src/main/java/stacksandqueues/monotonicstack/MaxBinaryRectangle.java",
+      "leetcodeUrl": "https://leetcode.com/problems/maximal-rectangle/",
+      "pattern": "Stack"
     },
     {
       "task": "MaxConsecutiveOnesIII",
@@ -1017,13 +1010,6 @@
       "pattern": "1-D Dynamic Programming"
     },
     {
-      "task": "MaximumSumIncreasingTriplet",
-      "className": "MaximumSumIncreasingTriplet",
-      "javaFile": "src/main/java/arrays/twopointers/MaximumSumIncreasingTriplet.java",
-      "leetcodeUrl": "https://leetcode.com/problems/maximum-sum-of-3-non-overlapping-subarrays/",
-      "pattern": "Arrays & Hashing"
-    },
-    {
       "task": "MaximumSwap__binarysearch",
       "className": "MaximumSwap",
       "javaFile": "src/main/java/arrays/binarysearch/MaximumSwap.java",
@@ -1084,13 +1070,6 @@
       "className": "MinBuses",
       "javaFile": "src/main/java/graphs/MinBuses.java",
       "leetcodeUrl": "https://leetcode.com/problems/bus-routes/",
-      "pattern": "Graphs"
-    },
-    {
-      "task": "MinCostSum",
-      "className": "MinCostSum",
-      "javaFile": "src/main/java/graphs/dijkstra/MinCostSum.java",
-      "leetcodeUrl": "https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/",
       "pattern": "Graphs"
     },
     {
@@ -1225,13 +1204,6 @@
       "javaFile": "src/main/java/graphs/mst/MinimumMaxCostAfterKComponents.java",
       "leetcodeUrl": "https://leetcode.com/problems/minimize-the-maximum-edge-weight-of-graph/",
       "pattern": "Graphs"
-    },
-    {
-      "task": "MinimumMovesToAggregateSeats",
-      "className": "MinimumMovesToAggregateSeats",
-      "javaFile": "src/main/java/greedy/MinimumMovesToAggregateSeats.java",
-      "leetcodeUrl": "https://leetcode.com/problems/minimum-moves-to-equal-array-elements/",
-      "pattern": "Greedy"
     },
     {
       "task": "MinimumMovesToEqualArrayElementsII",
@@ -1395,6 +1367,13 @@
       "pattern": "1-D Dynamic Programming"
     },
     {
+      "task": "OddEvenLinkedList",
+      "className": "OddEvenLinkedList",
+      "javaFile": "src/main/java/linkedlist/OddEvenLinkedList.java",
+      "leetcodeUrl": "https://leetcode.com/problems/odd-even-linked-list/",
+      "pattern": "Linked List"
+    },
+    {
       "task": "OptimalAccountBalancing",
       "className": "OptimalAccountBalancing",
       "javaFile": "src/main/java/graphs/OptimalAccountBalancing.java",
@@ -1428,6 +1407,13 @@
       "javaFile": "src/main/java/dynamicprogramming/statemachine/PaintHouseII.java",
       "leetcodeUrl": "https://leetcode.com/problems/paint-house-ii/",
       "pattern": "1-D Dynamic Programming"
+    },
+    {
+      "task": "PairDivisibleBy60",
+      "className": "PairDivisibleBy60",
+      "javaFile": "src/main/java/arrays/hashmap/PairDivisibleBy60.java",
+      "leetcodeUrl": "https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/",
+      "pattern": "Arrays & Hashing"
     },
     {
       "task": "PairsOfSongsWithTotalDurationsDivisibleBy60",
@@ -1640,6 +1626,13 @@
       "pattern": "Two Pointers"
     },
     {
+      "task": "RobotRoomCleaner",
+      "className": "RobotRoomCleaner",
+      "javaFile": "src/main/java/graphs/RobotRoomCleaner.java",
+      "leetcodeUrl": "https://leetcode.com/problems/robot-room-cleaner/",
+      "pattern": "Graphs"
+    },
+    {
       "task": "RotateFunction",
       "className": "RotateFunction",
       "javaFile": "src/main/java/arrays/RotateFunction.java",
@@ -1651,13 +1644,6 @@
       "className": "RotatedDigits",
       "javaFile": "src/main/java/strings/RotatedDigits.java",
       "leetcodeUrl": "https://leetcode.com/problems/rotated-digits/",
-      "pattern": "Strings"
-    },
-    {
-      "task": "RotatedString",
-      "className": "RotatedString",
-      "javaFile": "src/main/java/strings/patternmatching/RotatedString.java",
-      "leetcodeUrl": "https://leetcode.com/problems/rotate-string/",
       "pattern": "Strings"
     },
     {
@@ -1815,20 +1801,6 @@
       "pattern": "Strings"
     },
     {
-      "task": "SpiralTraversal",
-      "className": "SpiralTraversal",
-      "javaFile": "src/main/java/trees/traversal/SpiralTraversal.java",
-      "leetcodeUrl": "https://leetcode.com/problems/spiral-order-traversal-of-binary-tree/",
-      "pattern": "Trees"
-    },
-    {
-      "task": "StrStr",
-      "className": "StrStr",
-      "javaFile": "src/main/java/strings/patternmatching/StrStr.java",
-      "leetcodeUrl": "https://leetcode.com/problems/implement-strstr/",
-      "pattern": "Strings"
-    },
-    {
       "task": "StringCompression",
       "className": "StringCompression",
       "javaFile": "src/main/java/strings/StringCompression.java",
@@ -1871,20 +1843,6 @@
       "pattern": "Backtracking"
     },
     {
-      "task": "SumOfDistancesInTree",
-      "className": "SumOfDistancesInTree",
-      "javaFile": "src/main/java/trees/traversal/SumOfDistancesInTree.java",
-      "leetcodeUrl": "https://leetcode.com/problems/sum-of-distances-in-tree/",
-      "pattern": "Trees"
-    },
-    {
-      "task": "SumTree",
-      "className": "SumTree",
-      "javaFile": "src/main/java/trees/dfs/SumTree.java",
-      "leetcodeUrl": "https://leetcode.com/problems/check-if-a-binary-tree-is-a-sum-tree/",
-      "pattern": "Trees"
-    },
-    {
       "task": "SwapAdjacentInLRString",
       "className": "SwapAdjacentInLRString",
       "javaFile": "src/main/java/arrays/twopointers/SwapAdjacentInLRString.java",
@@ -1911,13 +1869,6 @@
       "javaFile": "src/main/java/arrays/TicTacToe.java",
       "leetcodeUrl": "https://leetcode.com/problems/design-tic-tac-toe/",
       "pattern": "Arrays & Hashing"
-    },
-    {
-      "task": "TilingDominoes",
-      "className": "TilingDominoes",
-      "javaFile": "src/main/java/dynamicprogramming/statemachine/TilingDominoes.java",
-      "leetcodeUrl": "https://leetcode.com/problems/domino-and-tromino-tiling/",
-      "pattern": "1-D Dynamic Programming"
     },
     {
       "task": "TimeNeededToRearrangeBinaryString",

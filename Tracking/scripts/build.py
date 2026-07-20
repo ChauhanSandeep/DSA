@@ -36,9 +36,19 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-# Local module — lives beside this file.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _queue import pick_queue, coming_saturday, DIFFICULTY_RANK  # noqa: E402
+from _javadoc import (  # noqa: E402
+    extract_javadoc_blocks,
+    parse_class_javadoc,
+    parse_method_javadoc,
+    parse_leetcode_section,
+    parse_rating_section,
+    parse_followups,
+    parse_related,
+    parse_example,
+    rating_band,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -167,8 +177,8 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
       <nav>
         {back}
         <a href="{{root}}index.html">Queue</a>
+        <a href="{{root}}browse.html">Browse</a>
         <a href="{{root}}patterns/index.html">Patterns</a>
-        <a href="{{root}}tags/index.html">Tags</a>
         <button class="theme-toggle" aria-label="Toggle color theme" data-action="toggle-theme">
           {SUN_ICON}{MOON_ICON}
         </button>
@@ -188,20 +198,35 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
 
 
 def badges_for_problem(problem: dict, root: str = "") -> str:
-    """Render badges for a single problem. `root` is the relative prefix that
-    lets links (e.g. `tags/easy.html`) resolve correctly regardless of the
-    depth of the page rendering them. Pass "" from index/patterns/index/etc.
-    Pass "../" from a page one directory deep (problems/*, patterns/*, tags/*).
+    """Render badges. Rating band replaces the coarse Easy/Medium/Hard chip
+    when the Rating section is present in the Javadoc.
     """
     parts = []
 
+    rating = problem.get("rating") or {}
+    band = rating.get("band")
     diff = problem.get("difficulty", "Unknown")
-    diff_slug = diff.lower() if diff in DIFFICULTY_CLASS else "unknown"
-    if diff != "Unknown":
+
+    # Difficulty / rating chip.
+    if band and band != "Unknown":
+        # Map rating band to the same colour classes.
+        band_slug = band.lower().replace(" ", "-")
+        css_class = {
+            "Easy": "diff-easy", "Medium": "diff-medium",
+            "Hard": "diff-hard", "Very Hard": "diff-hard",
+        }.get(band, "diff-unknown")
+        title = rating.get("label") or f"{band} (from Rating)"
+        parts.append(
+            f'<a class="badge {css_class}" '
+            f'href="{root}browse.html?band={esc(band_slug)}" '
+            f'title="{esc(title)}">{esc(band)}</a>'
+        )
+    elif diff != "Unknown":
+        diff_slug = diff.lower()
         parts.append(
             f'<a class="badge {DIFFICULTY_CLASS.get(diff, "diff-unknown")}" '
-            f'href="{root}tags/{esc(diff_slug)}.html" title="All {esc(diff)} problems">'
-            f'{esc(diff)}</a>'
+            f'href="{root}browse.html?diff={esc(diff_slug)}" '
+            f'title="Filter Browse by {esc(diff)}">{esc(diff)}</a>'
         )
     else:
         parts.append(
@@ -210,18 +235,18 @@ def badges_for_problem(problem: dict, root: str = "") -> str:
 
     if problem.get("isNC150"):
         parts.append(
-            f'<a class="badge nc150" href="{root}tags/nc150.html" '
-            'title="All NeetCode 150 problems">NC150</a>'
+            f'<a class="badge nc150" href="{root}browse.html?nc=1" '
+            'title="Filter Browse by NeetCode 150">NC150</a>'
         )
     if problem.get("isBlind75"):
         parts.append(
-            f'<a class="badge blind75" href="{root}tags/blind75.html" '
-            'title="All Blind 75 problems">Blind 75</a>'
+            f'<a class="badge blind75" href="{root}browse.html?blind=1" '
+            'title="Filter Browse by Blind 75">Blind 75</a>'
         )
     if problem.get("flags", {}).get("pinned"):
         parts.append(
-            f'<a class="badge pinned" href="{root}tags/core.html" '
-            'title="Core anchor set">📌 Core</a>'
+            f'<a class="badge pinned" href="{root}browse.html?core=1" '
+            'title="Filter Browse by core anchors">📌 Core</a>'
         )
 
     pattern = problem.get("pattern", "Uncategorized")
@@ -484,7 +509,6 @@ def compute_weekly_dots(state: dict, today: date, weeks: int = 12) -> dict:
 
 def render_motivation_stack(state: dict, today: date) -> str:
     health = compute_anchor_health(state, today)
-    warmth = compute_pattern_warmth(state, today)
     dots = compute_weekly_dots(state, today)
 
     if health["total"] == 0:
@@ -500,24 +524,6 @@ def render_motivation_stack(state: dict, today: date) -> str:
             f'</div>'
             f'<div class="progress-track">'
             f'<div class="progress-fill" style="width:{health["pct"]}%"></div>'
-            f'</div>'
-        )
-
-    warmth_tiles = []
-    for w in warmth:
-        cls = warmth_class(w["min_days"])
-        if w["min_days"] is None:
-            recency = "never"
-        elif w["min_days"] == 0:
-            recency = "today"
-        elif w["min_days"] == 1:
-            recency = "1d ago"
-        else:
-            recency = f"{w['min_days']}d ago"
-        warmth_tiles.append(
-            f'<div class="warmth-tile {cls}" title="{esc(w["pattern"])} — {w["reviewed"]}/{w["count"]} reviewed">'
-            f'<div class="warmth-name">{esc(w["pattern"])}</div>'
-            f'<div class="warmth-recency">{esc(recency)}</div>'
             f'</div>'
         )
 
@@ -539,11 +545,6 @@ def render_motivation_stack(state: dict, today: date) -> str:
       <div class="motiv-panel">
         <div class="motiv-label">Anchor health</div>
         {anchor_line}
-      </div>
-
-      <div class="motiv-panel">
-        <div class="motiv-label">Pattern warmth</div>
-        <div class="warmth-grid">{"".join(warmth_tiles)}</div>
       </div>
 
       <div class="motiv-panel">
@@ -656,7 +657,122 @@ def format_review_banner(problem: dict, today: date) -> str:
     )
 
 
-def render_problem_page(problem: dict, today: date) -> str:
+def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> str:
+    """Render the class Javadoc as an ordered stack of themed callouts, one
+    per AGENT.md section. `leetcode_number_index` maps a Leetcode number to
+    the task_id so `Related:` items can become clickable links.
+    """
+    blocks = extract_javadoc_blocks(source)
+    if not blocks:
+        return '<p class="dim">(no class Javadoc found)</p>'
+    cls = parse_class_javadoc(blocks[0])
+
+    parts: list[str] = []
+
+    # Problem — the meat. Show as plain text (multi-line) with a subtle callout.
+    if cls.get("problem"):
+        parts.append(_callout("problem", "Problem statement", _prose_html(cls["problem"])))
+
+    # Example — split into Input / Output / Why for a table-like look.
+    if cls.get("example"):
+        ex = parse_example(cls["example"])
+        rows = []
+        if ex.get("input"):
+            rows.append(f'<div class="ex-row"><span class="ex-label">Input</span>'
+                        f'<code class="ex-value">{esc(ex["input"])}</code></div>')
+        if ex.get("output"):
+            rows.append(f'<div class="ex-row"><span class="ex-label">Output</span>'
+                        f'<code class="ex-value">{esc(ex["output"])}</code></div>')
+        if ex.get("why"):
+            rows.append(f'<div class="ex-row"><span class="ex-label">Why</span>'
+                        f'<span class="ex-value ex-why">{esc(ex["why"])}</span></div>')
+        if not rows:
+            # Fall back to prose if we couldn't classify.
+            rows.append(_prose_html(cls["example"]))
+        parts.append(_callout("example", "Example", "".join(rows)))
+
+    # Pattern — small typographic callout.
+    if cls.get("pattern"):
+        pattern_html = f'<div class="pattern-line mono">{esc(cls["pattern"])}</div>'
+        parts.append(_callout("pattern", "Pattern", pattern_html))
+
+    # Rating — chip-ish display for the granular signal.
+    if cls.get("rating"):
+        r = parse_rating_section(cls["rating"])
+        if r["label"]:
+            parts.append(_callout("rating", "Rating",
+                                  f'<div class="rating-line">{esc(r["label"])}</div>'))
+
+    # Follow-ups — numbered pairs.
+    followups = parse_followups(cls.get("followups"))
+    if followups:
+        rows = []
+        for i, fu in enumerate(followups, 1):
+            rows.append(
+                f'<div class="fu-row">'
+                f'<div class="fu-index">{i}.</div>'
+                f'<div class="fu-body">'
+                f'<div class="fu-question">{esc(fu["question"])}</div>'
+                f'<div class="fu-answer">{esc(fu["answer"])}</div>'
+                f'</div>'
+                f'</div>'
+            )
+        parts.append(_callout("followups", "Follow-ups", "".join(rows)))
+    elif cls.get("followups"):
+        parts.append(_callout("followups", "Follow-ups", _prose_html(cls["followups"])))
+
+    # Related — clickable when the Leetcode number matches a tracked problem.
+    related = parse_related(cls.get("related"))
+    if related:
+        chips = []
+        for r in related:
+            task = leetcode_number_index.get(r["number"])
+            label = f"{esc(r['name'])} <span class='mono dim'>({r['number']})</span>"
+            if task:
+                chips.append(
+                    f'<a class="related-chip" href="../problems/{esc(task)}.html">'
+                    f'{label}</a>'
+                )
+            else:
+                chips.append(f'<span class="related-chip related-chip-dim">{label}</span>')
+        parts.append(_callout("related", "Related",
+                              f'<div class="related-list">{"".join(chips)}</div>'))
+
+    # Approach table (rare) — keep as pre for now; it's tabular.
+    if cls.get("approach"):
+        parts.append(_callout("approach", "Approaches",
+                              f'<pre class="approach-table">{esc(cls["approach"])}</pre>'))
+
+    return "".join(parts) or '<p class="dim">(no recognisable Javadoc sections)</p>'
+
+
+def _prose_html(text: str) -> str:
+    """Escape text and preserve paragraph breaks."""
+    paragraphs = re.split(r"\n\s*\n", text.strip())
+    return "".join(
+        f'<p>{esc(p).replace(chr(10), "<br>")}</p>' for p in paragraphs if p.strip()
+    )
+
+
+def _callout(kind: str, label: str, inner: str) -> str:
+    return (
+        f'<section class="doc-section doc-{esc(kind)}">'
+        f'<div class="doc-section-label">{esc(label)}</div>'
+        f'<div class="doc-section-body">{inner}</div>'
+        f'</section>'
+    )
+
+
+def build_leetcode_number_index(state: dict) -> dict[int, str]:
+    idx: dict[int, str] = {}
+    for entry in state["problems"].values():
+        num = entry.get("leetcodeNumber")
+        if isinstance(num, int) and num not in idx:
+            idx[num] = entry["task"]
+    return idx
+
+
+def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, str]) -> str:
     task = problem["task"]
     java_file = REPO_ROOT / problem["javaFile"]
 
@@ -665,13 +781,8 @@ def render_problem_page(problem: dict, today: date) -> str:
     except FileNotFoundError:
         source = "// Source file not found: " + problem["javaFile"]
 
-    class_doc, code_body = extract_javadoc(source)
-
-    doc_html = (
-        f'<pre class="doc">{esc(class_doc)}</pre>'
-        if class_doc
-        else '<p class="dim">(no class Javadoc found)</p>'
-    )
+    _, code_body = extract_javadoc(source)
+    doc_sections_html = render_class_javadoc_sections(source, leetcode_index)
 
     sm2 = problem.get("sm2", {})
     meta_bits = [
@@ -700,7 +811,7 @@ def render_problem_page(problem: dict, today: date) -> str:
     {render_qa_card(problem)}
 
     <h2>Full problem statement</h2>
-    {doc_html}
+    {doc_sections_html}
 
     <details class="reveal">
       <summary>Reveal my solution <span class="mono dim" style="margin-left:8px">(Enter)</span></summary>
@@ -768,6 +879,198 @@ def format_last_reviewed(sm2: dict, today: date) -> tuple[str, str]:
     elif delta < 30: pretty = f"{delta // 7}w ago"
     else:            pretty = last
     return (f"{emoji} {pretty}", last)
+
+
+def _classify_status_flags(sm2: dict, today: date) -> tuple[bool, bool, bool]:
+    next_due = sm2.get("nextDue")
+    last = sm2.get("lastReviewed")
+    is_overdue = False
+    is_fresh = False
+    if next_due:
+        try:
+            is_overdue = date.fromisoformat(next_due) < today
+        except ValueError:
+            pass
+    if last:
+        try:
+            is_fresh = (today - date.fromisoformat(last)).days <= 14
+        except ValueError:
+            pass
+    is_never = not last
+    return is_overdue, is_never, is_fresh
+
+
+def render_browse_page(state: dict, today: date) -> str:
+    entries = list(state["problems"].values())
+    entries_sorted = sorted(
+        entries,
+        key=lambda e: (
+            not e.get("isNC150"),
+            not e.get("isBlind75"),
+            -DIFFICULTY_RANK.get(e.get("difficulty", "Unknown"), 0),
+            e["task"],
+        ),
+    )
+
+    pattern_counts: dict[str, int] = defaultdict(int)
+    for e in entries:
+        pattern_counts[e.get("pattern", "Uncategorized")] += 1
+    patterns_ordered = sorted(pattern_counts, key=lambda p: -pattern_counts[p])
+
+    items_html: list[str] = []
+    for entry in entries_sorted:
+        qa = entry.get("qa") or {}
+        sm2 = entry["sm2"]
+        next_due_iso = sm2.get("nextDue") or "9999-12-31"
+        last_label, last_sort = format_last_reviewed(sm2, today)
+        next_due_pretty = format_next_due(sm2.get("nextDue"))
+        is_overdue, is_never, is_fresh = _classify_status_flags(sm2, today)
+
+        rating = entry.get("rating") or {}
+        band = rating.get("band") or entry.get("difficulty", "Unknown")
+        band_slug = band.lower().replace(" ", "-")
+        pat_slug = pattern_slug(entry.get("pattern", "Uncategorized"))
+
+        problem_html = ""
+        if qa.get("problem"):
+            problem_html = (
+                '<div class="qa-mini-section">'
+                '<div class="qa-mini-label">Problem</div>'
+                f'<div class="qa-mini-body">{esc(qa["problem"])}</div>'
+                '</div>'
+            )
+        answer_html = ""
+        if qa.get("answer"):
+            answer_html = (
+                '<div class="qa-mini-section">'
+                '<div class="qa-mini-label">Answer</div>'
+                f'<div class="qa-mini-body">{esc(qa["answer"])}</div>'
+                '</div>'
+            )
+        complexity_html = ""
+        if qa.get("complexity"):
+            complexity_html = (
+                '<div class="qa-mini-section">'
+                f'<div class="qa-complexity">{esc(qa["complexity"])}</div>'
+                '</div>'
+            )
+        body_content = problem_html + answer_html + complexity_html
+        if not body_content:
+            body_content = '<div class="dim">No summary yet — open the full page.</div>'
+
+        items_html.append(f"""
+      <details class="pattern-item browse-item"
+               data-name="{esc((entry.get('problemName') or entry['task']).lower())}"
+               data-due="{esc(next_due_iso)}"
+               data-last="{esc(last_sort)}"
+               data-band="{esc(band_slug)}"
+               data-pattern="{esc(pat_slug)}"
+               data-nc="{1 if entry.get('isNC150') else 0}"
+               data-blind="{1 if entry.get('isBlind75') else 0}"
+               data-core="{1 if entry.get('flags', {}).get('pinned') else 0}"
+               data-overdue="{1 if is_overdue else 0}"
+               data-fresh="{1 if is_fresh else 0}"
+               data-never="{1 if is_never else 0}">
+        <summary>
+          <span class="pattern-item-chevron">▸</span>
+          <span class="pattern-item-title">
+            <a href="problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a>
+          </span>
+          <span class="pattern-item-badges">{badges_for_problem(entry, root="")}</span>
+          <span class="pattern-item-meta">
+            <span class="pattern-item-due">next: {esc(next_due_pretty)}</span>
+            <span class="pattern-item-last">last: {esc(last_label)}</span>
+          </span>
+        </summary>
+        <div class="pattern-item-body">
+          {body_content}
+          <a class="pattern-item-open" href="problems/{esc(entry['task'])}.html">Open full page →</a>
+        </div>
+      </details>""")
+
+    def chip(facet: str, value: str, label: str, title: str = "") -> str:
+        t = f' title="{esc(title)}"' if title else ""
+        return (
+            f'<button class="filter-chip" data-facet="{esc(facet)}" '
+            f'data-value="{esc(value)}"{t}>{label}</button>'
+        )
+
+    curated_chips = "".join([
+        chip("nc",    "1", "NC150",     "NeetCode 150 subset"),
+        chip("blind", "1", "Blind 75",  "Blind 75 subset"),
+        chip("core",  "1", "📌 Core",    "Curated anchor set"),
+    ])
+    diff_chips = "".join([
+        chip("band", "easy",      "Easy"),
+        chip("band", "medium",    "Medium"),
+        chip("band", "hard",      "Hard"),
+        chip("band", "very-hard", "Very Hard"),
+    ])
+    pattern_chip_htmls = [
+        chip("pattern", pattern_slug(p),
+             f"{esc(p)} <span class='dim mono' style='margin-left:4px'>{pattern_counts[p]}</span>",
+             p)
+        for p in patterns_ordered
+    ]
+    pattern_chips = "".join(pattern_chip_htmls)
+    status_chips = "".join([
+        chip("overdue", "1", "Overdue",      "Next due date is in the past"),
+        chip("never",   "1", "Never solved", "No review recorded yet"),
+        chip("fresh",   "1", "Fresh · ≤14d", "Reviewed within the last 14 days"),
+    ])
+
+    filter_bar = f"""
+    <section class="browse-filters">
+      <div class="filter-group">
+        <span class="filter-group-label">Curated</span>
+        {curated_chips}
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Rating band</span>
+        {diff_chips}
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Status</span>
+        {status_chips}
+      </div>
+      <div class="filter-group filter-group-wrap">
+        <span class="filter-group-label">Pattern</span>
+        {pattern_chips}
+      </div>
+      <div class="filter-actions">
+        <span class="filter-summary">
+          Showing <span class="browse-count">{len(entries_sorted)}</span>
+          of {len(entries_sorted)}
+        </span>
+        <button class="chip" data-action="clear-filters">Clear all</button>
+      </div>
+    </section>
+    """
+
+    body = f"""
+    <h2>Browse all problems</h2>
+    <p class="dim" style="margin-top:-4px">Chip filters combine with AND
+      across categories, OR within a category. Filter state is captured
+      in the URL — bookmark useful views.</p>
+
+    {filter_bar}
+
+    <div class="pattern-list-controls" style="margin-top:20px">
+      <div class="sort-controls">
+        <span class="dim">Sort:</span>
+        <button class="chip" data-sort="due" data-order="asc">Next due ↑</button>
+        <button class="chip" data-sort="last" data-order="desc">Last reviewed ↓</button>
+        <button class="chip" data-sort="name" data-order="asc">Name A–Z</button>
+      </div>
+      <div class="expand-controls">
+        <button class="chip" data-action="expand-all">Expand all</button>
+        <button class="chip" data-action="collapse-all">Collapse all</button>
+      </div>
+    </div>
+
+    <div class="pattern-list browse-items">{"".join(items_html)}</div>
+    """
+    return base_layout("Browse", body).replace("{root}", "")
 
 
 def _render_expandable_list(title: str, entries: list[dict], root: str = "../",
@@ -893,7 +1196,6 @@ def prepare_site_dir() -> None:
         shutil.rmtree(SITE_DIR)
     (SITE_DIR / "problems").mkdir(parents=True)
     (SITE_DIR / "patterns").mkdir(parents=True)
-    (SITE_DIR / "tags").mkdir(parents=True)
     (SITE_DIR / "assets").mkdir(parents=True)
 
 
@@ -927,8 +1229,9 @@ def build() -> int:
     write(SITE_DIR / "index.html", render_dashboard(state, today))
 
     # Problem pages
+    leetcode_index = build_leetcode_number_index(state)
     for problem in state["problems"].values():
-        page = render_problem_page(problem, today)
+        page = render_problem_page(problem, today, leetcode_index)
         write(SITE_DIR / "problems" / f"{problem['task']}.html", page)
 
     # Pattern index + per-pattern pages
@@ -943,63 +1246,12 @@ def build() -> int:
             render_pattern_page(pattern, entries),
         )
 
-    # Tag pages: difficulty, NC150, Blind75, core anchors
-    all_entries = list(state["problems"].values())
-    tag_definitions = [
-        ("easy",    "Easy problems",
-         lambda e: e.get("difficulty") == "Easy",
-         "All Easy-difficulty problems tracked in the repo."),
-        ("medium",  "Medium problems",
-         lambda e: e.get("difficulty") == "Medium",
-         "All Medium-difficulty problems tracked in the repo."),
-        ("hard",    "Hard problems",
-         lambda e: e.get("difficulty") == "Hard",
-         "All Hard-difficulty problems tracked in the repo."),
-        ("nc150",   "NeetCode 150",
-         lambda e: bool(e.get("isNC150")),
-         "The canonical NeetCode 150 subset of your tracked problems."),
-        ("blind75", "Blind 75",
-         lambda e: bool(e.get("isBlind75")),
-         "The Blind 75 subset — the tightest interview-anchor list."),
-        ("core",    "Core anchors",
-         lambda e: bool(e.get("flags", {}).get("pinned")),
-         "Your curated ~50 anchor problems (see Tracking/core.md)."),
-    ]
-    tags_written: list[tuple[str, str, int]] = []
-    for slug, title, predicate, subtitle in tag_definitions:
-        matching = [e for e in all_entries if predicate(e)]
-        if not matching:
-            continue
-        write(
-            SITE_DIR / "tags" / f"{slug}.html",
-            render_tag_page(title, matching, subtitle=subtitle),
-        )
-        tags_written.append((slug, title, len(matching)))
-
-    # tags/index.html — hub page linking to each tag list
-    tag_hub_rows = "".join(
-        f'<div class="pattern-card">'
-        f'<a href="{esc(slug)}.html">{esc(title)}</a>'
-        f'<div class="count">{count} problems</div>'
-        f'</div>'
-        for slug, title, count in tags_written
-    )
-    tag_hub_body = f"""
-    <h2>Tag pages</h2>
-    <p class="dim" style="margin-top:-4px">Cross-cutting problem lists —
-      by difficulty, curated set membership, or anchor status.</p>
-    <div class="pattern-grid">{tag_hub_rows}</div>
-    """
-    write(
-        SITE_DIR / "tags" / "index.html",
-        base_layout("Tags", tag_hub_body, back_link="../index.html")
-            .replace("{root}", "../"),
-    )
+    # Browse (all-problems with facet filters)
+    write(SITE_DIR / "browse.html", render_browse_page(state, today))
 
     print(f"Built site → {SITE_DIR.relative_to(REPO_ROOT)}")
     print(f"  problems: {len(state['problems'])}")
     print(f"  patterns: {len(by_pattern)}")
-    print(f"  tag pages: {len(tags_written)}")
     print(f"  open: file://{SITE_DIR}/index.html")
     return 0
 

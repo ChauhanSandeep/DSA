@@ -44,6 +44,14 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _javadoc import (  # noqa: E402
+    extract_javadoc_blocks,
+    parse_class_javadoc,
+    parse_rating_section,
+    rating_band,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
@@ -133,6 +141,7 @@ class RepoProblem:
     slug: str | None          # leetcode slug or None if no URL found
     leetcode_url: str | None
     directory_pattern: str    # best-guess pattern from directory
+    rating: dict              # parsed Rating section (elo/acceptance/label/band)
 
 
 @dataclass
@@ -192,12 +201,32 @@ def scan_repo() -> list[RepoProblem]:
 
         slug = extract_leetcode_slug(head)
         leetcode_url = f"https://leetcode.com/problems/{slug}/" if slug else None
+
+        # Parse rating from the class Javadoc (if present). This value
+        # regenerates on every sync so any hand-edited `Rating:` line in the
+        # Java source is reflected in state.json without a manual step.
+        rating_info: dict = {
+            "elo": None, "acceptance": None,
+            "label": None, "meta": None, "difficulty": None, "band": None,
+        }
+        try:
+            blocks = extract_javadoc_blocks(head)
+            if blocks:
+                cls = parse_class_javadoc(blocks[0])
+                if cls.get("rating"):
+                    parsed = parse_rating_section(cls["rating"])
+                    band = rating_band(parsed, parsed.get("difficulty"))
+                    rating_info = {**parsed, "band": band if band != "Unknown" else None}
+        except Exception:
+            pass
+
         problems.append(RepoProblem(
             task=java_path.stem,
             java_file=rel,
             slug=slug,
             leetcode_url=leetcode_url,
             directory_pattern=directory_pattern_for(rel),
+            rating=rating_info,
         ))
     return problems
 
@@ -318,6 +347,7 @@ def build_state(
                 "isNC150": nc_entry.get("isNC150", False),
                 "isBlind75": nc_entry.get("isBlind75", False),
                 "source": "neetcode",
+                "rating": repo_problem.rating,
             }
         else:
             counts.extras += 1
@@ -333,6 +363,7 @@ def build_state(
                 "isNC150": False,
                 "isBlind75": False,
                 "source": "extras",
+                "rating": repo_problem.rating,
             }
             extras_problems.append({
                 "task": task_id,

@@ -403,6 +403,7 @@
     initThemeToggle();
     initQaCard();
     initPatternPage();
+    initBrowsePage();
   });
 
   // --------------------------------------------------------------------------
@@ -595,6 +596,108 @@
 
     // Apply the initial sort so the DOM matches the "active" chip.
     sortBy(currentSort.key, currentSort.order);
+  }
+
+  // --------------------------------------------------------------------------
+  // Browse page: facet chip filter engine + URL sync.
+  // Semantics:
+  //   - Active chips in the same facet are OR'd (Easy or Medium).
+  //   - Facets are AND'd (must satisfy every non-empty facet).
+  //   - Empty facet = no constraint.
+  //   - Filter state serializes to URL query params:
+  //       ?nc=1&diff=hard,medium&pattern=trees
+  // --------------------------------------------------------------------------
+  function initBrowsePage() {
+    const list = document.querySelector(".browse-items");
+    if (!list) return;
+
+    const items = Array.from(list.querySelectorAll(".browse-item"));
+    const chips = Array.from(document.querySelectorAll(".filter-chip"));
+    const countEl = document.querySelector(".browse-count");
+    const clearBtn = document.querySelector("[data-action='clear-filters']");
+
+    // Model: { facet: Set<value> }
+    const state = {};
+
+    // Seed from URL.
+    const params = new URLSearchParams(location.search);
+    ["nc", "blind", "core", "band", "diff", "pattern", "overdue", "fresh", "never"].forEach((facet) => {
+      const raw = params.get(facet);
+      if (raw) state[facet] = new Set(raw.split(",").filter(Boolean));
+    });
+    // Back-compat: old `diff=` URLs get routed to `band=`.
+    if (state.diff && !state.band) {
+      state.band = state.diff;
+      delete state.diff;
+    }
+
+    // Reflect model on chips.
+    chips.forEach((chip) => {
+      const f = chip.dataset.facet;
+      const v = chip.dataset.value;
+      if (state[f] && state[f].has(v)) chip.classList.add("active");
+    });
+
+    function updateUrl() {
+      const p = new URLSearchParams();
+      Object.entries(state).forEach(([facet, values]) => {
+        if (values && values.size) {
+          p.set(facet, Array.from(values).join(","));
+        }
+      });
+      const qs = p.toString();
+      const url = qs ? location.pathname + "?" + qs : location.pathname;
+      history.replaceState(null, "", url);
+    }
+
+    function itemMatches(item) {
+      for (const [facet, values] of Object.entries(state)) {
+        if (!values || !values.size) continue;
+        const attr = item.dataset[facet];
+        // Boolean facets (nc, blind, core, overdue, fresh, never): attr === "1".
+        // Multi-value facets (diff, pattern): attr is the current value.
+        if (!attr || !values.has(attr)) return false;
+      }
+      return true;
+    }
+
+    function applyFilters() {
+      let visible = 0;
+      items.forEach((item) => {
+        const match = itemMatches(item);
+        item.style.display = match ? "" : "none";
+        if (match) visible++;
+      });
+      if (countEl) countEl.textContent = String(visible);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const f = chip.dataset.facet;
+        const v = chip.dataset.value;
+        if (!state[f]) state[f] = new Set();
+        if (state[f].has(v)) {
+          state[f].delete(v);
+          chip.classList.remove("active");
+        } else {
+          state[f].add(v);
+          chip.classList.add("active");
+        }
+        updateUrl();
+        applyFilters();
+      });
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        Object.keys(state).forEach((k) => delete state[k]);
+        chips.forEach((chip) => chip.classList.remove("active"));
+        updateUrl();
+        applyFilters();
+      });
+    }
+
+    applyFilters();
   }
 
   // Expose a small debug surface (visible in DevTools console).

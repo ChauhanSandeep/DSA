@@ -546,7 +546,157 @@ a.badge { cursor: pointer; }
 }
 
 
-/* --- "Reveal my solution" ----------------------------------------------- */
+/* --- Class Javadoc section callouts (per AGENT.md sections) --------- */
+
+.doc-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--doc-accent, var(--accent));
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  margin: 10px 0;
+}
+.doc-section-label {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--doc-accent, var(--accent));
+  margin-bottom: 8px;
+}
+.doc-section-body {
+  color: var(--fg-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.doc-section-body p { margin: 0 0 8px; }
+.doc-section-body p:last-child { margin-bottom: 0; }
+.doc-section-body code { color: inherit; }
+
+.doc-problem   { --doc-accent: var(--accent); }
+.doc-example   { --doc-accent: #4d84c9; }
+.doc-pattern   { --doc-accent: var(--accent-2); }
+.doc-rating    { --doc-accent: #6fa96f; }
+.doc-followups { --doc-accent: #cf9a4a; }
+.doc-related   { --doc-accent: var(--fg-muted); }
+.doc-approach  { --doc-accent: var(--fg-muted); }
+
+/* Example: three labeled rows */
+.ex-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.ex-row:last-child { margin-bottom: 0; }
+.ex-label {
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ex-value {
+  font-family: var(--font-code);
+  font-size: 13.5px;
+  color: var(--fg-primary);
+  background: color-mix(in srgb, var(--fg-muted) 8%, transparent);
+  padding: 3px 8px;
+  border-radius: 3px;
+  word-break: break-word;
+}
+.ex-value.ex-why {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--fg-body);
+  background: transparent;
+  padding: 0;
+}
+
+.pattern-line {
+  font-family: var(--font-code);
+  font-size: 13.5px;
+  color: var(--fg-primary);
+}
+.rating-line {
+  font-family: var(--font-code);
+  font-size: 13.5px;
+  color: var(--fg-primary);
+}
+
+/* Follow-ups: numbered Q/A rows */
+.fu-row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.fu-row:last-child { margin-bottom: 0; }
+.fu-index {
+  font-family: var(--font-header);
+  font-weight: 700;
+  color: var(--doc-accent, var(--accent));
+}
+.fu-question {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--fg-primary);
+  margin-bottom: 2px;
+}
+.fu-answer {
+  font-family: var(--font-body);
+  color: var(--fg-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Related: chip-style links */
+.related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.related-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--fg-muted) 10%, transparent);
+  color: var(--fg-primary);
+  font-family: var(--font-header);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+.related-chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  text-decoration: none;
+}
+.related-chip-dim {
+  color: var(--fg-muted);
+  opacity: 0.7;
+}
+.related-chip .dim { color: var(--fg-muted); font-weight: 400; margin-left: 4px; }
+
+.approach-table {
+  font-family: var(--font-code);
+  font-size: 12.5px;
+  color: var(--fg-body);
+  margin: 0;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--fg-muted) 8%, transparent);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+
+
 
 /* The full problem statement block (rendered as <pre class="doc"> so
    whitespace / line breaks from the Javadoc are preserved). We deliberately
@@ -950,6 +1100,79 @@ details.pattern-item[open] .pattern-item-chevron { transform: rotate(90deg); }
   font-size: 12px;
   font-weight: 600;
   color: var(--accent);
+}
+
+
+/* --- Browse page filter bar -------------------------------------------- */
+
+.browse-filters {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin: 12px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.filter-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.filter-group-label {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  min-width: 84px;
+  margin-right: 4px;
+}
+.filter-chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg-body);
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-header);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+.filter-chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--fg-primary);
+}
+.filter-chip.active {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  font-weight: 600;
+}
+.filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.filter-summary {
+  color: var(--fg-body);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+.filter-summary .browse-count {
+  font-family: var(--font-header);
+  font-weight: 700;
+  color: var(--fg-primary);
 }
 
 

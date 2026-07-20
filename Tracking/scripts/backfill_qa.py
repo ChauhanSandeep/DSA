@@ -26,6 +26,13 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _javadoc import (  # noqa: E402
+    extract_javadoc_blocks,
+    parse_class_javadoc,
+    parse_method_javadoc,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "Tracking" / "data"
@@ -99,103 +106,54 @@ def parse_sheet(path: Path) -> dict[str, dict]:
 # Javadoc extraction (fallback path)
 # ---------------------------------------------------------------------------
 
-JAVADOC_RE = re.compile(r"/\*\*(.*?)\*/", re.DOTALL)
-CLASS_DECL_RE = re.compile(
-    r"^\s*public\s+(?:final\s+|abstract\s+)?(?:class|interface|enum)\s+\w+",
-    re.MULTILINE,
-)
-INTUITION_MARKERS = [
-    r"🧠\s*Intuition[:：]?",
-    r"Intuition[:：]",
-    r"---\s*Intuition\s*---",
-    r"Approach[:：]",
-    r"---\s*Approach\s*---",
-]
-PROBLEM_MARKERS = [
-    r"✅\s*Problem[:：]?\s*",
-    r"Problem[:：]\s*",
-    r"---\s*Problem\s+Description\s*---\s*",
-]
-COMPLEXITY_RE = re.compile(
-    r"Time(?:\s+[Cc]omplexity)?[:：]\s*([^\n]+).*?Space(?:\s+[Cc]omplexity)?[:：]\s*([^\n]+)",
-    re.DOTALL,
-)
+def extract_qa_from_source(source: str) -> tuple[str | None, str | None, str | None, str]:
+    """Return (problem, answer, complexity, source_tag).
 
+    source_tag is one of: 'javadoc-teach' (rich Intuition available),
+    'javadoc' (first-paragraph fallback), or 'missing' (nothing found).
+    """
+    blocks = extract_javadoc_blocks(source)
+    if not blocks:
+        return None, None, None, "missing"
 
-def clean_javadoc(raw: str) -> str:
-    lines = []
-    for line in raw.splitlines():
-        s = line.strip()
-        if s.startswith("*"):
-            s = s[1:].lstrip(" ")
-        lines.append(s)
-    while lines and not lines[0]:
-        lines.pop(0)
-    while lines and not lines[-1]:
-        lines.pop()
-    return "\n".join(lines).strip()
+    cls = parse_class_javadoc(blocks[0])
+    problem_text = cls.get("problem")
+    if problem_text:
+        # Split "Title\n\nBody..." pattern — keep the body only.
+        parts = problem_text.split("\n\n", 1)
+        problem_text = parts[1].strip() if len(parts) == 2 else problem_text.strip()
 
+    # Method-level teaching text.
+    answer_text: str | None = None
+    complexity_text: str | None = None
+    source_tag = "javadoc"
 
-def first_paragraph(text: str) -> str:
-    text = text.strip()
-    if not text:
-        return ""
-    # Split on blank line.
-    para = re.split(r"\n\s*\n", text, maxsplit=1)[0]
-    return para.strip()
+    if len(blocks) > 1:
+        method = parse_method_javadoc(blocks[1])
+        intuition = (method.get("intuition") or "").strip()
+        first_para = (method.get("first_paragraph") or "").strip()
 
+        if intuition and len(intuition) >= 180:
+            answer_text = intuition
+            source_tag = "javadoc-teach"
+        elif intuition:
+            answer_text = intuition
+        elif first_para:
+            answer_text = first_para
 
-def extract_after_marker(text: str, markers: list[str], stop_re: str = r"(?:\n\s*\n|\n\s*[🔗🏷🧪🚧🔍🔁📌✅🧠]|\n\s*(?:Time|Space|Example|Algorithm|Complexity|Constraints|Follow[- ]?up|Related)\s*[:：])") -> str | None:
-    for m in markers:
-        found = re.search(m, text)
-        if not found:
-            continue
-        after = text[found.end():]
-        stop = re.search(stop_re, after)
-        chunk = after[: stop.start()] if stop else after
-        chunk = chunk.strip()
-        if chunk:
-            # Return up to first paragraph if multi-paragraph.
-            return first_paragraph(chunk)
-    return None
+        time_line = (method.get("time") or "").strip()
+        space_line = (method.get("space") or "").strip()
+        if time_line and space_line:
+            complexity_text = f"Time: {time_line} · Space: {space_line}"
+        elif time_line:
+            complexity_text = f"Time: {time_line}"
+        elif space_line:
+            complexity_text = f"Space: {space_line}"
 
+    if not problem_text and not answer_text:
+        return None, None, None, "missing"
 
-def extract_qa_from_source(source: str) -> tuple[str | None, str | None, str | None]:
-    """Return (problem, answer, complexity) from Java source's Javadocs."""
-    docs = JAVADOC_RE.findall(source)
-    if not docs:
-        return None, None, None
-
-    class_doc = clean_javadoc(docs[0])
-    method_doc = clean_javadoc(docs[1]) if len(docs) > 1 else ""
-
-    # Problem
-    problem = extract_after_marker(class_doc, PROBLEM_MARKERS)
-    if not problem:
-        # Fallback: first paragraph of the class Javadoc, minus a title line.
-        cd_lines = class_doc.splitlines()
-        # Skip a leading title-ish line (single line, no period)
-        if cd_lines and len(cd_lines[0]) < 80 and "." not in cd_lines[0]:
-            body = "\n".join(cd_lines[1:]).lstrip()
-        else:
-            body = class_doc
-        problem = first_paragraph(body) or None
-
-    # Answer
-    answer = extract_after_marker(method_doc, INTUITION_MARKERS)
-    if not answer and method_doc:
-        # Fallback: first paragraph of the method Javadoc.
-        answer = first_paragraph(method_doc) or None
-
-    # Complexity — best effort from either doc
-    combined = f"{method_doc}\n{class_doc}"
-    m = COMPLEXITY_RE.search(combined)
-    complexity = None
-    if m:
-        t, s = m.group(1).strip(), m.group(2).strip()
-        complexity = f"Time: {t} · Space: {s}"
-
-    return problem, answer, complexity
+    return problem_text, answer_text, complexity_text, source_tag
 
 
 # ---------------------------------------------------------------------------
@@ -234,10 +192,12 @@ def backfill_qa(state: dict, sheet: dict[str, dict]) -> Counter[str]:
         # Javadoc fallback
         java_path = REPO_ROOT / entry["javaFile"]
         problem_txt = answer_txt = complexity_txt = None
+        source_tag = "missing"
         if java_path.exists():
             try:
                 source = java_path.read_text(encoding="utf-8", errors="replace")
-                problem_txt, answer_txt, complexity_txt = extract_qa_from_source(source)
+                problem_txt, answer_txt, complexity_txt, source_tag = \
+                    extract_qa_from_source(source)
             except Exception:
                 pass
 
@@ -246,9 +206,9 @@ def backfill_qa(state: dict, sheet: dict[str, dict]) -> Counter[str]:
                 "problem": problem_txt,
                 "answer": answer_txt,
                 "complexity": complexity_txt,
-                "source": "javadoc",
+                "source": source_tag,
             }
-            counts["javadoc"] += 1
+            counts[source_tag] += 1
         else:
             entry["qa"] = {
                 "problem": None,
@@ -290,7 +250,7 @@ def main() -> int:
 
     print()
     print(f"Backfill coverage over {total} problems:")
-    for source in ("user", "sheet", "javadoc", "missing"):
+    for source in ("user", "sheet", "javadoc-teach", "javadoc", "missing"):
         n = counts.get(source, 0)
         pct = (n * 100 // total) if total else 0
         print(f"  {source:8s}  {n:4d}  ({pct:3d}%)")
