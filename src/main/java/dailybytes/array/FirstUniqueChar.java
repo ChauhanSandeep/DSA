@@ -35,12 +35,14 @@ import java.util.Map;
 public class FirstUniqueChar {
 
     public static void main(String[] args) {
-        String[] inputs = { "loveleetcode", "aabb", "thedailybyte" };
-        int[] expected = { 2, -1, 1 };
+        String[] inputs = { "aaa", "loveleetcode", "aabb", "aabca", "leetcode", "thedailybyte" };
+        int[] expected = { -1, 2, -1, 2, 0, 1 };
 
         for (int i = 0; i < inputs.length; i++) {
-            int output = findFirstUniqueCharIndex(inputs[i]);
-            System.out.printf("str=%s -> %d  expected=%d%n", inputs[i], output, expected[i]);
+            int output = findFirstUniqueCharIndexWithMap(inputs[i]);
+            int primaryOutput = findFirstUniqueCharIndex(inputs[i]);
+            System.out.printf("str=%s -> %d  expected=%d  primary=%d%n",
+                inputs[i], output, expected[i], primaryOutput);
         }
     }
 
@@ -82,11 +84,22 @@ public class FirstUniqueChar {
     }
 
     /**
-     * 🔁 Alternative method using Map to track index of first occurrence,
-     * and remove if character repeats (less efficient due to removals).
+     * Intuition: LinkedHashMap preserves first-seen order, so store each
+     * character's first index and permanently mark repeats with a sentinel.
+     * Once a character repeats, later copies can never make it unique again.
      *
-     * Time: O(n) on average, worst-case O(n²) due to `remove()` in `HashMap`
-     * Space: O(n)
+     * Algorithm:
+     *   1. Return -1 for a null or empty string.
+     *   2. Scan str from left to right.
+     *   3. Store a new character's index, or mark an existing character as repeated.
+     *   4. Return the first non-sentinel index left in insertion order.
+     *   5. Return -1 if every character repeats.
+     *
+     * Time:  O(n) - one scan plus one pass over distinct characters.
+     * Space: O(n) - the linked map can hold each distinct character.
+     *
+     * @param str lowercase input string
+     * @return index of the first unique character, or -1 when none exists
      */
     public static int findFirstUniqueCharIndexWithMap(String str) {
         if (str == null || str.isEmpty()) return -1;
@@ -96,12 +109,15 @@ public class FirstUniqueChar {
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
             if (charIndexMap.containsKey(ch)) {
-                charIndexMap.remove(ch); // Not unique anymore
+                charIndexMap.put(ch, -1);
             } else {
                 charIndexMap.put(ch, i);
             }
         }
 
-        return charIndexMap.values().stream().findFirst().orElse(-1);
+        return charIndexMap.values().stream()
+            .filter(index -> index != -1)
+            .findFirst()
+            .orElse(-1);
     }
 }
