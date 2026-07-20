@@ -40,8 +40,14 @@ public class MeetingRoomsII {
 
     public static void main(String[] args) {
         MeetingRoomsII solver = new MeetingRoomsII();
-        int[][][] inputs = { {{0, 30}, {5, 10}, {15, 20}}, {} };
-        int[] expected = {2, 0};
+        int[][][] inputs = {
+            {{0, 30}, {5, 10}, {15, 20}},
+            {{1, 10}, {2, 3}, {11, 12}},
+            {{1, 2}, {2, 3}},
+            {{5, 6}},
+            {}
+        };
+        int[] expected = {2, 2, 1, 1, 0};
 
         for (int i = 0; i < inputs.length; i++) {
             int[][] copy = new int[inputs[i].length][];
@@ -63,13 +69,13 @@ public class MeetingRoomsII {
      *   1. Return 0 for null or empty intervals.
      *   2. Sort meetings by start time.
      *   3. Before scheduling each meeting, poll all rooms whose end time is <= start.
-     *   4. Offer the current meeting's end time and return the remaining heap size.
+     *   4. Offer the current meeting's end time and track the largest active heap size.
      *
      * Time:  O(n log n) - sorting dominates and each interval updates the heap.
      * Space: O(n) - the heap stores end times of active meetings.
      *
      * @param intervals meeting intervals as [start, end]
-     * @return number of rooms reported by the heap schedule
+     * @return minimum number of rooms needed for the peak overlap
      */
 
     public int minMeetingRooms(int[][] intervals) {
@@ -83,6 +89,8 @@ public class MeetingRoomsII {
         // Min heap to track end times of ongoing meetings
         PriorityQueue<Integer> minHeap = new PriorityQueue<>();
 
+        int maxRoomsNeeded = 0;
+
         for (int[] interval : intervals) {
             int start = interval[0];
             int end = interval[1];
@@ -94,9 +102,10 @@ public class MeetingRoomsII {
 
             // Add current meeting's end time
             minHeap.offer(end);
+            maxRoomsNeeded = Math.max(maxRoomsNeeded, minHeap.size());
         }
 
-        return minHeap.size();
+        return maxRoomsNeeded;
     }
 
     /**
