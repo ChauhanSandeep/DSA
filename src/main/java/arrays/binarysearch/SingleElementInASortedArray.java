@@ -28,11 +28,11 @@ public class SingleElementInASortedArray {
 
     public static void main(String[] args) {
         SingleElementInASortedArray solver = new SingleElementInASortedArray();
-        int[][] primaryInputs = { {1,2,2,3,3}, {7} };
-        int[] primaryExpected = { 1, 7 };
+        int[][] primaryInputs = { {1}, {1,1,2}, {3,3,7,7,10,11,11}, {1,1,2,2,3}, {1,2,2,3,3} };
+        int[] primaryExpected = { 1, 2, 10, 3, 1 };
         for (int i = 0; i < primaryInputs.length; i++) {
             int got = solver.singleNonDuplicate(primaryInputs[i]);
-            System.out.printf("method=singleNonDuplicate nums=%s -> %d  expected=%d%n", Arrays.toString(primaryInputs[i]), got, primaryExpected[i]);
+            System.out.printf("method=singleNonDuplicate input=%s -> output=%d  expected=%d%n", Arrays.toString(primaryInputs[i]), got, primaryExpected[i]);
         }
         int[] xorInput = {1,1,2,3,3,4,4,8,8};
         int xorGot = solver.singleNonDuplicateXOR(xorInput);
@@ -40,20 +40,20 @@ public class SingleElementInASortedArray {
     }
 
 
-        /**
-     * Intuition: The restored method checks whether mid is isolated, then uses whether mid matches its left neighbor to choose a side. Pair alignment is the intended signal.
+    /**
+     * Intuition: Before the single value, each pair starts at an even index and ends at the next odd index. After the single value, that alignment flips.
+     * So binary search only needs to inspect the pair that starts at an even mid: if it is still a valid pair, the single value is to the right; otherwise it is at or to the left.
      *
      * Algorithm:
-     *   1. Search while left < right.
-     *   2. Return nums[mid] if mid differs from both neighbors.
-     *   3. Set isMidMatchingLeft when mid pairs with mid - 1.
-     *   4. Move right to mid - 1 for a left match; otherwise move left to mid + 1.
+     *   1. Pick the middle pair start by moving an odd mid one step left.
+     *   2. If nums[mid] equals nums[mid + 1], discard that complete pair and everything before it.
+     *   3. Otherwise the broken alignment is on the left side, so keep mid in the search range.
      *
-     * Time:  O(log n) - one boundary moves each iteration.
-     * Space: O(1) - only indexes and a boolean are stored.
+     * Time:  O(log n) - each check discards about half of the remaining array.
+     * Space: O(1) - only two indexes are stored.
      *
      * @param nums sorted array with one single value
-     * @return value selected by the restored parity search
+     * @return the value that appears once
      */
     public int singleNonDuplicate(int[] nums) {
         int left = 0;
@@ -61,50 +61,18 @@ public class SingleElementInASortedArray {
 
         while (left < right) {
             int mid = left + (right - left) / 2;
-
-            // If mid itself is the single element, return it
-            if (isSingleElement(nums, mid)) {
-                return nums[mid];
+            if ((mid & 1) == 1) {
+                mid--;
             }
 
-            /*
-            * Determine how many elements remain on the LEFT side
-            * after excluding the pair that mid belongs to.
-            *
-            * If nums[mid] == nums[mid - 1], then (mid - 1, mid) is a pair
-            * and the remaining left side ends at index (mid - 2).
-            *
-            * Otherwise, mid pairs with mid + 1 and the left side ends at (mid - 1).
-            */
-            boolean isMidMatchingLeft = false;
-
-            if (mid > 0 && nums[mid] == nums[mid - 1]) {
-                // Pair is on the left side, exclude both elements
-                isMidMatchingLeft = true;
-            }
-
-            /*
-            * Key idea:
-            * - The side with an odd number of elements contains the single element
-            */
-            if (isMidMatchingLeft) {
-                // One element of left is paired with mid 
-                // remaining left side is odd -> single element is on the left
-                right = mid - 1;
+            if (nums[mid] == nums[mid + 1]) {
+                left = mid + 2;
             } else {
-                // One element of mid is paired with right
-                // remaining right side is odd -> single element is on the right
-                left = mid + 1;
+                right = mid;
             }
         }
 
         return nums[left];
-    }
-
-    /** Returns whether nums[mid] differs from both existing neighbors. */
-    private boolean isSingleElement(int[] nums, int mid) {
-        return (mid == 0 || nums[mid] != nums[mid - 1]) &&
-            (mid == nums.length - 1 || nums[mid] != nums[mid + 1]);
     }
 
     /**
