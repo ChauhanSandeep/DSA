@@ -44,7 +44,7 @@ public class MergeTwoTrees {
      * match, or creates a missing child before descending.
      *
      * Algorithm:
-     *   1. Return early if target, source, or source.children is empty.
+     *   1. Return early if target or source is null.
      *   2. Push source and target roots onto parallel stacks.
      *   3. For each source child, linearly scan target children for a matching key.
      *   4. Sum a matching target child or create a new target child, then push the pair.
@@ -57,9 +57,9 @@ public class MergeTwoTrees {
      * @param source source tree whose values and missing branches are merged into target
      */
     public void merge(TreeNode target, TreeNode source) {
-      if (target == null || source == null || source.children.isEmpty()) {
-        return;
-      }
+        if (target == null || source == null) {
+            return;
+        }
 
         // Parallel stacks for synchronized DFS traversal
         Deque<NodeState> sourceStack = new ArrayDeque<>();
@@ -157,12 +157,18 @@ public class MergeTwoTrees {
         solver.merge(nullSourceTarget, null);
         String secondOutput = nullSourceTarget.key + ":" + nullSourceTarget.value;
 
+        TreeNode leafTarget = new TreeNode(2, "R");
+        TreeNode leafSource = new TreeNode(3, "R");
+        solver.merge(leafTarget, leafSource);
+        String thirdOutput = leafTarget.key + ":" + leafTarget.value;
+
         String[] inputs = {
             "target=A:10[B:1,C:2], source=A:5[B:4,D:7]",
-            "target=R:2, source=null"
+            "target=R:2, source=null",
+            "target=R:2, source=R:3"
         };
-        String[] outputs = {firstOutput, secondOutput};
-        String[] expected = {"A:15[B:5,C:2,D:7]", "R:2"};
+        String[] outputs = {firstOutput, secondOutput, thirdOutput};
+        String[] expected = {"A:15[B:5,C:2,D:7]", "R:2", "R:5"};
 
         for (int i = 0; i < inputs.length; i++) {
             System.out.printf("%s -> %s  expected=%s%n", inputs[i], outputs[i], expected[i]);
