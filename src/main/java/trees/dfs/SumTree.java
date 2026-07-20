@@ -29,12 +29,21 @@ import trees.Node;
 public class SumTree {
 
         public static void main(String[] args) {
+        Node valid = new Node(26);
+        valid.left = new Node(10);
+        valid.right = new Node(3);
+        valid.left.left = new Node(4);
+        valid.left.right = new Node(6);
+        valid.right.right = new Node(3);
+
         Node leaf = new Node(26);
 
         Node invalid = new Node(10);
         invalid.left = new Node(20);
         invalid.right = new Node(30);
 
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[26,10,3,4,6,null,3]", isSumTree(valid), true);
         System.out.printf("root=%s -> %s  expected=%s%n",
             "[26]", isSumTree(leaf), true);
         System.out.printf("root=%s -> %s  expected=%s%n",
@@ -45,14 +54,14 @@ public class SumTree {
         /**
      * Intuition: a node can be checked only after knowing the sums of both
      * subtrees. isSumTreeRec returns that subtree total for valid subtrees and
-     * throws when it sees a mismatch. The restored original public method then
-     * compares root.data with that returned subtree total.
+     * throws when it sees a mismatch. The public method only needs to know
+     * whether that full postorder check finished without an exception.
      *
      * Algorithm:
      *   1. Return true immediately for null input.
      *   2. Recursively compute leftSum and rightSum for every non-leaf node.
      *   3. Throw if node.data is not leftSum + rightSum.
-     *   4. Return true only when the root value matches the helper's returned total.
+     *   4. Return true if the helper finishes without finding a mismatch.
      *
      * Time:  O(n) - each node is visited once until a mismatch stops traversal.
      * Space: O(h) - recursion stack follows the tree height.
@@ -66,10 +75,9 @@ public class SumTree {
 
         // Try-catch block to catch the runtime exception if the tree is not a SumTree
         try {
-            // Call the helper function to check the SumTree condition and return the result
-            int subtreeSum = isSumTreeRec(root);
-            // The node's value should be equal to the sum of the left and right subtrees
-            return root.data == subtreeSum;
+            // Call the helper function to check the SumTree condition for every node.
+            isSumTreeRec(root);
+            return true;
         } catch (RuntimeException e) {
             // Return false if a RuntimeException is thrown (meaning the tree is not a SumTree)
             return false;

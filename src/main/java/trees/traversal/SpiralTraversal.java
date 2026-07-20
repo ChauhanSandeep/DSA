@@ -1,9 +1,10 @@
 package trees.traversal;
 
 import trees.Node;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Problem: Spiral Traversal of Binary Tree
@@ -35,10 +36,20 @@ import java.util.Stack;
 public class SpiralTraversal {
 
         public static void main(String[] args) {
+        Node balanced = new Node(1);
+        balanced.left = new Node(2);
+        balanced.right = new Node(3);
+        balanced.left.left = new Node(7);
+        balanced.left.right = new Node(6);
+        balanced.right.left = new Node(5);
+        balanced.right.right = new Node(4);
+
         Node root = new Node(1);
         root.right = new Node(2);
         root.right.right = new Node(3);
 
+        System.out.printf("root=%s -> %s  expected=%s%n",
+            "[1,2,3,7,6,5,4]", spiralTraversal(balanced), "[1, 3, 2, 7, 6, 5, 4]");
         System.out.printf("root=%s -> %s  expected=%s%n",
             "[1,null,2,null,3]", spiralTraversal(root), "[1, 2, 3]");
         System.out.printf("root=%s -> %s  expected=%s%n",
@@ -48,15 +59,15 @@ public class SpiralTraversal {
 
         /**
      * Intuition: the restored original uses two stacks and alternates which
-     * stack is drained. stack1 drains a level while pushing right then left into
-     * stack2; stack2 drains the next level while pushing left then right back
+     * stack is drained. stack1 drains a level while pushing left then right into
+     * stack2; stack2 drains the next level while pushing right then left back
      * into stack1.
      *
      * Algorithm:
      *   1. Return an empty result for a null root.
      *   2. Push root into stack1.
-     *   3. Drain stack1, adding node values and pushing right then left into stack2.
-     *   4. Drain stack2, adding node values and pushing left then right into stack1.
+     *   3. Drain stack1, adding node values and pushing left then right into stack2.
+     *   4. Drain stack2, adding node values and pushing right then left into stack1.
      *   5. Repeat until both stacks are empty.
      *
      * Time:  O(n) - each node is pushed and popped once.
@@ -72,8 +83,8 @@ public class SpiralTraversal {
         if (root == null) return result;
 
         // Two stacks for alternating level-order traversal
-        Stack<Node> stack1 = new Stack<>();
-        Stack<Node> stack2 = new Stack<>();
+        Deque<Node> stack1 = new ArrayDeque<>();
+        Deque<Node> stack2 = new ArrayDeque<>();
 
         // Push the root node to the first stack
         stack1.push(root);
@@ -86,12 +97,11 @@ public class SpiralTraversal {
                 Node node = stack1.pop();
                 result.add(node.data);
 
-                // Push the right child first to ensure the left child is processed next
-                if (node.right != null) {
-                    stack2.push(node.right);
-                }
                 if (node.left != null) {
                     stack2.push(node.left);
+                }
+                if (node.right != null) {
+                    stack2.push(node.right);
                 }
             }
 
@@ -100,12 +110,11 @@ public class SpiralTraversal {
                 Node node = stack2.pop();
                 result.add(node.data);
 
-                // Push the left child first to ensure the right child is processed next
-                if (node.left != null) {
-                    stack1.push(node.left);
-                }
                 if (node.right != null) {
                     stack1.push(node.right);
+                }
+                if (node.left != null) {
+                    stack1.push(node.left);
                 }
             }
         }
