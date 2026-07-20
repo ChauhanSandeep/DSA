@@ -1,6 +1,8 @@
 package arrays.twopointers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -31,20 +33,25 @@ import java.util.*;
  */
 public class FourSum {
 
-public static void main(String[] args) {
-  int[] nums = {-2, -1, -1, 1, 1, 2, 2};
-  int target = 0;
+  public static void main(String[] args) {
+    int[][] cases = {
+        {1, 0, -1, 0, -2, 2},
+        {2, 2, 2, 2, 2},
+        {-2, -1, -1, 1, 1, 2, 2}
+    };
+    int[] targets = {0, 8, 0};
+    String[] expected = {
+        "[[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]",
+        "[[2, 2, 2, 2]]",
+        "[[-2, -1, 1, 2], [-1, -1, 1, 1]]"
+    };
 
-  try {
-    List<List<Integer>> got = fourSum(nums.clone(), target);
-    System.out.printf("nums=%s target=%d -> %s  expected=%s%n",
-        Arrays.toString(nums), target, got, "[[-2, -1, 1, 2], [-1, -1, 1, 1]]");
-  } catch (UnsupportedOperationException ex) {
-    System.out.printf("nums=%s target=%d -> %s  expected=%s%n",
-        Arrays.toString(nums), target, ex.getClass().getSimpleName(),
-        "UnsupportedOperationException (original bug)");
+    for (int i = 0; i < cases.length; i++) {
+      List<List<Integer>> got = fourSum(cases[i].clone(), targets[i]);
+      System.out.printf("nums=%s target=%d -> %s  expected=%s%n",
+          Arrays.toString(cases[i]), targets[i], got, expected[i]);
+    }
   }
-}
 
   /**
  * Intuition: 4Sum is just k-sum with k = 4. Sorting gives duplicate control and
@@ -122,7 +129,7 @@ public static void main(String[] args) {
       } else if (sum > target || (high < nums.length - 1 && nums[high] == nums[high + 1])) {
         high--;  // Skip duplicate or move backward
       } else {
-        result.add(Arrays.asList(nums[low++], nums[high--]));
+        result.add(new ArrayList<>(Arrays.asList(nums[low++], nums[high--])));
       }
     }
 
