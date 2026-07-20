@@ -40,9 +40,10 @@ public class MaximumXor {
         int[][] inputs = {
             {5, 8, 2},
             {0},
-            {3, 10, 5, 25, 2, 8}
+            {3, 10, 5, 25, 2, 8},
+            {1 << 30, 0}
         };
-        int[] expected = {13, 0, 28};
+        int[] expected = {13, 0, 28, 1 << 30};
 
         for (int i = 0; i < inputs.length; i++) {
             int output = solver.findMaximumXor(inputs[i]);
@@ -106,10 +107,6 @@ public class MaximumXor {
         for (int num : arr) {
             max = Math.max(max, num);
         }
-        int bitIdx = 0;
-        while ((1 << bitIdx) <= max) {
-            bitIdx++;
-        }
-        return bitIdx - 1; // Subtract 1 because last increment exceeded max
+        return max == 0 ? -1 : 31 - Integer.numberOfLeadingZeros(max);
     }
 }
