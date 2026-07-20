@@ -61,7 +61,7 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
          * Space: O(1) - stores one index for the new occurrence.
          *
          * @param val value to insert
-         * @return true if the value did not already have an index set
+         * @return true if the value was not currently present
          */
         public boolean insert(int val) {
             boolean isNew = !indices.containsKey(val);
@@ -110,6 +110,9 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             
             // Remove last element
             values.remove(lastIndex);
+            if (valIndices.isEmpty()) {
+                indices.remove(val);
+            }
             
             return true;
         }
@@ -179,6 +182,9 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             }
             
             values.remove(lastIndex);
+            if (valIndices.isEmpty()) {
+                indices.remove(val);
+            }
             
             return true;
         }
@@ -244,6 +250,9 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
                 }
                 
                 values.remove(lastIndex);
+                if (valIndices.isEmpty()) {
+                    indices.remove(val);
+                }
                 
                 return true;
             }
@@ -314,6 +323,9 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             }
             
             size--;
+            if (valIndices.isEmpty()) {
+                indices.remove(val);
+            }
             
             return true;
         }
@@ -390,6 +402,9 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
             }
             
             values.remove(lastIndex);
+            if (valIndices.isEmpty()) {
+                indices.remove(val);
+            }
             valueFrequency.put(val, valueFrequency.get(val) - 1);
             if (valueFrequency.get(val) == 0) {
                 valueFrequency.remove(val);
@@ -440,5 +455,15 @@ public class InsertDeleteGetrandomO1DuplicatesAllowed {
         boolean[] expectedAfterRemove = {true, false};
         System.out.printf("ops=remove(1),remove(3) -> %s  expected=%s%n",
                 Arrays.toString(gotAfterRemove), Arrays.toString(expectedAfterRemove));
+
+        RandomizedCollection reinsertionCollection = new RandomizedCollection();
+        boolean[] gotAfterRemovingAll = {
+                reinsertionCollection.insert(7),
+                reinsertionCollection.remove(7),
+                reinsertionCollection.insert(7)
+        };
+        boolean[] expectedAfterRemovingAll = {true, true, true};
+        System.out.printf("ops=insert(7),remove(7),insert(7) -> %s  expected=%s%n",
+                Arrays.toString(gotAfterRemovingAll), Arrays.toString(expectedAfterRemovingAll));
     }
 }
