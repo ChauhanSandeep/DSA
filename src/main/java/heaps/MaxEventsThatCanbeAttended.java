@@ -37,16 +37,19 @@ public class MaxEventsThatCanbeAttended {
         MaxEventsThatCanbeAttended solver = new MaxEventsThatCanbeAttended();
         int[][][] inputs = {
                 {{1, 4}, {4, 4}, {2, 2}, {3, 4}, {1, 1}},
+                {{1, 2}, {1, 2}},
+                {{1, 2}, {2, 3}},
+                {{5, 5}},
                 {}
         };
-        int[] expected = {4, 0};
+        int[] expected = {4, 2, 2, 1, 0};
 
         for (int i = 0; i < inputs.length; i++) {
             int[][] copy = new int[inputs[i].length][];
             for (int row = 0; row < inputs[i].length; row++) {
                 copy[row] = inputs[i][row].clone();
             }
-            int got = solver.maxEvents(copy);
+            int got = solver.maxEventsGreedy(copy);
             System.out.printf("events=%s -> %d  expected=%d%n",
                     Arrays.deepToString(inputs[i]), got, expected[i]);
         }
@@ -55,35 +58,22 @@ public class MaxEventsThatCanbeAttended {
     /**
      * Using Greedy approach:
      *
+     * Intuition: this is the same day-sweep greedy used by maxEvents. On each
+     * day, choosing the available event with the earliest end day keeps longer
+     * events available for later days.
+     *
      * Algorithm:
-     * - Always attend the event that ends the earliest.
-     * This ensures that we leave the most room for future events,
-     * maximizing the total number of events attended.
-     * * This greedy strategy works because by always choosing the event that finishes earliest,
-     * we leave the most room for future events,
-     * maximizing the total number you can attend.
+     *   1. Sort events by start day, then end day.
+     *   2. Add newly available events to a min heap of end days.
+     *   3. Remove expired events and attend the available event ending earliest.
+     *   4. Move to the next day until every event has been considered.
      *
      * * Time Complexity: O(N log N) due to sorting.
      * * Space Complexity: O(N) for the heap.
      *
      */
     public int maxEventsGreedy(int[][] events) {
-        if (events == null || events.length == 0) return 0;
-
-        // Sort events by end day, then by start day for tie-breaking.
-        Arrays.sort(events, (a, b) -> a[1] == b[1] ? Integer.compare(a[0], b[0]) : Integer.compare(a[1], b[1]));
-
-        int eventsAttended = 0;
-        int lastEndDay = 0;
-
-        for (int[] event : events) {
-            // Attend the event only if it starts after the last attended event's end day.
-            if (event[0] > lastEndDay) {
-                eventsAttended++;
-                lastEndDay = event[1]; // Update the last end day to this event's end day.
-            }
-        }
-        return eventsAttended;
+        return maxEvents(events);
     }
 
         /**
