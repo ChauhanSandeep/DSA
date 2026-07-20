@@ -30,11 +30,11 @@ public class ZigZagStringConverter {
 
   public static void main(String[] args) {
     ZigZagStringConverter converter = new ZigZagStringConverter();
-    String[] inputs = {"PAYPALISHIRING", "PAYPALISHIRING", "A", ""};
-    int[] rows = {3, 4, 3, 3};
-    String[] expected = {"PAHNAPLSIIGYIR", "PINALSIGYAHRPI", "A", ""};
+    String[] inputs = {"PAYPALISHIRING", "PAYPALISHIRING", "PAYPALISHIRING", "A", ""};
+    int[] rows = {3, 4, 1, 3, 3};
+    String[] expected = {"PAHNAPLSIIGYIR", "PINALSIGYAHRPI", "PAYPALISHIRING", "A", ""};
     for (int i = 0; i < inputs.length; i++) {
-      String got = converter.convertToZigZagOptimized(inputs[i], rows[i]);
+      String got = converter.convertToZigZag(inputs[i], rows[i]);
       System.out.printf("input=%s rows=%d -> %s  expected=%s%n", inputs[i], rows[i], got, expected[i]);
     }
   }
@@ -65,7 +65,7 @@ public class ZigZagStringConverter {
     }
 
     int currentRow = 0;
-    int direction = 1;
+    int direction = -1;
 
     for (char character : inputString.toCharArray()) {
       builderList.get(currentRow).append(character);

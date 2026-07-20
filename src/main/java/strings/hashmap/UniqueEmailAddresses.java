@@ -43,6 +43,9 @@ public class UniqueEmailAddresses {
             int got = solver.numUniqueEmails(inputs[i]);
             System.out.printf("emails=%s -> %d  expected=%d%n",
                 java.util.Arrays.toString(inputs[i]), got, expected[i]);
+            int gotStringMethods = solver.numUniqueEmailsStringMethods(inputs[i]);
+            System.out.printf("stringMethods emails=%s -> %d  expected=%d%n",
+                java.util.Arrays.toString(inputs[i]), gotStringMethods, expected[i]);
         }
     }
 
@@ -142,7 +145,7 @@ public class UniqueEmailAddresses {
                 local = local.substring(0, plusIndex);
             }
 
-            local = local.replaceAll(".", "");
+            local = local.replace(".", "");
 
             uniqueEmails.add(local + domain);
         }

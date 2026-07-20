@@ -45,7 +45,7 @@ public class TextJustification {
         };
 
         for (int i = 0; i < inputs.length; i++) {
-            java.util.List<String> got = solver.fullJustifyEnhanced(inputs[i], widths[i]);
+            java.util.List<String> got = solver.fullJustify(inputs[i], widths[i]);
             System.out.printf("words=%s maxWidth=%d -> %s  expected=%s%n",
                 java.util.Arrays.toString(inputs[i]), widths[i], got, java.util.Arrays.toString(expected[i]));
         }
@@ -111,7 +111,11 @@ public class TextJustification {
             wordCount++;
         }
 
-        return new LineInfo(wordCount, totalLength);
+        LineInfo lineInfo = new LineInfo(wordCount, totalLength);
+        for (int i = 0; i < wordCount; i++) {
+            lineInfo.words.add(words[start + i]);
+        }
+        return lineInfo;
     }
 
     /** Formats one line according to last-line and single-word rules. */
