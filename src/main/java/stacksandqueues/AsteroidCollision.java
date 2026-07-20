@@ -1,7 +1,8 @@
 package stacksandqueues;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 
 
 /**
@@ -44,8 +45,8 @@ public class AsteroidCollision {
    * Algorithm:
    *   1. Scan asteroids from left to right.
    *   2. While current is negative and stack top is positive, compare sizes.
-   *   3. Pop smaller or equal stack asteroids according to the collision rule.
-   *   4. Push the current asteroid after collision handling.
+   *   3. Pop smaller stack asteroids; pop equal and mark current destroyed.
+   *   4. Push the current asteroid only if it survives collision handling.
    *   5. Pop the stack into the result array in reverse order.
    *
    * Time:  O(n) - each asteroid is pushed once and popped at most once.
@@ -55,10 +56,12 @@ public class AsteroidCollision {
    * @return array representing final state after all collisions
    */
 public int[] asteroidCollision(int[] asteroids) {
-    Stack<Integer> stack = new Stack<>();
+    Deque<Integer> stack = new ArrayDeque<>();
 
     for (int asteroid : asteroids) {
-      while (!stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
+      boolean isCurrentAlive = true;
+
+      while (isCurrentAlive && !stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
         int top = stack.peek();
 
         if (top < -asteroid) {
@@ -71,11 +74,13 @@ public int[] asteroidCollision(int[] asteroids) {
         }
 
         // current asteroid is destroyed
-        continue;
+        isCurrentAlive = false;
       }
 
-      // current asteroid survived, push to stack
-      stack.push(asteroid);
+      if (isCurrentAlive) {
+        // current asteroid survived, push to stack
+        stack.push(asteroid);
+      }
     }
 
     int[] result = new int[stack.size()];
@@ -94,8 +99,9 @@ public int[] asteroidCollision(int[] asteroids) {
    * 1. Use write pointer to track position in result array
    * 2. Process each asteroid, using array positions [0, write) as stack
    * 3. Handle collisions by comparing with asteroids[write - 1]
-   * 4. Only increment write when asteroid survives
-   * 5. Return subarray of first write elements
+   * 4. Mark current destroyed when the stored asteroid is greater or equal
+   * 5. Only increment write when asteroid survives
+   * 6. Return subarray of first write elements
    *
    * Time Complexity: O(N) where N is the number of asteroids.
    *
@@ -109,7 +115,9 @@ public int[] asteroidCollision(int[] asteroids) {
     int write = 0;
 
     for (int asteroid : asteroids) {
-      while (write > 0 && asteroids[write - 1] > 0 && asteroid < 0) {
+      boolean isCurrentAlive = true;
+
+      while (isCurrentAlive && write > 0 && asteroids[write - 1] > 0 && asteroid < 0) {
         if (asteroids[write - 1] < -asteroid) {
           write--;
           continue;
@@ -118,10 +126,12 @@ public int[] asteroidCollision(int[] asteroids) {
         }
 
         // current asteroid is destroyed
-        continue;
+        isCurrentAlive = false;
       }
 
-      asteroids[write++] = asteroid;
+      if (isCurrentAlive) {
+        asteroids[write++] = asteroid;
+      }
     }
 
     int[] result = new int[write];
@@ -131,8 +141,24 @@ public int[] asteroidCollision(int[] asteroids) {
 
   public static void main(String[] args) {
     AsteroidCollision solver = new AsteroidCollision();
-    int[][] inputs = { {}, {5, 10, 15}, {-2, -1, 1, 2} };
-    String[] expected = { "[]", "[5, 10, 15]", "[-2, -1, 1, 2]" };
+    int[][] inputs = {
+        {},
+        {5, 10, 15},
+        {5, 10, -5},
+        {8, -8},
+        {10, 2, -5},
+        {-2, -1, 1, 2},
+        {-2, 2, -1, -2}
+    };
+    String[] expected = {
+        "[]",
+        "[5, 10, 15]",
+        "[5, 10]",
+        "[]",
+        "[10]",
+        "[-2, -1, 1, 2]",
+        "[-2]"
+    };
     for (int i = 0; i < inputs.length; i++) {
       int[] got = solver.asteroidCollision(inputs[i].clone());
       System.out.printf("asteroids=%s -> %s  expected=%s%n", Arrays.toString(inputs[i]), Arrays.toString(got), expected[i]);
