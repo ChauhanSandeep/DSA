@@ -106,7 +106,7 @@ public class ShortestSubarraySum {
             prefixSum += nums[i];
 
             // Step 1: Check if any prefix in monotonicIncreasingQueue can form a valid subarray
-            while (!monotonicIncreasingQueue.isEmpty() && prefixSum - monotonicIncreasingQueue.peekFirst().index >= k) {
+            while (!monotonicIncreasingQueue.isEmpty() && prefixSum - monotonicIncreasingQueue.peekFirst().prefixSum >= k) {
                 int startIndex = monotonicIncreasingQueue.pollFirst().index;
                 result = Math.min(result, i - startIndex);
             }
@@ -136,9 +136,9 @@ public class ShortestSubarraySum {
 
     public static void main(String[] args) {
         ShortestSubarraySum solver = new ShortestSubarraySum();
-        int[][] inputs = { {3}, {1, 2}, {5, 1, 1} };
-        int[] targets = {3, 5, 5};
-        int[] expected = {1, -1, 1};
+        int[][] inputs = { {3}, {1, 2}, {1, 2}, {5, 1, 1} };
+        int[] targets = {3, 5, 4, 5};
+        int[] expected = {1, -1, -1, 1};
 
         for (int i = 0; i < inputs.length; i++) {
             int output = solver.shortestSubarray(inputs[i], targets[i]);

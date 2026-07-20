@@ -150,12 +150,10 @@ public class BurstBalloon {
                 for (int burstIndex = leftIndex + 1; burstIndex < rightIndex; burstIndex++) {
                     int leftCoins = dp[leftIndex][burstIndex]; // burst balloons in [left+1 to burstIndex-1]
                     int rightCoins = dp[burstIndex][rightIndex]; // burst balloons in [burstIndex+1 to right-1]
-                    int coins = leftCoins + rightCoins;
-
                     // When burstIndex is burst LAST in interval (left, right):
                     // - Its neighbors remaining are arr[left] and arr[right]
                     // - Subproblems [left+1 to burstIndex-1] and [burstIndex+1 to right-1] are already solved
-                    coins = arr[leftIndex] * arr[burstIndex] * arr[rightIndex];
+                    int coins = leftCoins + rightCoins + arr[leftIndex] * arr[burstIndex] * arr[rightIndex];
                     
                     dp[leftIndex][rightIndex] = Math.max(dp[leftIndex][rightIndex], coins);
                 }
@@ -179,7 +177,7 @@ public class BurstBalloon {
         int[] expected = {0, 167, 10};
 
         for (int i = 0; i < inputs.length; i++) {
-            int output = solver.maxCoinsRecursiveApproach(inputs[i]);
+            int output = solver.maxCoinsIterative(inputs[i]);
             System.out.printf("nums=%s  ->  %d  expected=%d%n",
                 Arrays.toString(inputs[i]), output, expected[i]);
         }

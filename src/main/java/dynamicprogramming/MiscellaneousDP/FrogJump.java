@@ -1,6 +1,10 @@
 package dynamicprogramming.MiscellaneousDP;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Problem: Frog Jump
@@ -33,10 +37,12 @@ public class FrogJump {
     public static void main(String[] args) {
         FrogJump solver = new FrogJump();
         int[][] inputs = {
+            {0},
+            {0, 1, 3, 5, 6, 8, 12, 17},
             {0, 2},
             {0, 1, 2, 3, 4, 8, 9, 11}
         };
-        boolean[] expected = {false, false};
+        boolean[] expected = {true, true, false, false};
 
         for (int i = 0; i < inputs.length; i++) {
             boolean got = solver.canCross(inputs[i]);
@@ -55,8 +61,8 @@ public class FrogJump {
      * stone, the frog can cross.
      *
      * Algorithm:
-     *   1. Reject obviously unreachable gaps using the original early check.
-     *   2. Put all stones in a set and start DFS stack from position 0 with jump 0.
+     *   1. Accept a single starting stone and reject obviously unreachable gaps.
+     *   2. Put all stones in a set and start a DFS stack from position 0 with jump 0.
      *   3. For each state, try jumps lastJump - 1, lastJump, and lastJump + 1.
      *   4. Return true when a jump reaches the last stone; otherwise avoid repeated states with visited.
      *
@@ -68,6 +74,7 @@ public class FrogJump {
      */
     public boolean canCross(int[] stones) {
         int length = stones.length;
+        if (length <= 1) return true;
 
         // Early termination: If a stone is unreachable
         for (int i = 3; i < length; i++) {
@@ -81,25 +88,25 @@ public class FrogJump {
             stoneSet.add(stone);
         }
 
-        Stack<int[]> stack = new Stack<>();
-        stack.push(new int[]{0, 0}); // {currentPosition, lastJumpSize}
+        Deque<int[]> dfsStack = new ArrayDeque<>();
+        dfsStack.push(new int[]{0, 0}); // {currentPosition, lastJumpSize}
 
         Set<String> visited = new HashSet<>();
-        visited.add("0-0");
 
         int lastStone = stones[length - 1];
 
-        while (!stack.isEmpty()) {
+        while (!dfsStack.isEmpty()) {
             // SELECT : pop the current state from the stack
-            int[] state = stack.pop();
+            int[] state = dfsStack.pop();
             int position = state[0];
             int lastJump = state[1];
 
             // MARK(*) : Check if we have already visited this state. If not, then mark it as visited and proceed.
-            if(visited.contains(position + "-" + lastJump)) {
+            String stateKey = position + "-" + lastJump;
+            if (visited.contains(stateKey)) {
                 continue; // Already visited this state
             }
-            visited.add(position + "-" + lastJump);
+            visited.add(stateKey);
 
             // WORK : Try all possible jump sizes (k-1, k, k+1)
             for (int jump = lastJump - 1; jump <= lastJump + 1; jump++) {
@@ -110,7 +117,7 @@ public class FrogJump {
 
                 // ADD(*) : Add to queue, if the next position is a valid stone and not visited with this jump size
                 if (stoneSet.contains(nextPosition) && !visited.contains(nextPosition + "-" + jump)) {
-                    stack.push(new int[]{nextPosition, jump});
+                    dfsStack.push(new int[]{nextPosition, jump});
                 }
             }
         }
