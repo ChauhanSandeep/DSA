@@ -50,6 +50,15 @@ public class ConvexHull {
             System.out.printf("trees=%s -> %s  expected=%s%n",
                 Arrays.deepToString(inputs[i]), Arrays.deepToString(got), Arrays.deepToString(expected[i]));
         }
+
+        int[][] chanInput = { {0, 0}, {1, 1}, {2, 0}, {1, 2} };
+        int[][] chanExpected = { {0, 0}, {1, 2}, {2, 0} };
+        int[][] chanGot = solver.outerTreesChan(chanInput);
+        Arrays.sort(chanGot, (a, b) -> a[0] != b[0]
+            ? Integer.compare(a[0], b[0])
+            : Integer.compare(a[1], b[1]));
+        System.out.printf("outerTreesChan trees=%s -> %s  expected=%s%n",
+            Arrays.deepToString(chanInput), Arrays.deepToString(chanGot), Arrays.deepToString(chanExpected));
     }
 
 
@@ -427,8 +436,23 @@ public class ConvexHull {
     }
 
     /**
-     * Chan's Algorithm - optimal for h < log n where h is hull size.
-     * Combines divide-and-conquer with gift wrapping.
+     * Intuition: try a guessed hull-size limit and gift-wrap across small
+     * group hulls. If the walk returns to the leftmost point within that limit,
+     * the hull is complete; otherwise grow the limit and retry. The first limit
+     * must be greater than one so the retry loop always makes progress.
+     *
+     * Algorithm:
+     *   1. Return small inputs directly, then convert coordinates to Point objects.
+     *   2. Try increasing hull-size limits, starting from two.
+     *   3. For each limit, split points into groups and gift-wrap over group hulls.
+     *   4. When the walk closes, add collinear boundary points on every hull edge.
+     *   5. Fall back to the primary Graham scan if no guessed limit closes the hull.
+     *
+     * Time:  O(nh) for the simple tangent scan used here; O(n log n) fallback.
+     * Space: O(n) for grouped hulls and the output set.
+     *
+     * @param trees coordinates of all trees
+     * @return coordinates of trees on the outer fence
      */
     public int[][] outerTreesChan(int[][] trees) {
         int n = trees.length;
@@ -440,10 +464,13 @@ public class ConvexHull {
         }
 
         // Try different values of h (expected hull size)
-        for (int h = 1; h <= n; h = h * h) {
+        for (int h = 2; h <= n; h = h > n / h ? n : h * h) {
             int[][] result = chanWithH(points, h);
             if (result != null) {
                 return result;
+            }
+            if (h == n) {
+                break;
             }
         }
 
@@ -479,15 +506,32 @@ public class ConvexHull {
 
             if (next.equals(leftmost) && iter > 0) {
                 // Completed the hull
-                return globalHull.stream()
-                                 .map(p -> new int[]{p.x, p.y})
-                                 .toArray(int[][]::new);
+                return includeCollinearBoundaryPoints(points, globalHull);
             }
 
             current = next;
         }
 
         return null; // h was too small
+    }
+
+    private int[][] includeCollinearBoundaryPoints(Point[] points, List<Point> hullVertices) {
+        Set<Point> boundaryPoints = new LinkedHashSet<>(hullVertices);
+
+        for (int i = 0; i < hullVertices.size(); i++) {
+            Point start = hullVertices.get(i);
+            Point end = hullVertices.get((i + 1) % hullVertices.size());
+
+            for (Point point : points) {
+                if (orientation(start, end, point) == 0 && isOnSegment(start, point, end)) {
+                    boundaryPoints.add(point);
+                }
+            }
+        }
+
+        return boundaryPoints.stream()
+                             .map(p -> new int[]{p.x, p.y})
+                             .toArray(int[][]::new);
     }
 
     private List<Point> computeHullGraham(Point[] points) {
@@ -517,7 +561,9 @@ public class ConvexHull {
         for (List<Point> hull : groupHulls) {
             Point candidate = findTangentPoint(current, hull);
 
-            if (next == null || orientation(current, next, candidate) > 0) {
+            int turn = next == null ? 1 : orientation(current, next, candidate);
+            if (next == null || turn > 0 ||
+                (turn == 0 && distanceSquared(current, candidate) > distanceSquared(current, next))) {
                 next = candidate;
             }
         }
