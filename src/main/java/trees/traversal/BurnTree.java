@@ -1,10 +1,9 @@
 package trees.traversal;
 
-import trees.Node;
 import trees.TreeNode;
 
 /**
- * Problem: Burn a Binary Tree from a Leaf
+ * Problem: Burn a Binary Tree from a Target
  *
  * Fire starts at a node value and spreads to connected nodes every second
  * through parent, left child, and right child links. Return the time required
@@ -15,13 +14,13 @@ import trees.TreeNode;
  * Pattern:  Trees | DFS | Distance bubbling | Opposite-subtree propagation
  *
  * Example:
- *   Input:  root = [5,4,6,3,14,null,7,null,null,null,null,9,8], leaf = 14
+ *   Input:  root = [5,4,6,3,14,null,7,null,null,null,null,9,8], target = 14
  *   Output: 5
  *   Why:    the farthest nodes, 9 and 8, burn five seconds after node 14.
  *
  * Follow-ups:
- *   1. How would you support any starting node, not only a leaf?
- *      The same distance-bubbling DFS works as long as values are unique.
+ *   1. What if values are duplicated?
+ *      Pass the exact target node reference instead of searching by value.
  *   2. How would you return nodes burned at each second?
  *      Build parent links and run BFS levels from the start node.
  *   3. What if edges have different burn times?
@@ -44,22 +43,32 @@ public class BurnTree {
         root.right.right.right = new TreeNode(8);
 
         TreeNode single = new TreeNode(1);
-        System.out.printf("root=%s leaf=%d -> %d  expected=%d%n",
+        System.out.printf("root=%s target=%d -> %d  expected=%d%n",
             "[5,4,6,3,14,null,7,null,null,null,null,9,8]", 14,
             new BurnTree().burnTree(root, 14), 5);
-        System.out.printf("root=%s leaf=%d -> %d  expected=%d%n",
-            "[1]", 1, new BurnTree().burnTree(single, 1), 0);
+
+        TreeNode skewed = new TreeNode(1);
+        skewed.left = new TreeNode(2);
+        skewed.left.left = new TreeNode(3);
+        skewed.left.left.left = new TreeNode(4);
+
+        BurnTree solver = new BurnTree();
+        System.out.printf("root=%s target=%d -> %d  expected=%d%n",
+            "[1,2,null,3,null,4] root", 1, solver.burnTree(skewed, 1), 3);
+        System.out.printf("root=%s target=%d -> %d  expected=%d%n",
+            "[1]", 1, solver.burnTree(single, 1), 0);
     }
 
 
         /**
-     * Intuition: once the burning node is found, ancestors learn how many seconds
-     * away they are as recursion unwinds. At each ancestor, fire also enters the
-     * opposite subtree, so propagateFire measures the deepest node reached from
-     * that side with the elapsed time already spent.
+     * Intuition: once the burning node is found, burn its own children, then let
+     * ancestors learn how many seconds away they are as recursion unwinds. At
+     * each ancestor, fire also enters the opposite subtree, so propagateFire
+     * measures the deepest node reached from that side with the elapsed time
+     * already spent.
      *
      * Algorithm:
-     *   1. DFS left before right to find leafValue.
+     *   1. Reset maxBurnTime, then DFS left before right to find targetValue.
      *   2. Return -1 from subtrees that do not contain the burning node.
      *   3. When a child path contains the start, update maxBurnTime with that distance.
      *   4. Propagate fire into the opposite child using the known elapsed time.
@@ -69,30 +78,35 @@ public class BurnTree {
      * Space: O(h) - recursion follows tree height.
      *
      * @param root root of the binary tree
-     * @param leafValue value where the fire starts
+     * @param targetValue value where the fire starts
      * @return seconds needed to burn the whole tree
      */
-    public int burnTree(TreeNode root, int leafValue) {
-        findBurningNode(root, leafValue);
+    public int burnTree(TreeNode root, int targetValue) {
+        maxBurnTime = 0;
+        findBurningNode(root, targetValue);
         return maxBurnTime;
     }
 
         // Finds the start node and returns its distance to each ancestor.
-    private int findBurningNode(TreeNode node, int leafValue) {
+    private int findBurningNode(TreeNode node, int targetValue) {
         if (node == null) return -1;
 
-        if (node.val == leafValue) return 0; // Found the leaf node, fire starts here
+        if (node.val == targetValue) {
+            propagateFire(node.left, 0);
+            propagateFire(node.right, 0);
+            return 0;
+        }
 
         // Recurse into left and right subtrees
-        int leftDepth = findBurningNode(node.left, leafValue);
-        if (leftDepth != -1) { // If leaf found in left subtree
+        int leftDepth = findBurningNode(node.left, targetValue);
+        if (leftDepth != -1) { // If target found in left subtree
             maxBurnTime = Math.max(maxBurnTime, leftDepth + 1);
             propagateFire(node.right, leftDepth + 1); // Burn right subtree
             return leftDepth + 1;
         }
 
-        int rightDepth = findBurningNode(node.right, leafValue);
-        if (rightDepth != -1) { // If leaf found in right subtree
+        int rightDepth = findBurningNode(node.right, targetValue);
+        if (rightDepth != -1) { // If target found in right subtree
             maxBurnTime = Math.max(maxBurnTime, rightDepth + 1);
             propagateFire(node.left, rightDepth + 1); // Burn left subtree
             return rightDepth + 1;

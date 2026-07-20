@@ -43,10 +43,16 @@ public class PathSum3 {
         root.left.left.right = new TreeNode(-2);
         root.left.right.right = new TreeNode(1);
 
+        TreeNode negative = new TreeNode(-2);
+        negative.right = new TreeNode(-3);
+
         TreeNode single = new TreeNode(1);
+        PathSum3 solver = new PathSum3();
         System.out.printf("root=%s targetSum=%d -> %d  expected=%d%n",
             Arrays.toString(new int[] {10, 5, -3, 3, 2, 11, 3, -2, 1}), 8,
-            new PathSum3().pathSum(root, 8), 3);
+            solver.pathSum(root, 8), 3);
+        System.out.printf("root=%s targetSum=%d -> %d  expected=%d%n",
+            Arrays.toString(new int[] {-2, -3}), -5, solver.pathSum(negative, -5), 1);
         System.out.printf("root=%s targetSum=%d -> %d  expected=%d%n",
             Arrays.toString(new int[] {1}), 1, new PathSum3().pathSum(single, 1), 1);
     }
@@ -62,7 +68,7 @@ public class PathSum3 {
      * current prefix before returning to siblings.
      *
      * Algorithm:
-     *   1. Start DFS with currSum 0 and an empty prefix-frequency map.
+     *   1. Reset result, then start DFS with currSum 0 and an empty prefix-frequency map.
      *   2. Add root.val to currSum and count direct root-starting matches.
      *   3. Add frequencies of currSum - targetSum to result.
      *   4. Record currSum, recurse left then right, and remove currSum while backtracking.
@@ -75,7 +81,9 @@ public class PathSum3 {
      * @return number of downward paths that sum to sum
      */
     public int pathSum(TreeNode root, int sum) {
-        // Initialize the result and hashmap to store cumulative sums
+        result = 0;
+
+        // Initialize the hashmap to store cumulative sums
         Map<Integer, Integer> map = new HashMap<>(); // <sum, frequency>
 
         // Start DFS traversal from the root node
