@@ -1,6 +1,12 @@
 package dynamicprogramming.MiscellaneousDP;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Problem: Number Of Ways To Reconstruct A Tree
@@ -29,21 +35,20 @@ import java.util.*;
  * Related: Validate Binary Tree Nodes (1361), Minimum Height Trees (310).
  */
 public class NumberOfWaysToReconstructATree {
-    private static final int MOD = 1000000007;
 
     /**
      * Intuition: a root must be connected to every other node because every node is
      * either its ancestor or descendant. For any other node, its parent must be a
      * neighbour with at least as many relationships, and all of the node's other
      * neighbours must also be neighbours of that parent. Equal-degree parent and
-     * child choices mean the tree can be rearranged without changing the pair set,
-     * which is exactly the multiple-reconstruction case.
+     * child choices mean at least two valid trees exist, so the answer is the
+     * multiple-reconstruction sentinel 2.
      *
      * Algorithm:
      *   1. Build adjacency sets and degrees from every pair.
      *   2. Sort nodes by descending degree and require the first node to connect to all others.
      *   3. For each remaining node, choose the earlier adjacent node with minimum degree as parent.
-     *   4. Verify every other neighbor is also a parent neighbor, and mark multiple ways on equal degree.
+     *   4. Verify every other neighbor is also a parent neighbor, and return 2 if any equal-degree edge appears.
      *
      * Time:  O(n^2) - each node may compare its neighbours against a candidate parent set.
      * Space: O(n^2) - dense pair input can store a neighbour set for every node pair.
@@ -66,7 +71,7 @@ public class NumberOfWaysToReconstructATree {
 
         // Sort nodes by degree in descending order
         List<Integer> nodes = new ArrayList<>(degree.keySet());
-        nodes.sort((a, b) -> degree.get(b) - degree.get(a));
+        nodes.sort((a, b) -> Integer.compare(degree.get(b), degree.get(a)));
 
         // Check if there's a root (node with degree n-1)
         int n = nodes.size();
@@ -74,7 +79,7 @@ public class NumberOfWaysToReconstructATree {
             return 0;
         }
 
-        int res = 1;
+        int result = 1;
         // For each node, check if it can be a child of any previous node
         for (int i = 1; i < n; i++) {
             int u = nodes.get(i);
@@ -105,25 +110,26 @@ public class NumberOfWaysToReconstructATree {
 
             // If parent has the same degree as u, we can swap them
             if (degree.get(parent) == degree.get(u)) {
-                res = (res * 2) % MOD;
+                result = 2;
             }
         }
 
-        return res;
+        return result;
     }
 
     public static void main(String[] args) {
         NumberOfWaysToReconstructATree solver = new NumberOfWaysToReconstructATree();
         int[][][] inputs = {
             {{1, 2}, {2, 3}},
-            {{1, 2}, {2, 3}, {2, 4}, {1, 5}}
+            {{1, 2}, {2, 3}, {2, 4}, {1, 5}},
+            {{1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4}}
         };
-        int[] expected = {1, 0};
+        int[] expected = {1, 0, 2};
 
         for (int i = 0; i < inputs.length; i++) {
             int got = solver.checkWays(inputs[i]);
             System.out.printf("pairs=%s -> %d  expected=%d%n",
-                java.util.Arrays.deepToString(inputs[i]), got, expected[i]);
+                Arrays.deepToString(inputs[i]), got, expected[i]);
         }
     }
 }

@@ -32,46 +32,52 @@ import java.util.Arrays;
 public class LongestCommonSubstring {
 
     public static void main(String[] args) {
-        String[][] cases = { {"abcde", "abfce"}, {"abc", "def"} };
-        int[] expected = { 2, 0 };
+        String[][] cases = { {"abc", "ac"}, {"abcde", "abfce"}, {"abc", "def"} };
+        int[] expected = { 1, 2, 0 };
 
         for (int i = 0; i < cases.length; i++) {
-            int got = longestCommonSubstringIterative(cases[i][0], cases[i][1]);
+            int got = longestCommonSubstringRecursive(cases[i][0], cases[i][1]);
             System.out.printf("texts=%s -> %d  expected=%d%n",
                 Arrays.toString(cases[i]), got, expected[i]);
         }
     }
 
     /**
-     * Recursive approach with memoization (Top-Down DP)
+     * Intuition: for each pair of starting positions, the only contiguous match
+     * length comes from walking both strings forward together until a mismatch.
+     * Memoization stores that common-prefix length, then scanning every pair picks
+     * the longest substring without accidentally joining separated matches.
      *
-     * Intuition:
-     * - Try matching characters at i and j.
-     * - If they match, we can extend the current length by +1 and move forward.
-     * - If they don't match, we reset current length to 0.
-     * - Explore all possibilities and track the maximum substring length found so far.
+     * Algorithm:
+     *   1. Create a 2D memo table for common-prefix lengths at each index pair.
+     *   2. Try every pair of starting positions as a possible substring start.
+     *   3. Recursively extend only along the diagonal while characters match.
+     *   4. Return the maximum memoized match length seen.
      *
-     * Steps:
-     * 1. Create a 2D dp array to store results of subproblems.
-     * 2. Use recursion to explore all character matches.
-     * 3. Use memoization to avoid recomputation.
-     * 4. Return the maximum length found.
+     * Time:  O(m * n) - each index pair is computed once.
+     * Space: O(m * n) - memo table plus recursion stack.
      *
-     * Time Complexity: O(m * n)
-     * Space Complexity: O(m * n) (for dp table) + recursion stack
+     * @param text1 first input string
+     * @param text2 second input string
+     * @return length of the longest common substring
      */
     public static int longestCommonSubstringRecursive(String text1, String text2) {
         int len1 = text1.length();
         int len2 = text2.length();
-        // dp[i][j] will store the length of longest common substring ending at text1[i] and text2[j]
         int[][] dp = new int[len1][len2];
 
-        // Initialize dp with -1
         for (int i = 0; i < len1; i++) {
             Arrays.fill(dp[i], -1);
         }
 
-        return findLCSRecursive(text1, text2, 0, 0, dp);
+        int maxLength = 0;
+        for (int i = 0; i < len1; i++) {
+            for (int j = 0; j < len2; j++) {
+                maxLength = Math.max(maxLength, findLCSRecursive(text1, text2, i, j, dp));
+            }
+        }
+
+        return maxLength;
     }
 
     private static int findLCSRecursive(String text1, String text2, int i, int j, int[][] dp) {
@@ -79,21 +85,16 @@ public class LongestCommonSubstring {
             return 0;
         }
 
-        // Already computed
         if (dp[i][j] != -1) {
             return dp[i][j];
         }
 
-        int matchLength = 0;
-        if (text1.charAt(i) == text2.charAt(j)) {
-            // If characters match, extend the length and check for rest of the characters in both strings
-            matchLength = 1 + findLCSRecursive(text1, text2, i + 1, j + 1, dp);
+        if (text1.charAt(i) != text2.charAt(j)) {
+            dp[i][j] = 0;
+            return 0;
         }
-        // If characters don't match, we can either skip one character from text1 or text2 and check for the rest of the strings
-        int skipText1 = findLCSRecursive(text1, text2, i + 1, j, dp);
-        int skipText2 = findLCSRecursive(text1, text2, i, j + 1, dp);
 
-        dp[i][j] = Math.max(matchLength, Math.max(skipText1, skipText2));
+        dp[i][j] = 1 + findLCSRecursive(text1, text2, i + 1, j + 1, dp);
         return dp[i][j];
     }
 
