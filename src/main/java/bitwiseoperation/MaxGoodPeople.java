@@ -56,6 +56,10 @@ public class MaxGoodPeople {
       System.out.printf("statements=%s -> %d  expected=%d%n",
           Arrays.deepToString(cases[i]), output, expected[i]);
     }
+
+    int backtrackingOutput = solver.maximumGoodBacktracking(cases[1]);
+    System.out.printf("backtracking statements=%s -> %d  expected=%d%n",
+        Arrays.deepToString(cases[1]), backtrackingOutput, expected[1]);
   }
 
   /**
@@ -148,7 +152,7 @@ public class MaxGoodPeople {
 
     // Base case: all people assigned
     if (personIndex == size) {
-      return isValidAssignment(assignments, statements, size) ? currentGoodCount : 0;
+      return isValidAssignment(assignments, statements, size - 1) ? currentGoodCount : 0;
     }
 
     int maxFound = 0;
