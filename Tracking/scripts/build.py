@@ -27,6 +27,7 @@ Idempotent: rerun after any repo change or sync.
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
@@ -59,8 +60,7 @@ SITE_DIR = REPO_ROOT / "Tracking" / "site"
 
 STATE_JSON = DATA_DIR / "state.json"
 NEETCODE_JSON = DATA_DIR / "neetcode.json"
-
-QUEUE_SIZE = 6
+QUEUE_SIZE = 10
 DIFFICULTY_CLASS = {
     "Easy": "diff-easy",
     "Medium": "diff-medium",
@@ -70,6 +70,19 @@ DIFFICULTY_CLASS = {
 
 # Path of state.json relative to site/ pages (for a hint in the UI).
 STATE_JSON_REL_FROM_SITE = "../data/state.json"
+
+# Cache-busting version for CSS/JS links; recomputed from asset contents at
+# build time so a rebuilt stylesheet is never served from a stale cache.
+ASSET_VERSION = "dev"
+
+
+def compute_asset_version() -> str:
+    digest = hashlib.md5()
+    for name in ("styles.css", "app.js"):
+        asset = SITE_SRC_DIR / name
+        if asset.exists():
+            digest.update(asset.read_bytes())
+    return digest.hexdigest()[:8]
 
 
 # ---------------------------------------------------------------------------
@@ -167,7 +180,7 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
   <title>{esc(title)}</title>
   {THEME_INIT}
   {FONT_LINKS}
-  <link rel="stylesheet" href="{{root}}assets/styles.css">
+  <link rel="stylesheet" href="{{root}}assets/styles.css?v={ASSET_VERSION}">
   {PRISM_LINKS}
 </head>
 <body>
@@ -191,7 +204,7 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
     </div>
   </div>
   <script src="{{root}}assets/prism/prism.js" defer></script>
-  <script src="{{root}}assets/app.js" defer></script>
+  <script src="{{root}}assets/app.js?v={ASSET_VERSION}" defer></script>
 </body>
 </html>
 """
@@ -288,10 +301,9 @@ def render_dashboard(state: dict, today: date) -> str:
     total = len(all_problems)
     nc150 = sum(1 for p in all_problems if p.get("isNC150"))
     reviewed_ever = sum(1 for p in all_problems if p["sm2"].get("lastReviewed"))
-    due_this_week = sum(
-        1 for p in all_problems
-        if p["sm2"].get("nextDue") and date.fromisoformat(p["sm2"]["nextDue"]) <= review_day
-    )
+    # Show the actual review load for Saturday — the capped queue (≤ QUEUE_SIZE),
+    # not the full backlog of everything whose nextDue has passed.
+    due_this_week = len(queue)
 
     stats = f"""
     <div class="stats">
@@ -320,11 +332,13 @@ def render_dashboard(state: dict, today: date) -> str:
             done_today = reviewed_today(problem.get("sm2", {}), today)
             item_class = "queue-item"
             index_mark = f"{index:02d}"
-            done_meta = ""
+            sm2 = problem.get("sm2", {})
+            # Persistent solved marker (shown whenever it wasn't graded today).
+            done_meta = solved_status_tag(sm2)
             if done_today:
                 item_class += " reviewed-today"
                 index_mark = "✓"
-                grade = problem["sm2"].get("lastGrade", "")
+                grade = sm2.get("lastGrade", "")
                 emoji, label = GRADE_LABELS.get(grade, ("•", grade))
                 done_meta = f'<span class="reviewed-tag">{emoji} {esc(label)} today</span>'
 
@@ -626,6 +640,27 @@ GRADE_LABELS = {
     "hint":    ("🟡", "Hint"),
     "blank":   ("🔴", "Blank"),
 }
+
+# Compact at-a-glance markers for the dashboard queue. Solved/Trivial get a
+# tick; weaker outcomes get a distinct glyph so "what's solved" reads instantly.
+STATUS_MARKERS = {
+    "trivial": ("✓", "Mastered"),
+    "solved":  ("✓", "Solved"),
+    "hint":    ("◐", "Hint"),
+    "blank":   ("✗", "Blank"),
+}
+
+
+def solved_status_tag(sm2: dict) -> str:
+    """Persistent status pill for a queue item, based on the last grade."""
+    grade = sm2.get("lastGrade")
+    if not grade:
+        return '<span class="status-tag status-new" title="Not reviewed yet">○ New</span>'
+    icon, label = STATUS_MARKERS.get(grade, ("•", grade))
+    return (
+        f'<span class="status-tag status-{esc(grade)}" '
+        f'title="Last attempt: {esc(label)}">{icon} {esc(label)}</span>'
+    )
 
 
 def reviewed_today(sm2: dict, today: date) -> bool:
@@ -977,10 +1012,8 @@ def render_browse_page(state: dict, today: date) -> str:
             <a href="problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a>
           </span>
           <span class="pattern-item-badges">{badges_for_problem(entry, root="")}</span>
-          <span class="pattern-item-meta">
-            <span class="pattern-item-due">next: {esc(next_due_pretty)}</span>
-            <span class="pattern-item-last">last: {esc(last_label)}</span>
-          </span>
+          <span class="pattern-item-col pattern-item-due"><span class="pattern-item-col-label">next</span>{esc(next_due_pretty)}</span>
+          <span class="pattern-item-col pattern-item-last"><span class="pattern-item-col-label">last</span>{esc(last_label)}</span>
         </summary>
         <div class="pattern-item-body">
           {body_content}
@@ -1139,10 +1172,8 @@ def _render_expandable_list(title: str, entries: list[dict], root: str = "../",
             <a href="{root}problems/{esc(entry['task'])}.html">{esc(entry.get('problemName') or entry['task'])}</a>
           </span>
           <span class="pattern-item-badges">{badges_for_problem(entry, root=root)}</span>
-          <span class="pattern-item-meta">
-            <span class="pattern-item-due">next: {esc(next_due_pretty)}</span>
-            <span class="pattern-item-last">last: {esc(last_label)}</span>
-          </span>
+          <span class="pattern-item-col pattern-item-due"><span class="pattern-item-col-label">next</span>{esc(next_due_pretty)}</span>
+          <span class="pattern-item-col pattern-item-last"><span class="pattern-item-col-label">last</span>{esc(last_label)}</span>
         </summary>
         <div class="pattern-item-body">
           {body_content}
@@ -1218,6 +1249,9 @@ def build() -> int:
     if not STATE_JSON.exists():
         print("ERROR: state.json missing. Run sync.py first.", file=sys.stderr)
         return 1
+
+    global ASSET_VERSION
+    ASSET_VERSION = compute_asset_version()
 
     state = json.loads(STATE_JSON.read_text())
     today = date.today()

@@ -50,8 +50,27 @@ BUILD_SCRIPT = REPO_ROOT / "Tracking" / "scripts" / "build.py"
 
 # SM-2 formula constants — MUST match app.js and Tracking/README.md.
 MAX_INTERVAL_DAYS = 180
+MIN_INTERVAL_DAYS = 3
 MIN_EASE = 1.3
 MAX_EASE = 3.0
+
+# Difficulty-weighted intervals: harder problems come back sooner, easier ones
+# stretch out. Keyed by rating band (falls back to Leetcode difficulty).
+# MUST match app.js and Tracking/README.md.
+DIFFICULTY_INTERVAL_FACTOR = {
+    "Very Hard": 0.5,
+    "Hard": 0.65,
+    "Medium": 1.0,
+    "Easy": 1.35,
+    "Unknown": 1.0,
+}
+
+
+def effective_difficulty(entry: dict) -> str:
+    band = (entry.get("rating") or {}).get("band")
+    if band:
+        return band
+    return entry.get("difficulty") or "Unknown"
 
 # --------------------------------------------------------------------------
 # SM-2 update — server-side authoritative copy. Duplicated from the JS in
@@ -59,7 +78,7 @@ MAX_EASE = 3.0
 # it computes the value the user sees toasted. Keep them in sync manually.
 # --------------------------------------------------------------------------
 
-def apply_sm2(sm2: dict, grade: str, today: date) -> dict:
+def apply_sm2(sm2: dict, grade: str, today: date, difficulty: str = "Unknown") -> dict:
     sm2 = dict(sm2 or {})
     sm2.setdefault("easeFactor", 2.5)
     sm2.setdefault("intervalDays", 0)
@@ -88,6 +107,9 @@ def apply_sm2(sm2: dict, grade: str, today: date) -> dict:
     else:
         raise ValueError(f"Unknown grade: {grade!r}")
 
+    # Difficulty weighting: shorten hard, stretch easy — then clamp.
+    factor = DIFFICULTY_INTERVAL_FACTOR.get(difficulty, 1.0)
+    sm2["intervalDays"] = max(MIN_INTERVAL_DAYS, round(sm2["intervalDays"] * factor))
     sm2["easeFactor"] = max(MIN_EASE, min(MAX_EASE, sm2["easeFactor"]))
     sm2["intervalDays"] = min(sm2["intervalDays"], MAX_INTERVAL_DAYS)
     sm2["lastReviewed"] = today.isoformat()
@@ -119,7 +141,8 @@ def grade_problem(task: str, grade: str) -> dict:
         if task not in state["problems"]:
             raise KeyError(task)
         entry = state["problems"][task]
-        new_sm2 = apply_sm2(entry.get("sm2", {}), grade, date.today())
+        new_sm2 = apply_sm2(entry.get("sm2", {}), grade, date.today(),
+                            effective_difficulty(entry))
         entry["sm2"] = new_sm2
         history = entry.setdefault("history", [])
         history.append({"date": date.today().isoformat(), "grade": grade})

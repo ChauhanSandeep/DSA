@@ -23,14 +23,19 @@
         "band": "Easy"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-07-25",
-        "lastGrade": null
+        "easeFactor": 2.65,
+        "intervalDays": 14,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-15",
+        "lastGrade": "trivial"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "trivial"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": true,
@@ -1582,13 +1587,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-07-25",
-        "lastGrade": null
+        "intervalDays": 7,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-08",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -2811,14 +2821,19 @@
         "band": "Medium"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-07-25",
-        "lastGrade": null
+        "easeFactor": 2.35,
+        "intervalDays": 3,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-04",
+        "lastGrade": "hint"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "hint"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -5312,17 +5327,69 @@
         "band": "Easy"
       },
       "sm2": {
-        "easeFactor": 2.3,
-        "intervalDays": 3,
-        "repetitions": 0,
-        "lastReviewed": "2026-07-19",
-        "nextDue": "2026-07-22",
-        "lastGrade": "blank"
+        "easeFactor": 1.8499999999999996,
+        "intervalDays": 55,
+        "repetitions": 3,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-09-25",
+        "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-07-19",
           "grade": "blank"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "trivial"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "hint"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "trivial"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "hint"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "blank"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "blank"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "blank"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "trivial"
+        },
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -16146,16 +16213,20 @@
         "band": null
       },
       "sm2": {
-        "easeFactor": 2.35,
-        "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-07-19",
-        "nextDue": "2026-07-22",
+        "easeFactor": 2.2,
+        "intervalDays": 4,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-05",
         "lastGrade": "hint"
       },
       "history": [
         {
           "date": "2026-07-19",
+          "grade": "hint"
+        },
+        {
+          "date": "2026-08-01",
           "grade": "hint"
         }
       ],

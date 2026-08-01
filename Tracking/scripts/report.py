@@ -40,7 +40,7 @@ STATE_JSON = DATA_DIR / "state.json"
 EXTRAS_JSON = DATA_DIR / "extras.json"
 JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
 
-QUEUE_SIZE = 6
+QUEUE_SIZE = 10
 
 
 def load_json(path: Path) -> dict:

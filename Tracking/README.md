@@ -84,6 +84,13 @@ elif grade == "trivial":
     easeFactor   += 0.15
 
 easeFactor   = clamp(easeFactor, 1.3, 3.0)
+
+# Difficulty weighting — harder problems recur sooner, easier ones stretch out.
+# Keyed by rating band (falls back to Leetcode difficulty). Mirrored in
+# app.js and serve.py.
+factor       = { "Very Hard": 0.5, "Hard": 0.65, "Medium": 1.0,
+                 "Easy": 1.35, "Unknown": 1.0 }[difficulty]
+intervalDays = max(3, round(intervalDays * factor))
 intervalDays = min(intervalDays, 180)     # 6-month cap
 lastReviewed = d
 nextDue      = d + intervalDays
@@ -93,17 +100,30 @@ nextDue      = d + intervalDays
 
 ## Weekly queue algorithm
 
-```
-due = [p for p in state if p.nextDue <= today]
-sort due by (nextDue ascending, difficulty descending, easeFactor ascending)
-queue = first 6 items
+Two hardest-first lanes balance reinforcing old hard problems against
+covering new ground. The revision lane is a *soft cap* filled by what's due
+(≈2 early, up to 4 once a review backlog exists); the new lane takes the rest
+of a 10-item queue (so ≈8 new / 2 revision early, drifting to 6 new / 4):
 
-if len(queue) < 6:
-    fill from pinned + least-recently-touched-pattern rotation
+```
+due = [p for p in state if not p.skip and p.nextDue <= today]
+
+review_pool = [p for p in due if p.lastReviewed]      # depth
+new_pool    = [p for p in due if not p.lastReviewed]  # breadth
+
+sort review_pool by (difficulty desc, nextDue asc, easeFactor asc)
+sort new_pool    by (difficulty desc, nextDue asc)
+
+queue = review_pool[:4] + new_pool[:6]   # 4 = MAX_REVIEW_SLOTS (soft cap)
+
+# Cross-backfill a short lane from the other lane's surplus, then from
+# pinned anchors, so Saturday always has 10 problems.
 ```
 
-Guarantees Saturday always has 6 problems in the queue even during
-quiet stretches.
+Difficulty is the rating band (Very Hard / Hard / Medium / Easy), falling
+back to the raw Leetcode difficulty. Combined with the difficulty-weighted
+intervals above, hard problems both resurface sooner *and* jump to the front
+of each lane.
 
 ---
 

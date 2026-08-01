@@ -27,13 +27,30 @@
 
   // Interval cap keeps SM-2 honest for weekly cadence (see Tracking/README.md).
   const MAX_INTERVAL_DAYS = 180;
+  const MIN_INTERVAL_DAYS = 3;
   const MIN_EASE = 1.3;
   const MAX_EASE = 3.0;
+
+  // Difficulty-weighted intervals: harder problems return sooner, easier ones
+  // stretch out. Keyed by rating band (falls back to Leetcode difficulty).
+  // MUST match serve.py and Tracking/README.md.
+  const DIFFICULTY_INTERVAL_FACTOR = {
+    "Very Hard": 0.5,
+    "Hard": 0.65,
+    "Medium": 1.0,
+    "Easy": 1.35,
+    "Unknown": 1.0,
+  };
+
+  function effectiveDifficulty(problem) {
+    const band = problem && problem.rating && problem.rating.band;
+    return band || (problem && problem.difficulty) || "Unknown";
+  }
 
   // --------------------------------------------------------------------------
   // SM-2 algorithm — exact formula documented in Tracking/README.md.
   // --------------------------------------------------------------------------
-  function applySm2(currentSm2, grade, today) {
+  function applySm2(currentSm2, grade, today, difficulty) {
     const sm2 = Object.assign({}, currentSm2);
     sm2.easeFactor    = sm2.easeFactor    ?? 2.5;
     sm2.intervalDays  = sm2.intervalDays  ?? 0;
@@ -72,6 +89,9 @@
     }
 
     sm2.easeFactor   = clamp(sm2.easeFactor, MIN_EASE, MAX_EASE);
+    // Difficulty weighting: shorten hard, stretch easy — then clamp.
+    const factor = DIFFICULTY_INTERVAL_FACTOR[difficulty] ?? 1.0;
+    sm2.intervalDays = Math.max(MIN_INTERVAL_DAYS, Math.round(sm2.intervalDays * factor));
     sm2.intervalDays = Math.min(sm2.intervalDays, MAX_INTERVAL_DAYS);
     sm2.lastReviewed = isoDate(today);
     sm2.nextDue      = isoDate(addDays(today, sm2.intervalDays));
@@ -258,6 +278,63 @@
   }
 
   // --------------------------------------------------------------------------
+  // Grade feedback — a short celebratory (or encouraging) pop after grading.
+  // Trivial gets full confetti, Solved a lighter burst, Hint/Blank a
+  // supportive nudge. Respects prefers-reduced-motion.
+  // --------------------------------------------------------------------------
+  const FEEDBACK = {
+    trivial: { emoji: "🎉", title: "Mastered!",   sub: "Nailed it cold — interval stretched way out.", cls: "fb-trivial", confetti: 130 },
+    solved:  { emoji: "✅", title: "Solved!",     sub: "Locked in and rescheduled. Nice work.",        cls: "fb-solved",  confetti: 60  },
+    hint:    { emoji: "💡", title: "So close!",   sub: "A hint was needed — we'll circle back sooner.", cls: "fb-hint" },
+    blank:   { emoji: "💪", title: "Shake it off", sub: "Blanks happen. You'll get it next round.",     cls: "fb-blank" },
+  };
+
+  const CONFETTI_COLORS = ["#6fa96f", "#4d84c9", "#cf9a4a", "#c0554a", "#8e7cc3", "#f1c40f"];
+
+  function prefersReducedMotion() {
+    return window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  function launchConfetti(count) {
+    if (prefersReducedMotion()) return;
+    const layer = document.createElement("div");
+    layer.className = "confetti-layer";
+    document.body.appendChild(layer);
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("span");
+      piece.className = "confetti-piece";
+      const size = 6 + Math.random() * 8;
+      piece.style.left = (Math.random() * 100) + "vw";
+      piece.style.width = size + "px";
+      piece.style.height = (size * (0.4 + Math.random())) + "px";
+      piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      piece.style.animationDelay = (Math.random() * 0.3) + "s";
+      piece.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
+      piece.style.setProperty("--spin", (Math.random() * 720 - 360) + "deg");
+      piece.style.setProperty("--drift", (Math.random() * 30 - 15) + "vw");
+      layer.appendChild(piece);
+    }
+    setTimeout(() => layer.remove(), 3300);
+  }
+
+  function showFeedback(gradeName) {
+    const cfg = FEEDBACK[gradeName];
+    if (!cfg) return;
+    if (cfg.confetti) launchConfetti(cfg.confetti);
+
+    const card = document.createElement("div");
+    card.className = `feedback-pop ${cfg.cls}`;
+    card.innerHTML =
+      `<div class="feedback-emoji">${cfg.emoji}</div>` +
+      `<div class="feedback-title">${cfg.title}</div>` +
+      `<div class="feedback-sub">${cfg.sub}</div>`;
+    document.body.appendChild(card);
+    setTimeout(() => card.classList.add("leaving"), 1400);
+    setTimeout(() => card.remove(), 1900);
+  }
+
+  // --------------------------------------------------------------------------
   // Local server persistence (preferred when serve.py is running).
   // POST /api/grade → server updates state.json atomically and returns the
   // new SM-2 state so the toast can show the accurate next-review date.
@@ -299,6 +376,7 @@
     }
 
     if (serverResult && serverResult.ok) {
+      showFeedback(gradeName);
       const nextDueStr = new Date(serverResult.sm2.nextDue).toLocaleDateString(undefined, {
         weekday: "short", year: "numeric", month: "short", day: "numeric",
       });
@@ -319,7 +397,7 @@
     }
 
     const today = new Date();
-    const newSm2 = applySm2(problem.sm2 || {}, gradeName, today);
+    const newSm2 = applySm2(problem.sm2 || {}, gradeName, today, effectiveDifficulty(problem));
     const history = Array.isArray(problem.history) ? problem.history.slice() : [];
     history.push({ date: isoDate(today), grade: gradeName });
 
@@ -333,10 +411,12 @@
 
     try {
       await persistAllToStateFile();
+      showFeedback(gradeName);
       toast(`Saved (via file system) · next review ${nextDueStr}`, "success");
       renderPendingBanner();
       return;
     } catch (err) {
+      showFeedback(gradeName);
       toast(
         `Recorded locally · next review ${nextDueStr}. ` +
         `Run \`python Tracking/scripts/serve.py\` for one-click saves, ` +

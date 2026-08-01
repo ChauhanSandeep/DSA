@@ -29,7 +29,7 @@ from _queue import pick_queue, coming_saturday, count_due  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[2]
 STATE_JSON = REPO_ROOT / "Tracking" / "data" / "state.json"
 
-QUEUE_SIZE = 6
+QUEUE_SIZE = 10
 GITHUB_BLOB = "https://github.com/ChauhanSandeep/DSA/blob/master/"
 
 
