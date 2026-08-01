@@ -29,7 +29,7 @@ import java.util.Arrays;
  */
 public class PalindromePartitioningII {
 
-        /**
+    /**
      * Intuition: once palindrome substrings are known, the last cut before position
      * end can be tried directly. If input[start..end] is a palindrome, then it can
      * be the final block after the best partition ending at start - 1.

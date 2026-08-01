@@ -3360,13 +3360,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-07-25",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-06",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -10222,14 +10227,19 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-01",
-        "lastGrade": null
+        "easeFactor": 2.35,
+        "intervalDays": 3,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-04",
+        "lastGrade": "hint"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "hint"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -11248,15 +11258,19 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 7,
-        "repetitions": 1,
-        "lastReviewed": "2026-07-19",
-        "nextDue": "2026-07-26",
+        "intervalDays": 9,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-10",
         "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-07-19",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-01",
           "grade": "solved"
         }
       ],
@@ -16550,24 +16564,29 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-01",
-        "lastGrade": null
+        "easeFactor": 2.35,
+        "intervalDays": 3,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-04",
+        "lastGrade": "hint"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "hint"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
         "skip": false
       },
       "qa": {
-        "problem": "Given two integers dividend and divisor, divide them without using multiplication, division, or modulo operators. Return the quotient after dividing dividend by divisor, truncated toward zero. For example, 10/3=3, 7/-3=-2, -7/3=-2. Handle integer overflow by returning 2^31-1 if the result would overflow. Assume the environment can only store 32-bit signed integers. Return the quotient as an integer.",
-        "answer": "Use bit manipulation with exponential search to subtract divisor multiples efficiently. Handle edge cases (overflow when dividing Integer.MIN_VALUE by -1, division by zero). Determine result sign and work with absolute values. For each iteration, find the largest multiple of divisor (using left shifts to double divisor) that fits in remaining dividend. Subtract this multiple and add corresponding power of 2 to quotient. Repeat until dividend is less than divisor. The key insight: doubling divisor with bit shifts allows exponential rather than linear search, and working with multiples avoids prohibited operations. Time complexity: O(log N²) where N is dividend value, due to nested doubling loops. Space complexity: O(1) using only constant extra variables.",
-        "complexity": null,
-        "source": "sheet"
+        "problem": "Given a numerator and denominator, return the decimal representation of the fraction as a string. If the fractional part repeats, wrap the repeating cycle in parentheses. For example, 4/333 = \"0.(012)\" and 2/3 = \"0.(6)\".",
+        "answer": "This is grade-school long division. Determine the sign, then work with Math.abs cast to long to avoid Integer.MIN_VALUE overflow. Emit the integer part with num/den and take the remainder; if it is zero, you're done. Otherwise append '.' and repeatedly multiply the remainder by 10, append remainder/den as the next digit, and set remainder = remainder%den. Store each remainder in a HashMap alongside the output index where its digit started: the moment a remainder repeats, the exact same future digits will recur, so insert '(' at that stored index and append ')' to wrap the cycle. Time: O(k) fractional digits before termination or repeat. Space: O(k) for the distinct remainders seen.",
+        "complexity": "Time: O(k) - k fractional digits are emitted before termination or repeat. · Space: O(k) - each distinct fractional remainder is stored once.",
+        "source": "user"
       }
     },
     "FindSqrt": {
@@ -16920,13 +16939,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-01",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-01",
+        "nextDue": "2026-08-06",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-01",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,

@@ -279,15 +279,36 @@
 
   // --------------------------------------------------------------------------
   // Grade feedback — a short celebratory (or encouraging) pop after grading.
-  // Trivial gets full confetti, Solved a lighter burst, Hint/Blank a
-  // supportive nudge. Respects prefers-reduced-motion.
+  // "Nailed it" gets full confetti, "Passed" a lighter burst, Bar-raiser/Bombed
+  // a supportive nudge. Respects prefers-reduced-motion.
   // --------------------------------------------------------------------------
   const FEEDBACK = {
-    trivial: { emoji: "🎉", title: "Mastered!",   sub: "Nailed it cold — interval stretched way out.", cls: "fb-trivial", confetti: 130 },
-    solved:  { emoji: "✅", title: "Solved!",     sub: "Locked in and rescheduled. Nice work.",        cls: "fb-solved",  confetti: 60  },
-    hint:    { emoji: "💡", title: "So close!",   sub: "A hint was needed — we'll circle back sooner.", cls: "fb-hint" },
-    blank:   { emoji: "💪", title: "Shake it off", sub: "Blanks happen. You'll get it next round.",     cls: "fb-blank" },
+    trivial: { emoji: "🎉", title: "Nailed it!",  cls: "fb-trivial", confetti: 130,
+      subs: ["Nailed it cold — interval stretched way out.",
+             "Effortless. That's interview-ready.",
+             "Too easy for you now. 💪",
+             "Clean recall. Banking the XP."] },
+    solved:  { emoji: "✅", title: "Passed!",      cls: "fb-solved",  confetti: 60,
+      subs: ["Locked in and rescheduled. Nice work.",
+             "Solid solve. Onward!",
+             "That's how it's done.",
+             "One more in the bank. 🏦"] },
+    hint:    { emoji: "💡", title: "Bar-raiser!",  cls: "fb-hint",
+      subs: ["A hint was needed — we'll circle back sooner.",
+             "Almost had it. Next time it sticks.",
+             "Progress, not perfection.",
+             "The gap is closing."] },
+    blank:   { emoji: "💪", title: "Shake it off", cls: "fb-blank",
+      subs: ["Bombed one — it happens. You'll get it next round.",
+             "Now you know where to focus. 🎯",
+             "Every expert was once here.",
+             "Reset. Come back stronger."] },
   };
+
+  function pickSub(cfg) {
+    const subs = cfg.subs || [];
+    return subs.length ? subs[Math.floor(Math.random() * subs.length)] : "";
+  }
 
   const CONFETTI_COLORS = ["#6fa96f", "#4d84c9", "#cf9a4a", "#c0554a", "#8e7cc3", "#f1c40f"];
 
@@ -328,7 +349,7 @@
     card.innerHTML =
       `<div class="feedback-emoji">${cfg.emoji}</div>` +
       `<div class="feedback-title">${cfg.title}</div>` +
-      `<div class="feedback-sub">${cfg.sub}</div>`;
+      `<div class="feedback-sub">${pickSub(cfg)}</div>`;
     document.body.appendChild(card);
     setTimeout(() => card.classList.add("leaving"), 1400);
     setTimeout(() => card.remove(), 1900);
@@ -474,6 +495,72 @@
     if (dlBtn) {
       dlBtn.addEventListener("click", downloadStateJson);
     }
+
+    const loadMoreBtn = document.querySelector("[data-action='load-more']");
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", async () => {
+        if (location.protocol !== "http:" && location.protocol !== "https:") {
+          toast("Start serve.py to load more problems.", "error", 4500);
+          return;
+        }
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = "Loading…";
+        try {
+          const res = await fetch("/api/load-more", { method: "POST", cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          toast(`Added ${data.added} more — weekly goal now ${data.target}`, "success");
+          setTimeout(() => location.reload(), 500);
+        } catch (err) {
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.textContent = "Load more problems →";
+          toast(`Could not load more: ${err.message}. Is serve.py running?`, "error", 4500);
+        }
+      });
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // Deadline countdown — "time running out" urgency for the weekly queue.
+  // Ticks every second and escalates styling as the review Saturday nears.
+  // --------------------------------------------------------------------------
+  function initCountdown() {
+    const el = document.getElementById("deadline-countdown");
+    if (!el) return;
+    const deadline = new Date(el.dataset.deadline);
+    if (isNaN(deadline.getTime())) return;
+    const textEl = el.querySelector(".dc-text");
+
+    function tick() {
+      const now = new Date();
+      let ms = deadline - now;
+      const overdue = ms <= 0;
+      if (overdue) ms = -ms;
+
+      const totalSec = Math.floor(ms / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+      const pretty = days > 0
+        ? `${days}d ${hours}h ${mins}m`
+        : `${hours}h ${mins}m ${secs}s`;
+
+      el.classList.remove("dc-ok", "dc-soon", "dc-urgent", "dc-overdue");
+      if (overdue) {
+        el.classList.add("dc-overdue");
+        textEl.innerHTML = `This week's window closed — a fresh queue is up. Get ahead early! 🚀`;
+        return;
+      }
+      const hoursLeft = totalSec / 3600;
+      if (hoursLeft <= 24) el.classList.add("dc-urgent");
+      else if (hoursLeft <= 72) el.classList.add("dc-soon");
+      else el.classList.add("dc-ok");
+      textEl.innerHTML = `<strong>${pretty}</strong> left to finish this week's queue`;
+    }
+
+    tick();
+    setInterval(tick, 1000);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -484,6 +571,7 @@
     initQaCard();
     initPatternPage();
     initBrowsePage();
+    initCountdown();
   });
 
   // --------------------------------------------------------------------------

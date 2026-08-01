@@ -45,8 +45,15 @@ from urllib.parse import urlparse
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "Tracking" / "data"
 STATE_JSON = DATA_DIR / "state.json"
+CYCLE_JSON = DATA_DIR / "cycle.json"
 SITE_DIR = REPO_ROOT / "Tracking" / "site"
 BUILD_SCRIPT = REPO_ROOT / "Tracking" / "scripts" / "build.py"
+
+# Weekly goal increment for "load more" — MUST match build.py WEEKLY_GOAL.
+WEEKLY_GOAL = 10
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _queue import coming_saturday  # noqa: E402
 
 # SM-2 formula constants — MUST match app.js and Tracking/README.md.
 MAX_INTERVAL_DAYS = 180
@@ -150,6 +157,32 @@ def grade_problem(task: str, grade: str) -> dict:
         return {"task": task, "sm2": new_sm2, "grade": grade}
 
 
+def load_more_batch() -> dict:
+    """Raise this week's goal by WEEKLY_GOAL so the user can keep going.
+
+    Called when the user has met the current weekly goal and wants more work.
+    The goal is keyed by the coming review Saturday; a stale week resets to a
+    single WEEKLY_GOAL before the increment. The subsequent rebuild re-renders
+    the dashboard with the higher target.
+    """
+    with _state_lock:
+        review_iso = coming_saturday(date.today()).isoformat()
+        cycle = None
+        if CYCLE_JSON.exists():
+            try:
+                cycle = json.loads(CYCLE_JSON.read_text())
+            except Exception:
+                cycle = None
+        if not cycle or cycle.get("weekOf") != review_iso:
+            cycle = {"weekOf": review_iso, "target": WEEKLY_GOAL}
+        new_target = int(cycle.get("target", WEEKLY_GOAL)) + WEEKLY_GOAL
+        payload = {"weekOf": review_iso, "target": new_target}
+        tmp = CYCLE_JSON.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(payload, indent=2) + "\n")
+        os.replace(tmp, CYCLE_JSON)
+        return {"target": new_target, "added": WEEKLY_GOAL}
+
+
 def rebuild_site() -> tuple[bool, str]:
     result = subprocess.run(
         [sys.executable, str(BUILD_SCRIPT)],
@@ -190,6 +223,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/api/load-more":
+            self.handle_load_more()
+            return
         if parsed.path != "/api/grade":
             self.send_json(HTTPStatus.NOT_FOUND, {"error": "not found"})
             return
@@ -226,6 +262,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             "task": result["task"],
             "grade": result["grade"],
             "sm2": result["sm2"],
+            "rebuilt": self.auto_rebuild,
+        })
+
+    def handle_load_more(self) -> None:
+        try:
+            result = load_more_batch()
+        except Exception as e:
+            self.send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(e)})
+            return
+
+        if self.auto_rebuild:
+            ok, msg = rebuild_site()
+            if not ok:
+                sys.stderr.write(f"[rebuild failed] {msg}\n")
+
+        self.send_json(HTTPStatus.OK, {
+            "ok": True,
+            "target": result["target"],
+            "added": result["added"],
             "rebuilt": self.auto_rebuild,
         })
 

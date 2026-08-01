@@ -113,6 +113,30 @@ def pick_queue(state: dict, target: date, size: int,
     return queue
 
 
+def week_start_iso(review_day: date) -> str:
+    """ISO date of the 7-day window's start (Sunday) ending on the review Saturday."""
+    from datetime import timedelta
+    return (review_day - timedelta(days=6)).isoformat()
+
+
+def count_solved_this_week(state: dict, review_day: date) -> int:
+    """How many non-skipped problems have been graded during the current week.
+
+    'This week' is the 7 days ending on the coming review Saturday. Every grade
+    (even a blank) counts as attempted, so this is the progress toward the
+    weekly goal regardless of which specific problems were tackled.
+    """
+    since = week_start_iso(review_day)
+    total = 0
+    for entry in state["problems"].values():
+        if entry.get("flags", {}).get("skip"):
+            continue
+        last_reviewed = entry.get("sm2", {}).get("lastReviewed")
+        if last_reviewed and last_reviewed >= since:
+            total += 1
+    return total
+
+
 def count_due(state: dict, target: date) -> int:
     count = 0
     for entry in state["problems"].values():

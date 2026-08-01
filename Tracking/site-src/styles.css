@@ -1348,6 +1348,237 @@ details.pattern-item[open] .pattern-item-chevron { transform: rotate(90deg); }
   transition: width 0.4s ease;
 }
 
+/* --- Deadline countdown banner ("time running out") ------------------- */
+.deadline-countdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  font-size: 14px;
+  margin: 0 0 12px;
+  transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+}
+.deadline-countdown .dc-icon { font-size: 18px; line-height: 1; }
+.deadline-countdown .dc-text strong {
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.deadline-countdown.dc-ok {
+  color: var(--grade-solved);
+  border-color: color-mix(in srgb, var(--grade-solved) 40%, transparent);
+  background: color-mix(in srgb, var(--grade-solved) 8%, var(--bg-surface));
+}
+.deadline-countdown.dc-soon {
+  color: var(--grade-hint);
+  border-color: color-mix(in srgb, var(--grade-hint) 45%, transparent);
+  background: color-mix(in srgb, var(--grade-hint) 10%, var(--bg-surface));
+}
+.deadline-countdown.dc-urgent {
+  color: var(--grade-blank);
+  border-color: color-mix(in srgb, var(--grade-blank) 55%, transparent);
+  background: color-mix(in srgb, var(--grade-blank) 12%, var(--bg-surface));
+  animation: dc-pulse 1.4s ease-in-out infinite;
+}
+.deadline-countdown.dc-overdue { color: var(--fg-muted); }
+@keyframes dc-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--grade-blank) 35%, transparent); }
+  50%      { box-shadow: 0 0 0 6px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deadline-countdown.dc-urgent { animation: none; }
+}
+
+/* --- Gamification: momentum hero (streak / level / weekly goal) --------- */
+.momentum-hero {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0 0 12px;
+}
+.mo-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.mo-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: 0.85;
+}
+.mo-label {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--fg-muted);
+  margin-bottom: 10px;
+}
+.mo-big {
+  font-family: var(--font-header);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--fg-primary);
+}
+.mo-big .mo-unit { font-size: 15px; color: var(--fg-muted); font-weight: 600; }
+.mo-sub {
+  color: var(--fg-muted);
+  font-size: 12px;
+  margin-top: 8px;
+}
+.mo-streak .mo-big { color: var(--grade-hint); }
+
+/* Weekly goal ring via conic-gradient */
+.mo-goal { display: flex; flex-direction: column; }
+.mo-ring {
+  --pct: 0;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background:
+    conic-gradient(var(--accent) calc(var(--pct) * 1%),
+                   color-mix(in srgb, var(--fg-muted) 15%, transparent) 0);
+  display: grid;
+  place-items: center;
+  margin: 2px 0;
+  transition: background 0.5s ease;
+}
+.mo-ring::before {
+  content: "";
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+}
+.mo-ring-text {
+  position: relative;
+  font-family: var(--font-header);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--fg-primary);
+}
+.mo-ring-sub { font-size: 12px; color: var(--fg-muted); font-weight: 600; }
+
+/* Trophy case */
+.achievements-bar { margin: 0 0 24px; }
+.trophy-count {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-left: 4px;
+}
+.trophy-case {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(94px, 1fr));
+  gap: 16px 10px;
+  padding: 4px 2px;
+}
+.trophy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.trophy-medallion {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  isolation: isolate;
+  border: 3px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 7px rgba(0, 0, 0, 0.38),
+    0 5px 12px rgba(0, 0, 0, 0.32);
+}
+/* glossy top-left highlight */
+.trophy-medallion::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 26%,
+              rgba(255, 255, 255, 0.7), transparent 46%);
+  z-index: 1;
+}
+.trophy-emoji {
+  font-size: 30px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+.trophy-name {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 11.5px;
+  color: var(--fg-primary);
+  line-height: 1.25;
+}
+
+/* Tier metals */
+.tier-bronze  .trophy-medallion { background: linear-gradient(150deg, #f4bd8a, #cd7f32 46%, #7a4a1e); }
+.tier-silver  .trophy-medallion { background: linear-gradient(150deg, #ffffff, #c5cace 46%, #7d8288); }
+.tier-gold    .trophy-medallion { background: linear-gradient(150deg, #fff7c4, #ffd23f 46%, #b8860b); }
+.tier-platinum .trophy-medallion { background: linear-gradient(150deg, #f2feff, #bfe9f2 44%, #6bb8c9); }
+
+/* Earned: pop-in + slow shine sweep */
+.trophy.earned .trophy-medallion { animation: trophy-pop 0.45s ease both; }
+.trophy.earned .trophy-medallion::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 1;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.6) 50%, transparent 58%);
+  background-size: 250% 250%;
+  animation: trophy-shine 3.8s ease-in-out infinite;
+}
+
+/* Locked: dim empty slot */
+.trophy.locked { opacity: 0.6; }
+.trophy.locked .trophy-medallion {
+  background: linear-gradient(150deg, #3c414a, #22262c);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.08),
+    inset 0 -4px 7px rgba(0, 0, 0, 0.5);
+}
+.trophy.locked .trophy-emoji { filter: grayscale(1) opacity(0.85); font-size: 24px; }
+.trophy.locked .trophy-name { color: var(--fg-muted); font-weight: 600; }
+
+@keyframes trophy-shine {
+  0%   { background-position: 150% 0; }
+  100% { background-position: -60% 0; }
+}
+@keyframes trophy-pop {
+  0%   { transform: scale(0.6); }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trophy.earned .trophy-medallion,
+  .trophy.earned .trophy-medallion::after { animation: none; }
+}
+@media (max-width: 720px) {
+  .momentum-hero { grid-template-columns: 1fr; }
+}
+
 /* Pattern warmth heatmap */
 .warmth-grid {
   display: grid;
@@ -1468,3 +1699,29 @@ details.pattern-item[open] .pattern-item-chevron { transform: rotate(90deg); }
 .dim { color: var(--fg-muted); }
 .right { text-align: right; }
 .mono { font-family: var(--font-code); }
+
+/* Batch-complete celebration + load-more affordance. Shown when every
+   problem in the current set has been graded and the queue is empty. */
+.batch-complete {
+  text-align: center;
+  padding: 40px 24px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.batch-complete .bc-emoji { font-size: 48px; line-height: 1; }
+.batch-complete .bc-title { margin: 12px 0 6px; }
+.batch-complete .bc-sub { margin: 0 auto 20px; max-width: 42ch; }
+.bc-load-more {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--palette-bg, #fff);
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.bc-load-more:hover:not(:disabled) { filter: brightness(1.08); }
+.bc-load-more:disabled { opacity: 0.6; cursor: default; }

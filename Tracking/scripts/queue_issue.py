@@ -44,7 +44,7 @@ def format_body(state: dict, review_day: date, queue: list[dict]) -> str:
     lines.append("```")
     lines.append("python Tracking/scripts/build.py && open Tracking/site/index.html")
     lines.append("```")
-    lines.append("Keyboard: `1` trivial · `2` solved · `3` hint · `4` blank")
+    lines.append("Keyboard: `1` nailed it · `2` passed · `3` bar-raiser · `4` bombed")
     lines.append("")
     lines.append("---")
     lines.append("")

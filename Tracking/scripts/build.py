@@ -38,7 +38,14 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _queue import pick_queue, coming_saturday, DIFFICULTY_RANK  # noqa: E402
+from _queue import (  # noqa: E402
+    pick_queue,
+    coming_saturday,
+    DIFFICULTY_RANK,
+    effective_difficulty,
+    count_solved_this_week,
+    week_start_iso,
+)
 from _javadoc import (  # noqa: E402
     extract_javadoc_blocks,
     parse_class_javadoc,
@@ -60,7 +67,9 @@ SITE_DIR = REPO_ROOT / "Tracking" / "site"
 
 STATE_JSON = DATA_DIR / "state.json"
 NEETCODE_JSON = DATA_DIR / "neetcode.json"
+CYCLE_JSON = DATA_DIR / "cycle.json"
 QUEUE_SIZE = 10
+WEEKLY_GOAL = 10
 DIFFICULTY_CLASS = {
     "Easy": "diff-easy",
     "Medium": "diff-medium",
@@ -293,23 +302,117 @@ def format_next_due(iso: str | None) -> str:
 # Page renderers
 # ---------------------------------------------------------------------------
 
+def load_cycle() -> dict | None:
+    if CYCLE_JSON.exists():
+        try:
+            return json.loads(CYCLE_JSON.read_text())
+        except Exception:
+            return None
+    return None
+
+
+def save_cycle(week_of: str, target: int) -> None:
+    CYCLE_JSON.write_text(
+        json.dumps({"weekOf": week_of, "target": target}, indent=2) + "\n"
+    )
+
+
+def ensure_cycle(review_day: date) -> dict:
+    """Return the current week's goal state, resetting when the week rolls over.
+
+    The weekly goal defaults to WEEKLY_GOAL and only grows when the user asks
+    for more (POST /api/load-more). It is keyed by the coming review Saturday,
+    so a new week automatically starts a fresh goal of WEEKLY_GOAL.
+    """
+    week_of = review_day.isoformat()
+    cycle = load_cycle()
+    if cycle and cycle.get("weekOf") == week_of and cycle.get("target"):
+        return cycle
+    save_cycle(week_of, WEEKLY_GOAL)
+    return {"weekOf": week_of, "target": WEEKLY_GOAL}
+
+
+def render_batch_complete(target: int) -> str:
+    """Congratulations panel + 'load more' button shown when the goal is met."""
+    noun = "problem" if target == 1 else "problems"
+    return f"""
+      <div class="batch-complete">
+        <div class="bc-emoji">🎉</div>
+        <h3 class="bc-title">All {target} {noun} solved this week!</h3>
+        <p class="bc-sub dim">You hit your weekly goal. Take a breath — or load
+          another {WEEKLY_GOAL} if you're on a roll.</p>
+        <button class="bc-load-more" data-action="load-more">Load more problems →</button>
+      </div>"""
+
+
+def render_queue_row(problem: dict, position: int, is_solved: bool, today: date) -> str:
+    """Render one dashboard queue row.
+
+    Solved rows stay on the page (marked with a check + grade) rather than
+    disappearing, so the week's progress is visible; pending rows show the
+    ordinal position and next-due meta.
+    """
+    task = problem["task"]
+    qa = problem.get("qa") or {}
+    preview = qa.get("problem") or ""
+    preview_html = f'<div class="preview">{esc(preview)}</div>' if preview else ""
+    sm2 = problem.get("sm2", {})
+
+    if is_solved:
+        item_class = "queue-item reviewed-today"
+        index_mark = "✓"
+        grade = sm2.get("lastGrade", "")
+        emoji, label = GRADE_LABELS.get(grade, ("•", grade))
+        suffix = " today" if reviewed_today(sm2, today) else ""
+        done_meta = f'<span class="reviewed-tag">{emoji} {esc(label)}{suffix}</span>'
+    else:
+        item_class = "queue-item"
+        index_mark = f"{position:02d}"
+        done_meta = solved_status_tag(sm2)
+
+    return f"""
+      <div class="{item_class}">
+        <div class="index">{index_mark}</div>
+        <div>
+          <div class="title"><a href="problems/{esc(task)}.html">{esc(problem.get("problemName") or task)}</a></div>
+          <div class="meta">{esc(task)} · next due {esc(format_next_due(sm2.get("nextDue")))} {done_meta}</div>
+          {preview_html}
+        </div>
+        <div class="badges">{badges_for_problem(problem, root="")}</div>
+      </div>"""
+
+
 def render_dashboard(state: dict, today: date) -> str:
     review_day = coming_saturday(today)
-    queue = pick_queue(state, review_day, QUEUE_SIZE)
+    cycle = ensure_cycle(review_day)
+    target = cycle["target"]
+    solved_count = count_solved_this_week(state, review_day)
+    remaining = max(0, target - solved_count)
+    # Pending = up to `remaining` unsolved, hardest-due problems (shrinks toward
+    # zero as the goal is met). Solved-this-week problems stay listed too, marked
+    # done, so the page shows the full picture of the week's progress.
+    pending = pick_queue(state, review_day, QUEUE_SIZE)[:remaining]
+    since = week_start_iso(review_day)
+    solved_entries = [
+        entry for entry in state["problems"].values()
+        if not entry.get("flags", {}).get("skip")
+        and entry.get("sm2", {}).get("lastReviewed")
+        and entry["sm2"]["lastReviewed"] >= since
+    ]
+    solved_entries.sort(key=lambda entry: entry["sm2"]["lastReviewed"], reverse=True)
     all_problems = list(state["problems"].values())
 
     total = len(all_problems)
     nc150 = sum(1 for p in all_problems if p.get("isNC150"))
     reviewed_ever = sum(1 for p in all_problems if p["sm2"].get("lastReviewed"))
-    # Show the actual review load for Saturday — the capped queue (≤ QUEUE_SIZE),
-    # not the full backlog of everything whose nextDue has passed.
-    due_this_week = len(queue)
+    # How many problems remain before this week's goal is met.
+    due_this_week = remaining
 
     stats = f"""
     <div class="stats">
       <div class="stat"><div class="value">{total}</div><div class="label">tracked problems</div></div>
       <div class="stat"><div class="value">{nc150}</div><div class="label">NC150 in repo</div></div>
-      <div class="stat"><div class="value">{due_this_week}</div><div class="label">due this Saturday</div></div>
+      <div class="stat"><div class="value">{due_this_week}</div><div class="label">left this week</div></div>
       <div class="stat"><div class="value">{reviewed_ever}</div><div class="label">reviewed at least once</div></div>
     </div>
     """
@@ -321,51 +424,52 @@ def render_dashboard(state: dict, today: date) -> str:
     </div>
     """
 
-    if queue:
-        queue_html_parts = []
-        for index, problem in enumerate(queue, 1):
-            task = problem["task"]
-            qa = problem.get("qa") or {}
-            preview = qa.get("problem") or ""
-            preview_html = f'<div class="preview">{esc(preview)}</div>' if preview else ""
+    rows = []
+    for index, problem in enumerate(pending, 1):
+        rows.append(render_queue_row(problem, index, is_solved=False, today=today))
+    for problem in solved_entries:
+        rows.append(render_queue_row(problem, 0, is_solved=True, today=today))
 
-            done_today = reviewed_today(problem.get("sm2", {}), today)
-            item_class = "queue-item"
-            index_mark = f"{index:02d}"
-            sm2 = problem.get("sm2", {})
-            # Persistent solved marker (shown whenever it wasn't graded today).
-            done_meta = solved_status_tag(sm2)
-            if done_today:
-                item_class += " reviewed-today"
-                index_mark = "✓"
-                grade = sm2.get("lastGrade", "")
-                emoji, label = GRADE_LABELS.get(grade, ("•", grade))
-                done_meta = f'<span class="reviewed-tag">{emoji} {esc(label)} today</span>'
-
-            queue_html_parts.append(f"""
-      <div class="{item_class}">
-        <div class="index">{index_mark}</div>
-        <div>
-          <div class="title"><a href="problems/{esc(task)}.html">{esc(problem.get("problemName") or task)}</a></div>
-          <div class="meta">{esc(task)} · next due {esc(format_next_due(problem["sm2"].get("nextDue")))} {done_meta}</div>
-          {preview_html}
-        </div>
-        <div class="badges">{badges_for_problem(problem, root="")}</div>
-      </div>""")
-        queue_html = "\n".join(queue_html_parts)
+    completion_html = render_batch_complete(target) if remaining == 0 else ""
+    if rows:
+        queue_html = completion_html + "\n".join(rows)
+    elif completion_html:
+        queue_html = completion_html
     else:
-        queue_html = '<p class="dim">Nothing due this Saturday — the queue picker will fill from least-recently-reviewed on the actual review day.</p>'
+        queue_html = '<p class="dim">Nothing due right now — enjoy the break.</p>'
 
     review_day_str = review_day.strftime("%A, %d %b %Y")
 
+    # Live "time running out" countdown to this week's deadline (end of the
+    # review Saturday). app.js ticks it down and escalates urgency styling.
+    deadline_dt = datetime(review_day.year, review_day.month, review_day.day, 23, 59, 59)
+    countdown_banner = (
+        f'<div id="deadline-countdown" class="deadline-countdown" '
+        f'data-deadline="{deadline_dt.isoformat()}">'
+        f'<span class="dc-icon">⏳</span>'
+        f'<span class="dc-text">Calculating time left…</span>'
+        f'</div>'
+    )
+
+    if remaining > 0:
+        queue_heading = (
+            f"This week · {solved_count}/{target} solved · {remaining} left"
+        )
+    else:
+        queue_heading = f"Weekly goal complete · {solved_count}/{target} solved"
+
     body = f"""
     {pending_banner}
+
+    {countdown_banner}
+
+    {render_momentum_panel(state, today)}
 
     {render_motivation_stack(state, today)}
 
     {stats}
 
-    <h2>Queue for {esc(review_day_str)}</h2>
+    <h2>{esc(queue_heading)}</h2>
     <div class="queue">{queue_html}</div>
 
     <h2>Actions</h2>
@@ -419,31 +523,6 @@ def render_dashboard(state: dict, today: date) -> str:
     body_with_state = body + inline
     html_doc = base_layout(f"Weekend review — {review_day_str}", body_with_state)
     return html_doc.replace("{root}", "")
-
-
-def compute_anchor_health(state: dict, today: date) -> dict:
-    anchors = [e for e in state["problems"].values() if e.get("flags", {}).get("pinned")]
-    total = len(anchors)
-    cutoff = today - timedelta(days=90)
-    touched = 0
-    most_recent_days = None
-    for entry in anchors:
-        last = entry["sm2"].get("lastReviewed")
-        if not last:
-            continue
-        last_d = date.fromisoformat(last)
-        delta = (today - last_d).days
-        if last_d >= cutoff:
-            touched += 1
-        if most_recent_days is None or delta < most_recent_days:
-            most_recent_days = delta
-    pct = int((touched / total) * 100) if total else 0
-    return {
-        "touched": touched,
-        "total": total,
-        "pct": pct,
-        "most_recent_days": most_recent_days,
-    }
 
 
 def compute_pattern_warmth(state: dict, today: date) -> list[dict]:
@@ -521,25 +600,171 @@ def compute_weekly_dots(state: dict, today: date, weeks: int = 12) -> dict:
     return {"dots": dots, "streak": streak, "total_grades_12w": total_grades}
 
 
-def render_motivation_stack(state: dict, today: date) -> str:
-    health = compute_anchor_health(state, today)
-    dots = compute_weekly_dots(state, today)
+# ---------------------------------------------------------------------------
+# Gamification — streak, XP/level, weekly goal, achievements.
+# Psychology: loss-aversion (streak), endowed-progress + goal-gradient (XP bar
+# and weekly ring), collection + curiosity (achievements with a locked teaser).
+# ---------------------------------------------------------------------------
 
-    if health["total"] == 0:
-        anchor_line = '<div class="dim">No anchors pinned yet. Run <code>curate_core.py</code> to seed the core set.</div>'
+GRADE_XP = {"blank": 4, "hint": 8, "solved": 12, "trivial": 16}
+DIFFICULTY_XP_MULT = {
+    "Very Hard": 2.0, "Hard": 1.6, "Medium": 1.2, "Easy": 1.0, "Unknown": 1.0,
+}
+RANK_TITLES = [
+    (1, "Warming Up"), (3, "Grinder"), (5, "Problem Slayer"),
+    (8, "Pattern Wizard"), (12, "Algorithm Assassin"), (18, "Interview Ready"),
+    (25, "FAANG Boss"),
+]
+XP_PER_LEVEL_BASE = 50  # xp needed for level L = base * L^2
+
+
+def _rank_title(level: int) -> str:
+    title = RANK_TITLES[0][1]
+    for threshold, name in RANK_TITLES:
+        if level >= threshold:
+            title = name
+    return title
+
+
+def compute_gamification(state: dict, today: date) -> dict:
+    problems = list(state["problems"].values())
+
+    # --- XP from full grade history, weighted by difficulty ---------------
+    total_xp = 0.0
+    total_reviews = 0
+    hard_wins = 0
+    reviewed_tasks = set()
+    for entry in problems:
+        diff = effective_difficulty(entry)
+        mult = DIFFICULTY_XP_MULT.get(diff, 1.0)
+        for h in entry.get("history", []) or []:
+            grade = h.get("grade")
+            if grade not in GRADE_XP:
+                continue
+            total_xp += GRADE_XP[grade] * mult
+            total_reviews += 1
+            reviewed_tasks.add(entry["task"])
+            if grade in ("solved", "trivial") and diff in ("Hard", "Very Hard"):
+                hard_wins += 1
+    total_xp = int(round(total_xp))
+
+    # --- Level curve: xp for level L = base * L^2 -------------------------
+    level = int((total_xp / XP_PER_LEVEL_BASE) ** 0.5) + 1
+    cur_floor = XP_PER_LEVEL_BASE * (level - 1) ** 2
+    next_floor = XP_PER_LEVEL_BASE * level ** 2
+    span = max(1, next_floor - cur_floor)
+    level_pct = int(round((total_xp - cur_floor) / span * 100))
+
+    # --- Streak + this-week goal -----------------------------------------
+    dots = compute_weekly_dots(state, today)
+    week_streak = dots["streak"]
+    best_streak = 0
+    run = 0
+    for d in dots["dots"]:
+        run = run + 1 if d["active"] else 0
+        best_streak = max(best_streak, run)
+    this_week_count = dots["dots"][-1]["count"] if dots["dots"] else 0
+    goal = QUEUE_SIZE
+    goal_pct = min(100, int(round(this_week_count / goal * 100))) if goal else 0
+
+    # --- Achievements (id, emoji, title, desc, tier, unlocked) -----------
+    # Tiers escalate bronze -> silver -> gold -> platinum by rarity/effort.
+    achievements = [
+        ("first_blood", "🥉", "First Blood", "Grade your first problem",
+         "bronze", total_reviews >= 1),
+        ("quarter", "📖", "Getting Serious", "25 reviews logged",
+         "bronze", total_reviews >= 25),
+        ("hard_hitter", "⚔️", "Hard Hitter", "10 hard problems solved",
+         "silver", hard_wins >= 10),
+        ("explorer", "🧭", "Explorer", "50 distinct problems touched",
+         "silver", len(reviewed_tasks) >= 50),
+        ("streak4", "🔥", "On Fire", "4-week streak",
+         "silver", best_streak >= 4),
+        ("century", "💯", "Century", "100 reviews logged",
+         "gold", total_reviews >= 100),
+        ("legend", "👑", "Legend", "500 reviews logged",
+         "gold", total_reviews >= 500),
+        ("streak12", "🏆", "Unstoppable", "12-week streak",
+         "platinum", best_streak >= 12),
+    ]
+
+    return {
+        "xp": total_xp,
+        "level": level,
+        "rank": _rank_title(level),
+        "level_pct": level_pct,
+        "xp_to_next": max(0, next_floor - total_xp),
+        "week_streak": week_streak,
+        "best_streak": best_streak,
+        "this_week_count": this_week_count,
+        "goal": goal,
+        "goal_pct": goal_pct,
+        "total_reviews": total_reviews,
+        "achievements": achievements,
+    }
+
+
+def render_momentum_panel(state: dict, today: date) -> str:
+    g = compute_gamification(state, today)
+
+    if g["week_streak"] >= 1:
+        streak_sub = f'best {g["best_streak"]} · keep it alive this week!'
     else:
-        oldest_hint = ""
-        if health["most_recent_days"] is not None:
-            oldest_hint = f' · last review {health["most_recent_days"]} day(s) ago'
-        anchor_line = (
-            f'<div class="motiv-value">'
-            f'{health["touched"]} <span class="motiv-of">of {health["total"]}</span>'
-            f' <span class="motiv-hint">core anchors reviewed in last 90 days{oldest_hint}</span>'
-            f'</div>'
-            f'<div class="progress-track">'
-            f'<div class="progress-fill" style="width:{health["pct"]}%"></div>'
+        streak_sub = "start a streak this Saturday"
+    flame = "🔥" if g["week_streak"] >= 1 else "🌱"
+
+    # Trophy case — every achievement is a medallion; earned ones gleam with
+    # their tier metal, locked ones show as dimmed empty slots (curiosity).
+    earned_count = sum(1 for a in g["achievements"] if a[5])
+    total_count = len(g["achievements"])
+    trophy_parts = []
+    for _id, emoji, title, desc, tier, unlocked in g["achievements"]:
+        state_cls = "earned" if unlocked else "locked"
+        face = emoji if unlocked else "🔒"
+        trophy_parts.append(
+            f'<div class="trophy tier-{tier} {state_cls}" '
+            f'title="{esc(title)} — {esc(desc)}">'
+            f'<div class="trophy-medallion"><span class="trophy-emoji">{face}</span></div>'
+            f'<div class="trophy-name">{esc(title)}</div>'
             f'</div>'
         )
+    trophy_html = "".join(trophy_parts)
+
+    goal_sub = "goal smashed! 🎉" if g["goal_pct"] >= 100 else "reviews done this week"
+    return f"""
+    <section class="momentum-hero">
+      <div class="mo-card mo-streak">
+        <div class="mo-label">Weekly streak</div>
+        <div class="mo-big">{flame} {g["week_streak"]}</div>
+        <div class="mo-sub">{esc(streak_sub)}</div>
+      </div>
+
+      <div class="mo-card mo-level">
+        <div class="mo-label">Level {g["level"]} · {esc(g["rank"])}</div>
+        <div class="mo-big">{g["xp"]} <span class="mo-unit">XP</span></div>
+        <div class="progress-track" style="margin-top:8px">
+          <div class="progress-fill" style="width:{g["level_pct"]}%"></div>
+        </div>
+        <div class="mo-sub">{g["xp_to_next"]} XP to level {g["level"] + 1}</div>
+      </div>
+
+      <div class="mo-card mo-goal">
+        <div class="mo-label">This week's goal</div>
+        <div class="mo-ring" style="--pct:{g["goal_pct"]}">
+          <span class="mo-ring-text">{g["this_week_count"]}<span class="mo-ring-sub">/{g["goal"]}</span></span>
+        </div>
+        <div class="mo-sub">{goal_sub}</div>
+      </div>
+    </section>
+    <section class="achievements-bar">
+      <div class="mo-label">🏆 Trophy case <span class="trophy-count">{earned_count}/{total_count}</span></div>
+      <div class="trophy-case">{trophy_html}</div>
+    </section>
+    """
+
+
+def render_motivation_stack(state: dict, today: date) -> str:
+    dots = compute_weekly_dots(state, today)
 
     dot_html_parts = []
     for dot in dots["dots"]:
@@ -556,10 +781,6 @@ def render_motivation_stack(state: dict, today: date) -> str:
 
     return f"""
     <section class="motiv-stack">
-      <div class="motiv-panel">
-        <div class="motiv-label">Anchor health</div>
-        {anchor_line}
-      </div>
 
       <div class="motiv-panel">
         <div class="motiv-label">Last 12 weeks</div>
@@ -635,19 +856,19 @@ def render_qa_card(problem: dict) -> str:
 
 
 GRADE_LABELS = {
-    "trivial": ("⭐", "Trivial"),
-    "solved":  ("✅", "Solved"),
-    "hint":    ("🟡", "Hint"),
-    "blank":   ("🔴", "Blank"),
+    "trivial": ("⭐", "Nailed it"),
+    "solved":  ("✅", "Passed"),
+    "hint":    ("🟡", "Bar-raiser"),
+    "blank":   ("🔴", "Bombed"),
 }
 
 # Compact at-a-glance markers for the dashboard queue. Solved/Trivial get a
 # tick; weaker outcomes get a distinct glyph so "what's solved" reads instantly.
 STATUS_MARKERS = {
-    "trivial": ("✓", "Mastered"),
-    "solved":  ("✓", "Solved"),
-    "hint":    ("◐", "Hint"),
-    "blank":   ("✗", "Blank"),
+    "trivial": ("✓", "Nailed it"),
+    "solved":  ("✓", "Passed"),
+    "hint":    ("◐", "Bar-raiser"),
+    "blank":   ("✗", "Bombed"),
 }
 
 
@@ -857,10 +1078,10 @@ def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, st
 
     <div class="grade-bar">
       <span class="hint">grade this attempt →</span>
-      <button class="grade-btn trivial" data-grade="trivial">⭐ Trivial <span class="key">1</span></button>
-      <button class="grade-btn solved"  data-grade="solved">✅ Solved <span class="key">2</span></button>
-      <button class="grade-btn hint"    data-grade="hint">🟡 Hint <span class="key">3</span></button>
-      <button class="grade-btn blank"   data-grade="blank">🔴 Blank <span class="key">4</span></button>
+      <button class="grade-btn trivial" data-grade="trivial">⭐ Nailed it <span class="key">1</span></button>
+      <button class="grade-btn solved"  data-grade="solved">✅ Passed <span class="key">2</span></button>
+      <button class="grade-btn hint"    data-grade="hint">🟡 Bar-raiser <span class="key">3</span></button>
+      <button class="grade-btn blank"   data-grade="blank">🔴 Bombed <span class="key">4</span></button>
     </div>
 
     <script>window.__STATE__ = {{"problems": {{{json.dumps(task)}: {json.dumps(problem, ensure_ascii=False)}}}}};</script>
