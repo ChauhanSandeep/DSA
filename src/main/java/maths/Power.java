@@ -41,7 +41,7 @@ public class Power {
         }
     }
 
-        /**
+    /**
      * Intuition: x^n can be split in half because x^n = (x^(n / 2))^2, with one
      * extra x when n is odd. That reduces the exponent by half at each recursive
      * level. Negative exponents become positive after replacing x with 1 / x.
@@ -72,7 +72,7 @@ public class Power {
         return power(x, exponent);
     }
 
-        /** Recursively computes a non-negative exponent by squaring. */
+    /** Recursively computes a non-negative exponent by squaring. */
     private double power(double x, long n) {
         if (n == 0) return 1; // Base case
         double half = power(x, n / 2);

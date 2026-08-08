@@ -34,7 +34,7 @@ public class SlidingWindowMedian {
     private PriorityQueue<Integer> maxHeap; // contains the smaller half
     private PriorityQueue<Integer> minHeap; // contains the larger half
 
-        /**
+    /**
      * Intuition: the median is the boundary between the smaller half and larger
      * half. `maxHeap` keeps the smaller half with its largest value on top, while
      * `minHeap` keeps the larger half with its smallest value on top. Balanced

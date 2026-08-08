@@ -106,11 +106,6 @@ public class MergeKSortedArrays {
 
   /**
    * Represents an entry in the heap that keeps track of:
-   * - The source array
-   * - The current index within that array
-   */
-  /**
-   * Represents an entry in the heap that keeps track of:
    * - arrayIndex: Index of the array in the original list
    * - pointerIndex: Current position within that array
    */

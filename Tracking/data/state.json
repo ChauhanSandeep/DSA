@@ -1587,15 +1587,19 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 7,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-08",
+        "intervalDays": 14,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-22",
         "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-08-01",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-08",
           "grade": "solved"
         }
       ],
@@ -2822,16 +2826,20 @@
       },
       "sm2": {
         "easeFactor": 2.35,
-        "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-04",
-        "lastGrade": "hint"
+        "intervalDays": 14,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-22",
+        "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-08-01",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-08",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -3359,17 +3367,25 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 5,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-06",
-        "lastGrade": "solved"
+        "easeFactor": 2.0999999999999996,
+        "intervalDays": 3,
+        "repetitions": 0,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-11",
+        "lastGrade": "blank"
       },
       "history": [
         {
           "date": "2026-08-01",
           "grade": "solved"
+        },
+        {
+          "date": "2026-08-08",
+          "grade": "blank"
+        },
+        {
+          "date": "2026-08-08",
+          "grade": "blank"
         }
       ],
       "userNotes": "",
@@ -4102,14 +4118,19 @@
         "band": null
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "easeFactor": 2.35,
+        "intervalDays": 3,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-11",
+        "lastGrade": "hint"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-08",
+          "grade": "hint"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -10227,16 +10248,20 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.35,
+        "easeFactor": 2.2,
         "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-04",
+        "repetitions": 2,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-11",
         "lastGrade": "hint"
       },
       "history": [
         {
           "date": "2026-08-01",
+          "grade": "hint"
+        },
+        {
+          "date": "2026-08-08",
           "grade": "hint"
         }
       ],
@@ -13459,47 +13484,6 @@
         "source": "sheet"
       }
     },
-    "WordSearch2": {
-      "task": "WordSearch2",
-      "className": "WordSearch2",
-      "javaFile": "src/main/java/graphs/WordSearch2.java",
-      "leetcodeUrl": "https://leetcode.com/problems/word-search-ii/",
-      "leetcodeNumber": 212,
-      "problemName": "Word Search II",
-      "pattern": "Tries",
-      "difficulty": "Hard",
-      "isNC150": true,
-      "isBlind75": true,
-      "source": "neetcode",
-      "rating": {
-        "elo": null,
-        "acceptance": 38.7,
-        "label": "acceptance 38.7% · Hard",
-        "meta": null,
-        "difficulty": "Hard",
-        "band": "Hard"
-      },
-      "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-09-12",
-        "lastGrade": null
-      },
-      "history": [],
-      "userNotes": "",
-      "flags": {
-        "pinned": true,
-        "skip": false
-      },
-      "qa": {
-        "problem": "Given a 2D character board and a list of target words, find all words that can be formed by sequentially adjacent cells (horizontally or vertically adjacent), where each cell may be used at most once per word. For example, board=[['o','a','a','n'],['e','t','a','e'],['i','h','k','r'],['i','f','l','v']], words=['oath','pea','eat','rain'] returns ['eat','oath']. Return all found words in any order, without duplicates.",
-        "answer": "Build a Trie from all target words, then run DFS backtracking from every board cell using the Trie to guide and prune the search. Starting from any cell, simultaneously traverse the Trie and explore neighboring board cells: if the current character has no corresponding child in the Trie node, prune immediately rather than exploring further. When a Trie node marks end-of-word, record the word and clear the end marker to prevent duplicate additions. Temporarily mark visited cells (e.g., replacing with '#') during DFS and restore afterward. After finding a word, prune dead Trie subtrees by removing leaf nodes to accelerate future searches. The key insight: the Trie serves as a shared prefix dictionary for all words simultaneously — a single DFS from each cell explores all words at once rather than requiring separate DFS per word, and Trie-guided pruning eliminates branches that cannot lead to any target word, collapsing the exponential brute-force space. Time complexity: O(M × 4 × 3^(L-1)) where M is board cells and L is maximum word length. Space complexity: O(W×L) for the Trie.",
-        "complexity": null,
-        "source": "sheet"
-      }
-    },
     "NetworkDelayTimeSolver": {
       "task": "NetworkDelayTimeSolver",
       "className": "NetworkDelayTimeSolver",
@@ -16227,11 +16211,11 @@
         "band": null
       },
       "sm2": {
-        "easeFactor": 2.2,
-        "intervalDays": 4,
-        "repetitions": 2,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-05",
+        "easeFactor": 2.0500000000000003,
+        "intervalDays": 3,
+        "repetitions": 3,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-11",
         "lastGrade": "hint"
       },
       "history": [
@@ -16241,6 +16225,10 @@
         },
         {
           "date": "2026-08-01",
+          "grade": "hint"
+        },
+        {
+          "date": "2026-08-08",
           "grade": "hint"
         }
       ],
@@ -16565,16 +16553,20 @@
       },
       "sm2": {
         "easeFactor": 2.35,
-        "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-04",
-        "lastGrade": "hint"
+        "intervalDays": 9,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-17",
+        "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-08-01",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-08",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -16938,17 +16930,21 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 5,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-06",
-        "lastGrade": "solved"
+        "easeFactor": 2.35,
+        "intervalDays": 4,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-12",
+        "lastGrade": "hint"
       },
       "history": [
         {
           "date": "2026-08-01",
           "grade": "solved"
+        },
+        {
+          "date": "2026-08-08",
+          "grade": "hint"
         }
       ],
       "userNotes": "",
@@ -17723,13 +17719,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-01",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-13",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-08",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -22683,17 +22684,22 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-01",
-        "lastGrade": null
+        "easeFactor": 2.35,
+        "intervalDays": 3,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-08",
+        "nextDue": "2026-08-11",
+        "lastGrade": "hint"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-08",
+          "grade": "hint"
+        }
+      ],
       "userNotes": "",
       "flags": {
-        "pinned": false,
+        "pinned": true,
         "skip": false
       },
       "qa": {

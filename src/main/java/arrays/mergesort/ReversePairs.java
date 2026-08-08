@@ -44,18 +44,9 @@ public class ReversePairs {
     }
 
     /**
-     * Intuition: brute force checks every pair - O(n^2). A reverse pair only
-     * cares about relative order, so values can be reordered *within* a half
-     * without harm. Merge sort gives exactly that: split the array in two, and
-     * every pair is either fully in the left half, fully in the right half, or
-     * straddles the split. Recursion handles the two "fully inside" cases; the
-     * straddling pairs are counted while both halves are sorted, right before
-     * we merge them.
-     *
-     * Why it is correct: each pair (i, j) with i < j lands in exactly one of
-     * those three buckets at one level of the recursion, so it is counted once
-     * and never double-counted. Sorting a half is safe because it only shuffles
-     * indices that already sit on the same side of the eventual partner.
+     * ENTRY POINT: Solves the problem in O(n log n) using a modified Merge Sort.
+     * We allocate a single 'buffer' array here and pass it down to avoid
+     * creating new arrays at every level of recursion, keeping space complexity to O(n).
      *
      * Time:  O(n log n) - merge sort's log n levels, each doing a linear
      *        cross-count plus a linear merge.
@@ -74,15 +65,16 @@ public class ReversePairs {
     }
 
     /**
-     * Intuition: standard merge sort, but the cross pairs are counted BEFORE the
-     * merge. Ordering matters: once the two sorted halves interleave, the
-     * "everything on the left comes before everything on the right" property
-     * that makes the count valid is gone, so counting must happen first.
+     * THE RECURSION:
+     * 1. Recursively count pairs strictly inside the left half.
+     * 2. Recursively count pairs strictly inside the right half.
+     * 3. Count straddling pairs (crossCount) BEFORE merging.
      *
-     * Algorithm:
-     *   1. Recurse into the left and right halves to count pairs inside each.
-     *   2. Count straddling pairs while the halves are still separately sorted.
-     *   3. Merge the halves and return the summed count.
+     * WHY DOESN'T SORTING RUIN THE ORIGINAL ORDER?
+     * Even if we sort the halves internally (e.g., [8, 5] -> [5, 8]), EVERYTHING
+     * in the Left Half STILL originally came before EVERYTHING in the Right Half.
+     * Because we only count pairs ACROSS the boundary, the relative left-to-right
+     * order between the two halves is perfectly preserved!
      *
      * Time:  O(n log n) - the recurrence T(n) = 2T(n/2) + O(n).
      * Space: O(n) shared buffer, O(log n) recursion stack.
@@ -110,19 +102,18 @@ public class ReversePairs {
     }
 
     /**
-     * Intuition: both halves are sorted ascending, so for a fixed left value the
-     * qualifying right values form a prefix of the right half. As the left value
-     * grows that prefix only extends, so the right pointer never rewinds - one
-     * linear sweep replaces a nested scan.
+     * THE TWO-POINTER SWEEP: Counts pairs where nums[left] > 2 * nums[right].
      *
-     * Time:  O(n) - each pointer walks its half at most once.
-     * Space: O(1).
+     * HOW IT WORKS WITHOUT REWINDING:
+     * Because the left half is sorted, if nums[left] is big enough to form a pair
+     * with nums[right], the NEXT number on the left will be even bigger. It is
+     * GUARANTEED to form a pair with nums[right] too. Thus, rightPointer never
+     * needs to rewind—it just picks up where it left off.
      *
-     * @param nums  array with sorted halves nums[left..mid] and nums[mid+1..right]
-     * @param left  inclusive start of the left half
-     * @param mid   inclusive end of the left half
-     * @param right inclusive end of the right half
-     * @return number of straddling reverse pairs across the two halves
+     * THE MATH: rightPointer - (mid + 1)
+     * This calculates exactly how many steps the right pointer has moved from the
+     * start of the right half (mid + 1). This perfectly equals the number of valid
+     * elements we've found for the current leftPointer.
      */
     private long countCrossPairs(int[] nums, int left, int mid, int right) {
         long reversePairs = 0;
@@ -130,8 +121,7 @@ public class ReversePairs {
 
         for (int leftPointer = left; leftPointer <= mid; leftPointer++) {
             // long cast guards against 2 * nums[rightPointer] overflowing int range
-            while (rightPointer <= right
-                && (long) nums[leftPointer] > 2L * nums[rightPointer]) {
+            while (rightPointer <= right && (long) nums[leftPointer] > 2L * nums[rightPointer]) {
                 rightPointer++;
             }
             reversePairs += rightPointer - (mid + 1);

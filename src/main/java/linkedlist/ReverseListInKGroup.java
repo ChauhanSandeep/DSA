@@ -49,97 +49,51 @@ public class ReverseListInKGroup {
 
 
   /**
-   * Problem: Reverse nodes in k-group from a singly linked list.
-   *
-   * Input: 1 -> 2 -> 3 -> 4 -> 5, k = 3
-   * Output: 3 -> 2 -> 1 -> 4 -> 5
-   *
-   * Approach:
-   * - Use a dummy node to simplify pointer management.
-   * - Maintain pointers to the end of the last processed group and the start of the current group.
-   * - Traverse the list in k-sized groups.
-   * - For each group:
-   *   - Verify that k nodes exist.
-   *   - Reverse the k nodes in-place.
-   *   - Reconnect the reversed group with the previous and next parts of the list.
-   *   - Set the pointers for the next iteration.
-   *
-   * Time: O(N), each node is visited once.
-   * Space: O(1), in-place reversal with pointers.
-   */
-    /**
-   * Intuition: treat each k-sized block as a closed mini-list with a start and
-   * end. Reverse that block, connect the previous group to its new head, and
-   * connect its old head to the next group.
+   * Intuition: reuse the same SRK head-insertion trick from Reverse Linked
+   * List II — repeatedly lift the node right after currentGroupStart to just
+   * after previousGroupEnd. Running that move groupSize - 1 times reverses
+   * an entire group without a separate reverse helper. Advance previousGroupEnd
+   * to currentGroupStart (now the group tail) and repeat.
    *
    * Algorithm:
    *   1. Return originalHead when the list is empty or groupSize <= 1.
-   *   2. Use dummyHead, previousGroupEnd, and currentGroupStart to track boundaries.
-   *   3. While a complete group exists, find currentGroupEnd and nextGroupStart.
-   *   4. Reverse the group, reconnect it, and advance to the next group.
+   *   2. Set previousGroupEnd to dummyHead.
+   *   3. While a full group of groupSize exists starting at previousGroupEnd.next:
+   *      a. Set currentGroupStart = previousGroupEnd.next (becomes the tail).
+   *      b. Repeat groupSize - 1 times: lift currentGroupStart.next to the group front.
+   *      c. Advance previousGroupEnd to currentGroupStart.
    *
-   * Time:  O(n) - each node is checked and reversed a constant number of times.
-   * Space: O(1) - reversal uses pointer variables only.
+   * Time:  O(n) - each node is moved exactly once across all groups.
+   * Space: O(1) - only a dummy and a few pointers are used.
    *
    * @param originalHead head of the linked list
    * @param groupSize number of nodes per reversed group
    * @return head after reversing every complete group
    */
   public ListNode reverseInGroupsOfK(ListNode originalHead, int groupSize) {
-    if (originalHead == null || groupSize <= 1) {
-      return originalHead; // Nothing to reverse
-    }
+    if (originalHead == null || groupSize <= 1) return originalHead;
 
-    ListNode dummyHead = new ListNode(-1); // Dummy node to simplify edge cases
+    ListNode dummyHead = new ListNode(-1);
     dummyHead.next = originalHead;
+    ListNode prev = dummyHead;
 
-    ListNode previousGroupEnd = dummyHead; // Points to end of last processed group
-    ListNode currentGroupStart = originalHead; // Start of the group to be reversed
+    while (hasKNodes(prev.next, groupSize)) {
+      // --- Step: SRK head-insertion, repeated groupSize-1 times --------
+      ListNode curr = prev.next; // will become the tail
 
-    while (hasKNodes(currentGroupStart, groupSize)) {
-      // Step 1: Identify the end of the current k-sized group
-      ListNode currentGroupEnd = currentGroupStart;
-      for (int i = 1; i < groupSize; i++) {
-        currentGroupEnd = currentGroupEnd.next;
+      for (int i = 0; i < groupSize - 1; i++) {
+        ListNode next = curr.next;
+        curr.next = next.next;
+        next.next = prev.next;
+        prev.next = next;
       }
-
-      ListNode nextGroupStart = currentGroupEnd.next; // This will be start of the next group
-
-      // Step 2: Reverse current group
-      reverseGroup(currentGroupStart, currentGroupEnd);
-
-      // Step 3: Connect the reversed group with previous and next parts
-      previousGroupEnd.next = currentGroupEnd; // currentGroupEnd is new head after reversal
-      currentGroupStart.next = nextGroupStart; // currentGroupStart is now end of group
-
-      // Step 4: Move pointers for next iteration
-      previousGroupEnd = currentGroupStart;
-      currentGroupStart = nextGroupStart;
+      prev = curr; // currentGroupStart is now the group tail
     }
 
     return dummyHead.next;
   }
 
-  /**
-   * Reverses the linked list from start to end (inclusive).
-   */
-  private void reverseGroup(ListNode groupStart, ListNode groupEnd) {
-    ListNode previousNode = null;
-    ListNode currentNode = groupStart;
-    ListNode stopNode = groupEnd.next;
-
-    while (currentNode != stopNode) {
-      ListNode nextNode = currentNode.next;
-      currentNode.next = previousNode;
-
-      previousNode = currentNode;
-      currentNode = nextNode;
-    }
-  }
-
-  /**
-   * Checks if there are at least k nodes left from the current node.
-   */
+  /** Returns true if at least k nodes exist starting from startNode. */
   private boolean hasKNodes(ListNode startNode, int k) {
     int count = 0;
     while (startNode != null && count < k) {

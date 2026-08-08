@@ -61,7 +61,7 @@ _Total: 52 problems across 18 patterns. Generated 2026-07-19 by `curate_core.py`
 | Trees | `SerializeAndDeserializeBinaryTree` | [Serialize And Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/) | Hard | Blind75 · NC150 |
 | Trees | `ValidateBinarySearchTree` | [Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/) | Medium | Blind75 · NC150 |
 | Trees | `BinaryTreeLevelOrderTraversal` | [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/) | Medium | Blind75 · NC150 |
-| Tries | `WordSearch2` | [Word Search II](https://leetcode.com/problems/word-search-ii/) | Hard | Blind75 · NC150 |
+| Tries | `WordSearchII` | [Word Search II](https://leetcode.com/problems/word-search-ii/) | Hard | Blind75 · NC150 |
 | Tries | `TrieTest` | [Implement Trie Prefix Tree](https://leetcode.com/problems/implement-trie-prefix-tree/) | Medium | Blind75 · NC150 |
 | Two Pointers | `ContainerWithMostWater` | [Container With Most Water](https://leetcode.com/problems/container-with-most-water/) | Medium | Blind75 · NC150 |
 | Two Pointers | `ThreeSum` | [3Sum](https://leetcode.com/problems/3sum/) | Medium | Blind75 · NC150 |

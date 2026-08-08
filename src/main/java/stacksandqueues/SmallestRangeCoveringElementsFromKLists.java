@@ -31,7 +31,7 @@ import java.util.*;
  * Related: Merge k Sorted Lists (23), Minimum Window Substring (76).
  */
 public class SmallestRangeCoveringElementsFromKLists {
-        /**
+    /**
      * Intuition: one chosen value from each list forms a range from the current
      * minimum to the current maximum. To possibly shrink that range, advance the
      * list that owns the minimum; moving any other list cannot lower the left
@@ -49,7 +49,7 @@ public class SmallestRangeCoveringElementsFromKLists {
      * @param nums k sorted integer lists
      * @return smallest inclusive range covering every list
      */
-public int[] smallestRange(List<List<Integer>> nums) {
+    public int[] smallestRange(List<List<Integer>> nums) {
         // Min heap to track the current smallest element from each list
         PriorityQueue<Element> minHeap = new PriorityQueue<>((a, b) -> a.val - b.val);
 
