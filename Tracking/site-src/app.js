@@ -594,62 +594,26 @@
   // --------------------------------------------------------------------------
   // Read-only mode detection.
   // The site is deployed to GitHub Pages for browse-anywhere access, but
-  // grading is only supported when serve.py is running locally. If we can't
-  // reach /api/ping quickly, mark the body so CSS can hide the grade bar
-  // and any "Save all" affordances, and surface a banner explaining why.
+  // grading/editing is only supported when serve.py is running locally.
+  //
+  // We decide by ORIGIN, not by pinging: a ping to /api/ping is fragile
+  // because `localhost` may resolve to IPv6 ::1 while serve.py binds only
+  // 127.0.0.1 (so the ping fails and the grade bar gets hidden even though
+  // the server is up). Since the page itself was served by serve.py, any
+  // http(s) localhost origin is treated as editable; only file:// and real
+  // domains are read-only. If the server is somehow gone, a grade POST fails
+  // and grade() already falls back gracefully with an explanatory toast.
   // --------------------------------------------------------------------------
-  async function initReadOnlyMode() {
-    // Non-http (file://) can't reach a local server → always read-only.
-    if (location.protocol !== "http:" && location.protocol !== "https:") {
+  function initReadOnlyMode() {
+    const host = location.hostname;
+    const isLocal = (host === "localhost" || host === "127.0.0.1"
+      || host === "::1" || host === "[::1]");
+    const servedLocally =
+      (location.protocol === "http:" || location.protocol === "https:") && isLocal;
+    if (!servedLocally) {
       document.body.classList.add("read-only");
       injectReadOnlyBanner();
-      return;
     }
-    // The local server briefly stops answering while it rebuilds the site
-    // after a grade, and auto-advance loads the next page mid-rebuild — so a
-    // single quick ping can spuriously fail and hide the grade bar. Retry a
-    // few times with a generous timeout before concluding the server is gone.
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (await pingServer(1500)) return;
-      await new Promise((resolve) => setTimeout(resolve, 400));
-    }
-    document.body.classList.add("read-only");
-    injectReadOnlyBanner();
-    // Keep probing: if the server finishes rebuilding and answers, drop
-    // read-only so grading re-enables without a manual reload.
-    scheduleReadOnlyRecheck();
-  }
-
-  async function pingServer(timeoutMs) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch("/api/ping", {
-        method: "GET",
-        signal: controller.signal,
-        cache: "no-store",
-      });
-      return res.ok;
-    } catch (_) {
-      return false;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  function scheduleReadOnlyRecheck() {
-    let tries = 0;
-    const id = setInterval(async () => {
-      tries += 1;
-      if (await pingServer(1500)) {
-        clearInterval(id);
-        document.body.classList.remove("read-only");
-        const banner = document.getElementById("readonly-banner");
-        if (banner) banner.remove();
-      } else if (tries >= 6) {
-        clearInterval(id);
-      }
-    }, 2000);
   }
 
   function injectReadOnlyBanner() {
