@@ -599,27 +599,57 @@
   // and any "Save all" affordances, and surface a banner explaining why.
   // --------------------------------------------------------------------------
   async function initReadOnlyMode() {
-    // file:// or http(s): both may or may not have serve.py behind them.
-    let reachable = false;
-    if (location.protocol === "http:" || location.protocol === "https:") {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 800);
-        const res = await fetch("/api/ping", {
-          method: "GET",
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        clearTimeout(timer);
-        reachable = res.ok;
-      } catch (_) {
-        reachable = false;
-      }
-    }
-    if (!reachable) {
+    // Non-http (file://) can't reach a local server → always read-only.
+    if (location.protocol !== "http:" && location.protocol !== "https:") {
       document.body.classList.add("read-only");
       injectReadOnlyBanner();
+      return;
     }
+    // The local server briefly stops answering while it rebuilds the site
+    // after a grade, and auto-advance loads the next page mid-rebuild — so a
+    // single quick ping can spuriously fail and hide the grade bar. Retry a
+    // few times with a generous timeout before concluding the server is gone.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (await pingServer(1500)) return;
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    }
+    document.body.classList.add("read-only");
+    injectReadOnlyBanner();
+    // Keep probing: if the server finishes rebuilding and answers, drop
+    // read-only so grading re-enables without a manual reload.
+    scheduleReadOnlyRecheck();
+  }
+
+  async function pingServer(timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch("/api/ping", {
+        method: "GET",
+        signal: controller.signal,
+        cache: "no-store",
+      });
+      return res.ok;
+    } catch (_) {
+      return false;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function scheduleReadOnlyRecheck() {
+    let tries = 0;
+    const id = setInterval(async () => {
+      tries += 1;
+      if (await pingServer(1500)) {
+        clearInterval(id);
+        document.body.classList.remove("read-only");
+        const banner = document.getElementById("readonly-banner");
+        if (banner) banner.remove();
+      } else if (tries >= 6) {
+        clearInterval(id);
+      }
+    }, 2000);
   }
 
   function injectReadOnlyBanner() {
