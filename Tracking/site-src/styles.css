@@ -1034,10 +1034,65 @@ pre.code .token.punctuation.brace-selected {
 /* Read-only mode: no local serve.py reachable. Grade UI hidden. */
 body.read-only .grade-bar,
 body.read-only .pending-banner,
+body.read-only .code-tools,
 body.read-only [data-action="save-all"],
 body.read-only [data-action="download-state"] {
   display: none !important;
 }
+
+/* In-browser source editing (local serve.py only). */
+.code-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.code-edit-btn,
+.code-save-btn,
+.code-cancel-btn {
+  font: inherit;
+  font-size: 0.9em;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+}
+.code-edit-btn:hover,
+.code-cancel-btn:hover { background: var(--surface-hover, var(--surface)); }
+.code-save-btn {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.code-save-btn:disabled { opacity: 0.6; cursor: default; }
+.code-tools-hint { font-size: 0.82em; }
+.code-editor-area {
+  width: 100%;
+  min-height: 60vh;
+  box-sizing: border-box;
+  font-family: var(--mono, monospace);
+  font-size: 0.9em;
+  line-height: 1.5;
+  tab-size: 4;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg, var(--surface));
+  color: var(--fg);
+  white-space: pre;
+  overflow: auto;
+  resize: vertical;
+}
+.code-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.code-editor-status { font-size: 0.82em; }
+
 
 .readonly-banner {
   display: flex;

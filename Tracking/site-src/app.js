@@ -569,6 +569,7 @@
     initDashboard();
     initThemeToggle();
     initTextSize();
+    initSourceEditor();
     initQaCard();
     initPatternPage();
     initBrowsePage();
@@ -715,6 +716,86 @@
       () => applyTextScale(currentTextScale() - TEXT_SCALE_STEP));
     if (larger) larger.addEventListener("click",
       () => applyTextScale(currentTextScale() + TEXT_SCALE_STEP));
+  }
+
+  // --------------------------------------------------------------------------
+  // In-browser source editing.
+  // Only works when serve.py is behind the page (read-only mode hides the UI
+  // via CSS). "Edit source" fetches the FULL .java file from /api/source,
+  // swaps the highlighted view for a textarea; "Save to file" POSTs it back to
+  // /api/save-source, which writes atomically to src/main/java and rebuilds.
+  // --------------------------------------------------------------------------
+  function initSourceEditor() {
+    const container = document.querySelector("[data-task]");
+    const editBtn = document.querySelector("[data-action='edit-source']");
+    if (!container || !editBtn) return;
+
+    const task = container.dataset.task;
+    const view = document.querySelector(".code-view");
+    const editor = document.querySelector(".code-editor");
+    const area = editor && editor.querySelector(".code-editor-area");
+    const status = editor && editor.querySelector(".code-editor-status");
+    const saveBtn = document.querySelector("[data-action='save-source']");
+    const cancelBtn = document.querySelector("[data-action='cancel-edit']");
+    if (!view || !editor || !area || !saveBtn || !cancelBtn) return;
+
+    function showEditor(show) {
+      editor.classList.toggle("hidden", !show);
+      view.classList.toggle("hidden", show);
+      editBtn.classList.toggle("hidden", show);
+    }
+
+    editBtn.addEventListener("click", async () => {
+      editBtn.disabled = true;
+      try {
+        const res = await fetch("/api/source?task=" + encodeURIComponent(task), {
+          cache: "no-store",
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "failed to load source");
+        area.value = data.source;
+        if (status) status.textContent = data.javaFile;
+        showEditor(true);
+        area.focus();
+      } catch (err) {
+        toast(err.message || "Could not load source", "error");
+      } finally {
+        editBtn.disabled = false;
+      }
+    });
+
+    cancelBtn.addEventListener("click", () => showEditor(false));
+
+    saveBtn.addEventListener("click", async () => {
+      saveBtn.disabled = true;
+      if (status) status.textContent = "Saving…";
+      try {
+        const res = await fetch("/api/save-source", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ task, source: area.value }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "save failed");
+        toast("Saved · rebuilding…", "success");
+        setTimeout(() => location.reload(), 400);
+      } catch (err) {
+        if (status) status.textContent = "";
+        toast(err.message || "Save failed", "error");
+        saveBtn.disabled = false;
+      }
+    });
+
+    // Tab inserts a tab instead of moving focus, so indentation survives edits.
+    area.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = area.selectionStart;
+        const end = area.selectionEnd;
+        area.value = area.value.slice(0, start) + "    " + area.value.slice(end);
+        area.selectionStart = area.selectionEnd = start + 4;
+      }
+    });
   }
 
   // --------------------------------------------------------------------------

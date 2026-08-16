@@ -1102,7 +1102,21 @@ def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, st
     <details class="reveal">
       <summary>Reveal my solution <span class="mono dim" style="margin-left:8px">(Enter)</span></summary>
       <div class="content">
-        <pre class="code language-java match-braces rainbow-braces"><code class="language-java">{esc(code_body)}</code></pre>
+        <div class="code-tools">
+          <button class="code-edit-btn" data-action="edit-source">✏️ Edit source</button>
+          <span class="code-tools-hint dim">writes straight to {esc(problem["javaFile"])} · git-backed</span>
+        </div>
+        <div class="code-view">
+          <pre class="code language-java match-braces rainbow-braces"><code class="language-java">{esc(code_body)}</code></pre>
+        </div>
+        <div class="code-editor hidden">
+          <textarea class="code-editor-area" spellcheck="false" wrap="off" aria-label="Edit Java source"></textarea>
+          <div class="code-editor-actions">
+            <button class="code-save-btn" data-action="save-source">💾 Save to file</button>
+            <button class="code-cancel-btn" data-action="cancel-edit">Cancel</button>
+            <span class="code-editor-status dim"></span>
+          </div>
+        </div>
       </div>
     </details>
 

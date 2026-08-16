@@ -34,12 +34,13 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from datetime import date, timedelta
 from http import HTTPStatus
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -48,6 +49,7 @@ STATE_JSON = DATA_DIR / "state.json"
 CYCLE_JSON = DATA_DIR / "cycle.json"
 SITE_DIR = REPO_ROOT / "Tracking" / "site"
 BUILD_SCRIPT = REPO_ROOT / "Tracking" / "scripts" / "build.py"
+JAVA_ROOT = (REPO_ROOT / "src" / "main" / "java").resolve()
 
 # Weekly goal increment for "load more" — MUST match build.py WEEKLY_GOAL.
 WEEKLY_GOAL = 10
@@ -157,6 +159,54 @@ def grade_problem(task: str, grade: str) -> dict:
         return {"task": task, "sm2": new_sm2, "grade": grade}
 
 
+# --------------------------------------------------------------------------
+# Source editing — read / write the problem's actual .java file so small
+# fixes spotted during revision can be applied straight from the dashboard.
+# Writes are atomic and confined to src/main/java; a timestamped backup is
+# dropped in the OS temp dir. git remains the primary safety net.
+# --------------------------------------------------------------------------
+
+def _resolve_java_path(task: str) -> tuple[str, Path]:
+    """Map a task to its .java path, refusing anything outside JAVA_ROOT."""
+    state = load_state()
+    if task not in state["problems"]:
+        raise KeyError(task)
+    rel = state["problems"][task]["javaFile"]
+    path = (REPO_ROOT / rel).resolve()
+    if JAVA_ROOT != path and JAVA_ROOT not in path.parents:
+        raise ValueError(f"refusing path outside java source root: {rel}")
+    return rel, path
+
+
+def read_source(task: str) -> dict:
+    rel, path = _resolve_java_path(task)
+    if not path.exists():
+        raise FileNotFoundError(rel)
+    return {"task": task, "javaFile": rel, "source": path.read_text(encoding="utf-8")}
+
+
+def save_source(task: str, source: str) -> dict:
+    with _state_lock:
+        rel, path = _resolve_java_path(task)
+        if not path.exists():
+            raise FileNotFoundError(rel)
+
+        # Timestamped backup outside the repo so it never pollutes git.
+        backup_dir = Path(tempfile.gettempdir()) / "dsa-source-backups"
+        backup_dir.mkdir(exist_ok=True)
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        backup = backup_dir / f"{task}.{stamp}.java.bak"
+        backup.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+
+        # Normalise to exactly one trailing newline, then atomic replace.
+        normalised = source.rstrip("\n") + "\n"
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(normalised, encoding="utf-8")
+        os.replace(tmp, path)
+        return {"task": task, "javaFile": rel, "bytes": len(normalised),
+                "backup": str(backup)}
+
+
 def load_more_batch() -> dict:
     """Raise this week's goal by WEEKLY_GOAL so the user can keep going.
 
@@ -226,6 +276,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if parsed.path == "/api/load-more":
             self.handle_load_more()
             return
+        if parsed.path == "/api/save-source":
+            self.handle_save_source()
+            return
         if parsed.path != "/api/grade":
             self.send_json(HTTPStatus.NOT_FOUND, {"error": "not found"})
             return
@@ -284,12 +337,69 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             "rebuilt": self.auto_rebuild,
         })
 
+    def handle_save_source(self) -> None:
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            body = self.rfile.read(length).decode("utf-8") if length else ""
+            payload = json.loads(body or "{}")
+            task = str(payload.get("task", "")).strip()
+            source = payload.get("source")
+            if not task or not isinstance(source, str) or not source.strip():
+                self.send_json(HTTPStatus.BAD_REQUEST, {
+                    "error": "task and non-empty source required"
+                })
+                return
+            result = save_source(task, source)
+        except KeyError as e:
+            self.send_json(HTTPStatus.NOT_FOUND, {"error": f"unknown task: {e.args[0]}"})
+            return
+        except (ValueError, FileNotFoundError) as e:
+            self.send_json(HTTPStatus.BAD_REQUEST, {"error": str(e)})
+            return
+        except Exception as e:
+            self.send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(e)})
+            return
+
+        if self.auto_rebuild:
+            ok, msg = rebuild_site()
+            if not ok:
+                sys.stderr.write(f"[rebuild failed] {msg}\n")
+
+        self.send_json(HTTPStatus.OK, {
+            "ok": True,
+            "task": result["task"],
+            "javaFile": result["javaFile"],
+            "bytes": result["bytes"],
+            "rebuilt": self.auto_rebuild,
+        })
+
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/api/ping":
             self.send_json(HTTPStatus.OK, {"ok": True})
             return
+        if parsed.path == "/api/source":
+            self.handle_read_source(parse_qs(parsed.query))
+            return
         return super().do_GET()
+
+    def handle_read_source(self, query: dict) -> None:
+        task = (query.get("task") or [""])[0].strip()
+        if not task:
+            self.send_json(HTTPStatus.BAD_REQUEST, {"error": "task required"})
+            return
+        try:
+            result = read_source(task)
+        except KeyError as e:
+            self.send_json(HTTPStatus.NOT_FOUND, {"error": f"unknown task: {e.args[0]}"})
+            return
+        except (ValueError, FileNotFoundError) as e:
+            self.send_json(HTTPStatus.BAD_REQUEST, {"error": str(e)})
+            return
+        except Exception as e:
+            self.send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(e)})
+            return
+        self.send_json(HTTPStatus.OK, {"ok": True, **result})
 
 
 def make_handler_class(auto_rebuild: bool):
