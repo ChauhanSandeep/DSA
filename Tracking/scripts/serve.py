@@ -304,14 +304,24 @@ def make_handler_class(auto_rebuild: bool):
 # --------------------------------------------------------------------------
 
 def ensure_site_exists() -> bool:
-    if SITE_DIR.exists() and (SITE_DIR / "index.html").exists():
-        return True
-    print("site/ not built yet — running build.py once...")
+    """Rebuild the site on every startup so the queue always reflects the
+    current state.json (grades, new syncs, week rollover). build.py is a pure
+    render of state.json — it never mutates your progress — so rebuilding is
+    idempotent no matter how often you launch the server in a week.
+
+    If the build fails but a prior site exists, serve the stale copy rather
+    than block the ritual; only refuse to start when there is nothing to serve.
+    """
+    site_exists = SITE_DIR.exists() and (SITE_DIR / "index.html").exists()
+    print("Rebuilding site from state.json...")
     ok, msg = rebuild_site()
-    if not ok:
-        print(f"build failed:\n{msg}", file=sys.stderr)
-        return False
-    return True
+    if ok:
+        return True
+    if site_exists:
+        print(f"build failed — serving existing site:\n{msg}", file=sys.stderr)
+        return True
+    print(f"build failed:\n{msg}", file=sys.stderr)
+    return False
 
 
 def main() -> int:
