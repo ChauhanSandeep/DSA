@@ -954,13 +954,13 @@ pre.code .token.punctuation.brace-selected {
  * ============================================================= */
 
 .grade-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: sticky;
+  bottom: 12px;
+  margin: 28px 0 8px;
   background: color-mix(in srgb, var(--bg-page) 92%, transparent);
   backdrop-filter: blur(8px);
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 14px 20px;
   display: flex;
   gap: 10px;
