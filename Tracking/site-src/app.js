@@ -459,8 +459,9 @@
   function maybeAdvanceToNext() {
     const next = document.querySelector(".problem-nav-btn.next[href]");
     if (!next) return;
-    // Brief pause so the "Saved" toast is visible before we navigate.
-    setTimeout(() => { window.location.href = next.getAttribute("href"); }, 650);
+    // Let the confetti + "Nailed it" feedback pop finish before navigating
+    // (the feedback card lives ~1.9s); otherwise the celebration is cut off.
+    setTimeout(() => { window.location.href = next.getAttribute("href"); }, 2000);
   }
 
   // --------------------------------------------------------------------------
