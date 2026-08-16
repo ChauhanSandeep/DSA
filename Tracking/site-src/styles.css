@@ -524,6 +524,71 @@ a.badge { cursor: pointer; }
   font-size: 13px;
 }
 
+/* Prominent tag row — larger badges so difficulty + acceptance lead. */
+.problem-header .meta-tags {
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.problem-header .meta-tags .badge {
+  font-size: 13px;
+  padding: 5px 13px;
+  letter-spacing: 0.01em;
+}
+.badge.acceptance {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Secondary, low-key line — external links + SM-2 stats (reps kept quiet). */
+.problem-header .meta-secondary {
+  font-size: 12px;
+  color: var(--fg-muted);
+  opacity: 0.85;
+}
+.problem-header .meta-secondary a { color: var(--fg-muted); }
+.problem-header .meta-secondary a:hover { color: var(--accent); }
+
+/* Prev / Next across this week's problem set. */
+.problem-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.problem-nav-btn {
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--fg-primary);
+  background: var(--bg-surface);
+  transition: color 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+.problem-nav-btn:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.problem-nav-btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  background: transparent;
+}
+.problem-nav-pos {
+  font-family: var(--font-header);
+  font-size: 12px;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 
 /* =============================================================
  * 9. Callouts (Quartz-style: subtle border + accent-mix bg)

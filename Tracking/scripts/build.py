@@ -923,17 +923,22 @@ def format_review_banner(problem: dict, today: date) -> str:
     )
 
 
-def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> str:
+def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> tuple[str, str]:
     """Render the class Javadoc as an ordered stack of themed callouts, one
     per AGENT.md section. `leetcode_number_index` maps a Leetcode number to
     the task_id so `Related:` items can become clickable links.
+
+    Returns `(main_html, footer_html)`. `footer_html` holds the Follow-ups and
+    Related callouts so the problem page can push them to the very bottom;
+    everything else stays in `main_html`.
     """
     blocks = extract_javadoc_blocks(source)
     if not blocks:
-        return '<p class="dim">(no class Javadoc found)</p>'
+        return ('<p class="dim">(no class Javadoc found)</p>', "")
     cls = parse_class_javadoc(blocks[0])
 
     parts: list[str] = []
+    footer_parts: list[str] = []
 
     # Problem — the meat. Show as plain text (multi-line) with a subtle callout.
     if cls.get("problem"):
@@ -969,7 +974,8 @@ def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> s
             parts.append(_callout("rating", "Rating",
                                   f'<div class="rating-line">{esc(r["label"])}</div>'))
 
-    # Follow-ups — numbered pairs.
+    # Follow-ups — numbered pairs. Rendered into the page footer so the
+    # solution + grading flow comes first.
     followups = parse_followups(cls.get("followups"))
     if followups:
         rows = []
@@ -983,9 +989,9 @@ def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> s
                 f'</div>'
                 f'</div>'
             )
-        parts.append(_callout("followups", "Follow-ups", "".join(rows)))
+        footer_parts.append(_callout("followups", "Follow-ups", "".join(rows)))
     elif cls.get("followups"):
-        parts.append(_callout("followups", "Follow-ups", _prose_html(cls["followups"])))
+        footer_parts.append(_callout("followups", "Follow-ups", _prose_html(cls["followups"])))
 
     # Related — clickable when the Leetcode number matches a tracked problem.
     related = parse_related(cls.get("related"))
@@ -1001,7 +1007,7 @@ def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> s
                 )
             else:
                 chips.append(f'<span class="related-chip related-chip-dim">{label}</span>')
-        parts.append(_callout("related", "Related",
+        footer_parts.append(_callout("related", "Related",
                               f'<div class="related-list">{"".join(chips)}</div>'))
 
     # Approach table (rare) — keep as pre for now; it's tabular.
@@ -1009,7 +1015,8 @@ def render_class_javadoc_sections(source: str, leetcode_number_index: dict) -> s
         parts.append(_callout("approach", "Approaches",
                               f'<pre class="approach-table">{esc(cls["approach"])}</pre>'))
 
-    return "".join(parts) or '<p class="dim">(no recognisable Javadoc sections)</p>'
+    main_html = "".join(parts) or '<p class="dim">(no recognisable Javadoc sections)</p>'
+    return (main_html, "".join(footer_parts))
 
 
 def _prose_html(text: str) -> str:
@@ -1038,7 +1045,8 @@ def build_leetcode_number_index(state: dict) -> dict[int, str]:
     return idx
 
 
-def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, str]) -> str:
+def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, str],
+                        week_tasks: list[str] | None = None) -> str:
     task = problem["task"]
     java_file = REPO_ROOT / problem["javaFile"]
 
@@ -1048,28 +1056,38 @@ def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, st
         source = "// Source file not found: " + problem["javaFile"]
 
     _, code_body = extract_javadoc(source)
-    doc_sections_html = render_class_javadoc_sections(source, leetcode_index)
+    doc_sections_html, doc_footer_html = render_class_javadoc_sections(source, leetcode_index)
 
     sm2 = problem.get("sm2", {})
-    meta_bits = [
-        f'{esc(problem.get("pattern", "Uncategorized"))}',
-        f'difficulty: {esc(problem.get("difficulty", "Unknown"))}',
-    ]
+    rating = problem.get("rating") or {}
+
+    # Prominent tags: difficulty band, NC150/Blind75/pinned, pattern, plus a
+    # bright acceptance chip so difficulty + acceptance lead the page.
+    prominent = [badges_for_problem(problem, root="../")]
+    acceptance = rating.get("acceptance")
+    if isinstance(acceptance, (int, float)):
+        prominent.append(
+            f'<span class="badge acceptance" title="Leetcode acceptance rate">'
+            f'accept {acceptance:.1f}%</span>'
+        )
+
+    # Secondary, low-key line: external links + SM-2 stats. `next due` removed;
+    # `reps` kept here so it stays available but visually quiet.
+    secondary = []
     if problem.get("leetcodeUrl"):
-        meta_bits.append(f'<a href="{esc(problem["leetcodeUrl"])}" target="_blank" rel="noopener">Leetcode ↗</a>')
+        secondary.append(f'<a href="{esc(problem["leetcodeUrl"])}" target="_blank" rel="noopener">Leetcode ↗</a>')
     github_url = f'https://github.com/ChauhanSandeep/DSA/blob/master/{problem["javaFile"]}'
-    meta_bits.append(f'<a href="{esc(github_url)}" target="_blank" rel="noopener">source ↗</a>')
-    meta_bits.append(f'next due: {esc(format_next_due(sm2.get("nextDue")))}')
-    meta_bits.append(f'ease: {sm2.get("easeFactor", 2.5):.2f}')
-    meta_bits.append(f'reps: {sm2.get("repetitions", 0)}')
+    secondary.append(f'<a href="{esc(github_url)}" target="_blank" rel="noopener">source ↗</a>')
+    secondary.append(f'ease {sm2.get("easeFactor", 2.5):.2f}')
+    secondary.append(f'reps {sm2.get("repetitions", 0)}')
 
     body = f"""
     <div class="problem-header" data-task="{esc(task)}">
       <div class="title">{esc(problem.get("problemName") or task)}</div>
-      <div class="meta">
-        {badges_for_problem(problem, root="../")}
+      <div class="meta meta-tags">
+        {"".join(prominent)}
       </div>
-      <div class="meta" style="margin-top:8px">{" · ".join(meta_bits)}</div>
+      <div class="meta meta-secondary">{" · ".join(secondary)}</div>
     </div>
 
     {format_review_banner(problem, today)}
@@ -1094,10 +1112,45 @@ def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, st
       <button class="grade-btn blank"   data-grade="blank">🔴 Bombed <span class="key">4</span></button>
     </div>
 
+    {doc_footer_html}
+
+    {render_problem_nav(task, week_tasks)}
+
     <script>window.__STATE__ = {{"problems": {{{json.dumps(task)}: {json.dumps(problem, ensure_ascii=False)}}}}};</script>
     """
 
     return base_layout(problem.get("problemName") or task, body, back_link="../index.html").replace("{root}", "../")
+
+
+def render_problem_nav(task: str, week_tasks: list[str] | None) -> str:
+    """Prev/Next navigation across this week's problem set.
+
+    Only rendered when the current problem is part of the weekend queue; the
+    order matches the dashboard/issue queue so navigation is predictable.
+    """
+    if not week_tasks or task not in week_tasks:
+        return ""
+    pos = week_tasks.index(task)
+    total = len(week_tasks)
+    prev_task = week_tasks[pos - 1] if pos > 0 else None
+    next_task = week_tasks[pos + 1] if pos < total - 1 else None
+
+    if prev_task:
+        prev_html = f'<a class="problem-nav-btn prev" href="../problems/{esc(prev_task)}.html">← Prev</a>'
+    else:
+        prev_html = '<span class="problem-nav-btn prev disabled" aria-disabled="true">← Prev</span>'
+    if next_task:
+        next_html = f'<a class="problem-nav-btn next" href="../problems/{esc(next_task)}.html">Next →</a>'
+    else:
+        next_html = '<span class="problem-nav-btn next disabled" aria-disabled="true">Next →</span>'
+
+    return (
+        '<nav class="problem-nav" aria-label="This week\'s problem set">'
+        f'{prev_html}'
+        f'<span class="problem-nav-pos">{pos + 1} / {total} this week</span>'
+        f'{next_html}'
+        '</nav>'
+    )
 
 
 def render_pattern_index(state: dict) -> str:
@@ -1493,10 +1546,13 @@ def build() -> int:
     # Dashboard
     write(SITE_DIR / "index.html", render_dashboard(state, today))
 
-    # Problem pages
+    # Problem pages. Compute this week's ordered queue once so each problem
+    # page can render Prev/Next across the same set the dashboard shows.
     leetcode_index = build_leetcode_number_index(state)
+    review_day = coming_saturday(today)
+    week_tasks = [p["task"] for p in pick_queue(state, review_day, QUEUE_SIZE)]
     for problem in state["problems"].values():
-        page = render_problem_page(problem, today, leetcode_index)
+        page = render_problem_page(problem, today, leetcode_index, week_tasks)
         write(SITE_DIR / "problems" / f"{problem['task']}.html", page)
 
     # Pattern index + per-pattern pages
