@@ -596,13 +596,12 @@
   // The site is deployed to GitHub Pages for browse-anywhere access, but
   // grading/editing is only supported when serve.py is running locally.
   //
-  // We decide by ORIGIN, not by pinging: a ping to /api/ping is fragile
-  // because `localhost` may resolve to IPv6 ::1 while serve.py binds only
-  // 127.0.0.1 (so the ping fails and the grade bar gets hidden even though
-  // the server is up). Since the page itself was served by serve.py, any
-  // http(s) localhost origin is treated as editable; only file:// and real
-  // domains are read-only. If the server is somehow gone, a grade POST fails
-  // and grade() already falls back gracefully with an explanatory toast.
+  // Decide by ORIGIN, not by pinging the server: `localhost` may resolve to
+  // IPv6 ::1 while serve.py binds only 127.0.0.1, so a probe can fail even
+  // though the server is up. Since the page itself was served by serve.py,
+  // any http(s) localhost origin is treated as editable; only file:// and
+  // real domains are read-only. If the server is somehow gone, a grade POST
+  // fails and grade() already falls back gracefully with an explanatory toast.
   // --------------------------------------------------------------------------
   function initReadOnlyMode() {
     const host = location.hostname;

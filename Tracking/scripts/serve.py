@@ -379,9 +379,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
-        if parsed.path == "/api/ping":
-            self.send_json(HTTPStatus.OK, {"ok": True})
-            return
         if parsed.path == "/api/source":
             self.handle_read_source(parse_qs(parsed.query))
             return

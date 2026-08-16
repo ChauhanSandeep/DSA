@@ -113,9 +113,9 @@ only the built-in `GITHUB_TOKEN` — no PATs, no secrets.
   `Tracking/site/` to **GitHub Pages** — a public, read-only view of
   your queue, Q/A cards, patterns, and syntax-highlighted source.
 - Live at **https://chauhansandeep.github.io/DSA/**.
-- The published dashboard runs in *read-only mode*: it pings
-  `/api/ping` on load, finds no local server, and hides the grade bar
-  + shows a banner reminding you that grading needs `serve.py` locally.
+- The published dashboard runs in *read-only mode*: because it isn't
+  served from `localhost`, it hides the grade + edit UI and shows a
+  banner reminding you that grading needs `serve.py` locally.
 
 ### One-time GitHub setup
 
