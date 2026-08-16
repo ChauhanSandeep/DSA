@@ -323,10 +323,50 @@ def load_cycle() -> dict | None:
     return None
 
 
-def save_cycle(week_of: str, target: int) -> None:
-    CYCLE_JSON.write_text(
-        json.dumps({"weekOf": week_of, "target": target}, indent=2) + "\n"
-    )
+def save_cycle(week_of: str, target: int, queue: list[str] | None = None) -> None:
+    """Persist the weekly cycle, preserving the frozen queue across writes.
+
+    The `queue` is this week's *stable* ordered problem set used for Prev/Next
+    navigation; it must survive target-only updates (e.g. load-more) and the
+    idempotent rebuilds triggered by grading, or navigation would drift as
+    solved problems leave the live due-queue.
+    """
+    payload: dict = {"weekOf": week_of, "target": target}
+    if queue is not None:
+        payload["queue"] = queue
+    else:
+        existing = load_cycle()
+        if (existing and existing.get("weekOf") == week_of
+                and isinstance(existing.get("queue"), list)):
+            payload["queue"] = existing["queue"]
+    CYCLE_JSON.write_text(json.dumps(payload, indent=2) + "\n")
+
+
+def ensure_week_queue(state: dict, review_day: date, target: int) -> list[str]:
+    """Frozen ordered task list for this week's Prev/Next set.
+
+    Computed once per week from pick_queue and persisted in cycle.json, so the
+    navigation set stays stable even as graded problems leave the live
+    due-queue. Grows toward `target` when the user loads more, but never
+    reorders or drops existing entries; stale tasks (renamed/removed) are pruned.
+    """
+    week_of = review_day.isoformat()
+    cycle = load_cycle() or {}
+    frozen = cycle.get("queue") if cycle.get("weekOf") == week_of else None
+    frozen = [t for t in frozen if t in state["problems"]] if isinstance(frozen, list) else []
+
+    if len(frozen) < target:
+        seen = set(frozen)
+        live = [p["task"] for p in pick_queue(state, review_day, max(QUEUE_SIZE, target))]
+        for task in live:
+            if len(frozen) >= target:
+                break
+            if task not in seen:
+                frozen.append(task)
+                seen.add(task)
+
+    save_cycle(week_of, cycle.get("target", target), queue=frozen)
+    return frozen
 
 
 def ensure_cycle(review_day: date) -> dict:
@@ -1562,11 +1602,13 @@ def build() -> int:
     # Dashboard
     write(SITE_DIR / "index.html", render_dashboard(state, today))
 
-    # Problem pages. Compute this week's ordered queue once so each problem
-    # page can render Prev/Next across the same set the dashboard shows.
+    # Problem pages. Freeze this week's ordered set (persisted in cycle.json)
+    # so Prev/Next stays stable all week — solved problems remain in the set
+    # instead of dropping out and letting new ones backfill the tail.
     leetcode_index = build_leetcode_number_index(state)
     review_day = coming_saturday(today)
-    week_tasks = [p["task"] for p in pick_queue(state, review_day, QUEUE_SIZE)]
+    target = ensure_cycle(review_day)["target"]
+    week_tasks = ensure_week_queue(state, review_day, target)
     for problem in state["problems"].values():
         page = render_problem_page(problem, today, leetcode_index, week_tasks)
         write(SITE_DIR / "problems" / f"{problem['task']}.html", page)

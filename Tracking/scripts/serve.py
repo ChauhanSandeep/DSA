@@ -227,6 +227,10 @@ def load_more_batch() -> dict:
             cycle = {"weekOf": review_iso, "target": WEEKLY_GOAL}
         new_target = int(cycle.get("target", WEEKLY_GOAL)) + WEEKLY_GOAL
         payload = {"weekOf": review_iso, "target": new_target}
+        # Preserve the frozen navigation queue; the next rebuild extends it to
+        # the new target rather than reshuffling this week's set.
+        if isinstance(cycle.get("queue"), list) and cycle.get("weekOf") == review_iso:
+            payload["queue"] = cycle["queue"]
         tmp = CYCLE_JSON.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(payload, indent=2) + "\n")
         os.replace(tmp, CYCLE_JSON)
