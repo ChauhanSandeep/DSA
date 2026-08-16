@@ -4118,17 +4118,21 @@
         "band": null
       },
       "sm2": {
-        "easeFactor": 2.35,
-        "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-11",
-        "lastGrade": "hint"
+        "easeFactor": 2.5,
+        "intervalDays": 20,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-09-05",
+        "lastGrade": "trivial"
       },
       "history": [
         {
           "date": "2026-08-08",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "trivial"
         }
       ],
       "userNotes": "",
