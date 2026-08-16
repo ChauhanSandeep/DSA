@@ -145,6 +145,15 @@ html, body {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+/* User-adjustable text size. `--ui-scale` is set inline before paint
+ * (see SCALE_INIT in build.py) and toggled by the A−/A+ nav controls
+ * (see app.js). Defaults to a slightly-enlarged 1.08 baseline. `zoom`
+ * scales every fixed-px component uniformly, which the rest of this
+ * stylesheet relies on. */
+body {
+  zoom: var(--ui-scale, 1.08);
+}
+
 ::selection {
   background: color-mix(in srgb, var(--accent-2) 60%, transparent);
   color: var(--fg-primary);
@@ -225,6 +234,38 @@ a:hover { color: var(--accent-2); text-decoration: underline; }
   color: var(--fg-primary);
   border-color: var(--accent);
 }
+
+/* Text-size (A− / A+) controls — grouped, styled to match the theme toggle. */
+.text-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.text-size-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--fg-muted);
+  height: 34px;
+  min-width: 34px;
+  padding: 0 8px;
+  cursor: pointer;
+  font-family: var(--font-header);
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+.text-size-btn:hover {
+  color: var(--fg-primary);
+  border-color: var(--accent);
+}
+.text-size-btn .text-size-minus { font-size: 0.8em; margin-left: 1px; }
+.text-size-btn .text-size-plus  { font-size: 0.9em; margin-left: 1px; }
+.text-size-btn:first-child { font-size: 12px; }
+.text-size-btn:last-child  { font-size: 15px; }
 .theme-toggle svg { width: 16px; height: 16px; }
 .theme-toggle .icon-sun,
 .theme-toggle .icon-moon { display: none; }

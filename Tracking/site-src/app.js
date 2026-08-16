@@ -568,6 +568,7 @@
     initProblemPage();
     initDashboard();
     initThemeToggle();
+    initTextSize();
     initQaCard();
     initPatternPage();
     initBrowsePage();
@@ -677,6 +678,43 @@
     const btn = document.querySelector("[data-action='toggle-theme']");
     if (btn) btn.addEventListener("click", toggleTheme);
     updatePrismTheme(currentTheme());
+  }
+
+  // --------------------------------------------------------------------------
+  // Text-size control. Scales the whole page via the `--ui-scale` custom
+  // property (CSS: `body { zoom: var(--ui-scale, 1.08); }`). Persisted to
+  // localStorage and applied inline before paint by SCALE_INIT in build.py.
+  // --------------------------------------------------------------------------
+  const TEXT_SCALE_KEY = "dsa-tracker.textScale";
+  const TEXT_SCALE_DEFAULT = 1.08;
+  const TEXT_SCALE_MIN = 0.8;
+  const TEXT_SCALE_MAX = 1.6;
+  const TEXT_SCALE_STEP = 0.08;
+
+  function currentTextScale() {
+    const inline = parseFloat(
+      document.documentElement.style.getPropertyValue("--ui-scale"));
+    if (inline >= TEXT_SCALE_MIN && inline <= TEXT_SCALE_MAX) return inline;
+    let stored = NaN;
+    try { stored = parseFloat(localStorage.getItem(TEXT_SCALE_KEY)); } catch (e) {}
+    if (stored >= TEXT_SCALE_MIN && stored <= TEXT_SCALE_MAX) return stored;
+    return TEXT_SCALE_DEFAULT;
+  }
+
+  function applyTextScale(scale) {
+    const s = clamp(Math.round(scale * 100) / 100, TEXT_SCALE_MIN, TEXT_SCALE_MAX);
+    document.documentElement.style.setProperty("--ui-scale", s);
+    try { localStorage.setItem(TEXT_SCALE_KEY, String(s)); } catch (e) {}
+    return s;
+  }
+
+  function initTextSize() {
+    const smaller = document.querySelector("[data-action='text-smaller']");
+    const larger = document.querySelector("[data-action='text-larger']");
+    if (smaller) smaller.addEventListener("click",
+      () => applyTextScale(currentTextScale() - TEXT_SCALE_STEP));
+    if (larger) larger.addEventListener("click",
+      () => applyTextScale(currentTextScale() + TEXT_SCALE_STEP));
   }
 
   // --------------------------------------------------------------------------

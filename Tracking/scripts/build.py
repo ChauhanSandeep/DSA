@@ -168,6 +168,11 @@ FONT_LINKS = (
 # so there's no light-flash-on-dark-load.
 THEME_INIT = """<script>(function(){try{var t=localStorage.getItem('dsa-tracker.theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>"""
 
+# Inline early-run script that applies the persisted text-size scale before CSS
+# paints, so the page doesn't visibly resize after load. Mirrors THEME_INIT.
+# The CSS default (var(--ui-scale, 1.08)) makes the baseline a bit larger.
+SCALE_INIT = """<script>(function(){try{var s=parseFloat(localStorage.getItem('dsa-tracker.textScale'));if(s>=0.8&&s<=1.6){document.documentElement.style.setProperty('--ui-scale',s);}}catch(e){}})();</script>"""
+
 # Prism.js highlighter + GitHub themes (assets copied by build).
 PRISM_LINKS = (
     '<link rel="stylesheet" href="{root}assets/prism/github-light.css" '
@@ -188,6 +193,7 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{esc(title)}</title>
   {THEME_INIT}
+  {SCALE_INIT}
   {FONT_LINKS}
   <link rel="stylesheet" href="{{root}}assets/styles.css?v={ASSET_VERSION}">
   {PRISM_LINKS}
@@ -201,6 +207,10 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
         <a href="{{root}}index.html">Queue</a>
         <a href="{{root}}browse.html">Browse</a>
         <a href="{{root}}patterns/index.html">Patterns</a>
+        <div class="text-size" role="group" aria-label="Text size">
+          <button class="text-size-btn" aria-label="Decrease text size" title="Decrease text size" data-action="text-smaller">A<span class="text-size-minus">−</span></button>
+          <button class="text-size-btn" aria-label="Increase text size" title="Increase text size" data-action="text-larger">A<span class="text-size-plus">+</span></button>
+        </div>
         <button class="theme-toggle" aria-label="Toggle color theme" data-action="toggle-theme">
           {SUN_ICON}{MOON_ICON}
         </button>
