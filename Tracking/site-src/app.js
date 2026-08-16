@@ -406,6 +406,7 @@
       const pending = loadPending();
       if (pending[task]) { delete pending[task]; savePending(pending); }
       renderPendingBanner();
+      maybeAdvanceToNext();
       return;
     }
 
@@ -447,6 +448,19 @@
       );
       renderPendingBanner();
     }
+  }
+
+  // --------------------------------------------------------------------------
+  // Auto-advance: after grading a problem that's part of this week's set, hop
+  // to the next problem so "grade → next → grade" flows without extra clicks.
+  // Reuses the Prev/Next nav link the page already renders; if this is the
+  // last problem (Next is a disabled span, no href), we simply stay put.
+  // --------------------------------------------------------------------------
+  function maybeAdvanceToNext() {
+    const next = document.querySelector(".problem-nav-btn.next[href]");
+    if (!next) return;
+    // Brief pause so the "Saved" toast is visible before we navigate.
+    setTimeout(() => { window.location.href = next.getAttribute("href"); }, 650);
   }
 
   // --------------------------------------------------------------------------
