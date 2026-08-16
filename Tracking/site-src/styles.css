@@ -147,10 +147,15 @@ html, body {
 
 /* User-adjustable text size. `--ui-scale` is set inline before paint
  * (see SCALE_INIT in build.py) and toggled by the A−/A+ nav controls
- * (see app.js). Defaults to a slightly-enlarged 1.08 baseline. `zoom`
- * scales every fixed-px component uniformly, which the rest of this
- * stylesheet relies on. */
-body {
+ * (see app.js). Defaults to a slightly-enlarged 1.08 baseline.
+ *
+ * Zoom is applied to `.container` (the page content) rather than `body`
+ * so that body-level fixed overlays — toast, confetti, the celebration
+ * pop — are NOT scaled: a fixed element inside a zoomed ancestor is
+ * positioned in the zoomed coordinate space and drifts off-centre/off
+ * screen. Keeping them outside the zoom lets `position: fixed` behave
+ * normally at any text size. */
+.container {
   zoom: var(--ui-scale, 1.08);
 }
 
