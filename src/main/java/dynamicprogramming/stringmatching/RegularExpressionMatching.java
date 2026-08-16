@@ -97,7 +97,6 @@ public boolean isMatch(String str, String pattern) {
     return dp[stringLength][patternLength];
   }
 
-  // Helper method to check if character matches pattern character
   /** Checks whether a string character matches one pattern character. */
   private boolean charMatches(char sChar, char pChar) {
     return pChar == '.' || sChar == pChar;

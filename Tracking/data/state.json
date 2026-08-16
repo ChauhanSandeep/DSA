@@ -3368,11 +3368,11 @@
       },
       "sm2": {
         "easeFactor": 2.0999999999999996,
-        "intervalDays": 3,
-        "repetitions": 0,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-11",
-        "lastGrade": "blank"
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-21",
+        "lastGrade": "solved"
       },
       "history": [
         {
@@ -3386,6 +3386,10 @@
         {
           "date": "2026-08-08",
           "grade": "blank"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -5235,13 +5239,22 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "intervalDays": 9,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-25",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": true,
@@ -9843,13 +9856,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-21",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": true,
@@ -10253,11 +10271,11 @@
       },
       "sm2": {
         "easeFactor": 2.2,
-        "intervalDays": 3,
-        "repetitions": 2,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-11",
-        "lastGrade": "hint"
+        "intervalDays": 5,
+        "repetitions": 3,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-21",
+        "lastGrade": "solved"
       },
       "history": [
         {
@@ -10267,6 +10285,10 @@
         {
           "date": "2026-08-08",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -11287,10 +11309,10 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 9,
-        "repetitions": 2,
-        "lastReviewed": "2026-08-01",
-        "nextDue": "2026-08-10",
+        "intervalDays": 14,
+        "repetitions": 3,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-30",
         "lastGrade": "solved"
       },
       "history": [
@@ -11300,6 +11322,10 @@
         },
         {
           "date": "2026-08-01",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-16",
           "grade": "solved"
         }
       ],
@@ -16216,11 +16242,11 @@
       },
       "sm2": {
         "easeFactor": 2.0500000000000003,
-        "intervalDays": 3,
-        "repetitions": 3,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-11",
-        "lastGrade": "hint"
+        "intervalDays": 4,
+        "repetitions": 4,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-20",
+        "lastGrade": "solved"
       },
       "history": [
         {
@@ -16234,6 +16260,10 @@
         {
           "date": "2026-08-08",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -16935,11 +16965,11 @@
       },
       "sm2": {
         "easeFactor": 2.35,
-        "intervalDays": 4,
-        "repetitions": 2,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-12",
-        "lastGrade": "hint"
+        "intervalDays": 6,
+        "repetitions": 3,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-22",
+        "lastGrade": "solved"
       },
       "history": [
         {
@@ -16949,6 +16979,10 @@
         {
           "date": "2026-08-08",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -17723,15 +17757,19 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 5,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-13",
+        "intervalDays": 9,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-25",
         "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-08-08",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-16",
           "grade": "solved"
         }
       ],
@@ -22689,16 +22727,20 @@
       },
       "sm2": {
         "easeFactor": 2.35,
-        "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-11",
-        "lastGrade": "hint"
+        "intervalDays": 9,
+        "repetitions": 2,
+        "lastReviewed": "2026-08-16",
+        "nextDue": "2026-08-25",
+        "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-08-08",
           "grade": "hint"
+        },
+        {
+          "date": "2026-08-16",
+          "grade": "solved"
         }
       ],
       "userNotes": "",

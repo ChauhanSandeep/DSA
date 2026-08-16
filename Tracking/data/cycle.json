@@ -1,4 +1,16 @@
 {
   "weekOf": "2026-08-22",
-  "target": 10
+  "target": 10,
+  "queue": [
+    "RegularExpressionMatching",
+    "Division",
+    "ReverseListInKGroup",
+    "ReversePairs",
+    "SwimInRisingWater__graphs",
+    "MaxPointsOnALine",
+    "FindTheClosestPalindrome",
+    "LongestSubstringWithoutRepeatingCharacters",
+    "CanPlaceFlowers",
+    "WordLadder2"
+  ]
 }

@@ -6,27 +6,27 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * ✅ Problem: Word Search II
+ * Problem: Word Search II
  *
  * Given an {@code m x n} board of lowercase letters and a dictionary of words,
  * return every word that can be formed by walking through horizontally or
  * vertically adjacent cells. A single cell may be used at most once per word.
  *
- * 🔗 Leetcode: https://leetcode.com/problems/word-search-ii/   (Hard)
- * 🏷️ Pattern:  Trie · Board DFS backtracking · Prefix pruning
+ * Leetcode: https://leetcode.com/problems/word-search-ii/   (Hard)
+ * Pattern:  Trie · Board DFS backtracking · Prefix pruning
  *
- * 🧪 Example:
+ * Example:
  *   Input:  board = [[o,a,a,n],[e,t,a,e],[i,h,k,r],[i,f,l,v]], words = [oath,pea,eat,rain]
  *   Output: [eat, oath]
  *   Why:    "oath" and "eat" have adjacent, non-reusing paths; "pea" has no
  *           starting cell and "rain" cannot be connected on the board.
  *
- * 🚧 Edge cases to remember:
+ * Edge cases to remember:
  *   - null / empty board or words → empty list
  *   - duplicate paths to one word  → clear the terminal word after reporting it
  *   - repeated words in dictionary → still reported once (word cleared on first hit)
  *
- * 🔍 Follow-ups:
+ * Follow-ups:
  *   1. Huge dictionary? The trie already stops a path the moment its prefix
  *      leaves the trie, so search cost scales with the board, not the word count.
  *   2. Dictionary changes between searches? Keep a mutable trie and update only
@@ -34,7 +34,7 @@ import java.util.List;
  *   3. Diagonal or 3D movement? Swap the fixed 4-neighbor offsets for the
  *      allowed neighbor set.
  *
- * 🔁 Related: Word Search (79), Implement Trie (208), Add and Search Words (211).
+ * Related: Word Search (79), Implement Trie (208), Add and Search Words (211).
  */
 public class WordSearchII {
 
@@ -42,7 +42,7 @@ public class WordSearchII {
     private static final char VISITED = '#';
 
     /**
-     * 🧠 Intuition: searching the board once per word repeats the same prefix
+     * Intuition: searching the board once per word repeats the same prefix
      * walks. A trie collapses that work — one board path represents every word
      * sharing its prefix, so the instant the next board character has no trie
      * edge, no dictionary word can complete along that path and we bail out.
@@ -82,7 +82,7 @@ public class WordSearchII {
     }
 
     /**
-     * 🧠 Intuition: {@code parent} is the trie node reached just before this
+     * Intuition: {@code parent} is the trie node reached just before this
      * cell, so the current character must be one of its child edges. If that
      * edge is missing the path is not a valid prefix and we return immediately.
      *

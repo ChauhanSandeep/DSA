@@ -80,7 +80,7 @@ public class DecodeWays {
         return ways;
     }
 
-        /**
+    /**
      * Intuition: dp[i] means the number of ways to decode the prefix input[0..i-1].
      * The last decoded letter of that prefix must use either the final one digit
      * or the final two digits. If the one-digit piece is valid, every decoding of

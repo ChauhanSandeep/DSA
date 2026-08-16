@@ -104,24 +104,24 @@ public static void main(String[] args) {
     }
 
     /**
- * Intuition: after sorting, fix one value and the remaining problem is Two
- * Sum II on the suffix. Moving leftPointer right increases the pair sum;
- * moving rightPointer left decreases it. Skipping equal values prevents the
- * same triplet from being emitted more than once.
- *
- * Algorithm:
- *   1. Return an empty list for null or too-short input.
- *   2. Sort nums so duplicates are adjacent and two pointers are valid.
- *   3. For each unique firstIndex, set requiredSum = targetSum - nums[firstIndex].
- *   4. Scan the suffix with leftPointer and rightPointer, adding matches and skipping duplicates.
- *
- * Time:  O(n^2) - each fixed firstIndex runs one linear two-pointer scan.
- * Space: O(1) - excluding the output list and sorting implementation storage.
- *
- * @param nums input array, sorted in place by this method
- * @param targetSum desired triplet sum
- * @return unique triplets whose values sum to targetSum
- */
+     * Intuition: after sorting, fix one value and the remaining problem is Two
+     * Sum II on the suffix. Moving leftPointer right increases the pair sum;
+     * moving rightPointer left decreases it. Skipping equal values prevents the
+     * same triplet from being emitted more than once.
+     *
+     * Algorithm:
+     *   1. Return an empty list for null or too-short input.
+     *   2. Sort nums so duplicates are adjacent and two pointers are valid.
+     *   3. For each unique firstIndex, set requiredSum = targetSum - nums[firstIndex].
+     *   4. Scan the suffix with leftPointer and rightPointer, adding matches and skipping duplicates.
+     *
+     * Time:  O(n^2) - each fixed firstIndex runs one linear two-pointer scan.
+     * Space: O(1) - excluding the output list and sorting implementation storage.
+     *
+     * @param nums input array, sorted in place by this method
+     * @param targetSum desired triplet sum
+     * @return unique triplets whose values sum to targetSum
+     */
     public List<List<Integer>> threeSumGeneral(int[] nums, int targetSum) {
         List<List<Integer>> triplets = new ArrayList<>();
         if (nums == null || nums.length < 3) {
