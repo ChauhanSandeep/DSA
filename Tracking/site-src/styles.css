@@ -912,6 +912,42 @@ code[class*="language-"] {
   border-radius: 3px;
 }
 
+/* Disable programming ligatures. JetBrains Mono fuses `!=`→≠, `->`→→,
+ * `>=`/`<=`/`==` via the calt/liga OpenType features; we want the raw
+ * operators shown. Text content is unaffected (copy-paste already yields
+ * the literal characters). */
+pre.code,
+code[class*="language-"],
+:not(pre) > code,
+.mono {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+/* Bracket matching (Prism match-braces plugin). Depth colors themed to the
+ * warm palette; higher specificity than the plugin CSS (which loads after
+ * this file) so these win regardless of source order. */
+pre.code.rainbow-braces .token.punctuation.brace-level-1,
+pre.code.rainbow-braces .token.punctuation.brace-level-5,
+pre.code.rainbow-braces .token.punctuation.brace-level-9  { color: var(--accent);   opacity: 1; }
+pre.code.rainbow-braces .token.punctuation.brace-level-2,
+pre.code.rainbow-braces .token.punctuation.brace-level-6,
+pre.code.rainbow-braces .token.punctuation.brace-level-10 { color: #6fa96f; opacity: 1; }
+pre.code.rainbow-braces .token.punctuation.brace-level-3,
+pre.code.rainbow-braces .token.punctuation.brace-level-7,
+pre.code.rainbow-braces .token.punctuation.brace-level-11 { color: #4d84c9; opacity: 1; }
+pre.code.rainbow-braces .token.punctuation.brace-level-4,
+pre.code.rainbow-braces .token.punctuation.brace-level-8,
+pre.code.rainbow-braces .token.punctuation.brace-level-12 { color: #cf9a4a; opacity: 1; }
+
+/* Hover/selected partner highlight — themed outline + subtle fill. */
+pre.code .token.punctuation.brace-hover,
+pre.code .token.punctuation.brace-selected {
+  outline: solid 1px var(--accent-2);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: 2px;
+}
+
 
 /* =============================================================
  * 11. Grade bar (sticky)

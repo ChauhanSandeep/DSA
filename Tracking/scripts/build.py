@@ -179,6 +179,7 @@ PRISM_LINKS = (
     'media="(prefers-color-scheme: light)" id="prism-light">'
     '<link rel="stylesheet" href="{root}assets/prism/github-dark.css" '
     'media="(prefers-color-scheme: dark)" id="prism-dark">'
+    '<link rel="stylesheet" href="{root}assets/prism/prism-match-braces.min.css">'
 )
 
 
@@ -223,6 +224,7 @@ def base_layout(title: str, body: str, back_link: str = "") -> str:
     </div>
   </div>
   <script src="{{root}}assets/prism/prism.js" defer></script>
+  <script src="{{root}}assets/prism/prism-match-braces.min.js" defer></script>
   <script src="{{root}}assets/app.js?v={ASSET_VERSION}" defer></script>
 </body>
 </html>
@@ -1100,7 +1102,7 @@ def render_problem_page(problem: dict, today: date, leetcode_index: dict[int, st
     <details class="reveal">
       <summary>Reveal my solution <span class="mono dim" style="margin-left:8px">(Enter)</span></summary>
       <div class="content">
-        <pre class="code language-java"><code class="language-java">{esc(code_body)}</code></pre>
+        <pre class="code language-java match-braces rainbow-braces"><code class="language-java">{esc(code_body)}</code></pre>
       </div>
     </details>
 
