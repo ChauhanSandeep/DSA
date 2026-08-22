@@ -438,12 +438,9 @@ def render_dashboard(state: dict, today: date) -> str:
     review_day = coming_saturday(today)
     cycle = ensure_cycle(review_day)
     target = cycle["target"]
+    week_tasks = ensure_week_queue(state, review_day, target)
     solved_count = count_solved_this_week(state, review_day)
     remaining = max(0, target - solved_count)
-    # Pending = up to `remaining` unsolved, hardest-due problems (shrinks toward
-    # zero as the goal is met). Solved-this-week problems stay listed too, marked
-    # done, so the page shows the full picture of the week's progress.
-    pending = pick_queue(state, review_day, QUEUE_SIZE)[:remaining]
     since = week_start_iso(review_day)
     solved_entries = [
         entry for entry in state["problems"].values()
@@ -452,6 +449,16 @@ def render_dashboard(state: dict, today: date) -> str:
         and entry["sm2"]["lastReviewed"] >= since
     ]
     solved_entries.sort(key=lambda entry: entry["sm2"]["lastReviewed"], reverse=True)
+    # Pending = the frozen weekly set minus what's already solved this week, in
+    # the frozen order. This is the SAME set the problem-page Prev/Next nav
+    # walks (ensure_week_queue), so the index and the nav can never disagree —
+    # every problem the Next button can reach is listed here or under "solved".
+    solved_tasks = {entry["task"] for entry in solved_entries}
+    pending = [
+        state["problems"][task]
+        for task in week_tasks
+        if task not in solved_tasks and task in state["problems"]
+    ]
     all_problems = list(state["problems"].values())
 
     total = len(all_problems)
