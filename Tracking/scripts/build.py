@@ -43,7 +43,6 @@ from _queue import (  # noqa: E402
     coming_saturday,
     DIFFICULTY_RANK,
     effective_difficulty,
-    count_solved_this_week,
     week_start_iso,
 )
 from _javadoc import (  # noqa: E402
@@ -439,21 +438,29 @@ def render_dashboard(state: dict, today: date) -> str:
     cycle = ensure_cycle(review_day)
     target = cycle["target"]
     week_tasks = ensure_week_queue(state, review_day, target)
-    solved_count = count_solved_this_week(state, review_day)
-    remaining = max(0, target - solved_count)
     since = week_start_iso(review_day)
-    solved_entries = [
-        entry for entry in state["problems"].values()
-        if not entry.get("flags", {}).get("skip")
-        and entry.get("sm2", {}).get("lastReviewed")
-        and entry["sm2"]["lastReviewed"] >= since
-    ]
+    # Everything about "this week" is measured over the FROZEN set (week_tasks),
+    # the same ordered list the problem-page Prev/Next nav walks. Measuring the
+    # count, the pending list, and the solved list from one source keeps them in
+    # perfect agreement: solved entries stay listed as done, every unsolved
+    # entry the Next button can reach is listed as pending, and the "X/target
+    # solved" header always matches the number of rows shown.
+    def solved_this_week(entry: dict) -> bool:
+        last_reviewed = entry.get("sm2", {}).get("lastReviewed")
+        return bool(
+            last_reviewed
+            and last_reviewed >= since
+            and not entry.get("flags", {}).get("skip")
+        )
+
+    solved_tasks = {
+        task for task in week_tasks
+        if task in state["problems"] and solved_this_week(state["problems"][task])
+    }
+    solved_count = len(solved_tasks)
+    remaining = max(0, target - solved_count)
+    solved_entries = [state["problems"][task] for task in week_tasks if task in solved_tasks]
     solved_entries.sort(key=lambda entry: entry["sm2"]["lastReviewed"], reverse=True)
-    # Pending = the frozen weekly set minus what's already solved this week, in
-    # the frozen order. This is the SAME set the problem-page Prev/Next nav
-    # walks (ensure_week_queue), so the index and the nav can never disagree —
-    # every problem the Next button can reach is listed here or under "solved".
-    solved_tasks = {entry["task"] for entry in solved_entries}
     pending = [
         state["problems"][task]
         for task in week_tasks
