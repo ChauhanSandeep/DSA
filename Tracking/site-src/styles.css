@@ -193,6 +193,13 @@ body {
   zoom: var(--ui-scale, 1.08);
 }
 
+/* On phones the zoom-based text scale would push the width-filling container
+ * ~8% past the viewport (horizontal scroll / clipped right edge). Render at
+ * 1.0 there; pinch-zoom covers manual enlargement on touch. */
+@media (max-width: 600px) {
+  .container { zoom: 1; }
+}
+
 ::selection {
   background: color-mix(in srgb, var(--accent-2) 60%, transparent);
   color: var(--fg-primary);
@@ -1717,7 +1724,8 @@ details.pattern-item[open] .pattern-item-chevron { transform: rotate(90deg); }
 .deadline-countdown {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   padding: 11px 16px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
