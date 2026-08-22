@@ -25,28 +25,32 @@
 :root {
   color-scheme: light dark;
 
-  /* Light palette (default) */
-  --palette-light:      #f5f1e6;   /* Anthropic Oat — page bg           */
-  --palette-lightgray:  #e6e0cf;   /* warm beige — surfaces / borders   */
-  --palette-gray:       #8c7e6a;   /* warm muted — icons                */
-  --palette-darkgray:   #5a4f40;   /* warm subtext                      */
-  --palette-dark:       #1f1b16;   /* near-black, warm — primary text   */
-  --palette-secondary:  #cc785c;   /* Book Cloth — links / accent       */
-  --palette-tertiary:   #a05a3f;   /* deeper clay — secondary accent    */
-  --palette-highlight:      rgba(204, 120, 92, 0.08);
-  --palette-text-highlight: rgba(204, 120, 92, 0.28);
+  /* Light palette — "blueprint / drafting table" (cool, not warm cream) */
+  --palette-light:      #eef1f4;   /* cool porcelain — page bg           */
+  --palette-lightgray:  #e3e8ee;   /* cool surface / row bg              */
+  --palette-gray:       #7a8794;   /* slate muted — icons / captions     */
+  --palette-darkgray:   #3f4a55;   /* slate subtext / body               */
+  --palette-dark:       #12181d;   /* near-black slate — primary text    */
+  --palette-secondary:  #0f8f7e;   /* deep teal — links / signal accent  */
+  --palette-tertiary:   #0b6d60;   /* deeper teal — hover / accent-2      */
+  --palette-highlight:      rgba(15, 143, 126, 0.08);
+  --palette-text-highlight: rgba(15, 143, 126, 0.26);
 
   /* Semantic aliases — light mode */
   --bg-page:     var(--palette-light);
   --bg-surface:  var(--palette-lightgray);
-  --bg-code:     #ecdfcf;
+  --bg-code:     #e2e8ee;
   --fg-primary:  var(--palette-dark);
   --fg-body:     var(--palette-darkgray);
   --fg-muted:    var(--palette-gray);
-  --border:      color-mix(in srgb, var(--palette-darkgray) 18%, transparent);
+  --line:        #d3dae1;   /* hairline grid / borders (drafting rule)   */
+  --border:      var(--line);
   --accent:      var(--palette-secondary);
   --accent-2:    var(--palette-tertiary);
+  --signal:      var(--palette-secondary);
+  --due:         #d98514;   /* amber — deadline / urgency / "due" marks  */
   --highlight:   var(--palette-highlight);
+  --grid-line:   rgba(18, 24, 29, 0.035);  /* graph-paper backdrop       */
 
   /* Grade semantics (kept warm, not competing with primary accent) */
   --grade-trivial: #6fa96f;
@@ -74,6 +78,7 @@
   --page-max:    1280px;
   --top-space:   4rem;
 
+  --font-display: "Space Grotesk", "Inter", system-ui, -apple-system, sans-serif;
   --font-header: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-body:   "Atkinson Hyperlegible", system-ui, -apple-system, sans-serif;
   --font-code:   "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -83,17 +88,20 @@
    sets it explicitly. Explicit light override falls back to :root. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --palette-light:      #1a1714;
-    --palette-lightgray:  #2c2823;
-    --palette-gray:       #8b8273;
-    --palette-darkgray:   #b8afa0;
-    --palette-dark:       #ede6d6;
-    --palette-secondary:  #d99077;
-    --palette-tertiary:   #bb7159;
-    --palette-highlight:      rgba(217, 144, 119, 0.12);
-    --palette-text-highlight: rgba(217, 144, 119, 0.32);
+    --palette-light:      #0e1317;
+    --palette-lightgray:  #151c22;
+    --palette-gray:       #93a1af;
+    --palette-darkgray:   #b6c2cd;
+    --palette-dark:       #e7edf2;
+    --palette-secondary:  #37b7a3;
+    --palette-tertiary:   #63c9b8;
+    --palette-highlight:      rgba(55, 183, 163, 0.14);
+    --palette-text-highlight: rgba(55, 183, 163, 0.30);
 
-    --bg-code:     #22201c;
+    --bg-code:     #12181d;
+    --line:        #26303a;
+    --due:         #e8a13a;
+    --grid-line:   rgba(231, 237, 242, 0.04);
 
     --nc150-bg:  color-mix(in srgb, #d9b06a 15%, transparent);
     --nc150-fg:  #e0c58b;
@@ -103,17 +111,20 @@
 }
 
 [data-theme="dark"] {
-  --palette-light:      #1a1714;
-  --palette-lightgray:  #2c2823;
-  --palette-gray:       #8b8273;
-  --palette-darkgray:   #b8afa0;
-  --palette-dark:       #ede6d6;
-  --palette-secondary:  #d99077;
-  --palette-tertiary:   #bb7159;
-  --palette-highlight:      rgba(217, 144, 119, 0.12);
-  --palette-text-highlight: rgba(217, 144, 119, 0.32);
+  --palette-light:      #0e1317;
+  --palette-lightgray:  #151c22;
+  --palette-gray:       #93a1af;
+  --palette-darkgray:   #b6c2cd;
+  --palette-dark:       #e7edf2;
+  --palette-secondary:  #37b7a3;
+  --palette-tertiary:   #63c9b8;
+  --palette-highlight:      rgba(55, 183, 163, 0.14);
+  --palette-text-highlight: rgba(55, 183, 163, 0.30);
 
-  --bg-code:     #22201c;
+  --bg-code:     #12181d;
+  --line:        #26303a;
+  --due:         #e8a13a;
+  --grid-line:   rgba(231, 237, 242, 0.04);
 
   --nc150-bg:  color-mix(in srgb, #d9b06a 15%, transparent);
   --nc150-fg:  #e0c58b;
@@ -143,6 +154,26 @@ html, body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Signature: faint graph-paper backdrop — DSA lives in grids/arrays/trees,
+ * so a drafting grid quietly grounds the whole surface. Fixed so it doesn't
+ * scroll away; kept very low-contrast via --grid-line. */
+body {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center top;
+  background-attachment: fixed;
+}
+
+/* Visible keyboard focus everywhere (quality floor). Pointer users don't
+ * see it thanks to :focus-visible. */
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 /* User-adjustable text size. `--ui-scale` is set inline before paint
@@ -194,7 +225,7 @@ a:hover { color: var(--accent-2); text-decoration: underline; }
 
 .site-header h1 {
   margin: 0;
-  font-family: var(--font-header);
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -288,7 +319,7 @@ a:hover { color: var(--accent-2); text-decoration: underline; }
  * ============================================================= */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-header);
+  font-family: var(--font-display);
   color: var(--fg-primary);
   font-weight: 700;
   letter-spacing: -0.01em;

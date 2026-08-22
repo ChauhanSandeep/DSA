@@ -153,11 +153,14 @@ MOON_ICON = (
     '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
 )
 
-# Google Fonts — Inter, Atkinson Hyperlegible, JetBrains Mono. Matches Quartz.
+# Google Fonts. Space Grotesk (display/headings) is the redesign's characterful
+# face; Atkinson Hyperlegible (body) and JetBrains Mono (data/code) are kept for
+# legibility. Inter stays as a neutral UI fallback for small controls.
 FONT_LINKS = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
     '<link href="https://fonts.googleapis.com/css2?'
+    'family=Space+Grotesk:wght@400;500;600;700&'
     'family=Inter:wght@400;500;600;700&'
     'family=Atkinson+Hyperlegible:wght@400;700&'
     'family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">'
