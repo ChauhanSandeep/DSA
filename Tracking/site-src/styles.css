@@ -313,6 +313,15 @@ h2 {
   display: grid;
   gap: 12px;
 }
+.queue-divider {
+  margin: 10px 2px 2px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
 .queue-item {
   background: var(--bg-surface);
   border: 1px solid var(--border);

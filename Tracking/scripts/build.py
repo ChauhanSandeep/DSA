@@ -490,11 +490,28 @@ def render_dashboard(state: dict, today: date) -> str:
     </div>
     """
 
+    # Order the week's set as: due re-reviews first (previously solved, now due
+    # again), then everything already completed this week, then brand-new
+    # problems last. New material never leads the page — the reader sees their
+    # revision work first and treats never-seen problems as the tail-end goal.
+    pending_revision = [p for p in pending if p.get("sm2", {}).get("lastReviewed")]
+    pending_new = [p for p in pending if not p.get("sm2", {}).get("lastReviewed")]
+
     rows = []
-    for index, problem in enumerate(pending, 1):
-        rows.append(render_queue_row(problem, index, is_solved=False, today=today))
+    position = 1
+    for problem in pending_revision:
+        rows.append(render_queue_row(problem, position, is_solved=False, today=today))
+        position += 1
     for problem in solved_entries:
         rows.append(render_queue_row(problem, 0, is_solved=True, today=today))
+    if pending_new:
+        rows.append(
+            '<div class="queue-divider">New problems · not reviewed before — '
+            'tackle these once your revision is done</div>'
+        )
+        for problem in pending_new:
+            rows.append(render_queue_row(problem, position, is_solved=False, today=today))
+            position += 1
 
     completion_html = render_batch_complete(target) if remaining == 0 else ""
     if rows:
