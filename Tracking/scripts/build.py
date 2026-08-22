@@ -631,8 +631,6 @@ def render_dashboard(state: dict, today: date) -> str:
 
     {render_momentum_panel(state, today)}
 
-    {render_motivation_stack(state, today)}
-
     {stats}
 
     <h2>{esc(queue_heading)}</h2>
@@ -871,7 +869,15 @@ def compute_gamification(state: dict, today: date) -> dict:
 
 
 def render_momentum_panel(state: dict, today: date) -> str:
+    """One cohesive 'momentum' band: streak, level/XP, the 12-week heatmap, and
+    the trophy case, sharing a single card language.
+
+    The weekly-goal ring that used to live here is intentionally gone — the
+    hero's progress meter already carries 'solved this week', so repeating it
+    was noise (one accessory removed).
+    """
     g = compute_gamification(state, today)
+    dots = compute_weekly_dots(state, today)
 
     if g["week_streak"] >= 1:
         streak_sub = f'best {g["best_streak"]} · keep it alive this week!'
@@ -879,8 +885,28 @@ def render_momentum_panel(state: dict, today: date) -> str:
         streak_sub = "start a streak this Saturday"
     flame = "🔥" if g["week_streak"] >= 1 else "🌱"
 
-    # Trophy case — every achievement is a medallion; earned ones gleam with
-    # their tier metal, locked ones show as dimmed empty slots (curiosity).
+    dot_html_parts = []
+    for dot in dots["dots"]:
+        active_cls = "on" if dot["active"] else "off"
+        tooltip = (
+            f'{dot["label"]} — {dot["count"]} grade(s)' if dot["active"]
+            else f'{dot["label"]} — no reviews'
+        )
+        dot_html_parts.append(
+            f'<div class="week-dot {active_cls}" title="{esc(tooltip)}"></div>'
+        )
+    if dots["streak"] == 0:
+        streak_hint = "No active streak — pick something up this Saturday."
+    elif dots["streak"] == 1:
+        streak_hint = "1 week active — momentum building."
+    else:
+        streak_hint = (
+            f'{dots["streak"]}-week streak · {dots["total_grades_12w"]} '
+            f'grades in the last 12 weeks'
+        )
+
+    # Trophy case — earned medallions gleam with their tier metal, locked ones
+    # show as dimmed slots (curiosity hook).
     earned_count = sum(1 for a in g["achievements"] if a[5])
     total_count = len(g["achievements"])
     trophy_parts = []
@@ -896,62 +922,35 @@ def render_momentum_panel(state: dict, today: date) -> str:
         )
     trophy_html = "".join(trophy_parts)
 
-    goal_sub = "goal smashed! 🎉" if g["goal_pct"] >= 100 else "reviews done this week"
     return f"""
-    <section class="momentum-hero">
-      <div class="mo-card mo-streak">
-        <div class="mo-label">Weekly streak</div>
-        <div class="mo-big">{flame} {g["week_streak"]}</div>
-        <div class="mo-sub">{esc(streak_sub)}</div>
-      </div>
-
-      <div class="mo-card mo-level">
-        <div class="mo-label">Level {g["level"]} · {esc(g["rank"])}</div>
-        <div class="mo-big">{g["xp"]} <span class="mo-unit">XP</span></div>
-        <div class="progress-track" style="margin-top:8px">
-          <div class="progress-fill" style="width:{g["level_pct"]}%"></div>
+    <section class="session-band">
+      <div class="sb-eyebrow">Momentum</div>
+      <div class="sb-grid">
+        <div class="sb-tile">
+          <div class="mo-label">Weekly streak</div>
+          <div class="mo-big">{flame} {g["week_streak"]}</div>
+          <div class="mo-sub">{esc(streak_sub)}</div>
         </div>
-        <div class="mo-sub">{g["xp_to_next"]} XP to level {g["level"] + 1}</div>
-      </div>
 
-      <div class="mo-card mo-goal">
-        <div class="mo-label">This week's goal</div>
-        <div class="mo-ring" style="--pct:{g["goal_pct"]}">
-          <span class="mo-ring-text">{g["this_week_count"]}<span class="mo-ring-sub">/{g["goal"]}</span></span>
+        <div class="sb-tile">
+          <div class="mo-label">Level {g["level"]} · {esc(g["rank"])}</div>
+          <div class="mo-big">{g["xp"]} <span class="mo-unit">XP</span></div>
+          <div class="progress-track" style="margin-top:8px">
+            <div class="progress-fill" style="width:{g["level_pct"]}%"></div>
+          </div>
+          <div class="mo-sub">{g["xp_to_next"]} XP to level {g["level"] + 1}</div>
         </div>
-        <div class="mo-sub">{goal_sub}</div>
+
+        <div class="sb-tile sb-tile-wide">
+          <div class="mo-label">Last 12 weeks</div>
+          <div class="week-dots">{"".join(dot_html_parts)}</div>
+          <div class="mo-sub">{esc(streak_hint)}</div>
+        </div>
       </div>
-    </section>
-    <section class="achievements-bar">
-      <div class="mo-label">🏆 Trophy case <span class="trophy-count">{earned_count}/{total_count}</span></div>
-      <div class="trophy-case">{trophy_html}</div>
-    </section>
-    """
 
-
-def render_motivation_stack(state: dict, today: date) -> str:
-    dots = compute_weekly_dots(state, today)
-
-    dot_html_parts = []
-    for dot in dots["dots"]:
-        active_cls = "on" if dot["active"] else "off"
-        tooltip = f'{dot["label"]} — {dot["count"]} grade(s)' if dot["active"] else f'{dot["label"]} — no reviews'
-        dot_html_parts.append(f'<div class="week-dot {active_cls}" title="{esc(tooltip)}"></div>')
-
-    if dots["streak"] == 0:
-        streak_hint = "No active streak — pick something up this Saturday."
-    elif dots["streak"] == 1:
-        streak_hint = "1 week active — momentum building."
-    else:
-        streak_hint = f'{dots["streak"]}-week streak · {dots["total_grades_12w"]} grades in the last 12 weeks'
-
-    return f"""
-    <section class="motiv-stack">
-
-      <div class="motiv-panel">
-        <div class="motiv-label">Last 12 weeks</div>
-        <div class="week-dots">{"".join(dot_html_parts)}</div>
-        <div class="motiv-hint">{esc(streak_hint)}</div>
+      <div class="sb-trophies">
+        <div class="mo-label">🏆 Trophy case <span class="trophy-count">{earned_count}/{total_count}</span></div>
+        <div class="trophy-case">{trophy_html}</div>
       </div>
     </section>
     """
