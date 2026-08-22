@@ -344,38 +344,63 @@ h2 {
  * ============================================================= */
 
 .queue {
-  display: grid;
-  gap: 12px;
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.queue::before {          /* the track rail the markers sit on */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 42px;
+  width: 2px;
+  background: var(--line);
 }
 .queue-divider {
-  margin: 10px 2px 2px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--border);
-  font-size: 0.82em;
-  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 14px 22px 12px 74px;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--signal) 4%, var(--bg-surface));
+  font-family: var(--font-code);
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--fg-muted);
 }
 .queue-item {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
+  position: relative;
   display: grid;
-  grid-template-columns: 32px 1fr auto;
-  gap: 16px;
+  grid-template-columns: 40px 1fr auto;
+  gap: 18px;
   align-items: center;
-  transition: border-color 0.12s ease, transform 0.08s ease;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.12s ease;
 }
+.queue-item:last-child { border-bottom: 0; }
 .queue-item:hover {
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--signal) 5%, transparent);
 }
-.queue-item .index {
+.queue-item .index {          /* station marker on the rail */
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bg-surface);
+  border: 2px solid var(--line);
   font-family: var(--font-code);
   color: var(--fg-muted);
   font-size: 12px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 .queue-item .title {
   font-family: var(--font-header);
@@ -408,20 +433,14 @@ h2 {
   justify-content: flex-end;
 }
 
-.queue-item.reviewed-today {
-  border-color: color-mix(in srgb, var(--grade-trivial) 45%, transparent);
-  background: color-mix(in srgb, var(--grade-trivial) 7%, var(--bg-surface));
-}
-.queue-item.reviewed-today .title a {
-  color: var(--fg-muted);
-  text-decoration: line-through;
-  text-decoration-color: color-mix(in srgb, var(--grade-trivial) 65%, transparent);
-  text-decoration-thickness: 2px;
-}
+/* Completed station: filled marker, quietly dimmed row — done, not cancelled */
+.queue-item.reviewed-today .title a { color: var(--fg-muted); }
+.queue-item.reviewed-today .preview { opacity: 0.6; }
 .queue-item.reviewed-today .index {
-  color: var(--grade-trivial);
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--on-accent);
   font-weight: 700;
-  font-size: 16px;
 }
 .queue-item .reviewed-tag {
   display: inline-block;
