@@ -357,13 +357,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-15",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-27",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-22",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -10271,10 +10276,10 @@
       },
       "sm2": {
         "easeFactor": 2.2,
-        "intervalDays": 5,
-        "repetitions": 3,
-        "lastReviewed": "2026-08-16",
-        "nextDue": "2026-08-21",
+        "intervalDays": 7,
+        "repetitions": 4,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-29",
         "lastGrade": "solved"
       },
       "history": [
@@ -10288,6 +10293,10 @@
         },
         {
           "date": "2026-08-16",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-22",
           "grade": "solved"
         }
       ],
@@ -13290,13 +13299,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-27",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-22",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -13453,14 +13467,19 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
+        "easeFactor": 2.3,
+        "intervalDays": 3,
         "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-15",
-        "lastGrade": null
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-25",
+        "lastGrade": "blank"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-22",
+          "grade": "blank"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -16587,10 +16606,10 @@
       },
       "sm2": {
         "easeFactor": 2.35,
-        "intervalDays": 9,
-        "repetitions": 2,
-        "lastReviewed": "2026-08-08",
-        "nextDue": "2026-08-17",
+        "intervalDays": 14,
+        "repetitions": 3,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-09-05",
         "lastGrade": "solved"
       },
       "history": [
@@ -16600,6 +16619,10 @@
         },
         {
           "date": "2026-08-08",
+          "grade": "solved"
+        },
+        {
+          "date": "2026-08-22",
           "grade": "solved"
         }
       ],
@@ -16760,13 +16783,18 @@
       },
       "sm2": {
         "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-27",
+        "lastGrade": "solved"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-22",
+          "grade": "solved"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -18790,14 +18818,19 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "easeFactor": 2.35,
+        "intervalDays": 3,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-25",
+        "lastGrade": "hint"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-22",
+          "grade": "hint"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": false,
@@ -18954,14 +18987,19 @@
         "band": "Hard"
       },
       "sm2": {
-        "easeFactor": 2.5,
-        "intervalDays": 0,
-        "repetitions": 0,
-        "lastReviewed": null,
-        "nextDue": "2026-08-08",
-        "lastGrade": null
+        "easeFactor": 2.65,
+        "intervalDays": 9,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-22",
+        "nextDue": "2026-08-31",
+        "lastGrade": "trivial"
       },
-      "history": [],
+      "history": [
+        {
+          "date": "2026-08-22",
+          "grade": "trivial"
+        }
+      ],
       "userNotes": "",
       "flags": {
         "pinned": true,

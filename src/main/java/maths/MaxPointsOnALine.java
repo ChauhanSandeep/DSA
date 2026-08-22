@@ -49,7 +49,7 @@ public class MaxPointsOnALine {
   }
 
 
-    /**
+  /**
    * Intuition: fix one anchor point and group every later point by the line it
    * forms with that anchor. Two points are on the same anchor line exactly when
    * their reduced dy/dx slope is the same, so a map from slope string to count

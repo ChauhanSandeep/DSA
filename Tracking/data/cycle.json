@@ -1,6 +1,6 @@
 {
   "weekOf": "2026-08-22",
-  "target": 10,
+  "target": 20,
   "queue": [
     "RegularExpressionMatching",
     "Division",
@@ -11,6 +11,16 @@
     "FindTheClosestPalindrome",
     "LongestSubstringWithoutRepeatingCharacters",
     "CanPlaceFlowers",
-    "WordLadder2"
+    "WordLadder2",
+    "PalindromePartitioningII",
+    "LargestRectangleInHistogram",
+    "JumpGame",
+    "LongestValidParentheses",
+    "RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable",
+    "TextJustification",
+    "SerializeAndDeserializeBinaryTree",
+    "SerializeDeserializeBst",
+    "FactorsCombination",
+    "TimeMap"
   ]
 }

@@ -45,7 +45,7 @@ public class SwimInRisingWater {
         }
     }
 
-        /**
+    /**
      * Intuition: a path's cost is the maximum elevation seen along it, not the sum
      * of elevations. This is still Dijkstra-shaped: always expand the cell with
      * the currently smallest possible arrival time, and the first time the target
@@ -63,7 +63,6 @@ public class SwimInRisingWater {
      * @param grid square elevation grid
      * @return minimum time needed to reach the bottom-right cell
      */
-
     public int swimInRisingWater(int[][] grid) {
         int size = grid.length;
         boolean[][] visited = new boolean[size][size];
