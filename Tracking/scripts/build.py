@@ -399,6 +399,82 @@ def render_batch_complete(target: int) -> str:
       </div>"""
 
 
+def render_hero(next_problem: dict | None, solved_count: int, target: int,
+                remaining: int, deadline_dt: datetime, today: date) -> str:
+    """The page thesis: a single 'Resume' card for the next problem to revise.
+
+    A revision tool's hero is the next rep, not a stat wall. It folds in the
+    live deadline countdown (kept as #deadline-countdown so app.js still ticks
+    it) and a slim weekly-progress meter. When the week is complete it flips to
+    a quiet 'done' state.
+    """
+    pct = int(round(100 * solved_count / target)) if target else 0
+    countdown = (
+        f'<div id="deadline-countdown" class="deadline-countdown" '
+        f'data-deadline="{deadline_dt.isoformat()}">'
+        f'<span class="dc-icon">⏳</span>'
+        f'<span class="dc-text">Calculating time left…</span>'
+        f'</div>'
+    )
+    meter = f"""
+      <div class="hero-progress">
+        <div class="hp-head">
+          <span class="hp-count">{solved_count}<span class="hp-total">/{target}</span></span>
+          <span class="hp-label">solved this week</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:{pct}%"></div></div>
+        <div class="hp-sub">{remaining} left · revision first</div>
+      </div>"""
+
+    if next_problem is None:
+        return f"""
+    <section class="hero hero-complete">
+      <div class="hero-main">
+        <div class="hero-eyebrow">Weekend complete</div>
+        <div class="hero-title-static">All {target} solved <span aria-hidden="true">🎉</span></div>
+        <p class="hero-preview">Every problem in this week's set is reviewed. Rest, or load another batch below to keep the streak alive.</p>
+      </div>
+      <aside class="hero-side">
+        {countdown}
+        {meter}
+      </aside>
+    </section>"""
+
+    task = next_problem["task"]
+    name = next_problem.get("problemName") or task
+    qa = next_problem.get("qa") or {}
+    preview = (qa.get("problem") or "").strip()
+    if len(preview) > 200:
+        preview = preview[:200].rstrip() + "…"
+    preview_html = f'<p class="hero-preview">{esc(preview)}</p>' if preview else ""
+    sm2 = next_problem.get("sm2", {})
+    is_revision = bool(sm2.get("lastReviewed"))
+    eyebrow = "Next up · resume your revision" if is_revision else "Next up · new problem"
+    due_html = (
+        f'<span class="hero-due">next due {esc(format_next_due(sm2.get("nextDue")))}</span>'
+        if is_revision else '<span class="hero-due">never reviewed</span>'
+    )
+
+    return f"""
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-eyebrow">{eyebrow}</div>
+        <a class="hero-title" href="problems/{esc(task)}.html">{esc(name)}</a>
+        <div class="hero-meta">
+          <span class="hero-task mono">{esc(task)}</span>
+          {due_html}
+        </div>
+        <div class="hero-badges">{badges_for_problem(next_problem, root="")}</div>
+        {preview_html}
+        <a class="hero-cta" href="problems/{esc(task)}.html">Resume <span aria-hidden="true">→</span></a>
+      </div>
+      <aside class="hero-side">
+        {countdown}
+        {meter}
+      </aside>
+    </section>"""
+
+
 def render_queue_row(problem: dict, position: int, is_solved: bool, today: date) -> str:
     """Render one dashboard queue row.
 
@@ -500,6 +576,15 @@ def render_dashboard(state: dict, today: date) -> str:
     pending_revision = [p for p in pending if p.get("sm2", {}).get("lastReviewed")]
     pending_new = [p for p in pending if not p.get("sm2", {}).get("lastReviewed")]
 
+    # The hero surfaces the single next problem to revise: first due re-review,
+    # else the first never-seen problem, else None (week complete).
+    if pending_revision:
+        next_problem = pending_revision[0]
+    elif pending_new:
+        next_problem = pending_new[0]
+    else:
+        next_problem = None
+
     rows = []
     position = 1
     for problem in pending_revision:
@@ -527,15 +612,10 @@ def render_dashboard(state: dict, today: date) -> str:
     review_day_str = review_day.strftime("%A, %d %b %Y")
 
     # Live "time running out" countdown to this week's deadline (end of the
-    # review Saturday). app.js ticks it down and escalates urgency styling.
+    # review Saturday). It now lives inside the hero (render_hero) so app.js
+    # still finds #deadline-countdown and ticks it down there.
     deadline_dt = datetime(review_day.year, review_day.month, review_day.day, 23, 59, 59)
-    countdown_banner = (
-        f'<div id="deadline-countdown" class="deadline-countdown" '
-        f'data-deadline="{deadline_dt.isoformat()}">'
-        f'<span class="dc-icon">⏳</span>'
-        f'<span class="dc-text">Calculating time left…</span>'
-        f'</div>'
-    )
+    hero_html = render_hero(next_problem, solved_count, target, remaining, deadline_dt, today)
 
     if remaining > 0:
         queue_heading = (
@@ -547,7 +627,7 @@ def render_dashboard(state: dict, today: date) -> str:
     body = f"""
     {pending_banner}
 
-    {countdown_banner}
+    {hero_html}
 
     {render_momentum_panel(state, today)}
 

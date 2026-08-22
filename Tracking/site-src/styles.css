@@ -49,6 +49,7 @@
   --accent-2:    var(--palette-tertiary);
   --signal:      var(--palette-secondary);
   --due:         #d98514;   /* amber — deadline / urgency / "due" marks  */
+  --on-accent:   #ffffff;   /* text on a filled accent surface (CTA)     */
   --highlight:   var(--palette-highlight);
   --grid-line:   rgba(18, 24, 29, 0.035);  /* graph-paper backdrop       */
 
@@ -101,6 +102,7 @@
     --bg-code:     #12181d;
     --line:        #26303a;
     --due:         #e8a13a;
+    --on-accent:   #08201c;
     --grid-line:   rgba(231, 237, 242, 0.04);
 
     --nc150-bg:  color-mix(in srgb, #d9b06a 15%, transparent);
@@ -124,6 +126,7 @@
   --bg-code:     #12181d;
   --line:        #26303a;
   --due:         #e8a13a;
+  --on-accent:   #08201c;
   --grid-line:   rgba(231, 237, 242, 0.04);
 
   --nc150-bg:  color-mix(in srgb, #d9b06a 15%, transparent);
@@ -1588,6 +1591,144 @@ details.pattern-item[open] .pattern-item-chevron { transform: rotate(90deg); }
   height: 100%;
   border-radius: 999px;
   transition: width 0.4s ease;
+}
+
+/* --- Hero: 'Resume' next-problem card (the page thesis) --------------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 320px);
+  gap: 24px;
+  align-items: stretch;
+  margin: 0 0 28px;
+  padding: 26px 30px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--signal) 6%, var(--bg-surface)),
+      var(--bg-surface));
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {          /* signal rule on the leading edge = 'you are here' */
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--signal);
+}
+.hero-eyebrow {
+  font-family: var(--font-code);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  color: var(--signal);
+  margin-bottom: 12px;
+}
+.hero-title {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 3.4vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fg-primary);
+  margin: 0 0 12px;
+}
+.hero-title:hover { color: var(--signal); text-decoration: none; }
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-bottom: 10px;
+}
+.hero-task { color: var(--fg-body); }
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.hero-preview {
+  color: var(--fg-body);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  max-width: 62ch;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: var(--radius);
+  background: var(--accent-2);
+  color: var(--on-accent);
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.hero-cta:hover {
+  background: color-mix(in srgb, var(--accent-2) 82%, #000);
+  color: var(--on-accent);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.hero-cta span { font-size: 18px; line-height: 1; }
+
+.hero-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+.hero-side .deadline-countdown { margin: 0; }
+.hero-progress .hp-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.hp-count {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--fg-primary);
+  line-height: 1;
+}
+.hp-total { font-size: 16px; color: var(--fg-muted); font-weight: 600; }
+.hp-label {
+  font-size: 11px;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.hp-sub { font-size: 12px; color: var(--fg-muted); margin-top: 9px; }
+
+.hero-complete .hero-title-static {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(24px, 3vw, 34px);
+  color: var(--fg-primary);
+  margin-bottom: 12px;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 22px 22px;
+  }
+  .hero-side {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
 }
 
 /* --- Deadline countdown banner ("time running out") ------------------- */
