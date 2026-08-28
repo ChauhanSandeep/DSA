@@ -50,7 +50,7 @@ public class SerializeDeserializeBst {
     }
 
 
-        /**
+    /**
      * Intuition: level order treats the tree like an array layout. Real nodes enqueue
      * both children, and null tokens mark missing positions so deserialize can attach
      * children to the correct parent later.
@@ -102,7 +102,7 @@ public class SerializeDeserializeBst {
         return builder.toString();
     }
 
-        /**
+    /**
      * Intuition: the BFS string lists children in the same order parents are removed
      * from a queue. For each queued parent, the next two tokens are exactly its left
      * and right children.
@@ -166,7 +166,7 @@ public class SerializeDeserializeBst {
         return root;
     }
 
-        /**
+    /**
      * Appends preorder DFS tokens for node, including null markers.
      */
     public String serialize_UsingDfsApproach(TreeNode root) {

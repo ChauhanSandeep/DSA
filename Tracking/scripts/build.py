@@ -386,6 +386,44 @@ def ensure_cycle(review_day: date) -> dict:
     return {"weekOf": week_of, "target": WEEKLY_GOAL}
 
 
+# Aspirational "target companies" — the wall of logos you're grinding toward.
+# Each entry is (name, brand-colour, monogram). We render an original
+# brand-coloured monogram badge (no bundled logo artwork), so the band is
+# self-contained, offline, and doesn't ship any third-party logo files.
+MOTIVATION_COMPANIES = [
+    ("Google",    "#4285F4", "G"),
+    ("Meta",      "#0866FF", "M"),
+    ("Microsoft", "#00A4EF", "M"),
+    ("Netflix",   "#E50914", "N"),
+    ("NVIDIA",    "#76B900", "N"),
+    ("Stripe",    "#635BFF", "S"),
+    ("Uber",      "#0B0B0B", "U"),
+    ("Airbnb",    "#FF5A5F", "A"),
+]
+
+
+def render_motivation_band() -> str:
+    """A quiet wall of aspirational company badges — the 'why' behind the reps.
+
+    Rendered from MOTIVATION_COMPANIES as brand-coloured monogram badges so the
+    dashboard stays offline (no runtime fetches, no bundled logo files) while
+    still giving a glanceable dose of motivation on every reload.
+    """
+    badges = []
+    for name, colour, monogram in MOTIVATION_COMPANIES:
+        badges.append(
+            f'<div class="mc-badge" title="{esc(name)}">'
+            f'<span class="mc-mark" style="--mc:{colour}">{esc(monogram)}</span>'
+            f'<span class="mc-name">{esc(name)}</span>'
+            f'</div>'
+        )
+    return f"""
+    <section class="motivation-band" aria-label="Target companies">
+      <div class="mb-eyebrow">Grind now · interview here</div>
+      <div class="mb-wall">{''.join(badges)}</div>
+    </section>"""
+
+
 def render_batch_complete(target: int) -> str:
     """Congratulations panel + 'load more' button shown when the goal is met."""
     noun = "problem" if target == 1 else "problems"
@@ -628,6 +666,8 @@ def render_dashboard(state: dict, today: date) -> str:
     {pending_banner}
 
     {hero_html}
+
+    {render_motivation_band()}
 
     {render_momentum_panel(state, today)}
 

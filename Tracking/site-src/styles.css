@@ -1720,6 +1720,69 @@ details.pattern-item[open] .pattern-item-chevron { transform: rotate(90deg); }
   }
 }
 
+/* --- Motivation band (aspirational company wall) --------------------- */
+.motivation-band {
+  margin: 0 0 28px;
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+.mb-eyebrow {
+  font-family: var(--font-code);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-bottom: 14px;
+}
+.mb-wall {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  align-items: center;
+}
+.mc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 13px 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-page);
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.mc-badge:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--fg-muted) 55%, transparent);
+}
+.mc-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--mc);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1;
+  flex: none;
+}
+.mc-name {
+  font-family: var(--font-ui, var(--font-display));
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--fg-primary);
+}
+
+@media (max-width: 720px) {
+  .motivation-band { padding: 16px 16px; }
+  .mc-name { font-size: 13px; }
+}
+
 /* --- Deadline countdown banner ("time running out") ------------------- */
 .deadline-countdown {
   display: flex;

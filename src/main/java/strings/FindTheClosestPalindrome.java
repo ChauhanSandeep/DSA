@@ -33,7 +33,7 @@ public class FindTheClosestPalindrome {
     }
 
 
-        /**
+    /**
      * Intuition: the nearest palindrome comes from mirroring the prefix, except
      * near powers of ten where length-boundary palindromes matter. Trying the
      * prefix itself, prefix - 1, prefix + 1, and both boundaries covers the closest candidate.
