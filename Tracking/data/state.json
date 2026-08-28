@@ -13491,16 +13491,20 @@
       },
       "sm2": {
         "easeFactor": 2.3,
-        "intervalDays": 3,
-        "repetitions": 0,
-        "lastReviewed": "2026-08-22",
-        "nextDue": "2026-08-25",
-        "lastGrade": "blank"
+        "intervalDays": 5,
+        "repetitions": 1,
+        "lastReviewed": "2026-08-28",
+        "nextDue": "2026-09-02",
+        "lastGrade": "solved"
       },
       "history": [
         {
           "date": "2026-08-22",
           "grade": "blank"
+        },
+        {
+          "date": "2026-08-28",
+          "grade": "solved"
         }
       ],
       "userNotes": "",
@@ -21757,52 +21761,6 @@
         "answer": "inorder traversal of a valid BST is increasing. Swapping two values\ncreates one inversion if the values are adjacent in inorder, or two inversions\notherwise. The original fields first, second, and prev capture those misplaced\nnodes during traversal.",
         "complexity": "Time: O(n) - inorder traversal visits each node once. · Space: O(h) - the iterative stack can hold one root-to-leaf path.",
         "source": "javadoc-teach"
-      }
-    },
-    "SerializeAndDeserializeBinaryTree": {
-      "task": "SerializeAndDeserializeBinaryTree",
-      "className": "SerializeAndDeserializeBinaryTree",
-      "javaFile": "src/main/java/trees/binarysearchtree/SerializeAndDeserializeBinaryTree.java",
-      "leetcodeUrl": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/",
-      "leetcodeNumber": 297,
-      "problemName": "Serialize And Deserialize Binary Tree",
-      "pattern": "Trees",
-      "difficulty": "Hard",
-      "isNC150": true,
-      "isBlind75": true,
-      "source": "neetcode",
-      "rating": {
-        "elo": null,
-        "acceptance": null,
-        "label": "not available",
-        "meta": null,
-        "difficulty": null,
-        "band": null
-      },
-      "sm2": {
-        "easeFactor": 2.35,
-        "intervalDays": 3,
-        "repetitions": 1,
-        "lastReviewed": "2026-08-28",
-        "nextDue": "2026-08-31",
-        "lastGrade": "hint"
-      },
-      "history": [
-        {
-          "date": "2026-08-28",
-          "grade": "hint"
-        }
-      ],
-      "userNotes": "",
-      "flags": {
-        "pinned": true,
-        "skip": false
-      },
-      "qa": {
-        "problem": "Design a codec that converts any binary tree into a string and reconstructs the\nsame structure later. Null markers are required so missing left and right child\npositions are not lost.",
-        "answer": "PreOrder DFS serialization approach.",
-        "complexity": null,
-        "source": "javadoc"
       }
     },
     "SerializeDeserializeBst": {

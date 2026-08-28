@@ -10,7 +10,7 @@
     "LongestValidParentheses",
     "RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable",
     "TextJustification",
-    "SerializeAndDeserializeBinaryTree",
-    "SerializeDeserializeBst"
+    "SerializeDeserializeBst",
+    "WordLadder2"
   ]
 }
