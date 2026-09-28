@@ -1,16 +1,16 @@
 {
-  "weekOf": "2026-08-29",
+  "weekOf": "2026-10-03",
   "target": 10,
   "queue": [
-    "ReverseListInKGroup",
-    "ReversePairs",
-    "DecodeWays",
-    "Power",
-    "JumpGame",
-    "LongestValidParentheses",
-    "RemoveMaxNumberOfEdgesToKeepGraphFullyTraversable",
-    "TextJustification",
-    "SerializeDeserializeBst",
-    "WordLadder2"
+    "FindTheClosestPalindrome",
+    "WordSearchII",
+    "ThreeSum",
+    "SlidingWindowMedian",
+    "MaxProductSubarray",
+    "DistinctSubsequence",
+    "RemoveKDigits",
+    "SwapAdjacentInLRString",
+    "MinCostCutStick",
+    "CreateMaximumNumber"
   ]
 }
